@@ -2,6 +2,93 @@ from flask import Flask, send_from_directory, jsonify, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+import os
+import datetime
+import google.generativeai as genai
+
+# Define static folder explicitly
+# Gunicorn runs from root, so 'build' should be in os.getcwd()
+static_folder = os.path.join(os.getcwd(), 'build')
+app = Flask(__name__, static_folder=static_folder, static_url_path='')
+
+app.config['SECRET_KEY'] = 'dev-secret-key-change-in-prod'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gem.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = 'uploads'
+
+# Ensure upload folder exists
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# Debug print
+if os.path.exists(static_folder):
+    print(f"Build folder found at: {static_folder}")
+else:
+    print(f"WARNING: Build folder missing at: {static_folder}")
+
+CORS(app, supports_credentials=True)
+db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+# --- Gemini Setup ---
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel('gemini-pro')
+else:
+    model = None
+    print("WARNING: GEMINI_API_KEY not found. AI features will use mock responses.")
+
+# --- Models ---
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(120), nullable=False)
+    
+    # Relationships
+    journals = db.relationship('Journal', backref='user', lazy=True)
+    stats = db.relationship('Stats', backref='user', uselist=False, lazy=True)
+
+class Journal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date = db.Column(db.String(50), nullable=False)
+    notes = db.Column(db.Text)
+    effort = db.Column(db.Integer)
+    confidence = db.Column(db.Integer)
+    audio_url = db.Column(db.String(200))
+
+class Stats(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    total_points = db.Column(db.Integer, default=0)
+    total_seconds = db.Column(db.Integer, default=0)
+    level = db.Column(db.Integer, default=1)
+    high_scores = db.Column(db.JSON, default={})
+
+# --- Auth Setup ---
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# --- Routes ---
+
+@app.route('/')
+def index():
+    if os.path.exists(os.path.join(app.static_folder, 'index.html')):
+        return send_from_directory(app.static_folder, 'index.html')
+    return "Frontend build not found. Please ensure 'npm run build' ran successfully.", 404
+
+@app.route('/<path:path>')
+def serve_static(path):
+    if os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    # Fallback to index.html for SPA routing
+    return index()
+
+@app.route('/api/health')
 def health():
     return jsonify({"status": "ok", "message": "Vocal GEM Backend Running"})
 
