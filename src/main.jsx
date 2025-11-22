@@ -4,10 +4,14 @@ import App from './App.jsx'
 import { GemProvider } from './context/GemContext'
 import './index.css'
 
+import ErrorBoundary from './components/ui/ErrorBoundary'
+
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <GemProvider>
-            <App />
-        </GemProvider>
+        <ErrorBoundary>
+            <GemProvider>
+                <App />
+            </GemProvider>
+        </ErrorBoundary>
     </React.StrictMode>,
 )
