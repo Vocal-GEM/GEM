@@ -1,0 +1,6 @@
+@echo off
+echo Setting up environment...
+SET PATH=%PATH%;C:\Program Files\nodejs
+echo Opening Android Studio...
+call npx cap open android
+pause

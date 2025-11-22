@@ -1,0 +1,248 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { useGem } from './context/GemContext';
+import ResonanceOrb from './components/viz/ResonanceOrb';
+import LiveMetricsBar from './components/viz/LiveMetricsBar';
+import PitchVisualizer from './components/viz/PitchVisualizer';
+import Spectrogram from './components/viz/Spectrogram';
+import VoiceQualityMeter from './components/viz/VoiceQualityMeter';
+import VowelSpacePlot from './components/viz/VowelSpacePlot';
+import GameHub from './components/games/GameHub';
+import CoachView from './components/ui/CoachView';
+import DailyGoalsWidget from './components/ui/DailyGoalsWidget';
+import HistoryView from './components/ui/HistoryView';
+import AudioLibrary from './components/ui/AudioLibrary';
+import PitchPipe from './components/ui/PitchPipe';
+import FeedbackSettings from './components/ui/FeedbackSettings';
+import TutorialWizard from './components/ui/TutorialWizard';
+import CompassWizard from './components/ui/CompassWizard';
+import CalibrationWizard from './components/ui/CalibrationWizard';
+import BreathPacer from './components/ui/BreathPacer';
+import MirrorComponent from './components/ui/MirrorComponent';
+import JournalForm from './components/ui/JournalForm';
+import Login from './components/ui/Login';
+import Signup from './components/ui/Signup';
+import ComparisonTool from './components/ui/ComparisonTool';
+import IntonationExercise from './components/ui/IntonationExercise';
+
+const App = () => {
+    const {
+        isAudioActive, toggleAudio,
+        dataRef,
+        calibration, updateCalibration,
+        targetRange, updateTargetRange,
+        userMode,
+        goals,
+        settings, updateSettings,
+        journals, addJournalEntry,
+        stats,
+        audioEngineRef
+    } = useGem();
+
+    const [activeTab, setActiveTab] = useState('practice');
+    const [showSettings, setShowSettings] = useState(false);
+    const [showTutorial, setShowTutorial] = useState(false);
+    const [showCompass, setShowCompass] = useState(false);
+    const [showCalibration, setShowCalibration] = useState(false);
+    const [showJournalForm, setShowJournalForm] = useState(false);
+    const [showLogin, setShowLogin] = useState(false);
+    const [showSignup, setShowSignup] = useState(false);
+
+    // Initial check for onboarding progress
+    useEffect(() => {
+        const hasSeenTutorial = localStorage.getItem('gem_tutorial_seen');
+        const hasSeenCompass = localStorage.getItem('gem_compass_seen');
+        const hasCalibrated = localStorage.getItem('gem_calibration_done');
+
+        if (!hasSeenTutorial) {
+            setShowTutorial(true);
+        } else if (!hasSeenCompass) {
+            setShowCompass(true);
+        } else if (!hasCalibrated) {
+            setShowCalibration(true);
+        }
+    }, []);
+
+    const handleTutorialComplete = () => {
+        setShowTutorial(false);
+        localStorage.setItem('gem_tutorial_seen', 'true');
+        setShowCompass(true);
+    };
+
+    const handleCompassComplete = (mode) => {
+        setShowCompass(false);
+        localStorage.setItem('gem_compass_seen', 'true');
+        setShowCalibration(true);
+    };
+
+    const handleCalibrationComplete = () => {
+        setShowCalibration(false);
+        localStorage.setItem('gem_calibration_done', 'true');
+    };
+
+    const [activeGame, setActiveGame] = useState(null);
+
+    const handleSelectGame = (gameId) => {
+        const game = { id: gameId, name: gameId, gameId: gameId, range: 200 }; // Simple game config
+        setActiveGame(game);
+        setActiveTab('practice'); // Switch back to practice to play
+    };
+
+    return (
+        <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-blue-500/30 pb-20">
+            {/* Header */}
+            <header className="p-4 flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0 z-30 border-b border-white/5">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <i data-lucide="mic" className="w-5 h-5 text-white"></i>
+                    </div>
+                    <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+                        Vocal GEM
+                    </h1>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button onClick={() => setShowSettings(true)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+                        <i data-lucide="settings" className="w-5 h-5 text-slate-400"></i>
+                    </button>
+                    <button onClick={() => setShowLogin(true)} className="w-8 h-8 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors">
+                        <i data-lucide="user" className="w-4 h-4 text-slate-400"></i>
+                    </button>
+                </div>
+            </header>
+
+            {/* Main Content */}
+            <main className="p-4 max-w-md mx-auto">
+                {activeTab === 'practice' && (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <DailyGoalsWidget goals={goals} />
+
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Real-time Analysis</h2>
+                            <button onClick={toggleAudio} className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all ${isAudioActive ? 'bg-red-500/20 text-red-400 animate-pulse' : 'bg-blue-600 text-white'}`}>
+                                {isAudioActive ? <><span className="w-2 h-2 bg-red-500 rounded-full"></span> LIVE</> : <><i data-lucide="mic" className="w-3 h-3"></i> START</>}
+                            </button>
+                        </div>
+
+                        <ResonanceOrb dataRef={dataRef} calibration={calibration} />
+                        <LiveMetricsBar dataRef={dataRef} />
+
+                        <div className="space-y-4">
+                            <PitchVisualizer
+                                dataRef={dataRef}
+                                targetRange={targetRange}
+                                userMode={userMode}
+                                exercise={activeGame}
+                                onScore={(score) => submitGameResult(activeGame?.id, score)}
+                            />
+                            {activeGame && (
+                                <button onClick={() => setActiveGame(null)} className="w-full py-2 bg-red-500/20 text-red-400 rounded-xl font-bold text-xs hover:bg-red-500/30 transition-colors">
+                                    EXIT GAME
+                                </button>
+                            )}
+
+                            {userMode === 'slp' && <Spectrogram dataRef={dataRef} />}
+                            <div className="grid grid-cols-2 gap-4">
+                                <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />
+                                <VowelSpacePlot dataRef={dataRef} userMode={userMode} />
+                            </div>
+                        </div>
+
+                        <div className="mt-6 grid grid-cols-2 gap-3">
+                            <button onClick={() => setShowJournalForm(true)} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
+                                <i data-lucide="book" className="text-blue-400"></i>
+                                <span className="text-xs font-bold">Log Journal</span>
+                            </button>
+                            <button onClick={() => setActiveTab('tools')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
+                                <i data-lucide="wrench" className="text-purple-400"></i>
+                                <span className="text-xs font-bold">Tools</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'games' && <GameHub onSelectGame={handleSelectGame} />}
+
+                {activeTab === 'coach' && <CoachView />}
+
+                {activeTab === 'history' && <HistoryView stats={stats} journals={journals} />}
+
+                {activeTab === 'tools' && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex items-center gap-2 mb-4">
+                            <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><i data-lucide="arrow-left"></i></button>
+                            <h2 className="text-xl font-bold">Tools</h2>
+                        </div>
+                        <AudioLibrary audioEngine={audioEngineRef} />
+                        <IntonationExercise />
+                        <ComparisonTool />
+                        <PitchPipe audioEngine={audioEngineRef} />
+                        <BreathPacer />
+                        <MirrorComponent />
+                    </div>
+                )}
+            </main>
+
+            {/* Navigation */}
+            <nav className="fixed bottom-0 inset-x-0 bg-slate-950/90 backdrop-blur-lg border-t border-white/5 pb-safe z-40">
+                <div className="flex justify-around items-center p-2 max-w-md mx-auto">
+                    <button onClick={() => setActiveTab('practice')} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'practice' ? 'text-blue-400 bg-blue-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <i data-lucide="mic-2" className="w-6 h-6"></i>
+                        <span className="text-[10px] font-bold">Practice</span>
+                    </button>
+                    <button onClick={() => setActiveTab('games')} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'games' ? 'text-purple-400 bg-purple-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <i data-lucide="gamepad-2" className="w-6 h-6"></i>
+                        <span className="text-[10px] font-bold">Arcade</span>
+                    </button>
+                    <button onClick={() => setActiveTab('coach')} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'coach' ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <i data-lucide="bot" className="w-6 h-6"></i>
+                        <span className="text-[10px] font-bold">Coach</span>
+                    </button>
+                    <button onClick={() => setActiveTab('history')} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'history' ? 'text-orange-400 bg-orange-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <i data-lucide="bar-chart-2" className="w-6 h-6"></i>
+                        <span className="text-[10px] font-bold">Progress</span>
+                    </button>
+                </div>
+            </nav>
+
+            {/* Modals */}
+            <FeedbackSettings
+                isOpen={showSettings}
+                onClose={() => setShowSettings(false)}
+                settings={settings}
+                setSettings={updateSettings}
+                targetRange={targetRange}
+                onSetGoal={(type) => {
+                    if (type === 'fem') r = { min: 165, max: 255 };
+                    if (type === 'androg') r = { min: 145, max: 175 };
+                    updateTargetRange(r);
+                }}
+                onUpdateRange={(min, max) => updateTargetRange({ min, max })}
+                calibration={calibration}
+                onUpdateCalibration={updateCalibration}
+                onOpenTutorial={() => { setShowSettings(false); setShowTutorial(true); }}
+                onExportData={() => {
+                    const data = { journals, stats, goals, settings, targetRange, calibration };
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a'); a.href = url; a.download = 'vocal-gem-data.json'; a.click();
+                }}
+            />
+
+            {showTutorial && <TutorialWizard onComplete={handleTutorialComplete} onSkip={() => { setShowTutorial(false); setShowCompass(true); }} />}
+            {!showTutorial && showCompass && <CompassWizard onComplete={handleCompassComplete} />}
+            {showCalibration && <CalibrationWizard onComplete={handleCalibrationComplete} audioEngine={audioEngineRef} />}
+
+            {showJournalForm && (
+                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="w-full max-w-md">
+                        <JournalForm onSubmit={addJournalEntry} onCancel={() => setShowJournalForm(false)} />
+                    </div>
+                </div>
+            )}
+
+            {showLogin && <Login onSwitchToSignup={() => { setShowLogin(false); setShowSignup(true); }} onClose={() => setShowLogin(false)} />}
+            {showSignup && <Signup onSwitchToLogin={() => { setShowSignup(false); setShowLogin(true); }} onClose={() => setShowSignup(false)} />}
+        </div>
+    );
+};
+
+export default App;
