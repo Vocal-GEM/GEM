@@ -8,7 +8,7 @@ import os
 import datetime
 import google.generativeai as genai
 
-app = Flask(__name__, static_folder='../build', static_url_path='/')
+app = Flask(__name__, static_folder='../dist', static_url_path='/')
 app.config['SECRET_KEY'] = 'dev-secret-key-change-in-prod'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gem.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

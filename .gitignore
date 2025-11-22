@@ -37,7 +37,3 @@ instance/
 # Editor
 .vscode/
 .idea/
-
-# Android/Capacitor
-android/
-ios/
