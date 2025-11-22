@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 
 const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore }) => {
+    const canvasRef = useRef(null);
+    const gameRef = useRef({ score: 0, lastUpdate: Date.now(), lastPitch: 0 });
     const balloonRef = useRef(new Image());
     const birdRef = useRef(new Image());
 
