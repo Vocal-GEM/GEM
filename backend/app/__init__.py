@@ -3,6 +3,9 @@ from flask_cors import CORS
 from flask_login import LoginManager
 from .models import db, User
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 login_manager = LoginManager()
 

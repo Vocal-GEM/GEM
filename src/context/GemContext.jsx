@@ -73,13 +73,14 @@ export const GemProvider = ({ children }) => {
     useEffect(() => {
         const init = async () => {
             try {
-                const res = await fetch('/api/me');
+                const API_URL = import.meta.env.VITE_API_URL || '';
+                const res = await fetch(`${API_URL}/api/me`);
                 if (res.ok) {
                     const data = await res.json();
                     if (data.user) {
                         setUser(data.user);
                         // Fetch User Data
-                        const dataRes = await fetch('/api/data');
+                        const dataRes = await fetch(`${API_URL}/api/data`);
                         if (dataRes.ok) {
                             const userData = await dataRes.json();
                             if (userData.stats) setStats(prev => ({ ...prev, ...userData.stats }));
@@ -303,7 +304,8 @@ export const GemProvider = ({ children }) => {
     // --- Auth Actions ---
     const login = async (username, password) => {
         try {
-            const res = await fetch('/api/login', {
+            const API_URL = import.meta.env.VITE_API_URL || '';
+            const res = await fetch(`${API_URL}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
@@ -319,7 +321,8 @@ export const GemProvider = ({ children }) => {
 
     const signup = async (username, password) => {
         try {
-            const res = await fetch('/api/signup', {
+            const API_URL = import.meta.env.VITE_API_URL || '';
+            const res = await fetch(`${API_URL}/api/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
@@ -335,7 +338,8 @@ export const GemProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await fetch('/api/logout', { method: 'POST' });
+            const API_URL = import.meta.env.VITE_API_URL || '';
+            await fetch(`${API_URL}/api/logout`, { method: 'POST' });
             setUser(null);
         } catch (e) { console.error(e); }
     };

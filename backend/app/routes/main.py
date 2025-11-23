@@ -19,3 +19,7 @@ def serve_static(path):
 @main_bp.route('/api/health')
 def health():
     return jsonify({"status": "ok", "message": "Vocal GEM Backend Running"})
+
+@main_bp.route('/uploads/<path:filename>')
+def serve_uploads(filename):
+    return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)

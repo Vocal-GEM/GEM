@@ -11,6 +11,7 @@ const JournalForm = ({ onSubmit, onCancel }) => {
     const [isRecording, setIsRecording] = useState(false);
     const [audioBlobUrl, setAudioBlobUrl] = useState(null);
     const [recordingTime, setRecordingTime] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const timerRef = useRef(null);
 
     const toggleRecording = async () => {
@@ -33,6 +34,8 @@ const JournalForm = ({ onSubmit, onCancel }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (isSubmitting) return;
+        setIsSubmitting(true);
 
         let uploadedUrl = null;
         if (audioBlobUrl) {
@@ -41,18 +44,20 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                 const formData = new FormData();
                 formData.append('file', blob, 'recording.ogg');
 
-                const res = await fetch('http://localhost:5000/api/upload', {
+                const API_URL = import.meta.env.VITE_API_URL || '';
+                const res = await fetch(`${API_URL}/api/upload`, {
                     method: 'POST',
                     body: formData
                 });
 
                 if (res.ok) {
                     const data = await res.json();
-                    uploadedUrl = data.url; // Server URL (e.g., /uploads/...)
+                    uploadedUrl = data.url;
+                } else {
+                    console.warn("Audio upload failed, saving text only.");
                 }
             } catch (err) {
-                console.error("Upload failed", err);
-                alert("Audio upload failed, saving text only.");
+                console.warn("Upload failed (network error?), saving text only.", err);
             }
         }
 
@@ -65,6 +70,9 @@ const JournalForm = ({ onSubmit, onCancel }) => {
             audioUrl: uploadedUrl,
             timestamp: Date.now()
         });
+
+        // Reset or close is handled by parent, but we can reset submitting just in case
+        setTimeout(() => setIsSubmitting(false), 2000);
     };
 
     const formatTime = (s) => {
@@ -163,7 +171,9 @@ const JournalForm = ({ onSubmit, onCancel }) => {
 
             <div className="flex gap-3 pt-2">
                 <button type="button" onClick={onCancel} className="flex-1 py-3 rounded-xl bg-slate-800 text-slate-300 font-bold hover:bg-slate-700 transition-colors">Cancel</button>
-                <button type="submit" className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20">Save Log</button>
+                <button type="submit" disabled={isSubmitting} className={`flex-1 py-3 rounded-xl font-bold transition-colors shadow-lg shadow-blue-500/20 ${isSubmitting ? 'bg-blue-800 text-slate-400 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-500'}`}>
+                    {isSubmitting ? 'Saving...' : 'Save Log'}
+                </button>
             </div>
         </form>
     );

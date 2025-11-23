@@ -23,9 +23,13 @@ const IntonationExercise = () => {
         const generatePath = () => {
             const path = [];
             const center = (targetRange.min + targetRange.max) / 2;
+            // Create a more natural speech-like curve
+            // Instead of pure sine, use Perlin-like noise or combined sines
             for (let i = 0; i < 800; i++) {
-                // Sine wave pattern based on variance
-                const y = center + Math.sin(i * 0.02 * speed) * variance;
+                // Combine slow wave (phrase arch) and fast wave (syllable variation)
+                const slow = Math.sin(i * 0.005 * speed);
+                const fast = Math.sin(i * 0.03 * speed) * 0.3;
+                const y = center + (slow + fast) * variance;
                 path.push(y);
             }
             stateRef.current.targetPath = path;
@@ -60,13 +64,26 @@ const IntonationExercise = () => {
             const yMin = 600 - ((targetRange.min - 50) / 300) * 600;
             const yMax = 600 - ((targetRange.max - 50) / 300) * 600;
 
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            // Target Range Band
+            ctx.fillStyle = 'rgba(59, 130, 246, 0.05)';
             ctx.fillRect(0, yMax, canvas.width, yMin - yMax);
+
+            // Center Line
+            const yCenter = 600 - (((targetRange.min + targetRange.max) / 2 - 50) / 300) * 600;
+            ctx.beginPath();
+            ctx.moveTo(0, yCenter);
+            ctx.lineTo(canvas.width, yCenter);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.setLineDash([5, 5]);
+            ctx.stroke();
+            ctx.setLineDash([]);
 
             // Draw Target Path
             ctx.beginPath();
-            ctx.strokeStyle = 'rgba(59, 130, 246, 0.5)';
-            ctx.lineWidth = 4;
+            ctx.strokeStyle = 'rgba(96, 165, 250, 0.6)'; // Blue-400
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
             stateRef.current.targetPath.forEach((p, i) => {
                 const x = i * 2 - (stateRef.current.x % 1600); // Loop
                 const y = 600 - ((p - 50) / 300) * 600;
@@ -77,8 +94,10 @@ const IntonationExercise = () => {
 
             // Draw User Path (Live)
             ctx.beginPath();
-            ctx.strokeStyle = '#eab308'; // Yellow
-            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#fbbf24'; // Amber-400
+            ctx.lineWidth = 4;
+            ctx.shadowColor = '#fbbf24';
+            ctx.shadowBlur = 10;
             const userLen = stateRef.current.userPath.length;
             stateRef.current.userPath.forEach((p, i) => {
                 if (p) {
@@ -89,14 +108,28 @@ const IntonationExercise = () => {
                 }
             });
             ctx.stroke();
+            ctx.shadowBlur = 0;
 
             // Current Pitch Indicator
             if (pitch > 0) {
                 const y = 600 - ((pitch - 50) / 300) * 600;
-                ctx.fillStyle = '#eab308';
+                ctx.fillStyle = '#fff';
                 ctx.beginPath();
-                ctx.arc(canvas.width / 2, y, 8, 0, Math.PI * 2);
+                ctx.arc(canvas.width / 2, y, 6, 0, Math.PI * 2);
                 ctx.fill();
+
+                // Feedback Ring
+                const centerIdx = Math.floor((stateRef.current.x + canvas.width / 2) / 2) % 800;
+                const targetPitch = stateRef.current.targetPath[centerIdx];
+                const diff = Math.abs(pitch - targetPitch);
+
+                if (diff < 20) {
+                    ctx.strokeStyle = '#4ade80'; // Green
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(canvas.width / 2, y, 12, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
             }
 
             // Tone Generator (Guide)
@@ -105,7 +138,14 @@ const IntonationExercise = () => {
                 const centerIdx = Math.floor((stateRef.current.x + canvas.width / 2) / 2) % 800;
                 const targetPitch = stateRef.current.targetPath[centerIdx];
                 if (targetPitch) {
-                    audioEngineRef.current.playFeedbackTone(targetPitch); // Needs update to support continuous tone
+                    // Use a more continuous tone approach if possible, or rapid updates
+                    // For now, we just trigger. Ideally, AudioEngine should support setFrequency() on a running oscillator.
+                    // Since we don't have that exposed yet, we'll skip the tone or accept the stutter.
+                    // Let's try to just play it less frequently to avoid stutter, or implement a continuous oscillator in AudioEngine later.
+                    // For this step, we'll just keep it as is but maybe lower volume.
+                    if (stateRef.current.x % 10 < 1) { // Throttle
+                        audioEngineRef.current.playFeedbackTone(targetPitch);
+                    }
                 }
             }
 

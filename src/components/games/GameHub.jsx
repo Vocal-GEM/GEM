@@ -12,10 +12,41 @@ const GameHub = ({ onSelectGame }) => {
     const progress = ((totalPoints - prevLevelPoints) / (nextLevelPoints - prevLevelPoints)) * 100;
 
     const games = [
-        { id: 'flappy', name: 'Balloon Adventure', icon: '🎈', desc: 'Control altitude with pitch', color: 'bg-blue-500' },
-        { id: 'river', name: 'Resonance River', icon: '🛶', desc: 'Steer with vocal resonance', color: 'bg-emerald-500' },
-        { id: 'hopper', name: 'Cloud Hopper', icon: '🐸', desc: 'Jump with volume bursts', color: 'bg-purple-500' },
-        { id: 'stairs', name: 'Pitch Staircase', icon: '🎹', desc: 'Hold steady notes to climb', color: 'bg-orange-500' }
+        {
+            id: 'pitchmatch',
+            name: 'Pitch Match',
+            icon: '🎸',
+            desc: 'Match the scrolling notes!',
+            color: 'bg-amber-500'
+        },
+        {
+            id: 'flappy',
+            name: 'Balloon Adventure',
+            icon: '🎈',
+            desc: 'Control altitude with pitch',
+            color: 'bg-blue-500'
+        },
+        {
+            id: 'river',
+            name: 'Resonance River',
+            icon: '🛶',
+            desc: 'Steer with vocal resonance',
+            color: 'bg-emerald-500'
+        },
+        {
+            id: 'hopper',
+            name: 'Cloud Hopper',
+            icon: '🐸',
+            desc: 'Jump with volume bursts',
+            color: 'bg-purple-500'
+        },
+        {
+            id: 'stairs',
+            name: 'Pitch Staircase',
+            icon: '🎹',
+            desc: 'Hold steady notes to climb',
+            color: 'bg-orange-500'
+        }
     ];
 
     return (

@@ -28,8 +28,8 @@ const Login = ({ onSwitchToSignup, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-slate-700 p-6 rounded-2xl w-full max-w-sm shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
+            <div className="bg-slate-900 border border-slate-700 p-6 rounded-2xl w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-white">Welcome Back</h2>
                     <button onClick={onClose} className="text-slate-400 hover:text-white"><i data-lucide="x"></i></button>

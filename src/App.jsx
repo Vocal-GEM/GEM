@@ -28,6 +28,14 @@ import AssessmentModule from './components/ui/AssessmentModule';
 import WarmUpModule from './components/ui/WarmUpModule';
 import ForwardFocusDrill from './components/ui/ForwardFocusDrill';
 import IncognitoScreen from './components/ui/IncognitoScreen';
+import FloatingCamera from './components/ui/FloatingCamera';
+
+// Games
+import ResonanceRiverGame from './components/games/ResonanceRiverGame';
+import CloudHopperGame from './components/games/CloudHopperGame';
+import StaircaseGame from './components/games/StaircaseGame';
+import FlappyVoiceGame from './components/games/FlappyVoiceGame';
+import PitchMatchGame from './components/games/PitchMatchGame';
 
 const App = () => {
     const {
@@ -44,7 +52,8 @@ const App = () => {
         showVocalHealthTips, setShowVocalHealthTips,
         showAssessment, setShowAssessment,
         showWarmUp, setShowWarmUp,
-        showForwardFocus, setShowForwardFocus
+        showForwardFocus, setShowForwardFocus,
+        submitGameResult
     } = useGem();
 
     const [activeTab, setActiveTab] = useState('practice');
@@ -56,6 +65,7 @@ const App = () => {
     const [showLogin, setShowLogin] = useState(false);
     const [showSignup, setShowSignup] = useState(false);
     const [showIncognito, setShowIncognito] = useState(false);
+    const [showCamera, setShowCamera] = useState(false);
 
     // Initial check for onboarding progress
     useEffect(() => {
@@ -112,8 +122,6 @@ const App = () => {
     // Listen for profile switching
     useEffect(() => {
         const handleSwitchProfile = (e) => {
-            const profileId = e.detail;
-            const { switchProfile } = require('./context/GemContext');
             // This will be handled by GemContext
             window.location.reload(); // Temporary: reload to apply profile
         };
@@ -142,8 +150,7 @@ const App = () => {
     };
 
     const handleSelectGame = (gameId) => {
-        const game = { id: gameId, name: gameId, gameId: gameId, range: 200 }; // Simple game config
-        setActiveGame(game);
+        setActiveGame(gameId);
         setActiveTab('practice'); // Switch back to practice to play
     };
 
@@ -165,6 +172,9 @@ const App = () => {
                     </button>
                     <button onClick={() => setShowLogin(true)} className="w-10 h-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors">
                         <span className="text-lg">👤</span>
+                    </button>
+                    <button onClick={() => setShowCamera(!showCamera)} className={`w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transition-colors ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
+                        <i data-lucide="camera" className="w-5 h-5"></i>
                     </button>
                 </div>
             </header>
@@ -191,13 +201,21 @@ const App = () => {
                                 targetRange={targetRange}
                                 userMode={userMode}
                                 exercise={activeGame}
-                                onScore={(score) => submitGameResult(activeGame?.id, score)}
+                                onScore={(score) => submitGameResult(activeGame, score)}
                                 settings={settings}
                             />
+
+                            {/* Active Game Overlay */}
                             {activeGame && (
-                                <button onClick={() => setActiveGame(null)} className="w-full py-2 bg-red-500/20 text-red-400 rounded-xl font-bold text-xs hover:bg-red-500/30 transition-colors">
-                                    EXIT GAME
-                                </button>
+                                <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+                                    <div className="w-full max-w-md">
+                                        {activeGame === 'flappy' && <FlappyVoiceGame dataRef={dataRef} targetRange={targetRange} onScore={(s) => submitGameResult('flappy', s)} onClose={() => setActiveGame(null)} />}
+                                        {activeGame === 'river' && <ResonanceRiverGame dataRef={dataRef} targetRange={targetRange} onScore={(s) => submitGameResult('river', s)} onClose={() => setActiveGame(null)} />}
+                                        {activeGame === 'hopper' && <CloudHopperGame dataRef={dataRef} targetRange={targetRange} onScore={(s) => submitGameResult('hopper', s)} onClose={() => setActiveGame(null)} />}
+                                        {activeGame === 'stairs' && <StaircaseGame dataRef={dataRef} targetRange={targetRange} onScore={(s) => submitGameResult('stairs', s)} onClose={() => setActiveGame(null)} />}
+                                        {activeGame === 'pitchmatch' && <PitchMatchGame dataRef={dataRef} targetRange={targetRange} onScore={(s) => submitGameResult('pitchmatch', s)} onClose={() => setActiveGame(null)} />}
+                                    </div>
+                                </div>
                             )}
 
                             {userMode === 'slp' && <Spectrogram dataRef={dataRef} />}
@@ -245,19 +263,19 @@ const App = () => {
             {/* Navigation */}
             <nav className="fixed bottom-0 inset-x-0 bg-slate-950/90 backdrop-blur-lg border-t border-white/5 pb-safe z-40">
                 <div className="flex justify-around items-center p-2 max-w-md mx-auto">
-                    <button onClick={() => setActiveTab('practice')} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'practice' ? 'text-blue-400 bg-blue-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                    <button onClick={() => { setActiveTab('practice'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'practice' ? 'text-blue-400 bg-blue-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
                         <i data-lucide="mic-2" className="w-6 h-6"></i>
                         <span className="text-[10px] font-bold">Practice</span>
                     </button>
-                    <button onClick={() => setActiveTab('games')} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'games' ? 'text-purple-400 bg-purple-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                    <button onClick={() => { setActiveTab('games'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'games' ? 'text-purple-400 bg-purple-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
                         <i data-lucide="gamepad-2" className="w-6 h-6"></i>
                         <span className="text-[10px] font-bold">Arcade</span>
                     </button>
-                    <button onClick={() => setActiveTab('coach')} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'coach' ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                    <button onClick={() => { setActiveTab('coach'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'coach' ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
                         <i data-lucide="bot" className="w-6 h-6"></i>
                         <span className="text-[10px] font-bold">Coach</span>
                     </button>
-                    <button onClick={() => setActiveTab('history')} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'history' ? 'text-orange-400 bg-orange-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                    <button onClick={() => { setActiveTab('history'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'history' ? 'text-orange-400 bg-orange-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
                         <i data-lucide="bar-chart-2" className="w-6 h-6"></i>
                         <span className="text-[10px] font-bold">Progress</span>
                     </button>
@@ -272,7 +290,9 @@ const App = () => {
                 setSettings={updateSettings}
                 targetRange={targetRange}
                 onSetGoal={(type) => {
+                    let r = { min: 170, max: 220 };
                     if (type === 'fem') r = { min: 165, max: 255 };
+                    if (type === 'masc') r = { min: 85, max: 145 };
                     if (type === 'androg') r = { min: 145, max: 175 };
                     updateTargetRange(r);
                 }}
@@ -309,6 +329,7 @@ const App = () => {
             {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}
             {showForwardFocus && <ForwardFocusDrill onClose={() => setShowForwardFocus(false)} />}
             {showIncognito && <IncognitoScreen onClose={() => setShowIncognito(false)} />}
+            {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
         </div>
     );
 };

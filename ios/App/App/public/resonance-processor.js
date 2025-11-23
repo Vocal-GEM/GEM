@@ -10,16 +10,13 @@ class DSP {
         }
         return result;
     }
-    
-    // Biquad Filter (Direct Form I)
-    // Used for cleaning the signal before analysis (Bandpass)
-    // FEATURE: Bandpass Filter (70Hz - 1500Hz) applied to pitch detection to remove rumble and hiss
+
     static biquadFilter(input, type, freq, sampleRate, Q = 0.707) {
         const output = new Float32Array(input.length);
         const omega = 2 * Math.PI * freq / sampleRate;
         const alpha = Math.sin(omega) / (2 * Q);
         const cos = Math.cos(omega);
-        
+
         let a0, a1, a2, b0, b1, b2;
 
         if (type === 'lowpass') {
@@ -40,7 +37,6 @@ class DSP {
             return input;
         }
 
-        // Normalize
         b0 /= a0; b1 /= a0; b2 /= a0; a1 /= a0; a2 /= a0;
 
         let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
@@ -49,7 +45,6 @@ class DSP {
             const x0 = input[i];
             const y0 = (b0 * x0) + (b1 * x1) + (b2 * x2) - (a1 * y1) - (a2 * y2);
             output[i] = y0;
-            // Shift states
             x2 = x1; x1 = x0;
             y2 = y1; y1 = y0;
         }
@@ -61,104 +56,183 @@ class DSP {
     static autoCorrelate(signal, order) { const r = new Float32Array(order + 1); for (let lag = 0; lag <= order; lag++) { let sum = 0; for (let i = 0; i < signal.length - lag; i++) sum += signal[i] * signal[i + lag]; r[lag] = sum; } return r; }
     static levinsonDurbin(r, order) { const a = new Float32Array(order + 1); const e = new Float32Array(order + 1); a[0] = 1.0; e[0] = r[0]; for (let k = 1; k <= order; k++) { let sum = 0; for (let j = 1; j < k; j++) sum += a[j] * r[k - j]; const gamma = (r[k] - sum) / e[k - 1]; a[k] = gamma; for (let j = 1; j < k; j++) a[j] = a[j] - gamma * a[k - j]; e[k] = e[k - 1] * (1 - gamma * gamma); } return a; }
     static getLPCSpectrum(a, nPoints, sampleRate) { const spectrum = new Float32Array(nPoints); const order = a.length - 1; for (let i = 0; i < nPoints; i++) { const freq = (i * sampleRate) / (2 * nPoints); const omega = (2 * Math.PI * freq) / sampleRate; let real = 1.0; let imag = 0.0; for (let k = 1; k <= order; k++) { real -= a[k] * Math.cos(k * omega); imag -= a[k] * Math.sin(k * omega); } spectrum[i] = 1.0 / Math.sqrt(real * real + imag * imag); } return spectrum; }
-    
+
     static calculatePitchYIN(buffer, sampleRate) {
-        // FEATURE: CONFIDENCE THRESHOLD TUNING
-        // Increased strictness to 0.15 (prevents tracking breath noise)
-        const threshold = 0.15; 
+        const threshold = 0.15;
         const bufferSize = buffer.length; const halfSize = Math.floor(bufferSize / 2);
         const yinBuffer = new Float32Array(halfSize);
         for (let tau = 0; tau < halfSize; tau++) { for (let i = 0; i < halfSize; i++) { const delta = buffer[i] - buffer[i + tau]; yinBuffer[tau] += delta * delta; } }
         yinBuffer[0] = 1; let runningSum = 0;
         for (let tau = 1; tau < halfSize; tau++) { runningSum += yinBuffer[tau]; yinBuffer[tau] *= tau / runningSum; }
-        
-        let tau = 0; 
-        for (tau = 2; tau < halfSize; tau++) { 
-            if (yinBuffer[tau] < threshold) { 
-                while (tau + 1 < halfSize && yinBuffer[tau + 1] < yinBuffer[tau]) { tau++; } 
-                break; 
-            } 
+
+        let tau = 0;
+        for (tau = 2; tau < halfSize; tau++) {
+            if (yinBuffer[tau] < threshold) {
+                while (tau + 1 < halfSize && yinBuffer[tau + 1] < yinBuffer[tau]) { tau++; }
+                break;
+            }
         }
-        
-        // If no valley found below threshold, it's unpitched noise (breath, hiss)
-        if (tau == halfSize || yinBuffer[tau] >= threshold) return -1; 
-        
+
+        if (tau == halfSize || yinBuffer[tau] >= threshold) return -1;
+
         let betterTau = tau; if (tau > 0 && tau < halfSize - 1) { const s0 = yinBuffer[tau - 1]; const s1 = yinBuffer[tau]; const s2 = yinBuffer[tau + 1]; let adjustment = (s2 - s0) / (2 * (2 * s1 - s2 - s0)); betterTau += adjustment; }
         const pitch = sampleRate / betterTau; if (pitch < 60 || pitch > 600) return -1; return pitch;
     }
-}
-class ResonanceProcessor extends AudioWorkletProcessor {
-    constructor() { 
-        super(); 
-        this.buffer = new Float32Array(2048); 
-        this.bufferIndex = 0; 
-        this.smoothedCentroid = 0;
-        this.threshold = 0.02; // Default noise gate
-        
-        this.port.onmessage = (e) => {
-            if (e.data.type === 'config' && e.data.config.threshold !== undefined) {
-                this.threshold = e.data.config.threshold;
-            }
-        };
+
+    // FEATURE: SPECTRAL TILT (True Vocal Weight)
+    // Measures the slope of the spectrum. Steeper slope = Thinner/Breathier. Flatter slope = Heavier/Pressed.
+    // We approximate this by comparing energy in low freq (0-1kHz) vs high freq (1k-4kHz)
+    static calculateSpectralTilt(spectrum, sampleRate) {
+        const binWidth = (sampleRate / 2) / spectrum.length;
+        let lowEnergy = 0;
+        let highEnergy = 0;
+
+        for (let i = 0; i < spectrum.length; i++) {
+            const freq = i * binWidth;
+            if (freq < 1000) lowEnergy += spectrum[i];
+            else if (freq < 4000) highEnergy += spectrum[i];
+        }
+
+        // Avoid divide by zero
+        if (highEnergy === 0) return 0;
+
+        // Ratio of Low to High. 
+        // High Ratio = Lots of Low Energy (Thin/Breathy or just Dark)
+        // Low Ratio = Lots of High Energy (Bright/Pressed)
+        // We normalize this to a 0-1 "Weight" scale where 1 is Heavy/Pressed.
+
+        const ratio = lowEnergy / highEnergy;
+
+        // Empirically derived mapping
+        // Ratio 2.0 -> Weight 0.8 (Heavy)
+        // Ratio 10.0 -> Weight 0.2 (Thin)
+
+        // Log scale is often better for energy ratios
+        const logRatio = Math.log10(ratio); // Typically 0.3 to 1.5
+
+        // Invert so higher value = heavier
+        // Map 1.5 (Thin) -> 0
+        // Map 0.3 (Heavy) -> 1
+
+        let weight = 1 - ((logRatio - 0.3) / 1.2);
+        return Math.max(0, Math.min(1, weight));
     }
+
+    static estimateVowel(f1, f2) {
+        // Simple Vowel Space Mapping (Average Female Values)
+        // i (beet): F1 300, F2 2500
+        // a (bat): F1 800, F2 1700
+        // u (boot): F1 350, F2 800
+        // o (boat): F1 500, F2 1000
+
+        if (f1 < 500 && f2 > 2000) return 'i'; // ee
+        if (f1 > 600 && f2 < 1800 && f2 > 1200) return 'a'; // ah/ae
+        if (f1 < 500 && f2 < 1200) return 'u'; // oo
+        if (f1 > 500 && f1 < 800 && f2 < 1200) return 'o'; // oh
+        return '';
+    }
+}
+
+class ResonanceProcessor extends AudioWorkletProcessor {
+    constructor() {
+        super();
+        this.buffer = new Float32Array(2048);
+        this.bufferIndex = 0;
+        this.smoothedCentroid = 0;
+        this.threshold = 0.02;
+
+        // Jitter State
+        this.lastPitch = 0;
+        this.jitterBuffer = [];
+    }
+
     process(inputs, outputs, parameters) {
-        const input = inputs[0]; if (!input || !input.length) return true; const channel = input[0]; 
+        const input = inputs[0]; if (!input || !input.length) return true; const channel = input[0];
         for (let i = 0; i < channel.length; i++) { this.buffer[this.bufferIndex] = channel[i]; this.bufferIndex++; if (this.bufferIndex >= 2048) { this.analyze(); this.bufferIndex = 0; } } return true;
     }
+
     analyze() {
-        const fs = (typeof sampleRate !== 'undefined' ? sampleRate : 44100); 
+        const fs = (typeof sampleRate !== 'undefined' ? sampleRate : 44100);
         const buffer = this.buffer;
-        
-        // FEATURE: NOISE GATE
-        // Calculate RMS and ignore if too quiet
-        let rms = 0; for(let x of buffer) rms += x*x; rms = Math.sqrt(rms/buffer.length); 
-        if (rms < this.threshold) {
-            this.port.postMessage({ type: 'update', data: { pitch: -1, resonance: 0, f1: 0, f2: 0, weight: 0, spectrum: null } });
-            return;
-        }
 
-        // BANDPASS FILTERING (Cleaning)
-        // 1. High Pass @ 70Hz (Remove rumble) - Applied to BOTH paths
-        const hpBuffer = DSP.biquadFilter(buffer, 'highpass', 70, fs);
+        let rms = 0; for (let x of buffer) rms += x * x; rms = Math.sqrt(rms / buffer.length);
 
-        // 2. Low Pass @ 1500Hz (Remove hiss) - Applied ONLY to PITCH path
-        const pitchAnalysisBuffer = DSP.biquadFilter(hpBuffer, 'lowpass', 1500, fs);
+        if (rms > this.threshold) {
+            const TARGET_RATE = 11025;
+            const dsBuffer = DSP.decimate(buffer, fs, TARGET_RATE);
+            const preEmphasized = DSP.preEmphasis(dsBuffer);
+            const windowed = DSP.applyWindow(preEmphasized);
+            const lpcOrder = 14;
 
-        // Analysis
-        const pitch = DSP.calculatePitchYIN(pitchAnalysisBuffer, fs);
+            const r = DSP.autoCorrelate(windowed, lpcOrder);
+            const a = DSP.levinsonDurbin(r, lpcOrder);
+            const lpcSpec = DSP.getLPCSpectrum(a, 512, TARGET_RATE);
 
-        if (pitch > 0) {
-            const weight = Math.min(100, (rms * 600));
-            
-            // Use High-Passed (but wide band) buffer for Resonance
-            const TARGET_RATE = 11025; 
-            const dsBuffer = DSP.decimate(hpBuffer, fs, TARGET_RATE); 
-            const preEmphasized = DSP.preEmphasis(dsBuffer); 
-            const windowed = DSP.applyWindow(preEmphasized); 
-            const lpcOrder = 14; 
-            
-            const r = DSP.autoCorrelate(windowed, lpcOrder); 
-            const a = DSP.levinsonDurbin(r, lpcOrder); 
-            const nSpec = 512; 
-            const lpcSpec = DSP.getLPCSpectrum(a, nSpec, TARGET_RATE); 
-            const binSize = (TARGET_RATE / 2) / nSpec;
+            const pitch = DSP.calculatePitchYIN(buffer, fs);
 
-            const findPeak = (minHz, maxHz, minMag) => { const minBin = Math.floor(minHz / binSize); const maxBin = Math.floor(maxHz / binSize); let maxVal = -Infinity, maxFreq = 0; for (let i = minBin + 1; i < maxBin - 1; i++) { if (lpcSpec[i] > lpcSpec[i-1] && lpcSpec[i] > lpcSpec[i+1]) { if (lpcSpec[i] > maxVal && lpcSpec[i] > minMag) { maxVal = lpcSpec[i]; maxFreq = i * binSize; } } } return { freq: maxFreq, mag: maxVal }; }; 
-            
-            const minF1 = pitch > 0 ? pitch + 50 : 250; 
-            const p1 = findPeak(minF1, 900, 0.01); 
-            const p2 = findPeak(900, 3000, 0.005); 
-            
-            let sumMag = 0, sumWeighted = 0; 
-            for(let i=0; i<nSpec; i++) { const freq = i * binSize; if (freq > 300 && freq < 4500) { sumMag += lpcSpec[i]; sumWeighted += freq * lpcSpec[i]; } } 
-            
-            const rawCentroid = sumMag > 0 ? sumWeighted / sumMag : 0; 
-            this.smoothedCentroid = (this.smoothedCentroid * 0.8) + (rawCentroid * 0.2);
-            
-            this.port.postMessage({ type: 'update', data: { pitch, resonance: this.smoothedCentroid, f1: p1.freq, f2: p2.freq, weight, spectrum: lpcSpec } });
-        } else { 
-            this.port.postMessage({ type: 'update', data: { pitch: -1, resonance: 0, f1: 0, f2: 0, weight: 0, spectrum: null } }); 
+            // Resonance
+            let sumFreq = 0, sumAmp = 0;
+            for (let i = 0; i < lpcSpec.length; i++) {
+                const freq = (i * TARGET_RATE) / (2 * lpcSpec.length);
+                sumFreq += freq * lpcSpec[i];
+                sumAmp += lpcSpec[i];
+            }
+            const centroid = sumAmp > 0 ? sumFreq / sumAmp : 0;
+            this.smoothedCentroid = (this.smoothedCentroid * 0.8) + (centroid * 0.2);
+
+            // Formants
+            let p1 = { freq: 0, amp: -Infinity }, p2 = { freq: 0, amp: -Infinity };
+            for (let i = 1; i < lpcSpec.length - 1; i++) {
+                if (lpcSpec[i] > lpcSpec[i - 1] && lpcSpec[i] > lpcSpec[i + 1]) {
+                    const freq = (i * TARGET_RATE) / (2 * lpcSpec.length);
+                    if (freq > 200 && freq < 1000 && lpcSpec[i] > p1.amp) {
+                        p2 = p1; p1 = { freq, amp: lpcSpec[i] };
+                    } else if (freq > 1000 && freq < 3000 && lpcSpec[i] > p2.amp) {
+                        p2 = { freq, amp: lpcSpec[i] };
+                    }
+                }
+            }
+
+            // FEATURE: TRUE VOCAL WEIGHT (Spectral Tilt)
+            // We use the LPC Spectrum to calculate tilt, which is cleaner than raw FFT
+            const spectralTilt = DSP.calculateSpectralTilt(lpcSpec, TARGET_RATE);
+
+            // FEATURE: JITTER (Pitch Stability)
+            let jitter = 0;
+            if (pitch > 0 && this.lastPitch > 0) {
+                const diff = Math.abs(pitch - this.lastPitch);
+                // Normalize by period (approx) or just raw Hz diff
+                // Jitter is usually % of period, but raw Hz diff is easier to visualize for "Stability"
+                this.jitterBuffer.push(diff);
+                if (this.jitterBuffer.length > 5) this.jitterBuffer.shift();
+
+                const avgJitter = this.jitterBuffer.reduce((a, b) => a + b, 0) / this.jitterBuffer.length;
+                jitter = avgJitter;
+            }
+            this.lastPitch = pitch;
+
+            // FEATURE: VOWEL DETECTION
+            const vowel = DSP.estimateVowel(p1.freq, p2.freq);
+
+            this.port.postMessage({
+                type: 'update',
+                data: {
+                    pitch,
+                    resonance: this.smoothedCentroid,
+                    f1: p1.freq,
+                    f2: p2.freq,
+                    weight: spectralTilt, // Replaced RMS with Spectral Tilt
+                    volume: rms, // Keep RMS as Volume
+                    jitter,
+                    vowel,
+                    spectrum: lpcSpec
+                }
+            });
+        } else {
+            this.lastPitch = 0;
+            this.port.postMessage({ type: 'update', data: { pitch: -1, resonance: 0, f1: 0, f2: 0, weight: 0, volume: 0, jitter: 0, vowel: '', spectrum: null } });
         }
     }
 }
+
 registerProcessor('resonance-processor', ResonanceProcessor);
