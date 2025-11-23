@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { X } from 'lucide-react';
 
 const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
     const canvasRef = useRef(null);
@@ -249,7 +250,7 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
                 onClick={onClose}
                 className="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-full shadow-lg transition-colors z-10"
             >
-                <i data-lucide="x" className="w-4 h-4"></i>
+                <X className="w-4 h-4" />
             </button>
         </div>
     );

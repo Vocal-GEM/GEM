@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BookOpen, Music, Volume2 } from 'lucide-react';
 
 const AudioLibrary = ({ audioEngine }) => {
     const [playingNote, setPlayingNote] = useState(null);
@@ -37,7 +38,7 @@ const AudioLibrary = ({ audioEngine }) => {
             {/* Pitch References */}
             <section>
                 <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                    <i data-lucide="music" className="text-blue-400"></i> Pitch Targets
+                    <Music className="text-blue-400" /> Pitch Targets
                 </h2>
                 <div className="grid grid-cols-2 gap-3">
                     {PITCH_TARGETS.map((note) => (
@@ -56,7 +57,7 @@ const AudioLibrary = ({ audioEngine }) => {
             {/* Vocal Concepts */}
             <section>
                 <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                    <i data-lucide="book-open" className="text-purple-400"></i> Vocal Concepts
+                    <BookOpen className="text-purple-400" /> Vocal Concepts
                 </h2>
                 <div className="space-y-3">
                     {CONCEPTS.map((c, i) => (
@@ -64,7 +65,7 @@ const AudioLibrary = ({ audioEngine }) => {
                             <div className="flex justify-between items-start mb-2">
                                 <h3 className="font-bold text-slate-200">{c.title}</h3>
                                 <button onClick={() => speak(c.speech)} className="p-2 bg-slate-700/50 hover:bg-blue-600 rounded-full transition-colors text-slate-300 hover:text-white">
-                                    <i data-lucide="volume-2" className="w-4 h-4"></i>
+                                    <Volume2 className="w-4 h-4" />
                                 </button>
                             </div>
                             <p className="text-sm text-slate-400 leading-relaxed">{c.desc}</p>

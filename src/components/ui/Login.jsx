@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { X } from 'lucide-react';
 import { useGem } from '../../context/GemContext';
 
 const Login = ({ onSwitchToSignup, onClose }) => {
@@ -32,7 +33,7 @@ const Login = ({ onSwitchToSignup, onClose }) => {
             <div className="bg-slate-900 border border-slate-700 p-6 rounded-2xl w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-white">Welcome Back</h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-white"><i data-lucide="x"></i></button>
+                    <button onClick={onClose} className="text-slate-400 hover:text-white"><X /></button>
                 </div>
 
                 {error && <div className="bg-red-500/20 text-red-400 p-3 rounded-lg mb-4 text-sm">{error}</div>}

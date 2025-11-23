@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { AlertTriangle } from 'lucide-react';
 
 const VoiceQualityMeter = ({ dataRef, userMode }) => {
     const indicatorRef = useRef(null);
@@ -31,7 +32,7 @@ const VoiceQualityMeter = ({ dataRef, userMode }) => {
             </div>
             {isStrained && (
                 <div className="mt-2 text-[10px] text-red-400 flex items-center gap-1 animate-pulse">
-                    <i data-lucide="alert-triangle" className="w-3 h-3"></i> High Vocal Weight detected. Relax!
+                    <AlertTriangle className="w-3 h-3" /> High Vocal Weight detected. Relax!
                 </div>
             )}
         </div>

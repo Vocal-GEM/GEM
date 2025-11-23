@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { ClipboardCheck, Mic, X } from 'lucide-react';
 import { useGem } from '../../context/GemContext';
 
 const RAINBOW_PASSAGE = `When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow.`;
@@ -74,10 +75,10 @@ const AssessmentModule = ({ onClose }) => {
                 <div className="relative z-10">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-3xl font-bold text-white flex items-center gap-2">
-                            <i data-lucide="clipboard-check" className="text-blue-400"></i> Baseline Assessment
+                            <ClipboardCheck className="text-blue-400" /> Baseline Assessment
                         </h2>
                         <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                            <i data-lucide="x" className="w-5 h-5 text-slate-400"></i>
+                            <X className="w-5 h-5 text-slate-400" />
                         </button>
                     </div>
 
@@ -98,7 +99,7 @@ const AssessmentModule = ({ onClose }) => {
                                     onClick={handleStartRecording}
                                     className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20 transform active:scale-95"
                                 >
-                                    <i data-lucide="mic" className="w-5 h-5 inline mr-2"></i> Start Recording
+                                    <Mic className="w-5 h-5 inline mr-2" /> Start Recording
                                 </button>
                             ) : (
                                 <button

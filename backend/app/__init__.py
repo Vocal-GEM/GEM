@@ -18,8 +18,19 @@ def create_app():
     static_folder = os.path.join(os.getcwd(), 'build')
     app = Flask(__name__, static_folder=static_folder, static_url_path='')
 
-    app.config['SECRET_KEY'] = 'dev-secret-key-change-in-prod'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gem.db'
+    # Configuration
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-prod')
+    
+    # Database - support both PostgreSQL (production) and SQLite (development)
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url:
+        # Render.com provides postgres:// but SQLAlchemy needs postgresql://
+        if database_url.startswith('postgres://'):
+            database_url = database_url.replace('postgres://', 'postgresql://', 1)
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    else:
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gem.db'
+    
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = 'uploads'
 

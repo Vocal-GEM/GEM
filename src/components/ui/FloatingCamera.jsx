@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Maximize2, Minus, Plus, X } from 'lucide-react';
 
 const FloatingCamera = ({ onClose }) => {
     const videoRef = useRef(null);
@@ -123,12 +124,12 @@ const FloatingCamera = ({ onClose }) => {
             {/* Controls Overlay (Visible on Hover/Tap) */}
             <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-black/80 to-transparent flex justify-between items-end opacity-0 group-hover:opacity-100 transition-opacity z-20">
                 <div className="flex gap-1">
-                    <button onClick={() => handleZoom(-0.2)} className="p-1 bg-white/10 rounded hover:bg-white/20 text-white text-[10px]"><i data-lucide="minus" className="w-3 h-3"></i></button>
-                    <button onClick={() => handleZoom(0.2)} className="p-1 bg-white/10 rounded hover:bg-white/20 text-white text-[10px]"><i data-lucide="plus" className="w-3 h-3"></i></button>
+                    <button onClick={() => handleZoom(-0.2)} className="p-1 bg-white/10 rounded hover:bg-white/20 text-white text-[10px]"><Minus className="w-3 h-3" /></button>
+                    <button onClick={() => handleZoom(0.2)} className="p-1 bg-white/10 rounded hover:bg-white/20 text-white text-[10px]"><Plus className="w-3 h-3" /></button>
                 </div>
                 <div className="flex gap-1">
-                    <button onClick={toggleSize} className="p-1 bg-white/10 rounded hover:bg-white/20 text-white"><i data-lucide="maximize-2" className="w-3 h-3"></i></button>
-                    <button onClick={onClose} className="p-1 bg-red-500/80 rounded hover:bg-red-500 text-white"><i data-lucide="x" className="w-3 h-3"></i></button>
+                    <button onClick={toggleSize} className="p-1 bg-white/10 rounded hover:bg-white/20 text-white"><Maximize2 className="w-3 h-3" /></button>
+                    <button onClick={onClose} className="p-1 bg-red-500/80 rounded hover:bg-red-500 text-white"><X className="w-3 h-3" /></button>
                 </div>
             </div>
         </div>

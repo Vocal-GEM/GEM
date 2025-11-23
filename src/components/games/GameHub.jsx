@@ -1,4 +1,5 @@
 import React from 'react';
+import { Gamepad2 } from 'lucide-react';
 import { useGem } from '../../context/GemContext';
 
 const GameHub = ({ onSelectGame }) => {
@@ -80,7 +81,7 @@ const GameHub = ({ onSelectGame }) => {
 
             {/* Game Grid */}
             <h3 className="text-lg font-bold mb-4 px-1 flex items-center gap-2">
-                <i data-lucide="gamepad-2" className="text-purple-400"></i> Arcade
+                <Gamepad2 className="text-purple-400" /> Arcade
             </h3>
             <div className="grid grid-cols-1 gap-4">
                 {games.map(game => (

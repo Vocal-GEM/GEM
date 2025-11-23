@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Trash2 } from 'lucide-react';
 import { useGem } from '../../context/GemContext';
 
 const JournalForm = ({ onSubmit, onCancel }) => {
@@ -111,7 +112,7 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                 ) : (
                     <div className="w-full flex items-center gap-2">
                         <audio src={audioBlobUrl} controls className="w-full h-8" />
-                        <button type="button" onClick={() => setAudioBlobUrl(null)} className="p-2 text-red-400 hover:text-red-300"><i data-lucide="trash-2"></i></button>
+                        <button type="button" onClick={() => setAudioBlobUrl(null)} className="p-2 text-red-400 hover:text-red-300"><Trash2 /></button>
                     </div>
                 )}
                 <p className="text-xs text-slate-500">{isRecording ? 'Recording... Read your script!' : 'Tap to record your voice'}</p>

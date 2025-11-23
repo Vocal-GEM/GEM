@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { X } from 'lucide-react';
 
 const StaircaseGame = ({ dataRef, targetRange, onScore, onClose }) => {
     const canvasRef = useRef(null);
@@ -28,7 +29,7 @@ const StaircaseGame = ({ dataRef, targetRange, onScore, onClose }) => {
         requestRef.current = requestAnimationFrame(loop);
         return () => { window.removeEventListener('resize', resize); cancelAnimationFrame(requestRef.current); };
     }, [targetRange, onScore]);
-    return (<div className="relative w-full mb-4 rounded-2xl overflow-hidden shadow-2xl border-4 border-slate-800 bg-slate-800"> <canvas ref={canvasRef} className="w-full h-80 block cursor-pointer"></canvas> <div className="absolute top-2 left-2 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-white border border-white/10"> 🧗 Hold Pitch to Build </div> <button onClick={onClose} className="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-full shadow-lg transition-colors z-10"> <i data-lucide="x" className="w-4 h-4"></i> </button> </div>);
+    return (<div className="relative w-full mb-4 rounded-2xl overflow-hidden shadow-2xl border-4 border-slate-800 bg-slate-800"> <canvas ref={canvasRef} className="w-full h-80 block cursor-pointer"></canvas> <div className="absolute top-2 left-2 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-white border border-white/10"> 🧗 Hold Pitch to Build </div> <button onClick={onClose} className="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-full shadow-lg transition-colors z-10"> <X className="w-4 h-4" /> </button> </div>);
 };
 
 export default StaircaseGame;

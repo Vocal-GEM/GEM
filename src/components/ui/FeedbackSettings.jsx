@@ -1,4 +1,5 @@
 import React from 'react';
+import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X } from 'lucide-react';
 
 const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange, onSetGoal, onOpenTutorial, calibration, onUpdateRange, onUpdateCalibration, onExportData }) => {
     if (!isOpen) return null;
@@ -7,7 +8,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
         <div className={`fixed inset-x-0 bottom-0 z-50 bg-slate-900 rounded-t-3xl border-t border-white/10 shadow-2xl transition-transform duration-300 transform ${isOpen ? 'translate-y-0' : 'translate-y-full'} max-h-[85vh] overflow-y-auto`}>
             <div className="sticky top-0 bg-slate-900/95 backdrop-blur-md p-4 border-b border-white/5 flex justify-between items-center z-10">
                 <h2 className="text-lg font-bold text-white">Settings</h2>
-                <button onClick={onClose} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white"><i data-lucide="x" className="w-5 h-5"></i></button>
+                <button onClick={onClose} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
             </div>
 
             <div className="p-6 space-y-8 pb-20">
@@ -101,7 +102,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                     <div className="space-y-3">
                         <div className="flex items-center justify-between p-3 bg-slate-800 rounded-xl">
                             <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-lg ${settings.vibration ? 'bg-green-500/20 text-green-400' : 'bg-slate-700 text-slate-400'}`}><i data-lucide="vibrate" className="w-5 h-5"></i></div>
+                                <div className={`p-2 rounded-lg ${settings.vibration ? 'bg-green-500/20 text-green-400' : 'bg-slate-700 text-slate-400'}`}><Vibrate className="w-5 h-5" /></div>
                                 <div>
                                     <div className="text-sm font-bold text-white">Haptic Vibration</div>
                                     <div className="text-[10px] text-slate-400">Vibrate when off-target</div>
@@ -115,7 +116,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
 
                         <div className="flex items-center justify-between p-3 bg-slate-800 rounded-xl">
                             <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-lg ${settings.tone ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-700 text-slate-400'}`}><i data-lucide="volume-2" className="w-5 h-5"></i></div>
+                                <div className={`p-2 rounded-lg ${settings.tone ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-700 text-slate-400'}`}><Volume2 className="w-5 h-5" /></div>
                                 <div>
                                     <div className="text-sm font-bold text-white">Audio Guide Tone</div>
                                     <div className="text-[10px] text-slate-400">Play tone when off-target</div>
@@ -173,11 +174,11 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Data & System</h3>
                     <div className="space-y-3">
                         <button onClick={onOpenTutorial} className="w-full p-3 bg-slate-800 hover:bg-slate-700 rounded-xl text-left flex items-center gap-3 transition-colors">
-                            <i data-lucide="help-circle" className="w-5 h-5 text-slate-400"></i>
+                            <HelpCircle className="w-5 h-5 text-slate-400" />
                             <span className="text-sm font-bold text-slate-200">Replay Tutorial</span>
                         </button>
                         <button onClick={onExportData} className="w-full p-3 bg-slate-800 hover:bg-slate-700 rounded-xl text-left flex items-center gap-3 transition-colors">
-                            <i data-lucide="download" className="w-5 h-5 text-slate-400"></i>
+                            <Download className="w-5 h-5 text-slate-400" />
                             <span className="text-sm font-bold text-slate-200">Export My Data (JSON)</span>
                         </button>
                         <div className="text-[10px] text-slate-600 text-center pt-4">
@@ -192,11 +193,11 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Health & Progress</h3>
                     <div className="space-y-3">
                         <button onClick={() => { onClose(); setTimeout(() => window.dispatchEvent(new CustomEvent('openVocalHealth')), 100); }} className="w-full p-3 bg-emerald-800 hover:bg-emerald-700 rounded-xl text-left flex items-center gap-3 transition-colors">
-                            <i data-lucide="heart-pulse" className="w-5 h-5 text-emerald-400"></i>
+                            <HeartPulse className="w-5 h-5 text-emerald-400" />
                             <span className="text-sm font-bold text-white">Vocal Health Tips</span>
                         </button>
                         <button onClick={() => { onClose(); setTimeout(() => window.dispatchEvent(new CustomEvent('openAssessment')), 100); }} className="w-full p-3 bg-blue-800 hover:bg-blue-700 rounded-xl text-left flex items-center gap-3 transition-colors">
-                            <i data-lucide="clipboard-check" className="w-5 h-5 text-blue-400"></i>
+                            <ClipboardCheck className="w-5 h-5 text-blue-400" />
                             <span className="text-sm font-bold text-white">Baseline Assessment</span>
                         </button>
                     </div>
@@ -207,11 +208,11 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Exercises & Drills</h3>
                     <div className="space-y-3">
                         <button onClick={() => { onClose(); setTimeout(() => window.dispatchEvent(new CustomEvent('openWarmUp')), 100); }} className="w-full p-3 bg-orange-800 hover:bg-orange-700 rounded-xl text-left flex items-center gap-3 transition-colors">
-                            <i data-lucide="flame" className="w-5 h-5 text-orange-400"></i>
+                            <Flame className="w-5 h-5 text-orange-400" />
                             <span className="text-sm font-bold text-white">Warm-Up Exercises</span>
                         </button>
                         <button onClick={() => { onClose(); setTimeout(() => window.dispatchEvent(new CustomEvent('openForwardFocus')), 100); }} className="w-full p-3 bg-purple-800 hover:bg-purple-700 rounded-xl text-left flex items-center gap-3 transition-colors">
-                            <i data-lucide="target" className="w-5 h-5 text-purple-400"></i>
+                            <Target className="w-5 h-5 text-purple-400" />
                             <span className="text-sm font-bold text-white">Forward Focus Drill</span>
                         </button>
                     </div>

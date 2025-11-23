@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { ArrowLeftRight } from 'lucide-react';
 import { useGem } from '../../context/GemContext';
 
 const ComparisonTool = () => {
@@ -29,7 +30,7 @@ const ComparisonTool = () => {
     return (
         <div className="glass-panel p-6 rounded-2xl space-y-6 mb-4">
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <i data-lucide="arrow-left-right" className="text-blue-400"></i>
+                <ArrowLeftRight className="text-blue-400" />
                 Voice Comparison
             </h3>
             <p className="text-sm text-slate-400">Record a "Before" and "After" clip to hear your progress.</p>

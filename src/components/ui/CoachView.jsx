@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Send } from 'lucide-react';
 import { useGem } from '../../context/GemContext';
 import ChatMessage from './ChatMessage';
 
@@ -108,7 +109,7 @@ const CoachView = () => {
                     disabled={isChatLoading}
                 />
                 <button type="submit" disabled={isChatLoading} className="p-3 bg-blue-600 rounded-full text-white hover:bg-blue-500 disabled:opacity-50 transition-colors shadow-lg shadow-blue-500/20">
-                    {isChatLoading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <i data-lucide="send" className="w-4 h-4"></i>}
+                    {isChatLoading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <Send className="w-4 h-4" />}
                 </button>
             </form>
             <div className="text-[10px] text-slate-600 text-center pb-2">

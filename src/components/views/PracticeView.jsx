@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Book, EyeOff, Mic, Wrench } from 'lucide-react';
 import { useGem } from '../../context/GemContext';
 import { useNavigate } from 'react-router-dom';
 import ResonanceOrb from '../viz/ResonanceOrb';
@@ -35,7 +36,7 @@ const PracticeView = () => {
                     className="p-2 rounded-full hover:bg-white/10 text-slate-500 hover:text-white transition-colors"
                     title="Incognito Mode"
                 >
-                    <i data-lucide="eye-off" className="w-5 h-5"></i>
+                    <EyeOff className="w-5 h-5" />
                 </button>
             </div>
 
@@ -65,7 +66,7 @@ const PracticeView = () => {
                     {isAudioActive ? (
                         <><span className="w-3 h-3 bg-red-500 rounded-full animate-ping"></span> STOP LISTENING</>
                     ) : (
-                        <><i data-lucide="mic" className="w-6 h-6"></i> START PRACTICE</>
+                        <><Mic className="w-6 h-6" /> START PRACTICE</>
                     )}
                 </button>
 
@@ -100,11 +101,11 @@ const PracticeView = () => {
 
                     <div className="grid grid-cols-2 gap-3">
                         <button onClick={() => navigate('/journal')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
-                            <i data-lucide="book" className="text-blue-400"></i>
+                            <Book className="text-blue-400" />
                             <span className="text-xs font-bold">Log Journal</span>
                         </button>
                         <button onClick={() => navigate('/tools')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
-                            <i data-lucide="wrench" className="text-purple-400"></i>
+                            <Wrench className="text-purple-400" />
                             <span className="text-xs font-bold">Tools</span>
                         </button>
                     </div>

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Music, Play } from 'lucide-react';
 
 const PitchPipe = ({ audioEngine }) => {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -43,7 +44,7 @@ const PitchPipe = ({ audioEngine }) => {
     return (
         <div className="glass-panel p-3 rounded-xl mb-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-                <div className="p-2 bg-indigo-500/20 rounded-lg text-indigo-300"><i data-lucide="music" className="w-5 h-5"></i></div>
+                <div className="p-2 bg-indigo-500/20 rounded-lg text-indigo-300"><Music className="w-5 h-5" /></div>
                 <div>
                     <div className="text-xs font-bold text-white">Reference Tone</div>
                     <div className="text-[10px] text-slate-400">Hold to play</div>
@@ -64,7 +65,7 @@ const PitchPipe = ({ audioEngine }) => {
                     onTouchEnd={stopPlaying}
                     className={`p-2 rounded-full transition-all ${isPlaying ? 'bg-indigo-500 text-white scale-95' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
                 >
-                    <i data-lucide="play" className="w-4 h-4"></i>
+                    <Play className="w-4 h-4" />
                 </button>
             </div>
         </div>

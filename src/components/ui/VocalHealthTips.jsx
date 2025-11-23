@@ -1,4 +1,5 @@
 import React from 'react';
+import { HeartPulse, X } from 'lucide-react';
 
 const VocalHealthTips = ({ onClose }) => {
     const tips = [
@@ -19,10 +20,10 @@ const VocalHealthTips = ({ onClose }) => {
                 <div className="relative z-10">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                            <i data-lucide="heart-pulse" className="text-emerald-400"></i> Vocal Health
+                            <HeartPulse className="text-emerald-400" /> Vocal Health
                         </h2>
                         <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                            <i data-lucide="x" className="w-5 h-5 text-slate-400"></i>
+                            <X className="w-5 h-5 text-slate-400" />
                         </button>
                     </div>
 

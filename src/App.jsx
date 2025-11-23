@@ -29,6 +29,8 @@ import WarmUpModule from './components/ui/WarmUpModule';
 import ForwardFocusDrill from './components/ui/ForwardFocusDrill';
 import IncognitoScreen from './components/ui/IncognitoScreen';
 import FloatingCamera from './components/ui/FloatingCamera';
+import OfflineIndicator from './components/ui/OfflineIndicator';
+import MigrationModal from './components/ui/MigrationModal';
 
 // Games
 import ResonanceRiverGame from './components/games/ResonanceRiverGame';
@@ -36,6 +38,11 @@ import CloudHopperGame from './components/games/CloudHopperGame';
 import StaircaseGame from './components/games/StaircaseGame';
 import FlappyVoiceGame from './components/games/FlappyVoiceGame';
 import PitchMatchGame from './components/games/PitchMatchGame';
+
+import {
+    Mic, Camera, Book, Wrench, ArrowLeft,
+    Mic2, Gamepad2, Bot, BarChart2
+} from 'lucide-react';
 
 const App = () => {
     const {
@@ -66,6 +73,7 @@ const App = () => {
     const [showSignup, setShowSignup] = useState(false);
     const [showIncognito, setShowIncognito] = useState(false);
     const [showCamera, setShowCamera] = useState(false);
+    const [showMigration, setShowMigration] = useState(true); // Show migration modal on first load
 
     // Initial check for onboarding progress
     useEffect(() => {
@@ -160,13 +168,14 @@ const App = () => {
             <header className="p-4 flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0 z-30 border-b border-white/5">
                 <div className="flex items-center gap-3" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
                     <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                        <i data-lucide="mic" className="w-5 h-5 text-white"></i>
+                        <Mic className="w-5 h-5 text-white" />
                     </div>
                     <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
                         Vocal GEM
                     </h1>
                 </div>
                 <div className="flex items-center gap-2">
+                    <OfflineIndicator />
                     <button onClick={() => setShowSettings(true)} className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700">
                         <span className="text-sm font-bold text-white">⚙️ Settings</span>
                     </button>
@@ -174,7 +183,7 @@ const App = () => {
                         <span className="text-lg">👤</span>
                     </button>
                     <button onClick={() => setShowCamera(!showCamera)} className={`w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transition-colors ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
-                        <i data-lucide="camera" className="w-5 h-5"></i>
+                        <Camera className="w-5 h-5" />
                     </button>
                 </div>
             </header>
@@ -188,7 +197,7 @@ const App = () => {
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Real-time Analysis</h2>
                             <button onClick={toggleAudio} className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all ${isAudioActive ? 'bg-red-500/20 text-red-400 animate-pulse' : 'bg-blue-600 text-white'}`}>
-                                {isAudioActive ? <><span className="w-2 h-2 bg-red-500 rounded-full"></span> LIVE</> : <><i data-lucide="mic" className="w-3 h-3"></i> START</>}
+                                {isAudioActive ? <><span className="w-2 h-2 bg-red-500 rounded-full"></span> LIVE</> : <><Mic className="w-3 h-3" /> START</>}
                             </button>
                         </div>
 
@@ -227,11 +236,11 @@ const App = () => {
 
                         <div className="mt-6 grid grid-cols-2 gap-3">
                             <button onClick={() => setShowJournalForm(true)} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
-                                <i data-lucide="book" className="text-blue-400"></i>
+                                <Book className="text-blue-400" />
                                 <span className="text-xs font-bold">Log Journal</span>
                             </button>
                             <button onClick={() => setActiveTab('tools')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
-                                <i data-lucide="wrench" className="text-purple-400"></i>
+                                <Wrench className="text-purple-400" />
                                 <span className="text-xs font-bold">Tools</span>
                             </button>
                         </div>
@@ -247,7 +256,7 @@ const App = () => {
                 {activeTab === 'tools' && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="flex items-center gap-2 mb-4">
-                            <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><i data-lucide="arrow-left"></i></button>
+                            <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><ArrowLeft /></button>
                             <h2 className="text-xl font-bold">Tools</h2>
                         </div>
                         <AudioLibrary audioEngine={audioEngineRef} />
@@ -264,19 +273,19 @@ const App = () => {
             <nav className="fixed bottom-0 inset-x-0 bg-slate-950/90 backdrop-blur-lg border-t border-white/5 pb-safe z-40">
                 <div className="flex justify-around items-center p-2 max-w-md mx-auto">
                     <button onClick={() => { setActiveTab('practice'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'practice' ? 'text-blue-400 bg-blue-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
-                        <i data-lucide="mic-2" className="w-6 h-6"></i>
+                        <Mic2 className="w-6 h-6" />
                         <span className="text-[10px] font-bold">Practice</span>
                     </button>
                     <button onClick={() => { setActiveTab('games'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'games' ? 'text-purple-400 bg-purple-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
-                        <i data-lucide="gamepad-2" className="w-6 h-6"></i>
+                        <Gamepad2 className="w-6 h-6" />
                         <span className="text-[10px] font-bold">Arcade</span>
                     </button>
                     <button onClick={() => { setActiveTab('coach'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'coach' ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
-                        <i data-lucide="bot" className="w-6 h-6"></i>
+                        <Bot className="w-6 h-6" />
                         <span className="text-[10px] font-bold">Coach</span>
                     </button>
                     <button onClick={() => { setActiveTab('history'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'history' ? 'text-orange-400 bg-orange-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
-                        <i data-lucide="bar-chart-2" className="w-6 h-6"></i>
+                        <BarChart2 className="w-6 h-6" />
                         <span className="text-[10px] font-bold">Progress</span>
                     </button>
                 </div>
