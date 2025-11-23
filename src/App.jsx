@@ -60,7 +60,8 @@ const App = () => {
         showAssessment, setShowAssessment,
         showWarmUp, setShowWarmUp,
         showForwardFocus, setShowForwardFocus,
-        submitGameResult
+        submitGameResult,
+        isDataLoaded
     } = useGem();
 
     const [activeTab, setActiveTab] = useState('practice');
@@ -73,10 +74,12 @@ const App = () => {
     const [showSignup, setShowSignup] = useState(false);
     const [showIncognito, setShowIncognito] = useState(false);
     const [showCamera, setShowCamera] = useState(false);
-    const [showMigration, setShowMigration] = useState(true); // Show migration modal on first load
+    const [showMigration, setShowMigration] = useState(true);
 
     // Initial check for onboarding progress
     useEffect(() => {
+        if (!isDataLoaded) return;
+
         const hasSeenTutorial = localStorage.getItem('gem_tutorial_seen');
         const hasSeenCompass = localStorage.getItem('gem_compass_seen');
         const hasCalibrated = localStorage.getItem('gem_calibration_done');
@@ -88,7 +91,7 @@ const App = () => {
         } else if (!hasCalibrated) {
             setShowCalibration(true);
         }
-    }, []);
+    }, [isDataLoaded]);
 
     const handleTutorialComplete = () => {
         setShowTutorial(false);
@@ -130,8 +133,7 @@ const App = () => {
     // Listen for profile switching
     useEffect(() => {
         const handleSwitchProfile = (e) => {
-            // This will be handled by GemContext
-            window.location.reload(); // Temporary: reload to apply profile
+            window.location.reload();
         };
 
         window.addEventListener('switchProfile', handleSwitchProfile);
@@ -159,13 +161,13 @@ const App = () => {
 
     const handleSelectGame = (gameId) => {
         setActiveGame(gameId);
-        setActiveTab('practice'); // Switch back to practice to play
+        setActiveTab('practice');
     };
 
     return (
         <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-blue-500/30 pb-20">
             {/* Header */}
-            <header className="p-4 flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0 z-30 border-b border-white/5">
+            <header className="p-4 pt-safe flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0 z-30 border-b border-white/5">
                 <div className="flex items-center gap-3" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
                     <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
                         <Mic className="w-5 h-5 text-white" />
@@ -317,6 +319,7 @@ const App = () => {
                 }}
             />
 
+            {showMigration && <MigrationModal onComplete={() => setShowMigration(false)} />}
             {showTutorial && <TutorialWizard onComplete={handleTutorialComplete} onSkip={() => { setShowTutorial(false); setShowCompass(true); }} />}
             {!showTutorial && showCompass && <CompassWizard onComplete={handleCompassComplete} />}
             {showCalibration && <CalibrationWizard onComplete={handleCalibrationComplete} audioEngine={audioEngineRef} />}

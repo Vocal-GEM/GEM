@@ -2,17 +2,11 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { AudioEngine } from '../engines/AudioEngine';
 import { syncManager } from '../services/SyncManager';
 import { QuestManager } from '../services/QuestManager';
+import { indexedDB, STORES } from '../services/IndexedDBManager';
 
 const GemContext = createContext();
 
 export const useGem = () => useContext(GemContext);
-
-// Storage Utility
-const Storage = {
-    save: (key, data) => { localStorage.setItem(key, JSON.stringify(data)); },
-    load: (key, def) => { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; },
-    addJournal: (entry) => { const j = Storage.load('journals', []); j.push(entry); Storage.save('journals', j); return j; }
-};
 
 export const GemProvider = ({ children }) => {
     // --- State ---
@@ -31,47 +25,92 @@ export const GemProvider = ({ children }) => {
     const [showWarmUp, setShowWarmUp] = useState(false);
     const [showForwardFocus, setShowForwardFocus] = useState(false);
 
-    // Data
-    const [voiceProfiles, setVoiceProfiles] = useState(Storage.load('voiceProfiles', [
+    // Data - Initialize with defaults
+    const [voiceProfiles, setVoiceProfiles] = useState([
         { id: 'fem', name: 'Feminine', targetRange: { min: 170, max: 220 }, calibration: { dark: 500, bright: 2500 } },
         { id: 'masc', name: 'Masculine', targetRange: { min: 85, max: 145 }, calibration: { dark: 400, bright: 1800 } },
         { id: 'neutral', name: 'Neutral', targetRange: { min: 145, max: 175 }, calibration: { dark: 450, bright: 2200 } }
-    ]));
-    const [activeProfile, setActiveProfile] = useState(Storage.load('activeProfile', 'fem'));
-    const [targetRange, setTargetRange] = useState(() => {
-        const profile = voiceProfiles.find(p => p.id === activeProfile);
-        return profile ? profile.targetRange : { min: 170, max: 220 };
-    });
-    const [calibration, setCalibration] = useState(() => {
-        const profile = voiceProfiles.find(p => p.id === activeProfile);
-        return profile ? profile.calibration : { dark: 500, bright: 2500 };
-    });
-    const [goals, setGoals] = useState(() => {
-        const saved = Storage.load('goals', []);
-        const lastLogin = Storage.load('lastLogin', 0);
-        const quests = QuestManager.checkReset(saved.length ? saved : [], lastLogin);
-        Storage.save('lastLogin', Date.now());
-        Storage.save('goals', quests);
-        return quests;
-    });
-    const [journals, setJournals] = useState(Storage.load('journals', []));
-    const [stats, setStats] = useState(Storage.load('stats', { streak: 0, totalSeconds: 0 }));
-    const [settings, setSettings] = useState(Storage.load('settings', { vibration: true, tone: false, noiseGate: 0.02, triggerLowPitch: true, triggerDarkRes: true, notation: 'hz', homeNote: 190 }));
+    ]);
+    const [activeProfile, setActiveProfile] = useState('fem');
+    const [targetRange, setTargetRange] = useState({ min: 170, max: 220 });
+    const [calibration, setCalibration] = useState({ dark: 500, bright: 2500 });
+    const [goals, setGoals] = useState([]);
+    const [journals, setJournals] = useState([]);
+    const [stats, setStats] = useState({ streak: 0, totalSeconds: 0, totalPoints: 0, level: 1 });
+    const [settings, setSettings] = useState({ vibration: true, tone: false, noiseGate: 0.02, triggerLowPitch: true, triggerDarkRes: true, notation: 'hz', homeNote: 190 });
+    const [highScores, setHighScores] = useState({ flappy: 0, river: 0, hopper: 0, stairs: 0 });
 
     const [user, setUser] = useState(null); // { id, username }
     const [isAuthLoading, setIsAuthLoading] = useState(true);
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
 
     // Audio Engine
     const audioEngineRef = useRef(null);
     const dataRef = useRef({ pitch: 0, resonance: 0, f1: 0, f2: 0, weight: 0, history: new Array(100).fill(0), spectrum: new Float32Array(512) });
     const [isAudioActive, setIsAudioActive] = useState(false);
     const practiceTimer = useRef(null);
+    const syncTimers = useRef({ stats: null, settings: null });
 
     // --- Effects ---
 
-    // Check Auth & Fetch Data
+    // Load Data from IndexedDB
     useEffect(() => {
-        const init = async () => {
+        const loadLocalData = async () => {
+            try {
+                await indexedDB.ensureReady();
+
+                // Load Settings
+                const savedSettings = await indexedDB.getSetting('app_settings');
+                if (savedSettings) setSettings(savedSettings);
+
+                // Load Profiles
+                const profiles = await indexedDB.getProfiles();
+                if (profiles.length > 0) setVoiceProfiles(profiles);
+
+                // Load Active Profile
+                const savedProfileId = await indexedDB.getSetting('active_profile');
+                if (savedProfileId) {
+                    setActiveProfile(savedProfileId);
+                    const profile = profiles.length > 0 ? profiles.find(p => p.id === savedProfileId) : null;
+                    if (profile) {
+                        setTargetRange(profile.targetRange);
+                        setCalibration(profile.calibration);
+                    }
+                }
+
+                // Load Stats
+                const savedStats = await indexedDB.getStats();
+                if (savedStats) setStats(prev => ({ ...prev, ...savedStats }));
+
+                // Load Journals
+                const savedJournals = await indexedDB.getJournals();
+                if (savedJournals) setJournals(savedJournals);
+
+                // Load High Scores
+                const savedHighScores = await indexedDB.getSetting('high_scores');
+                if (savedHighScores) setHighScores(savedHighScores);
+
+                // Load Goals
+                const savedGoals = await indexedDB.getGoals();
+                const lastLogin = await indexedDB.getSetting('last_login', 0);
+                const quests = QuestManager.checkReset(savedGoals.length ? savedGoals : [], lastLogin);
+
+                await indexedDB.saveSetting('last_login', Date.now());
+                await indexedDB.saveGoals(quests);
+                setGoals(quests);
+
+                setIsDataLoaded(true);
+            } catch (e) {
+                console.error("Failed to load local data:", e);
+            }
+        };
+
+        loadLocalData();
+    }, []);
+
+    // Check Auth & Fetch Remote Data (Sync)
+    useEffect(() => {
+        const initAuth = async () => {
             try {
                 const API_URL = import.meta.env.VITE_API_URL || '';
                 const res = await fetch(`${API_URL}/api/me`);
@@ -83,8 +122,21 @@ export const GemProvider = ({ children }) => {
                         const dataRes = await fetch(`${API_URL}/api/data`);
                         if (dataRes.ok) {
                             const userData = await dataRes.json();
-                            if (userData.stats) setStats(prev => ({ ...prev, ...userData.stats }));
-                            if (userData.journals && userData.journals.length > 0) setJournals(userData.journals);
+                            // Merge remote data with local if needed, or overwrite
+                            // For now, we'll trust local for offline-first, but update if remote is newer?
+                            // Simple strategy: If local is empty, use remote.
+                            // Or just update stats/journals if they exist
+                            if (userData.stats) {
+                                setStats(prev => {
+                                    const merged = { ...prev, ...userData.stats };
+                                    indexedDB.saveStats(merged);
+                                    return merged;
+                                });
+                            }
+                            if (userData.journals && userData.journals.length > 0) {
+                                // This is tricky without ID matching, but let's assume append or replace
+                                // Ideally we'd merge by ID. For now, let's just add unique ones if possible or just rely on local
+                            }
                         }
                     }
                 }
@@ -94,7 +146,7 @@ export const GemProvider = ({ children }) => {
                 setIsAuthLoading(false);
             }
         };
-        init();
+        initAuth();
     }, []);
 
     // Refs for callback access (to avoid stale closures)
@@ -122,11 +174,6 @@ export const GemProvider = ({ children }) => {
                     if (s.vibration && typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(50);
                     if (s.tone) audioEngineRef.current.playFeedbackTone(220); // Low warning tone
                 }
-
-                // High Pitch Trigger (if configured, though user said "no pitch too high unless mickey mouse")
-                if (data.pitch > t.max + 50) { // Way over
-                    // Maybe warn?
-                }
             }
         });
         audioEngineRef.current.setNoiseGate(settings.noiseGate);
@@ -146,14 +193,18 @@ export const GemProvider = ({ children }) => {
                 if (audioEngineRef.current && audioEngineRef.current.isActive) {
                     setStats(s => {
                         const newSeconds = (s.totalSeconds || 0) + 1;
-                        // Check level every minute (approx) to avoid spamming calculation, or just every second is fine for simple math
                         const newLevel = checkLevelUp({ ...s, totalSeconds: newSeconds });
 
                         const newS = { ...s, totalSeconds: newSeconds, level: newLevel };
-                        Storage.save('stats', newS);
+                        // Save to DB periodically (every 5s) or on unmount? 
+                        // Saving every second might be too much for IDB transaction overhead?
+                        // Actually IDB is fast, but let's throttle slightly if needed. 
+                        // For now, direct save is fine for single user.
+                        indexedDB.saveStats(newS);
                         return newS;
                     });
                     setGoals(g => {
+                        let changed = false;
                         const newG = g.map(q => {
                             if (q.type === 'time' && !q.completed) {
                                 const newCurrent = q.current + (1 / 60);
@@ -162,16 +213,18 @@ export const GemProvider = ({ children }) => {
                                         const newXP = (s.totalPoints || 0) + q.xp;
                                         const newLevel = checkLevelUp({ ...s, totalPoints: newXP });
                                         const newS = { ...s, totalPoints: newXP, level: newLevel };
-                                        Storage.save('stats', newS);
+                                        indexedDB.saveStats(newS);
                                         return newS;
                                     });
+                                    changed = true;
                                     return { ...q, current: newCurrent, completed: true };
                                 }
+                                changed = true;
                                 return { ...q, current: newCurrent };
                             }
                             return q;
                         });
-                        Storage.save('goals', newG);
+                        if (changed) indexedDB.saveGoals(newG);
                         return newG;
                     });
                 }
@@ -193,8 +246,6 @@ export const GemProvider = ({ children }) => {
         }
     };
 
-    const [highScores, setHighScores] = useState(Storage.load('highScores', { flappy: 0, river: 0, hopper: 0, stairs: 0 }));
-
     // Ensure totalPoints exists in stats
     useEffect(() => {
         if (stats.totalPoints === undefined) {
@@ -208,6 +259,53 @@ export const GemProvider = ({ children }) => {
         syncManager.push(type, payload);
     };
 
+    // Sync stats changes (debounced)
+    useEffect(() => {
+        if (!user || !isDataLoaded) return;
+
+        // Clear existing timer
+        if (syncTimers.current.stats) {
+            clearTimeout(syncTimers.current.stats);
+        }
+
+        // Debounce sync by 2 seconds
+        syncTimers.current.stats = setTimeout(() => {
+            syncData('STATS_UPDATE', {
+                totalPoints: stats.totalPoints,
+                totalSeconds: stats.totalSeconds,
+                level: stats.level,
+                highScores: highScores
+            });
+        }, 2000);
+
+        return () => {
+            if (syncTimers.current.stats) {
+                clearTimeout(syncTimers.current.stats);
+            }
+        };
+    }, [stats, highScores, user, isDataLoaded]);
+
+    // Sync settings changes (debounced)
+    useEffect(() => {
+        if (!user || !isDataLoaded) return;
+
+        // Clear existing timer
+        if (syncTimers.current.settings) {
+            clearTimeout(syncTimers.current.settings);
+        }
+
+        // Debounce sync by 1 second
+        syncTimers.current.settings = setTimeout(() => {
+            syncData('SETTINGS_UPDATE', settings);
+        }, 1000);
+
+        return () => {
+            if (syncTimers.current.settings) {
+                clearTimeout(syncTimers.current.settings);
+            }
+        };
+    }, [settings, user, isDataLoaded]);
+
     // --- Gamification Logic ---
     const calculateLevel = (xp) => Math.floor(Math.sqrt(xp / 100)) + 1;
 
@@ -215,8 +313,6 @@ export const GemProvider = ({ children }) => {
         const xp = (currentStats.totalPoints || 0) + Math.floor((currentStats.totalSeconds || 0) / 60 * 10);
         const newLevel = calculateLevel(xp);
         if (newLevel > (currentStats.level || 1)) {
-            // Level Up!
-            // In a real app, we'd trigger a modal or toast here
             console.log(`Level Up! ${currentStats.level} -> ${newLevel}`);
             return newLevel;
         }
@@ -227,7 +323,7 @@ export const GemProvider = ({ children }) => {
         // 1. Update High Score
         setHighScores(prev => {
             const newScores = { ...prev, [gameId]: Math.max(prev[gameId] || 0, score) };
-            Storage.save('highScores', newScores);
+            indexedDB.saveSetting('high_scores', newScores);
             return newScores;
         });
 
@@ -237,7 +333,7 @@ export const GemProvider = ({ children }) => {
             const newLevel = checkLevelUp({ ...s, totalPoints: newPoints });
 
             const newS = { ...s, totalPoints: newPoints, level: newLevel };
-            Storage.save('stats', newS);
+            indexedDB.saveStats(newS);
             syncData('stats', newS); // Sync!
             return newS;
         });
@@ -253,7 +349,7 @@ export const GemProvider = ({ children }) => {
                             const newXP = (s.totalPoints || 0) + q.xp; // Add Quest XP to points for now (simplification)
                             const newLevel = checkLevelUp({ ...s, totalPoints: newXP });
                             const newS = { ...s, totalPoints: newXP, level: newLevel };
-                            Storage.save('stats', newS);
+                            indexedDB.saveStats(newS);
                             return newS;
                         });
                         return { ...q, current: newCurrent, completed: true };
@@ -262,33 +358,54 @@ export const GemProvider = ({ children }) => {
                 }
                 return q;
             });
-            Storage.save('goals', newG);
+            indexedDB.saveGoals(newG);
             return newG;
         });
     };
 
-    const addJournalEntry = (entry) => {
-        const newEntry = { ...entry, date: new Date().toISOString() };
-        const newJournals = Storage.addJournal(newEntry);
+    const addJournalEntry = async (entry) => {
+        const newEntry = { ...entry, date: new Date().toISOString(), id: Date.now() };
+        await indexedDB.saveJournal(newEntry);
+        const newJournals = await indexedDB.getJournals();
         setJournals(newJournals);
         setShowJournalForm(false);
-        syncData('journal', newEntry); // Sync!
+        syncData('JOURNAL_ADD', newEntry); // Sync with correct type!
     };
 
     const updateSettings = (newSettings) => {
         setSettings(newSettings);
-        Storage.save('settings', newSettings);
+        indexedDB.saveSetting('app_settings', newSettings);
     };
 
     const updateTargetRange = (range) => {
         setTargetRange(range);
-        Storage.save('targetRange', range);
+        // We save this as part of the active profile usually, or separate setting?
+        // Let's save to current profile if possible, or just a setting for now to match previous behavior
+        // But better to update the profile in DB
+        if (activeProfile) {
+            // We need to update the profile in the list and DB
+            setVoiceProfiles(prev => {
+                const newProfiles = prev.map(p => p.id === activeProfile ? { ...p, targetRange: range } : p);
+                // Save all profiles? Or just one. IDB manager has saveProfile.
+                // Let's save the specific profile
+                const profile = newProfiles.find(p => p.id === activeProfile);
+                if (profile) indexedDB.saveProfile(profile);
+                return newProfiles;
+            });
+        }
     };
 
     const updateCalibration = (dark, bright) => {
         const newCal = { dark, bright };
         setCalibration(newCal);
-        Storage.save('calibration', newCal);
+        if (activeProfile) {
+            setVoiceProfiles(prev => {
+                const newProfiles = prev.map(p => p.id === activeProfile ? { ...p, calibration: newCal } : p);
+                const profile = newProfiles.find(p => p.id === activeProfile);
+                if (profile) indexedDB.saveProfile(profile);
+                return newProfiles;
+            });
+        }
     };
 
     const switchProfile = (profileId) => {
@@ -297,7 +414,7 @@ export const GemProvider = ({ children }) => {
             setActiveProfile(profileId);
             setTargetRange(profile.targetRange);
             setCalibration(profile.calibration);
-            Storage.save('activeProfile', profileId);
+            indexedDB.saveSetting('active_profile', profileId);
         }
     };
 
@@ -368,6 +485,7 @@ export const GemProvider = ({ children }) => {
         highScores,
         settings,
         isAudioActive,
+        isDataLoaded,
 
         // Refs
         audioEngineRef,

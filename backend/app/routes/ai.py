@@ -17,22 +17,37 @@ else:
 @ai_bp.route('/chat', methods=['POST'])
 @login_required
 def chat():
+    if not model:
+        return jsonify({
+            "role": "assistant", 
+            "content": "I'm currently in offline mode (API Key missing). I can still help with basic questions about pitch, resonance, and weight!",
+            "isMock": True
+        }), 503
+
     data = request.json
     user_message = data.get('message', '')
     history = data.get('history', []) 
-    context = data.get('context', {}) # { stats: {...}, goals: [...] }
+    context = data.get('context', {}) # { stats: {...}, goals: [...], journals: [...] }
 
     # Construct Context String
     context_str = ""
     if context:
         stats = context.get('stats', {})
         goals = context.get('goals', [])
+        journals = context.get('journals', [])
+        
+        # Format recent journals
+        recent_journals = "\n".join([f"- {j.get('date', 'Unknown')}: {j.get('content', '')} (Mood: {j.get('mood', 'N/A')})" for j in journals[:3]])
+        
         context_str = f"""
         CURRENT USER CONTEXT:
         - Total Practice Time: {int(stats.get('totalSeconds', 0) / 60)} minutes
         - Total Points: {stats.get('totalPoints', 0)}
         - Current Level: {stats.get('level', 1)}
         - Active Goals: {', '.join([g['label'] for g in goals if g.get('target', 0) > g.get('current', 0)])}
+        
+        RECENT JOURNALS:
+        {recent_journals if recent_journals else "No recent entries."}
         """
 
     system_prompt = f"""You are Coach GEM, an empathetic and knowledgeable voice training assistant for gender-affirming voice therapy. 
@@ -42,42 +57,35 @@ def chat():
 
     GUIDELINES:
     - Be encouraging and supportive. Acknowledge their progress based on the context above.
+    - If the user mentions feeling down or frustrated in their journals, offer specific validation and encouragement.
     - Use simple, accessible language for vocal concepts (pitch, resonance, weight).
     - Suggest specific exercises from the app (Resonance Orb, Pitch Visualizer, Games).
     - Keep responses concise (under 3 sentences) unless asked for a detailed explanation.
     - If the user has low practice time, encourage small steps. If they have high points, celebrate their dedication.
     """
 
-    if not model:
-        # Fallback Mock Logic
-        response = "I'm listening! (Gemini API Key missing, using mock response)"
-        if "pitch" in user_message.lower():
-            response = "To raise your pitch, try reducing your vocal weight and increasing resonance. Have you tried the 'Resonance Orb' exercise?"
-        elif "resonance" in user_message.lower():
-            response = "Bright resonance is key for a feminine voice. Try to smile while speaking and keep your tongue high."
-        return jsonify({"role": "assistant", "content": response})
-
     try:
         # Construct chat history for Gemini
-        # We use a fresh chat session but inject history manually into the prompt for statelessness if needed, 
-        # or use history properly. For now, simple prompt injection is robust.
-        
-        # Convert history to Gemini format if needed, but for now we just append the last message with context.
-        # A better approach for multi-turn is to actually use history.
-        
         gemini_history = []
-        for msg in history:
+        # We need to ensure alternating user/model roles. 
+        # We'll filter the history to ensure validity or just use the last few turns.
+        for msg in history[-10:]: # Limit context window
             role = "user" if msg['role'] == 'user' else "model"
-            gemini_history.append({"role": role, "parts": [msg['content']]})
+            # Gemini doesn't like empty content
+            if msg.get('content'):
+                gemini_history.append({"role": role, "parts": [msg['content']]})
+
+        # Ensure the first message is from the user (Gemini requirement if starting with history)
+        if gemini_history and gemini_history[0]['role'] == 'model':
+            gemini_history.pop(0)
 
         chat_session = model.start_chat(history=gemini_history)
         
-        # We send the system prompt as a "User" message first to set context if history is empty, 
-        # or prepend it to the current message. Prepending is safer for context retention.
+        # Prepend system prompt to the current message for immediate context
         full_prompt = f"{system_prompt}\n\nUser: {user_message}"
         
         response = chat_session.send_message(full_prompt)
         return jsonify({"role": "assistant", "content": response.text})
     except Exception as e:
         print(f"Gemini API Error: {e}")
-        return jsonify({"role": "assistant", "content": "Sorry, I'm having trouble connecting to my brain right now. Try again later!"})
+        return jsonify({"role": "assistant", "content": "Sorry, I'm having trouble connecting to my brain right now. Try again later!"}), 500

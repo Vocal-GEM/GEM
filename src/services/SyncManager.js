@@ -1,49 +1,63 @@
-const STORAGE_KEY = 'gem_sync_queue';
-const METADATA_KEY = 'gem_sync_metadata';
+import { indexedDB, STORES } from './IndexedDBManager';
 
 class SyncManager {
     constructor() {
-        this.queue = this.loadQueue();
-        this.metadata = this.loadMetadata();
+        this.queue = [];
+        this.metadata = { lastSyncTime: null, totalSynced: 0, failedCount: 0 };
         this.isSyncing = false;
         this.retryAttempts = new Map(); // Track retry counts per item
         this.listeners = new Set(); // Status change listeners
+        this.isReady = false;
 
-        // Try to sync on load
+        // Initialize
+        this.init();
+
+        // Event listeners
         if (typeof window !== 'undefined') {
             window.addEventListener('online', () => {
                 this.notifyListeners();
                 this.sync();
             });
             window.addEventListener('offline', () => this.notifyListeners());
-            this.sync();
         }
     }
 
-    loadQueue() {
+    async init() {
         try {
-            const q = localStorage.getItem(STORAGE_KEY);
-            return q ? JSON.parse(q) : [];
+            await indexedDB.ensureReady();
+
+            // Load queue
+            const queueItems = await indexedDB.getAll(STORES.SYNC_QUEUE);
+            this.queue = queueItems.sort((a, b) => a.timestamp - b.timestamp);
+
+            // Load metadata
+            const meta = await indexedDB.get(STORES.SYNC_METADATA, 'main');
+            if (meta) {
+                this.metadata = meta;
+            }
+
+            this.isReady = true;
+            this.notifyListeners();
+
+            // Try to sync on load if online
+            if (navigator.onLine) {
+                this.sync();
+            }
         } catch (e) {
-            return [];
+            console.error('SyncManager init failed:', e);
         }
     }
 
-    loadMetadata() {
-        try {
-            const m = localStorage.getItem(METADATA_KEY);
-            return m ? JSON.parse(m) : { lastSyncTime: null, totalSynced: 0, failedCount: 0 };
-        } catch (e) {
-            return { lastSyncTime: null, totalSynced: 0, failedCount: 0 };
-        }
+    async saveQueue() {
+        // We handle individual item saves/deletes in push/sync to be more efficient
+        // This method might not be needed if we manage DB state incrementally, 
+        // but for consistency with previous API:
+        // In IndexedDB, we usually don't "save the whole queue", we add/remove items.
+        // So we'll leave this empty or deprecated, as we'll handle DB updates in place.
     }
 
-    saveQueue() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.queue));
-    }
-
-    saveMetadata() {
-        localStorage.setItem(METADATA_KEY, JSON.stringify(this.metadata));
+    async saveMetadata() {
+        await indexedDB.put(STORES.SYNC_METADATA, { key: 'main', ...this.metadata });
     }
 
     // Subscribe to sync status changes
@@ -65,11 +79,14 @@ class SyncManager {
             pendingCount: this.queue.length,
             lastSyncTime: this.metadata.lastSyncTime,
             totalSynced: this.metadata.totalSynced,
-            failedCount: this.metadata.failedCount
+            failedCount: this.metadata.failedCount,
+            isReady: this.isReady
         };
     }
 
     async push(type, payload) {
+        if (!this.isReady) await this.init();
+
         // Add to queue with metadata
         const item = {
             id: Date.now() + Math.random(),
@@ -80,7 +97,8 @@ class SyncManager {
         };
 
         this.queue.push(item);
-        this.saveQueue();
+        await indexedDB.add(STORES.SYNC_QUEUE, item);
+
         this.notifyListeners();
 
         // Try to sync immediately
@@ -97,10 +115,10 @@ class SyncManager {
     }
 
     // Clear all pending items (with caution)
-    clearQueue() {
+    async clearQueue() {
         this.queue = [];
         this.retryAttempts.clear();
-        this.saveQueue();
+        await indexedDB.clear(STORES.SYNC_QUEUE);
         this.notifyListeners();
     }
 
@@ -124,6 +142,8 @@ class SyncManager {
                 if (success) {
                     successCount++;
                     this.retryAttempts.delete(item.id);
+                    // Remove from DB
+                    await indexedDB.delete(STORES.SYNC_QUEUE, item.id);
                 } else {
                     failCount++;
                     const attempts = (this.retryAttempts.get(item.id) || 0) + 1;
@@ -134,6 +154,9 @@ class SyncManager {
                         remainingQueue.push(item);
                     } else {
                         console.error('Max retries exceeded for item:', item.id);
+                        // Remove from DB if max retries exceeded? Or keep for manual intervention?
+                        // For now, remove to prevent blocking
+                        await indexedDB.delete(STORES.SYNC_QUEUE, item.id);
                     }
                 }
             } catch (e) {
@@ -144,7 +167,6 @@ class SyncManager {
         }
 
         this.queue = remainingQueue;
-        this.saveQueue();
 
         // Update metadata
         if (successCount > 0) {
@@ -152,7 +174,7 @@ class SyncManager {
             this.metadata.totalSynced += successCount;
         }
         this.metadata.failedCount = failCount;
-        this.saveMetadata();
+        await this.saveMetadata();
 
         this.isSyncing = false;
         this.notifyListeners();
@@ -169,18 +191,18 @@ class SyncManager {
 
     async sendRequest(item) {
         const API_URL = import.meta.env.VITE_API_URL || '';
-        const body = {};
-        if (item.type === 'stats') body.stats = item.payload;
-        if (item.type === 'journal') body.journals = [item.payload];
 
-        const res = await fetch(`${API_URL}/api/sync`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(body)
-        });
-
-        return res.ok;
+        try {
+            const res = await fetch(`${API_URL}/api/sync`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ queue: [item] })
+            });
+            return res.ok;
+        } catch (e) {
+            return false;
+        }
     }
 }
 

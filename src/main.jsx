@@ -5,16 +5,16 @@ import App from './App.jsx'
 import { GemProvider } from './context/GemContext'
 import './index.css'
 
-import ErrorBoundary from './components/ui/ErrorBoundary'
+import GlobalErrorBoundary from './components/ui/GlobalErrorBoundary'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <ErrorBoundary>
+        <GlobalErrorBoundary>
             <GemProvider>
                 <HashRouter>
                     <App />
                 </HashRouter>
             </GemProvider>
-        </ErrorBoundary>
+        </GlobalErrorBoundary>
     </React.StrictMode>,
 )

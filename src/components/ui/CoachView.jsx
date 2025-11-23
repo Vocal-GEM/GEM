@@ -19,7 +19,11 @@ const CoachView = () => {
         scrollToBottom();
     }, [messages]);
 
-    const { stats, goals } = useGem();
+    const { stats, goals, journals } = useGem();
+
+    const handleClearChat = () => {
+        setMessages([{ role: 'assistant', content: "Chat cleared. What's on your mind?" }]);
+    };
 
     const handleChatSubmit = async (e) => {
         e.preventDefault();
@@ -37,12 +41,22 @@ const CoachView = () => {
                 body: JSON.stringify({
                     message: userMsg.content,
                     history: messages,
-                    context: { stats, goals }
+                    context: {
+                        stats,
+                        goals,
+                        journals: journals.slice(0, 3) // Send last 3 journals
+                    }
                 })
             });
+
             if (res.ok) {
                 const data = await res.json();
                 setMessages(prev => [...prev, data]);
+            } else if (res.status === 503) {
+                const data = await res.json();
+                setMessages(prev => [...prev, { role: 'assistant', content: `⚠️ ${data.content}` }]);
+            } else {
+                throw new Error('Server error');
             }
         } catch (err) {
             // Mock Response Logic (Offline Mode)
@@ -72,12 +86,21 @@ const CoachView = () => {
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-[calc(100vh-180px)] flex flex-col">
+            <div className="flex justify-between items-center px-2 mb-2">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">AI Coach</span>
+                <button onClick={handleClearChat} className="text-xs text-slate-500 hover:text-white transition-colors">
+                    Clear Chat
+                </button>
+            </div>
+
             <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {messages.map((m, i) => <ChatMessage key={i} role={m.role} content={m.content} />)}
                 {isChatLoading && (
                     <div className="flex justify-start">
-                        <div className="bg-slate-800 rounded-2xl rounded-tl-none p-4 text-slate-300 text-sm animate-pulse">
-                            Thinking...
+                        <div className="bg-slate-800 rounded-2xl rounded-tl-none p-4 text-slate-300 text-sm animate-pulse flex items-center gap-2">
+                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                         </div>
                     </div>
                 )}

@@ -11,6 +11,7 @@ class User(UserMixin, db.Model):
     # Relationships
     journals = db.relationship('Journal', backref='user', lazy=True)
     stats = db.relationship('Stats', backref='user', uselist=False, lazy=True)
+    settings = db.relationship('Settings', backref='user', uselist=False, lazy=True)
 
 class Journal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -20,6 +21,9 @@ class Journal(db.Model):
     effort = db.Column(db.Integer)
     confidence = db.Column(db.Integer)
     audio_url = db.Column(db.String(200))
+    mood = db.Column(db.String(50)) # Added mood
+    tags = db.Column(db.JSON)       # Added tags
+    client_id = db.Column(db.String(50)) # For sync deduplication
 
 class Stats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -28,3 +32,8 @@ class Stats(db.Model):
     total_seconds = db.Column(db.Integer, default=0)
     level = db.Column(db.Integer, default=1)
     high_scores = db.Column(db.JSON, default={})
+
+class Settings(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    preferences = db.Column(db.JSON, default={}) # Store all settings as JSON

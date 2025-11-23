@@ -9,17 +9,20 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
     const gameState = useRef({
         status: 'ready', // ready, playing, gameover
         score: 0,
+        bestScore: 0,
         birdY: 200,
         pipes: [],
         frame: 0,
         width: 300,
         height: 400,
-        clouds: []
+        clouds: [],
+        flash: 0, // Flash intensity for scoring
+        particles: [] // For collisions/score
     });
 
     // Constants
     const GAP = 180;
-    const SPEED = 2.5;
+    const SPEED = 3; // Slightly faster for better feel
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -31,7 +34,8 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
             gameState.current.clouds.push({
                 x: Math.random() * 400,
                 y: Math.random() * 200,
-                size: 20 + Math.random() * 20
+                size: 20 + Math.random() * 20,
+                speed: 0.2 + Math.random() * 0.3
             });
         }
 
@@ -67,11 +71,11 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
                     // Target Y (padding of 50px top/bottom)
                     const targetY = (height - 50) - (normalized * (height - 100));
 
-                    // Smooth movement
-                    state.birdY += (targetY - state.birdY) * 0.08;
+                    // Smooth movement - tuned for responsiveness
+                    state.birdY += (targetY - state.birdY) * 0.12;
                 } else {
                     // Gravity (fall down if no sound)
-                    state.birdY += 3;
+                    state.birdY += 4;
                 }
 
                 // Bounds
@@ -79,7 +83,7 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
                 if (state.birdY < 20) state.birdY = 20;
 
                 // Spawn Pipes
-                if (state.frame % 180 === 0) {
+                if (state.frame % 150 === 0) { // More frequent pipes
                     const pipeHeight = Math.random() * (height - GAP - 100) + 50;
                     state.pipes.push({ x: width, topHeight: pipeHeight, passed: false });
                 }
@@ -87,7 +91,7 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
                 // Move Pipes & Clouds
                 state.pipes.forEach(p => p.x -= SPEED);
                 state.clouds.forEach(c => {
-                    c.x -= 0.5;
+                    c.x -= c.speed;
                     if (c.x < -50) c.x = width + 50;
                 });
 
@@ -110,6 +114,7 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
                         // Check Y overlap (Hit top or bottom pipe)
                         if (state.birdY - birdRadius < pipe.topHeight || state.birdY + birdRadius > pipe.topHeight + GAP) {
                             state.status = 'gameover';
+                            if (state.score > state.bestScore) state.bestScore = state.score;
                         }
                     }
 
@@ -117,9 +122,32 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
                     if (!pipe.passed && birdX > pipeRight) {
                         pipe.passed = true;
                         state.score += 1;
+                        state.flash = 15; // Trigger flash
                         onScore(state.score);
+
+                        // Add particles
+                        for (let i = 0; i < 5; i++) {
+                            state.particles.push({
+                                x: birdX,
+                                y: state.birdY,
+                                vx: (Math.random() - 0.5) * 5,
+                                vy: (Math.random() - 0.5) * 5,
+                                life: 30,
+                                color: '#fbbf24'
+                            });
+                        }
                     }
                 });
+
+                // Update Particles
+                state.particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life--;
+                });
+                state.particles = state.particles.filter(p => p.life > 0);
+
+                if (state.flash > 0) state.flash--;
 
                 state.frame++;
             }
@@ -129,13 +157,13 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
 
             // Sky
             const gradient = ctx.createLinearGradient(0, 0, 0, height);
-            gradient.addColorStop(0, '#7dd3fc'); // Sky 300
-            gradient.addColorStop(1, '#e0f2fe'); // Sky 100
+            gradient.addColorStop(0, '#38bdf8'); // Sky 400
+            gradient.addColorStop(1, '#bae6fd'); // Sky 200
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, width, height);
 
             // Clouds
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
             state.clouds.forEach(c => {
                 ctx.beginPath();
                 ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
@@ -146,16 +174,37 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
 
             // Pipes
             state.pipes.forEach(pipe => {
-                ctx.fillStyle = '#475569'; // Slate 600
+                // Pipe Body
+                const pipeGradient = ctx.createLinearGradient(pipe.x, 0, pipe.x + 50, 0);
+                pipeGradient.addColorStop(0, '#475569');
+                pipeGradient.addColorStop(0.5, '#64748b');
+                pipeGradient.addColorStop(1, '#475569');
+                ctx.fillStyle = pipeGradient;
+
                 // Top
                 ctx.fillRect(pipe.x, 0, 50, pipe.topHeight);
                 // Bottom
                 ctx.fillRect(pipe.x, pipe.topHeight + GAP, 50, height - (pipe.topHeight + GAP));
 
-                // Borders
-                ctx.fillStyle = '#334155'; // Slate 700
-                ctx.fillRect(pipe.x, pipe.topHeight - 20, 50, 20);
-                ctx.fillRect(pipe.x, pipe.topHeight + GAP, 50, 20);
+                // Pipe Caps
+                ctx.fillStyle = '#334155';
+                ctx.fillRect(pipe.x - 2, pipe.topHeight - 24, 54, 24); // Top Cap
+                ctx.fillRect(pipe.x - 2, pipe.topHeight + GAP, 54, 24); // Bottom Cap
+
+                // Highlights
+                ctx.fillStyle = 'rgba(255,255,255,0.1)';
+                ctx.fillRect(pipe.x + 5, 0, 10, pipe.topHeight - 24);
+                ctx.fillRect(pipe.x + 5, pipe.topHeight + GAP + 24, 10, height);
+            });
+
+            // Particles
+            state.particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life / 30;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
             });
 
             // Balloon (Player)
@@ -164,50 +213,71 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
 
             // String
             ctx.beginPath();
-            ctx.moveTo(bx, by + 22);
-            ctx.lineTo(bx, by + 50);
-            ctx.strokeStyle = '#94a3b8';
+            ctx.moveTo(bx, by + 24);
+            ctx.quadraticCurveTo(bx - 5 + Math.sin(state.frame * 0.2) * 5, by + 40, bx, by + 55);
+            ctx.strokeStyle = '#f1f5f9';
             ctx.lineWidth = 2;
             ctx.stroke();
 
             // Balloon Body
+            const balloonGrad = ctx.createRadialGradient(bx - 8, by - 8, 2, bx, by, 22);
+            balloonGrad.addColorStop(0, '#f87171');
+            balloonGrad.addColorStop(1, '#dc2626');
+            ctx.fillStyle = balloonGrad;
+
             ctx.beginPath();
             ctx.ellipse(bx, by, 20, 24, 0, 0, Math.PI * 2);
-            ctx.fillStyle = '#ef4444'; // Red 500
+            ctx.fill();
+
+            // Knot
+            ctx.beginPath();
+            ctx.moveTo(bx, by + 23);
+            ctx.lineTo(bx - 4, by + 28);
+            ctx.lineTo(bx + 4, by + 28);
             ctx.fill();
 
             // Shine
             ctx.beginPath();
             ctx.ellipse(bx - 8, by - 8, 6, 10, -0.5, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
             ctx.fill();
+
+            // Flash Effect
+            if (state.flash > 0) {
+                ctx.fillStyle = `rgba(255, 255, 255, ${state.flash / 20})`;
+                ctx.fillRect(0, 0, width, height);
+            }
 
             // UI Text
             ctx.fillStyle = '#0f172a';
-            ctx.font = 'bold 24px sans-serif';
+            ctx.font = 'bold 32px Inter';
             ctx.textAlign = 'right';
-            ctx.fillText(state.score, width - 20, 40);
+            ctx.fillText(state.score, width - 20, 50);
+
+            ctx.font = 'bold 14px Inter';
+            ctx.fillStyle = '#475569';
+            ctx.fillText(`BEST: ${state.bestScore}`, width - 20, 70);
 
             ctx.textAlign = 'center';
             if (state.status === 'ready') {
                 ctx.fillStyle = 'rgba(0,0,0,0.4)';
                 ctx.fillRect(0, 0, width, height);
                 ctx.fillStyle = 'white';
-                ctx.font = 'bold 32px sans-serif';
+                ctx.font = 'bold 32px Inter';
                 ctx.fillText("Tap to Start", width / 2, height / 2);
-                ctx.font = '16px sans-serif';
+                ctx.font = '16px Inter';
                 ctx.fillText("Control height with PITCH", width / 2, height / 2 + 30);
             } else if (state.status === 'gameover') {
-                ctx.fillStyle = 'rgba(0,0,0,0.6)';
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
                 ctx.fillRect(0, 0, width, height);
                 ctx.fillStyle = 'white';
-                ctx.font = 'bold 32px sans-serif';
-                ctx.fillText("Game Over", width / 2, height / 2);
-                ctx.font = '20px sans-serif';
-                ctx.fillText(`Score: ${state.score}`, width / 2, height / 2 + 40);
-                ctx.font = '14px sans-serif';
-                ctx.fillStyle = '#cbd5e1';
-                ctx.fillText("Tap to restart", width / 2, height / 2 + 70);
+                ctx.font = 'bold 32px Inter';
+                ctx.fillText("Game Over", width / 2, height / 2 - 20);
+                ctx.font = '24px Inter';
+                ctx.fillText(`Score: ${state.score}`, width / 2, height / 2 + 20);
+                ctx.font = '14px Inter';
+                ctx.fillStyle = '#94a3b8';
+                ctx.fillText("Tap to restart", width / 2, height / 2 + 60);
             }
 
             requestRef.current = requestAnimationFrame(loop);

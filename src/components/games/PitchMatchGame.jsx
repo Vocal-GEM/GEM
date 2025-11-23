@@ -10,7 +10,8 @@ const PitchMatchGame = ({ dataRef, targetRange, onScore, onClose }) => {
         speed: 2,
         spawnTimer: 0,
         isPlaying: true,
-        combo: 0
+        combo: 0,
+        floatingTexts: [] // { x, y, text, life, color }
     });
 
     useEffect(() => {
@@ -35,14 +36,13 @@ const PitchMatchGame = ({ dataRef, targetRange, onScore, onClose }) => {
 
             // Map pitch to Y
             // High pitch = Top (0), Low pitch = Bottom (height)
-            // Actually, let's keep it consistent: High = Top
             const y = canvas.height - ((pitch - (minPitch - 20)) / (maxPitch - minPitch + 40)) * canvas.height;
 
             gameState.current.notes.push({
                 x: canvas.width,
                 y: y,
                 pitch: pitch,
-                width: 60,
+                width: 80, // Slightly longer notes
                 hit: false,
                 missed: false
             });
@@ -56,7 +56,7 @@ const PitchMatchGame = ({ dataRef, targetRange, onScore, onClose }) => {
 
             // Spawn
             state.spawnTimer++;
-            if (state.spawnTimer > 120) { // Every ~2 seconds
+            if (state.spawnTimer > 100) { // Slightly faster spawn
                 spawnNote();
                 state.spawnTimer = 0;
             }
@@ -87,21 +87,52 @@ const PitchMatchGame = ({ dataRef, targetRange, onScore, onClose }) => {
                     // Check X overlap
                     if (note.x < playheadX + hitZone && note.x + note.width > playheadX - hitZone) {
                         // Check Y overlap (Pitch match)
-                        if (Math.abs(cursorY - note.y) < 40) { // Tolerance
+                        if (Math.abs(cursorY - note.y) < 30) { // Tighter tolerance
                             note.hit = true;
-                            state.score += 10 + state.combo;
+                            const points = 10 + state.combo;
+                            state.score += points;
                             state.combo++;
-                            onScore(10); // Report score
+                            onScore(10);
 
-                            // Visual feedback
-                            // (Handled in render)
+                            // Floating Text
+                            state.floatingTexts.push({
+                                x: playheadX,
+                                y: note.y,
+                                text: `+${points}`,
+                                life: 40,
+                                color: '#4ade80'
+                            });
+
+                            if (state.combo > 5) {
+                                state.floatingTexts.push({
+                                    x: playheadX + 20,
+                                    y: note.y - 20,
+                                    text: 'Perfect!',
+                                    life: 50,
+                                    color: '#fbbf24'
+                                });
+                            }
                         }
                     } else if (note.x + note.width < playheadX - hitZone) {
                         note.missed = true;
                         state.combo = 0;
+                        state.floatingTexts.push({
+                            x: playheadX,
+                            y: note.y,
+                            text: 'Miss',
+                            life: 30,
+                            color: '#ef4444'
+                        });
                     }
                 }
             });
+
+            // Update Floating Texts
+            state.floatingTexts.forEach(t => {
+                t.y -= 1;
+                t.life--;
+            });
+            state.floatingTexts = state.floatingTexts.filter(t => t.life > 0);
 
             // Render
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -109,12 +140,26 @@ const PitchMatchGame = ({ dataRef, targetRange, onScore, onClose }) => {
             // Draw Target Range Background
             const minP = targetRange.min;
             const maxP = targetRange.max;
+            // Visual guide for target range
             const rangeBottom = canvas.height - ((minP - (targetRange.min - 40)) / (targetRange.max - targetRange.min + 80)) * canvas.height;
             const rangeTop = canvas.height - ((maxP - (targetRange.min - 40)) / (targetRange.max - targetRange.min + 80)) * canvas.height;
 
-            // Simplified background for now
-            ctx.fillStyle = '#1e293b';
+            // Background
+            const bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bgGrad.addColorStop(0, '#0f172a');
+            bgGrad.addColorStop(1, '#1e293b');
+            ctx.fillStyle = bgGrad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grid lines
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.height; i += 50) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
 
             // Draw Playhead Line
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
@@ -124,16 +169,30 @@ const PitchMatchGame = ({ dataRef, targetRange, onScore, onClose }) => {
             ctx.lineTo(playheadX, canvas.height);
             ctx.stroke();
 
+            // Playhead Glow
+            if (pitch > 0) {
+                const glowGrad = ctx.createRadialGradient(playheadX, cursorY, 5, playheadX, cursorY, 100);
+                glowGrad.addColorStop(0, 'rgba(251, 191, 36, 0.2)');
+                glowGrad.addColorStop(1, 'rgba(251, 191, 36, 0)');
+                ctx.fillStyle = glowGrad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
             // Draw Notes
             state.notes.forEach(note => {
                 if (note.hit) {
                     ctx.fillStyle = '#4ade80'; // Green
+                    ctx.shadowColor = '#4ade80';
+                    ctx.shadowBlur = 15;
                     ctx.globalAlpha = 1 - (playheadX - note.x) / 100; // Fade out
                 } else if (note.missed) {
                     ctx.fillStyle = '#ef4444'; // Red
-                    ctx.globalAlpha = 0.5;
+                    ctx.globalAlpha = 0.3;
+                    ctx.shadowBlur = 0;
                 } else {
                     ctx.fillStyle = '#60a5fa'; // Blue
+                    ctx.shadowColor = '#60a5fa';
+                    ctx.shadowBlur = 10;
                     ctx.globalAlpha = 1;
                 }
 
@@ -143,18 +202,36 @@ const PitchMatchGame = ({ dataRef, targetRange, onScore, onClose }) => {
                     ctx.fill();
                 }
                 ctx.globalAlpha = 1;
+                ctx.shadowBlur = 0;
             });
 
             // Draw User Cursor
             if (pitch > 0) {
                 ctx.fillStyle = '#fbbf24'; // Amber
                 ctx.shadowColor = '#fbbf24';
-                ctx.shadowBlur = 15;
+                ctx.shadowBlur = 20;
                 ctx.beginPath();
                 ctx.arc(playheadX, cursorY, 8, 0, Math.PI * 2);
                 ctx.fill();
+
+                // Ring
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(playheadX, cursorY, 12, 0, Math.PI * 2);
+                ctx.stroke();
+
                 ctx.shadowBlur = 0;
             }
+
+            // Floating Texts
+            state.floatingTexts.forEach(t => {
+                ctx.fillStyle = t.color;
+                ctx.font = 'bold 16px Inter';
+                ctx.globalAlpha = t.life / 40;
+                ctx.fillText(t.text, t.x, t.y);
+                ctx.globalAlpha = 1;
+            });
 
             // Draw Score & Combo
             ctx.fillStyle = 'white';

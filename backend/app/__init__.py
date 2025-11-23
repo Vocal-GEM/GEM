@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, redirect
 from flask_cors import CORS
 from flask_login import LoginManager
 from .models import db, User
@@ -37,7 +37,42 @@ def create_app():
     # Ensure upload folder exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-    CORS(app, supports_credentials=True)
+    # CORS Configuration
+    # In production, restrict to your frontend domain
+    allowed_origins = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
+    CORS(app, 
+         supports_credentials=True,
+         origins=allowed_origins,
+         allow_headers=['Content-Type', 'Authorization'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+    
+    # Security Headers
+    @app.after_request
+    def add_security_headers(response):
+        # HTTPS redirect in production
+        if os.environ.get('FLASK_ENV') == 'production' and request.headers.get('X-Forwarded-Proto') == 'http':
+            return redirect(request.url.replace('http://', 'https://'), code=301)
+        
+        # Security headers
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'DENY'
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        
+        # CSP - adjust based on your needs
+        csp = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data: https:; "
+            "font-src 'self' data:; "
+            "connect-src 'self' https://generativelanguage.googleapis.com; "
+            "media-src 'self' blob:; "
+            "worker-src 'self' blob:;"
+        )
+        response.headers['Content-Security-Policy'] = csp
+        
+        return response
     
     db.init_app(app)
     login_manager.init_app(app)
