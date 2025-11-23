@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useGem } from '../../context/GemContext';
 import ChatMessage from './ChatMessage';
 
 const CoachView = () => {
@@ -17,6 +18,8 @@ const CoachView = () => {
         scrollToBottom();
     }, [messages]);
 
+    const { stats, goals } = useGem();
+
     const handleChatSubmit = async (e) => {
         e.preventDefault();
         if (!chatInput.trim()) return;
@@ -30,7 +33,11 @@ const CoachView = () => {
             const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userMsg.content, history: messages })
+                body: JSON.stringify({
+                    message: userMsg.content,
+                    history: messages,
+                    context: { stats, goals }
+                })
             });
             if (res.ok) {
                 const data = await res.json();
@@ -78,12 +85,12 @@ const CoachView = () => {
 
             {/* Suggestions */}
             {messages.length === 1 && (
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-2 mb-4 px-2">
                     {suggestions.map((s, i) => (
                         <button
                             key={i}
                             onClick={() => setChatInput(s)}
-                            className="text-xs bg-slate-800 hover:bg-slate-700 text-blue-300 px-3 py-1.5 rounded-full border border-blue-500/20 transition-colors"
+                            className="text-xs glass-panel hover:bg-white/10 text-blue-300 px-3 py-1.5 rounded-full transition-colors"
                         >
                             {s}
                         </button>
@@ -91,7 +98,7 @@ const CoachView = () => {
                 </div>
             )}
 
-            <form onSubmit={handleChatSubmit} className="bg-slate-800 p-2 rounded-full flex items-center gap-2 shadow-xl border border-white/10 shrink-0">
+            <form onSubmit={handleChatSubmit} className="glass-panel p-2 rounded-full flex items-center gap-2 shadow-xl shrink-0 mx-2 mb-2">
                 <input
                     type="text"
                     value={chatInput}
@@ -100,10 +107,13 @@ const CoachView = () => {
                     className="flex-1 bg-transparent border-none outline-none px-4 text-white placeholder-slate-500"
                     disabled={isChatLoading}
                 />
-                <button type="submit" disabled={isChatLoading} className="p-3 bg-blue-600 rounded-full text-white hover:bg-blue-500 disabled:opacity-50 transition-colors">
+                <button type="submit" disabled={isChatLoading} className="p-3 bg-blue-600 rounded-full text-white hover:bg-blue-500 disabled:opacity-50 transition-colors shadow-lg shadow-blue-500/20">
                     {isChatLoading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <i data-lucide="send" className="w-4 h-4"></i>}
                 </button>
             </form>
+            <div className="text-[10px] text-slate-600 text-center pb-2">
+                Curriculum based on WPATH & SES-VMTW guidelines. Not medical advice.
+            </div>
         </div>
     );
 };

@@ -66,7 +66,7 @@ export class AudioEngine {
 
             this.workletNode.port.onmessage = (event) => {
                 if (event.data.type === 'update') {
-                    const { pitch, resonance, f1, f2, weight, spectrum } = event.data.data;
+                    const { pitch, resonance, f1, f2, weight, spectrum, jitter, vowel, volume } = event.data.data;
 
                     // --- MEDIAN SMOOTHING LOGIC ---
                     // FIX: Previously, raw pitch caused jitter. Now we buffer 5 frames and take median.
@@ -87,6 +87,9 @@ export class AudioEngine {
                         resonance,
                         formants: { f1, f2 },
                         weight,
+                        volume,
+                        jitter,
+                        vowel,
                         prosody,
                         spectrum
                     });

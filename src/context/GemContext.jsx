@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { AudioEngine } from '../engines/AudioEngine';
+import { syncManager } from '../services/SyncManager';
+import { QuestManager } from '../services/QuestManager';
 
 const GemContext = createContext();
 
@@ -24,17 +26,37 @@ export const GemProvider = ({ children }) => {
     const [showCompass, setShowCompass] = useState(false);
     const [showCalibration, setShowCalibration] = useState(false);
     const [showJournalForm, setShowJournalForm] = useState(false);
+    const [showVocalHealthTips, setShowVocalHealthTips] = useState(false);
+    const [showAssessment, setShowAssessment] = useState(false);
+    const [showWarmUp, setShowWarmUp] = useState(false);
+    const [showForwardFocus, setShowForwardFocus] = useState(false);
 
     // Data
-    const [targetRange, setTargetRange] = useState(Storage.load('targetRange', { min: 170, max: 220 }));
-    const [calibration, setCalibration] = useState(Storage.load('calibration', { dark: 500, bright: 2500 }));
-    const [goals, setGoals] = useState(Storage.load('goals', [
-        { id: 'time', label: 'Practice Time (min)', target: 15, current: 0 },
-        { id: 'score', label: 'Game Score', target: 500, current: 0 }
+    const [voiceProfiles, setVoiceProfiles] = useState(Storage.load('voiceProfiles', [
+        { id: 'fem', name: 'Feminine', targetRange: { min: 170, max: 220 }, calibration: { dark: 500, bright: 2500 } },
+        { id: 'masc', name: 'Masculine', targetRange: { min: 85, max: 145 }, calibration: { dark: 400, bright: 1800 } },
+        { id: 'neutral', name: 'Neutral', targetRange: { min: 145, max: 175 }, calibration: { dark: 450, bright: 2200 } }
     ]));
+    const [activeProfile, setActiveProfile] = useState(Storage.load('activeProfile', 'fem'));
+    const [targetRange, setTargetRange] = useState(() => {
+        const profile = voiceProfiles.find(p => p.id === activeProfile);
+        return profile ? profile.targetRange : { min: 170, max: 220 };
+    });
+    const [calibration, setCalibration] = useState(() => {
+        const profile = voiceProfiles.find(p => p.id === activeProfile);
+        return profile ? profile.calibration : { dark: 500, bright: 2500 };
+    });
+    const [goals, setGoals] = useState(() => {
+        const saved = Storage.load('goals', []);
+        const lastLogin = Storage.load('lastLogin', 0);
+        const quests = QuestManager.checkReset(saved.length ? saved : [], lastLogin);
+        Storage.save('lastLogin', Date.now());
+        Storage.save('goals', quests);
+        return quests;
+    });
     const [journals, setJournals] = useState(Storage.load('journals', []));
     const [stats, setStats] = useState(Storage.load('stats', { streak: 0, totalSeconds: 0 }));
-    const [settings, setSettings] = useState(Storage.load('settings', { vibration: true, tone: false, noiseGate: 0.02, triggerLowPitch: true, triggerDarkRes: true }));
+    const [settings, setSettings] = useState(Storage.load('settings', { vibration: true, tone: false, noiseGate: 0.02, triggerLowPitch: true, triggerDarkRes: true, notation: 'hz', homeNote: 190 }));
 
     const [user, setUser] = useState(null); // { id, username }
     const [isAuthLoading, setIsAuthLoading] = useState(true);
@@ -122,12 +144,32 @@ export const GemProvider = ({ children }) => {
             practiceTimer.current = setInterval(() => {
                 if (audioEngineRef.current && audioEngineRef.current.isActive) {
                     setStats(s => {
-                        const newS = { ...s, totalSeconds: s.totalSeconds + 1 };
+                        const newSeconds = (s.totalSeconds || 0) + 1;
+                        // Check level every minute (approx) to avoid spamming calculation, or just every second is fine for simple math
+                        const newLevel = checkLevelUp({ ...s, totalSeconds: newSeconds });
+
+                        const newS = { ...s, totalSeconds: newSeconds, level: newLevel };
                         Storage.save('stats', newS);
                         return newS;
                     });
                     setGoals(g => {
-                        const newG = g.map(x => x.id === 'time' ? { ...x, current: x.current + (1 / 60) } : x);
+                        const newG = g.map(q => {
+                            if (q.type === 'time' && !q.completed) {
+                                const newCurrent = q.current + (1 / 60);
+                                if (newCurrent >= q.target) {
+                                    setStats(s => {
+                                        const newXP = (s.totalPoints || 0) + q.xp;
+                                        const newLevel = checkLevelUp({ ...s, totalPoints: newXP });
+                                        const newS = { ...s, totalPoints: newXP, level: newLevel };
+                                        Storage.save('stats', newS);
+                                        return newS;
+                                    });
+                                    return { ...q, current: newCurrent, completed: true };
+                                }
+                                return { ...q, current: newCurrent };
+                            }
+                            return q;
+                        });
                         Storage.save('goals', newG);
                         return newG;
                     });
@@ -160,19 +202,24 @@ export const GemProvider = ({ children }) => {
     }, []);
 
     // --- Data Sync ---
-    const syncData = async (type, payload) => {
+    const syncData = (type, payload) => {
         if (!user) return;
-        try {
-            const body = {};
-            if (type === 'stats') body.stats = payload;
-            if (type === 'journal') body.journals = [payload]; // Send single entry
+        syncManager.push(type, payload);
+    };
 
-            await fetch('/api/sync', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-        } catch (e) { console.error("Sync failed", e); }
+    // --- Gamification Logic ---
+    const calculateLevel = (xp) => Math.floor(Math.sqrt(xp / 100)) + 1;
+
+    const checkLevelUp = (currentStats) => {
+        const xp = (currentStats.totalPoints || 0) + Math.floor((currentStats.totalSeconds || 0) / 60 * 10);
+        const newLevel = calculateLevel(xp);
+        if (newLevel > (currentStats.level || 1)) {
+            // Level Up!
+            // In a real app, we'd trigger a modal or toast here
+            console.log(`Level Up! ${currentStats.level} -> ${newLevel}`);
+            return newLevel;
+        }
+        return currentStats.level || 1;
     };
 
     const submitGameResult = (gameId, score) => {
@@ -183,17 +230,37 @@ export const GemProvider = ({ children }) => {
             return newScores;
         });
 
-        // 2. Add to Total Points (Cumulative)
+        // 2. Add to Total Points (Cumulative) & Check Level
         setStats(s => {
-            const newS = { ...s, totalPoints: (s.totalPoints || 0) + score };
+            const newPoints = (s.totalPoints || 0) + score;
+            const newLevel = checkLevelUp({ ...s, totalPoints: newPoints });
+
+            const newS = { ...s, totalPoints: newPoints, level: newLevel };
             Storage.save('stats', newS);
             syncData('stats', newS); // Sync!
             return newS;
         });
 
-        // 3. Update Daily Goal
+        // 3. Update Daily Quests (Score Type)
         setGoals(g => {
-            const newG = g.map(x => x.id === 'score' ? { ...x, current: Math.max(x.current, score) } : x);
+            const newG = g.map(q => {
+                if (q.type === 'score' && !q.completed) {
+                    const newCurrent = Math.max(q.current, score);
+                    if (newCurrent >= q.target) {
+                        // Quest Completed! Award XP
+                        setStats(s => {
+                            const newXP = (s.totalPoints || 0) + q.xp; // Add Quest XP to points for now (simplification)
+                            const newLevel = checkLevelUp({ ...s, totalPoints: newXP });
+                            const newS = { ...s, totalPoints: newXP, level: newLevel };
+                            Storage.save('stats', newS);
+                            return newS;
+                        });
+                        return { ...q, current: newCurrent, completed: true };
+                    }
+                    return { ...q, current: newCurrent };
+                }
+                return q;
+            });
             Storage.save('goals', newG);
             return newG;
         });
@@ -221,6 +288,16 @@ export const GemProvider = ({ children }) => {
         const newCal = { dark, bright };
         setCalibration(newCal);
         Storage.save('calibration', newCal);
+    };
+
+    const switchProfile = (profileId) => {
+        const profile = voiceProfiles.find(p => p.id === profileId);
+        if (profile) {
+            setActiveProfile(profileId);
+            setTargetRange(profile.targetRange);
+            setCalibration(profile.calibration);
+            Storage.save('activeProfile', profileId);
+        }
     };
 
     // --- Auth Actions ---
@@ -273,8 +350,14 @@ export const GemProvider = ({ children }) => {
         showCompass, setShowCompass,
         showCalibration, setShowCalibration,
         showJournalForm, setShowJournalForm,
+        showVocalHealthTips, setShowVocalHealthTips,
+        showAssessment, setShowAssessment,
+        showWarmUp, setShowWarmUp,
+        showForwardFocus, setShowForwardFocus,
         targetRange,
         calibration,
+        voiceProfiles,
+        activeProfile,
         goals,
         journals,
         stats,
@@ -293,6 +376,7 @@ export const GemProvider = ({ children }) => {
         updateSettings,
         updateTargetRange,
         updateCalibration,
+        switchProfile,
 
         // Auth
         user,

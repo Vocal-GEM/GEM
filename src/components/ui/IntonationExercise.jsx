@@ -115,6 +115,9 @@ const IntonationExercise = () => {
         return () => cancelAnimationFrame(animationId);
     }, [speed, variance, isPlaying, targetRange]);
 
+    const [textPrompt, setTextPrompt] = useState("Hello, how are you today?");
+    const [isEditingText, setIsEditingText] = useState(false);
+
     return (
         <div className="glass-panel p-4 rounded-2xl space-y-4 mb-4">
             <div className="flex justify-between items-center">
@@ -129,6 +132,29 @@ const IntonationExercise = () => {
 
             <div className="relative h-48 bg-slate-900 rounded-xl overflow-hidden border border-slate-700">
                 <canvas ref={canvasRef} width={400} height={600} className="w-full h-full" />
+            </div>
+
+            {/* Text Prompt Area */}
+            <div className="bg-slate-800/50 p-3 rounded-xl border border-white/5 text-center">
+                {isEditingText ? (
+                    <input
+                        type="text"
+                        value={textPrompt}
+                        onChange={(e) => setTextPrompt(e.target.value)}
+                        onBlur={() => setIsEditingText(false)}
+                        autoFocus
+                        className="w-full bg-transparent text-center text-lg font-serif text-white outline-none border-b border-blue-500"
+                    />
+                ) : (
+                    <p
+                        onClick={() => setIsEditingText(true)}
+                        className="text-lg font-serif text-slate-200 cursor-pointer hover:text-blue-300 transition-colors"
+                        title="Click to edit text"
+                    >
+                        "{textPrompt}"
+                    </p>
+                )}
+                <div className="text-[10px] text-slate-500 mt-1 uppercase tracking-widest">Read this while following the line</div>
             </div>
 
             <div className="grid grid-cols-3 gap-4">

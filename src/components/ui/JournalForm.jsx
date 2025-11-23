@@ -7,6 +7,7 @@ const JournalForm = ({ onSubmit, onCancel }) => {
     const [script, setScript] = useState('');
     const [effort, setEffort] = useState(5);
     const [confidence, setConfidence] = useState(5);
+    const [sentiment, setSentiment] = useState(3); // 1-5 scale
     const [isRecording, setIsRecording] = useState(false);
     const [audioBlobUrl, setAudioBlobUrl] = useState(null);
     const [recordingTime, setRecordingTime] = useState(0);
@@ -60,6 +61,7 @@ const JournalForm = ({ onSubmit, onCancel }) => {
             script,
             effort,
             confidence,
+            sentiment,
             audioUrl: uploadedUrl,
             timestamp: Date.now()
         });
@@ -116,6 +118,33 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 min-h-[80px]"
                     placeholder="Describe your sensations, challenges, or wins..."
                 ></textarea>
+            </div>
+
+            {/* Emotional Check-In */}
+            <div>
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">How does your voice feel?</label>
+                <div className="flex justify-between gap-2">
+                    {[
+                        { emoji: '😞', value: 1, label: 'Dysphoric' },
+                        { emoji: '😕', value: 2, label: 'Uncomfortable' },
+                        { emoji: '😐', value: 3, label: 'Neutral' },
+                        { emoji: '🙂', value: 4, label: 'Good' },
+                        { emoji: '😊', value: 5, label: 'Euphoric' }
+                    ].map(({ emoji, value, label }) => (
+                        <button
+                            key={value}
+                            type="button"
+                            onClick={() => setSentiment(value)}
+                            className={`flex-1 p-3 rounded-xl border transition-all ${sentiment === value
+                                ? 'bg-blue-600 border-blue-500 scale-110'
+                                : 'bg-slate-800 border-slate-700 hover:bg-slate-700'
+                                }`}
+                            title={label}
+                        >
+                            <div className="text-2xl">{emoji}</div>
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Sliders */}

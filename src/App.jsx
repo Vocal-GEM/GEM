@@ -23,6 +23,11 @@ import Login from './components/ui/Login';
 import Signup from './components/ui/Signup';
 import ComparisonTool from './components/ui/ComparisonTool';
 import IntonationExercise from './components/ui/IntonationExercise';
+import VocalHealthTips from './components/ui/VocalHealthTips';
+import AssessmentModule from './components/ui/AssessmentModule';
+import WarmUpModule from './components/ui/WarmUpModule';
+import ForwardFocusDrill from './components/ui/ForwardFocusDrill';
+import IncognitoScreen from './components/ui/IncognitoScreen';
 
 const App = () => {
     const {
@@ -35,7 +40,11 @@ const App = () => {
         settings, updateSettings,
         journals, addJournalEntry,
         stats,
-        audioEngineRef
+        audioEngineRef,
+        showVocalHealthTips, setShowVocalHealthTips,
+        showAssessment, setShowAssessment,
+        showWarmUp, setShowWarmUp,
+        showForwardFocus, setShowForwardFocus
     } = useGem();
 
     const [activeTab, setActiveTab] = useState('practice');
@@ -46,6 +55,7 @@ const App = () => {
     const [showJournalForm, setShowJournalForm] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [showSignup, setShowSignup] = useState(false);
+    const [showIncognito, setShowIncognito] = useState(false);
 
     // Initial check for onboarding progress
     useEffect(() => {
@@ -79,7 +89,57 @@ const App = () => {
         localStorage.setItem('gem_calibration_done', 'true');
     };
 
+    // Listen for custom events from Settings
+    useEffect(() => {
+        const handleOpenVocalHealth = () => setShowVocalHealthTips(true);
+        const handleOpenAssessment = () => setShowAssessment(true);
+        const handleOpenWarmUp = () => setShowWarmUp(true);
+        const handleOpenForwardFocus = () => setShowForwardFocus(true);
+
+        window.addEventListener('openVocalHealth', handleOpenVocalHealth);
+        window.addEventListener('openAssessment', handleOpenAssessment);
+        window.addEventListener('openWarmUp', handleOpenWarmUp);
+        window.addEventListener('openForwardFocus', handleOpenForwardFocus);
+
+        return () => {
+            window.removeEventListener('openVocalHealth', handleOpenVocalHealth);
+            window.removeEventListener('openAssessment', handleOpenAssessment);
+            window.removeEventListener('openWarmUp', handleOpenWarmUp);
+            window.removeEventListener('openForwardFocus', handleOpenForwardFocus);
+        };
+    }, [setShowVocalHealthTips, setShowAssessment, setShowWarmUp, setShowForwardFocus]);
+
+    // Listen for profile switching
+    useEffect(() => {
+        const handleSwitchProfile = (e) => {
+            const profileId = e.detail;
+            const { switchProfile } = require('./context/GemContext');
+            // This will be handled by GemContext
+            window.location.reload(); // Temporary: reload to apply profile
+        };
+
+        window.addEventListener('switchProfile', handleSwitchProfile);
+        return () => window.removeEventListener('switchProfile', handleSwitchProfile);
+    }, []);
+
     const [activeGame, setActiveGame] = useState(null);
+    const [logoTapCount, setLogoTapCount] = useState(0);
+    const [logoTapTimeout, setLogoTapTimeout] = useState(null);
+
+    const handleLogoClick = () => {
+        const newCount = logoTapCount + 1;
+        setLogoTapCount(newCount);
+
+        if (logoTapTimeout) clearTimeout(logoTapTimeout);
+
+        if (newCount === 3) {
+            setShowIncognito(true);
+            setLogoTapCount(0);
+        } else {
+            const timeout = setTimeout(() => setLogoTapCount(0), 1000);
+            setLogoTapTimeout(timeout);
+        }
+    };
 
     const handleSelectGame = (gameId) => {
         const game = { id: gameId, name: gameId, gameId: gameId, range: 200 }; // Simple game config
@@ -91,7 +151,7 @@ const App = () => {
         <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-blue-500/30 pb-20">
             {/* Header */}
             <header className="p-4 flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0 z-30 border-b border-white/5">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
                     <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
                         <i data-lucide="mic" className="w-5 h-5 text-white"></i>
                     </div>
@@ -100,11 +160,11 @@ const App = () => {
                     </h1>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button onClick={() => setShowSettings(true)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
-                        <i data-lucide="settings" className="w-5 h-5 text-slate-400"></i>
+                    <button onClick={() => setShowSettings(true)} className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700">
+                        <span className="text-sm font-bold text-white">⚙️ Settings</span>
                     </button>
-                    <button onClick={() => setShowLogin(true)} className="w-8 h-8 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors">
-                        <i data-lucide="user" className="w-4 h-4 text-slate-400"></i>
+                    <button onClick={() => setShowLogin(true)} className="w-10 h-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors">
+                        <span className="text-lg">👤</span>
                     </button>
                 </div>
             </header>
@@ -132,6 +192,7 @@ const App = () => {
                                 userMode={userMode}
                                 exercise={activeGame}
                                 onScore={(score) => submitGameResult(activeGame?.id, score)}
+                                settings={settings}
                             />
                             {activeGame && (
                                 <button onClick={() => setActiveGame(null)} className="w-full py-2 bg-red-500/20 text-red-400 rounded-xl font-bold text-xs hover:bg-red-500/30 transition-colors">
@@ -241,6 +302,13 @@ const App = () => {
 
             {showLogin && <Login onSwitchToSignup={() => { setShowLogin(false); setShowSignup(true); }} onClose={() => setShowLogin(false)} />}
             {showSignup && <Signup onSwitchToLogin={() => { setShowSignup(false); setShowLogin(true); }} onClose={() => setShowSignup(false)} />}
+
+            {/* Research-Backed Feature Modals */}
+            {showVocalHealthTips && <VocalHealthTips onClose={() => setShowVocalHealthTips(false)} />}
+            {showAssessment && <AssessmentModule onClose={() => setShowAssessment(false)} />}
+            {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}
+            {showForwardFocus && <ForwardFocusDrill onClose={() => setShowForwardFocus(false)} />}
+            {showIncognito && <IncognitoScreen onClose={() => setShowIncognito(false)} />}
         </div>
     );
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore }) => {
+const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, settings = {} }) => {
     const canvasRef = useRef(null);
     const gameRef = useRef({ score: 0, lastUpdate: Date.now(), lastPitch: 0 });
     const balloonRef = useRef(new Image());
@@ -25,6 +25,23 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore }) 
                 ctx.fillStyle = 'rgba(16, 185, 129, 0.05)'; ctx.fillRect(0, topY, width, h);
                 ctx.strokeStyle = 'rgba(16, 185, 129, 0.3)'; ctx.setLineDash([5, 5]); ctx.lineWidth = 1;
                 ctx.beginPath(); ctx.moveTo(0, topY); ctx.lineTo(width, topY); ctx.moveTo(0, botY); ctx.lineTo(width, botY); ctx.stroke(); ctx.setLineDash([]);
+
+                // Draw Home Note Anchor
+                if (settings.homeNote && settings.homeNote > yMin && settings.homeNote < yMax) {
+                    const homeY = mapY(settings.homeNote);
+                    ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([10, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(0, homeY);
+                    ctx.lineTo(width, homeY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = 'rgba(255, 215, 0, 0.9)';
+                    ctx.font = 'bold 10px sans-serif';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(`Home: ${Math.round(settings.homeNote)} Hz`, 10, homeY - 5);
+                }
             }
 
             if (exercise) {

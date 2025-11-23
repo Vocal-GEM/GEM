@@ -16,7 +16,26 @@ const VoiceQualityMeter = ({ dataRef, userMode }) => {
         const id = requestAnimationFrame(loop); return () => cancelAnimationFrame(id);
     }, []);
     const labels = userMode === 'slp' ? ['Low Energy', 'Vocal Weight', 'High Energy'] : ['Light / Airy', 'Vocal Weight', 'Heavy / Pressed'];
-    return (<div className="glass-panel rounded-xl p-4 mb-2"> <div className="flex justify-between text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-3"> <span>{labels[0]}</span><span>{labels[1]}</span><span>{labels[2]}</span> </div> <div className="relative h-3 bg-slate-800 rounded-full overflow-hidden shadow-inner"> <div className="absolute inset-0 opacity-20 weight-gradient"></div> <div ref={indicatorRef} className="absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)] transition-all duration-75 bg-emerald-500" style={{ left: '0%' }}></div> </div> </div>);
+
+    // Simple Strain Check (Visual only for now)
+    const isStrained = dataRef.current?.weight > 80;
+
+    return (
+        <div className="glass-panel rounded-xl p-4 mb-2">
+            <div className="flex justify-between text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-3">
+                <span>{labels[0]}</span><span>{labels[1]}</span><span>{labels[2]}</span>
+            </div>
+            <div className="relative h-3 bg-slate-800 rounded-full overflow-hidden shadow-inner">
+                <div className="absolute inset-0 opacity-20 weight-gradient"></div>
+                <div ref={indicatorRef} className="absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)] transition-all duration-75 bg-emerald-500" style={{ left: '0%' }}></div>
+            </div>
+            {isStrained && (
+                <div className="mt-2 text-[10px] text-red-400 flex items-center gap-1 animate-pulse">
+                    <i data-lucide="alert-triangle" className="w-3 h-3"></i> High Vocal Weight detected. Relax!
+                </div>
+            )}
+        </div>
+    );
 };
 
 export default VoiceQualityMeter;

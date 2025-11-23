@@ -42,6 +42,59 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                     </div>
                 </section>
 
+                {/* Voice Profiles */}
+                <section>
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Voice Profiles</h3>
+                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                        <div className="text-xs text-slate-400 mb-3">Quick switch between voice modes</div>
+                        <div className="grid grid-cols-3 gap-2">
+                            <button
+                                onClick={() => window.dispatchEvent(new CustomEvent('switchProfile', { detail: 'fem' }))}
+                                className="p-3 rounded-xl bg-pink-900/20 border border-pink-500/30 hover:bg-pink-900/40 transition-colors text-center"
+                            >
+                                <div className="text-pink-400 font-bold text-sm">Fem</div>
+                                <div className="text-[10px] text-slate-400">170-220 Hz</div>
+                            </button>
+                            <button
+                                onClick={() => window.dispatchEvent(new CustomEvent('switchProfile', { detail: 'neutral' }))}
+                                className="p-3 rounded-xl bg-purple-900/20 border border-purple-500/30 hover:bg-purple-900/40 transition-colors text-center"
+                            >
+                                <div className="text-purple-400 font-bold text-sm">Neutral</div>
+                                <div className="text-[10px] text-slate-400">145-175 Hz</div>
+                            </button>
+                            <button
+                                onClick={() => window.dispatchEvent(new CustomEvent('switchProfile', { detail: 'masc' }))}
+                                className="p-3 rounded-xl bg-blue-900/20 border border-blue-500/30 hover:bg-blue-900/40 transition-colors text-center"
+                            >
+                                <div className="text-blue-400 font-bold text-sm">Masc</div>
+                                <div className="text-[10px] text-slate-400">85-145 Hz</div>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Home Note Anchor */}
+                <section>
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Home Note Anchor</h3>
+                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                        <div className="flex justify-between text-xs text-slate-400 mb-2">
+                            <span>Your baseline pitch</span>
+                            <span className="text-yellow-400 font-bold">{settings.homeNote} Hz</span>
+                        </div>
+                        <input
+                            type="range"
+                            min="80"
+                            max="300"
+                            value={settings.homeNote}
+                            onChange={(e) => setSettings({ ...settings, homeNote: parseInt(e.target.value) })}
+                            className="w-full accent-yellow-500 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <div className="text-[10px] text-slate-500 mt-2">
+                            A golden line will appear on your pitch graph at this frequency
+                        </div>
+                    </div>
+                </section>
+
                 {/* Biofeedback Config */}
                 <section>
                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Biofeedback Triggers</h3>
@@ -131,6 +184,36 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                             Vocal GEM v0.9.2 (Beta) <br />
                             Made with ❤️ for the community
                         </div>
+                    </div>
+                </section>
+
+                {/* Health & Assessment */}
+                <section>
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Health & Progress</h3>
+                    <div className="space-y-3">
+                        <button onClick={() => { onClose(); setTimeout(() => window.dispatchEvent(new CustomEvent('openVocalHealth')), 100); }} className="w-full p-3 bg-emerald-800 hover:bg-emerald-700 rounded-xl text-left flex items-center gap-3 transition-colors">
+                            <i data-lucide="heart-pulse" className="w-5 h-5 text-emerald-400"></i>
+                            <span className="text-sm font-bold text-white">Vocal Health Tips</span>
+                        </button>
+                        <button onClick={() => { onClose(); setTimeout(() => window.dispatchEvent(new CustomEvent('openAssessment')), 100); }} className="w-full p-3 bg-blue-800 hover:bg-blue-700 rounded-xl text-left flex items-center gap-3 transition-colors">
+                            <i data-lucide="clipboard-check" className="w-5 h-5 text-blue-400"></i>
+                            <span className="text-sm font-bold text-white">Baseline Assessment</span>
+                        </button>
+                    </div>
+                </section>
+
+                {/* Exercises & Drills */}
+                <section>
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Exercises & Drills</h3>
+                    <div className="space-y-3">
+                        <button onClick={() => { onClose(); setTimeout(() => window.dispatchEvent(new CustomEvent('openWarmUp')), 100); }} className="w-full p-3 bg-orange-800 hover:bg-orange-700 rounded-xl text-left flex items-center gap-3 transition-colors">
+                            <i data-lucide="flame" className="w-5 h-5 text-orange-400"></i>
+                            <span className="text-sm font-bold text-white">Warm-Up Exercises</span>
+                        </button>
+                        <button onClick={() => { onClose(); setTimeout(() => window.dispatchEvent(new CustomEvent('openForwardFocus')), 100); }} className="w-full p-3 bg-purple-800 hover:bg-purple-700 rounded-xl text-left flex items-center gap-3 transition-colors">
+                            <i data-lucide="target" className="w-5 h-5 text-purple-400"></i>
+                            <span className="text-sm font-bold text-white">Forward Focus Drill</span>
+                        </button>
                     </div>
                 </section>
             </div>
