@@ -76,6 +76,7 @@ const App = () => {
     const [showIncognito, setShowIncognito] = useState(false);
     const [showCamera, setShowCamera] = useState(false);
     const [showMigration, setShowMigration] = useState(true);
+    const [practiceView, setPracticeView] = useState('all'); // 'all', 'pitch', 'resonance', 'weight', 'vowel'
 
     // Initial check for onboarding progress
     useEffect(() => {
@@ -204,18 +205,48 @@ const App = () => {
                             </button>
                         </div>
 
-                        <ResonanceOrb dataRef={dataRef} calibration={calibration} />
-                        <LiveMetricsBar dataRef={dataRef} />
+                        {/* Filter Menu */}
+                        <div className="glass-panel-dark rounded-xl p-2 mb-4 flex gap-2 overflow-x-auto">
+                            {[
+                                { id: 'all', label: 'Show All' },
+                                { id: 'pitch', label: 'Pitch' },
+                                { id: 'resonance', label: 'Resonance' },
+                                { id: 'weight', label: 'Weight' },
+                                { id: 'vowel', label: 'Vowel' }
+                            ].map(view => (
+                                <button
+                                    key={view.id}
+                                    onClick={() => setPracticeView(view.id)}
+                                    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${practiceView === view.id
+                                            ? 'bg-blue-500 text-white'
+                                            : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-white'
+                                        }`}
+                                >
+                                    {view.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Resonance Orb - Show in Resonance and All views */}
+                        {(practiceView === 'all' || practiceView === 'resonance') && (
+                            <ResonanceOrb dataRef={dataRef} calibration={calibration} />
+                        )}
+
+                        {/* Live Metrics Bar - Show in All view only */}
+                        {practiceView === 'all' && <LiveMetricsBar dataRef={dataRef} />}
 
                         <div className="space-y-4">
-                            <PitchVisualizer
-                                dataRef={dataRef}
-                                targetRange={targetRange}
-                                userMode={userMode}
-                                exercise={activeGame}
-                                onScore={(score) => submitGameResult(activeGame, score)}
-                                settings={settings}
-                            />
+                            {/* Pitch Visualizer - Show in Pitch and All views */}
+                            {(practiceView === 'all' || practiceView === 'pitch') && (
+                                <PitchVisualizer
+                                    dataRef={dataRef}
+                                    targetRange={targetRange}
+                                    userMode={userMode}
+                                    exercise={activeGame}
+                                    onScore={(score) => submitGameResult(activeGame, score)}
+                                    settings={settings}
+                                />
+                            )}
 
                             {/* Active Game Overlay */}
                             {activeGame && (
@@ -231,10 +262,18 @@ const App = () => {
                             )}
 
                             {userMode === 'slp' && <Spectrogram dataRef={dataRef} />}
-                            <div className="grid grid-cols-2 gap-4">
-                                <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />
-                                <VowelSpacePlot dataRef={dataRef} userMode={userMode} />
-                            </div>
+
+                            {/* Voice Quality & Vowel Space - Show in Weight/Vowel/All views */}
+                            {(practiceView === 'all' || practiceView === 'weight' || practiceView === 'vowel') && (
+                                <div className="grid grid-cols-2 gap-4">
+                                    {(practiceView === 'all' || practiceView === 'weight') && (
+                                        <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />
+                                    )}
+                                    {(practiceView === 'all' || practiceView === 'vowel') && (
+                                        <VowelSpacePlot dataRef={dataRef} userMode={userMode} />
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         <div className="mt-6 grid grid-cols-2 gap-3">
