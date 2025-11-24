@@ -7,7 +7,11 @@ main_bp = Blueprint('main', __name__)
 def index():
     if os.path.exists(os.path.join(current_app.static_folder, 'index.html')):
         return send_from_directory(current_app.static_folder, 'index.html')
-    return "Frontend build not found. Please ensure 'npm run build' ran successfully.", 404
+    return jsonify({
+        "status": "online",
+        "message": "Vocal GEM Backend is running. Access the frontend via your Vercel URL.",
+        "service": "api"
+    })
 
 @main_bp.route('/<path:path>')
 def serve_static(path):
