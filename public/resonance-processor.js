@@ -213,26 +213,6 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             }
 
             // 3. Hybrid Resonance Metric
-            // Research suggests F2 is dominant for gender perception, but Centroid gives broad "brightness".
-            // We combine them: 50% Centroid, 50% Weighted Formants.
-            // If formants are missing (0), we rely more on centroid.
-
-            let formantAvg = 0;
-            let count = 0;
-            if (p1.freq > 0) { formantAvg += p1.freq * 0.5; count += 0.5; } // F1 contributes less to brightness
-            if (p2.freq > 0) { formantAvg += p2.freq * 1.0; count += 1.0; } // F2 is key
-            if (p3.freq > 0) { formantAvg += p3.freq * 0.8; count += 0.8; } // F3 adds "ring"
-
-            const effectiveFormantResonance = count > 0 ? formantAvg / count : centroid;
-
-            // Raw Hybrid Resonance
-            const rawResonance = (centroid * 0.4) + (effectiveFormantResonance * 0.6);
-
-            // 4. Advanced Smoothing
-            // Step A: Median Filter (Remove glitches)
-            this.resonanceBuffer.push(rawResonance);
-            if (this.resonanceBuffer.length > 7) this.resonanceBuffer.shift();
-
             const sorted = [...this.resonanceBuffer].sort((a, b) => a - b);
             const medianResonance = sorted[Math.floor(sorted.length / 2)];
 
