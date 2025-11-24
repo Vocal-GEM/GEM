@@ -94,7 +94,15 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
             }
 
             const history = dataRef.current.history;
-            ctx.strokeStyle = exercise ? '#fbbf24' : '#60a5fa'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath();
+            const history = dataRef.current.history;
+
+            // 1. Draw the Line (Green)
+            ctx.strokeStyle = '#22c55e'; // Bright Green (Tailwind green-500)
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+
             let hasStarted = false;
             history.forEach((p, i) => {
                 const x = (i / (history.length - 1)) * width;
@@ -105,7 +113,7 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
                         hasStarted = true;
                     } else {
                         const prevP = history[i - 1];
-                        // IMPROVED CONTINUITY: Allow jumps up to 300Hz (octave+) and interpolate if needed
+                        // Continuity check
                         if (prevP > 0 && Math.abs(p - prevP) < 400) {
                             ctx.lineTo(x, y);
                         } else {
@@ -114,7 +122,23 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
                     }
                 }
             });
-            ctx.stroke(); ctx.shadowBlur = 0;
+            ctx.stroke();
+
+            // 2. Draw the Dots (Voice Tools Style)
+            ctx.fillStyle = '#22c55e'; // Same Green
+            history.forEach((p, i) => {
+                if (p > 0) {
+                    const x = (i / (history.length - 1)) * width;
+                    const y = mapY(p);
+                    // Only draw dots if connected to neighbors (to avoid noise dots)
+                    // or just draw all valid points
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, Math.PI * 2); // Small 3px radius dot
+                    ctx.fill();
+                }
+            });
+
+            ctx.shadowBlur = 0;
             const currentP = history[history.length - 1];
             if (currentP > 0) { ctx.fillStyle = '#60a5fa'; ctx.font = 'bold 20px monospace'; ctx.textAlign = 'right'; ctx.fillText(Math.round(currentP) + " Hz", width - 10, 30); }
             requestAnimationFrame(loop);
