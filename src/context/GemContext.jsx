@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { AudioEngine } from '../engines/AudioEngine';
-// import { syncManager } from '../services/SyncManager'; // Temporarily disabled due to circular dependency
+import { syncManager } from '../services/SyncManager';
 import { QuestManager } from '../services/QuestManager';
 import { indexedDB, STORES } from '../services/IndexedDBManager';
 
