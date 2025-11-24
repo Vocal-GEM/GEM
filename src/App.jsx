@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGem } from './context/GemContext';
 import ResonanceOrb from './components/viz/ResonanceOrb';
 import LiveMetricsBar from './components/viz/LiveMetricsBar';
 import PitchVisualizer from './components/viz/PitchVisualizer';
+import PitchOrb from './components/viz/PitchOrb';
 import Spectrogram from './components/viz/Spectrogram';
 import VoiceQualityMeter from './components/viz/VoiceQualityMeter';
 import VowelSpacePlot from './components/viz/VowelSpacePlot';
@@ -40,29 +41,35 @@ import StaircaseGame from './components/games/StaircaseGame';
 import FlappyVoiceGame from './components/games/FlappyVoiceGame';
 import PitchMatchGame from './components/games/PitchMatchGame';
 
-import {
-    Mic, Camera, Book, Wrench, ArrowLeft,
-    Mic2, Gamepad2, Bot, BarChart2
-} from 'lucide-react';
+import { Mic, Camera, Book, Wrench, ArrowLeft, Mic2, Gamepad2, Bot, BarChart2 } from 'lucide-react';
 
 const App = () => {
     const {
-        isAudioActive, toggleAudio,
+        isAudioActive,
+        toggleAudio,
         dataRef,
-        calibration, updateCalibration,
-        targetRange, updateTargetRange,
+        calibration,
+        updateCalibration,
+        targetRange,
+        updateTargetRange,
         userMode,
         goals,
-        settings, updateSettings,
-        journals, addJournalEntry,
+        settings,
+        updateSettings,
+        journals,
+        addJournalEntry,
         stats,
         audioEngineRef,
-        showVocalHealthTips, setShowVocalHealthTips,
-        showAssessment, setShowAssessment,
-        showWarmUp, setShowWarmUp,
-        showForwardFocus, setShowForwardFocus,
+        showVocalHealthTips,
+        setShowVocalHealthTips,
+        showAssessment,
+        setShowAssessment,
+        showWarmUp,
+        setShowWarmUp,
+        showForwardFocus,
+        setShowForwardFocus,
         submitGameResult,
-        isDataLoaded
+        isDataLoaded,
     } = useGem();
 
     const [activeTab, setActiveTab] = useState('practice');
@@ -76,16 +83,15 @@ const App = () => {
     const [showIncognito, setShowIncognito] = useState(false);
     const [showCamera, setShowCamera] = useState(false);
     const [showMigration, setShowMigration] = useState(true);
-    const [practiceView, setPracticeView] = useState('all'); // 'all', 'pitch', 'resonance', 'weight', 'vowel'
+    const [practiceView, setPracticeView] = useState('all'); // all, pitch, resonance, weight, vowel
+    const [pitchViewMode, setPitchViewMode] = useState('graph'); // graph or orb
 
-    // Initial check for onboarding progress
+    // Onboarding flow
     useEffect(() => {
         if (!isDataLoaded) return;
-
         const hasSeenTutorial = localStorage.getItem('gem_tutorial_seen');
         const hasSeenCompass = localStorage.getItem('gem_compass_seen');
         const hasCalibrated = localStorage.getItem('gem_calibration_done');
-
         if (!hasSeenTutorial) {
             setShowTutorial(true);
         } else if (!hasSeenCompass) {
@@ -101,7 +107,7 @@ const App = () => {
         setShowCompass(true);
     };
 
-    const handleCompassComplete = (mode) => {
+    const handleCompassComplete = () => {
         setShowCompass(false);
         localStorage.setItem('gem_compass_seen', 'true');
         setShowCalibration(true);
@@ -112,32 +118,27 @@ const App = () => {
         localStorage.setItem('gem_calibration_done', 'true');
     };
 
-    // Listen for custom events from Settings
+    // Settings events
     useEffect(() => {
         const handleOpenVocalHealth = () => setShowVocalHealthTips(true);
         const handleOpenAssessment = () => setShowAssessment(true);
         const handleOpenWarmUp = () => setShowWarmUp(true);
         const handleOpenForwardFocus = () => setShowForwardFocus(true);
-
         window.addEventListener('openVocalHealth', handleOpenVocalHealth);
         window.addEventListener('openAssessment', handleOpenAssessment);
         window.addEventListener('openWarmUp', handleOpenWarmUp);
         window.addEventListener('openForwardFocus', handleOpenForwardFocus);
-
         return () => {
             window.removeEventListener('openVocalHealth', handleOpenVocalHealth);
             window.removeEventListener('openAssessment', handleOpenAssessment);
             window.removeEventListener('openWarmUp', handleOpenWarmUp);
             window.removeEventListener('openForwardFocus', handleOpenForwardFocus);
         };
-    }, [setShowVocalHealthTips, setShowAssessment, setShowWarmUp, setShowForwardFocus]);
+    }, []);
 
-    // Listen for profile switching
+    // Profile switching
     useEffect(() => {
-        const handleSwitchProfile = (e) => {
-            window.location.reload();
-        };
-
+        const handleSwitchProfile = () => window.location.reload();
         window.addEventListener('switchProfile', handleSwitchProfile);
         return () => window.removeEventListener('switchProfile', handleSwitchProfile);
     }, []);
@@ -149,9 +150,7 @@ const App = () => {
     const handleLogoClick = () => {
         const newCount = logoTapCount + 1;
         setLogoTapCount(newCount);
-
         if (logoTapTimeout) clearTimeout(logoTapTimeout);
-
         if (newCount === 3) {
             setShowIncognito(true);
             setLogoTapCount(0);
@@ -174,9 +173,7 @@ const App = () => {
                     <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
                         <Mic className="w-5 h-5 text-white" />
                     </div>
-                    <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-                        Vocal GEM
-                    </h1>
+                    <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Vocal GEM</h1>
                 </div>
                 <div className="flex items-center gap-2">
                     <OfflineIndicator />
@@ -197,90 +194,65 @@ const App = () => {
                 {activeTab === 'practice' && (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <DailyGoalsWidget goals={goals} />
-
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Real-time Analysis</h2>
                             <button onClick={toggleAudio} className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all ${isAudioActive ? 'bg-red-500/20 text-red-400 animate-pulse' : 'bg-blue-600 text-white'}`}>
-                                {isAudioActive ? <><span className="w-2 h-2 bg-red-500 rounded-full"></span> LIVE</> : <><Mic className="w-3 h-3" /> START</>}
+                                {isAudioActive ? <><span className="w-2 h-2 bg-red-500 rounded-full" /> LIVE</> : <><Mic className="w-3 h-3" /> START</>}
                             </button>
                         </div>
-
                         {/* Filter Menu */}
                         <div className="glass-panel-dark rounded-xl p-2 mb-4 flex gap-2 overflow-x-auto">
-                            {[
-                                { id: 'all', label: 'Show All' },
-                                { id: 'pitch', label: 'Pitch' },
-                                { id: 'resonance', label: 'Resonance' },
-                                { id: 'weight', label: 'Weight' },
-                                { id: 'vowel', label: 'Vowel' }
-                            ].map(view => (
-                                <button
-                                    key={view.id}
-                                    onClick={() => setPracticeView(view.id)}
-                                    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${practiceView === view.id
-                                            ? 'bg-blue-500 text-white'
-                                            : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-white'
-                                        }`}
-                                >
+                            {[{ id: 'all', label: 'Show All' }, { id: 'pitch', label: 'Pitch' }, { id: 'resonance', label: 'Resonance' }, { id: 'weight', label: 'Weight' }, { id: 'vowel', label: 'Vowel' }].map(view => (
+                                <button key={view.id} onClick={() => setPracticeView(view.id)} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${practiceView === view.id ? 'bg-blue-500 text-white' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
                                     {view.label}
                                 </button>
                             ))}
                         </div>
-
-                        {/* Resonance Orb - Show in Resonance and All views */}
-                        {(practiceView === 'all' || practiceView === 'resonance') && (
-                            <ResonanceOrb dataRef={dataRef} calibration={calibration} />
-                        )}
-
-                        {/* Live Metrics Bar - Show in All view only */}
+                        {/* Resonance Orb */}
+                        {(practiceView === 'all' || practiceView === 'resonance') && <ResonanceOrb dataRef={dataRef} calibration={calibration} />}
+                        {/* Live Metrics Bar */}
                         {practiceView === 'all' && <LiveMetricsBar dataRef={dataRef} />}
-
                         <div className="space-y-4">
-                            {/* Pitch Visualizer - Show in Pitch and All views */}
+                            {/* Pitch Visualizer */}
                             {(practiceView === 'all' || practiceView === 'pitch') && (
-                                <PitchVisualizer
-                                    dataRef={dataRef}
-                                    targetRange={targetRange}
-                                    userMode={userMode}
-                                    exercise={activeGame}
-                                    onScore={(score) => submitGameResult(activeGame, score)}
-                                    settings={settings}
-                                />
+                                <div>
+                                    <div className="flex justify-end mb-2">
+                                        <div className="glass-panel-dark rounded-lg p-1 flex gap-1">
+                                            <button onClick={() => setPitchViewMode('graph')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${pitchViewMode === 'graph' ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`}>Graph</button>
+                                            <button onClick={() => setPitchViewMode('orb')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${pitchViewMode === 'orb' ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`}>Orb</button>
+                                        </div>
+                                    </div>
+                                    {pitchViewMode === 'graph' ? (
+                                        <PitchVisualizer dataRef={dataRef} targetRange={targetRange} userMode={userMode} exercise={activeGame} onScore={score => submitGameResult(activeGame, score)} settings={settings} />
+                                    ) : (
+                                        <PitchOrb dataRef={dataRef} settings={settings} />
+                                    )}
+                                </div>
                             )}
-
                             {/* Active Game Overlay */}
                             {activeGame && (
                                 <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
                                     <div className="w-full max-w-md">
-                                        {activeGame === 'flappy' && <FlappyVoiceGame dataRef={dataRef} targetRange={targetRange} onScore={(s) => submitGameResult('flappy', s)} onClose={() => setActiveGame(null)} />}
-                                        {activeGame === 'river' && <ResonanceRiverGame dataRef={dataRef} targetRange={targetRange} onScore={(s) => submitGameResult('river', s)} onClose={() => setActiveGame(null)} />}
-                                        {activeGame === 'hopper' && <CloudHopperGame dataRef={dataRef} targetRange={targetRange} onScore={(s) => submitGameResult('hopper', s)} onClose={() => setActiveGame(null)} />}
-                                        {activeGame === 'stairs' && <StaircaseGame dataRef={dataRef} targetRange={targetRange} onScore={(s) => submitGameResult('stairs', s)} onClose={() => setActiveGame(null)} />}
-                                        {activeGame === 'pitchmatch' && <PitchMatchGame dataRef={dataRef} targetRange={targetRange} onScore={(s) => submitGameResult('pitchmatch', s)} onClose={() => setActiveGame(null)} />}
+                                        {activeGame === 'flappy' && <FlappyVoiceGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('flappy', s)} onClose={() => setActiveGame(null)} />}
+                                        {activeGame === 'river' && <ResonanceRiverGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('river', s)} onClose={() => setActiveGame(null)} />}
+                                        {activeGame === 'hopper' && <CloudHopperGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('hopper', s)} onClose={() => setActiveGame(null)} />}
+                                        {activeGame === 'stairs' && <StaircaseGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('stairs', s)} onClose={() => setActiveGame(null)} />}
+                                        {activeGame === 'pitchmatch' && <PitchMatchGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('pitchmatch', s)} onClose={() => setActiveGame(null)} />}
                                     </div>
                                 </div>
                             )}
-
+                            {/* Spectrogram for SLP mode */}
                             {userMode === 'slp' && <Spectrogram dataRef={dataRef} />}
-
-                            {/* Voice Quality & Vowel Space - Show in Weight/Vowel/All views */}
+                            {/* Voice Quality & Vowel Space */}
                             {(practiceView === 'all' || practiceView === 'weight' || practiceView === 'vowel') && (
                                 <div className="grid grid-cols-2 gap-4">
-                                    {(practiceView === 'all' || practiceView === 'weight') && (
-                                        <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />
-                                    )}
-                                    {(practiceView === 'all' || practiceView === 'vowel') && (
-                                        <VowelSpacePlot dataRef={dataRef} userMode={userMode} />
-                                    )}
+                                    {(practiceView === 'all' || practiceView === 'weight') && <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />}
+                                    {(practiceView === 'all' || practiceView === 'vowel') && <VowelSpacePlot dataRef={dataRef} userMode={userMode} />}
                                 </div>
                             )}
                         </div>
-
-                        <div className="mt-6 grid grid-cols-2 gap-3">
-                            <button onClick={() => setShowJournalForm(true)} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
-                                <Book className="text-blue-400" />
-                                <span className="text-xs font-bold">Log Journal</span>
-                            </button>
+                        {/* Bottom Buttons */}
+                        <div className="mt-6 grid grid-cols-1 gap-3">
                             <button onClick={() => setActiveTab('tools')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
                                 <Wrench className="text-purple-400" />
                                 <span className="text-xs font-bold">Tools</span>
@@ -288,13 +260,9 @@ const App = () => {
                         </div>
                     </div>
                 )}
-
                 {activeTab === 'games' && <GameHub onSelectGame={handleSelectGame} />}
-
                 {activeTab === 'coach' && <CoachView />}
-
-                {activeTab === 'history' && <HistoryView stats={stats} journals={journals} />}
-
+                {activeTab === 'history' && <HistoryView stats={stats} journals={journals} onLogClick={() => setShowJournalForm(true)} />}
                 {activeTab === 'tools' && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="flex items-center gap-2 mb-4">
@@ -309,7 +277,6 @@ const App = () => {
                         <MirrorComponent />
                     </div>
                 )}
-
                 {activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} />}
             </main>
 
@@ -364,12 +331,10 @@ const App = () => {
                     const a = document.createElement('a'); a.href = url; a.download = 'vocal-gem-data.json'; a.click();
                 }}
             />
-
             {showMigration && <MigrationModal onComplete={() => setShowMigration(false)} />}
             {showTutorial && <TutorialWizard onComplete={handleTutorialComplete} onSkip={() => { setShowTutorial(false); setShowCompass(true); }} />}
             {!showTutorial && showCompass && <CompassWizard onComplete={handleCompassComplete} />}
             {showCalibration && <CalibrationWizard onComplete={handleCalibrationComplete} audioEngine={audioEngineRef} />}
-
             {showJournalForm && (
                 <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
                     <div className="w-full max-w-md">
@@ -377,11 +342,8 @@ const App = () => {
                     </div>
                 </div>
             )}
-
             {showLogin && <Login onSwitchToSignup={() => { setShowLogin(false); setShowSignup(true); }} onClose={() => setShowLogin(false)} />}
             {showSignup && <Signup onSwitchToLogin={() => { setShowSignup(false); setShowLogin(true); }} onClose={() => setShowSignup(false)} />}
-
-            {/* Research-Backed Feature Modals */}
             {showVocalHealthTips && <VocalHealthTips onClose={() => setShowVocalHealthTips(false)} />}
             {showAssessment && <AssessmentModule onClose={() => setShowAssessment(false)} />}
             {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}

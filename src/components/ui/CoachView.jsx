@@ -25,6 +25,13 @@ const CoachView = () => {
         setMessages([{ role: 'assistant', content: "Chat cleared. What's on your mind?" }]);
     };
 
+    const [showPersonalize, setShowPersonalize] = useState(false);
+    const [userContext, setUserContext] = useState({
+        name: '',
+        pronouns: '',
+        goals: ''
+    });
+
     const handleChatSubmit = async (e) => {
         e.preventDefault();
         if (!chatInput.trim()) return;
@@ -44,7 +51,8 @@ const CoachView = () => {
                     context: {
                         stats,
                         goals,
-                        journals: journals.slice(0, 3) // Send last 3 journals
+                        journals: journals.slice(0, 3),
+                        userProfile: userContext // Add user context
                     }
                 })
             });
@@ -63,11 +71,14 @@ const CoachView = () => {
             let reply = "I'm having trouble connecting to the server, but I can still help! Try asking about pitch, resonance, or vocal weight.";
             const lowerMsg = userMsg.content.toLowerCase();
 
-            if (lowerMsg.includes('pitch')) reply = "Pitch is the perceived frequency of your voice. For a feminine voice, target 170-220Hz. For masculine, 85-145Hz. Try the 'Pitch Staircase' game to practice control!";
-            else if (lowerMsg.includes('resonance') || lowerMsg.includes('bright') || lowerMsg.includes('dark')) reply = "Resonance is the 'color' of your voice. Bright resonance (head voice) sounds more feminine, while dark resonance (chest voice) sounds more masculine. Use the Resonance Orb to visualize this!";
-            else if (lowerMsg.includes('weight') || lowerMsg.includes('heavy') || lowerMsg.includes('light')) reply = "Vocal weight is how 'heavy' or 'buzzy' your voice sounds. A lighter weight is often perceived as more feminine. Try to speak softly and avoid 'pushing' the sound.";
-            else if (lowerMsg.includes('warmup') || lowerMsg.includes('exercise')) reply = "Try a simple siren exercise! Glide from your lowest note to your highest and back down. Keep it smooth and light.";
-            else if (lowerMsg.includes('game')) reply = "Games are a great way to practice! Go to the Arcade tab to try 'Balloon Adventure' or 'Resonance River'.";
+            // Personalize response if name is known
+            const prefix = userContext.name ? `${userContext.name}, ` : '';
+
+            if (lowerMsg.includes('pitch')) reply = `${prefix}Pitch is the perceived frequency of your voice. For a feminine voice, target 170-220Hz. For masculine, 85-145Hz. Try the 'Pitch Staircase' game to practice control!`;
+            else if (lowerMsg.includes('resonance') || lowerMsg.includes('bright') || lowerMsg.includes('dark')) reply = `${prefix}Resonance is the 'color' of your voice. Bright resonance (head voice) sounds more feminine, while dark resonance (chest voice) sounds more masculine. Use the Resonance Orb to visualize this!`;
+            else if (lowerMsg.includes('weight') || lowerMsg.includes('heavy') || lowerMsg.includes('light')) reply = `${prefix}Vocal weight is how 'heavy' or 'buzzy' your voice sounds. A lighter weight is often perceived as more feminine. Try to speak softly and avoid 'pushing' the sound.`;
+            else if (lowerMsg.includes('warmup') || lowerMsg.includes('exercise')) reply = `${prefix}Try a simple siren exercise! Glide from your lowest note to your highest and back down. Keep it smooth and light.`;
+            else if (lowerMsg.includes('game')) reply = `${prefix}Games are a great way to practice! Go to the Arcade tab to try 'Balloon Adventure' or 'Resonance River'.`;
 
             setTimeout(() => {
                 setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
@@ -85,12 +96,17 @@ const CoachView = () => {
     ];
 
     return (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-[calc(100vh-180px)] flex flex-col">
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-[calc(100vh-180px)] flex flex-col relative">
             <div className="flex justify-between items-center px-2 mb-2">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">AI Coach</span>
-                <button onClick={handleClearChat} className="text-xs text-slate-500 hover:text-white transition-colors">
-                    Clear Chat
-                </button>
+                <div className="flex gap-3">
+                    <button onClick={() => setShowPersonalize(true)} className="text-xs text-blue-400 hover:text-blue-300 transition-colors font-bold">
+                        Personalize
+                    </button>
+                    <button onClick={handleClearChat} className="text-xs text-slate-500 hover:text-white transition-colors">
+                        Clear Chat
+                    </button>
+                </div>
             </div>
 
             <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
@@ -138,6 +154,50 @@ const CoachView = () => {
             <div className="text-[10px] text-slate-600 text-center pb-2">
                 Curriculum based on WPATH & SES-VMTW guidelines. Not medical advice.
             </div>
+
+            {/* Personalization Modal */}
+            {showPersonalize && (
+                <div className="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-sm p-4 flex flex-col animate-in fade-in duration-200">
+                    <h3 className="text-lg font-bold text-white mb-4">Train Your Coach</h3>
+                    <div className="space-y-4 flex-1">
+                        <div>
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">What should I call you?</label>
+                            <input
+                                type="text"
+                                value={userContext.name}
+                                onChange={e => setUserContext({ ...userContext, name: e.target.value })}
+                                className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500"
+                                placeholder="Name"
+                            />
+                        </div>
+                        <div>
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Pronouns</label>
+                            <input
+                                type="text"
+                                value={userContext.pronouns}
+                                onChange={e => setUserContext({ ...userContext, pronouns: e.target.value })}
+                                className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500"
+                                placeholder="e.g. she/her, they/them"
+                            />
+                        </div>
+                        <div>
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Main Goal</label>
+                            <textarea
+                                value={userContext.goals}
+                                onChange={e => setUserContext({ ...userContext, goals: e.target.value })}
+                                className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 min-h-[100px]"
+                                placeholder="What do you want to achieve with your voice?"
+                            ></textarea>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => setShowPersonalize(false)}
+                        className="w-full py-3 bg-blue-600 rounded-xl font-bold text-white hover:bg-blue-500 transition-colors mt-4"
+                    >
+                        Save & Close
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

@@ -62,18 +62,20 @@ const JournalForm = ({ onSubmit, onCancel }) => {
             }
         }
 
-        onSubmit({
-            notes,
-            script,
-            effort,
-            confidence,
-            sentiment,
-            audioUrl: uploadedUrl,
-            timestamp: Date.now()
-        });
+        // Call parent handler
+        if (onSubmit) {
+            onSubmit({
+                notes,
+                script,
+                effort,
+                confidence,
+                sentiment,
+                audioUrl: uploadedUrl,
+                timestamp: Date.now()
+            });
+        }
 
-        // Reset or close is handled by parent, but we can reset submitting just in case
-        setTimeout(() => setIsSubmitting(false), 2000);
+        setIsSubmitting(false);
     };
 
     const formatTime = (s) => {

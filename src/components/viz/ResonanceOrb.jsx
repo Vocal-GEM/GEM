@@ -6,25 +6,48 @@ const ResonanceOrb = ({ dataRef, calibration }) => {
     const minC = calibration ? calibration.dark : 500;
     const maxC = calibration ? calibration.bright : 2500;
 
+    // Ref for smoothing
+    const currentRPercent = useRef(0);
+
     useEffect(() => {
         const loop = () => {
             if (orbRef.current) {
                 const { resonance, weight, pitch } = dataRef.current;
-                let rPercent = 0;
+
+                // 1. Calculate Target Percentage
+                let targetRPercent = 0;
                 if (resonance > 0) {
-                    // Adjusted normalization to be less sensitive to extremes
-                    // minC (dark) ~ 500, maxC (bright) ~ 2500
-                    // Typical speech is often 800-1800
-                    // Let's clamp the input range slightly to focus on the middle
-                    const effectiveMin = minC + 200;
-                    const effectiveMax = maxC - 200;
-                    rPercent = ((resonance - effectiveMin) / (effectiveMax - effectiveMin));
-                    rPercent = Math.max(0, Math.min(1, rPercent));
+                    // Adjusted normalization:
+                    // Lowering the "bright" threshold slightly to make it easier to hit
+                    // Shifting the "dark" threshold up slightly to avoid false positives
+                    const effectiveMin = minC + 100; // ~600Hz
+                    const effectiveMax = maxC - 400; // ~2100Hz (was 2500)
+
+                    targetRPercent = ((resonance - effectiveMin) / (effectiveMax - effectiveMin));
+                    targetRPercent = Math.max(0, Math.min(1, targetRPercent));
                 }
 
-                let color = `rgb(59, 130, 246)`;
-                if (rPercent > 0.5) { const t = (rPercent - 0.5) * 2; color = `rgb(${139 + (234 - 139) * t}, ${92 + (179 - 92) * t}, ${246 + (8 - 246) * t})`; } else { const t = rPercent * 2; color = `rgb(${59 + (139 - 59) * t}, ${130 + (92 - 130) * t}, ${246 + (246 - 246) * t})`; }
-                if (rPercent > 0.8) color = `rgb(250, 204, 21)`;
+                // 2. Smoothing (Lerp)
+                // factor 0.05 = slow smooth
+                const smoothFactor = 0.05;
+                currentRPercent.current = currentRPercent.current + (targetRPercent - currentRPercent.current) * smoothFactor;
+
+                const rPercent = currentRPercent.current;
+
+                // 3. Visuals
+                let color = `rgb(59, 130, 246)`; // Blue (Neutral)
+
+                if (rPercent > 0.5) {
+                    // Blue -> Yellow
+                    const t = (rPercent - 0.5) * 2;
+                    // Interpolate Blue (59, 130, 246) to Yellow (250, 204, 21)
+                    color = `rgb(${59 + (250 - 59) * t}, ${130 + (204 - 130) * t}, ${246 + (21 - 246) * t})`;
+                } else {
+                    // Darker Blue -> Blue
+                    const t = rPercent * 2;
+                    // Darker Blue (30, 58, 138) -> Blue (59, 130, 246)
+                    color = `rgb(${30 + (59 - 30) * t}, ${58 + (130 - 58) * t}, ${138 + (246 - 138) * t})`;
+                }
 
                 const scale = 1 + (weight / 200);
                 orbRef.current.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), ${color})`;
@@ -34,8 +57,8 @@ const ResonanceOrb = ({ dataRef, calibration }) => {
 
                 if (labelRef.current) {
                     if (pitch <= 0) labelRef.current.innerText = "Listening...";
-                    else if (rPercent > 0.75) labelRef.current.innerText = "Bright / Head"; // Higher threshold
-                    else if (rPercent < 0.25) labelRef.current.innerText = "Dark / Chest"; // Lower threshold
+                    else if (rPercent > 0.65) labelRef.current.innerText = "Bright / Head"; // Lowered threshold
+                    else if (rPercent < 0.35) labelRef.current.innerText = "Dark / Chest"; // Raised threshold
                     else labelRef.current.innerText = "Balanced";
                 }
             }

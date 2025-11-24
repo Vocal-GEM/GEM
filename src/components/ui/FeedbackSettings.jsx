@@ -2,6 +2,16 @@ import React from 'react';
 import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X } from 'lucide-react';
 
 const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange, onSetGoal, onOpenTutorial, calibration, onUpdateRange, onUpdateCalibration, onExportData }) => {
+    const defaultGenderRanges = {
+        masc: { min: 85, max: 145 },
+        androg: { min: 145, max: 175 },
+        fem: { min: 165, max: 255 },
+    };
+    const [customRanges, setCustomRanges] = React.useState({
+        masc: { min: targetRange.min, max: targetRange.max },
+        androg: { min: targetRange.min, max: targetRange.max },
+        fem: { min: targetRange.min, max: targetRange.max },
+    });
     if (!isOpen) return null;
 
     return (
@@ -28,6 +38,18 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                             <div className="font-bold text-sm">Feminine</div>
                             <div className="text-[10px] opacity-70">170-220 Hz</div>
                         </button>
+                    </div>
+                    {/* Custom Gender Range Inputs */}
+                    <div className="mt-4 space-y-4">
+                        {['masc', 'androg', 'fem'].map(type => (
+                            <div key={type} className="flex items-center gap-2">
+                                <span className="capitalize text-sm w-20">{type}</span>
+                                <input type="number" min="50" max="300" value={customRanges[type].min} onChange={e => setCustomRanges(prev => ({ ...prev, [type]: { ...prev[type], min: parseInt(e.target.value) } }))} className="w-16 p-1 bg-slate-800 border border-slate-600 rounded" />
+                                <span>-</span>
+                                <input type="number" min="50" max="300" value={customRanges[type].max} onChange={e => setCustomRanges(prev => ({ ...prev, [type]: { ...prev[type], max: parseInt(e.target.value) } }))} className="w-16 p-1 bg-slate-800 border border-slate-600 rounded" />
+                                <button onClick={() => setSettings({ ...settings, genderRanges: { ...settings.genderRanges, [type]: { min: customRanges[type].min, max: customRanges[type].max } } })} className="px-2 py-1 bg-blue-600 rounded text-xs">Apply</button>
+                            </div>
+                        ))}
                     </div>
 
                     {/* Manual Range Sliders */}
@@ -181,9 +203,12 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                             <Download className="w-5 h-5 text-slate-400" />
                             <span className="text-sm font-bold text-slate-200">Export My Data (JSON)</span>
                         </button>
-                        <div className="text-[10px] text-slate-600 text-center pt-4">
-                            Vocal GEM v0.9.2 (Beta) <br />
-                            Made with ❤️ for the community
+                        <div className="text-[10px] text-slate-600 text-center pt-4 space-y-1">
+                            <div>Vocal GEM v0.9.2 (Beta)</div>
+                            <div>Designed by Riley Reso</div>
+                            <div>Founded on clinical research and techniques</div>
+                            <div>A hobby project made with love ❤️</div>
+                            <div>Contact: <a href="mailto:rreso@msudenver.edu" className="text-blue-500 hover:underline">rreso@msudenver.edu</a></div>
                         </div>
                     </div>
                 </section>

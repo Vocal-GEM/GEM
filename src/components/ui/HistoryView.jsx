@@ -1,6 +1,8 @@
 import React from 'react';
 
-const HistoryView = ({ stats, journals }) => {
+import { Book } from 'lucide-react';
+
+const HistoryView = ({ stats, journals, onLogClick }) => {
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
             {/* Stats Cards */}
@@ -18,6 +20,15 @@ const HistoryView = ({ stats, journals }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Log Journal Button */}
+            <button
+                onClick={onLogClick}
+                className="w-full mb-6 p-4 bg-blue-600 hover:bg-blue-500 rounded-2xl flex items-center justify-center gap-3 transition-colors shadow-lg shadow-blue-500/20"
+            >
+                <Book className="w-5 h-5 text-white" />
+                <span className="font-bold text-white">Log New Entry</span>
+            </button>
 
             {/* Journal Feed */}
             <h3 className="text-lg font-bold mb-4 px-1">Journal History</h3>
