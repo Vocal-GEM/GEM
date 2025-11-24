@@ -11,17 +11,17 @@ const ResonanceOrb = ({ dataRef, calibration }) => {
 
     useEffect(() => {
         const loop = () => {
-            if (orbRef.current) {
+            if (orbRef.current && dataRef.current) {
                 const { resonance, weight, pitch } = dataRef.current;
 
                 // 1. Calculate Target Percentage
                 let targetRPercent = 0;
                 if (resonance > 0) {
                     // Adjusted normalization:
-                    // Lowering the "bright" threshold slightly to make it easier to hit
+                    // Lowering the "bright" threshold significantly to make it easier to hit
                     // Shifting the "dark" threshold up slightly to avoid false positives
                     const effectiveMin = minC + 100; // ~600Hz
-                    const effectiveMax = maxC - 500; // ~2000Hz (was 2100, originally 2500)
+                    const effectiveMax = 1800; // Lowered from 2500Hz to make "Bright" achievable
 
                     let rawPercent = ((resonance - effectiveMin) / (effectiveMax - effectiveMin));
                     rawPercent = Math.max(0, Math.min(1, rawPercent));
@@ -69,7 +69,7 @@ const ResonanceOrb = ({ dataRef, calibration }) => {
             requestAnimationFrame(loop);
         };
         const id = requestAnimationFrame(loop); return () => cancelAnimationFrame(id);
-    }, [calibration]);
+    }, [calibration, minC, maxC, dataRef]);
 
     return (
         <div className="relative h-48 w-full flex items-center justify-center mb-6 mt-2">

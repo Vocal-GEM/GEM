@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 from flask_login import login_required
 import google.generativeai as genai
 import os
+from werkzeug.utils import secure_filename
+from ..utils.rag import rag_system
 
 ai_bp = Blueprint('ai', __name__, url_prefix='/api')
 
@@ -13,6 +15,37 @@ if GEMINI_API_KEY:
 else:
     model = None
     print("WARNING: GEMINI_API_KEY not found. AI features will use mock responses.")
+
+@ai_bp.route('/train', methods=['POST'])
+@login_required
+def train_coach():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+        
+    if file:
+        filename = secure_filename(file.filename)
+        # Save temp
+        temp_path = os.path.join('uploads', filename)
+        file.save(temp_path)
+        
+        count = 0
+        if filename.endswith('.pdf'):
+            count = rag_system.add_pdf(temp_path)
+        elif filename.endswith('.txt') or filename.endswith('.md'):
+            text = file.read().decode('utf-8')
+            count = rag_system.add_document(text, source=filename)
+            
+        # Cleanup
+        try:
+            os.remove(temp_path)
+        except:
+            pass
+            
+        return jsonify({"message": f"Successfully trained on {count} chunks from {filename}"})
 
 @ai_bp.route('/chat', methods=['POST'])
 @login_required
@@ -28,6 +61,12 @@ def chat():
     user_message = data.get('message', '')
     history = data.get('history', []) 
     context = data.get('context', {}) # { stats: {...}, goals: [...], journals: [...] }
+
+    # --- RAG RETRIEVAL ---
+    retrieved_docs = rag_system.query(user_message, k=3)
+    knowledge_context = ""
+    if retrieved_docs:
+        knowledge_context = "\nRELEVANT KNOWLEDGE BASE:\n" + "\n".join([f"- {doc['text']} (Source: {doc['source']})" for doc in retrieved_docs])
 
     # Construct Context String
     context_str = ""
@@ -55,7 +94,10 @@ def chat():
     
     {context_str}
 
+    {knowledge_context}
+
     GUIDELINES:
+    - Use the RELEVANT KNOWLEDGE BASE above to answer technical questions if applicable.
     - Be encouraging and supportive. Acknowledge their progress based on the context above.
     - If the user mentions feeling down or frustrated in their journals, offer specific validation and encouragement.
     - Use simple, accessible language for vocal concepts (pitch, resonance, weight).

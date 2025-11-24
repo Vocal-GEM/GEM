@@ -13,6 +13,8 @@ import HighResSpectrogram from '../viz/HighResSpectrogram';
 import SpectrumAnalyzer from '../viz/SpectrumAnalyzer';
 import VoiceRangeProfile from '../viz/VoiceRangeProfile';
 import MPTTracker from '../viz/MPTTracker';
+import SZRatio from '../viz/SZRatio';
+import IntonationTrainer from '../viz/IntonationTrainer';
 import DailyGoalsWidget from '../ui/DailyGoalsWidget';
 
 const PracticeView = () => {
@@ -107,6 +109,10 @@ const PracticeView = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <VoiceRangeProfile dataRef={dataRef} isActive={isAudioActive} />
                                 <MPTTracker dataRef={dataRef} isActive={isAudioActive} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <IntonationTrainer dataRef={dataRef} isActive={isAudioActive} />
+                                <SZRatio dataRef={dataRef} isActive={isAudioActive} />
                             </div>
                         </div>
                     )}

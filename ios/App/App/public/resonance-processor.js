@@ -76,7 +76,7 @@ class DSP {
         if (tau == halfSize || yinBuffer[tau] >= threshold) return -1;
 
         let betterTau = tau; if (tau > 0 && tau < halfSize - 1) { const s0 = yinBuffer[tau - 1]; const s1 = yinBuffer[tau]; const s2 = yinBuffer[tau + 1]; let adjustment = (s2 - s0) / (2 * (2 * s1 - s2 - s0)); betterTau += adjustment; }
-        const pitch = sampleRate / betterTau; if (pitch < 60 || pitch > 600) return -1; return pitch;
+        const pitch = sampleRate / betterTau; if (pitch < 50 || pitch > 800) return -1; return pitch; // Expanded range for better detection
     }
 
     // FEATURE: SPECTRAL TILT (True Vocal Weight)
@@ -102,20 +102,20 @@ class DSP {
         // We normalize this to a 0-1 "Weight" scale where 1 is Heavy/Pressed.
 
         const ratio = lowEnergy / highEnergy;
+        return ratio;
+    }
 
-        // Empirically derived mapping
-        // Ratio 2.0 -> Weight 0.8 (Heavy)
-        // Ratio 10.0 -> Weight 0.2 (Thin)
-
-        // Log scale is often better for energy ratios
-        const logRatio = Math.log10(ratio); // Typically 0.3 to 1.5
-
-        // Invert so higher value = heavier
-        // Map 1.5 (Thin) -> 0
-        // Map 0.3 (Heavy) -> 1
-
-        let weight = 1 - ((logRatio - 0.3) / 1.2);
-        return Math.max(0, Math.min(1, weight));
+    // Targeted DFT to get magnitude of a specific frequency component
+    // This is much more efficient than a full FFT when we only need a few frequencies (H1, H2)
+    static getMagnitudeAtFrequency(buffer, freq, sampleRate) {
+        const omega = 2 * Math.PI * freq / sampleRate;
+        let real = 0;
+        let imag = 0;
+        for (let i = 0; i < buffer.length; i++) {
+            real += buffer[i] * Math.cos(omega * i);
+            imag -= buffer[i] * Math.sin(omega * i);
+        }
+        return Math.sqrt(real * real + imag * imag);
     }
 
     static estimateVowel(f1, f2) {
@@ -139,11 +139,27 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         this.buffer = new Float32Array(2048);
         this.bufferIndex = 0;
         this.smoothedCentroid = 0;
-        this.threshold = 0.02;
+        this.threshold = 0.005; // Lowered from 0.02 for better sensitivity
 
         // Jitter State
         this.lastPitch = 0;
         this.jitterBuffer = [];
+
+        // Smoothing Buffers
+        this.resonanceBuffer = []; // For median filtering
+        this.lastResonance = 0;
+
+        // Weight Smoothing
+        this.weightBuffer = [];
+
+        // Message Handler for Config
+        this.port.onmessage = (event) => {
+            if (event.data.type === 'config') {
+                if (event.data.config.threshold !== undefined) {
+                    this.threshold = event.data.config.threshold;
+                }
+            }
+        };
     }
 
     process(inputs, outputs, parameters) {
@@ -170,7 +186,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
 
             const pitch = DSP.calculatePitchYIN(buffer, fs);
 
-            // Resonance
+            // 1. Spectral Centroid Calculation
             let sumFreq = 0, sumAmp = 0;
             for (let i = 0; i < lpcSpec.length; i++) {
                 const freq = (i * TARGET_RATE) / (2 * lpcSpec.length);
@@ -178,34 +194,82 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                 sumAmp += lpcSpec[i];
             }
             const centroid = sumAmp > 0 ? sumFreq / sumAmp : 0;
-            this.smoothedCentroid = (this.smoothedCentroid * 0.8) + (centroid * 0.2);
 
-            // Formants
-            let p1 = { freq: 0, amp: -Infinity }, p2 = { freq: 0, amp: -Infinity };
+            // 2. Formant Extraction
+            let p1 = { freq: 0, amp: -Infinity }, p2 = { freq: 0, amp: -Infinity }, p3 = { freq: 0, amp: -Infinity };
+            // Find up to 3 peaks
             for (let i = 1; i < lpcSpec.length - 1; i++) {
                 if (lpcSpec[i] > lpcSpec[i - 1] && lpcSpec[i] > lpcSpec[i + 1]) {
                     const freq = (i * TARGET_RATE) / (2 * lpcSpec.length);
+                    // Simple logic to assign to F1/F2/F3 buckets
                     if (freq > 200 && freq < 1000 && lpcSpec[i] > p1.amp) {
                         p2 = p1; p1 = { freq, amp: lpcSpec[i] };
-                    } else if (freq > 1000 && freq < 3000 && lpcSpec[i] > p2.amp) {
-                        p2 = { freq, amp: lpcSpec[i] };
+                    } else if (freq > 1000 && freq < 2500 && lpcSpec[i] > p2.amp) {
+                        p3 = p2; p2 = { freq, amp: lpcSpec[i] };
+                    } else if (freq > 2500 && freq < 4500 && lpcSpec[i] > p3.amp) {
+                        p3 = { freq, amp: lpcSpec[i] };
                     }
                 }
             }
 
-            // FEATURE: TRUE VOCAL WEIGHT (Spectral Tilt)
-            // We use the LPC Spectrum to calculate tilt, which is cleaner than raw FFT
-            const spectralTilt = DSP.calculateSpectralTilt(lpcSpec, TARGET_RATE);
+            // 3. Hybrid Resonance Metric
+            const sorted = [...this.resonanceBuffer].sort((a, b) => a - b);
+            const medianResonance = sorted[Math.floor(sorted.length / 2)];
+
+            // Step B: Adaptive EMA (Exponential Moving Average)
+            // If change is large, react faster. If change is small, smooth more.
+            const diff = Math.abs(medianResonance - this.lastResonance);
+            let alpha = 0.1; // Default slow smoothing
+            if (diff > 200) alpha = 0.3; // Fast reaction for big shifts
+
+            this.smoothedCentroid = (this.lastResonance * (1 - alpha)) + (medianResonance * alpha);
+            this.lastResonance = this.smoothedCentroid;
+
+
+            // FEATURE: TRUE VOCAL WEIGHT (H1-H2 Harmonic Difference)
+            // H1 = Amplitude of Fundamental (Pitch)
+            // H2 = Amplitude of Second Harmonic (2 * Pitch)
+            // H1-H2 > 10dB => Breathy (Light)
+            // H1-H2 < 3dB => Pressed (Heavy)
+
+            let weight = 0.5; // Default neutral
+
+            if (pitch > 50) {
+                // Use the windowed buffer for cleaner spectral analysis
+                const h1Mag = DSP.getMagnitudeAtFrequency(windowed, pitch, TARGET_RATE);
+                const h2Mag = DSP.getMagnitudeAtFrequency(windowed, pitch * 2, TARGET_RATE);
+
+                if (h1Mag > 0 && h2Mag > 0) {
+                    const h1db = 20 * Math.log10(h1Mag);
+                    const h2db = 20 * Math.log10(h2Mag);
+                    const diffDb = h1db - h2db;
+
+                    // Map dB difference to 0-1 Weight
+                    // < 0dB (H2 > H1) -> Very Pressed (1.0)
+                    // 10dB (H1 >> H2) -> Very Breathy (0.0)
+
+                    // Clamp between 0 and 15 for mapping
+                    const clampedDiff = Math.max(0, Math.min(15, diffDb));
+
+                    // Invert: High Diff = Low Weight. Low Diff = High Weight.
+                    // 0dB diff -> 1.0 weight
+                    // 15dB diff -> 0.0 weight
+                    weight = 1.0 - (clampedDiff / 15.0);
+                }
+            }
+
+            // Smooth Weight
+            this.weightBuffer.push(weight);
+            if (this.weightBuffer.length > 5) this.weightBuffer.shift();
+            const avgWeight = this.weightBuffer.reduce((a, b) => a + b, 0) / this.weightBuffer.length;
+
 
             // FEATURE: JITTER (Pitch Stability)
             let jitter = 0;
             if (pitch > 0 && this.lastPitch > 0) {
                 const diff = Math.abs(pitch - this.lastPitch);
-                // Normalize by period (approx) or just raw Hz diff
-                // Jitter is usually % of period, but raw Hz diff is easier to visualize for "Stability"
                 this.jitterBuffer.push(diff);
                 if (this.jitterBuffer.length > 5) this.jitterBuffer.shift();
-
                 const avgJitter = this.jitterBuffer.reduce((a, b) => a + b, 0) / this.jitterBuffer.length;
                 jitter = avgJitter;
             }
@@ -221,8 +285,8 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                     resonance: this.smoothedCentroid,
                     f1: p1.freq,
                     f2: p2.freq,
-                    weight: spectralTilt, // Replaced RMS with Spectral Tilt
-                    volume: rms, // Keep RMS as Volume
+                    weight: avgWeight,
+                    volume: rms,
                     jitter,
                     vowel,
                     spectrum: lpcSpec
@@ -230,7 +294,11 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             });
         } else {
             this.lastPitch = 0;
-            this.port.postMessage({ type: 'update', data: { pitch: -1, resonance: 0, f1: 0, f2: 0, weight: 0, volume: 0, jitter: 0, vowel: '', spectrum: null } });
+            // Decay resonance slowly to 0 instead of hard reset to avoid visual flash
+            this.smoothedCentroid = this.smoothedCentroid * 0.9;
+            if (this.smoothedCentroid < 50) this.smoothedCentroid = 0;
+
+            this.port.postMessage({ type: 'update', data: { pitch: -1, resonance: this.smoothedCentroid, f1: 0, f2: 0, weight: 0, volume: 0, jitter: 0, vowel: '', spectrum: null } });
         }
     }
 }
