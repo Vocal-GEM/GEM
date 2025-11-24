@@ -37,14 +37,30 @@ def create_app():
     # Ensure upload folder exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-    # CORS Configuration
-    # In production, restrict to your frontend domain
-    allowed_origins = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
-    CORS(app, 
-         supports_credentials=True,
-         origins=allowed_origins,
-         allow_headers=['Content-Type', 'Authorization'],
-         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+    # CORS Configuration with Vercel preview support
+    def is_allowed_origin(origin):
+        allowed_origins = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
+        
+        # Check exact matches
+        if origin in allowed_origins or '*' in allowed_origins:
+            return True
+        
+        # Allow Vercel preview deployments (vocal-*.vercel.app)
+        if origin and origin.endswith('.vercel.app'):
+            return True
+        
+        return False
+    
+    # Custom CORS handler
+    @app.after_request
+    def handle_cors(response):
+        origin = request.headers.get('Origin')
+        if origin and is_allowed_origin(origin):
+            response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        return response
     
     # Security Headers
     @app.after_request
