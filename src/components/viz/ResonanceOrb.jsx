@@ -21,10 +21,14 @@ const ResonanceOrb = ({ dataRef, calibration }) => {
                     // Lowering the "bright" threshold slightly to make it easier to hit
                     // Shifting the "dark" threshold up slightly to avoid false positives
                     const effectiveMin = minC + 100; // ~600Hz
-                    const effectiveMax = maxC - 400; // ~2100Hz (was 2500)
+                    const effectiveMax = maxC - 500; // ~2000Hz (was 2100, originally 2500)
 
-                    targetRPercent = ((resonance - effectiveMin) / (effectiveMax - effectiveMin));
-                    targetRPercent = Math.max(0, Math.min(1, targetRPercent));
+                    let rawPercent = ((resonance - effectiveMin) / (effectiveMax - effectiveMin));
+                    rawPercent = Math.max(0, Math.min(1, rawPercent));
+
+                    // Apply curve to boost mid-range values towards bright
+                    // Power < 1 boosts lower values up
+                    targetRPercent = Math.pow(rawPercent, 0.8);
                 }
 
                 // 2. Smoothing (Lerp)
@@ -57,8 +61,8 @@ const ResonanceOrb = ({ dataRef, calibration }) => {
 
                 if (labelRef.current) {
                     if (pitch <= 0) labelRef.current.innerText = "Listening...";
-                    else if (rPercent > 0.65) labelRef.current.innerText = "Bright / Head"; // Lowered threshold
-                    else if (rPercent < 0.35) labelRef.current.innerText = "Dark / Chest"; // Raised threshold
+                    else if (rPercent > 0.6) labelRef.current.innerText = "Bright / Head"; // Lowered from 0.65
+                    else if (rPercent < 0.35) labelRef.current.innerText = "Dark / Chest"; // Kept same
                     else labelRef.current.innerText = "Balanced";
                 }
             }

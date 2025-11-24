@@ -98,11 +98,13 @@ def create_app():
     from .routes.data import data_bp
     from .routes.ai import ai_bp
     from .routes.main import main_bp
+    from .routes.analysis import analysis_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(data_bp)
     app.register_blueprint(ai_bp)
     app.register_blueprint(main_bp)
+    app.register_blueprint(analysis_bp)
 
     with app.app_context():
         db.create_all()

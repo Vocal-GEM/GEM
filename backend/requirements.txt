@@ -7,3 +7,9 @@ werkzeug
 python-dotenv
 gunicorn
 psycopg2-binary
+openai-whisper>=20231117
+praat-parselmouth>=0.4.3
+librosa>=0.10.0
+numpy>=1.24.0
+scipy>=1.11.0
+soundfile>=0.12.0

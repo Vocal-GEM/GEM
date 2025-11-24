@@ -36,11 +36,14 @@ export class AudioEngine {
         this.onAudioUpdate = onAudioUpdate;
         this.isActive = false;
         this.mediaRecorder = null;
+        this.analysisRecorder = null; // Separate recorder for WAV analysis
         this.chunks = [];
+        this.analysisChunks = [];
         this.toneEngine = null;
         this.pitchBuffer = [];
         // Median Smoothing Buffer
         this.smoothPitchBuffer = [];
+        this.isRecordingForAnalysis = false;
     }
 
     async start() {
@@ -126,8 +129,83 @@ export class AudioEngine {
         return { semitoneRange: stRange, slopeDirection: direction };
     }
     playFeedbackTone(freq) { if (this.toneEngine) this.toneEngine.play(freq, 0.15, 'sine'); }
+
+    // Original recording methods (OGG format for journal/comparison)
     startRecording() { if (this.mediaRecorder && this.mediaRecorder.state === 'inactive') { this.chunks = []; this.mediaRecorder.start(); } }
     async stopRecording() { return new Promise((resolve) => { if (this.mediaRecorder && this.mediaRecorder.state === 'recording') { this.mediaRecorder.onstop = () => { const blob = new Blob(this.chunks, { 'type': 'audio/ogg; codecs=opus' }); resolve(window.URL.createObjectURL(blob)); }; this.mediaRecorder.stop(); } else { resolve(null); } }); }
+
+    // New WAV recording methods for voice analysis
+    async startAnalysisRecording() {
+        if (!this.isActive || !this.microphone) {
+            console.error('Audio engine not active');
+            return false;
+        }
+
+        try {
+            // Create a destination node to capture processed audio
+            const dest = this.audioContext.createMediaStreamDestination();
+
+            // Connect the filtered audio to destination
+            this.lowpass.connect(dest);
+
+            // Create MediaRecorder with WAV support if available
+            const mimeType = MediaRecorder.isTypeSupported('audio/wav')
+                ? 'audio/wav'
+                : MediaRecorder.isTypeSupported('audio/webm;codecs=pcm')
+                    ? 'audio/webm;codecs=pcm'
+                    : 'audio/webm'; // Fallback
+
+            this.analysisRecorder = new MediaRecorder(dest.stream, { mimeType });
+            this.analysisChunks = [];
+
+            this.analysisRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) {
+                    this.analysisChunks.push(e.data);
+                }
+            };
+
+            this.analysisRecorder.start();
+            this.isRecordingForAnalysis = true;
+            return true;
+        } catch (err) {
+            console.error('Failed to start analysis recording:', err);
+            return false;
+        }
+    }
+
+    async stopAnalysisRecording() {
+        return new Promise((resolve) => {
+            if (this.analysisRecorder && this.analysisRecorder.state === 'recording') {
+                this.analysisRecorder.onstop = () => {
+                    const blob = new Blob(this.analysisChunks, { type: this.analysisRecorder.mimeType });
+                    this.isRecordingForAnalysis = false;
+
+                    // Disconnect the extra connection
+                    try {
+                        this.lowpass.disconnect(this.analysisRecorder.stream);
+                    } catch (e) {
+                        // Already disconnected
+                    }
+
+                    resolve({
+                        blob: blob,
+                        url: window.URL.createObjectURL(blob),
+                        mimeType: this.analysisRecorder.mimeType
+                    });
+                };
+                this.analysisRecorder.stop();
+            } else {
+                this.isRecordingForAnalysis = false;
+                resolve(null);
+            }
+        });
+    }
+
+    // Convert blob to AudioBuffer for analysis
+    async blobToAudioBuffer(blob) {
+        const arrayBuffer = await blob.arrayBuffer();
+        return await this.audioContext.decodeAudioData(arrayBuffer);
+    }
     stop() { if (!this.isActive) return; this.workletNode.disconnect(); this.microphone.disconnect(); this.audioContext.close(); this.isActive = false; }
 
     setNoiseGate(threshold) {

@@ -33,6 +33,7 @@ import IncognitoScreen from './components/ui/IncognitoScreen';
 import FloatingCamera from './components/ui/FloatingCamera';
 import OfflineIndicator from './components/ui/OfflineIndicator';
 import MigrationModal from './components/ui/MigrationModal';
+import AnalysisView from './components/views/AnalysisView';
 
 // Games
 import ResonanceRiverGame from './components/games/ResonanceRiverGame';
@@ -41,7 +42,7 @@ import StaircaseGame from './components/games/StaircaseGame';
 import FlappyVoiceGame from './components/games/FlappyVoiceGame';
 import PitchMatchGame from './components/games/PitchMatchGame';
 
-import { Mic, Camera, Book, Wrench, ArrowLeft, Mic2, Gamepad2, Bot, BarChart2 } from 'lucide-react';
+import { Mic, Camera, Book, Wrench, ArrowLeft, Mic2, Gamepad2, Bot, BarChart2, Activity } from 'lucide-react';
 
 const App = () => {
     const {
@@ -278,6 +279,7 @@ const App = () => {
                     </div>
                 )}
                 {activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} />}
+                {activeTab === 'analysis' && <AnalysisView />}
             </main>
 
             {/* Navigation */}
@@ -302,6 +304,10 @@ const App = () => {
                     <button onClick={() => { setActiveTab('history'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'history' ? 'text-orange-400 bg-orange-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
                         <BarChart2 className="w-6 h-6" />
                         <span className="text-[10px] font-bold">Progress</span>
+                    </button>
+                    <button onClick={() => { setActiveTab('analysis'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'analysis' ? 'text-cyan-400 bg-cyan-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <Activity className="w-6 h-6" />
+                        <span className="text-[10px] font-bold">Analysis</span>
                     </button>
                 </div>
             </nav>

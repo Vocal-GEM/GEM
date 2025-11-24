@@ -66,8 +66,8 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
                 // Pitch Control with Smoothing & Silence Bridging
                 if (pitch > 50) {
                     state.silenceTimer = 0;
-                    // Smooth the input pitch (EMA)
-                    state.smoothedPitch += (pitch - state.smoothedPitch) * 0.15;
+                    // Smooth the input pitch (EMA) - Reduced from 0.15 to 0.08 for less jitter
+                    state.smoothedPitch += (pitch - state.smoothedPitch) * 0.08;
                     state.lastValidPitch = state.smoothedPitch;
                 } else {
                     state.silenceTimer++;
@@ -83,15 +83,17 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
                 if (state.smoothedPitch > 50) {
                     // Map pitch to screen height (inverted: high pitch = top/0, low pitch = bottom/height)
                     // Range: targetRange.min to targetRange.max
-                    const minP = targetRange.min || 150;
-                    const maxP = targetRange.max || 300;
+                    // Add 10Hz buffer on each side so it's easier to reach edges
+                    const minP = (targetRange.min || 150) - 10;
+                    const maxP = (targetRange.max || 300) + 10;
                     const normalized = Math.max(0, Math.min(1, (state.smoothedPitch - minP) / (maxP - minP)));
 
                     // Target Y (padding of 50px top/bottom)
                     const targetY = (height - 50) - (normalized * (height - 100));
 
                     // Smooth movement - tuned for responsiveness
-                    state.birdY += (targetY - state.birdY) * 0.08; // Slower lerp for fluidity
+                    // Reduced from 0.08 to 0.05 for "heavier" feel
+                    state.birdY += (targetY - state.birdY) * 0.05;
                 } else {
                     // Gravity (fall down if no sound)
                     state.birdY += 4;
