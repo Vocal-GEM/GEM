@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, Square, Play, Pause, BarChart3, FileText, Waveform, History, Save, Trash2, ChevronLeft, Calendar } from 'lucide-react';
+import { Mic, Square, Play, Pause, BarChart3, FileText, Waveform, History, Save, Trash2, ChevronLeft, Calendar, ArrowRight } from 'lucide-react';
 import { useGem } from '../../context/GemContext';
 import { VoiceAnalyzer } from '../../utils/voiceAnalysis';
 import { transcriptionEngine } from '../../utils/transcriptionEngine';
 import { historyService } from '../../utils/historyService';
 import PitchTrace from '../viz/PitchTrace';
 import VowelSpacePlot from '../viz/VowelSpacePlot';
+import Toast from '../ui/Toast';
 
 const AnalysisView = () => {
     const { audioEngineRef, targetRange } = useGem();
@@ -22,6 +23,7 @@ const AnalysisView = () => {
     const [statusMessage, setStatusMessage] = useState('');
     const [historySessions, setHistorySessions] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
+    const [toast, setToast] = useState(null); // { message, type }
 
     const timerRef = useRef(null);
     const audioRef = useRef(null);
@@ -43,6 +45,10 @@ const AnalysisView = () => {
             if (timerRef.current) clearInterval(timerRef.current);
         };
     }, []);
+
+    const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+    };
 
     const handleStartRecording = async () => {
         if (!audioEngineRef.current) return;
@@ -134,7 +140,7 @@ const AnalysisView = () => {
 
         } catch (error) {
             console.error('Analysis error:', error);
-            alert('Analysis failed: ' + error.message);
+            showToast('Analysis failed: ' + error.message, 'error');
             setMode('record');
         }
     };
@@ -152,10 +158,10 @@ const AnalysisView = () => {
                 audioBlob: analysisResults.blob,
                 pitchSeries: analysisResults.pitchSeries
             });
-            alert('Session saved to history!');
+            showToast('Session saved to history!', 'success');
         } catch (error) {
             console.error('Failed to save session:', error);
-            alert('Failed to save session');
+            showToast('Failed to save session', 'error');
         } finally {
             setIsSaving(false);
         }
@@ -168,6 +174,7 @@ const AnalysisView = () => {
             setMode('history');
         } catch (error) {
             console.error('Failed to load history:', error);
+            showToast('Failed to load history', 'error');
         }
     };
 
@@ -189,8 +196,10 @@ const AnalysisView = () => {
             try {
                 await historyService.deleteSession(id);
                 loadHistory(); // Refresh list
+                showToast('Session deleted', 'success');
             } catch (error) {
                 console.error('Failed to delete session:', error);
+                showToast('Failed to delete session', 'error');
             }
         }
     };
@@ -281,7 +290,7 @@ const AnalysisView = () => {
 
                 {/* Record Mode */}
                 {mode === 'record' && (
-                    <div className="space-y-6">
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         {/* Recording Control */}
                         <div className="bg-slate-900 rounded-2xl p-8 border border-slate-800">
                             <div className="text-center space-y-6">
@@ -338,7 +347,7 @@ const AnalysisView = () => {
 
                 {/* Analyzing Mode */}
                 {mode === 'analyzing' && (
-                    <div className="bg-slate-900 rounded-2xl p-12 border border-slate-800 text-center">
+                    <div className="bg-slate-900 rounded-2xl p-12 border border-slate-800 text-center animate-in fade-in zoom-in-95 duration-300">
                         <div className="w-24 h-24 mx-auto mb-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                         <h2 className="text-2xl font-bold mb-2">Analyzing Your Voice...</h2>
                         <p className="text-slate-400">
@@ -349,7 +358,7 @@ const AnalysisView = () => {
 
                 {/* History Mode */}
                 {mode === 'history' && (
-                    <div className="space-y-6">
+                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                         <button
                             onClick={() => setMode('record')}
                             className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
@@ -360,8 +369,14 @@ const AnalysisView = () => {
 
                         <div className="grid gap-4">
                             {historySessions.length === 0 ? (
-                                <div className="text-center py-12 text-slate-500">
-                                    No history yet. Record your first session!
+                                <div className="text-center py-12 text-slate-500 bg-slate-900/50 rounded-xl border border-slate-800 border-dashed">
+                                    <p className="mb-4">No history yet.</p>
+                                    <button
+                                        onClick={() => setMode('record')}
+                                        className="px-4 py-2 bg-blue-600 rounded-lg text-sm font-bold hover:bg-blue-500 transition-colors"
+                                    >
+                                        Record your first session
+                                    </button>
                                 </div>
                             ) : (
                                 historySessions.map(session => (
@@ -417,7 +432,7 @@ const AnalysisView = () => {
 
                 {/* Results Mode */}
                 {mode === 'results' && analysisResults && (
-                    <div className="space-y-6">
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         {/* Playback Controls */}
                         <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
                             <audio
@@ -488,9 +503,9 @@ const AnalysisView = () => {
                         </div>
 
                         {/* Tab Content */}
-                        <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
+                        <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 min-h-[300px]">
                             {activeTab === 'transcript' && (
-                                <div className="space-y-4">
+                                <div className="space-y-4 animate-in fade-in duration-300">
                                     <h3 className="font-bold text-lg mb-4">Color-Coded Transcript</h3>
                                     <div className="text-lg leading-relaxed">
                                         {analysisResults.words.map((word, i) => (
@@ -534,7 +549,7 @@ const AnalysisView = () => {
                             )}
 
                             {activeTab === 'metrics' && (
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-2 gap-4 animate-in fade-in duration-300">
                                     {/* Pitch Metrics */}
                                     <div className="bg-slate-800/50 rounded-xl p-4">
                                         <div className="text-sm text-slate-400 mb-1">Average Pitch</div>
@@ -581,7 +596,7 @@ const AnalysisView = () => {
                             )}
 
                             {activeTab === 'viz' && (
-                                <div className="space-y-6">
+                                <div className="space-y-6 animate-in fade-in duration-300">
                                     <div>
                                         <h3 className="font-bold text-lg mb-4">Pitch Contour</h3>
                                         <PitchTrace
@@ -608,6 +623,13 @@ const AnalysisView = () => {
                     </div>
                 )}
             </div>
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </div>
     );
 };

@@ -32,7 +32,8 @@ export class VoiceAnalyzer {
             intensity: this.calculateIntensity(segment),
             spectral: this.calculateSpectralFeatures(segment, sampleRate),
             jitter: this.estimateJitter(segment, sampleRate),
-            hnr: this.estimateHNR(segment, sampleRate)
+            hnr: this.estimateHNR(segment, sampleRate),
+            sibilance: this.calculateSibilance(segment, sampleRate)
         };
     }
 
@@ -282,6 +283,73 @@ export class VoiceAnalyzer {
             };
         }
         return result;
+    }
+
+    /**
+     * Calculate sibilance features (specifically for /s/ vs /sh/ distinction)
+     * Focuses on energy in 4kHz-8kHz range vs lower frequencies
+     */
+    calculateSibilance(samples, sampleRate) {
+        const fftSize = 2048;
+        const fft = this.performFFT(samples.slice(0, fftSize));
+        const spectrum = fft.map(c => Math.sqrt(c.real * c.real + c.imag * c.imag));
+
+        // Calculate energy in specific bands
+        let energyLow = 0;   // 0 - 3kHz
+        let energyHigh = 0;  // 4kHz - 8kHz
+        let totalEnergy = 0;
+
+        // Spectral centroid specifically for high frequencies
+        let highFreqWeightedSum = 0;
+        let highFreqTotalSum = 0;
+
+        for (let i = 0; i < spectrum.length / 2; i++) {
+            const freq = (i * sampleRate) / fftSize;
+            const magnitude = spectrum[i];
+
+            totalEnergy += magnitude;
+
+            if (freq < 3000) {
+                energyLow += magnitude;
+            } else if (freq >= 4000 && freq <= 8000) {
+                energyHigh += magnitude;
+                highFreqWeightedSum += freq * magnitude;
+                highFreqTotalSum += magnitude;
+            }
+        }
+
+        const highFreqCentroid = highFreqTotalSum > 0 ? highFreqWeightedSum / highFreqTotalSum : 0;
+
+        return {
+            score: totalEnergy > 0 ? energyHigh / totalEnergy : 0, // Ratio of high freq energy
+            centroid: highFreqCentroid,
+            isSibilant: this.detectSibilant(samples, sampleRate) // Helper check
+        };
+    }
+
+    /**
+     * Detect if segment is likely a sibilant based on Zero Crossing Rate and Energy
+     */
+    detectSibilant(samples, sampleRate) {
+        // 1. Zero Crossing Rate (ZCR)
+        let zeroCrossings = 0;
+        for (let i = 1; i < samples.length; i++) {
+            if ((samples[i] >= 0 && samples[i - 1] < 0) || (samples[i] < 0 && samples[i - 1] >= 0)) {
+                zeroCrossings++;
+            }
+        }
+        const zcr = zeroCrossings / samples.length;
+
+        // 2. RMS Energy
+        let sumSq = 0;
+        for (let i = 0; i < samples.length; i++) {
+            sumSq += samples[i] * samples[i];
+        }
+        const rms = Math.sqrt(sumSq / samples.length);
+
+        // Thresholds (tuned for speech)
+        // High ZCR usually indicates unvoiced fricatives
+        return zcr > 0.15 && rms > 0.01;
     }
 
     /**

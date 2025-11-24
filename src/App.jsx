@@ -34,6 +34,7 @@ import FloatingCamera from './components/ui/FloatingCamera';
 import OfflineIndicator from './components/ui/OfflineIndicator';
 import MigrationModal from './components/ui/MigrationModal';
 import AnalysisView from './components/views/AnalysisView';
+import ArticulationView from './components/views/ArticulationView';
 
 // Games
 import ResonanceRiverGame from './components/games/ResonanceRiverGame';
@@ -258,6 +259,10 @@ const App = () => {
                                 <Wrench className="text-purple-400" />
                                 <span className="text-xs font-bold">Tools</span>
                             </button>
+                            <button onClick={() => setActiveTab('articulation')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
+                                <Mic className="text-pink-400" />
+                                <span className="text-xs font-bold">Articulation</span>
+                            </button>
                         </div>
                     </div>
                 )}
@@ -279,7 +284,17 @@ const App = () => {
                     </div>
                 )}
                 {activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} />}
+                {activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} />}
                 {activeTab === 'analysis' && <AnalysisView />}
+                {activeTab === 'articulation' && (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex items-center gap-2 mb-4 px-4 pt-4">
+                            <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><ArrowLeft /></button>
+                            <h2 className="text-xl font-bold">Articulation Practice</h2>
+                        </div>
+                        <ArticulationView />
+                    </div>
+                )}
             </main>
 
             {/* Navigation */}
