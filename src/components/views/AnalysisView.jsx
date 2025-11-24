@@ -1,15 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, Square, Play, Pause, BarChart3, FileText, Waveform, History, Save, Trash2, ChevronLeft, Calendar, ArrowRight } from 'lucide-react';
+import { Mic, Square, Play, Pause, BarChart3, FileText, Waveform, History, Save, Trash2, ChevronLeft, Calendar, ArrowRight, Sparkles } from 'lucide-react';
 import { useGem } from '../../context/GemContext';
 import { VoiceAnalyzer } from '../../utils/voiceAnalysis';
 import { transcriptionEngine } from '../../utils/transcriptionEngine';
 import { historyService } from '../../utils/historyService';
+import { CoachEngine } from '../../utils/coachEngine';
 import PitchTrace from '../viz/PitchTrace';
 import VowelSpacePlot from '../viz/VowelSpacePlot';
 import Toast from '../ui/Toast';
+import AssessmentView from './AssessmentView';
 
 const AnalysisView = () => {
-    const { audioEngineRef, targetRange } = useGem();
+    const { audioEngineRef, targetRange, userSettings } = useGem();
 
     // State management
     const [mode, setMode] = useState('record'); // 'record' | 'analyzing' | 'results' | 'history'
@@ -17,13 +19,14 @@ const AnalysisView = () => {
     const [recordingTime, setRecordingTime] = useState(0);
     const [audioData, setAudioData] = useState(null);
     const [analysisResults, setAnalysisResults] = useState(null);
-    const [activeTab, setActiveTab] = useState('transcript'); // 'transcript' | 'metrics' | 'viz'
+    const [activeTab, setActiveTab] = useState('transcript'); // 'transcript' | 'metrics' | 'viz' | 'coach'
     const [currentPlayTime, setCurrentPlayTime] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
     const [historySessions, setHistorySessions] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
     const [toast, setToast] = useState(null); // { message, type }
+    const [coachFeedback, setCoachFeedback] = useState(null);
 
     const timerRef = useRef(null);
     const audioRef = useRef(null);
@@ -136,6 +139,7 @@ const AnalysisView = () => {
             };
 
             setAnalysisResults(results);
+            setCoachFeedback(null); // Reset coach feedback
             setMode('results');
 
         } catch (error) {
@@ -143,6 +147,18 @@ const AnalysisView = () => {
             showToast('Analysis failed: ' + error.message, 'error');
             setMode('record');
         }
+    };
+
+    const generateCoachFeedback = () => {
+        if (!analysisResults) return;
+
+        const feedback = CoachEngine.generateFeedback(analysisResults, {
+            targetPitch: targetRange,
+            gender: userSettings?.gender || 'feminine' // Default or from settings
+        });
+
+        setCoachFeedback(feedback);
+        setActiveTab('coach');
     };
 
     const saveSession = async () => {
@@ -187,6 +203,7 @@ const AnalysisView = () => {
             audioUrl,
             blob: session.audioBlob
         });
+        setCoachFeedback(null); // Reset feedback on load
         setMode('results');
     };
 
@@ -482,16 +499,22 @@ const AnalysisView = () => {
                         </div>
 
                         {/* Tabs */}
-                        <div className="flex gap-2 border-b border-slate-800">
+                        <div className="flex gap-2 border-b border-slate-800 overflow-x-auto">
                             {[
                                 { id: 'transcript', label: 'Transcript', icon: FileText },
                                 { id: 'metrics', label: 'Metrics', icon: BarChart3 },
-                                { id: 'viz', label: 'Visualizations', icon: Waveform }
+                                { id: 'viz', label: 'Visualizations', icon: Waveform },
+                                { id: 'coach', label: 'AI Coach', icon: Sparkles }
                             ].map(tab => (
                                 <button
                                     key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`px-4 py-3 font-medium transition-colors flex items-center gap-2 ${activeTab === tab.id
+                                    onClick={() => {
+                                        setActiveTab(tab.id);
+                                        if (tab.id === 'coach' && !coachFeedback) {
+                                            generateCoachFeedback();
+                                        }
+                                    }}
+                                    className={`px-4 py-3 font-medium transition-colors flex items-center gap-2 whitespace-nowrap ${activeTab === tab.id
                                         ? 'text-blue-400 border-b-2 border-blue-400'
                                         : 'text-slate-400 hover:text-slate-300'
                                         }`}
@@ -617,6 +640,26 @@ const AnalysisView = () => {
                                             Shows your average resonance position relative to standard vowel targets.
                                         </p>
                                     </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'coach' && (
+                                <div className="animate-in fade-in duration-300">
+                                    {coachFeedback ? (
+                                        <AssessmentView
+                                            feedback={coachFeedback}
+                                            onClose={() => setActiveTab('transcript')}
+                                            onPractice={(exercise) => {
+                                                showToast(`Starting ${exercise}...`, 'success');
+                                                // In a real app, this would navigate to the exercise
+                                            }}
+                                        />
+                                    ) : (
+                                        <div className="text-center py-12">
+                                            <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                            <p className="text-slate-400">Consulting the coach...</p>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
