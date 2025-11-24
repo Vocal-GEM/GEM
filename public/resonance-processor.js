@@ -105,6 +105,19 @@ class DSP {
         return ratio;
     }
 
+    // Targeted DFT to get magnitude of a specific frequency component
+    // This is much more efficient than a full FFT when we only need a few frequencies (H1, H2)
+    static getMagnitudeAtFrequency(buffer, freq, sampleRate) {
+        const omega = 2 * Math.PI * freq / sampleRate;
+        let real = 0;
+        let imag = 0;
+        for (let i = 0; i < buffer.length; i++) {
+            real += buffer[i] * Math.cos(omega * i);
+            imag -= buffer[i] * Math.sin(omega * i);
+        }
+        return Math.sqrt(real * real + imag * imag);
+    }
+
     static estimateVowel(f1, f2) {
         // Simple Vowel Space Mapping (Average Female Values)
         // i (beet): F1 300, F2 2500
@@ -135,6 +148,9 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         // Smoothing Buffers
         this.resonanceBuffer = []; // For median filtering
         this.lastResonance = 0;
+
+        // Weight Smoothing
+        this.weightBuffer = [];
     }
 
     process(inputs, outputs, parameters) {
@@ -221,8 +237,43 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             this.lastResonance = this.smoothedCentroid;
 
 
-            // FEATURE: TRUE VOCAL WEIGHT (Spectral Tilt)
-            const spectralTilt = DSP.calculateSpectralTilt(lpcSpec, TARGET_RATE);
+            // FEATURE: TRUE VOCAL WEIGHT (H1-H2 Harmonic Difference)
+            // H1 = Amplitude of Fundamental (Pitch)
+            // H2 = Amplitude of Second Harmonic (2 * Pitch)
+            // H1-H2 > 10dB => Breathy (Light)
+            // H1-H2 < 3dB => Pressed (Heavy)
+
+            let weight = 0.5; // Default neutral
+
+            if (pitch > 50) {
+                // Use the windowed buffer for cleaner spectral analysis
+                const h1Mag = DSP.getMagnitudeAtFrequency(windowed, pitch, TARGET_RATE);
+                const h2Mag = DSP.getMagnitudeAtFrequency(windowed, pitch * 2, TARGET_RATE);
+
+                if (h1Mag > 0 && h2Mag > 0) {
+                    const h1db = 20 * Math.log10(h1Mag);
+                    const h2db = 20 * Math.log10(h2Mag);
+                    const diffDb = h1db - h2db;
+
+                    // Map dB difference to 0-1 Weight
+                    // < 0dB (H2 > H1) -> Very Pressed (1.0)
+                    // 10dB (H1 >> H2) -> Very Breathy (0.0)
+
+                    // Clamp between 0 and 15 for mapping
+                    const clampedDiff = Math.max(0, Math.min(15, diffDb));
+
+                    // Invert: High Diff = Low Weight. Low Diff = High Weight.
+                    // 0dB diff -> 1.0 weight
+                    // 15dB diff -> 0.0 weight
+                    weight = 1.0 - (clampedDiff / 15.0);
+                }
+            }
+
+            // Smooth Weight
+            this.weightBuffer.push(weight);
+            if (this.weightBuffer.length > 5) this.weightBuffer.shift();
+            const avgWeight = this.weightBuffer.reduce((a, b) => a + b, 0) / this.weightBuffer.length;
+
 
             // FEATURE: JITTER (Pitch Stability)
             let jitter = 0;
@@ -245,7 +296,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                     resonance: this.smoothedCentroid,
                     f1: p1.freq,
                     f2: p2.freq,
-                    weight: spectralTilt,
+                    weight: avgWeight,
                     volume: rms,
                     jitter,
                     vowel,
