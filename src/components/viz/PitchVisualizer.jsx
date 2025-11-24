@@ -94,9 +94,8 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
             }
 
             const history = dataRef.current.history;
-            const history = dataRef.current.history;
 
-            // 1. Draw the Line (Green)
+            // 1. Draw the Line (Green) with Gap Bridging
             ctx.strokeStyle = '#22c55e'; // Bright Green (Tailwind green-500)
             ctx.lineWidth = 3;
             ctx.lineCap = 'round';
@@ -104,6 +103,9 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
             ctx.beginPath();
 
             let hasStarted = false;
+            let lastValidIndex = -1;
+            const maxGap = 20; // Bridge gaps up to 20 frames (~300ms at 60fps)
+
             history.forEach((p, i) => {
                 const x = (i / (history.length - 1)) * width;
                 if (p > 0) {
@@ -111,14 +113,19 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
                     if (!hasStarted) {
                         ctx.moveTo(x, y);
                         hasStarted = true;
+                        lastValidIndex = i;
                     } else {
-                        const prevP = history[i - 1];
-                        // Continuity check
-                        if (prevP > 0 && Math.abs(p - prevP) < 400) {
+                        const gap = i - lastValidIndex;
+                        const lastValidP = history[lastValidIndex];
+
+                        // Connect if: gap is small OR pitch change is reasonable
+                        if (gap <= maxGap && Math.abs(p - lastValidP) < 400) {
                             ctx.lineTo(x, y);
                         } else {
+                            // Gap too large or pitch jump too big - start new segment
                             ctx.moveTo(x, y);
                         }
+                        lastValidIndex = i;
                     }
                 }
             });
