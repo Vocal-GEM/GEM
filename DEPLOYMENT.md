@@ -23,7 +23,7 @@
 2. **Configure Build Settings**
    ```
    Build Command: pip install -r requirements.txt
-   Start Command: gunicorn app:app
+   Start Command: gunicorn wsgi:app
    ```
 
 3. **Add Environment Variables**
