@@ -102,20 +102,7 @@ class DSP {
         // We normalize this to a 0-1 "Weight" scale where 1 is Heavy/Pressed.
 
         const ratio = lowEnergy / highEnergy;
-
-        // Empirically derived mapping
-        // Ratio 2.0 -> Weight 0.8 (Heavy)
-        // Ratio 10.0 -> Weight 0.2 (Thin)
-
-        // Log scale is often better for energy ratios
-        const logRatio = Math.log10(ratio); // Typically 0.3 to 1.5
-
-        // Invert so higher value = heavier
-        // Map 1.5 (Thin) -> 0
-        // Map 0.3 (Heavy) -> 1
-
-        let weight = 1 - ((logRatio - 0.3) / 1.2);
-        return Math.max(0, Math.min(1, weight));
+        return ratio;
     }
 
     static estimateVowel(f1, f2) {
@@ -144,6 +131,10 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         // Jitter State
         this.lastPitch = 0;
         this.jitterBuffer = [];
+
+        // Smoothing Buffers
+        this.resonanceBuffer = []; // For median filtering
+        this.lastResonance = 0;
     }
 
     process(inputs, outputs, parameters) {
@@ -170,7 +161,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
 
             const pitch = DSP.calculatePitchYIN(buffer, fs);
 
-            // Resonance
+            // 1. Spectral Centroid Calculation
             let sumFreq = 0, sumAmp = 0;
             for (let i = 0; i < lpcSpec.length; i++) {
                 const freq = (i * TARGET_RATE) / (2 * lpcSpec.length);
@@ -178,34 +169,67 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                 sumAmp += lpcSpec[i];
             }
             const centroid = sumAmp > 0 ? sumFreq / sumAmp : 0;
-            this.smoothedCentroid = (this.smoothedCentroid * 0.8) + (centroid * 0.2);
 
-            // Formants
-            let p1 = { freq: 0, amp: -Infinity }, p2 = { freq: 0, amp: -Infinity };
+            // 2. Formant Extraction
+            let p1 = { freq: 0, amp: -Infinity }, p2 = { freq: 0, amp: -Infinity }, p3 = { freq: 0, amp: -Infinity };
+            // Find up to 3 peaks
             for (let i = 1; i < lpcSpec.length - 1; i++) {
                 if (lpcSpec[i] > lpcSpec[i - 1] && lpcSpec[i] > lpcSpec[i + 1]) {
                     const freq = (i * TARGET_RATE) / (2 * lpcSpec.length);
+                    // Simple logic to assign to F1/F2/F3 buckets
                     if (freq > 200 && freq < 1000 && lpcSpec[i] > p1.amp) {
                         p2 = p1; p1 = { freq, amp: lpcSpec[i] };
-                    } else if (freq > 1000 && freq < 3000 && lpcSpec[i] > p2.amp) {
-                        p2 = { freq, amp: lpcSpec[i] };
+                    } else if (freq > 1000 && freq < 2500 && lpcSpec[i] > p2.amp) {
+                        p3 = p2; p2 = { freq, amp: lpcSpec[i] };
+                    } else if (freq > 2500 && freq < 4500 && lpcSpec[i] > p3.amp) {
+                        p3 = { freq, amp: lpcSpec[i] };
                     }
                 }
             }
 
+            // 3. Hybrid Resonance Metric
+            // Research suggests F2 is dominant for gender perception, but Centroid gives broad "brightness".
+            // We combine them: 50% Centroid, 50% Weighted Formants.
+            // If formants are missing (0), we rely more on centroid.
+
+            let formantAvg = 0;
+            let count = 0;
+            if (p1.freq > 0) { formantAvg += p1.freq * 0.5; count += 0.5; } // F1 contributes less to brightness
+            if (p2.freq > 0) { formantAvg += p2.freq * 1.0; count += 1.0; } // F2 is key
+            if (p3.freq > 0) { formantAvg += p3.freq * 0.8; count += 0.8; } // F3 adds "ring"
+
+            const effectiveFormantResonance = count > 0 ? formantAvg / count : centroid;
+
+            // Raw Hybrid Resonance
+            const rawResonance = (centroid * 0.4) + (effectiveFormantResonance * 0.6);
+
+            // 4. Advanced Smoothing
+            // Step A: Median Filter (Remove glitches)
+            this.resonanceBuffer.push(rawResonance);
+            if (this.resonanceBuffer.length > 7) this.resonanceBuffer.shift();
+
+            const sorted = [...this.resonanceBuffer].sort((a, b) => a - b);
+            const medianResonance = sorted[Math.floor(sorted.length / 2)];
+
+            // Step B: Adaptive EMA (Exponential Moving Average)
+            // If change is large, react faster. If change is small, smooth more.
+            const diff = Math.abs(medianResonance - this.lastResonance);
+            let alpha = 0.1; // Default slow smoothing
+            if (diff > 200) alpha = 0.3; // Fast reaction for big shifts
+
+            this.smoothedCentroid = (this.lastResonance * (1 - alpha)) + (medianResonance * alpha);
+            this.lastResonance = this.smoothedCentroid;
+
+
             // FEATURE: TRUE VOCAL WEIGHT (Spectral Tilt)
-            // We use the LPC Spectrum to calculate tilt, which is cleaner than raw FFT
             const spectralTilt = DSP.calculateSpectralTilt(lpcSpec, TARGET_RATE);
 
             // FEATURE: JITTER (Pitch Stability)
             let jitter = 0;
             if (pitch > 0 && this.lastPitch > 0) {
                 const diff = Math.abs(pitch - this.lastPitch);
-                // Normalize by period (approx) or just raw Hz diff
-                // Jitter is usually % of period, but raw Hz diff is easier to visualize for "Stability"
                 this.jitterBuffer.push(diff);
                 if (this.jitterBuffer.length > 5) this.jitterBuffer.shift();
-
                 const avgJitter = this.jitterBuffer.reduce((a, b) => a + b, 0) / this.jitterBuffer.length;
                 jitter = avgJitter;
             }
@@ -221,8 +245,8 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                     resonance: this.smoothedCentroid,
                     f1: p1.freq,
                     f2: p2.freq,
-                    weight: spectralTilt, // Replaced RMS with Spectral Tilt
-                    volume: rms, // Keep RMS as Volume
+                    weight: spectralTilt,
+                    volume: rms,
                     jitter,
                     vowel,
                     spectrum: lpcSpec
@@ -230,7 +254,11 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             });
         } else {
             this.lastPitch = 0;
-            this.port.postMessage({ type: 'update', data: { pitch: -1, resonance: 0, f1: 0, f2: 0, weight: 0, volume: 0, jitter: 0, vowel: '', spectrum: null } });
+            // Decay resonance slowly to 0 instead of hard reset to avoid visual flash
+            this.smoothedCentroid = this.smoothedCentroid * 0.9;
+            if (this.smoothedCentroid < 50) this.smoothedCentroid = 0;
+
+            this.port.postMessage({ type: 'update', data: { pitch: -1, resonance: this.smoothedCentroid, f1: 0, f2: 0, weight: 0, volume: 0, jitter: 0, vowel: '', spectrum: null } });
         }
     }
 }
