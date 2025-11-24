@@ -17,7 +17,10 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
         height: 400,
         clouds: [],
         flash: 0, // Flash intensity for scoring
-        particles: [] // For collisions/score
+        particles: [], // For collisions/score
+        smoothedPitch: 0,
+        silenceTimer: 0,
+        lastValidPitch: 0
     });
 
     // Constants
@@ -60,19 +63,35 @@ const FlappyVoiceGame = ({ dataRef, targetRange, onScore, onClose }) => {
             if (state.status === 'playing') {
                 const { pitch } = dataRef.current;
 
-                // Pitch Control
+                // Pitch Control with Smoothing & Silence Bridging
                 if (pitch > 50) {
+                    state.silenceTimer = 0;
+                    // Smooth the input pitch (EMA)
+                    state.smoothedPitch += (pitch - state.smoothedPitch) * 0.15;
+                    state.lastValidPitch = state.smoothedPitch;
+                } else {
+                    state.silenceTimer++;
+                    // Bridge short gaps in voicing (up to 15 frames / ~250ms)
+                    if (state.silenceTimer < 15) {
+                        state.smoothedPitch = state.lastValidPitch;
+                    } else {
+                        // Slowly decay pitch to 0 instead of hard drop
+                        state.smoothedPitch *= 0.9;
+                    }
+                }
+
+                if (state.smoothedPitch > 50) {
                     // Map pitch to screen height (inverted: high pitch = top/0, low pitch = bottom/height)
                     // Range: targetRange.min to targetRange.max
                     const minP = targetRange.min || 150;
                     const maxP = targetRange.max || 300;
-                    const normalized = Math.max(0, Math.min(1, (pitch - minP) / (maxP - minP)));
+                    const normalized = Math.max(0, Math.min(1, (state.smoothedPitch - minP) / (maxP - minP)));
 
                     // Target Y (padding of 50px top/bottom)
                     const targetY = (height - 50) - (normalized * (height - 100));
 
                     // Smooth movement - tuned for responsiveness
-                    state.birdY += (targetY - state.birdY) * 0.12;
+                    state.birdY += (targetY - state.birdY) * 0.08; // Slower lerp for fluidity
                 } else {
                     // Gravity (fall down if no sound)
                     state.birdY += 4;
