@@ -1,9 +1,26 @@
 /**
  * CoachEngine.js
  * 
- * A rule-based expert system that analyzes voice metrics and generates 
- * qualitative, educational feedback for the user.
+ * Enhanced rule-based expert system that analyzes voice metrics and generates 
+ * qualitative, educational, and actionable feedback for the user.
+ * 
+ * Features:
+ * - Pitch, Resonance, Stability, and Voice Quality analysis
+ * - Contextual multi-metric feedback
+ * - Actionable exercise recommendations with navigation
+ * - Progress tracking support
  */
+
+// Exercise mapping to actual app routes/components
+const EXERCISE_MAP = {
+    'Pitch Pipe': { route: '/tools', component: 'PitchPipe', difficulty: 'beginner', duration: 5 },
+    'Pitch Staircase': { route: '/games', component: 'StaircaseGame', difficulty: 'intermediate', duration: 3 },
+    'Vowel Practice': { route: '/articulation', component: 'ArticulationView', difficulty: 'beginner', duration: 10 },
+    'Breath Support': { route: '/tools', component: 'BreathPacer', difficulty: 'beginner', duration: 5 },
+    'Reading Practice': { route: '/practice', component: 'PracticeView', difficulty: 'intermediate', duration: 15 },
+    'Resonance River': { route: '/games', component: 'ResonanceRiverGame', difficulty: 'intermediate', duration: 5 },
+    'Intonation Exercise': { route: '/tools', component: 'IntonationExercise', difficulty: 'advanced', duration: 10 }
+};
 
 export const CoachEngine = {
     /**
@@ -21,185 +38,360 @@ export const CoachEngine = {
         const pitchEval = evaluatePitch(overall.pitch?.mean, targetPitch);
         const resonanceEval = evaluateResonance(overall.formants, genderGoal);
         const stabilityEval = evaluateStability(overall.jitter, overall.shimmer);
+        const voiceQualityEval = evaluateVoiceQuality(overall.hnr, overall.shimmer);
 
         // 2. Determine Primary Focus Area (The "One Thing" to fix)
-        const focusArea = determineFocusArea([pitchEval, resonanceEval, stabilityEval]);
+        const focusArea = determineFocusArea([pitchEval, resonanceEval, stabilityEval, voiceQualityEval]);
 
-        // 3. Generate Summary & Strengths
-        const summary = generateSummary(pitchEval, resonanceEval, focusArea);
-        const strengths = identifyStrengths([pitchEval, resonanceEval, stabilityEval]);
+        // 3. Generate Contextual Summary & Strengths
+        const summary = generateContextualSummary(pitchEval, resonanceEval, voiceQualityEval, focusArea);
+        const strengths = identifyStrengths([pitchEval, resonanceEval, stabilityEval, voiceQualityEval]);
+
+        // 4. Generate Contextual Tips
+        const tips = generateContextualTips(pitchEval, resonanceEval, voiceQualityEval, genderGoal);
 
         return {
             summary,
             strengths,
             focusArea,
+            tips,
             details: {
                 pitch: pitchEval,
                 resonance: resonanceEval,
-                stability: stabilityEval
+                stability: stabilityEval,
+                voiceQuality: voiceQualityEval
             }
         };
+    },
+
+    /**
+     * Get exercise details for navigation
+     */
+    getExerciseDetails: (exerciseName) => {
+        return EXERCISE_MAP[exerciseName] || null;
     }
 };
 
 // --- Helper Evaluation Functions ---
 
 const evaluatePitch = (pitch, target) => {
-    if (!pitch) return { status: 'unknown', message: "Could not detect pitch." };
+    if (!pitch) return { status: 'unknown', score: 0, title: 'Pitch', message: "Could not detect pitch." };
 
     const { min, max } = target;
     const center = (min + max) / 2;
+    const range = max - min;
 
     if (pitch >= min && pitch <= max) {
+        // Within range - check how centered
+        const deviation = Math.abs(pitch - center) / (range / 2);
+        const score = deviation < 0.3 ? 10 : (deviation < 0.6 ? 9 : 8);
         return {
             status: 'good',
-            score: 10,
+            score,
             title: 'Pitch',
-            message: `Your average pitch (${pitch.toFixed(0)}Hz) is right in your target range.`
+            message: `Your average pitch (${pitch.toFixed(0)}Hz) is right in your target range.`,
+            value: pitch
         };
     } else if (pitch < min) {
         const diff = min - pitch;
-        const severity = diff > 30 ? 'significant' : 'slight';
+        const severity = diff > 30 ? 'significant' : (diff > 15 ? 'moderate' : 'slight');
+        const score = severity === 'significant' ? 3 : (severity === 'moderate' ? 5 : 7);
         return {
             status: 'low',
-            score: severity === 'significant' ? 4 : 7,
+            score,
             title: 'Pitch',
-            message: `Your pitch (${pitch.toFixed(0)}Hz) is ${severity === 'significant' ? 'significantly' : 'slightly'} lower than your target (${min}Hz).`
+            message: `Your pitch (${pitch.toFixed(0)}Hz) is ${severity === 'significant' ? 'significantly' : severity === 'moderate' ? 'moderately' : 'slightly'} lower than your target (${min}Hz).`,
+            value: pitch,
+            target: min,
+            diff: -diff
         };
     } else {
         const diff = pitch - max;
-        const severity = diff > 30 ? 'significant' : 'slight';
+        const severity = diff > 30 ? 'significant' : (diff > 15 ? 'moderate' : 'slight');
+        const score = severity === 'significant' ? 3 : (severity === 'moderate' ? 5 : 7);
         return {
             status: 'high',
-            score: severity === 'significant' ? 4 : 7,
+            score,
             title: 'Pitch',
-            message: `Your pitch (${pitch.toFixed(0)}Hz) is ${severity === 'significant' ? 'significantly' : 'slightly'} higher than your target (${max}Hz).`
+            message: `Your pitch (${pitch.toFixed(0)}Hz) is ${severity === 'significant' ? 'significantly' : severity === 'moderate' ? 'moderately' : 'slightly'} higher than your target (${max}Hz).`,
+            value: pitch,
+            target: max,
+            diff: diff
         };
     }
 };
 
 const evaluateResonance = (formants, genderGoal) => {
-    if (!formants || !formants.f1) return { status: 'unknown', message: "Could not detect resonance." };
+    if (!formants || !formants.f1) return { status: 'unknown', score: 0, title: 'Resonance', message: "Could not detect resonance." };
 
-    // Simplified resonance targets (F1/F2 averages)
-    // Feminine: High F1 (>400), High F2 (>1800) - "Bright"
-    // Masculine: Low F1 (<350), Low F2 (<1500) - "Dark"
+    // Enhanced resonance targets with more granular ranges
+    // Feminine: Bright (high F1 > 450, high F2 > 1800)
+    // Masculine: Dark (low F1 < 350, low F2 < 1500)
+    // Androgynous: Neutral (F1 350-450, F2 1500-1800)
 
     const { f1, f2 } = formants;
     let status = 'neutral';
     let score = 5;
     let message = "";
+    let advice = "";
 
     if (genderGoal === 'feminine') {
-        if (f1 > 350 && f2 > 1600) {
+        if (f1 > 450 && f2 > 1800) {
             status = 'bright';
-            score = 9;
-            message = "Your resonance is bright and forward, which is great for a feminine voice.";
-        } else if (f1 < 300 || f2 < 1400) {
+            score = 10;
+            message = "Your resonance is bright and forward, which is excellent for a feminine voice.";
+        } else if (f1 > 400 && f2 > 1600) {
+            status = 'moderately-bright';
+            score = 8;
+            message = "Your resonance is fairly bright. You're on the right track!";
+            advice = "Try raising your larynx slightly and smiling with your throat to brighten it further.";
+        } else if (f1 < 350 || f2 < 1400) {
             status = 'dark';
-            score = 4;
-            message = "Your resonance is a bit dark (low R1). Try to 'smile' with your throat to brighten it.";
+            score = 3;
+            message = "Your resonance is quite dark (low R1). This can make your voice sound more masculine.";
+            advice = "Focus on 'small dog' exercises - imagine a small dog barking in your throat. This raises the larynx and brightens resonance.";
         } else {
-            status = 'mixed';
+            status = 'neutral';
             score = 6;
-            message = "Your resonance is in a neutral range. You could try to brighten it slightly.";
+            message = "Your resonance is in a neutral range.";
+            advice = "Try to brighten it by raising your soft palate and creating more space in the front of your mouth.";
         }
     } else if (genderGoal === 'masculine') {
         if (f1 < 350 && f2 < 1500) {
             status = 'dark';
-            score = 9;
+            score = 10;
             message = "Your resonance is rich and dark, perfect for a masculine voice.";
-        } else if (f1 > 400 || f2 > 1700) {
+        } else if (f1 < 400 && f2 < 1700) {
+            status = 'moderately-dark';
+            score = 8;
+            message = "Your resonance is fairly dark. Good progress!";
+            advice = "Try relaxing your throat and lowering your larynx slightly to darken it more.";
+        } else if (f1 > 450 || f2 > 1800) {
             status = 'bright';
-            score = 4;
-            message = "Your resonance is quite bright. Try creating more space in the back of your throat.";
+            score = 3;
+            message = "Your resonance is quite bright. This can make your voice sound more feminine.";
+            advice = "Focus on creating more space in the back of your throat. Think 'big dog' - a deep, resonant bark.";
         } else {
-            status = 'mixed';
+            status = 'neutral';
             score = 6;
-            message = "Your resonance is neutral. Relaxing the throat might help darken it.";
+            message = "Your resonance is neutral.";
+            advice = "Try to darken it by relaxing your throat and creating more space in the pharynx.";
+        }
+    } else {
+        // Androgynous goal
+        if (f1 >= 350 && f1 <= 450 && f2 >= 1500 && f2 <= 1800) {
+            status = 'neutral';
+            score = 10;
+            message = "Your resonance is perfectly balanced in the androgynous range.";
+        } else {
+            status = f1 > 450 ? 'bright' : 'dark';
+            score = 7;
+            message = `Your resonance is slightly ${status}. For an androgynous voice, aim for the middle ground.`;
         }
     }
 
-    return { status, score, title: 'Resonance', message };
+    return { status, score, title: 'Resonance', message, advice, f1, f2 };
 };
 
 const evaluateStability = (jitter, shimmer) => {
-    if (jitter === undefined) return { status: 'unknown', score: 0 };
+    if (jitter === undefined) return { status: 'unknown', score: 0, title: 'Stability' };
 
-    // Jitter < 1% is generally good
-    if (jitter < 1.0) {
+    // Jitter < 1% is good, shimmer < 3% is good
+    const jitterScore = jitter < 1.0 ? 10 : (jitter < 2.0 ? 7 : (jitter < 3.5 ? 4 : 2));
+    const shimmerScore = shimmer !== undefined ? (shimmer < 3.0 ? 10 : (shimmer < 6.0 ? 6 : 3)) : 10;
+
+    const avgScore = Math.round((jitterScore + shimmerScore) / 2);
+
+    if (avgScore >= 9) {
         return {
             status: 'stable',
-            score: 10,
+            score: avgScore,
             title: 'Stability',
-            message: "Your voice is very stable and clear."
+            message: "Your voice is very stable and clear.",
+            jitter,
+            shimmer
         };
-    } else if (jitter < 2.5) {
+    } else if (avgScore >= 6) {
         return {
             status: 'moderate',
-            score: 7,
+            score: avgScore,
             title: 'Stability',
-            message: "There is some slight wavering or roughness in your voice."
+            message: "There is some slight wavering in your voice.",
+            advice: "Focus on breath support and avoid pushing too hard. Gentle, supported airflow creates stability.",
+            jitter,
+            shimmer
         };
     } else {
         return {
             status: 'unstable',
-            score: 3,
+            score: avgScore,
             title: 'Stability',
-            message: "Your voice shows significant instability (jitter). This might be vocal fry or breathiness."
+            message: "Your voice shows instability. This might be vocal fry, breathiness, or tension.",
+            advice: "Practice breath support exercises and ensure you're not straining. Vocal fry often happens when pitch is too low for your anatomy.",
+            jitter,
+            shimmer
         };
     }
 };
 
+const evaluateVoiceQuality = (hnr, shimmer) => {
+    if (hnr === undefined) return { status: 'unknown', score: 0, title: 'Voice Quality' };
+
+    // HNR (Harmonics-to-Noise Ratio)
+    // > 15 dB = Good (clear, resonant)
+    // 10-15 dB = Moderate (some breathiness)
+    // < 10 dB = Poor (very breathy or harsh)
+
+    let status, score, message, advice;
+
+    if (hnr > 15) {
+        status = 'clear';
+        score = 10;
+        message = "Your voice quality is excellent - clear and resonant.";
+    } else if (hnr > 12) {
+        status = 'good';
+        score = 8;
+        message = "Your voice quality is good with minimal breathiness.";
+    } else if (hnr > 10) {
+        status = 'moderate';
+        score = 6;
+        message = "Your voice has some breathiness.";
+        advice = "Try to engage your vocal folds more fully. Avoid whispery or overly breathy phonation.";
+    } else {
+        status = 'breathy';
+        score = 3;
+        message = "Your voice is quite breathy or harsh.";
+        advice = "This could be from incomplete vocal fold closure or excessive tension. Practice gentle 'vocal fry to clear voice' exercises.";
+    }
+
+    return { status, score, title: 'Voice Quality', message, advice, hnr, shimmer };
+};
+
 const determineFocusArea = (evals) => {
     // Sort by score (ascending) to find the weakest link
-    const sorted = [...evals].sort((a, b) => a.score - b.score);
+    const sorted = [...evals].filter(e => e.score > 0).sort((a, b) => a.score - b.score);
     const weakest = sorted[0];
 
-    if (weakest.score >= 8) {
+    if (!weakest || weakest.score >= 8) {
         return {
-            title: "Maintenance",
-            description: "Everything looks great! Keep practicing to build muscle memory.",
-            exercise: "Reading Practice"
+            title: "Maintenance & Refinement",
+            description: "Everything looks great! Keep practicing to build muscle memory and consistency.",
+            exercise: "Reading Practice",
+            exerciseDetails: EXERCISE_MAP["Reading Practice"],
+            priority: "low"
         };
     }
 
-    // Map weakest area to specific advice
+    // Map weakest area to specific advice and exercises
     if (weakest.title === 'Pitch') {
+        const isLow = weakest.status === 'low';
         return {
             title: "Pitch Control",
-            description: weakest.message,
-            exercise: "Pitch Pipe"
+            description: weakest.message + (weakest.advice ? ` ${weakest.advice}` : ''),
+            exercise: isLow ? "Pitch Staircase" : "Pitch Pipe",
+            exerciseDetails: EXERCISE_MAP[isLow ? "Pitch Staircase" : "Pitch Pipe"],
+            advice: isLow
+                ? "Practice raising your pitch gradually. Start with humming at your current pitch, then slide up slowly."
+                : "Practice lowering your pitch gently. Avoid vocal fry - aim for a clear, supported tone.",
+            priority: weakest.score < 5 ? "high" : "medium"
         };
     } else if (weakest.title === 'Resonance') {
         return {
             title: "Resonance Shaping",
             description: weakest.message,
-            exercise: "Vowel Practice"
+            exercise: "Vowel Practice",
+            exerciseDetails: EXERCISE_MAP["Vowel Practice"],
+            advice: weakest.advice || "Focus on oral space and larynx position. Vowel exercises help train resonance control.",
+            priority: weakest.score < 5 ? "high" : "medium"
         };
     } else if (weakest.title === 'Stability') {
         return {
             title: "Vocal Stability",
             description: weakest.message,
-            exercise: "Breath Support"
+            exercise: "Breath Support",
+            exerciseDetails: EXERCISE_MAP["Breath Support"],
+            advice: weakest.advice || "Stability comes from good breath support. Practice diaphragmatic breathing.",
+            priority: weakest.score < 4 ? "high" : "medium"
+        };
+    } else if (weakest.title === 'Voice Quality') {
+        return {
+            title: "Voice Quality",
+            description: weakest.message,
+            exercise: "Breath Support",
+            exerciseDetails: EXERCISE_MAP["Breath Support"],
+            advice: weakest.advice || "Clear voice quality requires balanced vocal fold closure and airflow.",
+            priority: weakest.score < 5 ? "high" : "medium"
         };
     }
 
-    return { title: "General Practice", description: "Continue exploring your voice.", exercise: "Free Play" };
+    return {
+        title: "General Practice",
+        description: "Continue exploring your voice.",
+        exercise: "Reading Practice",
+        exerciseDetails: EXERCISE_MAP["Reading Practice"],
+        priority: "low"
+    };
 };
 
-const generateSummary = (pitch, resonance, focus) => {
-    if (pitch.score > 8 && resonance.score > 8) {
-        return "Outstanding session! Your pitch and resonance are perfectly aligned with your goals.";
-    } else if (pitch.score > 8) {
-        return "Your pitch is excellent, but we can work on your resonance to refine the tone.";
-    } else if (resonance.score > 8) {
-        return "Great resonance control! Now let's focus on getting your pitch into the target range.";
-    } else {
-        return "Good start. We have some clear areas to work on to get you closer to your goal.";
+const generateContextualSummary = (pitch, resonance, voiceQuality, focus) => {
+    // Generate smart, contextual summaries based on metric combinations
+
+    const allGood = pitch.score >= 8 && resonance.score >= 8 && voiceQuality.score >= 8;
+    const pitchGood = pitch.score >= 8;
+    const resonanceGood = resonance.score >= 8;
+    const qualityGood = voiceQuality.score >= 8;
+
+    if (allGood) {
+        return "Outstanding session! Your pitch, resonance, and voice quality are all aligned with your goals. Keep up the excellent work!";
     }
+
+    // Contextual combinations
+    if (pitchGood && !resonanceGood && qualityGood) {
+        return "Your pitch and voice quality are excellent! Now let's refine your resonance to complete the picture.";
+    }
+
+    if (!pitchGood && resonanceGood && qualityGood) {
+        return "Great resonance and voice quality! Your pitch needs some adjustment to hit your target range.";
+    }
+
+    if (pitchGood && resonanceGood && !qualityGood) {
+        return "Your pitch and resonance are spot-on! Let's work on voice quality to make your voice clearer and more resonant.";
+    }
+
+    if (!pitchGood && !resonanceGood) {
+        return "We have clear areas to work on. Let's start with your primary focus area and build from there.";
+    }
+
+    return "Good effort! We've identified some areas for improvement. Focus on one thing at a time for best results.";
 };
 
 const identifyStrengths = (evals) => {
     return evals.filter(e => e.score >= 8).map(e => e.message);
+};
+
+const generateContextualTips = (pitch, resonance, voiceQuality, genderGoal) => {
+    const tips = [];
+
+    // Add specific tips based on metric combinations
+    if (pitch.score < 7 && resonance.score < 7) {
+        tips.push("💡 Pitch and resonance work together. As you adjust pitch, your resonance may naturally shift too.");
+    }
+
+    if (voiceQuality.score < 7) {
+        tips.push("💡 Voice quality improves with proper breath support. Never strain or push your voice.");
+    }
+
+    if (resonance.status === 'dark' && genderGoal === 'feminine') {
+        tips.push("💡 Try the 'small dog' exercise: imagine a small, yappy dog barking in your throat. This raises the larynx and brightens resonance.");
+    }
+
+    if (resonance.status === 'bright' && genderGoal === 'masculine') {
+        tips.push("💡 Try the 'big dog' exercise: imagine a large dog's deep bark. This lowers the larynx and darkens resonance.");
+    }
+
+    if (pitch.score >= 8 && resonance.score < 6) {
+        tips.push("💡 You've mastered pitch! Resonance is the next frontier. It's often more important than pitch for gender perception.");
+    }
+
+    return tips;
 };

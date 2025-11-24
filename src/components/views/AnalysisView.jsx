@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, Square, Play, Pause, BarChart3, FileText, Waveform, History, Save, Trash2, ChevronLeft, Calendar, ArrowRight, Sparkles } from 'lucide-react';
+import { Mic, Square, Play, Pause, BarChart3, FileText, Activity, History, Save, Trash2, ChevronLeft, Calendar, ArrowRight, Sparkles } from 'lucide-react';
 import { useGem } from '../../context/GemContext';
 import { VoiceAnalyzer } from '../../utils/voiceAnalysis';
 import { transcriptionEngine } from '../../utils/transcriptionEngine';
@@ -650,8 +650,14 @@ const AnalysisView = () => {
                                             feedback={coachFeedback}
                                             onClose={() => setActiveTab('transcript')}
                                             onPractice={(exercise) => {
-                                                showToast(`Starting ${exercise}...`, 'success');
-                                                // In a real app, this would navigate to the exercise
+                                                const exerciseDetails = CoachEngine.getExerciseDetails(exercise);
+                                                if (exerciseDetails) {
+                                                    showToast(`Navigate to ${exerciseDetails.route} to practice ${exercise}`, 'success');
+                                                    // Note: Full navigation would require router integration
+                                                    // For now, we show helpful guidance
+                                                } else {
+                                                    showToast(`Starting ${exercise}...`, 'success');
+                                                }
                                             }}
                                         />
                                     ) : (

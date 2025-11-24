@@ -1,7 +1,7 @@
 import React from 'react';
-import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X } from 'lucide-react';
+import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X, Stethoscope } from 'lucide-react';
 
-const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange, onSetGoal, onOpenTutorial, calibration, onUpdateRange, onUpdateCalibration, onExportData }) => {
+const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange, onSetGoal, onOpenTutorial, calibration, onUpdateRange, onUpdateCalibration, onExportData, userMode, setUserMode }) => {
     const defaultGenderRanges = {
         masc: { min: 85, max: 145 },
         androg: { min: 145, max: 175 },
@@ -93,6 +93,46 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                                 <div className="text-[10px] text-slate-400">85-145 Hz</div>
                             </button>
                         </div>
+                    </div>
+                </section>
+
+                {/* SLP Professional Mode */}
+                <section>
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Professional Mode</h3>
+                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className={`p-2 rounded-lg ${userMode === 'slp' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-700 text-slate-400'}`}>
+                                    <Stethoscope className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <div className="text-sm font-bold text-white">SLP/Clinician Mode</div>
+                                    <div className="text-[10px] text-slate-400">Clinical-grade tools and visualizations</div>
+                                </div>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={userMode === 'slp'}
+                                    onChange={(e) => setUserMode(e.target.checked ? 'slp' : 'user')}
+                                    className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500"></div>
+                            </label>
+                        </div>
+
+                        {userMode === 'slp' && (
+                            <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <div className="text-xs font-bold text-indigo-300 mb-2">SLP Mode Features:</div>
+                                <ul className="text-[10px] text-indigo-200/80 space-y-1">
+                                    <li>• High-resolution spectrogram visualization</li>
+                                    <li>• CPP (Cepstral Peak Prominence) analysis</li>
+                                    <li>• Clinical terminology (F0, formants, etc.)</li>
+                                    <li>• PDF progress reports for clients</li>
+                                    <li>• Advanced acoustic measurements</li>
+                                </ul>
+                            </div>
+                        )}
                     </div>
                 </section>
 

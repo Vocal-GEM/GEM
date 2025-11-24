@@ -1,10 +1,10 @@
 import React from 'react';
-import { CheckCircle, AlertCircle, ArrowRight, Sparkles, Activity, Mic } from 'lucide-react';
+import { CheckCircle, AlertCircle, ArrowRight, Sparkles, Activity, Mic, Zap, Clock, TrendingUp } from 'lucide-react';
 
 const AssessmentView = ({ feedback, onClose, onPractice }) => {
     if (!feedback) return null;
 
-    const { summary, strengths, focusArea, details } = feedback;
+    const { summary, strengths, focusArea, details, tips } = feedback;
 
     return (
         <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -52,10 +52,28 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
                     <h3 className="font-bold text-amber-400 flex items-center gap-2">
                         <AlertCircle className="w-5 h-5" />
                         Primary Focus
+                        {focusArea.priority === 'high' && (
+                            <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full">High Priority</span>
+                        )}
                     </h3>
                     <div className="bg-amber-500/5 rounded-xl p-4 border border-amber-500/10">
                         <div className="font-bold text-amber-200 mb-1">{focusArea.title}</div>
                         <p className="text-slate-300 text-sm mb-4">{focusArea.description}</p>
+
+                        {/* Exercise Details */}
+                        {focusArea.exerciseDetails && (
+                            <div className="flex items-center gap-2 text-xs text-slate-400 mb-3">
+                                <span className="flex items-center gap-1">
+                                    <TrendingUp className="w-3 h-3" />
+                                    {focusArea.exerciseDetails.difficulty}
+                                </span>
+                                <span>•</span>
+                                <span className="flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {focusArea.exerciseDetails.duration} min
+                                </span>
+                            </div>
+                        )}
 
                         <button
                             onClick={() => onPractice(focusArea.exercise)}
@@ -68,10 +86,27 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
                 </div>
             </div>
 
+            {/* Contextual Tips */}
+            {tips && tips.length > 0 && (
+                <div className="mt-6 p-4 bg-blue-500/5 rounded-xl border border-blue-500/10">
+                    <h3 className="font-bold text-blue-400 flex items-center gap-2 mb-3">
+                        <Zap className="w-4 h-4" />
+                        Pro Tips
+                    </h3>
+                    <ul className="space-y-2">
+                        {tips.map((tip, index) => (
+                            <li key={index} className="text-slate-300 text-sm">
+                                {tip}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+
             {/* Detailed Metrics Breakdown */}
             <div className="mt-8 pt-6 border-t border-slate-800">
                 <h3 className="font-bold text-slate-400 mb-4 text-sm uppercase tracking-wider">Detailed Breakdown</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <MetricCard
                         title="Pitch"
                         status={details.pitch.status}
@@ -89,6 +124,12 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
                         status={details.stability.status}
                         score={details.stability.score}
                         icon={Activity}
+                    />
+                    <MetricCard
+                        title="Voice Quality"
+                        status={details.voiceQuality.status}
+                        score={details.voiceQuality.score}
+                        icon={Sparkles}
                     />
                 </div>
             </div>
@@ -115,16 +156,12 @@ const MetricCard = ({ title, status, score, icon: Icon }) => {
     const colorClass = getColor(score);
 
     return (
-        <div className={`p-4 rounded-xl border ${colorClass} flex items-center justify-between`}>
-            <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg bg-black/20`}>
-                    <Icon className="w-4 h-4" />
-                </div>
-                <div>
-                    <div className="font-bold text-sm">{title}</div>
-                    <div className="text-xs opacity-80 capitalize">{status}</div>
-                </div>
+        <div className={`p-4 rounded-xl border ${colorClass} flex flex-col items-center justify-center text-center`}>
+            <div className={`p-2 rounded-lg bg-black/20 mb-2`}>
+                <Icon className="w-4 h-4" />
             </div>
+            <div className="font-bold text-sm">{title}</div>
+            <div className="text-xs opacity-80 capitalize mb-1">{status}</div>
             <div className="font-bold text-lg">{score}/10</div>
         </div>
     );

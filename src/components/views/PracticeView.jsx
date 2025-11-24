@@ -8,6 +8,11 @@ import PitchVisualizer from '../viz/PitchVisualizer';
 import Spectrogram from '../viz/Spectrogram';
 import VoiceQualityMeter from '../viz/VoiceQualityMeter';
 import VowelSpacePlot from '../viz/VowelSpacePlot';
+import CPPMeter from '../viz/CPPMeter';
+import HighResSpectrogram from '../viz/HighResSpectrogram';
+import SpectrumAnalyzer from '../viz/SpectrumAnalyzer';
+import VoiceRangeProfile from '../viz/VoiceRangeProfile';
+import MPTTracker from '../viz/MPTTracker';
 import DailyGoalsWidget from '../ui/DailyGoalsWidget';
 
 const PracticeView = () => {
@@ -92,7 +97,19 @@ const PracticeView = () => {
                         settings={settings}
                     />
 
-                    {userMode === 'slp' && <Spectrogram dataRef={dataRef} />}
+                    {userMode === 'slp' && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                            <HighResSpectrogram dataRef={dataRef} />
+                            <div className="grid grid-cols-2 gap-4">
+                                <SpectrumAnalyzer dataRef={dataRef} userMode={userMode} />
+                                <CPPMeter dataRef={dataRef} isActive={isAudioActive} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <VoiceRangeProfile dataRef={dataRef} isActive={isAudioActive} />
+                                <MPTTracker dataRef={dataRef} isActive={isAudioActive} />
+                            </div>
+                        </div>
+                    )}
 
                     <div className="grid grid-cols-2 gap-4">
                         <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />

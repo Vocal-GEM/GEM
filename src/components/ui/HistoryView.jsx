@@ -1,8 +1,63 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Book, FileText } from 'lucide-react';
+import { pdfReportGenerator } from '../../utils/pdfReportGenerator';
 
-import { Book } from 'lucide-react';
+const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
+    const [isGenerating, setIsGenerating] = useState(false);
 
-const HistoryView = ({ stats, journals, onLogClick }) => {
+    const handleGenerateReport = async () => {
+        setIsGenerating(true);
+
+        try {
+            // Get recent sessions from journals (last 30 days)
+            const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+            const recentSessions = journals
+                .filter(j => j.timestamp > thirtyDaysAgo)
+                .map(j => ({
+                    timestamp: j.timestamp,
+                    duration: j.duration || 0,
+                    pitch: j.pitch,
+                    f1: j.f1,
+                    f2: j.f2,
+                    cpp: j.cpp,
+                    jitter: j.jitter,
+                    notes: j.notes
+                }));
+
+            // Generate report
+            const doc = await pdfReportGenerator.generateProgressReport({
+                clientName: 'Client', // Could be customized
+                dateRange: {
+                    start: new Date(thirtyDaysAgo),
+                    end: new Date()
+                },
+                sessions: recentSessions,
+                currentMetrics: recentSessions[0] || {},
+                targetMetrics: {
+                    pitchMin: 170,
+                    pitchMax: 220,
+                    f1Target: '>450',
+                    f2Target: '>1800'
+                },
+                coachNotes: [
+                    'Continue practicing pitch control exercises',
+                    'Focus on resonance shaping',
+                    'Maintain good breath support'
+                ]
+            });
+
+            // Save PDF
+            const filename = `voice-therapy-report-${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(filename);
+
+        } catch (error) {
+            console.error('Error generating report:', error);
+            alert('Failed to generate report. Please try again.');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
             {/* Stats Cards */}
@@ -24,11 +79,25 @@ const HistoryView = ({ stats, journals, onLogClick }) => {
             {/* Log Journal Button */}
             <button
                 onClick={onLogClick}
-                className="w-full mb-6 p-4 bg-blue-600 hover:bg-blue-500 rounded-2xl flex items-center justify-center gap-3 transition-colors shadow-lg shadow-blue-500/20"
+                className="w-full mb-4 p-4 bg-blue-600 hover:bg-blue-500 rounded-2xl flex items-center justify-center gap-3 transition-colors shadow-lg shadow-blue-500/20"
             >
                 <Book className="w-5 h-5 text-white" />
                 <span className="font-bold text-white">Log New Entry</span>
             </button>
+
+            {/* Generate Report Button (SLP Mode Only) */}
+            {userMode === 'slp' && (
+                <button
+                    onClick={handleGenerateReport}
+                    disabled={isGenerating || journals.length === 0}
+                    className="w-full mb-6 p-4 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:cursor-not-allowed rounded-2xl flex items-center justify-center gap-3 transition-colors shadow-lg shadow-indigo-500/20"
+                >
+                    <FileText className="w-5 h-5 text-white" />
+                    <span className="font-bold text-white">
+                        {isGenerating ? 'Generating Report...' : 'Generate PDF Report'}
+                    </span>
+                </button>
+            )}
 
             {/* Journal Feed */}
             <h3 className="text-lg font-bold mb-4 px-1">Journal History</h3>

@@ -90,6 +90,10 @@ export const GemProvider = ({ children }) => {
                 const savedHighScores = await indexedDB.getSetting('high_scores');
                 if (savedHighScores) setHighScores(savedHighScores);
 
+                // Load User Mode (SLP/User)
+                const savedUserMode = await indexedDB.getSetting('user_mode');
+                if (savedUserMode) setUserMode(savedUserMode);
+
                 // Load Goals
                 const savedGoals = await indexedDB.getGoals();
                 const lastLogin = await indexedDB.getSetting('last_login', 0);
@@ -490,6 +494,11 @@ export const GemProvider = ({ children }) => {
         } catch (e) { console.error(e); }
     };
 
+    const updateUserMode = (mode) => {
+        setUserMode(mode);
+        indexedDB.saveSetting('user_mode', mode);
+    };
+
     const value = {
         // State
         activeTab, setActiveTab,
@@ -527,6 +536,7 @@ export const GemProvider = ({ children }) => {
         updateSettings,
         updateTargetRange,
         updateCalibration,
+        updateUserMode,
         switchProfile,
 
         // Auth

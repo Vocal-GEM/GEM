@@ -55,6 +55,8 @@ const App = () => {
         targetRange,
         updateTargetRange,
         userMode,
+        setUserMode,
+        updateUserMode,
         goals,
         settings,
         updateSettings,
@@ -268,7 +270,7 @@ const App = () => {
                 )}
                 {activeTab === 'games' && <GameHub onSelectGame={handleSelectGame} />}
                 {activeTab === 'coach' && <CoachView />}
-                {activeTab === 'history' && <HistoryView stats={stats} journals={journals} onLogClick={() => setShowJournalForm(true)} />}
+                {activeTab === 'history' && <HistoryView stats={stats} journals={journals} userMode={userMode} onLogClick={() => setShowJournalForm(true)} />}
                 {activeTab === 'tools' && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="flex items-center gap-2 mb-4">
@@ -334,6 +336,8 @@ const App = () => {
                 settings={settings}
                 setSettings={updateSettings}
                 targetRange={targetRange}
+                userMode={userMode}
+                setUserMode={updateUserMode}
                 onSetGoal={(type) => {
                     let r = { min: 170, max: 220 };
                     if (type === 'fem') r = { min: 165, max: 255 };
