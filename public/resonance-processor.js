@@ -76,7 +76,7 @@ class DSP {
         if (tau == halfSize || yinBuffer[tau] >= threshold) return -1;
 
         let betterTau = tau; if (tau > 0 && tau < halfSize - 1) { const s0 = yinBuffer[tau - 1]; const s1 = yinBuffer[tau]; const s2 = yinBuffer[tau + 1]; let adjustment = (s2 - s0) / (2 * (2 * s1 - s2 - s0)); betterTau += adjustment; }
-        const pitch = sampleRate / betterTau; if (pitch < 60 || pitch > 600) return -1; return pitch;
+        const pitch = sampleRate / betterTau; if (pitch < 50 || pitch > 800) return -1; return pitch; // Expanded range for better detection
     }
 
     // FEATURE: SPECTRAL TILT (True Vocal Weight)
@@ -139,7 +139,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         this.buffer = new Float32Array(2048);
         this.bufferIndex = 0;
         this.smoothedCentroid = 0;
-        this.threshold = 0.02;
+        this.threshold = 0.005; // Lowered from 0.02 for better sensitivity
 
         // Jitter State
         this.lastPitch = 0;
