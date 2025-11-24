@@ -88,7 +88,7 @@ const PracticeView = () => {
                         targetRange={targetRange}
                         userMode={userMode}
                         exercise={activeGame}
-                        onScore={(score) => console.log("Game Score:", score)}
+                        onScore={(score) => { }}
                         settings={settings}
                     />
 

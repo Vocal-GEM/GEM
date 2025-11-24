@@ -151,6 +151,15 @@ class ResonanceProcessor extends AudioWorkletProcessor {
 
         // Weight Smoothing
         this.weightBuffer = [];
+
+        // Message Handler for Config
+        this.port.onmessage = (event) => {
+            if (event.data.type === 'config') {
+                if (event.data.config.threshold !== undefined) {
+                    this.threshold = event.data.config.threshold;
+                }
+            }
+        };
     }
 
     process(inputs, outputs, parameters) {
