@@ -162,7 +162,36 @@ export const GemProvider = ({ children }) => {
         if (isFirstTime) { setShowTutorial(true); localStorage.setItem('hasVisited', 'true'); }
 
         audioEngineRef.current = new AudioEngine((data) => {
-            dataRef.current = { ...data, history: [...dataRef.current.history.slice(1), data.pitch] };
+            // Pitch Hold Logic for Continuous Visualization
+            const currentHistory = dataRef.current.history;
+            let pitchToStore = data.pitch;
+
+            // Track silence duration
+            if (!dataRef.current.silenceCounter) dataRef.current.silenceCounter = 0;
+            if (!dataRef.current.lastValidPitch) dataRef.current.lastValidPitch = 0;
+
+            if (data.pitch > 0) {
+                // Valid pitch detected - reset silence counter
+                dataRef.current.silenceCounter = 0;
+                dataRef.current.lastValidPitch = data.pitch;
+            } else {
+                // No pitch detected - increment silence counter
+                dataRef.current.silenceCounter++;
+
+                // Hold last valid pitch for up to 15 frames (~250ms at 60fps)
+                // This bridges gaps during consonants and brief pauses
+                if (dataRef.current.silenceCounter < 15 && dataRef.current.lastValidPitch > 0) {
+                    pitchToStore = dataRef.current.lastValidPitch;
+                } else {
+                    // Silence too long - allow gap
+                    pitchToStore = 0;
+                }
+            }
+
+            dataRef.current = {
+                ...data,
+                history: [...currentHistory.slice(1), pitchToStore]
+            };
 
             // Biofeedback Triggers
             if (data.pitch > 0) {

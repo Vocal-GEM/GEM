@@ -95,7 +95,8 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
 
             const history = dataRef.current.history;
 
-            // 1. Draw the Line (Green) with Gap Bridging
+            // 1. Draw the Line (Green)
+            // Gap bridging is now handled at data level in GemContext
             ctx.strokeStyle = '#22c55e'; // Bright Green (Tailwind green-500)
             ctx.lineWidth = 3;
             ctx.lineCap = 'round';
@@ -103,9 +104,6 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
             ctx.beginPath();
 
             let hasStarted = false;
-            let lastValidIndex = -1;
-            const maxGap = 20; // Bridge gaps up to 20 frames (~300ms at 60fps)
-
             history.forEach((p, i) => {
                 const x = (i / (history.length - 1)) * width;
                 if (p > 0) {
@@ -113,19 +111,9 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
                     if (!hasStarted) {
                         ctx.moveTo(x, y);
                         hasStarted = true;
-                        lastValidIndex = i;
                     } else {
-                        const gap = i - lastValidIndex;
-                        const lastValidP = history[lastValidIndex];
-
-                        // Connect if: gap is small OR pitch change is reasonable
-                        if (gap <= maxGap && Math.abs(p - lastValidP) < 400) {
-                            ctx.lineTo(x, y);
-                        } else {
-                            // Gap too large or pitch jump too big - start new segment
-                            ctx.moveTo(x, y);
-                        }
-                        lastValidIndex = i;
+                        // Simply connect all valid points
+                        ctx.lineTo(x, y);
                     }
                 }
             });
@@ -137,8 +125,6 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
                 if (p > 0) {
                     const x = (i / (history.length - 1)) * width;
                     const y = mapY(p);
-                    // Only draw dots if connected to neighbors (to avoid noise dots)
-                    // or just draw all valid points
                     ctx.beginPath();
                     ctx.arc(x, y, 3, 0, Math.PI * 2); // Small 3px radius dot
                     ctx.fill();

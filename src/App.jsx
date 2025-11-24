@@ -9,6 +9,7 @@ import VowelSpacePlot from './components/viz/VowelSpacePlot';
 import GameHub from './components/games/GameHub';
 import CoachView from './components/ui/CoachView';
 import DailyGoalsWidget from './components/ui/DailyGoalsWidget';
+import MixingBoardView from './components/views/MixingBoardView';
 import HistoryView from './components/ui/HistoryView';
 import AudioLibrary from './components/ui/AudioLibrary';
 import PitchPipe from './components/ui/PitchPipe';
@@ -269,6 +270,8 @@ const App = () => {
                         <MirrorComponent />
                     </div>
                 )}
+
+                {activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} />}
             </main>
 
             {/* Navigation */}
@@ -281,6 +284,10 @@ const App = () => {
                     <button onClick={() => { setActiveTab('games'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'games' ? 'text-purple-400 bg-purple-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
                         <Gamepad2 className="w-6 h-6" />
                         <span className="text-[10px] font-bold">Arcade</span>
+                    </button>
+                    <button onClick={() => { setActiveTab('mixing'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'mixing' ? 'text-pink-400 bg-pink-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <Wrench className="w-6 h-6" />
+                        <span className="text-[10px] font-bold">Mixer</span>
                     </button>
                     <button onClick={() => { setActiveTab('coach'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'coach' ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
                         <Bot className="w-6 h-6" />
