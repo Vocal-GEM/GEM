@@ -1,4 +1,7 @@
+import { GAVT_REPORT } from './research/GAVT_Report.js';
+
 export const KNOWLEDGE_BASE = [
+    ...GAVT_REPORT,
     {
         id: 'res_01',
         tags: ['resonance', 'bright', 'R1', 'size'],
