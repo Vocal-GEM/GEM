@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import { useGem } from '../../context/GemContext';
 import ChatMessage from './ChatMessage';
+import { KnowledgeService } from '../../services/KnowledgeService';
 
 const CoachView = () => {
     const [chatInput, setChatInput] = useState('');
@@ -41,51 +42,38 @@ const CoachView = () => {
         setChatInput('');
         setIsChatLoading(true);
 
-        try {
-            const res = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message: userMsg.content,
-                    history: messages,
-                    context: {
-                        stats,
-                        goals,
-                        journals: journals.slice(0, 3),
-                        userProfile: userContext // Add user context
+        // Simulate network delay for realism
+        setTimeout(() => {
+            try {
+                // Use KnowledgeService to find answers
+                const results = KnowledgeService.search(userMsg.content);
+                let reply = '';
+
+                if (results.length > 0) {
+                    const topResult = results[0];
+                    reply = `**${topResult.question}**\n\n${topResult.answer}`;
+
+                    // Mention related topics if available
+                    if (results.length > 1) {
+                        const related = results.slice(1, 3).map(r => r.category).filter((v, i, a) => a.indexOf(v) === i);
+                        if (related.length > 0) {
+                            reply += `\n\n*Related topics: ${related.join(', ')}*`;
+                        }
                     }
-                })
-            });
+                } else {
+                    // Fallback for no matches
+                    const prefix = userContext.name ? `${userContext.name}, ` : '';
+                    reply = `${prefix}I'm not sure about that yet. I'm trained on resonance, pitch, and vocal weight. Try asking: "How do I brighten my voice?" or "What is vocal weight?"`;
+                }
 
-            if (res.ok) {
-                const data = await res.json();
-                setMessages(prev => [...prev, data]);
-            } else if (res.status === 503) {
-                const data = await res.json();
-                setMessages(prev => [...prev, { role: 'assistant', content: `⚠️ ${data.content}` }]);
-            } else {
-                throw new Error('Server error');
-            }
-        } catch (err) {
-            // Mock Response Logic (Offline Mode)
-            let reply = "I'm having trouble connecting to the server, but I can still help! Try asking about pitch, resonance, or vocal weight.";
-            const lowerMsg = userMsg.content.toLowerCase();
-
-            // Personalize response if name is known
-            const prefix = userContext.name ? `${userContext.name}, ` : '';
-
-            if (lowerMsg.includes('pitch')) reply = `${prefix}Pitch is the perceived frequency of your voice. For a feminine voice, target 170-220Hz. For masculine, 85-145Hz. Try the 'Pitch Staircase' game to practice control!`;
-            else if (lowerMsg.includes('resonance') || lowerMsg.includes('bright') || lowerMsg.includes('dark')) reply = `${prefix}Resonance is the 'color' of your voice. Bright resonance (head voice) sounds more feminine, while dark resonance (chest voice) sounds more masculine. Use the Resonance Orb to visualize this!`;
-            else if (lowerMsg.includes('weight') || lowerMsg.includes('heavy') || lowerMsg.includes('light')) reply = `${prefix}Vocal weight is how 'heavy' or 'buzzy' your voice sounds. A lighter weight is often perceived as more feminine. Try to speak softly and avoid 'pushing' the sound.`;
-            else if (lowerMsg.includes('warmup') || lowerMsg.includes('exercise')) reply = `${prefix}Try a simple siren exercise! Glide from your lowest note to your highest and back down. Keep it smooth and light.`;
-            else if (lowerMsg.includes('game')) reply = `${prefix}Games are a great way to practice! Go to the Arcade tab to try 'Balloon Adventure' or 'Resonance River'.`;
-
-            setTimeout(() => {
                 setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
-            }, 1000);
-        } finally {
-            setIsChatLoading(false);
-        }
+            } catch (err) {
+                console.error(err);
+                setMessages(prev => [...prev, { role: 'assistant', content: "I encountered an error processing your request." }]);
+            } finally {
+                setIsChatLoading(false);
+            }
+        }, 600);
     };
 
     const suggestions = [
@@ -96,7 +84,7 @@ const CoachView = () => {
     ];
 
     return (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-[calc(100vh-180px)] flex flex-col relative">
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-[calc(100dvh-180px)] flex flex-col relative">
             <div className="flex justify-between items-center px-2 mb-2">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">AI Coach</span>
                 <div className="flex gap-3">
