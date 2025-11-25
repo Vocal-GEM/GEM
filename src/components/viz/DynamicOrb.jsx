@@ -178,7 +178,7 @@ void main() {
 }
 `;
 
-const VisualizerMesh = ({ mode, dataRef }) => {
+const VisualizerMesh = ({ mode, dataRef, externalDataRef }) => {
     const mesh = useRef();
     const material = useRef();
 
@@ -203,7 +203,9 @@ const VisualizerMesh = ({ mode, dataRef }) => {
         if (!mesh.current || !material.current || !dataRef.current) return;
 
         const { pitch, resonance, weight, volume } = dataRef.current;
-        const vol = volume || 0;
+        const extVol = externalDataRef?.current?.volume || 0;
+        const vol = Math.max(volume || 0, extVol);
+
         const smoothedVol = THREE.MathUtils.lerp(uniforms.u_amplitude.value, vol, 0.15);
         const pitchVal = pitch || 150;
         const pitchNorm = (Math.max(85, Math.min(255, pitchVal)) - 85) / 170;
@@ -246,7 +248,7 @@ const VisualizerMesh = ({ mode, dataRef }) => {
     );
 };
 
-const DynamicOrb = React.memo(({ dataRef, calibration }) => {
+const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
     const [mode, setMode] = useState('gem');
     const [showDebug, setShowDebug] = useState(false);
     const [debugInfo, setDebugInfo] = useState(null);
@@ -337,7 +339,7 @@ const DynamicOrb = React.memo(({ dataRef, calibration }) => {
                 }}
             >
                 <ambientLight intensity={0.5} />
-                <VisualizerMesh key={mode} mode={mode} dataRef={dataRef} />
+                <VisualizerMesh key={mode} mode={mode} dataRef={dataRef} externalDataRef={externalDataRef} />
             </Canvas>
 
             {/* Debug Panel Overlay */}

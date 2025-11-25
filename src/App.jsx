@@ -80,6 +80,7 @@ import MigrationModal from './components/ui/MigrationModal';
 import AnalysisView from './components/views/AnalysisView';
 import ArticulationView from './components/views/ArticulationView';
 import SLPDashboard from './components/views/SLPDashboard';
+import PracticeMode from './components/views/PracticeMode';
 
 // Games
 import ResonanceRiverGame from './components/games/ResonanceRiverGame';
@@ -134,6 +135,7 @@ const App = () => {
     const [showSignup, setShowSignup] = useState(false);
     const [showIncognito, setShowIncognito] = useState(false);
     const [showCamera, setShowCamera] = useState(false);
+    const [showPracticeMode, setShowPracticeMode] = useState(false);
     const [showMigration, setShowMigration] = useState(true);
     const [practiceView, setPracticeView] = useState('all'); // all, pitch, resonance, weight, vowel
     const [pitchViewMode, setPitchViewMode] = useState('graph'); // graph or orb
@@ -259,9 +261,14 @@ const App = () => {
                             <DailyGoalsWidget goals={goals} />
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Real-time Analysis</h2>
-                                <button onClick={toggleAudio} className={`px-6 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all shadow-lg ${isAudioActive ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30' : 'bg-gradient-to-r from-teal-500 to-violet-500 hover:from-teal-400 hover:to-violet-400 text-white hover:shadow-xl hover:shadow-teal-500/30 animate-glow-pulse'}`}>
-                                    {isAudioActive ? <><span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" /> LIVE</> : <><Mic className="w-4 h-4" /> START LISTENING</>}
-                                </button>
+                                <div className="flex gap-2">
+                                    <button onClick={() => setShowPracticeMode(true)} className="px-4 py-2.5 rounded-full text-sm font-bold bg-slate-800 hover:bg-slate-700 text-purple-400 border border-purple-500/30 transition-all flex items-center gap-2">
+                                        <Mic2 className="w-4 h-4" /> Voice Mode
+                                    </button>
+                                    <button onClick={toggleAudio} className={`px-6 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all shadow-lg ${isAudioActive ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30' : 'bg-gradient-to-r from-teal-500 to-violet-500 hover:from-teal-400 hover:to-violet-400 text-white hover:shadow-xl hover:shadow-teal-500/30 animate-glow-pulse'}`}>
+                                        {isAudioActive ? <><span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" /> LIVE</> : <><Mic className="w-4 h-4" /> START LISTENING</>}
+                                    </button>
+                                </div>
                             </div>
                             {/* Filter Menu */}
                             <div className="glass-panel-dark rounded-xl p-2 mb-4 flex gap-2 overflow-x-auto">
@@ -456,6 +463,25 @@ const App = () => {
             {showForwardFocus && <ForwardFocusDrill onClose={() => setShowForwardFocus(false)} />}
             {showIncognito && <IncognitoScreen onClose={() => setShowIncognito(false)} />}
             {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
+            {showPracticeMode && (
+                <PracticeMode
+                    onClose={() => setShowPracticeMode(false)}
+                    dataRef={dataRef}
+                    calibration={calibration}
+                    targetRange={targetRange}
+                    goals={goals}
+                    onSelectGame={handleSelectGame}
+                    activeTab={activeTab}
+                    userMode={userMode}
+                    onOpenSettings={() => setShowSettings(true)}
+                    onOpenJournal={() => { setActiveTab('history'); setShowJournalForm(true); }}
+                    onOpenStats={() => setActiveTab('history')}
+                    onNavigate={setActiveTab}
+                    onUpdateRange={updateTargetRange}
+                    onSwitchProfile={switchProfile}
+                    onUpdateUserMode={updateUserMode}
+                />
+            )}
             <AchievementPopup />
         </div >
     );
