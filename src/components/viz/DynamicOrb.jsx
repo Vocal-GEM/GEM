@@ -122,25 +122,29 @@ varying float vDisplacement;
 varying vec3 vNormal;
 
 void main() {
-  // Colors
-  vec3 colorLow = vec3(0.0, 0.8, 0.9); // Cyan (#00CCFF)
-  vec3 colorHigh = vec3(0.8, 0.0, 1.0); // Purple (#CC00FF)
+  // Teal to Purple gradient (updated color scheme)
+  vec3 colorLow = vec3(0.08, 0.72, 0.65); // Teal (#14b8a6)
+  vec3 colorMid = vec3(0.02, 0.71, 0.83); // Cyan (#06b6d4)
+  vec3 colorHigh = vec3(0.54, 0.36, 0.97); // Violet (#8b5cf6)
   
-  // Mix based on pitch
-  vec3 baseColor = mix(colorLow, colorHigh, u_pitch_norm);
+  // Three-way color mix for smoother gradient
+  vec3 baseColor;
+  if (u_pitch_norm < 0.5) {
+    baseColor = mix(colorLow, colorMid, u_pitch_norm * 2.0);
+  } else {
+    baseColor = mix(colorMid, colorHigh, (u_pitch_norm - 0.5) * 2.0);
+  }
   
   // Intensity based on displacement (peaks are brighter)
   float brightness = 0.5 + vDisplacement * 2.0 + u_intensity;
   
-  // Fresnel / Rim lighting
-  vec3 viewDirection = normalize(cameraPosition - vNormal); // Approximation
-  // Actually in FS we need vPosition to calculate viewDir properly, 
-  // but for a sphere, normal is good enough for a rim effect if we assume camera is looking at center.
-  // Let's use a simple normal-z based rim for now or standard fresnel if we passed view vector.
-  // Simple glow:
-  float glow = pow(0.6 - dot(vNormal, vec3(0, 0, 1.0)), 3.0);
+  // Enhanced Fresnel / Rim lighting for glow effect
+  vec3 viewDirection = normalize(cameraPosition - vNormal);
+  float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0, 0, 1.0))), 2.5);
   
-  vec3 finalColor = baseColor * brightness + glow * baseColor * 2.0;
+  // Combine base color with brightness and glow
+  vec3 glowColor = mix(colorLow, colorHigh, u_pitch_norm);
+  vec3 finalColor = baseColor * brightness + fresnel * glowColor * 2.5;
   
   gl_FragColor = vec4(finalColor, 1.0);
 }
