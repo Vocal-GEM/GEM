@@ -4,6 +4,7 @@ import ResonanceOrb from './components/viz/ResonanceOrb';
 import LiveMetricsBar from './components/viz/LiveMetricsBar';
 import PitchVisualizer from './components/viz/PitchVisualizer';
 import PitchOrb from './components/viz/PitchOrb';
+import DynamicOrb from './components/viz/DynamicOrb';
 import Spectrogram from './components/viz/Spectrogram';
 import VoiceQualityMeter from './components/viz/VoiceQualityMeter';
 import VowelSpacePlot from './components/viz/VowelSpacePlot';
@@ -216,10 +217,19 @@ const App = () => {
                                     </button>
                                 ))}
                             </div>
-                            {/* Resonance Orb */}
-                            {(practiceView === 'all' || practiceView === 'resonance') && <ResonanceOrb dataRef={dataRef} calibration={calibration} />}
+
+                            {/* Dynamic Orb (Show All) or Legacy Resonance Orb (Resonance Tab) */}
+                            {practiceView === 'all' ? (
+                                <div className="h-80 w-full mb-6 relative z-0">
+                                    <DynamicOrb dataRef={dataRef} />
+                                </div>
+                            ) : (
+                                practiceView === 'resonance' && <ResonanceOrb dataRef={dataRef} calibration={calibration} />
+                            )}
+
                             {/* Live Metrics Bar */}
                             {practiceView === 'all' && <LiveMetricsBar dataRef={dataRef} />}
+
                             <div className="space-y-4">
                                 {/* Pitch Visualizer */}
                                 {(practiceView === 'all' || practiceView === 'pitch') && (
@@ -276,36 +286,40 @@ const App = () => {
                 {activeTab === 'games' && <GameHub onSelectGame={handleSelectGame} />}
                 {activeTab === 'coach' && <CoachView />}
                 {activeTab === 'history' && <HistoryView stats={stats} journals={journals} userMode={userMode} onLogClick={() => setShowJournalForm(true)} />}
-                {activeTab === 'tools' && (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="flex items-center gap-2 mb-4">
-                            <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><ArrowLeft /></button>
-                            <h2 className="text-xl font-bold">Tools</h2>
+                {
+                    activeTab === 'tools' && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="flex items-center gap-2 mb-4">
+                                <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><ArrowLeft /></button>
+                                <h2 className="text-xl font-bold">Tools</h2>
+                            </div>
+                            <AudioLibrary audioEngine={audioEngineRef} />
+                            <IntonationExercise />
+                            <ComparisonTool />
+                            <PitchPipe audioEngine={audioEngineRef} />
+                            <BreathPacer />
+                            <MirrorComponent />
                         </div>
-                        <AudioLibrary audioEngine={audioEngineRef} />
-                        <IntonationExercise />
-                        <ComparisonTool />
-                        <PitchPipe audioEngine={audioEngineRef} />
-                        <BreathPacer />
-                        <MirrorComponent />
-                    </div>
-                )}
+                    )
+                }
                 {activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} />}
 
                 {activeTab === 'analysis' && <AnalysisView />}
-                {activeTab === 'articulation' && (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="flex items-center gap-2 mb-4 px-4 pt-4">
-                            <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><ArrowLeft /></button>
-                            <h2 className="text-xl font-bold">Articulation Practice</h2>
+                {
+                    activeTab === 'articulation' && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="flex items-center gap-2 mb-4 px-4 pt-4">
+                                <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><ArrowLeft /></button>
+                                <h2 className="text-xl font-bold">Articulation Practice</h2>
+                            </div>
+                            <ArticulationView />
                         </div>
-                        <ArticulationView />
-                    </div>
-                )}
-            </main>
+                    )
+                }
+            </main >
 
             {/* Navigation */}
-            <nav className="fixed bottom-0 inset-x-0 bg-slate-950/90 backdrop-blur-lg border-t border-white/5 pb-safe z-40">
+            < nav className="fixed bottom-0 inset-x-0 bg-slate-950/90 backdrop-blur-lg border-t border-white/5 pb-safe z-40" >
                 <div className="flex justify-around items-center p-2 max-w-md mx-auto">
                     <button onClick={() => { setActiveTab('practice'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'practice' ? 'text-blue-400 bg-blue-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
                         <Mic2 className="w-6 h-6" />
@@ -332,10 +346,10 @@ const App = () => {
                         <span className="text-[10px] font-bold">Analysis</span>
                     </button>
                 </div>
-            </nav>
+            </nav >
 
             {/* Modals */}
-            <FeedbackSettings
+            < FeedbackSettings
                 isOpen={showSettings}
                 onClose={() => setShowSettings(false)}
                 settings={settings}
@@ -365,13 +379,15 @@ const App = () => {
             {showTutorial && <TutorialWizard onComplete={handleTutorialComplete} onSkip={() => { setShowTutorial(false); setShowCompass(true); }} />}
             {!showTutorial && showCompass && <CompassWizard onComplete={handleCompassComplete} />}
             {showCalibration && <CalibrationWizard onComplete={handleCalibrationComplete} audioEngine={audioEngineRef} />}
-            {showJournalForm && (
-                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="w-full max-w-md">
-                        <JournalForm onSubmit={addJournalEntry} onCancel={() => setShowJournalForm(false)} />
+            {
+                showJournalForm && (
+                    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                        <div className="w-full max-w-md">
+                            <JournalForm onSubmit={addJournalEntry} onCancel={() => setShowJournalForm(false)} />
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
             {showLogin && <Login onSwitchToSignup={() => { setShowLogin(false); setShowSignup(true); }} onClose={() => setShowLogin(false)} />}
             {showSignup && <Signup onSwitchToLogin={() => { setShowSignup(false); setShowLogin(true); }} onClose={() => setShowSignup(false)} />}
             {showVocalHealthTips && <VocalHealthTips onClose={() => setShowVocalHealthTips(false)} />}
@@ -380,7 +396,7 @@ const App = () => {
             {showForwardFocus && <ForwardFocusDrill onClose={() => setShowForwardFocus(false)} />}
             {showIncognito && <IncognitoScreen onClose={() => setShowIncognito(false)} />}
             {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
-        </div>
+        </div >
     );
 };
 
