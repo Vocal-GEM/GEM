@@ -40,5 +40,33 @@ export const KNOWLEDGE_BASE = [
         question: "How often should I practice?",
         answer: "Consistency is key! Short, frequent sessions are better than one long session.\n\n- **Recommended:** 15-30 minutes a day.\n- **Focus:** mindful practice is better than mindless repetition.\n- **Listen:** Record yourself to track progress.",
         category: "General"
+    },
+    {
+        id: 'mix_01',
+        tags: ['mix', 'mixed voice', 'blend', 'chest', 'head'],
+        question: "What is mixed voice?",
+        answer: "Mixed voice is a blend of chest voice (thick folds) and head voice (thin folds). It allows you to sing or speak in your middle range with power and ease, bridging the gap between low and high notes.",
+        category: "Technique"
+    },
+    {
+        id: 'pas_01',
+        tags: ['break', 'crack', 'passaggio', 'smooth'],
+        question: "How do I smooth my voice break?",
+        answer: "The 'break' or passaggio happens when your vocal folds abruptly switch coordination. To smooth it:\n\n1. **Lighten up:** Don't pull heavy chest weight up too high.\n2. **Support:** Keep steady airflow.\n3. **Modify Vowels:** Narrowing vowels (like 'uh' or 'oo') can help navigate the break.",
+        category: "Technique"
+    },
+    {
+        id: 'fry_01',
+        tags: ['fry', 'creak', 'gravel', 'rough'],
+        question: "What is vocal fry?",
+        answer: "Vocal fry is the lowest register of your voice, characterized by a popping or creaking sound. It happens when vocal folds are loose and bubbly. While natural, excessive fry can sometimes limit projection or pitch range.",
+        category: "Voice Quality"
+    },
+    {
+        id: 'bre_01',
+        tags: ['breathy', 'air', 'leak', 'support'],
+        question: "How do I stop sounding breathy?",
+        answer: "Breathiness is caused by air leaking through the vocal folds. To fix it:\n\n1. **Engage:** Try a gentle 'glottal onset' (say 'apple' with a crisp start).\n2. **Support:** Use your abdominal muscles to control airflow.\n3. **Focus:** Aim for a clear, focused sound like a laser beam, not a fog.",
+        category: "Voice Quality"
     }
 ];

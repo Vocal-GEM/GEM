@@ -3,6 +3,8 @@ import { Send } from 'lucide-react';
 import { useGem } from '../../context/GemContext';
 import ChatMessage from './ChatMessage';
 import { KnowledgeService } from '../../services/KnowledgeService';
+import { historyService } from '../../utils/historyService';
+import { CoachEngine } from '../../utils/coachEngine';
 
 const CoachView = () => {
     const [chatInput, setChatInput] = useState('');
@@ -43,27 +45,52 @@ const CoachView = () => {
         setIsChatLoading(true);
 
         // Simulate network delay for realism
-        setTimeout(() => {
+        setTimeout(async () => {
             try {
-                // Use KnowledgeService to find answers
-                const results = KnowledgeService.search(userMsg.content);
                 let reply = '';
+                const lowerInput = userMsg.content.toLowerCase();
 
-                if (results.length > 0) {
-                    const topResult = results[0];
-                    reply = `**${topResult.question}**\n\n${topResult.answer}`;
+                // 1. Check for Personal Progress Questions
+                if (lowerInput.includes('progress') || lowerInput.includes('stats') || lowerInput.includes('how am i doing') || lowerInput.includes('my pitch') || lowerInput.includes('my resonance')) {
+                    try {
+                        // Fetch latest session
+                        const sessions = await historyService.getAllSessions();
+                        if (sessions && sessions.length > 0) {
+                            const lastSession = sessions[0]; // Assuming sorted by date desc
+                            const feedback = CoachEngine.generateFeedback({ overall: lastSession.overall }, { targetPitch: { min: 170, max: 220 }, gender: 'feminine' }); // TODO: Use real user settings
 
-                    // Mention related topics if available
-                    if (results.length > 1) {
-                        const related = results.slice(1, 3).map(r => r.category).filter((v, i, a) => a.indexOf(v) === i);
-                        if (related.length > 0) {
-                            reply += `\n\n*Related topics: ${related.join(', ')}*`;
+                            if (lowerInput.includes('pitch')) {
+                                reply = feedback.details.pitch.message;
+                            } else if (lowerInput.includes('resonance')) {
+                                reply = feedback.details.resonance.message;
+                            } else {
+                                reply = `Based on your last session on ${new Date(lastSession.date).toLocaleDateString()}:\n\n${feedback.summary}\n\n**Focus Area:** ${feedback.focusArea.title}`;
+                            }
+                        } else {
+                            reply = "I don't have enough data yet. Try recording a session in the Analysis tab first!";
                         }
+                    } catch (err) {
+                        console.error("Error fetching history:", err);
+                        reply = "I couldn't access your history right now.";
                     }
-                } else {
-                    // Fallback for no matches
-                    const prefix = userContext.name ? `${userContext.name}, ` : '';
-                    reply = `${prefix}I'm not sure about that yet. I'm trained on resonance, pitch, and vocal weight. Try asking: "How do I brighten my voice?" or "What is vocal weight?"`;
+                }
+                // 2. Knowledge Base Search
+                else {
+                    const results = KnowledgeService.search(userMsg.content);
+                    if (results.length > 0) {
+                        const topResult = results[0];
+                        reply = `**${topResult.question}**\n\n${topResult.answer}`;
+
+                        if (results.length > 1) {
+                            const related = results.slice(1, 3).map(r => r.category).filter((v, i, a) => a.indexOf(v) === i);
+                            if (related.length > 0) {
+                                reply += `\n\n*Related topics: ${related.join(', ')}*`;
+                            }
+                        }
+                    } else {
+                        const prefix = userContext.name ? `${userContext.name}, ` : '';
+                        reply = `${prefix}I'm not sure about that yet. I'm trained on resonance, pitch, and vocal weight. Try asking: "How do I brighten my voice?" or "What is vocal weight?"`;
+                    }
                 }
 
                 setMessages(prev => [...prev, { role: 'assistant', content: reply }]);

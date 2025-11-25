@@ -243,13 +243,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                             <Download className="w-5 h-5 text-slate-400" />
                             <span className="text-sm font-bold text-slate-200">Export My Data (JSON)</span>
                         </button>
-                        <div className="text-[10px] text-slate-600 text-center pt-4 space-y-1">
-                            <div>Vocal GEM v0.9.2 (Beta)</div>
-                            <div>Designed by Riley Reso</div>
-                            <div>Founded on clinical research and techniques</div>
-                            <div>A hobby project made with love ❤️</div>
-                            <div>Contact: <a href="mailto:rreso@msudenver.edu" className="text-blue-500 hover:underline">rreso@msudenver.edu</a></div>
-                        </div>
+
                     </div>
                 </section>
 
@@ -277,13 +271,40 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                             <span className="text-sm font-bold text-white">Warm-Up Exercises</span>
                         </button>
                         <button onClick={() => { onClose(); setTimeout(() => window.dispatchEvent(new CustomEvent('openForwardFocus')), 100); }} className="w-full p-3 bg-purple-800 hover:bg-purple-700 rounded-xl text-left flex items-center gap-3 transition-colors">
-                            <Target className="w-5 h-5 text-purple-400" />
-                            <span className="text-sm font-bold text-white">Forward Focus Drill</span>
+                            <div className="text-[10px] text-slate-400">170-220 Hz</div>
+                        </button>
+                        <button
+                            onClick={() => window.dispatchEvent(new CustomEvent('switchProfile', { detail: 'neutral' }))}
+                            className="p-3 rounded-xl bg-purple-900/20 border border-purple-500/30 hover:bg-purple-900/40 transition-colors text-center"
+                        >
+                            <div className="text-purple-400 font-bold text-sm">Neutral</div>
+                            <div className="text-[10px] text-slate-400">145-175 Hz</div>
+                        </button>
+                        <button
+                            onClick={() => window.dispatchEvent(new CustomEvent('switchProfile', { detail: 'masc' }))}
+                            className="p-3 rounded-xl bg-blue-900/20 border border-blue-500/30 hover:bg-blue-900/40 transition-colors text-center"
+                        >
+                            <div className="text-blue-400 font-bold text-sm">Masc</div>
+                            <div className="text-[10px] text-slate-400">85-145 Hz</div>
                         </button>
                     </div>
                 </section>
-            </div>
-        </div>
+
+                {/* About Section */}
+                <section>
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">About</h3>
+                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 space-y-2 text-center">
+                        <div className="font-bold text-white">Vocal GEM v0.9.2 (Beta)</div>
+                        <div className="text-xs text-slate-400">Designed by Riley Reso</div>
+                        <div className="text-xs text-slate-400">Founded on clinical research and techniques</div>
+                        <div className="text-xs text-slate-400">A hobby project made with love ❤️</div>
+                        <div className="text-xs pt-2 border-t border-white/5 mt-2">
+                            Contact: <a href="mailto:rreso@msudenver.edu" className="text-blue-400 hover:underline">rreso@msudenver.edu</a>
+                        </div>
+                    </div>
+                </section>
+            </div >
+        </div >
     );
 };
 

@@ -15,6 +15,11 @@ const TutorialWizard = ({ onComplete, onSkip }) => {
             icon: "🎙️"
         },
         {
+            title: "Camera Mirror",
+            content: "Use the floating camera mirror to monitor your posture and lip shape while you practice. Toggle it anytime from the top menu.",
+            icon: "🪞"
+        },
+        {
             title: "Privacy First",
             content: "All audio processing happens right here on your device. Your voice data never leaves your browser.",
             icon: "🔒"

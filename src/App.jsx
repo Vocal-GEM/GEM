@@ -270,7 +270,7 @@ const App = () => {
                                 )}
                             </div>
                             {/* Bottom Buttons */}
-                            <div className="mt-6 grid grid-cols-1 gap-3">
+                            <div className="mt-6 grid grid-cols-2 gap-3">
                                 <button onClick={() => setActiveTab('tools')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
                                     <Wrench className="text-purple-400" />
                                     <span className="text-xs font-bold">Tools</span>
@@ -278,6 +278,10 @@ const App = () => {
                                 <button onClick={() => setActiveTab('articulation')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
                                     <Mic className="text-pink-400" />
                                     <span className="text-xs font-bold">Articulation</span>
+                                </button>
+                                <button onClick={() => setShowCamera(!showCamera)} className={`p-4 rounded-2xl flex flex-col items-center gap-2 transition-colors ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 hover:bg-slate-700'}`}>
+                                    <Camera className={showCamera ? "text-white" : "text-cyan-400"} />
+                                    <span className="text-xs font-bold">Mirror</span>
                                 </button>
                             </div>
                         </div>
@@ -302,7 +306,7 @@ const App = () => {
                         </div>
                     )
                 }
-                {activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} />}
+                {activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} calibration={calibration} />}
 
                 {activeTab === 'analysis' && <AnalysisView />}
                 {
