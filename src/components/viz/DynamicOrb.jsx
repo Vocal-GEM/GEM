@@ -284,7 +284,7 @@ const ParticleSystem = ({ dataRef }) => {
     );
 };
 
-const DynamicOrb = ({ dataRef }) => {
+const DynamicOrb = React.memo(({ dataRef }) => {
     return (
         <div className="w-full h-full relative">
             <Canvas
@@ -296,6 +296,7 @@ const DynamicOrb = ({ dataRef }) => {
                     alpha: true
                 }}
                 dpr={[1, 2]} // Handle high DPI screens
+                frameloop="always" // Ensure continuous rendering
             >
                 <color attach="background" args={['#020617']} /> {/* Match slate-950 */}
 
@@ -317,6 +318,6 @@ const DynamicOrb = ({ dataRef }) => {
             {/* Overlay Text/Labels could go here */}
         </div>
     );
-};
+});
 
 export default DynamicOrb;
