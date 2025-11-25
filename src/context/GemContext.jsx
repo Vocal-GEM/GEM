@@ -46,6 +46,7 @@ export const GemProvider = ({ children }) => {
         triggerDarkRes: true,
         notation: 'hz',
         homeNote: 190,
+        gamificationEnabled: true,
         ttsProvider: 'elevenlabs', // 'browser' | 'elevenlabs'
         elevenLabsKey: 'sk_d4ebb9d8a3540c49173de9a236f7a1642114d07762414784',
         voiceId: '21m00Tcm4TlvDq8ikWAM' // Default Rachel

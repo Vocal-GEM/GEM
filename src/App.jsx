@@ -24,6 +24,7 @@ import MirrorComponent from './components/ui/MirrorComponent';
 import JournalForm from './components/ui/JournalForm';
 import Login from './components/ui/Login';
 import Signup from './components/ui/Signup';
+import UserProfile from './components/ui/UserProfile';
 import ComparisonTool from './components/ui/ComparisonTool';
 import IntonationExercise from './components/ui/IntonationExercise';
 import VocalHealthTips from './components/ui/VocalHealthTips';
@@ -93,6 +94,7 @@ const App = () => {
     const [showJournalForm, setShowJournalForm] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [showSignup, setShowSignup] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
     const [showIncognito, setShowIncognito] = useState(false);
     const [showCamera, setShowCamera] = useState(false);
     const [showPracticeMode, setShowPracticeMode] = useState(false);
@@ -165,6 +167,13 @@ const App = () => {
         return () => window.removeEventListener('switchProfile', handleSwitchProfile);
     }, []);
 
+    // Clear active game if gamification is disabled
+    useEffect(() => {
+        if (settings.gamificationEnabled === false) {
+            setActiveGame(null);
+        }
+    }, [settings.gamificationEnabled]);
+
     const [activeGame, setActiveGame] = useState(null);
     const [logoTapCount, setLogoTapCount] = useState(0);
     const [logoTapTimeout, setLogoTapTimeout] = useState(null);
@@ -202,7 +211,7 @@ const App = () => {
                     <button onClick={() => setShowSettings(true)} className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700">
                         <span className="text-sm font-bold text-white">⚙️ Settings</span>
                     </button>
-                    <button onClick={() => setShowLogin(true)} className="w-10 h-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors">
+                    <button onClick={() => user ? setShowProfile(true) : setShowLogin(true)} className="w-10 h-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors">
                         <span className="text-lg">👤</span>
                     </button>
                     <button onClick={() => setShowCamera(!showCamera)} className={`w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transition-colors ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
@@ -351,11 +360,13 @@ const App = () => {
                         <span className="text-[10px] font-bold">Practice</span>
                         {activeTab === 'practice' && <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-teal-500 to-violet-500 rounded-full" />}
                     </button>
-                    <button onClick={() => { setActiveTab('games'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all relative ${activeTab === 'games' ? 'text-purple-400' : 'text-slate-500 hover:text-slate-300'}`}>
-                        <Gamepad2 className="w-6 h-6" />
-                        <span className="text-[10px] font-bold">Arcade</span>
-                        {activeTab === 'games' && <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-teal-500 to-violet-500 rounded-full" />}
-                    </button>
+                    {settings.gamificationEnabled !== false && (
+                        <button onClick={() => { setActiveTab('games'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all relative ${activeTab === 'games' ? 'text-purple-400' : 'text-slate-500 hover:text-slate-300'}`}>
+                            <Gamepad2 className="w-6 h-6" />
+                            <span className="text-[10px] font-bold">Arcade</span>
+                            {activeTab === 'games' && <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-teal-500 to-violet-500 rounded-full" />}
+                        </button>
+                    )}
                     <button onClick={() => { setActiveTab('mixing'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'mixing' ? 'text-pink-400 bg-pink-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
                         <Wrench className="w-6 h-6" />
                         <span className="text-[10px] font-bold">Mixer</span>
@@ -417,6 +428,7 @@ const App = () => {
             }
             {showLogin && <Login onSwitchToSignup={() => { setShowLogin(false); setShowSignup(true); }} onClose={() => setShowLogin(false)} />}
             {showSignup && <Signup onSwitchToLogin={() => { setShowSignup(false); setShowLogin(true); }} onClose={() => setShowSignup(false)} />}
+            {showProfile && <UserProfile user={user} onClose={() => setShowProfile(false)} onLogout={() => { logout(); setShowProfile(false); }} />}
             {showVocalHealthTips && <VocalHealthTips onClose={() => setShowVocalHealthTips(false)} />}
             {showAssessment && <AssessmentModule onClose={() => setShowAssessment(false)} />}
             {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}
