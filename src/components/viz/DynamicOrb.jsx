@@ -285,25 +285,27 @@ const ParticleSystem = ({ dataRef }) => {
 };
 
 const DynamicOrb = React.memo(({ dataRef }) => {
+    const canvasRef = useRef(null);
+
     return (
-        <div className="w-full h-full relative">
+        <div ref={canvasRef} className="w-full h-full relative">
             <Canvas
+                key="dynamic-orb-canvas"
                 camera={{ position: [0, 0, 5], fov: 50 }}
                 gl={{
                     antialias: false,
-                    toneMapping: THREE.ReinhardToneMapping,
-                    toneMappingExposure: 1.5,
-                    alpha: true
+                    powerPreference: "high-performance",
+                    alpha: true,
+                    preserveDrawingBuffer: false
                 }}
-                dpr={[1, 2]} // Handle high DPI screens
-                frameloop="always" // Ensure continuous rendering
+                dpr={[1, 1.5]}
+                frameloop="always"
+                onCreated={(state) => {
+                    state.gl.setClearColor('#020617', 1);
+                }}
             >
-                <color attach="background" args={['#020617']} /> {/* Match slate-950 */}
-
                 <ambientLight intensity={0.5} />
-
                 <OrbMesh dataRef={dataRef} />
-                <ParticleSystem dataRef={dataRef} />
 
                 <EffectComposer disableNormalPass>
                     <Bloom
@@ -314,8 +316,6 @@ const DynamicOrb = React.memo(({ dataRef }) => {
                     />
                 </EffectComposer>
             </Canvas>
-
-            {/* Overlay Text/Labels could go here */}
         </div>
     );
 });

@@ -8,13 +8,11 @@ import './index.css'
 import GlobalErrorBoundary from './components/ui/GlobalErrorBoundary'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
-        <GlobalErrorBoundary>
-            <GemProvider>
-                <HashRouter>
-                    <App />
-                </HashRouter>
-            </GemProvider>
-        </GlobalErrorBoundary>
-    </React.StrictMode>,
+    <GlobalErrorBoundary>
+        <GemProvider>
+            <HashRouter>
+                <App />
+            </HashRouter>
+        </GemProvider>
+    </GlobalErrorBoundary>,
 )
