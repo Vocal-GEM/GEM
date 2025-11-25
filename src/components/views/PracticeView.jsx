@@ -51,7 +51,7 @@ const PracticeView = () => {
             <div className="flex-1 relative flex items-center justify-center min-h-[300px]">
                 {/* The Orb */}
                 <div className="absolute inset-0 flex items-center justify-center z-10">
-                    <ResonanceOrb dataRef={dataRef} calibration={calibration} size={300} />
+                    <ResonanceOrb dataRef={dataRef} calibration={calibration} size={300} showDebug={true} />
                 </div>
 
                 {/* Metrics Overlay (Glassmorphism) */}

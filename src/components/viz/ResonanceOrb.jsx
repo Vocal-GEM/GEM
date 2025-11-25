@@ -1,81 +1,252 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-const ResonanceOrb = ({ dataRef, calibration }) => {
+/**
+ * ResonanceOrb - Visual feedback for voice resonance
+ * 
+ * Uses resonanceScore (0-1) from the processor:
+ * - 0.0 - 0.35: Dark (masculine resonance)
+ * - 0.35 - 0.65: Balanced (androgynous resonance)  
+ * - 0.65 - 1.0: Bright (feminine resonance)
+ * 
+ * Includes debug display for calibration (toggle with showDebug prop)
+ */
+const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
     const orbRef = useRef(null);
     const labelRef = useRef(null);
-    const minC = calibration ? calibration.dark : 500;
-    const maxC = calibration ? calibration.bright : 2500;
 
-    // Ref for smoothing
-    const currentRPercent = useRef(0);
+    // Debug state
+    const [debugInfo, setDebugInfo] = useState(null);
+
+    // Smoothing ref
+    const currentScore = useRef(0.5);
+
+    // Hold timer
+    const silenceTimer = useRef(0);
+
+    // Label stability tracking
+    const labelState = useRef({ current: "Listening...", candidate: "Listening...", count: 0 });
 
     useEffect(() => {
+        let frameCount = 0;
+
         const loop = () => {
             if (orbRef.current && dataRef.current) {
-                const { resonance, weight, pitch } = dataRef.current;
+                const { resonanceScore, pitch, volume, spectralCentroid, f1, f2, debug } = dataRef.current;
 
-                // 1. Calculate Target Percentage
-                let targetRPercent = 0;
-                if (resonance > 0) {
-                    // Adjusted normalization:
-                    // Lowering the "bright" threshold significantly to make it easier to hit
-                    // Shifting the "dark" threshold up slightly to avoid false positives
-                    const effectiveMin = minC + 100; // ~600Hz
-                    const effectiveMax = 1800; // Lowered from 2500Hz to make "Bright" achievable
-
-                    let rawPercent = ((resonance - effectiveMin) / (effectiveMax - effectiveMin));
-                    rawPercent = Math.max(0, Math.min(1, rawPercent));
-
-                    // Apply curve to boost mid-range values towards bright
-                    // Power < 1 boosts lower values up
-                    targetRPercent = Math.pow(rawPercent, 0.8);
+                // Update debug display every 10 frames (~6 times/sec) to reduce flicker
+                frameCount++;
+                if (showDebug && frameCount % 10 === 0 && debug) {
+                    setDebugInfo({
+                        centroid: spectralCentroid?.toFixed(0) || '—',
+                        rawCentroid: debug.rawCentroid?.toFixed(0) || '—',
+                        centroidScore: (debug.centroidScore * 100)?.toFixed(0) || '—',
+                        f1: f1?.toFixed(0) || '—',
+                        f2: f2?.toFixed(0) || '—',
+                        f2Score: debug.hasValidF2 ? (debug.f2Score * 100)?.toFixed(0) : 'N/A',
+                        rawScore: (debug.rawScore * 100)?.toFixed(0) || '—',
+                        finalScore: (resonanceScore * 100)?.toFixed(0) || '—',
+                        hasF2: debug.hasValidF2 ? 'Yes' : 'No',
+                        uiScore: (currentScore.current * 100)?.toFixed(0) || '—',
+                        label: labelState.current.current,
+                        peakCount: debug.peakCount !== undefined ? debug.peakCount : '—',
+                        smoothingMode: debug.smoothingMode || '—'
+                    });
                 }
 
-                // 2. Smoothing (Lerp)
-                // factor 0.05 = slow smooth
-                const smoothFactor = 0.05;
-                currentRPercent.current = currentRPercent.current + (targetRPercent - currentRPercent.current) * smoothFactor;
+                const isVoiceActive = pitch > 0 && volume > 0.005;
 
-                const rPercent = currentRPercent.current;
+                if (isVoiceActive) {
+                    silenceTimer.current = 0;
 
-                // 3. Visuals
-                let color = `rgb(59, 130, 246)`; // Blue (Neutral)
-
-                if (rPercent > 0.5) {
-                    // Blue -> Yellow
-                    const t = (rPercent - 0.5) * 2;
-                    // Interpolate Blue (59, 130, 246) to Yellow (250, 204, 21)
-                    color = `rgb(${59 + (250 - 59) * t}, ${130 + (204 - 130) * t}, ${246 + (21 - 246) * t})`;
+                    const targetScore = resonanceScore !== undefined ? resonanceScore : 0.5;
+                    const smoothFactor = 0.15; // Slightly faster response
+                    currentScore.current = currentScore.current + (targetScore - currentScore.current) * smoothFactor;
                 } else {
-                    // Darker Blue -> Blue
-                    const t = rPercent * 2;
-                    // Darker Blue (30, 58, 138) -> Blue (59, 130, 246)
-                    color = `rgb(${30 + (59 - 30) * t}, ${58 + (130 - 58) * t}, ${138 + (246 - 138) * t})`;
+                    silenceTimer.current++;
+
+                    if (silenceTimer.current > 25) {
+                        currentScore.current = currentScore.current * 0.97 + 0.5 * 0.03;
+                    }
                 }
 
-                const scale = 1 + (weight / 200);
-                orbRef.current.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), ${color})`;
-                orbRef.current.style.boxShadow = `0 0 ${20 + weight}px ${color}, inset 0 0 20px rgba(255,255,255,0.5)`;
-                orbRef.current.style.transform = `scale(${scale})`;
-                orbRef.current.style.opacity = pitch > 0 ? 1 : 0.3;
+                const score = currentScore.current;
 
+                // ============================================
+                // Visual Color Mapping
+                // ============================================
+                let color;
+                if (score <= 0.5) {
+                    // Dark -> Balanced (deep purple-blue to blue)
+                    const t = score * 2;
+                    const r = Math.round(45 + (59 - 45) * t);
+                    const g = Math.round(35 + (130 - 35) * t);
+                    const b = Math.round(120 + (246 - 120) * t);
+                    color = `rgb(${r}, ${g}, ${b})`;
+                } else {
+                    // Balanced -> Bright (blue to warm gold)
+                    const t = (score - 0.5) * 2;
+                    const r = Math.round(59 + (255 - 59) * t);
+                    const g = Math.round(130 + (200 - 130) * t);
+                    const b = Math.round(246 + (50 - 246) * t);
+                    color = `rgb(${r}, ${g}, ${b})`;
+                }
+
+                const weight = dataRef.current.weight || 0;
+                const scale = 1 + (weight * 0.12);
+
+                orbRef.current.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), ${color})`;
+                orbRef.current.style.boxShadow = `0 0 ${20 + weight * 25}px ${color}, inset 0 0 20px rgba(255,255,255,0.5)`;
+                orbRef.current.style.transform = `scale(${scale})`;
+                orbRef.current.style.opacity = isVoiceActive ? 1 : (silenceTimer.current > 25 ? 0.4 : 0.7);
+
+                // ============================================
+                // Label Text (Debounced)
+                // ============================================
                 if (labelRef.current) {
-                    if (pitch <= 0) labelRef.current.innerText = "Listening...";
-                    else if (rPercent > 0.6) labelRef.current.innerText = "Bright / Head"; // Lowered from 0.65
-                    else if (rPercent < 0.35) labelRef.current.innerText = "Dark / Chest"; // Kept same
-                    else labelRef.current.innerText = "Balanced";
+                    let nextLabel = labelState.current.current;
+
+                    // Determine candidate label
+                    let candidate = "";
+                    if (!isVoiceActive && silenceTimer.current > 45) { // Increased wait for silence
+                        candidate = "Listening...";
+                    } else if (isVoiceActive || silenceTimer.current <= 45) {
+                        if (score < 0.35) candidate = "Dark";
+                        else if (score > 0.65) candidate = "Bright";
+                        else candidate = "Balanced";
+                    }
+
+                    // Debounce logic
+                    if (candidate === labelState.current.candidate) {
+                        labelState.current.count++;
+                    } else {
+                        labelState.current.candidate = candidate;
+                        labelState.current.count = 0;
+                    }
+
+                    // Only switch if stable for 45 frames (~0.75s)
+                    if (labelState.current.count > 45) {
+                        nextLabel = candidate;
+                        labelState.current.current = nextLabel;
+                    }
+
+                    // Apply to DOM
+                    if (labelRef.current.innerText !== nextLabel) {
+                        labelRef.current.innerText = nextLabel;
+                    }
+
+                    // Opacity handling
+                    if (nextLabel === "Listening...") {
+                        labelRef.current.style.opacity = "0.6";
+                    } else {
+                        labelRef.current.style.opacity = "1";
+                    }
                 }
             }
             requestAnimationFrame(loop);
         };
-        const id = requestAnimationFrame(loop); return () => cancelAnimationFrame(id);
-    }, [calibration, minC, maxC, dataRef]);
+
+        const id = requestAnimationFrame(loop);
+        return () => cancelAnimationFrame(id);
+    }, [calibration, dataRef, showDebug]);
 
     return (
-        <div className="relative h-48 w-full flex items-center justify-center mb-6 mt-2">
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-purple-500/5 rounded-full blur-3xl"></div>
-            <div ref={orbRef} className="w-32 h-32 rounded-full transition-colors duration-200 z-10 relative"></div>
-            <div ref={labelRef} className="absolute bottom-0 translate-y-full text-xs font-bold tracking-widest text-slate-400 uppercase mt-4">Listening...</div>
+        <div className="relative flex flex-col items-center">
+            {/* Main orb container */}
+            <div className="relative h-48 w-full flex items-center justify-center mb-6 mt-2">
+                <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-purple-500/5 rounded-full blur-3xl"></div>
+
+                <div
+                    ref={orbRef}
+                    className="w-32 h-32 rounded-full transition-all duration-150 z-10 relative"
+                    style={{ transitionProperty: 'transform, opacity' }}
+                ></div>
+
+                <div
+                    ref={labelRef}
+                    className="absolute bottom-0 translate-y-full text-xs font-bold tracking-widest text-slate-400 uppercase mt-4 transition-opacity duration-200"
+                >
+                    Listening...
+                </div>
+            </div>
+
+            {/* Debug Panel */}
+            {showDebug && debugInfo && (
+                <div className="mt-8 p-4 bg-slate-800/80 rounded-lg text-xs font-mono text-slate-300 w-full max-w-sm">
+                    <div className="text-slate-500 uppercase tracking-wider mb-2 text-center">Debug Values</div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                        <div>Centroid (raw):</div>
+                        <div className="text-cyan-400">{debugInfo.rawCentroid} Hz</div>
+
+                        <div>Centroid (smooth):</div>
+                        <div className="text-cyan-400">{debugInfo.centroid} Hz</div>
+
+                        <div>Centroid Score:</div>
+                        <div className="text-yellow-400">{debugInfo.centroidScore}%</div>
+
+                        <div className="border-t border-slate-700 col-span-2 my-1"></div>
+
+                        <div>F1:</div>
+                        <div className="text-green-400">{debugInfo.f1} Hz</div>
+
+                        <div>F2:</div>
+                        <div className="text-green-400">{debugInfo.f2} Hz</div>
+
+                        <div>Valid F2?</div>
+                        <div className={debugInfo.hasF2 === 'Yes' ? 'text-green-400' : 'text-red-400'}>{debugInfo.hasF2}</div>
+
+                        <div className="border-t border-slate-700 col-span-2 my-1"></div>
+
+                        <div>Proc Score:</div>
+                        <div className="text-orange-400">{debugInfo.finalScore}%</div>
+
+                        <div>UI Score:</div>
+                        <div className="text-white font-bold">{debugInfo.uiScore}%</div>
+
+                        <div>Label:</div>
+                        <div className="text-white">{debugInfo.label}</div>
+
+                        <div className="border-t border-slate-700 col-span-2 my-1"></div>
+
+                        <div>Peaks:</div>
+                        <div className="text-slate-400">{debugInfo.peakCount}</div>
+
+                        <div>Mode:</div>
+                        <div className="text-slate-400">{debugInfo.smoothingMode}</div>
+                    </div>
+
+                    {/* Spectrum Scale */}
+                    <div className="mt-4 pt-4 border-t border-slate-700">
+                        <div className="flex justify-between text-[10px] text-slate-500 mb-1 uppercase tracking-wider">
+                            <span>Dark</span>
+                            <span>Balanced</span>
+                            <span>Bright</span>
+                        </div>
+
+                        <div className="relative h-4 w-full rounded-full bg-slate-900 overflow-hidden ring-1 ring-white/10">
+                            {/* Gradient Background */}
+                            <div className="absolute inset-0 opacity-80" style={{
+                                background: 'linear-gradient(to right, #312e81 0%, #3b82f6 35%, #3b82f6 65%, #facc15 100%)'
+                            }}></div>
+
+                            {/* Threshold Markers */}
+                            <div className="absolute top-0 bottom-0 w-px bg-white/20 left-[35%]"></div>
+                            <div className="absolute top-0 bottom-0 w-px bg-white/20 left-[65%]"></div>
+
+                            {/* Indicator Line */}
+                            <div className="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_10px_rgba(255,255,255,1)] transition-all duration-75 ease-out z-10"
+                                style={{ left: `${debugInfo.uiScore}%`, transform: 'translateX(-50%)' }}
+                            ></div>
+                        </div>
+
+                        <div className="flex justify-between text-[10px] text-slate-600 mt-1 font-mono">
+                            <span>0%</span>
+                            <span className="pl-2">35%</span>
+                            <span className="pr-2">65%</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

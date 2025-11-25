@@ -5,8 +5,8 @@ const MixingBoardView = ({ dataRef, audioEngine }) => {
     const [toneMode, setToneMode] = useState(false);
     const [sliderValues, setSliderValues] = useState({
         pitch: 200,
-        resonance: 1000,
-        weight: 0,
+        resonance: 0.5, // Now a score 0-1
+        weight: 50,
         contour: 0.5,
         volume: 50
     });
@@ -16,10 +16,18 @@ const MixingBoardView = ({ dataRef, audioEngine }) => {
     const knobRefs = useRef({});
     const valueRefs = useRef({});
 
+    // Ref for smooth visual interpolation of numbers
+    const displayedValues = useRef({
+        pitch: 200, resonance: 0.5, weight: 50, contour: 0.5, volume: 0
+    });
+
     // Audio Context Refs
     const oscillatorRef = useRef(null);
     const gainNodeRef = useRef(null);
     const audioContextRef = useRef(null);
+
+    // Helper: Linear Interpolation
+    const lerp = (start, end, factor) => start + (end - start) * factor;
 
     // Start/Stop Tone Mode
     useEffect(() => {
@@ -76,16 +84,27 @@ const MixingBoardView = ({ dataRef, audioEngine }) => {
             const data = dataRef.current;
 
             // Map data to slider percentages
-            const updates = {
+            const targets = {
                 pitch: { val: data.pitch, min: 50, max: 350 },
-                resonance: { val: data.resonance, min: 500, max: 2000 }, // Adjusted for no pre-emphasis
-                weight: { val: data.weight, min: -2, max: 2 },
+                // Resonance now uses the normalized score (0-1) directly
+                resonance: { val: data.resonanceScore !== undefined ? data.resonanceScore : 0.5, min: 0, max: 1 },
+                weight: { val: data.weight, min: 0, max: 100 },
                 contour: { val: data.prosody?.variation || 0, min: 0, max: 1 },
-                volume: { val: data.volume, min: 0, max: 100 } // Assuming volume is 0-100 or dB?
+                volume: { val: data.volume, min: 0, max: 100 }
             };
 
-            Object.keys(updates).forEach(key => {
-                const { val, min, max } = updates[key];
+            Object.keys(targets).forEach(key => {
+                const target = targets[key];
+
+                // Smooth the display value
+                // For resonance, we always want to update if we have a score
+                if (target.val !== undefined && (key === 'resonance' || target.val > 0)) {
+                    displayedValues.current[key] = lerp(displayedValues.current[key], target.val, 0.1);
+                }
+
+                const val = displayedValues.current[key];
+                const { min, max } = target;
+
                 let percentage = ((val - min) / (max - min)) * 100;
                 percentage = Math.max(0, Math.min(100, percentage));
 
@@ -97,7 +116,13 @@ const MixingBoardView = ({ dataRef, audioEngine }) => {
                     knobRefs.current[key].style.bottom = `calc(${percentage}% - 12px)`; // Center knob
                 }
                 if (valueRefs.current[key]) {
-                    valueRefs.current[key].innerText = val > 0 ? Math.round(val * 10) / 10 : '---';
+                    // Only show text if we have recent valid data (using raw data check)
+                    // For resonance, show qualitative label or score
+                    if (key === 'resonance') {
+                        valueRefs.current[key].innerText = val > 0.65 ? 'Bright' : (val < 0.35 ? 'Dark' : 'Balanced');
+                    } else {
+                        valueRefs.current[key].innerText = (data.pitch > 0 || key === 'volume') ? (Math.round(val * 10) / 10) : '---';
+                    }
                 }
             });
 
@@ -160,8 +185,8 @@ const MixingBoardView = ({ dataRef, audioEngine }) => {
 
     const sliders = [
         { id: 'pitch', label: 'Pitch', min: 50, max: 350, top: 'HIGH', bottom: 'LOW', unit: 'Hz' },
-        { id: 'resonance', label: 'Resonance', min: 500, max: 2000, top: 'BRIGHT', bottom: 'DARK', unit: '' },
-        { id: 'weight', label: 'Weight', min: -2, max: 2, top: 'HEAVY', bottom: 'LIGHT', unit: '' },
+        { id: 'resonance', label: 'Resonance', min: 0, max: 1, top: 'BRIGHT', bottom: 'DARK', unit: '' },
+        { id: 'weight', label: 'Weight', min: 0, max: 100, top: 'PRESSED', bottom: 'AIRY', unit: '' },
         { id: 'contour', label: 'Contour', min: 0, max: 1, top: 'WIDE', bottom: 'FLAT', unit: '' },
         { id: 'volume', label: 'Volume', min: 0, max: 100, top: 'LOUD', bottom: 'QUIET', unit: '' }
     ];
@@ -256,7 +281,7 @@ const MixingBoardView = ({ dataRef, audioEngine }) => {
 
                                 {/* Current Value */}
                                 <div ref={el => valueRefs.current[slider.id] = el} className="text-xs font-mono text-emerald-400 font-bold">
-                                    {val > 0 ? Math.round(val * 10) / 10 : '---'}
+                                    {val > 0 ? (slider.id === 'resonance' ? (val > 0.65 ? 'Bright' : (val < 0.35 ? 'Dark' : 'Balanced')) : Math.round(val * 10) / 10) : '---'}
                                 </div>
 
                                 {/* Bottom Label */}
