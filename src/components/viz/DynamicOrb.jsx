@@ -281,32 +281,6 @@ const ParticleSystem = ({ dataRef }) => {
                 blending={THREE.AdditiveBlending}
             />
         </points>
-    );
-};
-
-const DynamicOrb = React.memo(({ dataRef }) => {
-    const canvasRef = useRef(null);
-
-    return (
-        <div ref={canvasRef} className="w-full h-full relative">
-            <Canvas
-                key="dynamic-orb-canvas"
-                camera={{ position: [0, 0, 5], fov: 50 }}
-                gl={{
-                    antialias: false,
-                    powerPreference: "high-performance",
-                    alpha: true,
-                    preserveDrawingBuffer: false
-                }}
-                dpr={[1, 1.5]}
-                frameloop="always"
-                onCreated={(state) => {
-                    state.gl.setClearColor('#020617', 1);
-                }}
-            >
-                <ambientLight intensity={0.5} />
-                <OrbMesh dataRef={dataRef} />
-
                 <EffectComposer disableNormalPass>
                     <Bloom
                         luminanceThreshold={0.2}
@@ -315,8 +289,8 @@ const DynamicOrb = React.memo(({ dataRef }) => {
                         radius={0.6}
                     />
                 </EffectComposer>
-            </Canvas>
-        </div>
+            </Canvas >
+        </div >
     );
 });
 
