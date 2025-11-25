@@ -78,7 +78,7 @@ const MixingBoardView = ({ dataRef, audioEngine }) => {
             // Map data to slider percentages
             const updates = {
                 pitch: { val: data.pitch, min: 50, max: 350 },
-                resonance: { val: data.resonance, min: 500, max: 1800 }, // Updated max to 1800
+                resonance: { val: data.resonance, min: 500, max: 2000 }, // Adjusted for no pre-emphasis
                 weight: { val: data.weight, min: -2, max: 2 },
                 contour: { val: data.prosody?.variation || 0, min: 0, max: 1 },
                 volume: { val: data.volume, min: 0, max: 100 } // Assuming volume is 0-100 or dB?
@@ -160,7 +160,7 @@ const MixingBoardView = ({ dataRef, audioEngine }) => {
 
     const sliders = [
         { id: 'pitch', label: 'Pitch', min: 50, max: 350, top: 'HIGH', bottom: 'LOW', unit: 'Hz' },
-        { id: 'resonance', label: 'Resonance', min: 500, max: 1800, top: 'BRIGHT', bottom: 'DARK', unit: '' },
+        { id: 'resonance', label: 'Resonance', min: 500, max: 2000, top: 'BRIGHT', bottom: 'DARK', unit: '' },
         { id: 'weight', label: 'Weight', min: -2, max: 2, top: 'HEAVY', bottom: 'LIGHT', unit: '' },
         { id: 'contour', label: 'Contour', min: 0, max: 1, top: 'WIDE', bottom: 'FLAT', unit: '' },
         { id: 'volume', label: 'Volume', min: 0, max: 100, top: 'LOUD', bottom: 'QUIET', unit: '' }
