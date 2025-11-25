@@ -54,13 +54,15 @@ export class AudioEngine {
             if (this.audioContext.state === 'suspended') await this.audioContext.resume();
             this.toneEngine = new ToneEngine(this.audioContext);
 
-            // Load Worklet from public file
+            // Load Worklet from public file with cache busting
             try {
-                await this.audioContext.audioWorklet.addModule('/resonance-processor.js');
+                const timestamp = Date.now();
+                await this.audioContext.audioWorklet.addModule(`/resonance-processor.js?v=${timestamp}`);
             } catch (e) {
                 console.error("Failed to load worklet from /resonance-processor.js, trying relative path...", e);
-                // Fallback if needed, but /resonance-processor.js should work for Vite/public
-                await this.audioContext.audioWorklet.addModule('resonance-processor.js');
+                // Fallback if needed
+                const timestamp = Date.now();
+                await this.audioContext.audioWorklet.addModule(`resonance-processor.js?v=${timestamp}`);
             }
 
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });

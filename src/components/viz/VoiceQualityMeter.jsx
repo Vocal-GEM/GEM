@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Activity, Info } from 'lucide-react';
 
 const VoiceQualityMeter = ({ dataRef, userMode }) => {
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
-    const debugRef = useRef(null);
+    const metricsRef = useRef({ h1: null, h2: null, diff: null });
 
     useEffect(() => {
         const loop = () => {
@@ -31,10 +31,12 @@ const VoiceQualityMeter = ({ dataRef, userMode }) => {
                 // Update value display
                 valueRef.current.innerText = Math.round(weight);
 
-                // Update debug display if available
-                if (debugRef.current && dataRef.current.debug) {
+                // Update metrics display
+                if (dataRef.current.debug) {
                     const { h1db, h2db, diffDb } = dataRef.current.debug;
-                    debugRef.current.innerText = `H1-H2: ${diffDb?.toFixed(1) || '0.0'}dB`;
+                    if (metricsRef.current.h1) metricsRef.current.h1.innerText = h1db ? h1db.toFixed(1) : '-';
+                    if (metricsRef.current.h2) metricsRef.current.h2.innerText = h2db ? h2db.toFixed(1) : '-';
+                    if (metricsRef.current.diff) metricsRef.current.diff.innerText = diffDb ? diffDb.toFixed(1) : '-';
                 }
             }
             requestAnimationFrame(loop);
@@ -49,28 +51,73 @@ const VoiceQualityMeter = ({ dataRef, userMode }) => {
     const isStrained = dataRef.current?.weight > 80;
 
     return (
-        <div className="glass-panel rounded-xl p-6 mb-2">
-            <div className="flex justify-between items-center text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-3">
-                <span>{labels[0]}</span>
+        <div className="glass-panel rounded-2xl p-6 h-full flex flex-col justify-center">
+            {/* Header */}
+            <div className="flex justify-between items-end text-xs font-bold text-slate-400 tracking-wider mb-4">
+                <span className="w-24 text-left">{labels[0]}</span>
                 <div className="flex flex-col items-center">
-                    <span>{labels[1]}</span>
-                    <span ref={valueRef} className="text-lg font-mono text-emerald-400 mt-1">0</span>
+                    <span className="text-slate-500 mb-1 uppercase tracking-widest text-[10px]">{labels[1]}</span>
+                    <span ref={valueRef} className="text-4xl font-mono text-emerald-400 font-bold tabular-nums leading-none">0</span>
                 </div>
-                <span>{labels[2]}</span>
+                <span className="w-24 text-right">{labels[2]}</span>
             </div>
-            <div className="relative h-4 bg-slate-800 rounded-full overflow-hidden shadow-inner">
+
+            {/* Meter Bar */}
+            <div className="relative h-10 bg-slate-900/80 rounded-full overflow-hidden shadow-inner border border-white/5 mb-6">
                 {/* Dynamic Gradient Background */}
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-emerald-500 to-red-500 opacity-30"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-emerald-500/20 to-red-500/20"></div>
+
+                {/* Grid Lines */}
+                <div className="absolute left-[30%] top-0 bottom-0 w-px bg-white/10 dashed-line"></div>
+                <div className="absolute left-[70%] top-0 bottom-0 w-px bg-white/10 dashed-line"></div>
+                <div className="absolute left-[50%] top-2 bottom-2 w-px bg-white/5"></div>
+
                 {/* Indicator */}
-                <div ref={indicatorRef} className="absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-all duration-75 bg-emerald-500" style={{ left: '0%' }}></div>
+                <div
+                    ref={indicatorRef}
+                    className="absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_15px_rgba(100,255,100,0.6)] border border-white/50 transition-all duration-100 ease-out bg-emerald-500 z-10"
+                    style={{ left: '0%' }}
+                ></div>
             </div>
-            {/* Debug Info */}
-            <div ref={debugRef} className="mt-2 text-[10px] text-slate-500 font-mono text-center">
-                H1-H2: 0.0dB
+
+            {/* Analysis Panel */}
+            <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
+                <div className="flex items-center justify-center gap-2 mb-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    <Activity size={12} /> Real-Time Analysis
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-white/5">
+                        <div className="text-[10px] text-slate-500 mb-1">H1 (Fund.)</div>
+                        <div ref={el => metricsRef.current.h1 = el} className="text-lg font-mono text-blue-300 font-bold">-</div>
+                        <div className="text-[9px] text-slate-600">dB</div>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-white/5">
+                        <div className="text-[10px] text-slate-500 mb-1">H2 (Harm.)</div>
+                        <div ref={el => metricsRef.current.h2 = el} className="text-lg font-mono text-purple-300 font-bold">-</div>
+                        <div className="text-[9px] text-slate-600">dB</div>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-white/10 shadow-lg">
+                        <div className="text-[10px] text-emerald-500 mb-1 font-bold">Diff</div>
+                        <div ref={el => metricsRef.current.diff = el} className="text-lg font-mono text-white font-bold">-</div>
+                        <div className="text-[9px] text-slate-600">dB</div>
+                    </div>
+                </div>
+                <div className="mt-3 flex items-start gap-2 text-[10px] text-slate-500 leading-tight bg-slate-800/30 p-2 rounded-lg">
+                    <Info size={12} className="shrink-0 mt-0.5 text-slate-400" />
+                    <div>
+                        Weight is calculated from the difference between H1 and H2.
+                        <div className="mt-1 flex gap-2">
+                            <span className="text-blue-400 font-medium">&gt;10dB = Airy</span>
+                            <span className="text-slate-600">•</span>
+                            <span className="text-red-400 font-medium">&lt;3dB = Pressed</span>
+                        </div>
+                    </div>
+                </div>
             </div>
+
             {isStrained && (
-                <div className="mt-2 text-[10px] text-red-400 flex items-center justify-center gap-1 animate-pulse">
-                    <AlertTriangle className="w-3 h-3" /> High Vocal Weight detected. Relax!
+                <div className="mt-4 text-sm text-red-400 flex items-center justify-center gap-2 animate-pulse font-bold bg-red-500/10 py-3 rounded-xl border border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+                    <AlertTriangle className="w-5 h-5" /> High Vocal Weight detected. Relax!
                 </div>
             )}
         </div>
