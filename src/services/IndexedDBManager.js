@@ -176,7 +176,13 @@ class IndexedDBManager {
 
     async getStats() {
         const stats = await this.get(STORES.STATS, 'current');
-        return stats || { streak: 0, totalSeconds: 0 };
+        return stats || {
+            streak: 0,
+            totalSeconds: 0,
+            xp: 0,
+            lastPractice: null,
+            achievements: []
+        };
     }
 
     async saveGoals(goals) {

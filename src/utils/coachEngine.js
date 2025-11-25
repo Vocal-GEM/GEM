@@ -19,7 +19,9 @@ const EXERCISE_MAP = {
     'Breath Support': { route: '/tools', component: 'BreathPacer', difficulty: 'beginner', duration: 5 },
     'Reading Practice': { route: '/practice', component: 'PracticeView', difficulty: 'intermediate', duration: 15 },
     'Resonance River': { route: '/games', component: 'ResonanceRiverGame', difficulty: 'intermediate', duration: 5 },
-    'Intonation Exercise': { route: '/tools', component: 'IntonationExercise', difficulty: 'advanced', duration: 10 }
+    'Intonation Exercise': { route: '/tools', component: 'IntonationExercise', difficulty: 'advanced', duration: 10 },
+    'Forward Focus': { route: '/tools', component: 'ForwardFocusDrill', difficulty: 'intermediate', duration: 5 },
+    'Warm Up': { route: '/tools', component: 'WarmUpModule', difficulty: 'beginner', duration: 5 }
 };
 
 export const CoachEngine = {
@@ -27,16 +29,17 @@ export const CoachEngine = {
      * Generate a full feedback report based on analysis results and user goals.
      * @param {Object} analysisResults - The results from VoiceAnalyzer
      * @param {Object} userSettings - User preferences (targetPitch, gender, etc.)
+     * @param {Object} calibration - User calibration data (optional)
      * @returns {Object} Feedback report
      */
-    generateFeedback: (analysisResults, userSettings) => {
+    generateFeedback: (analysisResults, userSettings, calibration = null) => {
         const { overall } = analysisResults;
         const targetPitch = userSettings?.targetPitch || { min: 170, max: 220 }; // Default fem
         const genderGoal = userSettings?.gender || 'feminine'; // 'feminine', 'masculine', 'androgynous'
 
         // 1. Evaluate Core Metrics
         const pitchEval = evaluatePitch(overall.pitch?.mean, targetPitch);
-        const resonanceEval = evaluateResonance(overall.formants, genderGoal);
+        const resonanceEval = evaluateResonance(overall.formants, genderGoal, calibration);
         const stabilityEval = evaluateStability(overall.jitter, overall.shimmer);
         const voiceQualityEval = evaluateVoiceQuality(overall.hnr, overall.shimmer);
 
@@ -65,12 +68,75 @@ export const CoachEngine = {
     },
 
     /**
+     * Process a natural language query from the user.
+     * @param {string} query - The user's question
+     * @param {Object} context - Real-time context { metrics, history, settings }
+     * @returns {Object} { text, relatedTopics }
+     */
+    processUserQuery: (query, context) => {
+        const lowerQuery = query.toLowerCase();
+
+        // 1. Check for "Current State" questions (Real-time)
+        if (context?.metrics) {
+            if (lowerQuery.includes('pitch') && (lowerQuery.includes('now') || lowerQuery.includes('current') || lowerQuery.includes('right now'))) {
+                const pitch = context.metrics.pitch;
+                if (pitch && pitch > 0) {
+                    return {
+                        text: `Your pitch is currently around **${pitch.toFixed(0)} Hz**.`
+                    };
+                } else {
+                    return { text: "I can't detect your pitch right now. Make sure you're making sound!" };
+                }
+            }
+
+            if (lowerQuery.includes('resonance') && (lowerQuery.includes('now') || lowerQuery.includes('current'))) {
+                // Simplified resonance check
+                return { text: "I'm analyzing your resonance. Check the 'Analysis' tab for a detailed visualization!" };
+            }
+        }
+
+        // 2. Check for "Progress" questions (History)
+        if (lowerQuery.includes('progress') || lowerQuery.includes('how am i doing') || lowerQuery.includes('stats')) {
+            if (context?.history && context.history.length > 0) {
+                const lastSession = context.history[0];
+                const feedback = CoachEngine.generateFeedback(
+                    { overall: lastSession.overall },
+                    { targetPitch: context.settings?.targetRange, gender: context.settings?.genderGoal },
+                    context.settings?.calibration
+                );
+                return {
+                    text: `Based on your last session (${new Date(lastSession.date).toLocaleDateString()}):\n\n${feedback.summary}\n\n**Focus:** ${feedback.focusArea.title}`
+                };
+            } else {
+                return { text: "I don't have enough history yet. Record a session in the Analysis tab!" };
+            }
+        }
+
+        // 3. Fallback to Knowledge Base
+        const kbResults = KnowledgeService.search(query);
+        if (kbResults.length > 0) {
+            const topResult = kbResults[0];
+            return {
+                text: `**${topResult.question}**\n\n${topResult.answer}`,
+                relatedTopics: kbResults.slice(1, 3).map(r => r.category)
+            };
+        }
+
+        // 4. Default Fallback
+        return {
+            text: "I'm not sure about that. Try asking about 'pitch', 'resonance', or 'vocal weight'."
+        };
+    },
+
+    /**
      * Get exercise details for navigation
      */
     getExerciseDetails: (exerciseName) => {
         return EXERCISE_MAP[exerciseName] || null;
     }
 };
+
+import { KnowledgeService } from '../services/KnowledgeService';
 
 // --- Helper Evaluation Functions ---
 
@@ -121,13 +187,8 @@ const evaluatePitch = (pitch, target) => {
     }
 };
 
-const evaluateResonance = (formants, genderGoal) => {
+const evaluateResonance = (formants, genderGoal, calibration) => {
     if (!formants || !formants.f1) return { status: 'unknown', score: 0, title: 'Resonance', message: "Could not detect resonance." };
-
-    // Enhanced resonance targets with more granular ranges
-    // Feminine: Bright (high F1 > 450, high F2 > 1800)
-    // Masculine: Dark (low F1 < 350, low F2 < 1500)
-    // Androgynous: Neutral (F1 350-450, F2 1500-1800)
 
     const { f1, f2 } = formants;
     let status = 'neutral';
@@ -135,17 +196,36 @@ const evaluateResonance = (formants, genderGoal) => {
     let message = "";
     let advice = "";
 
+    // Use calibration if available for personalized thresholds
+    // Default thresholds
+    let thresholds = {
+        fem: { f1: 450, f2: 1800 },
+        masc: { f1: 350, f2: 1500 }
+    };
+
+    if (calibration) {
+        // Interpolate or use calibration values
+        // If user has calibrated 'bright' (fem target) and 'dark' (masc target)
+        if (calibration.bright) {
+            thresholds.fem.f1 = calibration.bright; // Simplified: using single value for F1 proxy
+            // We might need to estimate F2 or just use F1 for now if calibration is simple
+        }
+        if (calibration.dark) {
+            thresholds.masc.f1 = calibration.dark;
+        }
+    }
+
     if (genderGoal === 'feminine') {
-        if (f1 > 450 && f2 > 1800) {
+        if (f1 > thresholds.fem.f1 && f2 > thresholds.fem.f2) {
             status = 'bright';
             score = 10;
             message = "Your resonance is bright and forward, which is excellent for a feminine voice.";
-        } else if (f1 > 400 && f2 > 1600) {
+        } else if (f1 > (thresholds.fem.f1 - 50) && f2 > (thresholds.fem.f2 - 200)) {
             status = 'moderately-bright';
             score = 8;
             message = "Your resonance is fairly bright. You're on the right track!";
             advice = "Try raising your larynx slightly and smiling with your throat to brighten it further.";
-        } else if (f1 < 350 || f2 < 1400) {
+        } else if (f1 < thresholds.masc.f1 || f2 < thresholds.masc.f2) {
             status = 'dark';
             score = 3;
             message = "Your resonance is quite dark (low R1). This can make your voice sound more masculine.";
@@ -157,16 +237,16 @@ const evaluateResonance = (formants, genderGoal) => {
             advice = "Try to brighten it by raising your soft palate and creating more space in the front of your mouth.";
         }
     } else if (genderGoal === 'masculine') {
-        if (f1 < 350 && f2 < 1500) {
+        if (f1 < thresholds.masc.f1 && f2 < thresholds.masc.f2) {
             status = 'dark';
             score = 10;
             message = "Your resonance is rich and dark, perfect for a masculine voice.";
-        } else if (f1 < 400 && f2 < 1700) {
+        } else if (f1 < (thresholds.masc.f1 + 50) && f2 < (thresholds.masc.f2 + 200)) {
             status = 'moderately-dark';
             score = 8;
             message = "Your resonance is fairly dark. Good progress!";
             advice = "Try relaxing your throat and lowering your larynx slightly to darken it more.";
-        } else if (f1 > 450 || f2 > 1800) {
+        } else if (f1 > thresholds.fem.f1 || f2 > thresholds.fem.f2) {
             status = 'bright';
             score = 3;
             message = "Your resonance is quite bright. This can make your voice sound more feminine.";
@@ -179,12 +259,12 @@ const evaluateResonance = (formants, genderGoal) => {
         }
     } else {
         // Androgynous goal
-        if (f1 >= 350 && f1 <= 450 && f2 >= 1500 && f2 <= 1800) {
+        if (f1 >= thresholds.masc.f1 && f1 <= thresholds.fem.f1) {
             status = 'neutral';
             score = 10;
             message = "Your resonance is perfectly balanced in the androgynous range.";
         } else {
-            status = f1 > 450 ? 'bright' : 'dark';
+            status = f1 > thresholds.fem.f1 ? 'bright' : 'dark';
             score = 7;
             message = `Your resonance is slightly ${status}. For an androgynous voice, aim for the middle ground.`;
         }

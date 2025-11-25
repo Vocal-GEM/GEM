@@ -1,18 +1,46 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Send } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, Sparkles, User, History, BookOpen, ChevronRight, Mic, Play, Award, Zap } from 'lucide-react';
 import { useGem } from '../../context/GemContext';
-import ChatMessage from './ChatMessage';
-import { KnowledgeService } from '../../services/KnowledgeService';
-import { historyService } from '../../utils/historyService';
 import { CoachEngine } from '../../utils/coachEngine';
+import { KnowledgeService } from '../../services/KnowledgeService';
+import { historyService } from '../../services/HistoryService';
+import { gamificationService } from '../../services/GamificationService';
+import ChatMessage from './ChatMessage';
 
 const CoachView = () => {
+    const { dataRef, targetRange, settings } = useGem();
+    const [messages, setMessages] = useState([
+        { role: 'assistant', content: "Hi! I'm your AI Vocal Coach. Ask me about your progress, or for tips on resonance and pitch!" }
+    ]);
     const [chatInput, setChatInput] = useState('');
     const [isChatLoading, setIsChatLoading] = useState(false);
-    const [messages, setMessages] = useState([
-        { role: 'assistant', content: "Hi! I'm Coach GEM. Ask me anything about your voice journey!" }
-    ]);
+    const [userContext, setUserContext] = useState({ name: '', pronouns: '', goals: '' });
+    const [stats, setStats] = useState({ level: { level: 1, title: 'Novice' }, xp: 0, streak: 0 });
+    const [showPersonalize, setShowPersonalize] = useState(false);
+
     const messagesEndRef = useRef(null);
+
+    useEffect(() => {
+        // Load user context
+        const loadContext = async () => {
+            const savedSettings = await historyService.getSettings();
+            if (savedSettings) {
+                setUserContext(prev => ({ ...prev, ...savedSettings }));
+            }
+            // Load gamification stats
+            const gameStats = await gamificationService.getStats();
+            setStats(gameStats);
+        };
+        loadContext();
+
+        // Subscribe to gamification updates
+        const unsubscribe = gamificationService.subscribe((event) => {
+            if (event.type === 'XP_GAINED' || event.type === 'LEVEL_UP' || event.type === 'STREAK_UPDATE') {
+                gamificationService.getStats().then(setStats);
+            }
+        });
+        return () => unsubscribe();
+    }, []);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -22,18 +50,14 @@ const CoachView = () => {
         scrollToBottom();
     }, [messages]);
 
-    const { stats, goals, journals } = useGem();
+    // Calculate XP progress percentage
+    const nextLevelXP = gamificationService.getNextLevel(stats.xp).xp;
+    const currentLevelXP = stats.level.xp;
+    const progressPercent = Math.min(100, Math.max(0, ((stats.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100));
 
     const handleClearChat = () => {
         setMessages([{ role: 'assistant', content: "Chat cleared. What's on your mind?" }]);
     };
-
-    const [showPersonalize, setShowPersonalize] = useState(false);
-    const [userContext, setUserContext] = useState({
-        name: '',
-        pronouns: '',
-        goals: ''
-    });
 
     const handleChatSubmit = async (e) => {
         e.preventDefault();
@@ -47,53 +71,36 @@ const CoachView = () => {
         // Simulate network delay for realism
         setTimeout(async () => {
             try {
-                let reply = '';
-                const lowerInput = userMsg.content.toLowerCase();
+                // Fetch latest session history for context
+                const sessions = await historyService.getAllSessions();
 
-                // 1. Check for Personal Progress Questions
-                if (lowerInput.includes('progress') || lowerInput.includes('stats') || lowerInput.includes('how am i doing') || lowerInput.includes('my pitch') || lowerInput.includes('my resonance')) {
-                    try {
-                        // Fetch latest session
-                        const sessions = await historyService.getAllSessions();
-                        if (sessions && sessions.length > 0) {
-                            const lastSession = sessions[0]; // Assuming sorted by date desc
-                            const feedback = CoachEngine.generateFeedback({ overall: lastSession.overall }, { targetPitch: { min: 170, max: 220 }, gender: 'feminine' }); // TODO: Use real user settings
+                // Construct context object
+                const context = {
+                    metrics: dataRef.current, // Real-time metrics
+                    history: sessions,        // Historical sessions
+                    settings: {
+                        targetRange: targetRange,
+                        genderGoal: settings?.genderGoal,
+                        calibration: settings?.calibration
+                    },
+                    user: userContext
+                };
 
-                            if (lowerInput.includes('pitch')) {
-                                reply = feedback.details.pitch.message;
-                            } else if (lowerInput.includes('resonance')) {
-                                reply = feedback.details.resonance.message;
-                            } else {
-                                reply = `Based on your last session on ${new Date(lastSession.date).toLocaleDateString()}:\n\n${feedback.summary}\n\n**Focus Area:** ${feedback.focusArea.title}`;
-                            }
-                        } else {
-                            reply = "I don't have enough data yet. Try recording a session in the Analysis tab first!";
-                        }
-                    } catch (err) {
-                        console.error("Error fetching history:", err);
-                        reply = "I couldn't access your history right now.";
-                    }
-                }
-                // 2. Knowledge Base Search
-                else {
-                    const results = KnowledgeService.search(userMsg.content);
-                    if (results.length > 0) {
-                        const topResult = results[0];
-                        reply = `**${topResult.question}**\n\n${topResult.answer}`;
+                // Process query through CoachEngine
+                const response = CoachEngine.processUserQuery(userMsg.content, context);
 
-                        if (results.length > 1) {
-                            const related = results.slice(1, 3).map(r => r.category).filter((v, i, a) => a.indexOf(v) === i);
-                            if (related.length > 0) {
-                                reply += `\n\n*Related topics: ${related.join(', ')}*`;
-                            }
-                        }
-                    } else {
-                        const prefix = userContext.name ? `${userContext.name}, ` : '';
-                        reply = `${prefix}I'm not sure about that yet. I'm trained on resonance, pitch, and vocal weight. Try asking: "How do I brighten my voice?" or "What is vocal weight?"`;
-                    }
+                let replyContent = response.text;
+
+                // Append related topics if available
+                if (response.relatedTopics && response.relatedTopics.length > 0) {
+                    replyContent += `\n\n*Related topics: ${response.relatedTopics.join(', ')}*`;
                 }
 
-                setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+                setMessages(prev => [...prev, { role: 'assistant', content: replyContent }]);
+
+                // Award small XP for interacting with coach
+                await gamificationService.awardXP(10, 'Asked Coach a question');
+
             } catch (err) {
                 console.error(err);
                 setMessages(prev => [...prev, { role: 'assistant', content: "I encountered an error processing your request." }]);
@@ -111,20 +118,42 @@ const CoachView = () => {
     ];
 
     return (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-[calc(100dvh-180px)] flex flex-col relative">
-            <div className="flex justify-between items-center px-2 mb-2">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">AI Coach</span>
-                <div className="flex gap-3">
-                    <button onClick={() => setShowPersonalize(true)} className="text-xs text-blue-400 hover:text-blue-300 transition-colors font-bold">
-                        Personalize
-                    </button>
-                    <button onClick={handleClearChat} className="text-xs text-slate-500 hover:text-white transition-colors">
-                        Clear Chat
-                    </button>
+        <div className="h-full flex flex-col bg-slate-950 text-white relative overflow-hidden">
+            {/* Gamification Header */}
+            <div className="bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between shrink-0 z-10">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xl font-bold shadow-lg shadow-purple-500/20">
+                        {stats.level.level}
+                    </div>
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <h2 className="font-bold text-white">{stats.level.title}</h2>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                                {stats.xp} XP
+                            </span>
+                        </div>
+                        {/* XP Bar */}
+                        <div className="w-32 h-1.5 bg-slate-800 rounded-full mt-2 overflow-hidden">
+                            <div
+                                className="h-full bg-gradient-to-r from-blue-400 to-purple-400 transition-all duration-500"
+                                style={{ width: `${progressPercent}%` }}
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-end">
+                        <span className="text-xs text-slate-500 uppercase font-bold">Daily Streak</span>
+                        <div className="flex items-center gap-1 text-orange-400 font-bold">
+                            <Zap className="w-4 h-4 fill-orange-400" />
+                            {stats.streak} Days
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+            <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 p-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {messages.map((m, i) => <ChatMessage key={i} role={m.role} content={m.content} />)}
                 {isChatLoading && (
                     <div className="flex justify-start">
@@ -140,12 +169,12 @@ const CoachView = () => {
 
             {/* Suggestions */}
             {messages.length === 1 && (
-                <div className="flex flex-wrap gap-2 mb-4 px-2">
+                <div className="flex flex-wrap gap-2 mb-4 px-4">
                     {suggestions.map((s, i) => (
                         <button
                             key={i}
                             onClick={() => setChatInput(s)}
-                            className="text-xs glass-panel hover:bg-white/10 text-blue-300 px-3 py-1.5 rounded-full transition-colors"
+                            className="text-xs glass-panel hover:bg-white/10 text-blue-300 px-4 py-2.5 rounded-full transition-colors min-h-[40px]"
                         >
                             {s}
                         </button>
@@ -153,21 +182,32 @@ const CoachView = () => {
                 </div>
             )}
 
-            <form onSubmit={handleChatSubmit} className="glass-panel p-2 rounded-full flex items-center gap-2 shadow-xl shrink-0 mx-2 mb-2">
+            <form onSubmit={handleChatSubmit} className="glass-panel p-2 rounded-full flex items-center gap-2 shadow-xl shrink-0 mx-4 mb-4">
                 <input
                     type="text"
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     placeholder="Ask about your voice..."
-                    className="flex-1 bg-transparent border-none outline-none px-4 text-white placeholder-slate-500"
+                    className="flex-1 bg-transparent border-none outline-none px-4 text-white placeholder-slate-500 h-12"
                     disabled={isChatLoading}
                 />
-                <button type="submit" disabled={isChatLoading} className="p-3 bg-blue-600 rounded-full text-white hover:bg-blue-500 disabled:opacity-50 transition-colors shadow-lg shadow-blue-500/20">
-                    {isChatLoading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <Send className="w-4 h-4" />}
+                <button type="submit" disabled={isChatLoading} className="p-4 bg-blue-600 rounded-full text-white hover:bg-blue-500 disabled:opacity-50 transition-colors shadow-lg shadow-blue-500/20 min-w-[48px] min-h-[48px] flex items-center justify-center">
+                    {isChatLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <Send className="w-5 h-5" />}
                 </button>
             </form>
-            <div className="text-[10px] text-slate-600 text-center pb-2">
-                Curriculum based on WPATH & SES-VMTW guidelines. Not medical advice.
+
+            <div className="flex justify-between items-center px-4 mb-2">
+                <div className="text-[10px] text-slate-600">
+                    Curriculum based on WPATH & SES-VMTW guidelines.
+                </div>
+                <div className="flex gap-4">
+                    <button onClick={() => setShowPersonalize(true)} className="text-xs text-blue-400 hover:text-blue-300 transition-colors font-bold py-2">
+                        Personalize
+                    </button>
+                    <button onClick={handleClearChat} className="text-xs text-slate-500 hover:text-white transition-colors py-2">
+                        Clear Chat
+                    </button>
+                </div>
             </div>
 
             {/* Personalization Modal */}

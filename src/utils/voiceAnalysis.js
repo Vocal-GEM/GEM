@@ -25,15 +25,25 @@ export class VoiceAnalyzer {
         const endSample = endTime ? Math.floor(endTime * sampleRate) : channelData.length;
         const segment = channelData.slice(startSample, endSample);
 
+        return this.analyzeFrame(segment, sampleRate);
+    }
+
+    /**
+     * Analyze a raw frame of audio data
+     * @param {Float32Array} frame - Raw audio data
+     * @param {number} sampleRate - Sample rate
+     * @returns {Object} Voice metrics
+     */
+    analyzeFrame(frame, sampleRate) {
         return {
-            pitch: this.extractPitch(segment, sampleRate),
-            pitchSeries: this.extractPitchSeries(segment, sampleRate),
-            formants: this.estimateFormants(segment, sampleRate),
-            intensity: this.calculateIntensity(segment),
-            spectral: this.calculateSpectralFeatures(segment, sampleRate),
-            jitter: this.estimateJitter(segment, sampleRate),
-            hnr: this.estimateHNR(segment, sampleRate),
-            sibilance: this.calculateSibilance(segment, sampleRate)
+            pitch: this.extractPitch(frame, sampleRate),
+            pitchSeries: this.extractPitchSeries(frame, sampleRate),
+            formants: this.estimateFormants(frame, sampleRate),
+            intensity: this.calculateIntensity(frame),
+            spectral: this.calculateSpectralFeatures(frame, sampleRate),
+            jitter: this.estimateJitter(frame, sampleRate),
+            hnr: this.estimateHNR(frame, sampleRate),
+            sibilance: this.calculateSibilance(frame, sampleRate)
         };
     }
 

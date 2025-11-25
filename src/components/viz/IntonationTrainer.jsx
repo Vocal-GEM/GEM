@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { TrendingUp, RefreshCw, ChevronRight, ChevronLeft } from 'lucide-react';
+import { TrendingUp, RefreshCw, ChevronRight, ChevronLeft, Play } from 'lucide-react';
+import { useGem } from '../../context/GemContext';
 
 const IntonationTrainer = ({ dataRef, isActive }) => {
+    const { targetRange } = useGem();
     const canvasRef = useRef(null);
     const [selectedPattern, setSelectedPattern] = useState(0);
     const [score, setScore] = useState(0);
@@ -103,10 +105,9 @@ const IntonationTrainer = ({ dataRef, isActive }) => {
                     const x = elapsed / duration;
                     // Normalize pitch: map 150Hz-300Hz to 0-1? 
                     // Or relative to start pitch?
-                    // Let's use absolute range for now: 150-350Hz (Fem target)
-                    // TODO: Make this adaptive or based on user settings
-                    const minP = 150;
-                    const maxP = 350;
+                    // Adaptive range based on user settings
+                    const minP = targetRange.min - 20; // Add some headroom
+                    const maxP = targetRange.max + 20;
                     const pitch = dataRef.current.pitch;
                     const y = Math.max(0, Math.min(1, (pitch - minP) / (maxP - minP)));
 

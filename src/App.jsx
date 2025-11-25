@@ -41,11 +41,57 @@ import SLPDashboard from './components/views/SLPDashboard';
 // Games
 import ResonanceRiverGame from './components/games/ResonanceRiverGame';
 import CloudHopperGame from './components/games/CloudHopperGame';
+import React, { useState, useEffect } from 'react';
+import { useGem } from './context/GemContext';
+import ResonanceOrb from './components/viz/ResonanceOrb';
+import LiveMetricsBar from './components/viz/LiveMetricsBar';
+import PitchVisualizer from './components/viz/PitchVisualizer';
+import PitchOrb from './components/viz/PitchOrb';
+import DynamicOrb from './components/viz/DynamicOrb';
+import Spectrogram from './components/viz/Spectrogram';
+import VoiceQualityMeter from './components/viz/VoiceQualityMeter';
+import VowelSpacePlot from './components/viz/VowelSpacePlot';
+import GameHub from './components/games/GameHub';
+import CoachView from './components/ui/CoachView';
+import DailyGoalsWidget from './components/ui/DailyGoalsWidget';
+import MixingBoardView from './components/views/MixingBoardView';
+import HistoryView from './components/ui/HistoryView';
+import AudioLibrary from './components/ui/AudioLibrary';
+import PitchPipe from './components/ui/PitchPipe';
+import FeedbackSettings from './components/ui/FeedbackSettings';
+import TutorialWizard from './components/ui/TutorialWizard';
+import CompassWizard from './components/ui/CompassWizard';
+import CalibrationWizard from './components/ui/CalibrationWizard';
+import BreathPacer from './components/ui/BreathPacer';
+import MirrorComponent from './components/ui/MirrorComponent';
+import JournalForm from './components/ui/JournalForm';
+import Login from './components/ui/Login';
+import Signup from './components/ui/Signup';
+import ComparisonTool from './components/ui/ComparisonTool';
+import IntonationExercise from './components/ui/IntonationExercise';
+import VocalHealthTips from './components/ui/VocalHealthTips';
+import AssessmentModule from './components/ui/AssessmentModule';
+import WarmUpModule from './components/ui/WarmUpModule';
+import ForwardFocusDrill from './components/ui/ForwardFocusDrill';
+import IncognitoScreen from './components/ui/IncognitoScreen';
+import FloatingCamera from './components/ui/FloatingCamera';
+import OfflineIndicator from './components/ui/OfflineIndicator';
+import MigrationModal from './components/ui/MigrationModal';
+import AnalysisView from './components/views/AnalysisView';
+import ArticulationView from './components/views/ArticulationView';
+import SLPDashboard from './components/views/SLPDashboard';
+
+// Games
+import ResonanceRiverGame from './components/games/ResonanceRiverGame';
+import CloudHopperGame from './components/games/CloudHopperGame';
 import StaircaseGame from './components/games/StaircaseGame';
 import FlappyVoiceGame from './components/games/FlappyVoiceGame';
 import PitchMatchGame from './components/games/PitchMatchGame';
 
 import { Mic, Camera, Book, Wrench, ArrowLeft, Mic2, Gamepad2, Bot, BarChart2, Activity } from 'lucide-react';
+
+import AchievementPopup from './components/ui/AchievementPopup';
+import { gamificationService } from './services/GamificationService';
 
 const App = () => {
     const {
@@ -91,6 +137,14 @@ const App = () => {
     const [showMigration, setShowMigration] = useState(true);
     const [practiceView, setPracticeView] = useState('all'); // all, pitch, resonance, weight, vowel
     const [pitchViewMode, setPitchViewMode] = useState('graph'); // graph or orb
+
+    // Initialize Gamification
+    useEffect(() => {
+        if (isDataLoaded) {
+            gamificationService.updateStreak();
+            gamificationService.checkTimeBasedAchievements();
+        }
+    }, [isDataLoaded]);
 
     // Onboarding flow
     useEffect(() => {
@@ -212,7 +266,7 @@ const App = () => {
                             {/* Filter Menu */}
                             <div className="glass-panel-dark rounded-xl p-2 mb-4 flex gap-2 overflow-x-auto">
                                 {[{ id: 'all', label: 'Show All' }, { id: 'pitch', label: 'Pitch' }, { id: 'resonance', label: 'Resonance' }, { id: 'weight', label: 'Weight' }, { id: 'vowel', label: 'Vowel' }].map(view => (
-                                    <button key={view.id} onClick={() => setPracticeView(view.id)} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${practiceView === view.id ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white shadow-md shadow-teal-500/20' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/70 hover:text-white border border-slate-700/50'}`}>
+                                    <button key={view.id} onClick={() => setPracticeView(view.id)} className={`px-5 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap min-w-[80px] ${practiceView === view.id ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white shadow-md shadow-teal-500/20' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/70 hover:text-white border border-slate-700/50'}`}>
                                         {view.label}
                                     </button>
                                 ))}
@@ -236,8 +290,8 @@ const App = () => {
                                     <div>
                                         <div className="flex justify-end mb-2">
                                             <div className="glass-panel-dark rounded-lg p-1 flex gap-1">
-                                                <button onClick={() => setPitchViewMode('graph')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${pitchViewMode === 'graph' ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`}>Graph</button>
-                                                <button onClick={() => setPitchViewMode('orb')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${pitchViewMode === 'orb' ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`}>Orb</button>
+                                                <button onClick={() => setPitchViewMode('graph')} className={`px-4 py-2 rounded-md text-xs font-bold transition-all min-h-[44px] min-w-[60px] ${pitchViewMode === 'graph' ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`}>Graph</button>
+                                                <button onClick={() => setPitchViewMode('orb')} className={`px-4 py-2 rounded-md text-xs font-bold transition-all min-h-[44px] min-w-[60px] ${pitchViewMode === 'orb' ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`}>Orb</button>
                                             </div>
                                         </div>
                                         {pitchViewMode === 'graph' ? (
@@ -402,6 +456,7 @@ const App = () => {
             {showForwardFocus && <ForwardFocusDrill onClose={() => setShowForwardFocus(false)} />}
             {showIncognito && <IncognitoScreen onClose={() => setShowIncognito(false)} />}
             {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
+            <AchievementPopup />
         </div >
     );
 };

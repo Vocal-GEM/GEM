@@ -68,5 +68,26 @@ export const KNOWLEDGE_BASE = [
         question: "How do I stop sounding breathy?",
         answer: "Breathiness is caused by air leaking through the vocal folds. To fix it:\n\n1. **Engage:** Try a gentle 'glottal onset' (say 'apple' with a crisp start).\n2. **Support:** Use your abdominal muscles to control airflow.\n3. **Focus:** Aim for a clear, focused sound like a laser beam, not a fog.",
         category: "Voice Quality"
+    },
+    {
+        id: 'fwd_01',
+        tags: ['forward', 'focus', 'mask', 'resonance'],
+        question: "What is forward focus?",
+        answer: "Forward focus (or 'mask resonance') is the sensation of feeling vibrations in the front of your face (lips, nose, cheekbones) rather than in your throat. It helps project your voice and creates a brighter, clearer tone without strain.",
+        category: "Technique"
+    },
+    {
+        id: 'wrm_01',
+        tags: ['warmup', 'routine', 'start', 'prepare'],
+        question: "What is a good warm-up routine?",
+        answer: "A good warm-up prepares your vocal folds and breath support. Try this 5-minute routine:\n\n1. **Body:** Stretch your neck and shoulders.\n2. **Breath:** Take 5 deep, low breaths.\n3. **Sound:** Gentle lip trills or humming for 2 minutes.\n4. **Range:** Gentle sirens up and down your range.",
+        category: "Health"
+    },
+    {
+        id: 'int_01',
+        tags: ['intonation', 'melody', 'prosody', 'monotone'],
+        question: "Why is intonation important?",
+        answer: "Intonation is the 'melody' of your speech. \n\n- **Feminine speech** often has more pitch variation and upward inflections.\n- **Masculine speech** tends to be flatter or have downward inflections.\n\nVarying your pitch makes you sound more expressive and engaging.",
+        category: "Technique"
     }
 ];
