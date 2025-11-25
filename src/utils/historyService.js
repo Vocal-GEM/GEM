@@ -1,6 +1,7 @@
 const DB_NAME = 'VocalGEM_DB';
 const STORE_NAME = 'analysis_sessions';
-const DB_VERSION = 1;
+const USER_STORE_NAME = 'user_settings';
+const DB_VERSION = 2;
 
 class HistoryService {
     constructor() {
@@ -27,6 +28,9 @@ class HistoryService {
                 const db = event.target.result;
                 if (!db.objectStoreNames.contains(STORE_NAME)) {
                     db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains(USER_STORE_NAME)) {
+                    db.createObjectStore(USER_STORE_NAME, { keyPath: 'id' });
                 }
             };
         });
@@ -111,6 +115,50 @@ class HistoryService {
 
             request.onerror = (event) => {
                 reject('Could not delete session');
+            };
+        });
+    }
+
+    async saveSettings(settings) {
+        await this.open();
+
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([USER_STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(USER_STORE_NAME);
+
+            const settingsObj = {
+                id: 'user_preferences',
+                ...settings
+            };
+
+            const request = store.put(settingsObj);
+
+            request.onsuccess = () => {
+                resolve();
+            };
+
+            request.onerror = (event) => {
+                console.error('Error saving settings:', event.target.error);
+                reject('Could not save settings');
+            };
+        });
+    }
+
+    async getSettings() {
+        await this.open();
+
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([USER_STORE_NAME], 'readonly');
+            const store = transaction.objectStore(USER_STORE_NAME);
+            const request = store.get('user_preferences');
+
+            request.onsuccess = () => {
+                resolve(request.result || null);
+            };
+
+            request.onerror = (event) => {
+                console.error('Error fetching settings:', event.target.error);
+                resolve(null); // Return null instead of rejecting
             };
         });
     }

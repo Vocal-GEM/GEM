@@ -3,7 +3,7 @@ import { Send, Sparkles, User, History, BookOpen, ChevronRight, Mic, Play, Award
 import { useGem } from '../../context/GemContext';
 import { CoachEngine } from '../../utils/coachEngine';
 import { KnowledgeService } from '../../services/KnowledgeService';
-import { historyService } from '../../services/HistoryService';
+import { historyService } from '../../utils/historyService';
 import { gamificationService } from '../../services/GamificationService';
 import ChatMessage from './ChatMessage';
 
@@ -246,7 +246,10 @@ const CoachView = () => {
                         </div>
                     </div>
                     <button
-                        onClick={() => setShowPersonalize(false)}
+                        onClick={async () => {
+                            await historyService.saveSettings(userContext);
+                            setShowPersonalize(false);
+                        }}
                         className="w-full py-3 bg-blue-600 rounded-xl font-bold text-white hover:bg-blue-500 transition-colors mt-4"
                     >
                         Save & Close

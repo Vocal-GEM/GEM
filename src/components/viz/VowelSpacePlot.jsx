@@ -1,6 +1,6 @@
 import React from 'react';
 
-const VowelSpacePlot = ({ f1, f2 }) => {
+const VowelSpacePlot = ({ f1, f2, dataRef }) => {
     // Vowel targets (approximate for feminine resonance)
     const targets = [
         { label: '/i/', f1: 300, f2: 2500, color: 'rgba(236, 72, 153, 0.2)' }, // Pink
@@ -12,23 +12,36 @@ const VowelSpacePlot = ({ f1, f2 }) => {
     const minF1 = 200, maxF1 = 1000;
     const minF2 = 500, maxF2 = 3000;
 
-    const getX = (val) => ((val - minF2) / (maxF2 - minF2)) * 100; // F2 is usually X (inverted often, but let's keep standard X)
-    // Actually, standard vowel charts have F2 on X (inverted) and F1 on Y (inverted).
-    // Let's do: X = F2 (high to low), Y = F1 (low to high) - wait, F1 low is high vowel (top).
-    // Standard chart:
-    // Top-Left: /i/ (Low F1, High F2)
-    // Bottom-Left: /a/ (High F1, High F2) - Wait /a/ is central/back?
-    // Let's stick to a simple scatter: X=F2, Y=F1.
-    // To match "Vowel Space":
-    // X-axis: F2 (Back -> Front) :: 800 -> 2500
-    // Y-axis: F1 (Close -> Open) :: 200 -> 1000
-
-    // Let's invert axes to match standard IPA chart orientation roughly
-    // X: F2 (3000 -> 500)
-    // Y: F1 (200 -> 1000)
-
     const getXPos = (val) => 100 - ((val - minF2) / (maxF2 - minF2)) * 100;
     const getYPos = (val) => ((val - minF1) / (maxF1 - minF1)) * 100;
+
+    const pointRef = React.useRef(null);
+    const labelRef = React.useRef(null);
+
+    React.useEffect(() => {
+        if (!dataRef) return;
+
+        const loop = () => {
+            if (pointRef.current && dataRef.current) {
+                const { f1: currentF1, f2: currentF2 } = dataRef.current;
+
+                if (currentF1 && currentF2 && currentF1 > 0 && currentF2 > 0) {
+                    pointRef.current.style.opacity = '1';
+                    pointRef.current.style.left = `${getXPos(currentF2)}%`;
+                    pointRef.current.style.top = `${getYPos(currentF1)}%`;
+
+                    if (labelRef.current) {
+                        labelRef.current.innerText = `${currentF1.toFixed(0)} / ${currentF2.toFixed(0)} Hz`;
+                    }
+                } else {
+                    pointRef.current.style.opacity = '0';
+                }
+            }
+            requestAnimationFrame(loop);
+        };
+        const id = requestAnimationFrame(loop);
+        return () => cancelAnimationFrame(id);
+    }, [dataRef]);
 
     return (
         <div className="h-64 bg-slate-900 rounded-xl border border-slate-800 relative overflow-hidden">
@@ -60,8 +73,8 @@ const VowelSpacePlot = ({ f1, f2 }) => {
                         </div>
                     ))}
 
-                    {/* User Point */}
-                    {f1 && f2 && (
+                    {/* User Point (Static Props) */}
+                    {f1 && f2 && !dataRef && (
                         <div
                             className="absolute w-4 h-4 bg-white rounded-full shadow-[0_0_10px_white] transition-all duration-500"
                             style={{
@@ -72,6 +85,21 @@ const VowelSpacePlot = ({ f1, f2 }) => {
                         >
                             <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700">
                                 {f1.toFixed(0)} / {f2.toFixed(0)} Hz
+                            </div>
+                        </div>
+                    )}
+
+                    {/* User Point (Real-time Ref) */}
+                    {dataRef && (
+                        <div
+                            ref={pointRef}
+                            className="absolute w-4 h-4 bg-white rounded-full shadow-[0_0_10px_white] transition-all duration-75 opacity-0"
+                            style={{
+                                transform: 'translate(-50%, -50%)'
+                            }}
+                        >
+                            <div ref={labelRef} className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700">
+                                0 / 0 Hz
                             </div>
                         </div>
                     )}

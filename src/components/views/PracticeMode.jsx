@@ -10,68 +10,32 @@ import { coachMemory } from '../../services/CoachMemory';
 import { feedbackService } from '../../services/FeedbackService';
 import AnalysisReportView from '../ui/AnalysisReportView';
 
+import { textToSpeechService } from '../../services/TextToSpeechService';
+
 // Enhanced hook for Speech Synthesis with Voice Selection
 const useSpeechSynthesis = (onEnd) => {
     const [speaking, setSpeaking] = useState(false);
-    const [voices, setVoices] = useState([]);
-    const [selectedVoice, setSelectedVoice] = useState(null);
-
-    useEffect(() => {
-        const loadVoices = () => {
-            const available = window.speechSynthesis.getVoices();
-            const englishVoices = available.filter(v => v.lang.startsWith('en'));
-            setVoices(englishVoices);
-
-            const savedVoiceName = localStorage.getItem('gem_voice_name');
-            if (savedVoiceName) {
-                const saved = englishVoices.find(v => v.name === savedVoiceName);
-                if (saved) {
-                    setSelectedVoice(saved);
-                    return;
-                }
-            }
-
-            const preferred = englishVoices.find(v => v.name.includes('Google US English')) ||
-                englishVoices.find(v => v.name.includes('Zira')) ||
-                englishVoices.find(v => v.name.includes('Samantha')) ||
-                englishVoices[0];
-
-            if (preferred) setSelectedVoice(preferred);
-        };
-
-        loadVoices();
-        window.speechSynthesis.onvoiceschanged = loadVoices;
-    }, []);
-
-    const selectVoice = (voice) => {
-        setSelectedVoice(voice);
-        localStorage.setItem('gem_voice_name', voice.name);
-    };
+    const [isLoading, setIsLoading] = useState(false);
 
     const speak = useCallback((text) => {
-        if (!window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-
-        if (selectedVoice) utterance.voice = selectedVoice;
-
-        utterance.rate = 1.1;
-        utterance.pitch = 1.0;
-
-        utterance.onstart = () => setSpeaking(true);
-        utterance.onend = () => {
-            setSpeaking(false);
-            if (onEnd) onEnd();
-        };
-        window.speechSynthesis.speak(utterance);
-    }, [onEnd, selectedVoice]);
+        textToSpeechService.speak(text, {
+            onStartLoading: () => setIsLoading(true),
+            onEndLoading: () => setIsLoading(false),
+            onStart: () => setSpeaking(true),
+            onEnd: () => {
+                setSpeaking(false);
+                if (onEnd) onEnd();
+            }
+        });
+    }, [onEnd]);
 
     const stop = useCallback(() => {
-        window.speechSynthesis.cancel();
+        textToSpeechService.stop();
         setSpeaking(false);
+        setIsLoading(false);
     }, []);
 
-    return { speak, stop, speaking, voices, selectedVoice, selectVoice };
+    return { speak, stop, speaking, isLoading };
 };
 
 // Simple hook for Speech Recognition
@@ -186,7 +150,7 @@ const PracticeMode = ({
 
     // Animation loop
     const animationRef = useRef();
-    const { speak, stop: stopSpeak, speaking, voices, selectedVoice, selectVoice } = useSpeechSynthesis(() => {
+    const { speak, stop: stopSpeak, speaking } = useSpeechSynthesis(() => {
         setAiState('IDLE');
         if (state === 'GREETING') {
             setState('LISTENING_CHOICE');

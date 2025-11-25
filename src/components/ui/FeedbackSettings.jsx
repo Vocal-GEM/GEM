@@ -1,5 +1,6 @@
 import React from 'react';
-import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X, Stethoscope, Wifi, WifiOff, RefreshCw, Trash2 } from 'lucide-react';
+import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X, Stethoscope, Wifi, WifiOff, RefreshCw, Trash2, Mic2 } from 'lucide-react';
+import { textToSpeechService } from '../../services/TextToSpeechService';
 import { syncManager } from '../../services/SyncManager';
 import { indexedDB, STORES } from '../../services/IndexedDBManager';
 
@@ -14,6 +15,20 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
         androg: { min: targetRange.min, max: targetRange.max },
         fem: { min: targetRange.min, max: targetRange.max },
     });
+    const [availableVoices, setAvailableVoices] = React.useState([]);
+    const [isLoadingVoices, setIsLoadingVoices] = React.useState(false);
+
+    React.useEffect(() => {
+        if (settings.ttsProvider === 'elevenlabs' && settings.elevenLabsKey) {
+            setIsLoadingVoices(true);
+            textToSpeechService.getElevenLabsVoices(settings.elevenLabsKey)
+                .then(voices => {
+                    setAvailableVoices(voices);
+                    setIsLoadingVoices(false);
+                });
+        }
+    }, [settings.ttsProvider, settings.elevenLabsKey]);
+
     if (!isOpen) return null;
 
     return (
@@ -157,6 +172,69 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                         <div className="text-[10px] text-slate-500 mt-2">
                             A golden line will appear on your pitch graph at this frequency
                         </div>
+                    </div>
+                </section>
+
+                {/* Voice Settings */}
+                <section>
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Coach Voice</h3>
+                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className={`p-2 rounded-lg ${settings.ttsProvider === 'elevenlabs' ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-700 text-slate-400'}`}>
+                                    <Mic2 className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <div className="text-sm font-bold text-white">High Quality Voice</div>
+                                    <div className="text-[10px] text-slate-400">Use ElevenLabs AI (Requires API Key)</div>
+                                </div>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer p-2">
+                                <input
+                                    type="checkbox"
+                                    checked={settings.ttsProvider === 'elevenlabs'}
+                                    onChange={(e) => setSettings({ ...settings, ttsProvider: e.target.checked ? 'elevenlabs' : 'browser' })}
+                                    className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-500"></div>
+                            </label>
+                        </div>
+
+                        {settings.ttsProvider === 'elevenlabs' && (
+                            <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <div>
+                                    <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">ElevenLabs API Key</label>
+                                    <input
+                                        type="password"
+                                        value={settings.elevenLabsKey || ''}
+                                        onChange={(e) => setSettings({ ...settings, elevenLabsKey: e.target.value })}
+                                        placeholder="sk_..."
+                                        className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-white focus:border-purple-500 focus:outline-none transition-colors"
+                                    />
+                                    <div className="text-[10px] text-slate-500 mt-1">Key is stored locally on your device.</div>
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Voice Model</label>
+                                    <select
+                                        value={settings.voiceId || ''}
+                                        onChange={(e) => setSettings({ ...settings, voiceId: e.target.value })}
+                                        className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-white focus:border-purple-500 focus:outline-none transition-colors appearance-none"
+                                        disabled={isLoadingVoices || !settings.elevenLabsKey}
+                                    >
+                                        {isLoadingVoices ? (
+                                            <option>Loading voices...</option>
+                                        ) : availableVoices.length > 0 ? (
+                                            availableVoices.map(voice => (
+                                                <option key={voice.voice_id} value={voice.voice_id}>{voice.name}</option>
+                                            ))
+                                        ) : (
+                                            <option value="21m00Tcm4TlvDq8ikWAM">Rachel (Default)</option>
+                                        )}
+                                    </select>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </section>
 

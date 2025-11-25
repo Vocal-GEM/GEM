@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { AudioEngine } from '../engines/AudioEngine';
+import { textToSpeechService } from '../services/TextToSpeechService';
 import { syncManager } from '../services/SyncManager';
 import { QuestManager } from '../services/QuestManager';
 import { indexedDB, STORES } from '../services/IndexedDBManager';
@@ -37,7 +38,18 @@ export const GemProvider = ({ children }) => {
     const [goals, setGoals] = useState([]);
     const [journals, setJournals] = useState([]);
     const [stats, setStats] = useState({ streak: 0, totalSeconds: 0, totalPoints: 0, level: 1 });
-    const [settings, setSettings] = useState({ vibration: true, tone: false, noiseGate: 0.02, triggerLowPitch: true, triggerDarkRes: true, notation: 'hz', homeNote: 190 });
+    const [settings, setSettings] = useState({
+        vibration: true,
+        tone: false,
+        noiseGate: 0.02,
+        triggerLowPitch: true,
+        triggerDarkRes: true,
+        notation: 'hz',
+        homeNote: 190,
+        ttsProvider: 'elevenlabs', // 'browser' | 'elevenlabs'
+        elevenLabsKey: 'sk_d4ebb9d8a3540c49173de9a236f7a1642114d07762414784',
+        voiceId: '21m00Tcm4TlvDq8ikWAM' // Default Rachel
+    });
     const [highScores, setHighScores] = useState({ flappy: 0, river: 0, hopper: 0, stairs: 0 });
 
     // SLP Client Management
@@ -65,7 +77,7 @@ export const GemProvider = ({ children }) => {
 
                 // Load Settings
                 const savedSettings = await indexedDB.getSetting('app_settings');
-                if (savedSettings) setSettings(savedSettings);
+                if (savedSettings) setSettings(prev => ({ ...prev, ...savedSettings }));
 
                 // Load Profiles
                 const profiles = await indexedDB.getProfiles();
@@ -166,7 +178,7 @@ export const GemProvider = ({ children }) => {
     const settingsRef = useRef(settings);
     const targetRangeRef = useRef(targetRange);
 
-    useEffect(() => { settingsRef.current = settings; }, [settings]);
+    useEffect(() => { settingsRef.current = settings; textToSpeechService.init(settings); }, [settings]);
     useEffect(() => { targetRangeRef.current = targetRange; }, [targetRange]);
 
     // Initialize Audio Engine
