@@ -1,7 +1,7 @@
-import React, { useRef, useMemo, useState } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Diamond, Flame } from 'lucide-react';
+import { Diamond, Flame, Bug } from 'lucide-react';
 import OrbLegend from './OrbLegend';
 
 // Shared Noise Function
@@ -246,17 +246,60 @@ const VisualizerMesh = ({ mode, dataRef }) => {
     );
 };
 
-const DynamicOrb = React.memo(({ dataRef }) => {
+const DynamicOrb = React.memo(({ dataRef, calibration }) => {
     const [mode, setMode] = useState('gem');
+    const [showDebug, setShowDebug] = useState(false);
+    const [debugInfo, setDebugInfo] = useState(null);
 
     const modes = [
         { id: 'gem', icon: Diamond, label: 'Gem' },
         { id: 'fire', icon: Flame, label: 'Fire' },
     ];
 
+    // Keyboard shortcut: D to toggle debug
+    useEffect(() => {
+        const handleKeyPress = (e) => {
+            if (e.key === 'd' || e.key === 'D') {
+                setShowDebug(prev => !prev);
+            }
+        };
+        window.addEventListener('keydown', handleKeyPress);
+        return () => window.removeEventListener('keydown', handleKeyPress);
+    }, []);
+
+    // Update debug info periodically
+    useEffect(() => {
+        if (!showDebug) return;
+
+        const interval = setInterval(() => {
+            if (dataRef.current) {
+                const { pitch, resonance, volume } = dataRef.current;
+                const pitchVal = pitch || 0;
+
+                // Calculate resonance score for slider (Dark/Balanced/Bright)
+                let resScore = 0.5;
+                if (resonance && calibration) {
+                    const { dark, bright } = calibration;
+                    resScore = Math.max(0, Math.min(1, (resonance - dark) / (bright - dark)));
+                }
+
+                setDebugInfo({
+                    centroid: resonance?.toFixed(0) || '—',
+                    pitch: pitchVal > 0 ? pitchVal.toFixed(0) : '—',
+                    resScore: (resScore * 100).toFixed(0),
+                    volume: ((volume || 0) * 100).toFixed(1)
+                });
+            }
+        }, 200);
+
+        return () => clearInterval(interval);
+    }, [showDebug, dataRef, calibration]);
+
     return (
         <div className="w-full h-full relative group">
             <OrbLegend mode={mode} />
+
+            {/* Controls */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 p-2 rounded-full bg-slate-900/50 backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 {modes.map((m) => {
                     const Icon = m.icon;
@@ -272,7 +315,16 @@ const DynamicOrb = React.memo(({ dataRef }) => {
                         </button>
                     );
                 })}
+                <div className="w-px bg-white/10 mx-1"></div>
+                <button
+                    onClick={() => setShowDebug(!showDebug)}
+                    className={`p-2 rounded-full transition-all ${showDebug ? 'bg-amber-500 text-white shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
+                    title="Toggle Debug Panel"
+                >
+                    <Bug size={18} />
+                </button>
             </div>
+
             <Canvas
                 camera={{ position: [0, 0, 5], fov: 50 }}
                 gl={{ antialias: true, powerPreference: "high-performance", alpha: true, preserveDrawingBuffer: false }}
@@ -287,6 +339,47 @@ const DynamicOrb = React.memo(({ dataRef }) => {
                 <ambientLight intensity={0.5} />
                 <VisualizerMesh key={mode} mode={mode} dataRef={dataRef} />
             </Canvas>
+
+            {/* Debug Panel Overlay */}
+            {showDebug && debugInfo && (
+                <div className="absolute top-4 right-4 p-4 bg-slate-900/90 backdrop-blur-md rounded-lg border border-white/10 w-64 z-20 shadow-xl">
+                    <div className="text-xs font-mono text-slate-400 mb-3 uppercase tracking-wider flex justify-between items-center">
+                        <span>Diagnostics</span>
+                        <span className="text-amber-500 animate-pulse">●</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-y-2 text-xs font-mono mb-4">
+                        <div className="text-slate-500">Pitch</div>
+                        <div className="text-white text-right">{debugInfo.pitch} Hz</div>
+
+                        <div className="text-slate-500">Resonance</div>
+                        <div className="text-cyan-400 text-right">{debugInfo.centroid} Hz</div>
+
+                        <div className="text-slate-500">Volume</div>
+                        <div className="text-emerald-400 text-right">{debugInfo.volume}%</div>
+                    </div>
+
+                    {/* Resonance Gradient Slider */}
+                    <div className="pt-3 border-t border-white/10">
+                        <div className="flex justify-between text-[10px] text-slate-500 mb-1 uppercase tracking-wider">
+                            <span>Dark</span>
+                            <span>Balanced</span>
+                            <span>Bright</span>
+                        </div>
+                        <div className="relative h-3 w-full rounded-full bg-slate-800 overflow-hidden ring-1 ring-white/10">
+                            <div className="absolute inset-0 opacity-80" style={{
+                                background: 'linear-gradient(to right, #312e81 0%, #3b82f6 35%, #3b82f6 65%, #facc15 100%)'
+                            }}></div>
+                            <div className="absolute top-0 bottom-0 w-px bg-white/30 left-[35%]"></div>
+                            <div className="absolute top-0 bottom-0 w-px bg-white/30 left-[65%]"></div>
+                            <div
+                                className="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_8px_rgba(255,255,255,1)] transition-all duration-100 ease-out z-10"
+                                style={{ left: `${debugInfo.resScore}%`, transform: 'translateX(-50%)' }}
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 });

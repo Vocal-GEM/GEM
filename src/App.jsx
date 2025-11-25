@@ -221,7 +221,7 @@ const App = () => {
                             {/* Dynamic Orb (Show All) or Legacy Resonance Orb (Resonance Tab) */}
                             {practiceView === 'all' ? (
                                 <div key="dynamic-orb-container" className="h-80 w-full mb-6 relative z-0">
-                                    <DynamicOrb dataRef={dataRef} showDebug={true} />
+                                    <DynamicOrb dataRef={dataRef} calibration={calibration} />
                                 </div>
                             ) : (
                                 practiceView === 'resonance' && <ResonanceOrb dataRef={dataRef} calibration={calibration} showDebug={true} />

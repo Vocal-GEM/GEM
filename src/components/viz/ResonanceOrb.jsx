@@ -31,20 +31,30 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
 
         const loop = () => {
             if (orbRef.current && dataRef.current) {
-                const { resonanceScore, pitch, volume, spectralCentroid, f1, f2, debug } = dataRef.current;
+                const { resonance, pitch, volume, f1, f2, debug, weight } = dataRef.current;
+
+                // Calculate resonance score locally since processor doesn't send it
+                // Map resonance (Hz) to 0-1 score based on calibration
+                // Dark (Low Hz) -> 0, Bright (High Hz) -> 1
+                let calculatedScore = 0.5;
+                if (resonance && calibration) {
+                    const { dark, bright } = calibration;
+                    // Clamp and normalize
+                    calculatedScore = Math.max(0, Math.min(1, (resonance - dark) / (bright - dark)));
+                }
 
                 // Update debug display every 10 frames (~6 times/sec) to reduce flicker
                 frameCount++;
                 if (showDebug && frameCount % 10 === 0 && debug) {
                     setDebugInfo({
-                        centroid: spectralCentroid?.toFixed(0) || '—',
+                        centroid: resonance?.toFixed(0) || '—',
                         rawCentroid: debug.rawCentroid?.toFixed(0) || '—',
-                        centroidScore: (debug.centroidScore * 100)?.toFixed(0) || '—',
+                        centroidScore: (calculatedScore * 100)?.toFixed(0) || '—',
                         f1: f1?.toFixed(0) || '—',
                         f2: f2?.toFixed(0) || '—',
                         f2Score: debug.hasValidF2 ? (debug.f2Score * 100)?.toFixed(0) : 'N/A',
                         rawScore: (debug.rawScore * 100)?.toFixed(0) || '—',
-                        finalScore: (resonanceScore * 100)?.toFixed(0) || '—',
+                        finalScore: (calculatedScore * 100)?.toFixed(0) || '—',
                         hasF2: debug.hasValidF2 ? 'Yes' : 'No',
                         uiScore: (currentScore.current * 100)?.toFixed(0) || '—',
                         label: labelState.current.current,
@@ -58,7 +68,7 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
                 if (isVoiceActive) {
                     silenceTimer.current = 0;
 
-                    const targetScore = resonanceScore !== undefined ? resonanceScore : 0.5;
+                    const targetScore = calculatedScore;
                     const smoothFactor = 0.15; // Slightly faster response
                     currentScore.current = currentScore.current + (targetScore - currentScore.current) * smoothFactor;
                 } else {
@@ -91,11 +101,11 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
                     color = `rgb(${r}, ${g}, ${b})`;
                 }
 
-                const weight = dataRef.current.weight || 0;
-                const scale = 1 + (weight * 0.12);
+                const weightVal = weight || 0;
+                const scale = 1 + (weightVal * 0.12);
 
                 orbRef.current.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), ${color})`;
-                orbRef.current.style.boxShadow = `0 0 ${20 + weight * 25}px ${color}, inset 0 0 20px rgba(255,255,255,0.5)`;
+                orbRef.current.style.boxShadow = `0 0 ${20 + weightVal * 25}px ${color}, inset 0 0 20px rgba(255,255,255,0.5)`;
                 orbRef.current.style.transform = `scale(${scale})`;
                 orbRef.current.style.opacity = isVoiceActive ? 1 : (silenceTimer.current > 25 ? 0.4 : 0.7);
 
