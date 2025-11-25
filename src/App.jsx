@@ -35,6 +35,7 @@ import OfflineIndicator from './components/ui/OfflineIndicator';
 import MigrationModal from './components/ui/MigrationModal';
 import AnalysisView from './components/views/AnalysisView';
 import ArticulationView from './components/views/ArticulationView';
+import SLPDashboard from './components/views/SLPDashboard';
 
 // Games
 import ResonanceRiverGame from './components/games/ResonanceRiverGame';
@@ -194,79 +195,83 @@ const App = () => {
             </header>
 
             {/* Main Content */}
-            <main className="p-4 max-w-md mx-auto">
+            <main className={userMode === 'slp' ? "h-[calc(100vh-80px)]" : "p-4 max-w-md mx-auto"}>
                 {activeTab === 'practice' && (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <DailyGoalsWidget goals={goals} />
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Real-time Analysis</h2>
-                            <button onClick={toggleAudio} className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all ${isAudioActive ? 'bg-red-500/20 text-red-400 animate-pulse' : 'bg-blue-600 text-white'}`}>
-                                {isAudioActive ? <><span className="w-2 h-2 bg-red-500 rounded-full" /> LIVE</> : <><Mic className="w-3 h-3" /> START</>}
-                            </button>
-                        </div>
-                        {/* Filter Menu */}
-                        <div className="glass-panel-dark rounded-xl p-2 mb-4 flex gap-2 overflow-x-auto">
-                            {[{ id: 'all', label: 'Show All' }, { id: 'pitch', label: 'Pitch' }, { id: 'resonance', label: 'Resonance' }, { id: 'weight', label: 'Weight' }, { id: 'vowel', label: 'Vowel' }].map(view => (
-                                <button key={view.id} onClick={() => setPracticeView(view.id)} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${practiceView === view.id ? 'bg-blue-500 text-white' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
-                                    {view.label}
+                    userMode === 'slp' ? (
+                        <SLPDashboard dataRef={dataRef} audioEngine={audioEngineRef.current} />
+                    ) : (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <DailyGoalsWidget goals={goals} />
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Real-time Analysis</h2>
+                                <button onClick={toggleAudio} className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all ${isAudioActive ? 'bg-red-500/20 text-red-400 animate-pulse' : 'bg-blue-600 text-white'}`}>
+                                    {isAudioActive ? <><span className="w-2 h-2 bg-red-500 rounded-full" /> LIVE</> : <><Mic className="w-3 h-3" /> START</>}
                                 </button>
-                            ))}
-                        </div>
-                        {/* Resonance Orb */}
-                        {(practiceView === 'all' || practiceView === 'resonance') && <ResonanceOrb dataRef={dataRef} calibration={calibration} />}
-                        {/* Live Metrics Bar */}
-                        {practiceView === 'all' && <LiveMetricsBar dataRef={dataRef} />}
-                        <div className="space-y-4">
-                            {/* Pitch Visualizer */}
-                            {(practiceView === 'all' || practiceView === 'pitch') && (
-                                <div>
-                                    <div className="flex justify-end mb-2">
-                                        <div className="glass-panel-dark rounded-lg p-1 flex gap-1">
-                                            <button onClick={() => setPitchViewMode('graph')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${pitchViewMode === 'graph' ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`}>Graph</button>
-                                            <button onClick={() => setPitchViewMode('orb')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${pitchViewMode === 'orb' ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`}>Orb</button>
+                            </div>
+                            {/* Filter Menu */}
+                            <div className="glass-panel-dark rounded-xl p-2 mb-4 flex gap-2 overflow-x-auto">
+                                {[{ id: 'all', label: 'Show All' }, { id: 'pitch', label: 'Pitch' }, { id: 'resonance', label: 'Resonance' }, { id: 'weight', label: 'Weight' }, { id: 'vowel', label: 'Vowel' }].map(view => (
+                                    <button key={view.id} onClick={() => setPracticeView(view.id)} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${practiceView === view.id ? 'bg-blue-500 text-white' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-white'}`}>
+                                        {view.label}
+                                    </button>
+                                ))}
+                            </div>
+                            {/* Resonance Orb */}
+                            {(practiceView === 'all' || practiceView === 'resonance') && <ResonanceOrb dataRef={dataRef} calibration={calibration} />}
+                            {/* Live Metrics Bar */}
+                            {practiceView === 'all' && <LiveMetricsBar dataRef={dataRef} />}
+                            <div className="space-y-4">
+                                {/* Pitch Visualizer */}
+                                {(practiceView === 'all' || practiceView === 'pitch') && (
+                                    <div>
+                                        <div className="flex justify-end mb-2">
+                                            <div className="glass-panel-dark rounded-lg p-1 flex gap-1">
+                                                <button onClick={() => setPitchViewMode('graph')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${pitchViewMode === 'graph' ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`}>Graph</button>
+                                                <button onClick={() => setPitchViewMode('orb')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${pitchViewMode === 'orb' ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`}>Orb</button>
+                                            </div>
+                                        </div>
+                                        {pitchViewMode === 'graph' ? (
+                                            <PitchVisualizer dataRef={dataRef} targetRange={targetRange} userMode={userMode} exercise={activeGame} onScore={score => submitGameResult(activeGame, score)} settings={settings} />
+                                        ) : (
+                                            <PitchOrb dataRef={dataRef} settings={settings} />
+                                        )}
+                                    </div>
+                                )}
+                                {/* Active Game Overlay */}
+                                {activeGame && (
+                                    <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+                                        <div className="w-full max-w-md">
+                                            {activeGame === 'flappy' && <FlappyVoiceGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('flappy', s)} onClose={() => setActiveGame(null)} />}
+                                            {activeGame === 'river' && <ResonanceRiverGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('river', s)} onClose={() => setActiveGame(null)} />}
+                                            {activeGame === 'hopper' && <CloudHopperGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('hopper', s)} onClose={() => setActiveGame(null)} />}
+                                            {activeGame === 'stairs' && <StaircaseGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('stairs', s)} onClose={() => setActiveGame(null)} />}
+                                            {activeGame === 'pitchmatch' && <PitchMatchGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('pitchmatch', s)} onClose={() => setActiveGame(null)} />}
                                         </div>
                                     </div>
-                                    {pitchViewMode === 'graph' ? (
-                                        <PitchVisualizer dataRef={dataRef} targetRange={targetRange} userMode={userMode} exercise={activeGame} onScore={score => submitGameResult(activeGame, score)} settings={settings} />
-                                    ) : (
-                                        <PitchOrb dataRef={dataRef} settings={settings} />
-                                    )}
-                                </div>
-                            )}
-                            {/* Active Game Overlay */}
-                            {activeGame && (
-                                <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-                                    <div className="w-full max-w-md">
-                                        {activeGame === 'flappy' && <FlappyVoiceGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('flappy', s)} onClose={() => setActiveGame(null)} />}
-                                        {activeGame === 'river' && <ResonanceRiverGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('river', s)} onClose={() => setActiveGame(null)} />}
-                                        {activeGame === 'hopper' && <CloudHopperGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('hopper', s)} onClose={() => setActiveGame(null)} />}
-                                        {activeGame === 'stairs' && <StaircaseGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('stairs', s)} onClose={() => setActiveGame(null)} />}
-                                        {activeGame === 'pitchmatch' && <PitchMatchGame dataRef={dataRef} targetRange={targetRange} onScore={s => submitGameResult('pitchmatch', s)} onClose={() => setActiveGame(null)} />}
+                                )}
+                                {/* Spectrogram for SLP mode */}
+                                {userMode === 'slp' && <Spectrogram dataRef={dataRef} />}
+                                {/* Voice Quality & Vowel Space */}
+                                {(practiceView === 'all' || practiceView === 'weight' || practiceView === 'vowel') && (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {(practiceView === 'all' || practiceView === 'weight') && <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />}
+                                        {(practiceView === 'all' || practiceView === 'vowel') && <VowelSpacePlot dataRef={dataRef} userMode={userMode} />}
                                     </div>
-                                </div>
-                            )}
-                            {/* Spectrogram for SLP mode */}
-                            {userMode === 'slp' && <Spectrogram dataRef={dataRef} />}
-                            {/* Voice Quality & Vowel Space */}
-                            {(practiceView === 'all' || practiceView === 'weight' || practiceView === 'vowel') && (
-                                <div className="grid grid-cols-2 gap-4">
-                                    {(practiceView === 'all' || practiceView === 'weight') && <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />}
-                                    {(practiceView === 'all' || practiceView === 'vowel') && <VowelSpacePlot dataRef={dataRef} userMode={userMode} />}
-                                </div>
-                            )}
+                                )}
+                            </div>
+                            {/* Bottom Buttons */}
+                            <div className="mt-6 grid grid-cols-1 gap-3">
+                                <button onClick={() => setActiveTab('tools')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
+                                    <Wrench className="text-purple-400" />
+                                    <span className="text-xs font-bold">Tools</span>
+                                </button>
+                                <button onClick={() => setActiveTab('articulation')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
+                                    <Mic className="text-pink-400" />
+                                    <span className="text-xs font-bold">Articulation</span>
+                                </button>
+                            </div>
                         </div>
-                        {/* Bottom Buttons */}
-                        <div className="mt-6 grid grid-cols-1 gap-3">
-                            <button onClick={() => setActiveTab('tools')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
-                                <Wrench className="text-purple-400" />
-                                <span className="text-xs font-bold">Tools</span>
-                            </button>
-                            <button onClick={() => setActiveTab('articulation')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
-                                <Mic className="text-pink-400" />
-                                <span className="text-xs font-bold">Articulation</span>
-                            </button>
-                        </div>
-                    </div>
+                    )
                 )}
                 {activeTab === 'games' && <GameHub onSelectGame={handleSelectGame} />}
                 {activeTab === 'coach' && <CoachView />}
@@ -286,7 +291,7 @@ const App = () => {
                     </div>
                 )}
                 {activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} />}
-                {activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} />}
+
                 {activeTab === 'analysis' && <AnalysisView />}
                 {activeTab === 'articulation' && (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">

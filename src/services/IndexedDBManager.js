@@ -5,7 +5,7 @@
  */
 
 const DB_NAME = 'VocalGEM';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 // Store names
 const STORES = {
@@ -15,7 +15,8 @@ const STORES = {
     SETTINGS: 'settings',
     PROFILES: 'profiles',
     SYNC_QUEUE: 'sync_queue',
-    SYNC_METADATA: 'sync_metadata'
+    SYNC_METADATA: 'sync_metadata',
+    CLIENTS: 'clients'
 };
 
 class IndexedDBManager {
@@ -68,6 +69,11 @@ class IndexedDBManager {
 
                 if (!db.objectStoreNames.contains(STORES.SYNC_METADATA)) {
                     db.createObjectStore(STORES.SYNC_METADATA, { keyPath: 'key' });
+                }
+
+                if (!db.objectStoreNames.contains(STORES.CLIENTS)) {
+                    const clientStore = db.createObjectStore(STORES.CLIENTS, { keyPath: 'id' });
+                    clientStore.createIndex('name', 'name', { unique: false });
                 }
             };
         });
@@ -199,6 +205,20 @@ class IndexedDBManager {
 
     async getProfiles() {
         return await this.getAll(STORES.PROFILES);
+    }
+
+    async saveClient(client) {
+        if (!client.id) client.id = crypto.randomUUID();
+        if (!client.createdAt) client.createdAt = new Date().toISOString();
+        return await this.put(STORES.CLIENTS, client);
+    }
+
+    async getClients() {
+        return await this.getAll(STORES.CLIENTS);
+    }
+
+    async deleteClient(id) {
+        return await this.delete(STORES.CLIENTS, id);
     }
 
     // Migration helper: Import from localStorage

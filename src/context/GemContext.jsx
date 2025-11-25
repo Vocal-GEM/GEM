@@ -40,6 +40,10 @@ export const GemProvider = ({ children }) => {
     const [settings, setSettings] = useState({ vibration: true, tone: false, noiseGate: 0.02, triggerLowPitch: true, triggerDarkRes: true, notation: 'hz', homeNote: 190 });
     const [highScores, setHighScores] = useState({ flappy: 0, river: 0, hopper: 0, stairs: 0 });
 
+    // SLP Client Management
+    const [clients, setClients] = useState([]);
+    const [activeClient, setActiveClient] = useState(null);
+
     const [user, setUser] = useState(null); // { id, username }
     const [isAuthLoading, setIsAuthLoading] = useState(true);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -101,7 +105,12 @@ export const GemProvider = ({ children }) => {
 
                 await indexedDB.saveSetting('last_login', Date.now());
                 await indexedDB.saveGoals(quests);
+                await indexedDB.saveGoals(quests);
                 setGoals(quests);
+
+                // Load Clients (SLP Mode)
+                const savedClients = await indexedDB.getClients();
+                if (savedClients) setClients(savedClients);
 
                 setIsDataLoaded(true);
             } catch (e) {
@@ -499,6 +508,26 @@ export const GemProvider = ({ children }) => {
         indexedDB.saveSetting('user_mode', mode);
     };
 
+    // Client Actions
+    const addClient = async (clientData) => {
+        const newClient = { ...clientData, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
+        await indexedDB.saveClient(newClient);
+        setClients(prev => [...prev, newClient]);
+        return newClient;
+    };
+
+    const deleteClient = async (clientId) => {
+        await indexedDB.deleteClient(clientId);
+        setClients(prev => prev.filter(c => c.id !== clientId));
+        if (activeClient?.id === clientId) setActiveClient(null);
+    };
+
+    const updateClient = async (client) => {
+        await indexedDB.saveClient(client);
+        setClients(prev => prev.map(c => c.id === client.id ? client : c));
+        if (activeClient?.id === client.id) setActiveClient(client);
+    };
+
     const value = {
         // State
         activeTab, setActiveTab,
@@ -543,7 +572,15 @@ export const GemProvider = ({ children }) => {
         user,
         login,
         signup,
-        logout
+        logout,
+
+        // Client Management
+        clients,
+        activeClient,
+        setActiveClient,
+        addClient,
+        deleteClient,
+        updateClient
     };
 
     return <GemContext.Provider value={value}>{children}</GemContext.Provider>;
