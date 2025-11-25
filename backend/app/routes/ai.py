@@ -3,7 +3,9 @@ from flask_login import login_required
 import google.generativeai as genai
 import os
 from werkzeug.utils import secure_filename
-from ..utils.rag import rag_system
+# Temporarily disabled due to numpy dependency issues
+# from ..utils.rag import rag_system
+rag_system = None
 
 ai_bp = Blueprint('ai', __name__, url_prefix='/api')
 

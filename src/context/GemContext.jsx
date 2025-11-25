@@ -498,13 +498,19 @@ export const GemProvider = ({ children }) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
+
+            const data = await res.json();
+
             if (res.ok) {
-                const data = await res.json();
                 setUser(data.user);
-                return true;
+                return { success: true };
+            } else {
+                return { success: false, error: data.error || 'Signup failed' };
             }
-        } catch (e) { console.error(e); }
-        return false;
+        } catch (e) {
+            console.error(e);
+            return { success: false, error: 'Network error. Is the backend running?' };
+        }
     };
 
     const logout = async () => {

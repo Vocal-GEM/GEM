@@ -16,9 +16,9 @@ export default defineConfig({
         open: true,
         proxy: {
             '/api': {
-                target: 'http://localhost:5000',
+                target: 'https://vocalgem.onrender.com',
                 changeOrigin: true,
-                secure: false
+                secure: true
             }
         }
     },

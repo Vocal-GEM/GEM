@@ -21,11 +21,11 @@ const Signup = ({ onSwitchToLogin, onClose }) => {
         setError('');
 
         try {
-            const success = await signup(username, password);
-            if (success) {
+            const result = await signup(username, password);
+            if (result.success) {
                 onClose();
             } else {
-                setError('Username already taken');
+                setError(result.error);
             }
         } catch (err) {
             setError('Signup failed. Is the backend running?');

@@ -93,6 +93,7 @@ const gemFragment = `
 uniform float u_pitch_norm;
 uniform float u_weight;
 uniform float u_intensity;
+uniform float u_resonance_norm;
 varying float vDisplacement;
 varying vec3 vNormal;
 varying float vNoise;
@@ -123,6 +124,30 @@ void main() {
   vec3 reflectDir2 = reflect(-lightDir2, finalNormal);
   float spec2 = pow(max(dot(viewDir, reflectDir2), 0.0), 32.0);
   float subsurface = pow(max(dot(-viewDir, finalNormal), 0.0), 2.0);
+  
+  // Resonance-based lighting
+  // Dark resonance (< 0.35) = Blue light
+  // Bright resonance (> 0.65) = Pink light
+  // Balanced (0.35-0.65) = Minimal resonance lighting
+  vec3 resonanceLight = vec3(0.0);
+  float resonanceIntensity = 0.0;
+  
+  if (u_resonance_norm < 0.35) {
+    // Dark resonance - Blue light
+    float darkAmount = (0.35 - u_resonance_norm) / 0.35;
+    resonanceIntensity = darkAmount * u_intensity * 2.5;
+    resonanceLight = vec3(0.2, 0.5, 1.0) * resonanceIntensity;
+  } else if (u_resonance_norm > 0.65) {
+    // Bright resonance - Pink light
+    float brightAmount = (u_resonance_norm - 0.65) / 0.35;
+    resonanceIntensity = brightAmount * u_intensity * 2.5;
+    resonanceLight = vec3(1.0, 0.3, 0.7) * resonanceIntensity;
+  }
+  
+  // Add organic pulsing to resonance light
+  float pulse = 0.8 + 0.2 * sin(vNoise * 3.14159);
+  resonanceLight *= pulse;
+  
   float alpha = 0.4 + u_weight * 0.6;
   vec3 gemColor = baseColor * 0.8;
   gemColor += baseColor * vNoise * 0.15;
@@ -131,6 +156,10 @@ void main() {
   gemColor += baseColor * spec2 * 0.8;
   gemColor += baseColor * subsurface * 0.5;
   gemColor *= (0.9 + u_intensity * 0.6);
+  
+  // Add resonance lighting with organic blending
+  gemColor += resonanceLight * (0.5 + fresnel * 0.5);
+  
   gl_FragColor = vec4(gemColor, alpha);
 }
 `;
@@ -178,7 +207,7 @@ void main() {
 }
 `;
 
-const VisualizerMesh = ({ mode, dataRef, externalDataRef }) => {
+const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration }) => {
     const mesh = useRef();
     const material = useRef();
 
@@ -188,7 +217,8 @@ const VisualizerMesh = ({ mode, dataRef, externalDataRef }) => {
         u_roughness: { value: 0 },
         u_pitch_norm: { value: 0 },
         u_weight: { value: 0.5 },
-        u_intensity: { value: 0 }
+        u_intensity: { value: 0 },
+        u_resonance_norm: { value: 0.5 }
     }), []);
 
     const shaders = useMemo(() => {
@@ -216,12 +246,21 @@ const VisualizerMesh = ({ mode, dataRef, externalDataRef }) => {
         const weightVal = weight !== undefined ? weight : 0.5;
         const smoothedWeight = THREE.MathUtils.lerp(uniforms.u_weight.value, weightVal, 0.1);
 
+        // Calculate resonance_norm from calibration for blue/pink lighting
+        let resonanceNorm = 0.5; // Default to balanced
+        if (resonance && calibration) {
+            const { dark, bright } = calibration;
+            resonanceNorm = Math.max(0, Math.min(1, (resonance - dark) / (bright - dark)));
+        }
+        const smoothedResonanceNorm = THREE.MathUtils.lerp(uniforms.u_resonance_norm.value, resonanceNorm, 0.08);
+
         uniforms.u_time.value = state.clock.elapsedTime;
         uniforms.u_amplitude.value = smoothedVol;
         uniforms.u_pitch_norm.value = smoothedPitch;
         uniforms.u_roughness.value = smoothedRes;
         uniforms.u_weight.value = smoothedWeight;
         uniforms.u_intensity.value = smoothedVol;
+        uniforms.u_resonance_norm.value = smoothedResonanceNorm;
 
         mesh.current.rotation.y += 0.002 + smoothedVol * 0.01;
         if (mode === 'gem') mesh.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
@@ -339,7 +378,7 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
                 }}
             >
                 <ambientLight intensity={0.5} />
-                <VisualizerMesh key={mode} mode={mode} dataRef={dataRef} externalDataRef={externalDataRef} />
+                <VisualizerMesh key={mode} mode={mode} dataRef={dataRef} externalDataRef={externalDataRef} calibration={calibration} />
             </Canvas>
 
             {/* Debug Panel Overlay */}
