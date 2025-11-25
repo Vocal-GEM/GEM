@@ -166,12 +166,7 @@ const OrbMesh = ({ dataRef }) => {
     useFrame((state) => {
         if (!mesh.current || !material.current || !dataRef.current) return;
 
-        const { pitch, resonance, volume } = dataRef.current; // volume might need calculation if not directly in dataRef
-
-        // Calculate volume (RMS approximation or use volume from engine if available)
-        // Assuming dataRef has 'volume' (0-1) or we derive it. 
-        // If AudioEngine provides 'volume' (dB or linear), we normalize it.
-        // Let's assume volume is linear 0-1 for now.
+        const { pitch, resonance, volume } = dataRef.current;
         const vol = dataRef.current.volume || 0;
         const smoothedVol = THREE.MathUtils.lerp(uniforms.u_amplitude.value, vol, 0.1);
 
@@ -181,8 +176,6 @@ const OrbMesh = ({ dataRef }) => {
         const smoothedPitch = THREE.MathUtils.lerp(uniforms.u_pitch_norm.value, pitchNorm, 0.05);
 
         // Resonance (roughness)
-        // Map F1/F2 or resonance metric to 0-1
-        // Let's use a simple proxy if resonance is raw Hz
         const resNorm = Math.min(1, (resonance || 500) / 2000);
         const smoothedRes = THREE.MathUtils.lerp(uniforms.u_roughness.value, resNorm, 0.05);
 
@@ -191,7 +184,7 @@ const OrbMesh = ({ dataRef }) => {
         uniforms.u_amplitude.value = smoothedVol;
         uniforms.u_pitch_norm.value = smoothedPitch;
         uniforms.u_roughness.value = smoothedRes;
-        uniforms.u_intensity.value = smoothedVol * 0.5; // Extra brightness on loud sounds
+        uniforms.u_intensity.value = smoothedVol * 0.5;
 
         // Pulse scale slightly
         const scale = 1.0 + smoothedVol * 0.2;
@@ -213,74 +206,37 @@ const OrbMesh = ({ dataRef }) => {
     );
 };
 
-const ParticleSystem = ({ dataRef }) => {
-    const points = useRef();
-    const count = 100;
+const DynamicOrb = React.memo(({ dataRef }) => {
+    const mountCount = useRef(0);
 
-    // Initial positions
-    const [positions, randoms] = useMemo(() => {
-        const pos = new Float32Array(count * 3);
-        const rnd = new Float32Array(count);
-        for (let i = 0; i < count; i++) {
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.acos(Math.random() * 2 - 1);
-            const r = 2.5 + Math.random() * 2; // Outside the sphere
-            pos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-            pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-            pos[i * 3 + 2] = r * Math.cos(phi);
-            rnd[i] = Math.random();
-        }
-        return [pos, rnd];
+    useEffect(() => {
+        mountCount.current += 1;
+        console.log('🔮 DynamicOrb MOUNTED - Mount count:', mountCount.current);
+
+        return () => {
+            console.log('🔮 DynamicOrb UNMOUNTING - Mount count was:', mountCount.current);
+        };
     }, []);
 
-    useFrame((state) => {
-        if (!points.current) return;
-
-        const time = state.clock.elapsedTime;
-        const vol = dataRef.current?.volume || 0;
-
-        // Update positions (orbiting/pulsing)
-        const positionsArray = points.current.geometry.attributes.position.array;
-
-        for (let i = 0; i < count; i++) {
-            const i3 = i * 3;
-            // Simple orbit logic
-            const speed = 0.2 + vol;
-
-            // Rotate around Y
-            const x = positionsArray[i3];
-            const z = positionsArray[i3 + 2];
-
-            positionsArray[i3] = x * Math.cos(speed * 0.01) - z * Math.sin(speed * 0.01);
-            positionsArray[i3 + 2] = x * Math.sin(speed * 0.01) + z * Math.cos(speed * 0.01);
-
-            // Pulse out
-            // Reset if too far
-            // ... (simplified for performance)
-        }
-
-        points.current.geometry.attributes.position.needsUpdate = true;
-        points.current.rotation.y += 0.001 + vol * 0.01;
-    });
-
     return (
-        <points ref={points}>
-            <bufferGeometry>
-                <bufferAttribute
-                    attach="attributes-position"
-                    count={count}
-                    array={positions}
-                    itemSize={3}
-                />
-            </bufferGeometry>
-            <pointsMaterial
-                size={0.05}
-                color="#00ffff"
-                transparent
-                opacity={0.6}
-                blending={THREE.AdditiveBlending}
-            />
-        </points>
+        <div className="w-full h-full relative">
+            <Canvas
+                camera={{ position: [0, 0, 5], fov: 50 }}
+                gl={{
+                    antialias: false,
+                    powerPreference: "high-performance",
+                    alpha: true
+                }}
+                dpr={[1, 1.5]}
+                frameloop="always"
+                onCreated={(state) => {
+                    console.log('✨ Canvas WebGL context created');
+                    state.gl.setClearColor('#020617', 1);
+                }}
+            >
+                <ambientLight intensity={0.5} />
+                <OrbMesh dataRef={dataRef} />
+
                 <EffectComposer disableNormalPass>
                     <Bloom
                         luminanceThreshold={0.2}
@@ -289,8 +245,8 @@ const ParticleSystem = ({ dataRef }) => {
                         radius={0.6}
                     />
                 </EffectComposer>
-            </Canvas >
-        </div >
+            </Canvas>
+        </div>
     );
 });
 
