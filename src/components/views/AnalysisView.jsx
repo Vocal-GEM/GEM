@@ -7,6 +7,8 @@ import { historyService } from '../../utils/historyService';
 import { CoachEngine } from '../../utils/coachEngine';
 import PitchTrace from '../viz/PitchTrace';
 import VowelSpacePlot from '../viz/VowelSpacePlot';
+import VoiceRangeProfile from '../viz/VoiceRangeProfile';
+import Spectrogram from '../viz/Spectrogram';
 import Toast from '../ui/Toast';
 import AssessmentView from './AssessmentView';
 import { Info } from 'lucide-react';
@@ -107,6 +109,7 @@ const AnalysisView = () => {
     const [audioData, setAudioData] = useState(null);
     const [analysisResults, setAnalysisResults] = useState(null);
     const [activeTab, setActiveTab] = useState('transcript'); // 'transcript' | 'metrics' | 'viz' | 'coach'
+    const [vizSubTab, setVizSubTab] = useState('pitch'); // 'pitch' | 'resonance' | 'range' | 'spectrogram'
     const [currentPlayTime, setCurrentPlayTime] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
@@ -880,26 +883,77 @@ const AnalysisView = () => {
 
                             {activeTab === 'viz' && (
                                 <div className="space-y-6 animate-in fade-in duration-300">
-                                    <div>
-                                        <h3 className="font-bold text-lg mb-4">Pitch Contour</h3>
-                                        <PitchTrace
-                                            data={analysisResults.pitchSeries || []}
-                                            targetRange={targetRange}
-                                            currentTime={currentPlayTime}
-                                            duration={analysisResults.duration}
-                                        />
+                                    {/* Visualization Sub-Navigation */}
+                                    <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+                                        {[
+                                            { id: 'pitch', label: 'Pitch & Stability' },
+                                            { id: 'resonance', label: 'Resonance & Vowels' },
+                                            { id: 'range', label: 'Voice Range' },
+                                            { id: 'spectrogram', label: 'Spectrogram' }
+                                        ].map(sub => (
+                                            <button
+                                                key={sub.id}
+                                                onClick={() => setVizSubTab(sub.id)}
+                                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${vizSubTab === sub.id
+                                                    ? 'bg-blue-600 text-white'
+                                                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                                                    }`}
+                                            >
+                                                {sub.label}
+                                            </button>
+                                        ))}
                                     </div>
 
-                                    <div>
-                                        <h3 className="font-bold text-lg mb-4">Vowel Space (Resonance)</h3>
-                                        <VowelSpacePlot
-                                            f1={analysisResults.overall.formants?.f1}
-                                            f2={analysisResults.overall.formants?.f2}
-                                        />
-                                        <p className="text-xs text-slate-500 mt-2">
-                                            Shows your average resonance position relative to standard vowel targets.
-                                        </p>
-                                    </div>
+                                    {vizSubTab === 'pitch' && (
+                                        <div>
+                                            <h3 className="font-bold text-lg mb-4">Pitch Contour</h3>
+                                            <PitchTrace
+                                                data={analysisResults.pitchSeries || []}
+                                                targetRange={targetRange}
+                                                currentTime={currentPlayTime}
+                                                duration={analysisResults.duration}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {vizSubTab === 'resonance' && (
+                                        <div>
+                                            <h3 className="font-bold text-lg mb-4">Vowel Space (Resonance)</h3>
+                                            <VowelSpacePlot
+                                                f1={analysisResults.overall.formants?.f1}
+                                                f2={analysisResults.overall.formants?.f2}
+                                            />
+                                            <p className="text-xs text-slate-500 mt-2">
+                                                Shows your average resonance position relative to standard vowel targets.
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {vizSubTab === 'range' && (
+                                        <div>
+                                            <VoiceRangeProfile
+                                                isActive={isPlaying}
+                                                dataRef={analyzerRef} // Pass analyzer ref for live updates if needed, though we are in results mode
+                                                staticData={analysisResults.pitchSeries} // Pass full session data
+                                            />
+                                            <p className="text-xs text-slate-500 mt-2">
+                                                Phonetogram showing your pitch vs volume range. Brighter areas indicate more frequent usage.
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {vizSubTab === 'spectrogram' && (
+                                        <div>
+                                            <h3 className="font-bold text-lg mb-4">Spectrogram</h3>
+                                            <Spectrogram
+                                                audioRef={audioRef}
+                                                dataRef={analyzerRef}
+                                            />
+                                            <p className="text-xs text-slate-500 mt-2">
+                                                Visualizes frequency intensity over time. Play the audio to see the spectrogram scroll.
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 

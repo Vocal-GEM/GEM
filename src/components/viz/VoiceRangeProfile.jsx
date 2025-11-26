@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Maximize2, RotateCcw, Save } from 'lucide-react';
 
-const VoiceRangeProfile = ({ dataRef, isActive }) => {
+const VoiceRangeProfile = ({ dataRef, isActive, staticData }) => {
     const canvasRef = useRef(null);
     const [stats, setStats] = useState({
         minPitch: Infinity,
@@ -16,56 +16,90 @@ const VoiceRangeProfile = ({ dataRef, isActive }) => {
     // Key: "note_db", Value: count
     const gridRef = useRef(new Map());
 
+    // Range configuration
+    const minNote = 36; // C2
+    const maxNote = 84; // C6
+    const minDb = 40;
+    const maxDb = 110;
+
+    // Helper to process a single data point
+    const processPoint = (pitch, db) => {
+        if (pitch > 50 && db > minDb) {
+            const note = 12 * Math.log2(pitch / 440) + 69;
+
+            if (note >= minNote && note <= maxNote && db <= maxDb) {
+                const noteIdx = Math.floor(note);
+                const dbIdx = Math.floor(db);
+                const key = `${noteIdx}_${dbIdx}`;
+
+                const count = gridRef.current.get(key) || 0;
+                gridRef.current.set(key, count + 1);
+
+                return { pitch, db };
+            }
+        }
+        return null;
+    };
+
+    // Effect to handle static data loading
+    useEffect(() => {
+        if (staticData && staticData.length > 0) {
+            gridRef.current.clear();
+            let minP = Infinity, maxP = -Infinity, minD = Infinity, maxD = -Infinity;
+
+            staticData.forEach(point => {
+                // Ensure point has frequency and volume
+                if (point.frequency && point.volume) {
+                    const result = processPoint(point.frequency, point.volume);
+                    if (result) {
+                        minP = Math.min(minP, result.pitch);
+                        maxP = Math.max(maxP, result.pitch);
+                        minD = Math.min(minD, result.db);
+                        maxD = Math.max(maxD, result.db);
+                    }
+                }
+            });
+
+            if (minP !== Infinity) {
+                setStats({
+                    minPitch: minP,
+                    maxPitch: maxP,
+                    minDb: minD,
+                    maxDb: maxD,
+                    area: gridRef.current.size
+                });
+            }
+        }
+    }, [staticData]);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const width = canvas.width;
         const height = canvas.height;
 
-        // Range configuration
-        const minNote = 36; // C2
-        const maxNote = 84; // C6
-        const minDb = 40;
-        const maxDb = 110;
-
         let animationId;
 
         const draw = () => {
-            if (!dataRef.current) {
-                animationId = requestAnimationFrame(draw);
-                return;
-            }
+            // If we have static data, we don't need to loop for updates unless we want to support mixing both?
+            // For now, let's assume if isActive is true, we are in live mode.
 
-            const { pitch, volume } = dataRef.current; // volume is usually 0-1 or dB?
-            // Assuming volume is 0-1 linear amplitude, convert to dB
-            // 20 * log10(amp)
-            // But usually dataRef might have 'loudness' or 'decibels'
-            // Let's assume we calculate dB from volume
+            if (isActive && dataRef?.current) {
+                const { pitch, volume } = dataRef.current;
 
-            let db = -100;
-            if (volume > 0.001) {
-                db = 20 * Math.log10(volume) + 100; // Normalize: 0.001 -> 40dB, 1.0 -> 100dB approx
-            }
+                let db = -100;
+                if (volume > 0.001) {
+                    db = 20 * Math.log10(volume) + 100; // Normalize: 0.001 -> 40dB, 1.0 -> 100dB approx
+                }
 
-            // Update Grid if active and voicing
-            if (isActive && pitch > 50 && db > minDb) {
-                const note = 12 * Math.log2(pitch / 440) + 69;
-
-                if (note >= minNote && note <= maxNote && db <= maxDb) {
-                    const noteIdx = Math.floor(note);
-                    const dbIdx = Math.floor(db);
-                    const key = `${noteIdx}_${dbIdx}`;
-
-                    const count = gridRef.current.get(key) || 0;
-                    gridRef.current.set(key, count + 1);
-
-                    // Update stats
+                const result = processPoint(pitch, db);
+                if (result) {
                     setStats(prev => ({
-                        minPitch: Math.min(prev.minPitch, pitch),
-                        maxPitch: Math.max(prev.maxPitch, pitch),
-                        minDb: Math.min(prev.minDb, db),
-                        maxDb: Math.max(prev.maxDb, db),
-                        area: gridRef.current.size // Rough proxy for area
+                        minPitch: Math.min(prev.minPitch, result.pitch),
+                        maxPitch: Math.max(prev.maxPitch, result.pitch),
+                        minDb: Math.min(prev.minDb, result.db),
+                        maxDb: Math.max(prev.maxDb, result.db),
+                        area: gridRef.current.size
                     }));
                 }
             }
@@ -113,7 +147,7 @@ const VoiceRangeProfile = ({ dataRef, isActive }) => {
                 const y = height - ((d - minDb) / (maxDb - minDb)) * height;
 
                 // Color based on density/count
-                const intensity = Math.min(1, count / 50);
+                const intensity = Math.min(1, count / (staticData ? 5 : 50)); // Lower threshold for static data visibility
                 ctx.fillStyle = `rgba(59, 130, 246, ${0.3 + intensity * 0.7})`; // blue-500
 
                 // Draw cell (approx size)
@@ -123,15 +157,23 @@ const VoiceRangeProfile = ({ dataRef, isActive }) => {
             });
 
             // Draw Live Cursor
-            if (pitch > 50 && db > minDb) {
-                const note = 12 * Math.log2(pitch / 440) + 69;
-                const x = ((note - minNote) / (maxNote - minNote)) * width;
-                const y = height - ((db - minDb) / (maxDb - minDb)) * height;
+            if (isActive && dataRef?.current) {
+                const { pitch, volume } = dataRef.current;
+                let db = -100;
+                if (volume > 0.001) {
+                    db = 20 * Math.log10(volume) + 100;
+                }
 
-                ctx.beginPath();
-                ctx.arc(x, y, 4, 0, Math.PI * 2);
-                ctx.fillStyle = '#ef4444'; // red-500
-                ctx.fill();
+                if (pitch > 50 && db > minDb) {
+                    const note = 12 * Math.log2(pitch / 440) + 69;
+                    const x = ((note - minNote) / (maxNote - minNote)) * width;
+                    const y = height - ((db - minDb) / (maxDb - minDb)) * height;
+
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ef4444'; // red-500
+                    ctx.fill();
+                }
             }
 
             animationId = requestAnimationFrame(draw);
@@ -139,7 +181,7 @@ const VoiceRangeProfile = ({ dataRef, isActive }) => {
 
         draw();
         return () => cancelAnimationFrame(animationId);
-    }, [dataRef, isActive]);
+    }, [dataRef, isActive, staticData]);
 
     const handleReset = () => {
         gridRef.current.clear();

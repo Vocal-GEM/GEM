@@ -73,10 +73,20 @@ export class VoiceAnalyzer {
         for (let i = 0; i < samples.length - windowSize; i += windowSize) {
             const window = samples.slice(i, i + windowSize);
             const pitch = this.extractPitch(window, sampleRate);
+
+            // Calculate volume (dB) for this window
+            let sum = 0;
+            for (let j = 0; j < window.length; j++) {
+                sum += window[j] * window[j];
+            }
+            const rms = Math.sqrt(sum / window.length);
+            const db = 20 * Math.log10(rms + 1e-10);
+
             series.push({
                 time: i / sampleRate,
                 frequency: pitch ? pitch.mean : null,
-                confidence: pitch ? pitch.confidence : 0
+                confidence: pitch ? pitch.confidence : 0,
+                volume: db // Add volume in dB
             });
         }
         return series;
