@@ -1,5 +1,5 @@
 /**
- * Resonance Processor v5.2 - FFT-Based Formant Detection with Smoothing
+ * Resonance Processor v5.3 - FFT-Based Formant Detection with Smoothing & Shimmer
  * 
  * Changes:
  * - FFT-based spectral analysis
@@ -7,6 +7,7 @@
  * - Lenient vowel thresholds
  * - Added F1/F2 smoothing to reduce jitter
  * - Added hasValidF2 debug flag
+ * - Added Shimmer (Amplitude Perturbation)
  */
 
 class DSP {
@@ -144,6 +145,10 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         // Formant smoothing
         this.smoothedF1 = 0;
         this.smoothedF2 = 0;
+
+        // Shimmer smoothing
+        this.shimmerBuffer = [];
+        this.lastAmp = 0;
 
         this.port.onmessage = (event) => {
             if (event.data.type === 'config') {
@@ -299,6 +304,19 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             }
             this.lastPitch = pitch;
 
+            // FEATURE: SHIMMER (Amplitude Perturbation)
+            let shimmer = 0;
+            if (rms > 0 && this.lastAmp > 0) {
+                const diff = Math.abs(rms - this.lastAmp);
+                const avg = (rms + this.lastAmp) / 2;
+                const localShimmer = (diff / avg) * 100; // Percent
+
+                this.shimmerBuffer.push(localShimmer);
+                if (this.shimmerBuffer.length > 5) this.shimmerBuffer.shift();
+                shimmer = this.shimmerBuffer.reduce((a, b) => a + b, 0) / this.shimmerBuffer.length;
+            }
+            this.lastAmp = rms;
+
             // Smooth Formants
             if (!this.smoothedF1) this.smoothedF1 = p1.freq;
             if (!this.smoothedF2) this.smoothedF2 = p2.freq;
@@ -329,6 +347,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                     weight: avgWeight,
                     volume: rms,
                     jitter,
+                    shimmer,
                     vowel,
                     spectrum: spectrum,
                     debug: {
@@ -354,6 +373,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                     weight: 0,
                     volume: 0,
                     jitter: 0,
+                    shimmer: 0,
                     vowel: '',
                     spectrum: null,
                     debug: null

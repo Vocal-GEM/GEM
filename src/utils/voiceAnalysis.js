@@ -25,7 +25,14 @@ export class VoiceAnalyzer {
         const endSample = endTime ? Math.floor(endTime * sampleRate) : channelData.length;
         const segment = channelData.slice(startSample, endSample);
 
-        return this.analyzeFrame(segment, sampleRate);
+        const duration = segment.length / sampleRate;
+        const frameResults = this.analyzeFrame(segment, sampleRate);
+
+        return {
+            ...frameResults,
+            speechRate: this.calculateSpeechRate(segment, sampleRate, duration),
+            duration: duration
+        };
     }
 
     /**
@@ -35,15 +42,24 @@ export class VoiceAnalyzer {
      * @returns {Object} Voice metrics
      */
     analyzeFrame(frame, sampleRate) {
+        const formants = this.estimateFormants(frame, sampleRate);
+        const pitch = this.extractPitch(frame, sampleRate);
+
         return {
-            pitch: this.extractPitch(frame, sampleRate),
+            pitch: pitch,
             pitchSeries: this.extractPitchSeries(frame, sampleRate),
-            formants: this.estimateFormants(frame, sampleRate),
+            formants: formants,
+            avgFormantFreq: this.calculateAverageFormantFreq(formants),
             intensity: this.calculateIntensity(frame),
             spectral: this.calculateSpectralFeatures(frame, sampleRate),
             jitter: this.estimateJitter(frame, sampleRate),
+            shimmer: this.estimateShimmer(frame, sampleRate),
             hnr: this.estimateHNR(frame, sampleRate),
-            sibilance: this.calculateSibilance(frame, sampleRate)
+            cpps: this.calculateCPPS(frame, sampleRate),
+            sibilance: this.calculateSibilance(frame, sampleRate),
+            spi: this.calculateSPI(this.calculateSpectralFeatures(frame, sampleRate).spectrum, sampleRate),
+            spectralSlope: this.calculateSpectralSlope(this.calculateSpectralFeatures(frame, sampleRate).spectrum, sampleRate),
+            formantMismatch: pitch ? this.detectFormantMismatch(pitch.mean, formants.f2) : false
         };
     }
 
@@ -177,7 +193,8 @@ export class VoiceAnalyzer {
 
         return {
             centroid: centroid,
-            rolloff: rolloff
+            rolloff: rolloff,
+            spectrum: spectrum
         };
     }
 
@@ -381,6 +398,223 @@ export class VoiceAnalyzer {
         // Sort by magnitude and take top peaks
         peaks.sort((a, b) => b.magnitude - a.magnitude);
         return peaks.slice(0, numPeaks).map(p => p.freq).sort((a, b) => a - b);
+    }
+    /**
+     * Estimate Shimmer (Amplitude perturbation)
+     * Measures cycle-to-cycle variation in amplitude
+     */
+    estimateShimmer(samples, sampleRate) {
+        // We need pitch periods to measure cycle-to-cycle amplitude
+        // Simplified: Find peaks (approximate cycles) and measure their heights
+        const peaks = [];
+        const minDistance = Math.floor(sampleRate / 600); // Min period
+
+        for (let i = 1; i < samples.length - 1; i++) {
+            if (samples[i] > samples[i - 1] && samples[i] > samples[i + 1]) {
+                // Check if it's a significant peak (above zero and spaced out)
+                if (samples[i] > 0.01) {
+                    if (peaks.length === 0 || (i - peaks[peaks.length - 1].index) > minDistance) {
+                        peaks.push({ index: i, amp: samples[i] });
+                    } else if (samples[i] > peaks[peaks.length - 1].amp) {
+                        // Update if we found a higher peak in the same window
+                        peaks[peaks.length - 1] = { index: i, amp: samples[i] };
+                    }
+                }
+            }
+        }
+
+        if (peaks.length < 3) return null;
+
+        let sumDiff = 0;
+        let sumAmp = 0;
+
+        for (let i = 1; i < peaks.length; i++) {
+            const diff = Math.abs(peaks[i].amp - peaks[i - 1].amp);
+            sumDiff += diff;
+            sumAmp += peaks[i].amp;
+        }
+
+        const avgAmp = sumAmp / (peaks.length - 1); // Exclude first for sumAmp to match loop? No, use all involved
+        // Actually standard formula: sum(|A_i - A_{i+1}|) / (N-1) / (sum(A_i)/N)
+        // Let's use simple relative shimmer
+
+        if (avgAmp === 0) return 0;
+
+        // Shimmer (dB) = 20 * log10(avgAmp / (avgAmp - avgDiff)) ?? 
+        // Standard Shimmer (local, %) = (Average Absolute Difference / Average Amplitude) * 100
+        const shimmerPct = (sumDiff / (peaks.length - 1)) / avgAmp * 100;
+
+        // Convert to dB: 20 * log10(A_i / A_{i+1}) averaged... 
+        // Let's stick to percentage as requested in user doc (Shimmer %)
+
+        return shimmerPct;
+    }
+
+    /**
+     * Calculate Cepstral Peak Prominence (Smoothed) - CPPS
+     * A measure of breathiness/periodicity. Higher is better/clearer.
+     */
+    calculateCPPS(samples, sampleRate) {
+        // 1. Calculate Log Magnitude Spectrum
+        const fftSize = 2048;
+        const fft = this.performFFT(samples.slice(0, fftSize));
+        const logSpectrum = fft.map(c => Math.log(Math.sqrt(c.real * c.real + c.imag * c.imag) + 1e-10));
+
+        // 2. Calculate Cepstrum (IFFT of Log Spectrum)
+        // Since input is real and symmetric, we can just do FFT again (Real Cepstrum)
+        const cepstrumComplex = this.performFFT(logSpectrum);
+        const cepstrum = cepstrumComplex.map(c => c.real); // Real part of Cepstrum
+
+        // 3. Find peak in valid pitch range (quefrency)
+        // Pitch 75Hz - 600Hz
+        // Quefrency = sampleRate / frequency
+        const minQuef = Math.floor(sampleRate / 600);
+        const maxQuef = Math.floor(sampleRate / 75);
+
+        let maxPeak = -Infinity;
+        let peakIndex = 0;
+
+        for (let i = minQuef; i < Math.min(maxQuef, cepstrum.length / 2); i++) {
+            if (cepstrum[i] > maxPeak) {
+                maxPeak = cepstrum[i];
+                peakIndex = i;
+            }
+        }
+
+        // 4. Calculate Prominence (Peak minus regression line/average)
+        // Simplified: Peak minus local average
+        let sumSurround = 0;
+        let count = 0;
+        const window = 10;
+        for (let i = peakIndex - window; i <= peakIndex + window; i++) {
+            if (i >= 0 && i < cepstrum.length && i !== peakIndex) {
+                sumSurround += cepstrum[i];
+                count++;
+            }
+        }
+        const avgSurround = count > 0 ? sumSurround / count : 0;
+
+        const cpps = maxPeak - avgSurround;
+        return Math.max(0, cpps); // Ensure non-negative
+    }
+
+    /**
+     * Calculate Speech Rate (Syllables per second)
+     * Uses amplitude envelope peak detection
+     */
+    calculateSpeechRate(samples, sampleRate, duration) {
+        if (!duration || duration < 0.5) return 0; // Need some time
+
+        // 1. Get Amplitude Envelope (Smoothed RMS)
+        const windowSize = Math.floor(sampleRate * 0.05); // 50ms
+        const envelope = [];
+
+        for (let i = 0; i < samples.length; i += windowSize) {
+            let sum = 0;
+            for (let j = 0; j < windowSize && (i + j) < samples.length; j++) {
+                sum += samples[i + j] * samples[i + j];
+            }
+            envelope.push(Math.sqrt(sum / windowSize));
+        }
+
+        // 2. Count Peaks (Syllables)
+        let peaks = 0;
+        const threshold = 0.02; // Silence threshold
+        let inPeak = false;
+
+        for (let i = 1; i < envelope.length - 1; i++) {
+            if (envelope[i] > threshold) {
+                if (envelope[i] > envelope[i - 1] && envelope[i] > envelope[i + 1]) {
+                    // Local max
+                    if (!inPeak) {
+                        peaks++;
+                        inPeak = true;
+                    }
+                } else if (envelope[i] < threshold * 1.5) {
+                    // Dip between syllables
+                    inPeak = false;
+                }
+            } else {
+                inPeak = false;
+            }
+        }
+
+        return peaks / duration;
+    }
+
+    /**
+     * Calculate Average Formant Frequency
+     */
+    calculateAverageFormantFreq(formants) {
+        let sum = 0;
+        let count = 0;
+        if (formants.f1) { sum += formants.f1; count++; }
+        if (formants.f2) { sum += formants.f2; count++; }
+        if (formants.f3) { sum += formants.f3; count++; }
+
+        return count > 0 ? sum / count : 0;
+    }
+
+    /**
+     * Detect Formant Mismatch (High Pitch + Low Resonance)
+     */
+    detectFormantMismatch(pitch, f2) {
+        if (!pitch || !f2) return false;
+        // Example: Pitch > 180Hz (Fem) but F2 < 1500Hz (Masc/Dark)
+        return (pitch > 180 && f2 < 1500);
+    }
+
+    calculateSPI(spectrum, sampleRate) {
+        // Soft Phonation Index: Ratio of low freq energy to high freq energy
+        // Low: 70-1600 Hz, High: 1600-4500 Hz
+        if (!spectrum || spectrum.length === 0) return 0;
+
+        const binWidth = sampleRate / (2 * spectrum.length);
+        let lowEnergy = 0;
+        let highEnergy = 0;
+
+        for (let i = 0; i < spectrum.length; i++) {
+            const freq = i * binWidth;
+            const energy = spectrum[i] * spectrum[i]; // Power
+
+            if (freq >= 70 && freq <= 1600) {
+                lowEnergy += energy;
+            } else if (freq > 1600 && freq <= 4500) {
+                highEnergy += energy;
+            }
+        }
+
+        if (highEnergy === 0) return 0;
+        return lowEnergy / highEnergy;
+    }
+
+    calculateSpectralSlope(spectrum, sampleRate) {
+        // Spectral Slope: Linear regression of log-magnitude spectrum
+        // Returns slope in dB/octave or similar
+        if (!spectrum || spectrum.length === 0) return 0;
+
+        const binWidth = sampleRate / (2 * spectrum.length);
+        let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+        let n = 0;
+
+        for (let i = 1; i < spectrum.length; i++) { // Skip DC
+            const freq = i * binWidth;
+            if (freq > 8000) break; // Analyze up to 8kHz
+
+            const logFreq = Math.log10(freq);
+            const db = 20 * Math.log10(spectrum[i] + 1e-10);
+
+            sumX += logFreq;
+            sumY += db;
+            sumXY += logFreq * db;
+            sumXX += logFreq * logFreq;
+            n++;
+        }
+
+        if (n === 0) return 0;
+
+        const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+        return slope; // dB per decade (roughly)
     }
 }
 

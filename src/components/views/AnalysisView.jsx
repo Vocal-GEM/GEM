@@ -22,7 +22,7 @@ const MetricCard = ({ label, value, unit, status, description, details }) => {
     };
 
     return (
-        <div className="bg-slate-800/50 rounded-xl p-5 border border-slate-700/50 hover:border-slate-600 transition-all group">
+        <div className="bg-slate-800/50 rounded-xl p-5 border border-slate-700/50 hover:border-slate-600 transition-all group h-full flex flex-col">
             <div className="flex justify-between items-start mb-2">
                 <div className="text-sm font-medium text-slate-300">{label}</div>
                 <div className="group/info relative">
@@ -41,12 +41,12 @@ const MetricCard = ({ label, value, unit, status, description, details }) => {
             </div>
 
             {details && (
-                <div className="text-xs text-slate-500 bg-slate-900/50 py-1 px-2 rounded inline-block">
+                <div className="text-xs text-slate-500 bg-slate-900/50 py-1 px-2 rounded inline-block mb-2">
                     {details}
                 </div>
             )}
 
-            <div className="mt-3 text-xs text-slate-400 leading-relaxed border-t border-slate-700/50 pt-2">
+            <div className="mt-auto text-xs text-slate-400 leading-relaxed border-t border-slate-700/50 pt-2">
                 {description}
             </div>
         </div>
@@ -180,68 +180,76 @@ const AnalysisView = () => {
 
     const performAnalysis = async (recordingData) => {
         try {
+            setStatusMessage('Analyzing voice metrics...');
+
+            // 1. Run Local Acoustic Analysis FIRST (Robust, doesn't depend on cloud/model)
+            let overallMetrics = null;
+            try {
+                // Ensure analyzer is initialized
+                if (!analyzerRef.current && audioEngineRef.current?.audioContext) {
+                    analyzerRef.current = new VoiceAnalyzer(audioEngineRef.current.audioContext);
+                }
+
+                if (analyzerRef.current) {
+                    const arrayBuffer = await recordingData.blob.arrayBuffer();
+                    const audioBuffer = await audioEngineRef.current.audioContext.decodeAudioData(arrayBuffer);
+                    overallMetrics = analyzerRef.current.analyzeBuffer(audioBuffer);
+                }
+            } catch (analysisError) {
+                console.error("Local analysis failed:", analysisError);
+                // Continue to transcription, we might get metrics from backend
+            }
+
             setStatusMessage('Transcribing speech...');
 
-            // Try client-side transcription first
+            // 2. Try client-side transcription
             let transcription;
             try {
                 transcription = await transcriptionEngine.transcribe(recordingData.blob);
 
-                // If client-side returns empty text (common on some mobile devices), treat as failure
+                // If client-side returns empty text, treat as failure
                 if (!transcription || !transcription.text || transcription.text.trim() === '') {
                     console.warn('Client-side transcription returned empty text, attempting backend fallback');
                     setStatusMessage('Client-side model yielded no results. Connecting to cloud analysis...');
-                    await performBackendAnalysis(recordingData);
+                    await performBackendAnalysis(recordingData, overallMetrics);
                     return;
                 }
             } catch (clientError) {
                 console.warn('Client-side transcription failed, attempting backend fallback:', clientError);
                 setStatusMessage('Client-side model failed. Connecting to cloud analysis...');
-                await performBackendAnalysis(recordingData);
+                await performBackendAnalysis(recordingData, overallMetrics);
                 return;
             }
 
-            // Ensure analyzer is initialized for client-side metrics
-            if (!analyzerRef.current && audioEngineRef.current?.audioContext) {
-                analyzerRef.current = new VoiceAnalyzer(audioEngineRef.current.audioContext);
-            }
-
-            setStatusMessage('Analyzing voice metrics...');
-            const arrayBuffer = await recordingData.blob.arrayBuffer();
-            const audioBuffer = await audioEngineRef.current.audioContext.decodeAudioData(arrayBuffer);
-            const overallMetrics = analyzerRef.current.analyzeBuffer(audioBuffer);
-
+            // 3. Construct Results (Client-side success)
             const wordsWithMetrics = transcription.words.map(word => ({
                 ...word,
-                // We could add specific metrics per word here if we re-ran analysis on segments
-                // For now, we'll just keep the structure ready
                 metrics: {},
-                deviations: {} // Will be calculated later
+                deviations: {}
             }));
 
             const results = {
                 transcript: transcription?.text || 'Transcription unavailable',
                 words: wordsWithMetrics,
-                overall: overallMetrics,
-                duration: audioBuffer.duration,
+                overall: overallMetrics || {}, // Use local metrics
+                duration: overallMetrics?.duration || 0,
                 audioUrl: recordingData.url,
-                blob: recordingData.blob, // Keep blob for saving
-                pitchSeries: overallMetrics.pitchSeries // Pass pitch series
+                blob: recordingData.blob,
+                pitchSeries: overallMetrics?.pitchSeries || []
             };
 
             setAnalysisResults(results);
-            setCoachFeedback(null); // Reset coach feedback
+            setCoachFeedback(null);
             setMode('results');
 
         } catch (error) {
             console.error('Analysis error:', error);
-            // If even the fallback failed (or something else went wrong), show error
             showToast('Analysis failed: ' + error.message, 'error');
             setMode('record');
         }
     };
 
-    const performBackendAnalysis = async (recordingData) => {
+    const performBackendAnalysis = async (recordingData, localMetrics = null) => {
         try {
             const formData = new FormData();
             formData.append('audio', recordingData.blob, 'recording.wav');
@@ -259,21 +267,28 @@ const AnalysisView = () => {
             const data = await response.json();
 
             // Map backend response to expected format
+            // MERGE local metrics if available (they are likely more up-to-date with new features)
+            const mergedOverall = localMetrics ? {
+                ...data.overall,
+                ...localMetrics, // Local overrides backend
+                // Ensure pitch series is preserved/merged correctly
+                pitchSeries: localMetrics.pitchSeries || data.overall.pitch?.contour || []
+            } : {
+                ...data.overall,
+                pitchSeries: data.overall.pitch?.contour || []
+            };
+
             const results = {
                 transcript: data.transcript,
                 words: data.words.map(w => ({
                     ...w,
                     deviations: calculateDeviations(w.metrics, targetRange)
                 })),
-                overall: {
-                    ...data.overall,
-                    // Ensure pitch series is available for visualization
-                    pitchSeries: data.overall.pitch?.contour || []
-                },
+                overall: mergedOverall,
                 duration: data.duration,
                 audioUrl: recordingData.url,
                 blob: recordingData.blob,
-                pitchSeries: data.overall.pitch?.contour || []
+                pitchSeries: mergedOverall.pitchSeries
             };
 
             setAnalysisResults(results);
@@ -282,7 +297,7 @@ const AnalysisView = () => {
 
         } catch (error) {
             console.error('Backend analysis error:', error);
-            throw error; // Re-throw to be caught by main handler
+            throw error;
         }
     };
 
@@ -420,7 +435,7 @@ const AnalysisView = () => {
 
     return (
         <div className="min-h-screen bg-slate-950 text-white p-4 pb-24">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="flex justify-between items-start mb-6">
                     <div>
@@ -735,7 +750,7 @@ const AnalysisView = () => {
                                         </p>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                         {/* Pitch Metrics */}
                                         <MetricCard
                                             label="Average Pitch"
@@ -787,6 +802,77 @@ const AnalysisView = () => {
                                             description="Harmonics-to-Noise Ratio. Higher values mean a clearer voice with less breathiness or hoarseness."
                                             details="Target: > 15 dB"
                                         />
+
+                                        {/* Shimmer */}
+                                        <MetricCard
+                                            label="Amplitude Stability (Shimmer)"
+                                            value={analysisResults.overall.shimmer?.toFixed(2) || 'N/A'}
+                                            unit="%"
+                                            status={
+                                                !analysisResults.overall.shimmer ? 'neutral' :
+                                                    analysisResults.overall.shimmer > 3.8 ? 'warning' : 'good'
+                                            }
+                                            description="Measures how steady your volume is. Lower values mean a more stable voice."
+                                            details="Target: < 3.8%"
+                                        />
+
+                                        {/* CPPS */}
+                                        <MetricCard
+                                            label="Breathiness (CPPS)"
+                                            value={analysisResults.overall.cpps?.toFixed(1) || 'N/A'}
+                                            unit="dB"
+                                            status="neutral"
+                                            description="Cepstral Peak Prominence. Higher values indicate a clearer, more resonant voice."
+                                        />
+
+                                        {/* Speech Rate */}
+                                        <MetricCard
+                                            label="Speech Rate"
+                                            value={analysisResults.overall.speechRate?.toFixed(1) || 'N/A'}
+                                            unit="syl/s"
+                                            status="neutral"
+                                            description="How fast you are speaking. Normal conversation is usually 3-5 syllables per second."
+                                        />
+
+                                        {/* Avg Formant */}
+                                        <MetricCard
+                                            label="Avg Resonance"
+                                            value={analysisResults.overall.avgFormantFreq?.toFixed(0) || 'N/A'}
+                                            unit="Hz"
+                                            status="neutral"
+                                            description="Average of your formant frequencies. Higher average correlates with feminine perception."
+                                        />
+
+                                        {/* SPI */}
+                                        <MetricCard
+                                            label="Soft Phonation (SPI)"
+                                            value={analysisResults.overall.spi?.toFixed(2) || 'N/A'}
+                                            unit=""
+                                            status="neutral"
+                                            description="Soft Phonation Index. Higher values indicate a softer, breathier voice quality."
+                                        />
+
+                                        {/* Spectral Slope */}
+                                        <MetricCard
+                                            label="Spectral Slope"
+                                            value={analysisResults.overall.spectralSlope?.toFixed(1) || 'N/A'}
+                                            unit="dB/dec"
+                                            status="neutral"
+                                            description="How quickly energy drops off at higher frequencies. Steeper slope (more negative) sounds softer/flutier."
+                                        />
+
+                                        {/* Formant Mismatch Alert */}
+                                        {analysisResults.overall.formantMismatch && (
+                                            <div className="col-span-full bg-yellow-500/10 border border-yellow-500/50 rounded-xl p-4 flex items-start gap-3">
+                                                <Info className="w-5 h-5 text-yellow-400 mt-0.5" />
+                                                <div>
+                                                    <h4 className="font-bold text-yellow-400">Resonance Mismatch Detected</h4>
+                                                    <p className="text-sm text-yellow-200/80">
+                                                        Your pitch is high, but your resonance (formants) is relatively low. This can sometimes sound "hollow" or unnatural. Try brightening your resonance by smiling slightly or raising your tongue.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )}
