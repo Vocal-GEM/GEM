@@ -17,7 +17,7 @@ const LiveMetricsBar = ({ dataRef }) => {
         const id = requestAnimationFrame(loop); return () => cancelAnimationFrame(id);
     }, []);
     return (
-        <div className="glass-panel rounded-xl p-2 mb-2 flex justify-between text-[10px] font-mono text-blue-300">
+        <div className="glass-panel rounded-xl p-3 mb-4 flex justify-between text-xs font-mono text-blue-300">
             <span>F0: {metrics.f0 > 0 ? metrics.f0 : '--'}Hz</span>
             <span>F1: {metrics.f1}Hz</span>
             <span>F2: {metrics.f2}Hz</span>

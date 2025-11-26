@@ -29,7 +29,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     // Determine color based on pitch and gender ranges
     const getGenderColor = (pitch) => {
-        if (pitch >= genderRanges.feminine.min && pitch <= genderRanges.feminine.max) {
+        if (pitch >= genderRanges.feminine.min) {
             return {
                 primary: '#ec4899',
                 glow: 'rgba(236, 72, 153, 0.6)',

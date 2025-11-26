@@ -104,7 +104,7 @@ const MixingBoardView = ({ dataRef, audioEngine, calibration }) => {
                 pitch: { val: data.pitch, min: 50, max: 350 },
                 resonance: { val: resScore, min: 0, max: 1 },
                 weight: { val: data.weight, min: 0, max: 100 },
-                contour: { val: data.prosody?.variation || 0, min: 0, max: 1 },
+                contour: { val: data.prosody?.contour || 0, min: 0, max: 1 },
                 volume: { val: (data.volume || 0) * 100, min: 0, max: 100 }
             };
 

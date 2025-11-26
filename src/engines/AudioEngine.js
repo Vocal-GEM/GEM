@@ -130,9 +130,10 @@ export class AudioEngine {
         const validP = this.pitchBuffer.filter(p => p > 50 && p < 600);
         if (validP.length < 10) return { semitoneRange: 0, slopeDirection: 'flat' };
         let minP = Math.min(...validP); let maxP = Math.max(...validP); const stRange = MainDSP.hzToSemitones(maxP) - MainDSP.hzToSemitones(minP);
-        const recent = validP.slice(-20); if (recent.length < 5) return { semitoneRange: stRange, slopeDirection: 'flat' };
+        const contour = Math.min(1, stRange / 12); // Normalize 0-12 semitones to 0-1
+        const recent = validP.slice(-20); if (recent.length < 5) return { semitoneRange: stRange, slopeDirection: 'flat', contour };
         const first = recent[0]; const last = recent[recent.length - 1]; const diff = last - first; let direction = 'flat'; if (diff > 5) direction = 'rising'; if (diff < -5) direction = 'falling';
-        return { semitoneRange: stRange, slopeDirection: direction };
+        return { semitoneRange: stRange, slopeDirection: direction, contour };
     }
     playFeedbackTone(freq) { if (this.toneEngine) this.toneEngine.play(freq, 0.15, 'sine'); }
 

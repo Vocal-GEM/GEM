@@ -480,19 +480,31 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
         let label = 'Androgynous';
         let color = 'text-purple-400';
 
-        if (smoothedScore < 0.40) { // Relaxed from 0.35
-          label = 'Masculine';
-          color = 'text-blue-400';
-        } else if (smoothedScore > 0.60) { // Relaxed from 0.65
-          label = 'Feminine';
-          color = 'text-pink-400';
+        if (mode === 'fire') {
+          // Binary logic for Fire mode (No Androgynous)
+          if (smoothedScore < 0.5) {
+            label = 'Masculine';
+            color = 'text-blue-400';
+          } else {
+            label = 'Feminine';
+            color = 'text-pink-400';
+          }
+        } else {
+          // Ternary logic for Gem mode
+          if (smoothedScore < 0.40) {
+            label = 'Masculine';
+            color = 'text-blue-400';
+          } else if (smoothedScore > 0.60) {
+            label = 'Feminine';
+            color = 'text-pink-400';
+          }
         }
 
         setGenderPerception({ label, color });
       }
     }, 200);
     return () => clearInterval(interval);
-  }, [dataRef, calibration]);
+  }, [dataRef, calibration, mode]);
 
   return (
     <div className="w-full h-full relative group flex flex-col items-center justify-center">
@@ -502,7 +514,8 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
       <OrbLegend mode={mode} />
 
       {/* Controls */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 p-2 rounded-full bg-slate-900/50 backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      {/* Controls */}
+      <div className="absolute top-4 left-4 z-10 flex gap-2 p-2 rounded-full bg-slate-900/50 backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         {modes.map((m) => {
           const Icon = m.icon;
           const isActive = mode === m.id;
@@ -594,7 +607,7 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
       )}
 
       {/* Gender Perception Label */}
-      <div className="absolute bottom-16 left-0 right-0 text-center pointer-events-none">
+      <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
         <div className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Gender Perception</div>
         <div className={`text-lg font-bold ${genderPerception.color} transition-colors duration-300`}>
           {genderPerception.label}

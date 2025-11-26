@@ -200,7 +200,7 @@ const App = () => {
         <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-blue-500/30 pb-20">
             {/* Header */}
             <header className="p-4 pt-safe bg-slate-900/50 backdrop-blur-md sticky top-0 z-30 border-b border-white/5">
-                <div className="w-full max-w-6xl mx-auto flex justify-between items-center">
+                <div className="w-full max-w-[1600px] mx-auto flex justify-between items-center">
                     <div className="flex items-center gap-3" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
                         <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
                             <Mic className="w-5 h-5 text-white" />
@@ -223,7 +223,7 @@ const App = () => {
             </header>
 
             {/* Main Content */}
-            <main className={userMode === 'slp' ? "h-[calc(100vh-80px)]" : "p-4 max-w-6xl mx-auto"}>
+            <main className={userMode === 'slp' ? "h-[calc(100vh-80px)]" : "p-6 max-w-[1600px] mx-auto"}>
                 {activeTab === 'practice' && (
                     userMode === 'slp' ? (
                         <SLPDashboard dataRef={dataRef} audioEngine={audioEngineRef.current} />
@@ -250,11 +250,11 @@ const App = () => {
                                 ))}
                             </div>
 
-                            {/* Dashboard Grid */}
-                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                            {/* Dashboard Grid - 2x2 Layout for Top Section */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
 
-                                {/* LEFT COLUMN: Visualization (Orb) */}
-                                <div className="lg:col-span-5 flex flex-col">
+                                {/* 1. Top Left: Visualization (Orb) */}
+                                <div className="flex flex-col">
                                     {/* Dynamic Orb (Show All) or Legacy Resonance Orb (Resonance Tab) */}
                                     {practiceView === 'all' ? (
                                         <div key="dynamic-orb-container" className="h-80 lg:h-[500px] w-full mb-6 relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5">
@@ -271,11 +271,10 @@ const App = () => {
                                     {practiceView === 'all' && <LiveMetricsBar dataRef={dataRef} />}
                                 </div>
 
-                                {/* CENTER COLUMN: Analysis & Graphs */}
-                                <div className="lg:col-span-4 space-y-4">
-                                    {/* Pitch Visualizer */}
+                                {/* 2. Top Right: Pitch Tracking */}
+                                <div className="flex flex-col">
                                     {(practiceView === 'all' || practiceView === 'pitch') && (
-                                        <div>
+                                        <div className="h-80 lg:h-[500px] flex flex-col">
                                             <div className="flex justify-between items-center mb-2">
                                                 <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pitch Tracking</h3>
                                                 <div className="glass-panel-dark rounded-lg p-1 flex gap-1">
@@ -283,47 +282,51 @@ const App = () => {
                                                     <button onClick={() => setPitchViewMode('orb')} className={`px-3 py-1.5 rounded-md text-[10px] font-bold transition-all ${pitchViewMode === 'orb' ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`}>Orb</button>
                                                 </div>
                                             </div>
-                                            {pitchViewMode === 'graph' ? (
-                                                <PitchVisualizer dataRef={dataRef} targetRange={targetRange} userMode={userMode} exercise={activeGame} onScore={score => submitGameResult(activeGame, score)} settings={settings} />
-                                            ) : (
-                                                <PitchOrb dataRef={dataRef} settings={settings} />
-                                            )}
-                                        </div>
-                                    )}
-
-                                    {/* Voice Quality & Vowel Space */}
-                                    {(practiceView === 'all' || practiceView === 'weight' || practiceView === 'vowel') && (
-                                        <div className="space-y-4">
-                                            {(practiceView === 'all' || practiceView === 'weight') && <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />}
-                                            {(practiceView === 'all' || practiceView === 'vowel') && <VowelSpacePlot dataRef={dataRef} userMode={userMode} />}
+                                            <div className="flex-grow relative rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5">
+                                                {pitchViewMode === 'graph' ? (
+                                                    <PitchVisualizer dataRef={dataRef} targetRange={targetRange} userMode={userMode} exercise={activeGame} onScore={score => submitGameResult(activeGame, score)} settings={settings} />
+                                                ) : (
+                                                    <PitchOrb dataRef={dataRef} settings={settings} />
+                                                )}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
 
-                                {/* RIGHT COLUMN: Tools & Actions */}
-                                <div className="lg:col-span-3 space-y-4">
-                                    <div className="p-4 bg-slate-900/50 rounded-2xl border border-white/5">
-                                        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Quick Tools</h3>
-                                        <div className="grid grid-cols-1 gap-3">
-                                            <button onClick={() => setActiveTab('tools')} className="p-4 bg-slate-800 rounded-xl flex flex-row items-center gap-3 hover:bg-slate-700 transition-colors group">
-                                                <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all">
-                                                    <Wrench size={20} />
-                                                </div>
-                                                <span className="text-sm font-bold">All Tools</span>
-                                            </button>
-                                            <button onClick={() => setActiveTab('articulation')} className="p-4 bg-slate-800 rounded-xl flex flex-row items-center gap-3 hover:bg-slate-700 transition-colors group">
-                                                <div className="p-2 rounded-lg bg-pink-500/10 text-pink-400 group-hover:bg-pink-500 group-hover:text-white transition-all">
-                                                    <Mic size={20} />
-                                                </div>
-                                                <span className="text-sm font-bold">Articulation</span>
-                                            </button>
-                                            <button onClick={() => setShowCamera(!showCamera)} className={`p-4 rounded-xl flex flex-row items-center gap-3 transition-colors group ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 hover:bg-slate-700'}`}>
-                                                <div className={`p-2 rounded-lg transition-all ${showCamera ? 'bg-white/20 text-white' : 'bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white'}`}>
-                                                    <Camera size={20} />
-                                                </div>
-                                                <span className="text-sm font-bold">Mirror</span>
-                                            </button>
-                                        </div>
+                                {/* 3. Bottom Left: Voice Quality */}
+                                <div className="space-y-4 h-full min-h-[400px]">
+                                    {(practiceView === 'all' || practiceView === 'weight') && <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />}
+                                </div>
+
+                                {/* 4. Bottom Right: Vowel Space */}
+                                <div className="space-y-4 h-full min-h-[400px]">
+                                    {(practiceView === 'all' || practiceView === 'vowel') && <VowelSpacePlot dataRef={dataRef} userMode={userMode} />}
+                                </div>
+                            </div>
+
+                            {/* Full Width Tools Section */}
+                            <div className="w-full">
+                                <div className="p-6 bg-slate-900/50 rounded-2xl border border-white/5">
+                                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Quick Tools</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <button onClick={() => setActiveTab('tools')} className="p-4 bg-slate-800 rounded-xl flex flex-row items-center gap-3 hover:bg-slate-700 transition-colors group">
+                                            <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all">
+                                                <Wrench size={20} />
+                                            </div>
+                                            <span className="text-sm font-bold">All Tools</span>
+                                        </button>
+                                        <button onClick={() => setActiveTab('articulation')} className="p-4 bg-slate-800 rounded-xl flex flex-row items-center gap-3 hover:bg-slate-700 transition-colors group">
+                                            <div className="p-2 rounded-lg bg-pink-500/10 text-pink-400 group-hover:bg-pink-500 group-hover:text-white transition-all">
+                                                <Mic size={20} />
+                                            </div>
+                                            <span className="text-sm font-bold">Articulation</span>
+                                        </button>
+                                        <button onClick={() => setShowCamera(!showCamera)} className={`p-4 rounded-xl flex flex-row items-center gap-3 transition-colors group ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 hover:bg-slate-700'}`}>
+                                            <div className={`p-2 rounded-lg transition-all ${showCamera ? 'bg-white/20 text-white' : 'bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white'}`}>
+                                                <Camera size={20} />
+                                            </div>
+                                            <span className="text-sm font-bold">Mirror</span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -382,7 +385,7 @@ const App = () => {
 
             {/* Navigation */}
             < nav className="fixed bottom-0 inset-x-0 bg-slate-950/90 backdrop-blur-lg border-t border-white/5 pb-safe z-40" >
-                <div className="flex justify-around items-center p-2 max-w-6xl mx-auto">
+                <div className="flex justify-around items-center p-2 max-w-[1600px] mx-auto">
                     <button onClick={() => { setActiveTab('practice'); setActiveGame(null); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all relative ${activeTab === 'practice' ? 'text-teal-400' : 'text-slate-500 hover:text-slate-300'}`}>
                         <Mic2 className="w-6 h-6" />
                         <span className="text-[10px] font-bold">Practice</span>

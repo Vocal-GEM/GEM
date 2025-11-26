@@ -239,7 +239,7 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
     const label = userMode === 'slp' ? 'Fundamental Frequency (F0)' : 'Pitch';
 
     return (
-        <div className="glass-panel-dark rounded-2xl h-48 w-full mb-4 relative overflow-hidden shadow-lg group">
+        <div className="w-full h-full relative overflow-hidden group">
             <div className="absolute top-3 left-10 text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</div>
 
             {/* Zoom Controls */}

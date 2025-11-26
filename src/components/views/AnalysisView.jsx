@@ -180,13 +180,31 @@ const AnalysisView = () => {
 
     const performAnalysis = async (recordingData) => {
         try {
-            // Ensure analyzer is initialized
+            setStatusMessage('Transcribing speech...');
+
+            // Try client-side transcription first
+            let transcription;
+            try {
+                transcription = await transcriptionEngine.transcribe(recordingData.blob);
+
+                // If client-side returns empty text (common on some mobile devices), treat as failure
+                if (!transcription || !transcription.text || transcription.text.trim() === '') {
+                    console.warn('Client-side transcription returned empty text, attempting backend fallback');
+                    setStatusMessage('Client-side model yielded no results. Connecting to cloud analysis...');
+                    await performBackendAnalysis(recordingData);
+                    return;
+                }
+            } catch (clientError) {
+                console.warn('Client-side transcription failed, attempting backend fallback:', clientError);
+                setStatusMessage('Client-side model failed. Connecting to cloud analysis...');
+                await performBackendAnalysis(recordingData);
+                return;
+            }
+
+            // Ensure analyzer is initialized for client-side metrics
             if (!analyzerRef.current && audioEngineRef.current?.audioContext) {
                 analyzerRef.current = new VoiceAnalyzer(audioEngineRef.current.audioContext);
             }
-
-            setStatusMessage('Transcribing speech...');
-            const transcription = await transcriptionEngine.transcribe(recordingData.blob);
 
             setStatusMessage('Analyzing voice metrics...');
             const arrayBuffer = await recordingData.blob.arrayBuffer();
@@ -195,6 +213,10 @@ const AnalysisView = () => {
 
             const wordsWithMetrics = transcription.words.map(word => ({
                 ...word,
+                // We could add specific metrics per word here if we re-ran analysis on segments
+                // For now, we'll just keep the structure ready
+                metrics: {},
+                deviations: {} // Will be calculated later
             }));
 
             const results = {
@@ -213,8 +235,54 @@ const AnalysisView = () => {
 
         } catch (error) {
             console.error('Analysis error:', error);
+            // If even the fallback failed (or something else went wrong), show error
             showToast('Analysis failed: ' + error.message, 'error');
             setMode('record');
+        }
+    };
+
+    const performBackendAnalysis = async (recordingData) => {
+        try {
+            const formData = new FormData();
+            formData.append('audio', recordingData.blob, 'recording.wav');
+
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Backend analysis failed');
+            }
+
+            const data = await response.json();
+
+            // Map backend response to expected format
+            const results = {
+                transcript: data.transcript,
+                words: data.words.map(w => ({
+                    ...w,
+                    deviations: calculateDeviations(w.metrics, targetRange)
+                })),
+                overall: {
+                    ...data.overall,
+                    // Ensure pitch series is available for visualization
+                    pitchSeries: data.overall.pitch?.contour || []
+                },
+                duration: data.duration,
+                audioUrl: recordingData.url,
+                blob: recordingData.blob,
+                pitchSeries: data.overall.pitch?.contour || []
+            };
+
+            setAnalysisResults(results);
+            setCoachFeedback(null);
+            setMode('results');
+
+        } catch (error) {
+            console.error('Backend analysis error:', error);
+            throw error; // Re-throw to be caught by main handler
         }
     };
 
