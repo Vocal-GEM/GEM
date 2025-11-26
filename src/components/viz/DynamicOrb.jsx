@@ -75,9 +75,9 @@ void main() {
   vNormal = normal;
   
   // DRAMATIC Texture Change
-  // Low roughness (Dark) = Very low frequency (Smooth, liquid-like)
-  // High roughness (Bright) = High frequency (Jagged, crystal-like)
-  float noiseFreq = 0.5 + u_roughness * 6.0; 
+  // Low weight (Light) = Smooth, Glassy (Low roughness)
+  // High weight (Heavy) = Rough, Matte (High roughness)
+  float noiseFreq = 1.5 + u_roughness * 10.0; 
   
   // Speed
   float time = u_time * (0.1 + u_amplitude * 0.3);
@@ -86,21 +86,21 @@ void main() {
   float n2 = snoise(position * (noiseFreq * 1.5) - time);
   
   // Mix noise: 
-  // Low roughness -> Soft mix
-  // High roughness -> Hard, sharp mix
   float finalNoise = mix(n1, abs(n2) * 2.0 - 1.0, u_roughness);
   vNoise = finalNoise;
   
-  // Breathing
-  float breathe = 1.0 + u_amplitude * 0.2;
+  // Breathing (Volume affects Scale)
+  float breathe = 1.0 + u_amplitude * 0.4;
   
   // Displacement
-  // Low roughness -> Gentle waves
-  // High roughness -> Spiky crystals
-  float displacementStrength = 0.05 + u_amplitude * 0.3 + u_roughness * 0.2;
+  // KEEP IT SUBTLE! Too much displacement ruins the gem shape.
+  // Only displace when "Rough" (Heavy weight)
+  float displacementStrength = u_roughness * 0.2; 
   float displacement = finalNoise * displacementStrength;
   
+  // Apply breathing to position, and displacement along normal
   vec3 newPosition = position * breathe + normal * displacement;
+  
   vec4 mvPosition = modelViewMatrix * vec4(newPosition, 1.0);
   vViewPosition = -mvPosition.xyz;
   gl_Position = projectionMatrix * mvPosition;
@@ -113,6 +113,7 @@ uniform float u_pitch_norm;
 uniform float u_weight;
 uniform float u_intensity;
 uniform float u_resonance_norm;
+uniform float u_roughness;
 uniform float u_time;
 varying float vDisplacement;
 varying vec3 vNormal;
@@ -149,7 +150,8 @@ void main() {
   
   // Specular - Dual layer for "Bloom"
   // 1. Sharp, tight highlight (Core)
-  float specSharp = pow(max(dot(viewDir, reflectDir), 0.0), 80.0);
+  // High roughness (Heavy) -> Less sharp specular
+  float specSharp = pow(max(dot(viewDir, reflectDir), 0.0), 80.0 * (1.0 - u_roughness * 0.8));
   // 2. Broad, soft highlight (Bloom/Frost)
   float specSoft = pow(max(dot(viewDir, reflectDir), 0.0), 20.0) * 0.5;
   
@@ -175,14 +177,16 @@ void main() {
   // Composition
   vec3 finalColor = baseColor;
   
-  // Add dispersion sparkles
-  finalColor += refractColor * 0.8;
+  // Add dispersion sparkles (Less sparkles if rough/heavy)
+  finalColor += refractColor * 0.8 * (1.0 - u_roughness * 0.5);
   
   // Add sharp specular + bloom
-  finalColor += vec3(1.0) * spec * (1.5 + u_intensity);
+  // Resonance affects specular intensity (Bright = Sparkly, Dark = Dull)
+  float resBrightness = 0.5 + u_resonance_norm; // 0.5 to 1.5
+  finalColor += vec3(1.0) * spec * (1.5 + u_intensity) * resBrightness;
   
   // Add Fresnel rim
-  finalColor += baseColor * fresnel * 3.0; // Boosted Fresnel
+  finalColor += baseColor * fresnel * 3.0 * resBrightness; // Boosted Fresnel with Resonance
   
   // Add Resonance Glow (Pulse)
   // Pulse the resonance color with time for organic feel
@@ -190,10 +194,12 @@ void main() {
   finalColor = mix(finalColor, resonanceColor, resIntensity * 0.6 * pulse);
   
   // Inner brightness from volume
-  finalColor += finalColor * u_intensity;
+  // Resonance affects inner glow (Bright = Glowing, Dark = Dim)
+  finalColor += finalColor * u_intensity * (0.5 + u_resonance_norm);
 
   // Alpha - Frosted glass is slightly more opaque
-  float alpha = 0.85 + u_weight * 0.15;
+  // Heavy weight (Rough) -> More opaque/matte
+  float alpha = 0.85 + u_roughness * 0.15;
   
   gl_FragColor = vec4(finalColor, alpha);
 }
@@ -308,26 +314,28 @@ const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration }) => {
     uniforms.u_intensity.value = smoothedVol;
     uniforms.u_resonance_norm.value = smoothedResonanceNorm;
 
-    // Map Resonance to Roughness (Texture)
-    // Dark (0) -> Smooth (0.2)
-    // Bright (1) -> Rough/Faceted (0.8)
-    uniforms.u_roughness.value = 0.2 + smoothedResonanceNorm * 0.6;
+    // Map Weight to Roughness (Texture)
+    // Light (0) -> Smooth/Glassy (0.0)
+    // Heavy (1) -> Rough/Matte (1.0)
+    // Normalize weight (assuming 0-100 range from processor)
+    const weightNorm = Math.max(0, Math.min(1, weightVal / 100));
+    uniforms.u_roughness.value = weightNorm;
 
     // --- ORGANIC ANIMATION ---
     const time = state.clock.elapsedTime;
 
     // 1. Spinning Logic (Active vs Idle)
     // Base idle spin + Active spin based on volume
-    // Use smoothstep for transition
+    // Louder = Faster spin
     const idleSpeed = 0.2;
-    const activeSpeed = 2.0;
+    const activeSpeed = 8.0; // Much faster when loud
     const spinSpeed = THREE.MathUtils.lerp(idleSpeed, activeSpeed, smoothedVol);
 
     // Multi-axis rotation drift (Zero-gravity feel)
     // Using different prime frequencies for non-repetitive motion
     mesh.current.rotation.y += spinSpeed * delta;
-    mesh.current.rotation.x = Math.sin(time * 0.3) * 0.1 + (smoothedVol * 0.5); // Tilt when loud
-    mesh.current.rotation.z = Math.cos(time * 0.2) * 0.1;
+    mesh.current.rotation.x = 0.3; // Slight fixed tilt
+    mesh.current.rotation.z = 0;
 
     // 2. Floating/Bobbing (Composed Sine Waves)
     // Layer 1: Slow, large wave
@@ -342,7 +350,7 @@ const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration }) => {
   return (
     <mesh ref={mesh}>
       {mode === 'gem' ? (
-        <octahedronGeometry args={[1.8, 0]} /> // Low detail for sharp facets
+        <octahedronGeometry args={[2.0, 0]} /> // Classic 8-sided Gem shape
       ) : (
         <icosahedronGeometry args={[1.6, 30]} />
       )}
@@ -364,6 +372,7 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
   const [mode, setMode] = useState('gem');
   const [showDebug, setShowDebug] = useState(false);
   const [debugInfo, setDebugInfo] = useState(null);
+  const [genderPerception, setGenderPerception] = useState({ label: '—', color: 'text-slate-500' });
 
   const modes = [
     { id: 'gem', icon: Diamond, label: 'Gem' },
@@ -401,16 +410,95 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
           centroid: resonance?.toFixed(0) || '—',
           pitch: pitchVal > 0 ? pitchVal.toFixed(0) : '—',
           resScore: (resScore * 100).toFixed(0),
-          volume: ((volume || 0) * 100).toFixed(1)
+          volume: ((volume || 0) * 100).toFixed(1),
+          // Add raw scores for debugging
+          pScore: pitchScore.toFixed(2),
+          rScore: resScore.toFixed(2),
+          wScore: weightScore.toFixed(2),
+          tScore: currentScore.toFixed(2)
         });
       }
     }, 200);
+  }, [dataRef, calibration]);
 
+  // Gender Perception Logic
+  const scoreBuffer = useRef([]);
+  const silenceStart = useRef(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (dataRef.current) {
+        const { pitch, resonance, weight } = dataRef.current;
+
+        // Handle Silence / Invalid Pitch with Debounce
+        if (!pitch || pitch <= 0) {
+          if (!silenceStart.current) {
+            silenceStart.current = Date.now();
+          }
+
+          // If silence persists for > 1.5 seconds, reset
+          if (Date.now() - silenceStart.current > 1500) {
+            setGenderPerception({ label: '—', color: 'text-slate-500' });
+            scoreBuffer.current = []; // Clear buffer
+          }
+          return;
+        }
+
+        // Voice detected - reset silence timer
+        silenceStart.current = null;
+
+        // 1. Pitch Score (0 = Masc, 1 = Fem)
+        // < 130 = Masc, 130-175 = Andro, > 175 = Fem
+        let pitchScore = 0.5;
+        if (pitch < 130) pitchScore = 0.0 + (pitch / 130) * 0.35; // 0.0 - 0.35
+        else if (pitch < 175) pitchScore = 0.35 + ((pitch - 130) / 45) * 0.3; // 0.35 - 0.65
+        else pitchScore = 0.65 + Math.min(1, (pitch - 175) / 80) * 0.35; // 0.65 - 1.0
+
+        // 2. Resonance Score (0 = Masc, 1 = Fem)
+        let resScore = 0.5;
+        if (resonance && calibration) {
+          const { dark, bright } = calibration;
+          resScore = Math.max(0, Math.min(1, (resonance - dark) / (bright - dark)));
+        }
+
+        // 3. Weight Score (0 = Masc, 1 = Fem)
+        // Heavy (>60) = Masc, Light (<40) = Fem
+        // Weight is 0-100. Invert it: 100 -> 0, 0 -> 1
+        const weightVal = weight !== undefined ? weight : 50;
+        const weightScore = 1.0 - Math.max(0, Math.min(1, weightVal / 100));
+
+        // Average for this frame
+        const currentScore = (pitchScore + resScore + weightScore) / 3;
+
+        // Add to buffer (Keep last 10 frames = ~2 seconds at 200ms interval)
+        scoreBuffer.current.push(currentScore);
+        if (scoreBuffer.current.length > 10) scoreBuffer.current.shift();
+
+        // Calculate smoothed score
+        const smoothedScore = scoreBuffer.current.reduce((a, b) => a + b, 0) / scoreBuffer.current.length;
+
+        let label = 'Androgynous';
+        let color = 'text-purple-400';
+
+        if (smoothedScore < 0.40) { // Relaxed from 0.35
+          label = 'Masculine';
+          color = 'text-blue-400';
+        } else if (smoothedScore > 0.60) { // Relaxed from 0.65
+          label = 'Feminine';
+          color = 'text-pink-400';
+        }
+
+        setGenderPerception({ label, color });
+      }
+    }, 200);
     return () => clearInterval(interval);
-  }, [showDebug, dataRef, calibration]);
+  }, [dataRef, calibration]);
 
   return (
-    <div className="w-full h-full relative group">
+    <div className="w-full h-full relative group flex flex-col items-center justify-center">
+      <div className="absolute top-2 text-xs font-bold text-slate-500 uppercase tracking-widest z-10">
+        Dynamic Orb - Pitch, Resonance, Weight, & Volume
+      </div>
       <OrbLegend mode={mode} />
 
       {/* Controls */}
@@ -440,6 +528,7 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
       </div>
 
       <Canvas
+        className="w-full h-full"
         camera={{ position: [0, 0, 6], fov: 50 }}
         gl={{ antialias: true, powerPreference: "high-performance", alpha: true, preserveDrawingBuffer: false }}
         dpr={1}
@@ -471,6 +560,15 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
 
             <div className="text-slate-500">Volume</div>
             <div className="text-emerald-400 text-right">{debugInfo.volume}%</div>
+
+            <div className="col-span-2 border-t border-white/10 my-1"></div>
+
+            <div className="text-slate-500 text-[10px]">P/R/W Score</div>
+            <div className="text-white text-right text-[10px]">
+              {debugInfo.pScore} / {debugInfo.rScore} / {debugInfo.wScore}
+            </div>
+            <div className="text-slate-500 text-[10px]">Total</div>
+            <div className="text-white text-right text-[10px] font-bold">{debugInfo.tScore}</div>
           </div>
 
           {/* Resonance Gradient Slider */}
@@ -494,6 +592,14 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
           </div>
         </div>
       )}
+
+      {/* Gender Perception Label */}
+      <div className="absolute bottom-16 left-0 right-0 text-center pointer-events-none">
+        <div className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Gender Perception</div>
+        <div className={`text-lg font-bold ${genderPerception.color} transition-colors duration-300`}>
+          {genderPerception.label}
+        </div>
+      </div>
     </div>
   );
 });

@@ -26,6 +26,9 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
     // Label stability tracking
     const labelState = useRef({ current: "Listening...", candidate: "Listening...", count: 0 });
 
+    // History for sparklines
+    const historyRef = useRef([]);
+
     useEffect(() => {
         let frameCount = 0;
 
@@ -37,10 +40,15 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
                 // Map resonance (Hz) to 0-1 score based on calibration
                 // Dark (Low Hz) -> 0, Bright (High Hz) -> 1
                 let calculatedScore = 0.5;
-                if (resonance && calibration) {
+                if (calibration) {
                     const { dark, bright } = calibration;
-                    // Clamp and normalize
-                    calculatedScore = Math.max(0, Math.min(1, (resonance - dark) / (bright - dark)));
+
+                    historyRef.current.push({
+                        f1: f1 || 0,
+                        f2: f2 || 0,
+                        score: calculatedScore
+                    });
+                    if (historyRef.current.length > 50) historyRef.current.shift();
                 }
 
                 // Update debug display every 10 frames (~6 times/sec) to reduce flicker
@@ -59,7 +67,8 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
                         uiScore: (currentScore.current * 100)?.toFixed(0) || '—',
                         label: labelState.current.current,
                         peakCount: debug.peakCount !== undefined ? debug.peakCount : '—',
-                        smoothingMode: debug.smoothingMode || '—'
+                        smoothingMode: debug.smoothingMode || '—',
+                        history: [...historyRef.current] // Copy for render
                     });
                 }
 
@@ -96,38 +105,45 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
                     // Balanced -> Bright (blue to warm gold)
                     const t = (score - 0.5) * 2;
                     const r = Math.round(59 + (255 - 59) * t);
-                    let nextLabel = labelState.current.current;
+                    const g = Math.round(130 + (204 - 130) * t);
+                    const b = Math.round(246 + (21 - 246) * t);
+                    color = `rgb(${r}, ${g}, ${b})`;
+                }
 
-                    // Determine candidate label
-                    let candidate = "";
-                    if (!isVoiceActive && silenceTimer.current > 45) { // Increased wait for silence
-                        candidate = "Listening...";
-                    } else if (isVoiceActive || silenceTimer.current <= 45) {
-                        if (score < 0.35) candidate = "Dark";
-                        else if (score > 0.65) candidate = "Bright";
-                        else candidate = "Balanced";
-                    }
+                // Apply visual updates to orb
+                if (orbRef.current) {
+                    orbRef.current.style.backgroundColor = color;
+                    orbRef.current.style.boxShadow = `0 0 60px ${color}, 0 0 120px ${color}40`;
+                }
 
-                    // Debounce logic
-                    if (candidate === labelState.current.candidate) {
-                        labelState.current.count++;
-                    } else {
-                        labelState.current.candidate = candidate;
-                        labelState.current.count = 0;
-                    }
+                // Label Logic
+                let candidate = "";
+                if (!isVoiceActive && silenceTimer.current > 45) {
+                    candidate = "Listening...";
+                } else if (isVoiceActive || silenceTimer.current <= 45) {
+                    if (score < 0.35) candidate = "Dark";
+                    else if (score > 0.65) candidate = "Bright";
+                    else candidate = "Balanced";
+                }
 
-                    // Only switch if stable for 45 frames (~0.75s)
-                    if (labelState.current.count > 45) {
-                        nextLabel = candidate;
-                        labelState.current.current = nextLabel;
-                    }
+                if (candidate === labelState.current.candidate) {
+                    labelState.current.count++;
+                } else {
+                    labelState.current.candidate = candidate;
+                    labelState.current.count = 0;
+                }
 
-                    // Apply to DOM
+                let nextLabel = labelState.current.current;
+                if (labelState.current.count > 45) {
+                    nextLabel = candidate;
+                    labelState.current.current = nextLabel;
+                }
+
+                if (labelRef.current) {
                     if (labelRef.current.innerText !== nextLabel) {
                         labelRef.current.innerText = nextLabel;
                     }
 
-                    // Opacity handling
                     if (nextLabel === "Listening...") {
                         labelRef.current.style.opacity = "0.6";
                     } else {
@@ -142,6 +158,37 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
         return () => cancelAnimationFrame(id);
     }, [calibration, dataRef, showDebug]);
 
+    // Helper to render sparkline
+    const renderSparkline = (data, key, color, height = 30) => {
+        if (!data || data.length < 2) return null;
+        const max = Math.max(...data.map(d => d[key])) || 1;
+        const min = Math.min(...data.map(d => d[key])) || 0;
+        const range = max - min || 1;
+
+        const points = data.map((d, i) => {
+            const x = (i / (data.length - 1)) * 100;
+            const y = height - ((d[key] - min) / range) * height;
+            return `${x},${y}`;
+        }).join(' ');
+
+        return (
+            <div className="w-full h-8 relative border-b border-white/10 mt-1">
+                <svg className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                    <polyline
+                        points={points}
+                        fill="none"
+                        stroke={color}
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                </svg>
+                <div className="absolute top-0 right-0 text-[9px] text-slate-500">{max.toFixed(0)}</div>
+                <div className="absolute bottom-0 right-0 text-[9px] text-slate-500">{min.toFixed(0)}</div>
+            </div>
+        );
+    };
+
     return (
         <div className="relative flex flex-col items-center">
             {/* Main orb container */}
@@ -151,7 +198,11 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
                 <div
                     ref={orbRef}
                     className="w-32 h-32 rounded-full transition-all duration-150 z-10 relative"
-                    style={{ transitionProperty: 'transform, opacity' }}
+                    style={{
+                        transitionProperty: 'transform, opacity',
+                        backgroundColor: 'rgb(59, 130, 246)',
+                        boxShadow: '0 0 60px rgb(59, 130, 246), 0 0 120px rgba(59, 130, 246, 0.25)'
+                    }}
                 ></div>
 
                 <div
@@ -205,6 +256,15 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
 
                         <div>Mode:</div>
                         <div className="text-slate-400">{debugInfo.smoothingMode}</div>
+                    </div>
+
+                    {/* History Sparklines */}
+                    <div className="mt-4 pt-2 border-t border-slate-700">
+                        <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">F1 History</div>
+                        {renderSparkline(debugInfo.history, 'f1', '#4ade80')}
+
+                        <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1 mt-2">F2 History</div>
+                        {renderSparkline(debugInfo.history, 'f2', '#60a5fa')}
                     </div>
 
                     {/* Spectrum Scale */}

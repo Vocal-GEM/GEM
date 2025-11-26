@@ -1,11 +1,12 @@
 /**
- * Resonance Processor v3.9 - Deep Voice Fix + Weight Debug
+ * Resonance Processor v5.2 - FFT-Based Formant Detection with Smoothing
  * 
  * Changes:
- * - Lowered Peak Detection Min Freq to 70Hz (was 150Hz) to catch deep voice formants.
- * - Added Fallback Peak Detection: If no sharp peaks found, finds global max in range.
- * - Recalibrated Thresholds: Dark=400, Balanced=800, Bright=1500.
- * - Added H1/H2/Diff debug values for Vocal Weight.
+ * - FFT-based spectral analysis
+ * - Corrected frequency scaling formula
+ * - Lenient vowel thresholds
+ * - Added F1/F2 smoothing to reduce jitter
+ * - Added hasValidF2 debug flag
  */
 
 class DSP {
@@ -30,55 +31,6 @@ class DSP {
             output[i] = signal[i] * (0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (signal.length - 1)));
         }
         return output;
-    }
-
-    static autoCorrelate(signal, order) {
-        const r = new Float32Array(order + 1);
-        for (let lag = 0; lag <= order; lag++) {
-            let sum = 0;
-            for (let i = 0; i < signal.length - lag; i++) {
-                sum += signal[i] * signal[i + lag];
-            }
-            r[lag] = sum;
-        }
-        return r;
-    }
-
-    static levinsonDurbin(r, order) {
-        const a = new Float32Array(order + 1);
-        const e = new Float32Array(order + 1);
-        a[0] = 1.0;
-        e[0] = r[0];
-        for (let k = 1; k <= order; k++) {
-            let sum = 0;
-            for (let j = 1; j < k; j++) {
-                sum += a[j] * r[k - j];
-            }
-            const gamma = (r[k] - sum) / e[k - 1];
-            a[k] = gamma;
-            for (let j = 1; j < k; j++) {
-                a[j] = a[j] - gamma * a[k - j];
-            }
-            e[k] = e[k - 1] * (1 - gamma * gamma);
-        }
-        return a;
-    }
-
-    static getLPCSpectrum(a, nPoints, sampleRate) {
-        const spectrum = new Float32Array(nPoints);
-        const order = a.length - 1;
-        for (let i = 0; i < nPoints; i++) {
-            const freq = (i * sampleRate) / (2 * nPoints);
-            const omega = (2 * Math.PI * freq) / sampleRate;
-            let real = 1.0;
-            let imag = 0.0;
-            for (let k = 1; k <= order; k++) {
-                real -= a[k] * Math.cos(k * omega);
-                imag -= a[k] * Math.sin(k * omega);
-            }
-            spectrum[i] = 1.0 / Math.sqrt(real * real + imag * imag);
-        }
-        return spectrum;
     }
 
     static calculatePitchYIN(buffer, sampleRate) {
@@ -138,8 +90,29 @@ class DSP {
         return Math.sqrt(real * real + imag * imag);
     }
 
+    // Simple FFT for formant detection
+    static simpleFFT(signal) {
+        const N = signal.length;
+        const spectrum = new Float32Array(N / 2);
+
+        for (let k = 0; k < N / 2; k++) {
+            let real = 0;
+            let imag = 0;
+            for (let n = 0; n < N; n++) {
+                const angle = -2 * Math.PI * k * n / N;
+                real += signal[n] * Math.cos(angle);
+                imag += signal[n] * Math.sin(angle);
+            }
+            spectrum[k] = Math.sqrt(real * real + imag * imag);
+        }
+        return spectrum;
+    }
+
     static estimateVowel(f1, f2) {
-        if (f1 < 500 && f2 > 2000) return 'i';
+        // Safety: Don't detect vowels if formants are invalid
+        if (!f1 || !f2 || f1 === 0 || f2 === 0) return '';
+
+        if (f1 < 550 && f2 > 1900) return 'i';  // More lenient /i/ detection
         if (f1 > 600 && f2 < 1800 && f2 > 1200) return 'a';
         if (f1 < 500 && f2 < 1200) return 'u';
         if (f1 > 500 && f1 < 800 && f2 < 1200) return 'o';
@@ -167,6 +140,10 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         this.resonanceBuffer = [];
         this.lastResonance = 0;
         this.smoothedCentroid = 0;
+
+        // Formant smoothing
+        this.smoothedF1 = 0;
+        this.smoothedF2 = 0;
 
         this.port.onmessage = (event) => {
             if (event.data.type === 'config') {
@@ -204,49 +181,74 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         if (rms > this.threshold) {
             const TARGET_RATE = 11025;
             const dsBuffer = DSP.decimate(buffer, fs, TARGET_RATE);
-            const windowed = DSP.applyWindow(dsBuffer);
-            const lpcOrder = 14;
 
-            const r = DSP.autoCorrelate(windowed, lpcOrder);
-            const a = DSP.levinsonDurbin(r, lpcOrder);
-            const lpcSpec = DSP.getLPCSpectrum(a, 512, TARGET_RATE);
+            // Pre-emphasis for formant detection
+            const preEmphasized = new Float32Array(dsBuffer.length);
+            preEmphasized[0] = dsBuffer[0];
+            for (let i = 1; i < dsBuffer.length; i++) {
+                preEmphasized[i] = dsBuffer[i] - 0.97 * dsBuffer[i - 1];
+            }
 
+            const windowed = DSP.applyWindow(preEmphasized);
             const pitch = DSP.calculatePitchYIN(buffer, fs);
 
-            // 1. Spectral Centroid Calculation
+            // FFT-based formant detection
+            const spectrum = DSP.simpleFFT(windowed);
+
+            // Find formants by looking for spectral peaks
+            let formantCandidates = [];
+
+            for (let i = 2; i < spectrum.length - 2; i++) {
+                // Look for local maxima
+                if (spectrum[i] > spectrum[i - 1] && spectrum[i] > spectrum[i + 1] &&
+                    spectrum[i] > spectrum[i - 2] && spectrum[i] > spectrum[i + 2]) {
+
+                    // FIXED: Correct frequency scaling
+                    const freq = (i * TARGET_RATE) / (2 * spectrum.length);
+
+                    if (freq > 150 && freq < 4000) {
+                        formantCandidates.push({ freq, amp: spectrum[i] });
+                    }
+                }
+            }
+
+            // Sort by amplitude
+            formantCandidates.sort((a, b) => b.amp - a.amp);
+
+            // Assign F1 and F2
+            let p1 = { freq: 0, amp: 0 };
+            let p2 = { freq: 0, amp: 0 };
+
+            // F1: strongest peak in 200-1200Hz
+            for (let candidate of formantCandidates) {
+                if (candidate.freq >= 200 && candidate.freq <= 1200) {
+                    p1 = candidate;
+                    break;
+                }
+            }
+
+            // F2: strongest peak in 1000-3500Hz (must be > F1 + 300Hz)
+            for (let candidate of formantCandidates) {
+                if (candidate.freq >= Math.max(1000, p1.freq + 300) && candidate.freq <= 3500) {
+                    p2 = candidate;
+                    break;
+                }
+            }
+
+            // Spectral Centroid for resonance
             let sumFreq = 0;
             let sumAmp = 0;
-            for (let i = 0; i < lpcSpec.length; i++) {
-                const freq = (i * TARGET_RATE) / (2 * lpcSpec.length);
-                sumFreq += freq * lpcSpec[i];
-                sumAmp += lpcSpec[i];
+            for (let i = 0; i < spectrum.length; i++) {
+                // FIXED: Correct frequency scaling
+                const freq = (i * TARGET_RATE) / (2 * spectrum.length);
+                sumFreq += freq * spectrum[i];
+                sumAmp += spectrum[i];
             }
             const centroid = sumAmp > 0 ? sumFreq / sumAmp : 0;
 
             this.resonanceBuffer.push(centroid);
             if (this.resonanceBuffer.length > 5) this.resonanceBuffer.shift();
 
-            // 2. Formant Extraction
-            let p1 = { freq: 0, amp: -Infinity };
-            let p2 = { freq: 0, amp: -Infinity };
-            let p3 = { freq: 0, amp: -Infinity };
-
-            for (let i = 1; i < lpcSpec.length - 1; i++) {
-                if (lpcSpec[i] > lpcSpec[i - 1] && lpcSpec[i] > lpcSpec[i + 1]) {
-                    const freq = (i * TARGET_RATE) / (2 * lpcSpec.length);
-                    if (freq > 200 && freq < 1000 && lpcSpec[i] > p1.amp) {
-                        p2 = p1;
-                        p1 = { freq, amp: lpcSpec[i] };
-                    } else if (freq > 1000 && freq < 2500 && lpcSpec[i] > p2.amp) {
-                        p3 = p2;
-                        p2 = { freq, amp: lpcSpec[i] };
-                    } else if (freq > 2500 && freq < 4500 && lpcSpec[i] > p3.amp) {
-                        p3 = { freq, amp: lpcSpec[i] };
-                    }
-                }
-            }
-
-            // 3. Hybrid Resonance Metric
             const sorted = [...this.resonanceBuffer].sort((a, b) => a - b);
             const medianResonance = sorted[Math.floor(sorted.length / 2)];
 
@@ -258,7 +260,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             this.lastResonance = this.smoothedCentroid;
 
             // FEATURE: TRUE VOCAL WEIGHT (H1-H2 Harmonic Difference)
-            let weight = 50; // Default neutral (0-100 scale)
+            let weight = 50;
             let h1db = 0, h2db = 0, diffDb = 0;
 
             if (pitch > 50) {
@@ -270,8 +272,8 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                     h2db = 20 * Math.log10(h2Mag);
                     diffDb = h1db - h2db;
 
-                    const clampedDiff = Math.max(0, Math.min(15, diffDb));
-                    weight = (1.0 - (clampedDiff / 15.0)) * 100;
+                    const clampedDiff = Math.max(-5, Math.min(15, diffDb));
+                    weight = (1.0 - ((clampedDiff + 5) / 20.0)) * 100;
                 }
             }
 
@@ -297,24 +299,43 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             }
             this.lastPitch = pitch;
 
-            const vowel = DSP.estimateVowel(p1.freq, p2.freq);
+            // Smooth Formants
+            if (!this.smoothedF1) this.smoothedF1 = p1.freq;
+            if (!this.smoothedF2) this.smoothedF2 = p2.freq;
+
+            // Only smooth if we have valid values
+            if (p1.freq > 0) {
+                // Adaptive smoothing: less smoothing for large jumps (vowel changes), more for stability
+                const diff = Math.abs(p1.freq - this.smoothedF1);
+                const alpha = diff > 100 ? 0.3 : 0.1;
+                this.smoothedF1 = this.smoothedF1 * (1 - alpha) + p1.freq * alpha;
+            }
+
+            if (p2.freq > 0) {
+                const diff = Math.abs(p2.freq - this.smoothedF2);
+                const alpha = diff > 150 ? 0.3 : 0.1;
+                this.smoothedF2 = this.smoothedF2 * (1 - alpha) + p2.freq * alpha;
+            }
+
+            const vowel = DSP.estimateVowel(this.smoothedF1, this.smoothedF2);
 
             this.port.postMessage({
                 type: 'update',
                 data: {
                     pitch,
                     resonance: this.smoothedCentroid,
-                    f1: p1.freq,
-                    f2: p2.freq,
+                    f1: this.smoothedF1,
+                    f2: this.smoothedF2,
                     weight: avgWeight,
                     volume: rms,
                     jitter,
                     vowel,
-                    spectrum: lpcSpec,
+                    spectrum: spectrum,
                     debug: {
                         h1db: this.smoothedH1,
                         h2db: this.smoothedH2,
-                        diffDb: smoothedDiff
+                        diffDb: smoothedDiff,
+                        hasValidF2: p2.freq > 0
                     }
                 }
             });

@@ -1,0 +1,99 @@
+--- a/src/components/viz/ResonanceOrb.jsx
++++ b/src/components/viz/ResonanceOrb.jsx
+@@ -95,44 +95,59 @@
+                 } else {
+                     // Balanced -> Bright (blue to warm gold)
+                     const t = (score - 0.5) * 2;
+                     const r = Math.round(59 + (255 - 59) * t);
+-                    let nextLabel = labelState.current.current;
+-
+-                    // Determine candidate label
+-                    let candidate = "";
+-                    if (!isVoiceActive && silenceTimer.current > 45) { // Increased wait for silence
+-                        candidate = "Listening...";
+-                    } else if (isVoiceActive || silenceTimer.current <= 45) {
+-                        if (score < 0.35) candidate = "Dark";
+-                        else if (score > 0.65) candidate = "Bright";
+-                        else candidate = "Balanced";
+-                    }
+-
+-                    // Debounce logic
+-                    if (candidate === labelState.current.candidate) {
+-                        labelState.current.count++;
+-                    } else {
+-                        labelState.current.candidate = candidate;
+-                        labelState.current.count = 0;
+-                    }
+-
+-                    // Only switch if stable for 45 frames (~0.75s)
+-                    if (labelState.current.count > 45) {
+-                        nextLabel = candidate;
+-                        labelState.current.current = nextLabel;
+-                    }
+-
+-                    // Apply to DOM
+-                    if (labelRef.current.innerText !== nextLabel) {
+-                        labelRef.current.innerText = nextLabel;
+-                    }
+-
+-                    // Opacity handling
+-                    if (nextLabel === "Listening...") {
+-                        labelRef.current.style.opacity = "0.6";
+-                    } else {
+-                        labelRef.current.style.opacity = "1";
+-                    }
++                    const g = Math.round(130 + (204 - 130) * t);
++                    const b = Math.round(246 + (21 - 246) * t);
++                    color = `rgb(${r}, ${g}, ${b})`;
+                 }
++
++                // Apply visual updates to orb
++                if (orbRef.current) {
++                    orbRef.current.style.backgroundColor = color;
++                    orbRef.current.style.boxShadow = `0 0 60px ${color}, 0 0 120px ${color}40`;
++                }
++
++                // ============================================
++                // Label Logic
++                // ============================================
++                // Determine candidate label
++                let candidate = "";
++                if (!isVoiceActive && silenceTimer.current > 45) {
++                    candidate = "Listening...";
++                } else if (isVoiceActive || silenceTimer.current <= 45) {
++                    if (score < 0.35) candidate = "Dark";
++                    else if (score > 0.65) candidate = "Bright";
++                    else candidate = "Balanced";
++                }
++
++                // Debounce logic
++                if (candidate === labelState.current.candidate) {
++                    labelState.current.count++;
++                } else {
++                    labelState.current.candidate = candidate;
++                    labelState.current.count = 0;
++                }
++
++                // Only switch if stable for 45 frames (~0.75s)
++                let nextLabel = labelState.current.current;
++                if (labelState.current.count > 45) {
++                    nextLabel = candidate;
++                    labelState.current.current = nextLabel;
++                }
++
++                // Apply to label DOM
++                if (labelRef.current) {
++                    if (labelRef.current.innerText !== nextLabel) {
++                        labelRef.current.innerText = nextLabel;
++                    }
++
++                    // Opacity handling
++                    if (nextLabel === "Listening...") {
++                        labelRef.current.style.opacity = "0.6";
++                    } else {
++                        labelRef.current.style.opacity = "1";
++                    }
++                }
+             }
+             requestAnimationFrame(loop);
+         };

@@ -656,7 +656,7 @@ const PracticeMode = ({
                     setFeedback("Too Loud 🔊");
                     lastFeedbackTime.current = now;
                 }
-                else if (pitch > 0 && avgVol < 0.02 && now - lastFeedbackTime.current > 10000) {
+                else if (pitch > 0 && avgVol < 0.008 && now - lastFeedbackTime.current > 10000) {
                     speak("I can barely hear you. Please move closer to the microphone.");
                     setFeedback("Too Quiet 🔈");
                     lastFeedbackTime.current = now;

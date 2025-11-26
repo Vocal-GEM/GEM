@@ -17,13 +17,21 @@ const VowelSpacePlot = ({ f1, f2, dataRef }) => {
 
     const pointRef = React.useRef(null);
     const labelRef = React.useRef(null);
+    const [currentVowel, setCurrentVowel] = React.useState('');
+    const [currentF1, setCurrentF1] = React.useState(0);
+    const [currentF2, setCurrentF2] = React.useState(0);
 
     React.useEffect(() => {
         if (!dataRef) return;
 
         const loop = () => {
             if (pointRef.current && dataRef.current) {
-                const { f1: currentF1, f2: currentF2 } = dataRef.current;
+                const { f1: currentF1, f2: currentF2, vowel } = dataRef.current;
+
+                // Update state for vowel display
+                setCurrentVowel(vowel || '');
+                setCurrentF1(currentF1 || 0);
+                setCurrentF2(currentF2 || 0);
 
                 if (currentF1 && currentF2 && currentF1 > 0 && currentF2 > 0) {
                     pointRef.current.style.opacity = '1';
@@ -45,7 +53,26 @@ const VowelSpacePlot = ({ f1, f2, dataRef }) => {
 
     return (
         <div className="h-64 bg-slate-900 rounded-xl border border-slate-800 relative overflow-hidden">
-            <div className="absolute inset-0 p-4">
+            {/* Vowel Detection Display */}
+            <div className="absolute top-2 left-2 right-2 z-10 flex items-center justify-between">
+                <div className="glass-panel-dark px-3 py-2 rounded-lg">
+                    <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Detected Vowel</div>
+                    <div className={`text-xl font-bold transition-all ${currentVowel ? 'text-teal-400 animate-pulse' : 'text-slate-600'
+                        }`}>
+                        {currentVowel ? `/${currentVowel}/` : '—'}
+                    </div>
+                </div>
+                <div className="glass-panel-dark px-3 py-2 rounded-lg text-right">
+                    <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Formants</div>
+                    <div className="text-xs font-mono text-slate-300">
+                        F1: <span className="text-pink-400 font-bold">{currentF1 > 0 ? currentF1.toFixed(0) : '—'}</span> Hz
+                    </div>
+                    <div className="text-xs font-mono text-slate-300">
+                        F2: <span className="text-blue-400 font-bold">{currentF2 > 0 ? currentF2.toFixed(0) : '—'}</span> Hz
+                    </div>
+                </div>
+            </div>
+            <div className="absolute inset-0 p-4 pt-20">
                 {/* Grid & Labels */}
                 <div className="w-full h-full border-l border-b border-slate-700 relative">
                     <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-slate-500">

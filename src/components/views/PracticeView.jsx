@@ -15,7 +15,7 @@ import VoiceRangeProfile from '../viz/VoiceRangeProfile';
 import MPTTracker from '../viz/MPTTracker';
 import SZRatio from '../viz/SZRatio';
 import IntonationTrainer from '../viz/IntonationTrainer';
-import DailyGoalsWidget from '../ui/DailyGoalsWidget';
+
 
 const PracticeView = () => {
     const {
@@ -33,19 +33,7 @@ const PracticeView = () => {
     // Mobile Ergonomics: Controls at bottom
     return (
         <div className="h-[calc(100vh-140px)] flex flex-col relative">
-            {/* Top Section: Goals & Incognito */}
-            <div className="shrink-0 mb-4 flex justify-between items-start">
-                <div className="flex-1 mr-4">
-                    <DailyGoalsWidget goals={goals} compact={true} />
-                </div>
-                <button
-                    onClick={() => useGem().setIncognito(true)}
-                    className="p-2 rounded-full hover:bg-white/10 text-slate-500 hover:text-white transition-colors"
-                    title="Incognito Mode"
-                >
-                    <EyeOff className="w-5 h-5" />
-                </button>
-            </div>
+
 
             {/* Hero Section: Resonance Orb */}
             <div className="flex-1 relative flex items-center justify-center min-h-[300px]">

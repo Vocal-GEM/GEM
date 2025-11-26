@@ -1,4 +1,4 @@
-import { pipeline } from '@xenova/transformers';
+import { pipeline, env } from '@xenova/transformers';
 
 class TranscriptionEngine {
     constructor() {
@@ -13,10 +13,17 @@ class TranscriptionEngine {
         this.isLoading = true;
         try {
             console.log('Loading Whisper model...');
+            // Disable local models to force fetching from Hugging Face Hub
+            // This prevents 404s on local files returning HTML (which causes JSON.parse error)
+            env.allowLocalModels = false;
+
             this.pipe = await pipeline('automatic-speech-recognition', this.modelName);
             console.log('Whisper model loaded successfully');
         } catch (error) {
             console.error('Failed to load Whisper model:', error);
+            if (error.message.includes('JSON.parse') || error.message.includes('unexpected character')) {
+                throw new Error('Failed to load speech model. Please check your internet connection.');
+            }
             throw error;
         } finally {
             this.isLoading = false;
@@ -74,7 +81,7 @@ class TranscriptionEngine {
 
                 chunkWords.forEach((word, index) => {
                     words.push({
-                        word: word,
+                        text: word,
                         start: start + (index * timePerWord),
                         end: start + ((index + 1) * timePerWord)
                     });
@@ -84,7 +91,7 @@ class TranscriptionEngine {
             // Fallback if chunks aren't present
             const text = output.text.trim();
             words.push({
-                word: text,
+                text: text,
                 start: 0,
                 end: 0 // Unknown duration
             });

@@ -9,6 +9,93 @@ import PitchTrace from '../viz/PitchTrace';
 import VowelSpacePlot from '../viz/VowelSpacePlot';
 import Toast from '../ui/Toast';
 import AssessmentView from './AssessmentView';
+import { Info } from 'lucide-react';
+
+const MetricCard = ({ label, value, unit, status, description, details }) => {
+    const getStatusColor = () => {
+        switch (status) {
+            case 'good': return 'text-green-400';
+            case 'warning': return 'text-yellow-400';
+            case 'bad': return 'text-red-400';
+            default: return 'text-blue-400';
+        }
+    };
+
+    return (
+        <div className="bg-slate-800/50 rounded-xl p-5 border border-slate-700/50 hover:border-slate-600 transition-all group">
+            <div className="flex justify-between items-start mb-2">
+                <div className="text-sm font-medium text-slate-300">{label}</div>
+                <div className="group/info relative">
+                    <Info className="w-4 h-4 text-slate-500 hover:text-blue-400 cursor-help" />
+                    <div className="absolute right-0 w-48 p-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-300 shadow-xl opacity-0 group-hover/info:opacity-100 transition-opacity pointer-events-none z-10">
+                        {description}
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex items-baseline gap-1 mb-2">
+                <div className={`text-2xl font-bold ${getStatusColor()}`}>
+                    {value}
+                </div>
+                <div className="text-sm text-slate-500 font-medium">{unit}</div>
+            </div>
+
+            {details && (
+                <div className="text-xs text-slate-500 bg-slate-900/50 py-1 px-2 rounded inline-block">
+                    {details}
+                </div>
+            )}
+
+            <div className="mt-3 text-xs text-slate-400 leading-relaxed border-t border-slate-700/50 pt-2">
+                {description}
+            </div>
+        </div>
+    );
+};
+
+const generateAnalysisSummary = (results, targetRange) => {
+    if (!results || !results.overall) return "Insufficient data for summary.";
+
+    const { pitch, jitter, hnr } = results.overall;
+    const parts = [];
+
+    // Pitch analysis
+    if (pitch && pitch.mean) {
+        if (targetRange) {
+            if (pitch.mean < targetRange.min) {
+                parts.push(`Your average pitch (${pitch.mean.toFixed(0)} Hz) is lower than your target range.`);
+            } else if (pitch.mean > targetRange.max) {
+                parts.push(`Your average pitch (${pitch.mean.toFixed(0)} Hz) is higher than your target range.`);
+            } else {
+                parts.push(`Great job! Your pitch (${pitch.mean.toFixed(0)} Hz) is right within your target range.`);
+            }
+        } else {
+            parts.push(`Your average pitch is ${pitch.mean.toFixed(0)} Hz.`);
+        }
+    }
+
+    // Stability analysis
+    if (jitter) {
+        if (jitter < 1.0) {
+            parts.push("Your voice is very stable and clear.");
+        } else if (jitter < 2.0) {
+            parts.push("There is some slight instability or 'wobble' in your pitch.");
+        } else {
+            parts.push("Your pitch shows significant fluctuation, which might sound like vocal fry or unsteadiness.");
+        }
+    }
+
+    // Quality analysis
+    if (hnr) {
+        if (hnr > 20) {
+            parts.push("You have excellent vocal clarity.");
+        } else if (hnr < 12) {
+            parts.push("Your voice sounds a bit breathy or hoarse.");
+        }
+    }
+
+    return parts.join(" ") || "Keep practicing to generate more data!";
+};
 
 const AnalysisView = () => {
     const { audioEngineRef, targetRange, settings } = useGem();
@@ -93,43 +180,25 @@ const AnalysisView = () => {
 
     const performAnalysis = async (recordingData) => {
         try {
-            // Convert blob to AudioBuffer
-            setStatusMessage('Processing audio...');
-            const audioBuffer = await audioEngineRef.current.blobToAudioBuffer(recordingData.blob);
-
-            // Get transcription
-            setStatusMessage('Transcribing speech (this may take a moment)...');
-            const transcription = await transcriptionEngine.transcribe(recordingData.blob);
-
-            if (!transcription || !transcription.text) {
-                throw new Error('Transcription failed to produce text');
+            // Ensure analyzer is initialized
+            if (!analyzerRef.current && audioEngineRef.current?.audioContext) {
+                analyzerRef.current = new VoiceAnalyzer(audioEngineRef.current.audioContext);
             }
 
-            // Analyze overall metrics
-            setStatusMessage('Calculating voice metrics...');
+            setStatusMessage('Transcribing speech...');
+            const transcription = await transcriptionEngine.transcribe(recordingData.blob);
+
+            setStatusMessage('Analyzing voice metrics...');
+            const arrayBuffer = await recordingData.blob.arrayBuffer();
+            const audioBuffer = await audioEngineRef.current.audioContext.decodeAudioData(arrayBuffer);
             const overallMetrics = analyzerRef.current.analyzeBuffer(audioBuffer);
 
-            // Analyze each word
-            const wordsWithMetrics = transcription.words.map(word => {
-                const wordMetrics = analyzerRef.current.analyzeBuffer(
-                    audioBuffer,
-                    word.start,
-                    word.end
-                );
+            const wordsWithMetrics = transcription.words.map(word => ({
+                ...word,
+            }));
 
-                // Calculate deviations from target
-                const deviations = calculateDeviations(wordMetrics, targetRange);
-
-                return {
-                    ...word,
-                    metrics: wordMetrics,
-                    deviations: deviations
-                };
-            });
-
-            // Prepare results
             const results = {
-                transcript: transcription.text,
+                transcript: transcription?.text || 'Transcription unavailable',
                 words: wordsWithMetrics,
                 overall: overallMetrics,
                 duration: audioBuffer.duration,
@@ -530,93 +599,130 @@ const AnalysisView = () => {
                             {activeTab === 'transcript' && (
                                 <div className="space-y-4 animate-in fade-in duration-300">
                                     <h3 className="font-bold text-lg mb-4">Color-Coded Transcript</h3>
-                                    <div className="text-lg leading-relaxed">
-                                        {analysisResults.words.map((word, i) => (
-                                            <span
-                                                key={i}
-                                                onClick={() => handleWordClick(word)}
-                                                className={`${getWordColor(word.deviations)} cursor-pointer hover:underline transition-colors mr-2 ${currentPlayTime >= word.start && currentPlayTime <= word.end
-                                                    ? 'font-bold underline'
-                                                    : ''
-                                                    }`}
-                                                title={`Pitch: ${word.metrics.pitch?.mean?.toFixed(1) || 'N/A'} Hz`}
-                                            >
-                                                {word.text}
-                                            </span>
-                                        ))}
-                                    </div>
+                                    {analysisResults.words.length > 0 ? (
+                                        <>
+                                            <div className="text-lg leading-relaxed">
+                                                {analysisResults.words.map((word, i) => (
+                                                    <span
+                                                        key={i}
+                                                        onClick={() => handleWordClick(word)}
+                                                        className={`${getWordColor(word.deviations)} cursor-pointer hover:underline transition-colors mr-2 ${currentPlayTime >= word.start && currentPlayTime <= word.end
+                                                            ? 'font-bold underline'
+                                                            : ''
+                                                            }`}
+                                                        title={`Pitch: ${word.metrics.pitch?.mean?.toFixed(1) || 'N/A'} Hz`}
+                                                    >
+                                                        {word.text}
+                                                    </span>
+                                                ))}
+                                            </div>
 
-                                    {/* Legend */}
-                                    <div className="mt-6 pt-4 border-t border-slate-800">
-                                        <div className="text-sm text-slate-400 mb-2">Color Legend:</div>
-                                        <div className="flex flex-wrap gap-4 text-sm">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-4 h-4 bg-green-400 rounded"></div>
-                                                <span>Within target (±5%)</span>
+                                            {/* Legend */}
+                                            <div className="mt-6 pt-4 border-t border-slate-800">
+                                                <div className="text-sm text-slate-400 mb-2">Color Legend:</div>
+                                                <div className="flex flex-wrap gap-4 text-sm">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-4 h-4 bg-green-400 rounded"></div>
+                                                        <span>Within target (±5%)</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-4 h-4 bg-yellow-400 rounded"></div>
+                                                        <span>Minor deviation (5-15%)</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-4 h-4 bg-orange-400 rounded"></div>
+                                                        <span>Moderate deviation (15-25%)</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-4 h-4 bg-red-400 rounded"></div>
+                                                        <span>Significant deviation ({'>'} 25%)</span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-4 h-4 bg-yellow-400 rounded"></div>
-                                                <span>Minor deviation (5-15%)</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-4 h-4 bg-orange-400 rounded"></div>
-                                                <span>Moderate deviation (15-25%)</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-4 h-4 bg-red-400 rounded"></div>
-                                                <span>Significant deviation ({'>'}25%)</span>
-                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="text-slate-400 bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+                                            <p className="mb-2">
+                                                <strong>Transcript:</strong> {analysisResults.transcript}
+                                            </p>
+                                            <p className="text-sm text-slate-500 mt-4">
+                                                Word-level analysis is unavailable. The transcription model could not be loaded.
+                                                You can still view overall voice metrics in the other tabs.
+                                            </p>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             )}
 
                             {activeTab === 'metrics' && (
-                                <div className="grid grid-cols-2 gap-4 animate-in fade-in duration-300">
-                                    {/* Pitch Metrics */}
-                                    <div className="bg-slate-800/50 rounded-xl p-4">
-                                        <div className="text-sm text-slate-400 mb-1">Average Pitch</div>
-                                        <div className="text-3xl font-bold text-blue-400">
-                                            {analysisResults.overall.pitch?.mean?.toFixed(1) || 'N/A'} Hz
-                                        </div>
-                                        {targetRange && (
-                                            <div className="text-xs text-slate-500 mt-1">
-                                                Target: {targetRange.min}-{targetRange.max} Hz
-                                            </div>
-                                        )}
+                                <div className="space-y-6 animate-in fade-in duration-300">
+                                    {/* Analysis Summary */}
+                                    <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 border border-slate-700 shadow-lg">
+                                        <h3 className="flex items-center gap-2 font-bold text-lg mb-3 text-white">
+                                            <Sparkles className="w-5 h-5 text-yellow-400" />
+                                            Analysis Summary
+                                        </h3>
+                                        <p className="text-slate-300 leading-relaxed">
+                                            {generateAnalysisSummary(analysisResults, targetRange)}
+                                        </p>
                                     </div>
 
-                                    {/* Formants */}
-                                    <div className="bg-slate-800/50 rounded-xl p-4">
-                                        <div className="text-sm text-slate-400 mb-1">Resonance (F1/F2)</div>
-                                        <div className="text-2xl font-bold text-purple-400">
-                                            {analysisResults.overall.formants?.f1?.toFixed(0) || 'N/A'} / {analysisResults.overall.formants?.f2?.toFixed(0) || 'N/A'} Hz
-                                        </div>
-                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {/* Pitch Metrics */}
+                                        <MetricCard
+                                            label="Average Pitch"
+                                            value={analysisResults.overall.pitch?.mean?.toFixed(1) || 'N/A'}
+                                            unit="Hz"
+                                            status={
+                                                !analysisResults.overall.pitch?.mean ? 'neutral' :
+                                                    targetRange && (analysisResults.overall.pitch.mean < targetRange.min || analysisResults.overall.pitch.mean > targetRange.max)
+                                                        ? 'warning'
+                                                        : 'good'
+                                            }
+                                            description="How high or low your voice sounds. Higher values are more feminine, lower values are more masculine."
+                                            details={targetRange ? `Target: ${targetRange.min}-${targetRange.max} Hz` : null}
+                                        />
 
-                                    {/* Jitter */}
-                                    <div className="bg-slate-800/50 rounded-xl p-4">
-                                        <div className="text-sm text-slate-400 mb-1">Jitter</div>
-                                        <div className="text-2xl font-bold text-green-400">
-                                            {analysisResults.overall.jitter?.toFixed(2) || 'N/A'}%
-                                        </div>
-                                        <div className="text-xs text-slate-500 mt-1">
-                                            Normal: {'<'}1%
-                                        </div>
-                                    </div>
+                                        {/* Formants */}
+                                        <MetricCard
+                                            label="Resonance (F1/F2)"
+                                            value={`${analysisResults.overall.formants?.f1?.toFixed(0) || 'N/A'} / ${analysisResults.overall.formants?.f2?.toFixed(0) || 'N/A'}`}
+                                            unit="Hz"
+                                            status="neutral"
+                                            description="The 'brightness' or 'darkness' of your voice. Higher resonance typically sounds brighter and more feminine."
+                                            details="F1: Throat size / F2: Tongue position"
+                                        />
 
-                                    {/* HNR */}
-                                    <div className="bg-slate-800/50 rounded-xl p-4">
-                                        <div className="text-sm text-slate-400 mb-1">Voice Quality (HNR)</div>
-                                        <div className="text-2xl font-bold text-yellow-400">
-                                            {analysisResults.overall.hnr?.toFixed(1) || 'N/A'} dB
-                                        </div>
-                                        <div className="text-xs text-slate-500 mt-1">
-                                            Normal: {'>'}15 dB
-                                        </div>
+                                        {/* Jitter */}
+                                        <MetricCard
+                                            label="Pitch Stability (Jitter)"
+                                            value={analysisResults.overall.jitter?.toFixed(2) || 'N/A'}
+                                            unit="%"
+                                            status={
+                                                !analysisResults.overall.jitter ? 'neutral' :
+                                                    analysisResults.overall.jitter > 1.5 ? 'bad' :
+                                                        analysisResults.overall.jitter > 1.0 ? 'warning' : 'good'
+                                            }
+                                            description="Measures how steady your pitch is. Lower values mean a clearer voice."
+                                            details="Target: < 1.0%"
+                                        />
+
+                                        {/* HNR */}
+                                        <MetricCard
+                                            label="Voice Quality (HNR)"
+                                            value={analysisResults.overall.hnr?.toFixed(1) || 'N/A'}
+                                            unit="dB"
+                                            status={
+                                                !analysisResults.overall.hnr ? 'neutral' :
+                                                    analysisResults.overall.hnr < 15 ? 'warning' : 'good'
+                                            }
+                                            description="Harmonics-to-Noise Ratio. Higher values mean a clearer voice with less breathiness or hoarseness."
+                                            details="Target: > 15 dB"
+                                        />
                                     </div>
                                 </div>
                             )}
+
 
                             {activeTab === 'viz' && (
                                 <div className="space-y-6 animate-in fade-in duration-300">

@@ -109,7 +109,7 @@ const VoiceQualityMeter = ({ dataRef, userMode }) => {
                         <div className="mt-1 flex gap-2">
                             <span className="text-blue-400 font-medium">&gt;10dB = Airy</span>
                             <span className="text-slate-600">•</span>
-                            <span className="text-red-400 font-medium">&lt;3dB = Pressed</span>
+                            <span className="text-red-400 font-medium">&lt;0dB = Pressed</span>
                         </div>
                     </div>
                 </div>
