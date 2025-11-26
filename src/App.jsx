@@ -6,6 +6,65 @@ import { useProfile } from './context/ProfileContext';
 import { useStats } from './context/StatsContext';
 import { useJournal } from './context/JournalContext';
 
+// Icons
+import { Mic, Mic2, Camera, ArrowLeft, Wrench, Bot, BarChart2, Activity, Gamepad2 } from 'lucide-react';
+
+// Components - UI
+import OfflineIndicator from './components/ui/OfflineIndicator';
+import FeedbackSettings from './components/ui/FeedbackSettings';
+import MigrationModal from './components/ui/MigrationModal';
+import TutorialWizard from './components/ui/TutorialWizard';
+import CompassWizard from './components/ui/CompassWizard';
+import CalibrationWizard from './components/ui/CalibrationWizard';
+import JournalForm from './components/ui/JournalForm';
+import Login from './components/ui/Login';
+import Signup from './components/ui/Signup';
+import UserProfile from './components/ui/UserProfile';
+import VocalHealthTips from './components/ui/VocalHealthTips';
+import AssessmentModule from './components/ui/AssessmentModule';
+import WarmUpModule from './components/ui/WarmUpModule';
+import ForwardFocusDrill from './components/ui/ForwardFocusDrill';
+import IncognitoScreen from './components/ui/IncognitoScreen';
+import FloatingCamera from './components/ui/FloatingCamera';
+import AchievementPopup from './components/ui/AchievementPopup';
+import AudioLibrary from './components/ui/AudioLibrary';
+import IntonationExercise from './components/ui/IntonationExercise';
+import ComparisonTool from './components/ui/ComparisonTool';
+import PitchPipe from './components/ui/PitchPipe';
+import BreathPacer from './components/ui/BreathPacer';
+import MirrorComponent from './components/ui/MirrorComponent';
+import CoachView from './components/ui/CoachView';
+import HistoryView from './components/ui/HistoryView';
+
+// Components - Views
+import SLPDashboard from './components/views/SLPDashboard';
+import PracticeMode from './components/views/PracticeMode';
+import MixingBoardView from './components/views/MixingBoardView';
+import AnalysisView from './components/views/AnalysisView';
+import ArticulationView from './components/views/ArticulationView';
+
+// Components - Visualizations
+import DynamicOrb from './components/viz/DynamicOrb';
+import ResonanceOrb from './components/viz/ResonanceOrb';
+import LiveMetricsBar from './components/viz/LiveMetricsBar';
+import PitchVisualizer from './components/viz/PitchVisualizer';
+import PitchOrb from './components/viz/PitchOrb';
+import VoiceQualityMeter from './components/viz/VoiceQualityMeter';
+import VowelSpacePlot from './components/viz/VowelSpacePlot';
+import HighResSpectrogram from './components/viz/HighResSpectrogram';
+import Spectrogram from './components/viz/Spectrogram';
+
+// Components - Games
+import GameHub from './components/games/GameHub';
+import FlappyVoiceGame from './components/games/FlappyVoiceGame';
+import ResonanceRiverGame from './components/games/ResonanceRiverGame';
+import CloudHopperGame from './components/games/CloudHopperGame';
+import StaircaseGame from './components/games/StaircaseGame';
+import PitchMatchGame from './components/games/PitchMatchGame';
+
+// Services
+import { gamificationService } from './services/GamificationService';
+
 const App = () => {
     const {
         isAudioActive,
@@ -79,6 +138,11 @@ const App = () => {
     const [showMigration, setShowMigration] = useState(true);
     const [practiceView, setPracticeView] = useState('all'); // all, pitch, resonance, weight, vowel
     const [pitchViewMode, setPitchViewMode] = useState('graph'); // graph or orb
+
+    // Helper function for updating user mode
+    const updateUserMode = (newMode) => {
+        setUserMode(newMode);
+    };
 
     // Initialize Gamification
     useEffect(() => {
