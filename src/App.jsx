@@ -199,24 +199,26 @@ const App = () => {
     return (
         <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-blue-500/30 pb-20">
             {/* Header */}
-            <header className="p-4 pt-safe flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0 z-30 border-b border-white/5">
-                <div className="flex items-center gap-3" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                        <Mic className="w-5 h-5 text-white" />
+            <header className="p-4 pt-safe bg-slate-900/50 backdrop-blur-md sticky top-0 z-30 border-b border-white/5">
+                <div className="w-full max-w-md mx-auto flex justify-between items-center">
+                    <div className="flex items-center gap-3" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
+                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                            <Mic className="w-5 h-5 text-white" />
+                        </div>
+                        <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Vocal GEM</h1>
                     </div>
-                    <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Vocal GEM</h1>
-                </div>
-                <div className="flex items-center gap-2">
-                    <OfflineIndicator />
-                    <button onClick={() => setShowSettings(true)} className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700">
-                        <span className="text-sm font-bold text-white">⚙️ Settings</span>
-                    </button>
-                    <button onClick={() => user ? setShowProfile(true) : setShowLogin(true)} className="w-10 h-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors">
-                        <span className="text-lg">👤</span>
-                    </button>
-                    <button onClick={() => setShowCamera(!showCamera)} className={`w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transition-colors ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
-                        <Camera className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <OfflineIndicator />
+                        <button onClick={() => setShowSettings(true)} className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700">
+                            <span className="text-sm font-bold text-white">⚙️ Settings</span>
+                        </button>
+                        <button onClick={() => user ? setShowProfile(true) : setShowLogin(true)} className="w-10 h-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors">
+                            <span className="text-lg">👤</span>
+                        </button>
+                        <button onClick={() => setShowCamera(!showCamera)} className={`w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transition-colors ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
+                            <Camera className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -293,25 +295,25 @@ const App = () => {
                                 {userMode === 'slp' && <Spectrogram dataRef={dataRef} />}
                                 {/* Voice Quality & Vowel Space */}
                                 {(practiceView === 'all' || practiceView === 'weight' || practiceView === 'vowel') && (
-                                    <div className={practiceView === 'all' ? "grid grid-cols-2 gap-4" : "w-full"}>
+                                    <div className={practiceView === 'all' ? "grid grid-cols-1 gap-4" : "w-full"}>
                                         {(practiceView === 'all' || practiceView === 'weight') && <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />}
                                         {(practiceView === 'all' || practiceView === 'vowel') && <VowelSpacePlot dataRef={dataRef} userMode={userMode} />}
                                     </div>
                                 )}
                             </div>
                             {/* Bottom Buttons */}
-                            <div className="mt-6 grid grid-cols-2 gap-3">
-                                <button onClick={() => setActiveTab('tools')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
+                            <div className="mt-6 grid grid-cols-1 gap-3">
+                                <button onClick={() => setActiveTab('tools')} className="p-4 bg-slate-800 rounded-2xl flex flex-row items-center justify-center gap-3 hover:bg-slate-700 transition-colors">
                                     <Wrench className="text-purple-400" />
-                                    <span className="text-xs font-bold">Tools</span>
+                                    <span className="text-sm font-bold">Tools</span>
                                 </button>
-                                <button onClick={() => setActiveTab('articulation')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
+                                <button onClick={() => setActiveTab('articulation')} className="p-4 bg-slate-800 rounded-2xl flex flex-row items-center justify-center gap-3 hover:bg-slate-700 transition-colors">
                                     <Mic className="text-pink-400" />
-                                    <span className="text-xs font-bold">Articulation</span>
+                                    <span className="text-sm font-bold">Articulation</span>
                                 </button>
-                                <button onClick={() => setShowCamera(!showCamera)} className={`p-4 rounded-2xl flex flex-col items-center gap-2 transition-colors ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 hover:bg-slate-700'}`}>
+                                <button onClick={() => setShowCamera(!showCamera)} className={`p-4 rounded-2xl flex flex-row items-center justify-center gap-3 transition-colors ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 hover:bg-slate-700'}`}>
                                     <Camera className={showCamera ? "text-white" : "text-cyan-400"} />
-                                    <span className="text-xs font-bold">Mirror</span>
+                                    <span className="text-sm font-bold">Mirror</span>
                                 </button>
                             </div>
                         </div>
@@ -414,9 +416,27 @@ const App = () => {
                 }}
             />
             {showMigration && <MigrationModal onComplete={() => setShowMigration(false)} />}
+
+            {/* Onboarding Wizards */}
+            {(showTutorial || showCompass || showCalibration) && (
+                <button
+                    onClick={() => {
+                        localStorage.setItem('gem_tutorial_seen', 'true');
+                        localStorage.setItem('gem_compass_seen', 'true');
+                        localStorage.setItem('gem_calibration_done', 'true');
+                        setShowTutorial(false);
+                        setShowCompass(false);
+                        setShowCalibration(false);
+                    }}
+                    className="fixed top-4 right-4 z-[60] px-4 py-2 bg-slate-800/80 backdrop-blur-md text-slate-400 hover:text-white text-xs font-bold uppercase tracking-wider rounded-full border border-white/10 hover:bg-slate-700 transition-all"
+                >
+                    Skip Setup
+                </button>
+            )}
+
             {showTutorial && <TutorialWizard onComplete={handleTutorialComplete} onSkip={() => { setShowTutorial(false); setShowCompass(true); }} />}
             {!showTutorial && showCompass && <CompassWizard onComplete={handleCompassComplete} />}
-            {showCalibration && <CalibrationWizard onComplete={handleCalibrationComplete} audioEngine={audioEngineRef} />}
+            {showCalibration && <CalibrationWizard onComplete={handleCalibrationComplete} onSkip={handleCalibrationComplete} audioEngine={audioEngineRef} />}
             {
                 showJournalForm && (
                     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">

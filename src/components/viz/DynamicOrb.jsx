@@ -73,14 +73,33 @@ varying vec3 vViewPosition;
 void main() {
   vUv = uv;
   vNormal = normal;
-  float noiseFreq = 0.5 + u_roughness * 2.0;
+  
+  // DRAMATIC Texture Change
+  // Low roughness (Dark) = Very low frequency (Smooth, liquid-like)
+  // High roughness (Bright) = High frequency (Jagged, crystal-like)
+  float noiseFreq = 0.5 + u_roughness * 6.0; 
+  
+  // Speed
   float time = u_time * (0.1 + u_amplitude * 0.3);
+  
   float n1 = snoise(position * noiseFreq + time);
-  float n2 = snoise(position * (noiseFreq * 2.0) - time);
-  float finalNoise = mix(n1, abs(n2) * 2.0 - 1.0, u_roughness * 0.7);
+  float n2 = snoise(position * (noiseFreq * 1.5) - time);
+  
+  // Mix noise: 
+  // Low roughness -> Soft mix
+  // High roughness -> Hard, sharp mix
+  float finalNoise = mix(n1, abs(n2) * 2.0 - 1.0, u_roughness);
   vNoise = finalNoise;
+  
+  // Breathing
   float breathe = 1.0 + u_amplitude * 0.2;
-  float displacement = finalNoise * (0.1 + u_amplitude * 0.5);
+  
+  // Displacement
+  // Low roughness -> Gentle waves
+  // High roughness -> Spiky crystals
+  float displacementStrength = 0.05 + u_amplitude * 0.3 + u_roughness * 0.2;
+  float displacement = finalNoise * displacementStrength;
+  
   vec3 newPosition = position * breathe + normal * displacement;
   vec4 mvPosition = modelViewMatrix * vec4(newPosition, 1.0);
   vViewPosition = -mvPosition.xyz;
@@ -94,77 +113,93 @@ uniform float u_pitch_norm;
 uniform float u_weight;
 uniform float u_intensity;
 uniform float u_resonance_norm;
+uniform float u_time;
 varying float vDisplacement;
 varying vec3 vNormal;
 varying float vNoise;
 varying vec3 vViewPosition;
 
 void main() {
-  vec3 colorDeep = vec3(0.0, 0.5, 0.6);
-  vec3 colorMasc = vec3(0.0, 1.0, 1.0);
-  vec3 colorFem = vec3(0.8, 0.2, 1.0);
-  vec3 colorBright = vec3(1.0, 0.3, 0.9);
+  // Color Palette - Deep, Rich Gem Tones
+  vec3 colorDeep = vec3(0.02, 0.05, 0.2); // Deep Sapphire
+  vec3 colorMasc = vec3(0.0, 0.6, 0.8); // Blue Topaz
+  vec3 colorFem = vec3(0.8, 0.0, 0.6); // Rubellite
+  vec3 colorBright = vec3(0.9, 0.7, 0.9); // Pink Diamond
 
   vec3 baseColor;
   if (u_pitch_norm < 0.33) baseColor = mix(colorDeep, colorMasc, u_pitch_norm * 3.0);
   else if (u_pitch_norm < 0.66) baseColor = mix(colorMasc, colorFem, (u_pitch_norm - 0.33) * 3.0);
   else baseColor = mix(colorFem, colorBright, (u_pitch_norm - 0.66) * 3.0);
 
+  // Faceting: ALWAYS use flat face normals for that "cut gem" look
   vec3 fdx = dFdx(vViewPosition);
   vec3 fdy = dFdy(vViewPosition);
   vec3 faceNormal = normalize(cross(fdx, fdy));
-  vec3 finalNormal = normalize(mix(vNormal, faceNormal, 0.85));
+  vec3 finalNormal = faceNormal; // Hard facets
 
   vec3 viewDir = normalize(cameraPosition - vViewPosition);
+  
+  // Fresnel - Sharp and glass-like
+  // Enhanced for "Frosted Glass" look - wider rim
   float fresnel = pow(1.0 - abs(dot(finalNormal, viewDir)), 2.5);
+  
+  // Lighting
   vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
   vec3 reflectDir = reflect(-lightDir, finalNormal);
-  float spec1 = pow(max(dot(viewDir, reflectDir), 0.0), 64.0);
-  vec3 lightDir2 = normalize(vec3(-0.5, 1.0, 0.5));
-  vec3 reflectDir2 = reflect(-lightDir2, finalNormal);
-  float spec2 = pow(max(dot(viewDir, reflectDir2), 0.0), 32.0);
-  float subsurface = pow(max(dot(-viewDir, finalNormal), 0.0), 2.0);
   
-  // Resonance-based lighting
-  // Dark resonance (< 0.35) = Blue light
-  // Bright resonance (> 0.65) = Pink light
-  // Balanced (0.35-0.65) = Minimal resonance lighting
-  vec3 resonanceLight = vec3(0.0);
-  float resonanceIntensity = 0.0;
+  // Specular - Dual layer for "Bloom"
+  // 1. Sharp, tight highlight (Core)
+  float specSharp = pow(max(dot(viewDir, reflectDir), 0.0), 80.0);
+  // 2. Broad, soft highlight (Bloom/Frost)
+  float specSoft = pow(max(dot(viewDir, reflectDir), 0.0), 20.0) * 0.5;
   
-  if (u_resonance_norm < 0.35) {
-    // Dark resonance - Blue light
-    float darkAmount = (0.35 - u_resonance_norm) / 0.35;
-    resonanceIntensity = darkAmount * u_intensity * 2.5;
-    resonanceLight = vec3(0.2, 0.5, 1.0) * resonanceIntensity;
-  } else if (u_resonance_norm > 0.65) {
-    // Bright resonance - Pink light
-    float brightAmount = (u_resonance_norm - 0.65) / 0.35;
-    resonanceIntensity = brightAmount * u_intensity * 2.5;
-    resonanceLight = vec3(1.0, 0.3, 0.7) * resonanceIntensity;
+  float spec = specSharp + specSoft;
+  
+  // Internal Reflection / Refraction simulation (Fake Dispersion)
+  // We offset the view direction slightly for R, G, B channels
+  float aberration = 0.05 + u_intensity * 0.1;
+  vec3 refractColor;
+  refractColor.r = pow(max(dot(finalNormal, viewDir + vec3(aberration, 0.0, 0.0)), 0.0), 3.0);
+  refractColor.g = pow(max(dot(finalNormal, viewDir), 0.0), 3.0);
+  refractColor.b = pow(max(dot(finalNormal, viewDir - vec3(aberration, 0.0, 0.0)), 0.0), 3.0);
+  
+  // Resonance Glow
+  vec3 resonanceColor = vec3(0.0);
+  if (u_resonance_norm < 0.4) {
+      resonanceColor = vec3(0.0, 0.3, 1.0); // Blue glow
+  } else if (u_resonance_norm > 0.6) {
+      resonanceColor = vec3(1.0, 0.0, 0.8); // Pink glow
   }
+  float resIntensity = abs(u_resonance_norm - 0.5) * 2.0;
   
-  // Add organic pulsing to resonance light
-  float pulse = 0.8 + 0.2 * sin(vNoise * 3.14159);
-  resonanceLight *= pulse;
+  // Composition
+  vec3 finalColor = baseColor;
   
-  float alpha = 0.4 + u_weight * 0.6;
-  vec3 gemColor = baseColor * 0.8;
-  gemColor += baseColor * vNoise * 0.15;
-  gemColor += baseColor * fresnel * 3.0;
-  gemColor += vec3(1.0) * spec1 * 2.0;
-  gemColor += baseColor * spec2 * 0.8;
-  gemColor += baseColor * subsurface * 0.5;
-  gemColor *= (0.9 + u_intensity * 0.6);
+  // Add dispersion sparkles
+  finalColor += refractColor * 0.8;
   
-  // Add resonance lighting with organic blending
-  gemColor += resonanceLight * (0.5 + fresnel * 0.5);
+  // Add sharp specular + bloom
+  finalColor += vec3(1.0) * spec * (1.5 + u_intensity);
   
-  gl_FragColor = vec4(gemColor, alpha);
+  // Add Fresnel rim
+  finalColor += baseColor * fresnel * 3.0; // Boosted Fresnel
+  
+  // Add Resonance Glow (Pulse)
+  // Pulse the resonance color with time for organic feel
+  float pulse = 0.5 + 0.5 * sin(u_time * 2.0);
+  finalColor = mix(finalColor, resonanceColor, resIntensity * 0.6 * pulse);
+  
+  // Inner brightness from volume
+  finalColor += finalColor * u_intensity;
+
+  // Alpha - Frosted glass is slightly more opaque
+  float alpha = 0.85 + u_weight * 0.15;
+  
+  gl_FragColor = vec4(finalColor, alpha);
 }
 `;
 
-// FIRE SHADER
+// FIRE SHADER (Unchanged for now, or minimal updates)
 const fireVertex = `
 ${noiseChunk}
 uniform float u_time;
@@ -208,221 +243,259 @@ void main() {
 `;
 
 const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration }) => {
-    const mesh = useRef();
-    const material = useRef();
+  const mesh = useRef();
+  const material = useRef();
 
-    const uniforms = useMemo(() => ({
-        u_time: { value: 0 },
-        u_amplitude: { value: 0 },
-        u_roughness: { value: 0 },
-        u_pitch_norm: { value: 0 },
-        u_weight: { value: 0.5 },
-        u_intensity: { value: 0 },
-        u_resonance_norm: { value: 0.5 }
-    }), []);
+  const uniforms = useMemo(() => ({
+    u_time: { value: 0 },
+    u_amplitude: { value: 0 },
+    u_roughness: { value: 0 },
+    u_pitch_norm: { value: 0 },
+    u_weight: { value: 0.5 },
+    u_intensity: { value: 0 },
+    u_resonance_norm: { value: 0.5 }
+  }), []);
 
-    const shaders = useMemo(() => {
-        switch (mode) {
-            case 'fire': return { v: fireVertex, f: fireFragment };
-            case 'gem':
-            default: return { v: gemVertex, f: gemFragment };
-        }
-    }, [mode]);
+  const shaders = useMemo(() => {
+    switch (mode) {
+      case 'fire': return { v: fireVertex, f: fireFragment };
+      case 'gem':
+      default: return { v: gemVertex, f: gemFragment };
+    }
+  }, [mode]);
 
-    useFrame((state) => {
-        if (!mesh.current || !material.current || !dataRef.current) return;
+  useFrame((state, delta) => {
+    if (!mesh.current || !material.current || !dataRef.current) return;
 
-        const { pitch, resonance, weight, volume } = dataRef.current;
-        const extVol = externalDataRef?.current?.volume || 0;
-        const vol = Math.max(volume || 0, extVol);
+    const { pitch, resonance, weight, volume } = dataRef.current;
+    const extVol = externalDataRef?.current?.volume || 0;
+    const vol = Math.max(volume || 0, extVol);
 
-        const smoothedVol = THREE.MathUtils.lerp(uniforms.u_amplitude.value, vol, 0.15);
-        const pitchVal = pitch || 150;
-        const pitchNorm = (Math.max(85, Math.min(255, pitchVal)) - 85) / 170;
-        const smoothedPitch = THREE.MathUtils.lerp(uniforms.u_pitch_norm.value, pitchNorm, 0.08);
-        const resVal = resonance || 500;
-        const resNorm = Math.max(0, Math.min(1, (resVal - 400) / 1600));
-        const smoothedRes = THREE.MathUtils.lerp(uniforms.u_roughness.value, resNorm, 0.08);
-        const weightVal = weight !== undefined ? weight : 0.5;
-        const smoothedWeight = THREE.MathUtils.lerp(uniforms.u_weight.value, weightVal, 0.1);
+    // Damping factor for smooth transitions (Lerp)
+    const damping = 4.0 * delta; // Adjust speed here
 
-        // Calculate resonance_norm from calibration for blue/pink lighting
-        let resonanceNorm = 0.5; // Default to balanced
-        if (resonance && calibration) {
-            const { dark, bright } = calibration;
-            resonanceNorm = Math.max(0, Math.min(1, (resonance - dark) / (bright - dark)));
-        }
-        const smoothedResonanceNorm = THREE.MathUtils.lerp(uniforms.u_resonance_norm.value, resonanceNorm, 0.08);
+    // Smooth volume
+    const currentVol = uniforms.u_amplitude.value;
+    const targetVol = vol;
+    const smoothedVol = THREE.MathUtils.lerp(currentVol, targetVol, damping);
 
-        uniforms.u_time.value = state.clock.elapsedTime;
-        uniforms.u_amplitude.value = smoothedVol;
-        uniforms.u_pitch_norm.value = smoothedPitch;
-        uniforms.u_roughness.value = smoothedRes;
-        uniforms.u_weight.value = smoothedWeight;
-        uniforms.u_intensity.value = smoothedVol;
-        uniforms.u_resonance_norm.value = smoothedResonanceNorm;
+    // Smooth Pitch
+    // If pitch is 0 (silence), don't snap, just stay or drift slowly
+    const pitchVal = pitch || 0;
+    let targetPitchNorm = uniforms.u_pitch_norm.value;
+    if (pitchVal > 0) {
+      const pitchNorm = (Math.max(85, Math.min(255, pitchVal)) - 85) / 170;
+      targetPitchNorm = pitchNorm;
+    }
+    const smoothedPitch = THREE.MathUtils.lerp(uniforms.u_pitch_norm.value, targetPitchNorm, damping * 0.5);
 
-        mesh.current.rotation.y += 0.002 + smoothedVol * 0.01;
-        if (mode === 'gem') mesh.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
-    });
+    // Smooth Resonance
+    let resonanceNorm = 0.5;
+    if (resonance && calibration) {
+      const { dark, bright } = calibration;
+      resonanceNorm = Math.max(0, Math.min(1, (resonance - dark) / (bright - dark)));
+    }
+    const smoothedResonanceNorm = THREE.MathUtils.lerp(uniforms.u_resonance_norm.value, resonanceNorm, damping * 0.5);
 
-    return (
-        <mesh ref={mesh}>
-            {mode === 'gem' ? (
-                <octahedronGeometry args={[1.8, 0]} />
-            ) : (
-                <icosahedronGeometry args={[1.6, 30]} />
-            )}
-            <shaderMaterial
-                ref={material}
-                vertexShader={shaders.v}
-                fragmentShader={shaders.f}
-                uniforms={uniforms}
-                transparent={true}
-                blending={THREE.AdditiveBlending}
-                depthWrite={false}
-                extensions={{ derivatives: true }}
-            />
-        </mesh>
-    );
+    // Smooth Weight
+    const weightVal = weight !== undefined ? weight : 0.5;
+    const smoothedWeight = THREE.MathUtils.lerp(uniforms.u_weight.value, weightVal, damping);
+
+    uniforms.u_time.value = state.clock.elapsedTime;
+    uniforms.u_amplitude.value = smoothedVol;
+    uniforms.u_pitch_norm.value = smoothedPitch;
+    uniforms.u_weight.value = smoothedWeight;
+    uniforms.u_intensity.value = smoothedVol;
+    uniforms.u_resonance_norm.value = smoothedResonanceNorm;
+
+    // Map Resonance to Roughness (Texture)
+    // Dark (0) -> Smooth (0.2)
+    // Bright (1) -> Rough/Faceted (0.8)
+    uniforms.u_roughness.value = 0.2 + smoothedResonanceNorm * 0.6;
+
+    // --- ORGANIC ANIMATION ---
+    const time = state.clock.elapsedTime;
+
+    // 1. Spinning Logic (Active vs Idle)
+    // Base idle spin + Active spin based on volume
+    // Use smoothstep for transition
+    const idleSpeed = 0.2;
+    const activeSpeed = 2.0;
+    const spinSpeed = THREE.MathUtils.lerp(idleSpeed, activeSpeed, smoothedVol);
+
+    // Multi-axis rotation drift (Zero-gravity feel)
+    // Using different prime frequencies for non-repetitive motion
+    mesh.current.rotation.y += spinSpeed * delta;
+    mesh.current.rotation.x = Math.sin(time * 0.3) * 0.1 + (smoothedVol * 0.5); // Tilt when loud
+    mesh.current.rotation.z = Math.cos(time * 0.2) * 0.1;
+
+    // 2. Floating/Bobbing (Composed Sine Waves)
+    // Layer 1: Slow, large wave
+    const bob1 = Math.sin(time * 0.5) * 0.1;
+    // Layer 2: Faster, small wave (breathing)
+    const bob2 = Math.cos(time * 1.3) * 0.05;
+
+    mesh.current.position.y = bob1 + bob2;
+
+  });
+
+  return (
+    <mesh ref={mesh}>
+      {mode === 'gem' ? (
+        <octahedronGeometry args={[1.8, 0]} /> // Low detail for sharp facets
+      ) : (
+        <icosahedronGeometry args={[1.6, 30]} />
+      )}
+      <shaderMaterial
+        ref={material}
+        vertexShader={shaders.v}
+        fragmentShader={shaders.f}
+        uniforms={uniforms}
+        transparent={true}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+        extensions={{ derivatives: true }}
+      />
+    </mesh>
+  );
 };
 
 const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
-    const [mode, setMode] = useState('gem');
-    const [showDebug, setShowDebug] = useState(false);
-    const [debugInfo, setDebugInfo] = useState(null);
+  const [mode, setMode] = useState('gem');
+  const [showDebug, setShowDebug] = useState(false);
+  const [debugInfo, setDebugInfo] = useState(null);
 
-    const modes = [
-        { id: 'gem', icon: Diamond, label: 'Gem' },
-        { id: 'fire', icon: Flame, label: 'Fire' },
-    ];
+  const modes = [
+    { id: 'gem', icon: Diamond, label: 'Gem' },
+    { id: 'fire', icon: Flame, label: 'Fire' },
+  ];
 
-    // Keyboard shortcut: D to toggle debug
-    useEffect(() => {
-        const handleKeyPress = (e) => {
-            if (e.key === 'd' || e.key === 'D') {
-                setShowDebug(prev => !prev);
-            }
-        };
-        window.addEventListener('keydown', handleKeyPress);
-        return () => window.removeEventListener('keydown', handleKeyPress);
-    }, []);
+  // Keyboard shortcut: D to toggle debug
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === 'd' || e.key === 'D') {
+        setShowDebug(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
-    // Update debug info periodically
-    useEffect(() => {
-        if (!showDebug) return;
+  // Update debug info periodically
+  useEffect(() => {
+    if (!showDebug) return;
 
-        const interval = setInterval(() => {
-            if (dataRef.current) {
-                const { pitch, resonance, volume } = dataRef.current;
-                const pitchVal = pitch || 0;
+    const interval = setInterval(() => {
+      if (dataRef.current) {
+        const { pitch, resonance, volume } = dataRef.current;
+        const pitchVal = pitch || 0;
 
-                // Calculate resonance score for slider (Dark/Balanced/Bright)
-                let resScore = 0.5;
-                if (resonance && calibration) {
-                    const { dark, bright } = calibration;
-                    resScore = Math.max(0, Math.min(1, (resonance - dark) / (bright - dark)));
-                }
+        // Calculate resonance score for slider (Dark/Balanced/Bright)
+        let resScore = 0.5;
+        if (resonance && calibration) {
+          const { dark, bright } = calibration;
+          resScore = Math.max(0, Math.min(1, (resonance - dark) / (bright - dark)));
+        }
 
-                setDebugInfo({
-                    centroid: resonance?.toFixed(0) || '—',
-                    pitch: pitchVal > 0 ? pitchVal.toFixed(0) : '—',
-                    resScore: (resScore * 100).toFixed(0),
-                    volume: ((volume || 0) * 100).toFixed(1)
-                });
-            }
-        }, 200);
+        setDebugInfo({
+          centroid: resonance?.toFixed(0) || '—',
+          pitch: pitchVal > 0 ? pitchVal.toFixed(0) : '—',
+          resScore: (resScore * 100).toFixed(0),
+          volume: ((volume || 0) * 100).toFixed(1)
+        });
+      }
+    }, 200);
 
-        return () => clearInterval(interval);
-    }, [showDebug, dataRef, calibration]);
+    return () => clearInterval(interval);
+  }, [showDebug, dataRef, calibration]);
 
-    return (
-        <div className="w-full h-full relative group">
-            <OrbLegend mode={mode} />
+  return (
+    <div className="w-full h-full relative group">
+      <OrbLegend mode={mode} />
 
-            {/* Controls */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 p-2 rounded-full bg-slate-900/50 backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                {modes.map((m) => {
-                    const Icon = m.icon;
-                    const isActive = mode === m.id;
-                    return (
-                        <button
-                            key={m.id}
-                            onClick={() => setMode(m.id)}
-                            className={`p-2 rounded-full transition-all ${isActive ? 'bg-teal-500 text-white shadow-[0_0_10px_rgba(20,184,166,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
-                            title={m.label}
-                        >
-                            <Icon size={18} />
-                        </button>
-                    );
-                })}
-                <div className="w-px bg-white/10 mx-1"></div>
-                <button
-                    onClick={() => setShowDebug(!showDebug)}
-                    className={`p-2 rounded-full transition-all ${showDebug ? 'bg-amber-500 text-white shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
-                    title="Toggle Debug Panel"
-                >
-                    <Bug size={18} />
-                </button>
-            </div>
-
-            <Canvas
-                camera={{ position: [0, 0, 5], fov: 50 }}
-                gl={{ antialias: true, powerPreference: "high-performance", alpha: true, preserveDrawingBuffer: false }}
-                dpr={1}
-                frameloop="always"
-                onCreated={(state) => {
-                    state.gl.setClearColor('#020617', 0);
-                    const canvas = state.gl.domElement;
-                    canvas.addEventListener('webglcontextlost', (e) => e.preventDefault());
-                }}
+      {/* Controls */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 p-2 rounded-full bg-slate-900/50 backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {modes.map((m) => {
+          const Icon = m.icon;
+          const isActive = mode === m.id;
+          return (
+            <button
+              key={m.id}
+              onClick={() => setMode(m.id)}
+              className={`p-2 rounded-full transition-all ${isActive ? 'bg-teal-500 text-white shadow-[0_0_10px_rgba(20,184,166,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
+              title={m.label}
             >
-                <ambientLight intensity={0.5} />
-                <VisualizerMesh key={mode} mode={mode} dataRef={dataRef} externalDataRef={externalDataRef} calibration={calibration} />
-            </Canvas>
+              <Icon size={18} />
+            </button>
+          );
+        })}
+        <div className="w-px bg-white/10 mx-1"></div>
+        <button
+          onClick={() => setShowDebug(!showDebug)}
+          className={`p-2 rounded-full transition-all ${showDebug ? 'bg-amber-500 text-white shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
+          title="Toggle Debug Panel"
+        >
+          <Bug size={18} />
+        </button>
+      </div>
 
-            {/* Debug Panel Overlay */}
-            {showDebug && debugInfo && (
-                <div className="absolute top-4 right-4 p-4 bg-slate-900/90 backdrop-blur-md rounded-lg border border-white/10 w-64 z-20 shadow-xl">
-                    <div className="text-xs font-mono text-slate-400 mb-3 uppercase tracking-wider flex justify-between items-center">
-                        <span>Diagnostics</span>
-                        <span className="text-amber-500 animate-pulse">●</span>
-                    </div>
+      <Canvas
+        camera={{ position: [0, 0, 6], fov: 50 }}
+        gl={{ antialias: true, powerPreference: "high-performance", alpha: true, preserveDrawingBuffer: false }}
+        dpr={1}
+        frameloop="always"
+        onCreated={(state) => {
+          state.gl.setClearColor('#020617', 0);
+          const canvas = state.gl.domElement;
+          canvas.addEventListener('webglcontextlost', (e) => e.preventDefault());
+        }}
+      >
+        <ambientLight intensity={0.5} />
+        <VisualizerMesh key={mode} mode={mode} dataRef={dataRef} externalDataRef={externalDataRef} calibration={calibration} />
+      </Canvas>
 
-                    <div className="grid grid-cols-2 gap-y-2 text-xs font-mono mb-4">
-                        <div className="text-slate-500">Pitch</div>
-                        <div className="text-white text-right">{debugInfo.pitch} Hz</div>
+      {/* Debug Panel Overlay */}
+      {showDebug && debugInfo && (
+        <div className="absolute top-4 right-4 p-4 bg-slate-900/90 backdrop-blur-md rounded-lg border border-white/10 w-64 z-20 shadow-xl">
+          <div className="text-xs font-mono text-slate-400 mb-3 uppercase tracking-wider flex justify-between items-center">
+            <span>Diagnostics</span>
+            <span className="text-amber-500 animate-pulse">●</span>
+          </div>
 
-                        <div className="text-slate-500">Resonance</div>
-                        <div className="text-cyan-400 text-right">{debugInfo.centroid} Hz</div>
+          <div className="grid grid-cols-2 gap-y-2 text-xs font-mono mb-4">
+            <div className="text-slate-500">Pitch</div>
+            <div className="text-white text-right">{debugInfo.pitch} Hz</div>
 
-                        <div className="text-slate-500">Volume</div>
-                        <div className="text-emerald-400 text-right">{debugInfo.volume}%</div>
-                    </div>
+            <div className="text-slate-500">Resonance</div>
+            <div className="text-cyan-400 text-right">{debugInfo.centroid} Hz</div>
 
-                    {/* Resonance Gradient Slider */}
-                    <div className="pt-3 border-t border-white/10">
-                        <div className="flex justify-between text-[10px] text-slate-500 mb-1 uppercase tracking-wider">
-                            <span>Dark</span>
-                            <span>Balanced</span>
-                            <span>Bright</span>
-                        </div>
-                        <div className="relative h-3 w-full rounded-full bg-slate-800 overflow-hidden ring-1 ring-white/10">
-                            <div className="absolute inset-0 opacity-80" style={{
-                                background: 'linear-gradient(to right, #312e81 0%, #3b82f6 35%, #3b82f6 65%, #facc15 100%)'
-                            }}></div>
-                            <div className="absolute top-0 bottom-0 w-px bg-white/30 left-[35%]"></div>
-                            <div className="absolute top-0 bottom-0 w-px bg-white/30 left-[65%]"></div>
-                            <div
-                                className="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_8px_rgba(255,255,255,1)] transition-all duration-100 ease-out z-10"
-                                style={{ left: `${debugInfo.resScore}%`, transform: 'translateX(-50%)' }}
-                            ></div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <div className="text-slate-500">Volume</div>
+            <div className="text-emerald-400 text-right">{debugInfo.volume}%</div>
+          </div>
+
+          {/* Resonance Gradient Slider */}
+          <div className="pt-3 border-t border-white/10">
+            <div className="flex justify-between text-[10px] text-slate-500 mb-1 uppercase tracking-wider">
+              <span>Dark</span>
+              <span>Balanced</span>
+              <span>Bright</span>
+            </div>
+            <div className="relative h-3 w-full rounded-full bg-slate-800 overflow-hidden ring-1 ring-white/10">
+              <div className="absolute inset-0 opacity-80" style={{
+                background: 'linear-gradient(to right, #312e81 0%, #3b82f6 35%, #3b82f6 65%, #facc15 100%)'
+              }}></div>
+              <div className="absolute top-0 bottom-0 w-px bg-white/30 left-[35%]"></div>
+              <div className="absolute top-0 bottom-0 w-px bg-white/30 left-[65%]"></div>
+              <div
+                className="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_8px_rgba(255,255,255,1)] transition-all duration-100 ease-out z-10"
+                style={{ left: `${debugInfo.resScore}%`, transform: 'translateX(-50%)' }}
+              ></div>
+            </div>
+          </div>
         </div>
-    );
+      )}
+    </div>
+  );
 });
 
 export default DynamicOrb;

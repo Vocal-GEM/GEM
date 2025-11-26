@@ -938,10 +938,15 @@ const PracticeMode = ({
     useEffect(() => {
         const animate = () => {
             if (speaking) {
+                // AI Speaking: Simulate volume
                 const target = 0.3 + Math.random() * 0.4;
                 externalDataRef.current.volume += (target - externalDataRef.current.volume) * 0.2;
             } else {
-                externalDataRef.current.volume += (0 - externalDataRef.current.volume) * 0.1;
+                // User Speaking: Use actual mic volume
+                const userVolume = dataRef.current?.volume || 0;
+                // Amplify slightly for better visual feedback
+                const target = userVolume * 3;
+                externalDataRef.current.volume += (target - externalDataRef.current.volume) * 0.2;
             }
             animationRef.current = requestAnimationFrame(animate);
         };

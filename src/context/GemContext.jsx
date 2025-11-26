@@ -28,9 +28,27 @@ export const GemProvider = ({ children }) => {
 
     // Data - Initialize with defaults
     const [voiceProfiles, setVoiceProfiles] = useState([
-        { id: 'fem', name: 'Feminine', targetRange: { min: 170, max: 220 }, calibration: { dark: 500, bright: 2500 } },
-        { id: 'masc', name: 'Masculine', targetRange: { min: 85, max: 145 }, calibration: { dark: 400, bright: 1800 } },
-        { id: 'neutral', name: 'Neutral', targetRange: { min: 145, max: 175 }, calibration: { dark: 450, bright: 2200 } }
+        {
+            id: 'fem',
+            name: 'Feminine',
+            targetRange: { min: 180, max: 220 },
+            genderRange: { min: 180, max: 500 },
+            calibration: { dark: 500, bright: 2500 }
+        },
+        {
+            id: 'masc',
+            name: 'Masculine',
+            targetRange: { min: 90, max: 140 },
+            genderRange: { min: 50, max: 145 },
+            calibration: { dark: 400, bright: 1800 }
+        },
+        {
+            id: 'neutral',
+            name: 'Neutral',
+            targetRange: { min: 150, max: 180 },
+            genderRange: { min: 145, max: 180 },
+            calibration: { dark: 450, bright: 2200 }
+        }
     ]);
     const [activeProfile, setActiveProfile] = useState('fem');
     const [targetRange, setTargetRange] = useState({ min: 170, max: 220 });
@@ -47,6 +65,7 @@ export const GemProvider = ({ children }) => {
         notation: 'hz',
         homeNote: 190,
         gamificationEnabled: true,
+        theme: 'dark', // 'dark' | 'light'
         ttsProvider: 'elevenlabs', // 'browser' | 'elevenlabs'
         elevenLabsKey: 'sk_d4ebb9d8a3540c49173de9a236f7a1642114d07762414784',
         voiceId: '21m00Tcm4TlvDq8ikWAM' // Default Rachel
@@ -69,6 +88,15 @@ export const GemProvider = ({ children }) => {
     const syncTimers = useRef({ stats: null, settings: null });
 
     // --- Effects ---
+
+    // Apply Theme
+    useEffect(() => {
+        if (settings.theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+        } else {
+            document.documentElement.classList.remove('light-mode');
+        }
+    }, [settings.theme]);
 
     // Load Data from IndexedDB
     useEffect(() => {

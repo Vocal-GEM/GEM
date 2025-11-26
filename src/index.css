@@ -17,11 +17,63 @@
   --gradient-primary: linear-gradient(135deg, #14b8a6 0%, #8b5cf6 100%);
   --gradient-accent: linear-gradient(90deg, #06b6d4 0%, #a855f7 100%);
   --gradient-subtle: linear-gradient(135deg, rgba(20, 184, 166, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+
+  /* Theme Colors (RGB for Tailwind Opacity) - DARK MODE DEFAULT */
+  --slate-50: 248 250 252;
+  --slate-100: 241 245 249;
+  --slate-200: 226 232 240;
+  --slate-300: 203 213 225;
+  --slate-400: 148 163 184;
+  --slate-500: 100 116 139;
+  --slate-600: 71 85 105;
+  --slate-700: 51 65 85;
+  --slate-800: 30 41 59;
+  --slate-900: 15 23 42;
+  --slate-950: 2 6 23;
+
+  --white: 255 255 255;
+  --black: 0 0 0;
+}
+
+.light-mode {
+  /* LIGHT MODE - Inverted Slate Scale */
+  --slate-50: 2 6 23;
+  /* was 950 */
+  --slate-100: 15 23 42;
+  /* was 900 */
+  --slate-200: 30 41 59;
+  /* was 800 */
+  --slate-300: 51 65 85;
+  /* was 700 */
+  --slate-400: 71 85 105;
+  /* was 600 */
+  --slate-500: 100 116 139;
+  /* was 500 */
+  --slate-600: 148 163 184;
+  /* was 400 */
+  --slate-700: 203 213 225;
+  /* was 300 */
+  --slate-800: 226 232 240;
+  /* was 200 */
+  --slate-900: 241 245 249;
+  /* was 100 */
+  --slate-950: 248 250 252;
+  /* was 50 */
+
+  --white: 15 23 42;
+  /* Dark text for "white" elements */
+  --black: 255 255 255;
+  /* Light bg for "black" elements */
+
+  /* Adjust Glassmorphism for Light Mode */
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-bg: rgba(0, 0, 0, 0.05);
+  --gradient-subtle: linear-gradient(135deg, rgba(20, 184, 166, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
 }
 
 body {
-  background-color: #020617;
-  color: #ffffff;
+  background-color: rgb(var(--slate-950));
+  color: rgb(var(--white));
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
   overscroll-behavior-y: none;
@@ -99,7 +151,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: rgb(var(--slate-900));
 }
 
 ::-webkit-scrollbar-thumb {

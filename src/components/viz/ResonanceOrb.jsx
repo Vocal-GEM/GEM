@@ -96,23 +96,6 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
                     // Balanced -> Bright (blue to warm gold)
                     const t = (score - 0.5) * 2;
                     const r = Math.round(59 + (255 - 59) * t);
-                    const g = Math.round(130 + (200 - 130) * t);
-                    const b = Math.round(246 + (50 - 246) * t);
-                    color = `rgb(${r}, ${g}, ${b})`;
-                }
-
-                const weightVal = weight || 0;
-                const scale = 1 + (weightVal * 0.12);
-
-                orbRef.current.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), ${color})`;
-                orbRef.current.style.boxShadow = `0 0 ${20 + weightVal * 25}px ${color}, inset 0 0 20px rgba(255,255,255,0.5)`;
-                orbRef.current.style.transform = `scale(${scale})`;
-                orbRef.current.style.opacity = isVoiceActive ? 1 : (silenceTimer.current > 25 ? 0.4 : 0.7);
-
-                // ============================================
-                // Label Text (Debounced)
-                // ============================================
-                if (labelRef.current) {
                     let nextLabel = labelState.current.current;
 
                     // Determine candidate label

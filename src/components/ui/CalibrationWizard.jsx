@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const CalibrationWizard = ({ onComplete, audioEngine }) => {
+const CalibrationWizard = ({ onComplete, onSkip, audioEngine }) => {
     const [step, setStep] = useState(0);
     const [isListening, setIsListening] = useState(false);
     const [values, setValues] = useState({ dark: 0, bright: 0 });
@@ -59,6 +59,7 @@ const CalibrationWizard = ({ onComplete, audioEngine }) => {
                         <h2 className="text-2xl font-bold text-white">Resonance Calibration</h2>
                         <p className="text-slate-400">We need to learn your voice's unique range. We'll measure your darkest (chest) and brightest (head) sounds.</p>
                         <button onClick={() => setStep(1)} className="w-full py-4 bg-white text-black font-bold rounded-xl hover:bg-slate-200 transition-colors">Start Calibration</button>
+                        <button onClick={onSkip} className="w-full py-3 bg-transparent text-slate-400 font-medium rounded-xl hover:text-white hover:bg-white/5 transition-colors">Skip for now</button>
                     </>
                 )}
 

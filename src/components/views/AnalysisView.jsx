@@ -11,7 +11,7 @@ import Toast from '../ui/Toast';
 import AssessmentView from './AssessmentView';
 
 const AnalysisView = () => {
-    const { audioEngineRef, targetRange, userSettings } = useGem();
+    const { audioEngineRef, targetRange, settings } = useGem();
 
     // State management
     const [mode, setMode] = useState('record'); // 'record' | 'analyzing' | 'results' | 'history'
@@ -154,7 +154,7 @@ const AnalysisView = () => {
 
         const feedback = CoachEngine.generateFeedback(analysisResults, {
             targetPitch: targetRange,
-            gender: userSettings?.gender || 'feminine' // Default or from settings
+            gender: settings?.gender || 'feminine' // Default or from settings
         });
 
         setCoachFeedback(feedback);
@@ -503,7 +503,7 @@ const AnalysisView = () => {
                             {[
                                 { id: 'transcript', label: 'Transcript', icon: FileText },
                                 { id: 'metrics', label: 'Metrics', icon: BarChart3 },
-                                { id: 'viz', label: 'Visualizations', icon: Waveform },
+                                { id: 'viz', label: 'Visualizations', icon: Activity },
                                 { id: 'coach', label: 'AI Coach', icon: Sparkles }
                             ].map(tab => (
                                 <button
@@ -653,8 +653,6 @@ const AnalysisView = () => {
                                                 const exerciseDetails = CoachEngine.getExerciseDetails(exercise);
                                                 if (exerciseDetails) {
                                                     showToast(`Navigate to ${exerciseDetails.route} to practice ${exercise}`, 'success');
-                                                    // Note: Full navigation would require router integration
-                                                    // For now, we show helpful guidance
                                                 } else {
                                                     showToast(`Starting ${exercise}...`, 'success');
                                                 }
