@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react';
 const HighResSpectrogram = ({ dataRef }) => {
     const canvasRef = useRef(null);
     const tempCanvasRef = useRef(null);
+    const lastFormantsRef = useRef({ f1: 0, f2: 0 });
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -108,6 +109,41 @@ const HighResSpectrogram = ({ dataRef }) => {
             }
 
             ctx.putImageData(imgData, width - scrollSpeed, 0);
+
+            // 3. Draw Formant Overlay (F1 & F2)
+            const { f1, f2 } = dataRef.current;
+            const last = lastFormantsRef.current;
+
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // Helper to draw formant line
+            const drawFormant = (currFreq, lastFreq, color) => {
+                if (currFreq > 0 && lastFreq > 0) {
+                    // Map frequency to Y (0-8kHz)
+                    const currY = height * (1 - currFreq / 8000);
+                    const lastY = height * (1 - lastFreq / 8000);
+
+                    // Draw line from previous position (shifted left) to current
+                    ctx.beginPath();
+                    ctx.strokeStyle = color;
+                    // Previous point was at (width - scrollSpeed), now at (width - 2*scrollSpeed)
+                    ctx.moveTo(width - scrollSpeed * 2, lastY);
+                    ctx.lineTo(width - scrollSpeed, currY);
+                    ctx.stroke();
+                }
+            };
+
+            // Draw F1 (Red)
+            drawFormant(f1, last.f1, 'rgba(255, 50, 50, 0.9)');
+
+            // Draw F2 (Red)
+            drawFormant(f2, last.f2, 'rgba(255, 50, 50, 0.9)');
+
+            // Update history
+            lastFormantsRef.current = { f1, f2 };
+
             animationId = requestAnimationFrame(loop);
         };
 
@@ -116,7 +152,7 @@ const HighResSpectrogram = ({ dataRef }) => {
     }, [dataRef]);
 
     return (
-        <div className="relative h-64 w-full bg-black rounded-xl overflow-hidden border border-slate-800">
+        <div className="relative h-full w-full bg-black rounded-xl overflow-hidden border border-slate-800">
             <canvas ref={canvasRef} className="w-full h-full" />
 
             {/* Overlay Labels */}

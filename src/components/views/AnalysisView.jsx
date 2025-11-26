@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Play, Pause, BarChart3, FileText, Activity, History, Save, Trash2, ChevronLeft, Calendar, ArrowRight, Sparkles } from 'lucide-react';
-import { useGem } from '../../context/GemContext';
+import { useAudio } from '../../context/AudioContext';
+import { useProfile } from '../../context/ProfileContext';
+import { useSettings } from '../../context/SettingsContext';
 import { VoiceAnalyzer } from '../../utils/voiceAnalysis';
 import { transcriptionEngine } from '../../utils/transcriptionEngine';
 import { historyService } from '../../utils/historyService';
@@ -100,7 +102,9 @@ const generateAnalysisSummary = (results, targetRange) => {
 };
 
 const AnalysisView = () => {
-    const { audioEngineRef, targetRange, settings } = useGem();
+    const { audioEngineRef } = useAudio();
+    const { targetRange } = useProfile();
+    const { settings } = useSettings();
 
     // State management
     const [mode, setMode] = useState('record'); // 'record' | 'analyzing' | 'results' | 'history'

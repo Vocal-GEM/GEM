@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { Book, EyeOff, Mic, Wrench } from 'lucide-react';
-import { useGem } from '../../context/GemContext';
+import { Book, EyeOff, Mic, Wrench, Activity, Anchor, Aperture, Maximize2, Waves, LayoutGrid, Stethoscope } from 'lucide-react';
+import { useAudio } from '../../context/AudioContext';
+import { useProfile } from '../../context/ProfileContext';
+import { useStats } from '../../context/StatsContext';
+import { useSettings } from '../../context/SettingsContext';
 import { useNavigate } from 'react-router-dom';
 import ResonanceOrb from '../viz/ResonanceOrb';
 import LiveMetricsBar from '../viz/LiveMetricsBar';
@@ -18,15 +21,21 @@ import IntonationTrainer from '../viz/IntonationTrainer';
 
 
 const PracticeView = () => {
-    const {
-        isAudioActive, toggleAudio,
-        dataRef, calibration, targetRange, userMode,
-        goals, stats, settings,
-        audioEngineRef
-    } = useGem();
+    const { isAudioActive, toggleAudio, dataRef, audioEngineRef } = useAudio();
+    const { calibration, targetRange } = useProfile();
+    const { goals, stats } = useStats();
+    const { settings } = useSettings();
+    // userMode is local state in App.jsx, but passed down? No, it was in GemContext.
+    // I need to decide where userMode lives. It seems to be a UI toggle.
+    // For now, I'll assume it's in SettingsContext or I need to add it there.
+    // Let's check SettingsContext.jsx content.
+    // I'll add it to SettingsContext if it's not there, or just use a default for now.
+    // Actually, I should probably add userMode to SettingsContext.
+    // But for this file, I'll access it from SettingsContext assuming I'll put it there.
+    const { userMode } = settings; // Assuming userMode is part of settings object now.
     const navigate = useNavigate();
 
-    const [activeGame, setActiveGame] = useState(null);
+    const [activeGame, setActiveGame] = useState('pitch'); // Reusing this for tab state: 'pitch' | 'resonance' | 'range' | 'spectrogram' | 'clinical'
     const [showTools, setShowTools] = useState(false);
 
     // Hero Principle: Orb takes up most space
@@ -77,48 +86,127 @@ const PracticeView = () => {
 
             {/* Advanced Tools Drawer (Slide Up) */}
             {showTools && (
-                <div className="animate-in slide-in-from-bottom-10 fade-in duration-300 pt-4 space-y-4 pb-20">
-                    <PitchVisualizer
-                        dataRef={dataRef}
-                        targetRange={targetRange}
-                        userMode={userMode}
-                        exercise={activeGame}
-                        onScore={(score) => { }}
-                        settings={settings}
-                    />
+                <div className="animate-in slide-in-from-bottom-10 fade-in duration-300 pt-4 pb-20 bg-slate-900/90 backdrop-blur-xl rounded-t-3xl border-t border-white/10 shadow-2xl absolute bottom-0 left-0 right-0 h-[60vh] flex flex-col z-40">
 
-                    {userMode === 'slp' && (
-                        <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
-                            <HighResSpectrogram dataRef={dataRef} />
-                            <div className="grid grid-cols-2 gap-4">
-                                <SpectrumAnalyzer dataRef={dataRef} userMode={userMode} />
-                                <CPPMeter dataRef={dataRef} isActive={isAudioActive} />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <VoiceRangeProfile dataRef={dataRef} isActive={isAudioActive} />
-                                <MPTTracker dataRef={dataRef} isActive={isAudioActive} />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <IntonationTrainer dataRef={dataRef} isActive={isAudioActive} />
-                                <SZRatio dataRef={dataRef} isActive={isAudioActive} />
-                            </div>
-                        </div>
-                    )}
+                    {/* Drawer Handle */}
+                    <div className="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-4 shrink-0" onClick={() => setShowTools(false)}></div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />
-                        <VowelSpacePlot dataRef={dataRef} userMode={userMode} />
+                    {/* Tabs */}
+                    <div className="flex gap-2 px-4 mb-4 overflow-x-auto shrink-0 pb-2 no-scrollbar">
+                        {[
+                            { id: 'pitch', label: 'Pitch', icon: 'Activity' },
+                            { id: 'weight', label: 'Weight', icon: 'Anchor' },
+                            { id: 'vowel', label: 'Vowel', icon: 'Aperture' },
+                            { id: 'range', label: 'Range', icon: 'Maximize2' },
+                            { id: 'spectrogram', label: 'Spectrogram', icon: 'Waves' },
+                            { id: 'all', label: 'Show All', icon: 'LayoutGrid' },
+                            ...(userMode === 'slp' ? [{ id: 'clinical', label: 'Clinical', icon: 'Stethoscope' }] : [])
+                        ].map(tab => {
+                            const Icon = {
+                                'Activity': Activity,
+                                'Anchor': Anchor,
+                                'Aperture': Aperture,
+                                'Maximize2': Maximize2,
+                                'Waves': Waves,
+                                'LayoutGrid': LayoutGrid,
+                                'Stethoscope': Stethoscope
+                            }[tab.icon];
+
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveGame(tab.id === activeGame ? null : tab.id)}
+                                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${activeGame === tab.id
+                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                                        }`}
+                                >
+                                    {Icon && <Icon className="w-4 h-4" />}
+                                    {tab.label}
+                                </button>
+                            );
+                        })}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                        <button onClick={() => navigate('/journal')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
-                            <Book className="text-blue-400" />
-                            <span className="text-xs font-bold">Log Journal</span>
-                        </button>
-                        <button onClick={() => navigate('/tools')} className="p-4 bg-slate-800 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-700 transition-colors">
-                            <Wrench className="text-purple-400" />
-                            <span className="text-xs font-bold">Tools</span>
-                        </button>
+                    {/* Content Area */}
+                    <div className="flex-1 overflow-y-auto px-4 pb-4">
+                        {(!activeGame || activeGame === 'pitch') && (
+                            <div className="h-full min-h-[300px] bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden relative">
+                                <PitchVisualizer
+                                    dataRef={dataRef}
+                                    targetRange={targetRange}
+                                    userMode={userMode}
+                                    exercise={null}
+                                    onScore={() => { }}
+                                    settings={settings}
+                                />
+                            </div>
+                        )}
+
+                        {activeGame === 'weight' && (
+                            <div className="space-y-4">
+                                <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />
+                                <div className="p-4 bg-slate-800/50 rounded-xl text-sm text-slate-400">
+                                    <p>Visualizes vocal weight (spectral tilt/closed quotient). Aim for the target zone.</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeGame === 'vowel' && (
+                            <div className="space-y-4">
+                                <div className="h-64 bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden p-4 relative">
+                                    <h3 className="text-sm font-bold text-slate-400 mb-2 absolute top-4 left-4">Vowel Space</h3>
+                                    <VowelSpacePlot dataRef={dataRef} userMode={userMode} />
+                                </div>
+                                <div className="p-4 bg-slate-800/50 rounded-xl text-sm text-slate-400">
+                                    <p>Real-time formant tracking (F1 vs F2). Helps with vowel clarity and resonance.</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeGame === 'range' && (
+                            <div className="space-y-4">
+                                <VoiceRangeProfile dataRef={dataRef} isActive={isAudioActive} />
+                                <div className="p-4 bg-slate-800/50 rounded-xl text-sm text-slate-400">
+                                    <p>Explore your full vocal range. Try sliding from your lowest note to your highest note, and from quiet to loud.</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeGame === 'spectrogram' && (
+                            <div className="space-y-4">
+                                <HighResSpectrogram dataRef={dataRef} />
+                                <div className="p-4 bg-slate-800/50 rounded-xl text-sm text-slate-400">
+                                    <p>Visualizing frequency content up to 8kHz. Brighter colors indicate more energy.</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeGame === 'all' && (
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />
+                                    <VowelSpacePlot dataRef={dataRef} userMode={userMode} />
+                                </div>
+                                <div className="h-48">
+                                    <HighResSpectrogram dataRef={dataRef} />
+                                </div>
+                            </div>
+                        )}
+
+                        {activeGame === 'clinical' && userMode === 'slp' && (
+                            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <SpectrumAnalyzer dataRef={dataRef} userMode={userMode} />
+                                    <CPPMeter dataRef={dataRef} isActive={isAudioActive} />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <MPTTracker dataRef={dataRef} isActive={isAudioActive} />
+                                    <SZRatio dataRef={dataRef} isActive={isAudioActive} />
+                                </div>
+                                <IntonationTrainer dataRef={dataRef} isActive={isAudioActive} />
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

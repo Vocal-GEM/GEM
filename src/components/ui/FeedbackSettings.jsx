@@ -351,7 +351,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                     <div className="bg-slate-800 p-4 rounded-xl space-y-4">
                         <div>
                             <div className="flex justify-between text-xs text-slate-400 mb-1"><span>Noise Gate Threshold</span> <span>{Math.round(settings.noiseGate * 100)}%</span></div>
-                            <input type="range" min="0" max="10" step="1" value={settings.noiseGate * 100} onChange={(e) => setSettings({ ...settings, noiseGate: e.target.value / 100 })} className="w-full accent-slate-500 h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer" />
+                            <input type="range" min="0" max="30" step="1" value={settings.noiseGate * 100} onChange={(e) => setSettings({ ...settings, noiseGate: e.target.value / 100 })} className="w-full accent-slate-500 h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer" />
                         </div>
 
                         {calibration && (

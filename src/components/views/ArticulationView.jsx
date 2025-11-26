@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Volume2, Info, Trophy, Star, RefreshCw, ChevronRight } from 'lucide-react';
-import { useGem } from '../../context/GemContext';
+import { useAudio } from '../../context/AudioContext';
 import { VoiceAnalyzer } from '../../utils/voiceAnalysis';
 import { transcriptionEngine } from '../../utils/transcriptionEngine';
 import { convertToIPA, isSibilantWord } from '../../utils/ipaConverter';
@@ -49,7 +49,7 @@ const editDistance = (s1, s2) => {
 };
 
 const ArticulationView = () => {
-    const { audioEngineRef } = useGem();
+    const { audioEngineRef } = useAudio();
 
     // State
     const [isRecording, setIsRecording] = useState(false);
@@ -430,8 +430,8 @@ const ArticulationView = () => {
                                         onClick={() => handleTwisterRecord(t.id)}
                                         disabled={isRecording && activeTwister !== t.id}
                                         className={`w-full py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all ${isRecording && activeTwister === t.id
-                                                ? 'bg-red-500 text-white animate-pulse'
-                                                : 'bg-slate-800 hover:bg-slate-700 text-white border border-slate-700'
+                                            ? 'bg-red-500 text-white animate-pulse'
+                                            : 'bg-slate-800 hover:bg-slate-700 text-white border border-slate-700'
                                             }`}
                                     >
                                         {isRecording && activeTwister === t.id ? (

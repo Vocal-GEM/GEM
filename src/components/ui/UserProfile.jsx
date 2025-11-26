@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { X, LogOut, Trophy, Flame, Clock, Star, Lock, Award } from 'lucide-react';
 import { gamificationService, ACHIEVEMENTS } from '../../services/GamificationService';
 import { indexedDB } from '../../services/IndexedDBManager';
-import { useGem } from '../../context/GemContext';
+import { useSettings } from '../../context/SettingsContext';
 
 const UserProfile = ({ user, onClose, onLogout }) => {
-    const { settings } = useGem();
+    const { settings } = useSettings();
     const [gamificationStats, setGamificationStats] = useState({
         xp: 0,
         level: { level: 1, xp: 0, title: 'Novice' },

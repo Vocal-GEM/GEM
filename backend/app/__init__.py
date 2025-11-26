@@ -1,13 +1,12 @@
 from flask import Flask, request, redirect
 from flask_cors import CORS
-from flask_login import LoginManager
-from .models import db, User
+from .extensions import db, login_manager, limiter, csrf
+from .models import User
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv()
-
-login_manager = LoginManager()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -90,8 +89,17 @@ def create_app():
         
         return response
     
+    # Session Security
+    app.config['SESSION_COOKIE_SECURE'] = os.environ.get('FLASK_ENV') == 'production'
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+
     db.init_app(app)
     login_manager.init_app(app)
+    limiter.init_app(app)
+    # csrf.init_app(app) # Temporarily disabled until frontend is ready
+
 
     # Register Blueprints
     from .routes.auth import auth_bp

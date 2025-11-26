@@ -109,7 +109,7 @@ export class AudioEngine {
             // --- BANDPASS FILTER (Clean Signal) ---
             this.highpass = this.audioContext.createBiquadFilter();
             this.highpass.type = 'highpass';
-            this.highpass.frequency.value = 80; // Cut rumble
+            this.highpass.frequency.value = 100; // Cut rumble
 
             this.lowpass = this.audioContext.createBiquadFilter();
             this.lowpass.type = 'lowpass';

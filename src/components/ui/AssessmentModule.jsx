@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ClipboardCheck, Mic, X } from 'lucide-react';
-import { useGem } from '../../context/GemContext';
+import { useAudio } from '../../context/AudioContext';
 
 const RAINBOW_PASSAGE = `When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow.`;
 
 const AssessmentModule = ({ onClose }) => {
-    const { dataRef, isAudioActive, toggleAudio } = useGem();
+    const { dataRef, isAudioActive, toggleAudio } = useAudio();
     const [isRecording, setIsRecording] = useState(false);
     const [results, setResults] = useState(null);
     const recordingDataRef = useRef([]);

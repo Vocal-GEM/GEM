@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { useGem } from '../../context/GemContext';
+import { useAudio } from '../../context/AudioContext';
 
 const ForwardFocusDrill = ({ onClose }) => {
-    const { dataRef } = useGem();
+    const { dataRef } = useAudio();
     const [step, setStep] = useState(0);
 
     const steps = [

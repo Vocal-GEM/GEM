@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useGem } from '../../context/GemContext';
+import { useClient } from '../../context/ClientContext';
 import { Save, Clock, FileText } from 'lucide-react';
 
 const SessionNotes = () => {
-    const { activeClient, updateClient } = useGem();
+    const { activeClient, updateClient } = useClient();
     const [notes, setNotes] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const [lastSaved, setLastSaved] = useState(null);

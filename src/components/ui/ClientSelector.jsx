@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useGem } from '../../context/GemContext';
+import { useClient } from '../../context/ClientContext';
 import { Users, Plus, Trash2, User, ChevronDown, X } from 'lucide-react';
 
 const ClientSelector = () => {
-    const { clients, activeClient, setActiveClient, addClient, deleteClient } = useGem();
+    const { clients, activeClient, setActiveClient, addClient, deleteClient } = useClient();
     const [isOpen, setIsOpen] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
     const [newClientName, setNewClientName] = useState('');

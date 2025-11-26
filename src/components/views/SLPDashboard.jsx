@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useGem } from '../../context/GemContext';
+import { useClient } from '../../context/ClientContext';
+import { useSettings } from '../../context/SettingsContext';
 import ClientSelector from '../ui/ClientSelector';
 import SessionNotes from '../ui/SessionNotes';
 import HighResSpectrogram from '../viz/HighResSpectrogram';
@@ -12,7 +13,8 @@ import IntonationTrainer from '../viz/IntonationTrainer';
 import { Activity, Mic, Settings, FileText, BarChart2, Grid } from 'lucide-react';
 
 const SLPDashboard = ({ dataRef, audioEngine }) => {
-    const { activeClient, showSettings, setShowSettings } = useGem();
+    const { activeClient } = useClient();
+    const { showSettings, setShowSettings } = useSettings();
     const [activeTool, setActiveTool] = useState('spectrogram'); // spectrogram, vrp, mpt, sz, intonation
 
     // Ensure audio engine is running

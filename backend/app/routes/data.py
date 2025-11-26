@@ -4,11 +4,14 @@ from werkzeug.utils import secure_filename
 import os
 import datetime
 from ..models import db, Stats, Journal, Settings
+from ..validators import sanitize_html
+from ..extensions import limiter
 
 data_bp = Blueprint('data', __name__, url_prefix='/api')
 
 @data_bp.route('/sync', methods=['POST'])
 @login_required
+@limiter.limit("100 per minute")
 def sync_data():
     # Expecting a list of queue items from SyncManager
     # Payload: { queue: [ { type, payload, id, timestamp }, ... ] }
@@ -58,10 +61,14 @@ def sync_data():
                 exists = Journal.query.filter_by(user_id=current_user.id, client_id=str(client_id)).first() is not None
             
             if not exists:
+                notes = payload.get('content') or payload.get('notes')
+                if notes:
+                    notes = sanitize_html(notes)
+                
                 new_journal = Journal(
                     user=current_user,
                     date=payload.get('date'),
-                    notes=payload.get('content') or payload.get('notes'), # Handle both keys
+                    notes=notes,
                     effort=payload.get('effort', 0),
                     confidence=payload.get('confidence', 0),
                     audio_url=payload.get('audioUrl'),

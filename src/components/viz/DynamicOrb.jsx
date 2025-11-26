@@ -448,11 +448,13 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
         silenceStart.current = null;
 
         // 1. Pitch Score (0 = Masc, 1 = Fem)
-        // < 130 = Masc, 130-175 = Andro, > 175 = Fem
+        // Revised Curve for better separation
         let pitchScore = 0.5;
-        if (pitch < 130) pitchScore = 0.0 + (pitch / 130) * 0.35; // 0.0 - 0.35
-        else if (pitch < 175) pitchScore = 0.35 + ((pitch - 130) / 45) * 0.3; // 0.35 - 0.65
-        else pitchScore = 0.65 + Math.min(1, (pitch - 175) / 80) * 0.35; // 0.65 - 1.0
+        if (pitch < 85) pitchScore = 0.0;
+        else if (pitch < 165) pitchScore = ((pitch - 85) / 80) * 0.4; // 0.0 - 0.4 (Masc)
+        else if (pitch < 185) pitchScore = 0.4 + ((pitch - 165) / 20) * 0.2; // 0.4 - 0.6 (Andro)
+        else if (pitch < 255) pitchScore = 0.6 + ((pitch - 185) / 70) * 0.4; // 0.6 - 1.0 (Fem)
+        else pitchScore = 1.0;
 
         // 2. Resonance Score (0 = Masc, 1 = Fem)
         let resScore = 0.5;
@@ -467,8 +469,8 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
         const weightVal = weight !== undefined ? weight : 50;
         const weightScore = 1.0 - Math.max(0, Math.min(1, weightVal / 100));
 
-        // Average for this frame
-        const currentScore = (pitchScore + resScore + weightScore) / 3;
+        // Average for this frame (Weighted: Pitch 50%, Res 25%, Weight 25%)
+        const currentScore = (pitchScore * 2 + resScore + weightScore) / 4;
 
         // Add to buffer (Keep last 10 frames = ~2 seconds at 200ms interval)
         scoreBuffer.current.push(currentScore);

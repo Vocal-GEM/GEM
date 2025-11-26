@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useGem } from '../../context/GemContext';
+import { useAudio } from '../../context/AudioContext';
+import { useProfile } from '../../context/ProfileContext';
 
 const IntonationExercise = () => {
-    const { dataRef, audioEngineRef, targetRange } = useGem();
+    const { dataRef, audioEngineRef } = useAudio();
+    const { targetRange } = useProfile();
     const canvasRef = useRef(null);
 
     // Settings

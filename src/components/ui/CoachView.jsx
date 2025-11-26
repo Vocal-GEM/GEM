@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Sparkles, User, History, BookOpen, ChevronRight, Mic, Play, Award, Zap } from 'lucide-react';
-import { useGem } from '../../context/GemContext';
+import { useAudio } from '../../context/AudioContext';
+import { useProfile } from '../../context/ProfileContext';
+import { useSettings } from '../../context/SettingsContext';
 import { CoachEngine } from '../../utils/coachEngine';
 import { KnowledgeService } from '../../services/KnowledgeService';
 import { historyService } from '../../utils/historyService';
@@ -8,7 +10,9 @@ import { gamificationService } from '../../services/GamificationService';
 import ChatMessage from './ChatMessage';
 
 const CoachView = () => {
-    const { dataRef, targetRange, settings } = useGem();
+    const { dataRef } = useAudio();
+    const { targetRange } = useProfile();
+    const { settings } = useSettings();
     const [messages, setMessages] = useState([
         { role: 'assistant', content: "Hi! I'm your AI Vocal Coach. Ask me about your progress, or for tips on resonance and pitch!" }
     ]);

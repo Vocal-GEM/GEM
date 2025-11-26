@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { Trash2 } from 'lucide-react';
-import { useGem } from '../../context/GemContext';
+import { useAudio } from '../../context/AudioContext';
 
 const JournalForm = ({ onSubmit, onCancel }) => {
-    const { audioEngineRef } = useGem();
+    const { audioEngineRef } = useAudio();
     const [notes, setNotes] = useState('');
     const [script, setScript] = useState('');
     const [effort, setEffort] = useState(5);

@@ -2,17 +2,31 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { HashRouter } from 'react-router-dom'
 import App from './App.jsx'
-import { GemProvider } from './context/GemContext'
-import './index.css'
-
-import GlobalErrorBoundary from './components/ui/GlobalErrorBoundary'
+import { SettingsProvider } from './context/SettingsContext'
+import { AudioProvider } from './context/AudioContext'
+import { AuthProvider } from './context/AuthContext'
+import { ProfileProvider } from './context/ProfileContext'
+import { StatsProvider } from './context/StatsContext'
+import { ClientProvider } from './context/ClientContext'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <GlobalErrorBoundary>
-        <GemProvider>
-            <HashRouter>
-                <App />
-            </HashRouter>
-        </GemProvider>
+        <SettingsProvider>
+            <AudioProvider>
+                <AuthProvider>
+                    <ProfileProvider>
+                        <StatsProvider>
+                            <JournalProvider>
+                                <ClientProvider>
+                                    <HashRouter>
+                                        <App />
+                                    </HashRouter>
+                                </ClientProvider>
+                            </JournalProvider>
+                        </StatsProvider>
+                    </ProfileProvider>
+                </AuthProvider>
+            </AudioProvider>
+        </SettingsProvider>
     </GlobalErrorBoundary>,
 )

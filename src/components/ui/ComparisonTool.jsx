@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { ArrowLeftRight } from 'lucide-react';
-import { useGem } from '../../context/GemContext';
+import { useAudio } from '../../context/AudioContext';
 
 const ComparisonTool = () => {
-    const { audioEngineRef } = useGem();
+    const { audioEngineRef } = useAudio();
     const [clipA, setClipA] = useState(null);
     const [clipB, setClipB] = useState(null);
     const [recordingTarget, setRecordingTarget] = useState(null); // 'A' or 'B'

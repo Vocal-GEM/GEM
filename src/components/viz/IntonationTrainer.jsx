@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { TrendingUp, RefreshCw, ChevronRight, ChevronLeft, Play } from 'lucide-react';
-import { useGem } from '../../context/GemContext';
+import { useProfile } from '../../context/ProfileContext';
 
 const IntonationTrainer = ({ dataRef, isActive }) => {
-    const { targetRange } = useGem();
+    const { targetRange } = useProfile();
     const canvasRef = useRef(null);
     const [selectedPattern, setSelectedPattern] = useState(0);
     const [score, setScore] = useState(0);
@@ -73,8 +73,6 @@ const IntonationTrainer = ({ dataRef, isActive }) => {
             ctx.lineJoin = 'round';
 
             // Draw smooth curve through points
-            // Simple implementation: connect points
-            // Better: Catmull-Rom or Bezier. Let's use simple lines for now but smoothed
             if (pattern.points.length > 0) {
                 const p0 = pattern.points[0];
                 ctx.moveTo(p0.x * width, height - p0.y * height);
@@ -87,10 +85,6 @@ const IntonationTrainer = ({ dataRef, isActive }) => {
             ctx.stroke();
 
             // Draw User Trace
-            // Logic: X moves with time (wrapping or scrolling?), Y is pitch
-            // Let's do a "sweep" mode: 
-            // When voice starts, cursor moves left to right over 2 seconds.
-
             if (isActive && dataRef.current && dataRef.current.pitch > 50) {
                 if (!isTracing) {
                     setIsTracing(true);
@@ -103,18 +97,14 @@ const IntonationTrainer = ({ dataRef, isActive }) => {
 
                 if (elapsed <= duration) {
                     const x = elapsed / duration;
-                    // Normalize pitch: map 150Hz-300Hz to 0-1? 
-                    // Or relative to start pitch?
-                    // Adaptive range based on user settings
-                    const minP = targetRange.min - 20; // Add some headroom
+                    const minP = targetRange.min - 20;
                     const maxP = targetRange.max + 20;
                     const pitch = dataRef.current.pitch;
                     const y = Math.max(0, Math.min(1, (pitch - minP) / (maxP - minP)));
 
                     traceRef.current.push({ x, y });
                 } else {
-                    setIsTracing(false); // Finished sweep
-                    // Calculate score?
+                    setIsTracing(false);
                 }
             } else if (!isActive || (dataRef.current && dataRef.current.pitch <= 50)) {
                 if (isTracing && (Date.now() - startTimeRef.current) > 2000) {
@@ -125,7 +115,7 @@ const IntonationTrainer = ({ dataRef, isActive }) => {
             // Render Trace
             if (traceRef.current.length > 0) {
                 ctx.beginPath();
-                ctx.strokeStyle = '#f472b6'; // pink-400
+                ctx.strokeStyle = '#f472b6';
                 ctx.lineWidth = 3;
 
                 traceRef.current.forEach((p, i) => {

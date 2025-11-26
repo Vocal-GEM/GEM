@@ -203,6 +203,15 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             // Find formants by looking for spectral peaks
             let formantCandidates = [];
 
+            // Find max spectral amplitude for relative thresholding
+            let maxAmp = 0;
+            for (let i = 0; i < spectrum.length; i++) {
+                if (spectrum[i] > maxAmp) maxAmp = spectrum[i];
+            }
+
+            // THRESHOLD: 15% of max peak to filter noise, but keep formants
+            const magnitudeThreshold = maxAmp * 0.15;
+
             for (let i = 2; i < spectrum.length - 2; i++) {
                 // Look for local maxima
                 if (spectrum[i] > spectrum[i - 1] && spectrum[i] > spectrum[i + 1] &&
@@ -211,7 +220,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                     // FIXED: Correct frequency scaling
                     const freq = (i * TARGET_RATE) / (2 * spectrum.length);
 
-                    if (freq > 150 && freq < 4000) {
+                    if (freq > 150 && freq < 4000 && spectrum[i] > magnitudeThreshold) {
                         formantCandidates.push({ freq, amp: spectrum[i] });
                     }
                 }
@@ -219,6 +228,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
 
             // Sort by amplitude
             formantCandidates.sort((a, b) => b.amp - a.amp);
+
 
             // Assign F1 and F2
             let p1 = { freq: 0, amp: 0 };
@@ -231,36 +241,6 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                     break;
                 }
             }
-
-            // F2: strongest peak in 1000-3500Hz (must be > F1 + 300Hz)
-            for (let candidate of formantCandidates) {
-                if (candidate.freq >= Math.max(1000, p1.freq + 300) && candidate.freq <= 3500) {
-                    p2 = candidate;
-                    break;
-                }
-            }
-
-            // Spectral Centroid for resonance
-            let sumFreq = 0;
-            let sumAmp = 0;
-            for (let i = 0; i < spectrum.length; i++) {
-                // FIXED: Correct frequency scaling
-                const freq = (i * TARGET_RATE) / (2 * spectrum.length);
-                sumFreq += freq * spectrum[i];
-                sumAmp += spectrum[i];
-            }
-            const centroid = sumAmp > 0 ? sumFreq / sumAmp : 0;
-
-            this.resonanceBuffer.push(centroid);
-            if (this.resonanceBuffer.length > 5) this.resonanceBuffer.shift();
-
-            const sorted = [...this.resonanceBuffer].sort((a, b) => a - b);
-            const medianResonance = sorted[Math.floor(sorted.length / 2)];
-
-            const diff = Math.abs(medianResonance - this.lastResonance);
-            let alpha = 0.1;
-            if (diff > 200) alpha = 0.3;
-
             this.smoothedCentroid = (this.lastResonance * (1 - alpha)) + (medianResonance * alpha);
             this.lastResonance = this.smoothedCentroid;
 

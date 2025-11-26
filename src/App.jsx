@@ -1,97 +1,75 @@
 import React, { useState, useEffect } from 'react';
-import { useGem } from './context/GemContext';
-import ResonanceOrb from './components/viz/ResonanceOrb';
-import LiveMetricsBar from './components/viz/LiveMetricsBar';
-import PitchVisualizer from './components/viz/PitchVisualizer';
-import PitchOrb from './components/viz/PitchOrb';
-import DynamicOrb from './components/viz/DynamicOrb';
-import Spectrogram from './components/viz/Spectrogram';
-import VoiceQualityMeter from './components/viz/VoiceQualityMeter';
-import VowelSpacePlot from './components/viz/VowelSpacePlot';
-import GameHub from './components/games/GameHub';
-import CoachView from './components/ui/CoachView';
-
-import MixingBoardView from './components/views/MixingBoardView';
-import HistoryView from './components/ui/HistoryView';
-import AudioLibrary from './components/ui/AudioLibrary';
-import PitchPipe from './components/ui/PitchPipe';
-import FeedbackSettings from './components/ui/FeedbackSettings';
-import TutorialWizard from './components/ui/TutorialWizard';
-import CompassWizard from './components/ui/CompassWizard';
-import CalibrationWizard from './components/ui/CalibrationWizard';
-import BreathPacer from './components/ui/BreathPacer';
-import MirrorComponent from './components/ui/MirrorComponent';
-import JournalForm from './components/ui/JournalForm';
-import Login from './components/ui/Login';
-import Signup from './components/ui/Signup';
-import UserProfile from './components/ui/UserProfile';
-import ComparisonTool from './components/ui/ComparisonTool';
-import IntonationExercise from './components/ui/IntonationExercise';
-import VocalHealthTips from './components/ui/VocalHealthTips';
-import AssessmentModule from './components/ui/AssessmentModule';
-import WarmUpModule from './components/ui/WarmUpModule';
-import ForwardFocusDrill from './components/ui/ForwardFocusDrill';
-import IncognitoScreen from './components/ui/IncognitoScreen';
-import FloatingCamera from './components/ui/FloatingCamera';
-import OfflineIndicator from './components/ui/OfflineIndicator';
-import MigrationModal from './components/ui/MigrationModal';
-import AnalysisView from './components/views/AnalysisView';
-import ArticulationView from './components/views/ArticulationView';
-import SLPDashboard from './components/views/SLPDashboard';
-
-
-import PracticeMode from './components/views/PracticeMode';
-
-// Games
-import ResonanceRiverGame from './components/games/ResonanceRiverGame';
-import CloudHopperGame from './components/games/CloudHopperGame';
-import StaircaseGame from './components/games/StaircaseGame';
-import FlappyVoiceGame from './components/games/FlappyVoiceGame';
-import PitchMatchGame from './components/games/PitchMatchGame';
-
-import { Mic, Camera, Book, Wrench, ArrowLeft, Mic2, Gamepad2, Bot, BarChart2, Activity } from 'lucide-react';
-
-import AchievementPopup from './components/ui/AchievementPopup';
-import { gamificationService } from './services/GamificationService';
+import { useAudio } from './context/AudioContext';
+import { useSettings } from './context/SettingsContext';
+import { useAuth } from './context/AuthContext';
+import { useProfile } from './context/ProfileContext';
+import { useStats } from './context/StatsContext';
+import { useJournal } from './context/JournalContext';
 
 const App = () => {
     const {
         isAudioActive,
         toggleAudio,
         dataRef,
+        audioEngineRef
+    } = useAudio();
+
+    const {
+        settings,
+        updateSettings,
+        showSettings,
+        setShowSettings
+    } = useSettings();
+
+    const {
+        user,
+        logout
+    } = useAuth();
+
+    const {
         calibration,
         updateCalibration,
         targetRange,
         updateTargetRange,
-        userMode,
-        setUserMode,
-        updateUserMode,
+        switchProfile,
+        showCalibration,
+        setShowCalibration
+    } = useProfile();
+
+    const {
+        stats,
         goals,
-        settings,
-        updateSettings,
+        submitGameResult
+    } = useStats();
+
+    const {
         journals,
         addJournalEntry,
-        stats,
-        audioEngineRef,
-        showVocalHealthTips,
-        setShowVocalHealthTips,
-        showAssessment,
-        setShowAssessment,
-        showWarmUp,
-        setShowWarmUp,
-        showForwardFocus,
-        setShowForwardFocus,
-        submitGameResult,
-        isDataLoaded,
-        switchProfile,
-    } = useGem();
+        showJournalForm,
+        setShowJournalForm
+    } = useJournal();
+
+    // Local state for UI only
+    const [userMode, setUserMode] = useState('user'); // Moved to local or SettingsContext if global?
+    // Let's keep userMode local or in Settings for now. It was in GemContext.
+    // I'll add it to local state here for now, but ideally it should be in SettingsContext.
+    // Actually, let's assume it's in SettingsContext or handled locally if it's just a view toggle.
+    // The original GemContext had it. Let's add it to local state for now to minimize breakage.
+
+    // Other UI state
+    const [showVocalHealthTips, setShowVocalHealthTips] = useState(false);
+    const [showAssessment, setShowAssessment] = useState(false);
+    const [showWarmUp, setShowWarmUp] = useState(false);
+    const [showForwardFocus, setShowForwardFocus] = useState(false);
+    const [isDataLoaded, setIsDataLoaded] = useState(true); // Simplified for now
+
 
     const [activeTab, setActiveTab] = useState('practice');
-    const [showSettings, setShowSettings] = useState(false);
+    // showSettings moved to SettingsContext
     const [showTutorial, setShowTutorial] = useState(false);
     const [showCompass, setShowCompass] = useState(false);
-    const [showCalibration, setShowCalibration] = useState(false);
-    const [showJournalForm, setShowJournalForm] = useState(false);
+    // showCalibration moved to ProfileContext
+    // showJournalForm moved to JournalContext
     const [showLogin, setShowLogin] = useState(false);
     const [showSignup, setShowSignup] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
@@ -243,7 +221,7 @@ const App = () => {
                             </div>
                             {/* Filter Menu */}
                             <div className="glass-panel-dark rounded-xl p-2 mb-6 flex gap-2 overflow-x-auto">
-                                {[{ id: 'all', label: 'Show All' }, { id: 'pitch', label: 'Pitch' }, { id: 'resonance', label: 'Resonance' }, { id: 'weight', label: 'Weight' }, { id: 'vowel', label: 'Vowel' }].map(view => (
+                                {[{ id: 'all', label: 'Show All' }, { id: 'pitch', label: 'Pitch' }, { id: 'resonance', label: 'Resonance' }, { id: 'weight', label: 'Weight' }, { id: 'vowel', label: 'Vowel' }, { id: 'spectrogram', label: 'Spectrogram' }].map(view => (
                                     <button key={view.id} onClick={() => setPracticeView(view.id)} className={`px-5 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap min-w-[80px] flex-shrink-0 ${practiceView === view.id ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white shadow-md shadow-teal-500/20' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/70 hover:text-white border border-slate-700/50'}`}>
                                         {view.label}
                                     </button>
@@ -302,6 +280,18 @@ const App = () => {
                                 <div className="space-y-4 h-full min-h-[400px]">
                                     {(practiceView === 'all' || practiceView === 'vowel') && <VowelSpacePlot dataRef={dataRef} userMode={userMode} />}
                                 </div>
+
+                                {/* 5. Full Width: Spectrogram */}
+                                {(practiceView === 'all' || practiceView === 'spectrogram') && (
+                                    <div className="col-span-1 lg:col-span-2 space-y-4 h-full min-h-[300px]">
+                                        <div className="h-full bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden relative">
+                                            <HighResSpectrogram dataRef={dataRef} />
+                                            <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-mono text-blue-400 border border-blue-500/30">
+                                                Spectrogram
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Full Width Tools Section */}

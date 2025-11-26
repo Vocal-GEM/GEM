@@ -1,9 +1,9 @@
 import React from 'react';
 import { Gamepad2 } from 'lucide-react';
-import { useGem } from '../../context/GemContext';
+import { useStats } from '../../context/StatsContext';
 
 const GameHub = ({ onSelectGame }) => {
-    const { stats, highScores } = useGem();
+    const { stats, highScores } = useStats();
 
     // Level Calculation
     const totalPoints = stats.totalPoints || 0;

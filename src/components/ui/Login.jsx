@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { useGem } from '../../context/GemContext';
+import { useAuth } from '../../context/AuthContext';
 
 const Login = ({ onSwitchToSignup, onClose }) => {
-    const { login } = useGem();
+    const { login } = useAuth();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
