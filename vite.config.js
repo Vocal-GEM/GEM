@@ -5,7 +5,14 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
     base: './',
-    plugins: [react()],
+    plugins: [
+        react(),
+        // visualizer({
+        //     open: true,
+        //     gzipSize: true,
+        //     brotliSize: true,
+        // }),
+    ],
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './src'),
@@ -33,6 +40,7 @@ export default defineConfig({
                     'react-vendor': ['react', 'react-dom', 'react-router-dom'],
                     'transformers': ['@xenova/transformers'],
                     'pdf': ['jspdf', 'jspdf-autotable'],
+                    'ui-icons': ['lucide-react'],
                 }
             }
         },

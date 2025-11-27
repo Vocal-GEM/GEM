@@ -10,7 +10,7 @@ import React, { useEffect, useRef, useState } from 'react';
  * 
  * Includes debug display for calibration (toggle with showDebug prop)
  */
-const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
+const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128 }) => {
     const orbRef = useRef(null);
     const labelRef = useRef(null);
 
@@ -113,7 +113,7 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
                 // Apply visual updates to orb
                 if (orbRef.current) {
                     orbRef.current.style.backgroundColor = color;
-                    orbRef.current.style.boxShadow = `0 0 60px ${color}, 0 0 120px ${color}40`;
+                    orbRef.current.style.boxShadow = `0 0 ${size * 0.5}px ${color}, 0 0 ${size}px ${color}40`;
                 }
 
                 // Label Logic
@@ -156,7 +156,7 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
 
         const id = requestAnimationFrame(loop);
         return () => cancelAnimationFrame(id);
-    }, [calibration, dataRef, showDebug]);
+    }, [calibration, dataRef, showDebug, size]);
 
     // Helper to render sparkline
     const renderSparkline = (data, key, color, height = 30) => {
@@ -183,31 +183,34 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
                         strokeLinejoin="round"
                     />
                 </svg>
-                <div className="absolute top-0 right-0 text-[9px] text-slate-500">{max.toFixed(0)}</div>
-                <div className="absolute bottom-0 right-0 text-[9px] text-slate-500">{min.toFixed(0)}</div>
             </div>
         );
     };
 
     return (
-        <div className="relative flex flex-col items-center">
+        <div className="relative flex flex-col items-center justify-center w-full h-full overflow-hidden">
             {/* Main orb container */}
-            <div className="relative h-48 w-full flex items-center justify-center mb-6 mt-2">
+            <div
+                className="relative flex items-center justify-center shrink-0"
+                style={{ width: size, height: size }}
+            >
                 <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-purple-500/5 rounded-full blur-3xl"></div>
 
                 <div
                     ref={orbRef}
-                    className="w-32 h-32 rounded-full transition-all duration-150 z-10 relative"
+                    className="rounded-full transition-all duration-150 z-10 relative"
                     style={{
+                        width: size,
+                        height: size,
                         transitionProperty: 'transform, opacity',
                         backgroundColor: 'rgb(59, 130, 246)',
-                        boxShadow: '0 0 60px rgb(59, 130, 246), 0 0 120px rgba(59, 130, 246, 0.25)'
+                        boxShadow: `0 0 ${size * 0.5}px rgb(59, 130, 246), 0 0 ${size}px rgba(59, 130, 246, 0.25)`
                     }}
                 ></div>
 
                 <div
                     ref={labelRef}
-                    className="absolute bottom-0 translate-y-full text-xs font-bold tracking-widest text-slate-400 uppercase mt-4 transition-opacity duration-200"
+                    className="absolute bottom-0 translate-y-full text-xs font-bold tracking-widest text-slate-400 uppercase mt-4 transition-opacity duration-200 whitespace-nowrap"
                 >
                     Listening...
                 </div>
@@ -215,16 +218,13 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
 
             {/* Debug Panel */}
             {showDebug && debugInfo && (
-                <div className="mt-8 p-4 bg-slate-800/80 rounded-lg text-xs font-mono text-slate-300 w-full max-w-sm">
+                <div className="absolute top-4 left-4 p-4 bg-slate-800/90 backdrop-blur rounded-lg text-xs font-mono text-slate-300 w-64 z-50 border border-slate-700 shadow-xl">
                     <div className="text-slate-500 uppercase tracking-wider mb-2 text-center">Debug Values</div>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                        <div>Centroid (raw):</div>
-                        <div className="text-cyan-400">{debugInfo.rawCentroid} Hz</div>
-
-                        <div>Centroid (smooth):</div>
+                        <div>Centroid:</div>
                         <div className="text-cyan-400">{debugInfo.centroid} Hz</div>
 
-                        <div>Centroid Score:</div>
+                        <div>Score:</div>
                         <div className="text-yellow-400">{debugInfo.centroidScore}%</div>
 
                         <div className="border-t border-slate-700 col-span-2 my-1"></div>
@@ -235,68 +235,16 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false }) => {
                         <div>F2:</div>
                         <div className="text-green-400">{debugInfo.f2} Hz</div>
 
-                        <div>Valid F2?</div>
-                        <div className={debugInfo.hasF2 === 'Yes' ? 'text-green-400' : 'text-red-400'}>{debugInfo.hasF2}</div>
-
                         <div className="border-t border-slate-700 col-span-2 my-1"></div>
-
-                        <div>Proc Score:</div>
-                        <div className="text-orange-400">{debugInfo.finalScore}%</div>
 
                         <div>UI Score:</div>
                         <div className="text-white font-bold">{debugInfo.uiScore}%</div>
-
-                        <div>Label:</div>
-                        <div className="text-white">{debugInfo.label}</div>
-
-                        <div className="border-t border-slate-700 col-span-2 my-1"></div>
-
-                        <div>Peaks:</div>
-                        <div className="text-slate-400">{debugInfo.peakCount}</div>
-
-                        <div>Mode:</div>
-                        <div className="text-slate-400">{debugInfo.smoothingMode}</div>
                     </div>
 
                     {/* History Sparklines */}
                     <div className="mt-4 pt-2 border-t border-slate-700">
                         <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">F1 History</div>
                         {renderSparkline(debugInfo.history, 'f1', '#4ade80')}
-
-                        <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1 mt-2">F2 History</div>
-                        {renderSparkline(debugInfo.history, 'f2', '#60a5fa')}
-                    </div>
-
-                    {/* Spectrum Scale */}
-                    <div className="mt-4 pt-4 border-t border-slate-700">
-                        <div className="flex justify-between text-[10px] text-slate-500 mb-1 uppercase tracking-wider">
-                            <span>Dark</span>
-                            <span>Balanced</span>
-                            <span>Bright</span>
-                        </div>
-
-                        <div className="relative h-4 w-full rounded-full bg-slate-900 overflow-hidden ring-1 ring-white/10">
-                            {/* Gradient Background */}
-                            <div className="absolute inset-0 opacity-80" style={{
-                                background: 'linear-gradient(to right, #312e81 0%, #3b82f6 35%, #3b82f6 65%, #facc15 100%)'
-                            }}></div>
-
-                            {/* Threshold Markers */}
-                            <div className="absolute top-0 bottom-0 w-px bg-white/20 left-[35%]"></div>
-                            <div className="absolute top-0 bottom-0 w-px bg-white/20 left-[65%]"></div>
-
-                            {/* Indicator Line */}
-                            <div className="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_10px_rgba(255,255,255,1)] transition-all duration-75 ease-out z-10"
-                                style={{ left: `${debugInfo.uiScore}%`, transform: 'translateX(-50%)' }}
-                            ></div>
-                        </div>
-
-                        <div className="flex justify-between text-[10px] text-slate-600 mt-1 font-mono">
-                            <span>0%</span>
-                            <span className="pl-2">35%</span>
-                            <span className="pr-2">65%</span>
-                            <span>100%</span>
-                        </div>
                     </div>
                 </div>
             )}

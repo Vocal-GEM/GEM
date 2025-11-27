@@ -6,7 +6,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { CoachEngine } from '../../utils/coachEngine';
 import { KnowledgeService } from '../../services/KnowledgeService';
 import { historyService } from '../../utils/historyService';
-import { gamificationService } from '../../services/GamificationService';
+
 import ChatMessage from './ChatMessage';
 
 const CoachView = () => {
@@ -19,7 +19,6 @@ const CoachView = () => {
     const [chatInput, setChatInput] = useState('');
     const [isChatLoading, setIsChatLoading] = useState(false);
     const [userContext, setUserContext] = useState({ name: '', pronouns: '', goals: '' });
-    const [stats, setStats] = useState({ level: { level: 1, title: 'Novice' }, xp: 0, streak: 0 });
     const [showPersonalize, setShowPersonalize] = useState(false);
 
     const messagesEndRef = useRef(null);
@@ -31,19 +30,11 @@ const CoachView = () => {
             if (savedSettings) {
                 setUserContext(prev => ({ ...prev, ...savedSettings }));
             }
-            // Load gamification stats
-            const gameStats = await gamificationService.getStats();
-            setStats(gameStats);
+            if (savedSettings) {
+                setUserContext(prev => ({ ...prev, ...savedSettings }));
+            }
         };
         loadContext();
-
-        // Subscribe to gamification updates
-        const unsubscribe = gamificationService.subscribe((event) => {
-            if (event.type === 'XP_GAINED' || event.type === 'LEVEL_UP' || event.type === 'STREAK_UPDATE') {
-                gamificationService.getStats().then(setStats);
-            }
-        });
-        return () => unsubscribe();
     }, []);
 
     const scrollToBottom = () => {
@@ -54,10 +45,7 @@ const CoachView = () => {
         scrollToBottom();
     }, [messages]);
 
-    // Calculate XP progress percentage
-    const nextLevelXP = gamificationService.getNextLevel(stats.xp).xp;
-    const currentLevelXP = stats.level.xp;
-    const progressPercent = Math.min(100, Math.max(0, ((stats.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100));
+
 
     const handleClearChat = () => {
         setMessages([{ role: 'assistant', content: "Chat cleared. What's on your mind?" }]);
@@ -102,8 +90,7 @@ const CoachView = () => {
 
                 setMessages(prev => [...prev, { role: 'assistant', content: replyContent }]);
 
-                // Award small XP for interacting with coach
-                await gamificationService.awardXP(10, 'Asked Coach a question');
+
 
             } catch (err) {
                 console.error(err);
@@ -123,39 +110,7 @@ const CoachView = () => {
 
     return (
         <div className="h-full flex flex-col bg-slate-950 text-white relative overflow-hidden">
-            {/* Gamification Header */}
-            <div className="bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between shrink-0 z-10">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xl font-bold shadow-lg shadow-purple-500/20">
-                        {stats.level.level}
-                    </div>
-                    <div>
-                        <div className="flex items-center gap-2">
-                            <h2 className="font-bold text-white">{stats.level.title}</h2>
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
-                                {stats.xp} XP
-                            </span>
-                        </div>
-                        {/* XP Bar */}
-                        <div className="w-32 h-1.5 bg-slate-800 rounded-full mt-2 overflow-hidden">
-                            <div
-                                className="h-full bg-gradient-to-r from-blue-400 to-purple-400 transition-all duration-500"
-                                style={{ width: `${progressPercent}%` }}
-                            ></div>
-                        </div>
-                    </div>
-                </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="flex flex-col items-end">
-                        <span className="text-xs text-slate-500 uppercase font-bold">Daily Streak</span>
-                        <div className="flex items-center gap-1 text-orange-400 font-bold">
-                            <Zap className="w-4 h-4 fill-orange-400" />
-                            {stats.streak} Days
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 p-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {messages.map((m, i) => <ChatMessage key={i} role={m.role} content={m.content} />)}

@@ -46,8 +46,7 @@ const PracticeMode = ({
     dataRef,
     calibration,
     targetRange,
-    goals,
-    onSelectGame,
+
     activeTab,
     userMode,
     onOpenSettings,
@@ -98,7 +97,7 @@ const PracticeMode = ({
     // Phase 4: Emotional Intelligence & Style
     const [coachingStyle, setCoachingStyle] = useState('gentle'); // gentle, strict, technical
     const [userGoal, setUserGoal] = useState('exploration'); // feminization, masculinization, androgyny, exploration
-    const [streak, setStreak] = useState(0);
+
     const frustrationCounter = useRef(0);
 
     // Phase 5: Routine State
@@ -504,16 +503,7 @@ const PracticeMode = ({
                 }
             }
 
-            // Contextual Status
-            if (lowerText.includes('how am i doing')) {
-                if (goals) {
-                    const minutes = Math.floor(goals.dailyTime / 60);
-                    styleSpeak(`You're doing great. You've practiced for ${minutes} minutes today.`);
-                } else {
-                    speak("I think you're doing well, but I can't see your stats right now.");
-                }
-                return;
-            }
+
 
             // Existing Commands
             if (lowerText.includes('stop') || lowerText.includes('pause')) {
@@ -529,22 +519,7 @@ const PracticeMode = ({
                 }
             } else if (lowerText.includes('help')) {
                 speak("You can ask me questions, change settings, or say 'Start a siren'.");
-            } else if (lowerText.includes('play') || lowerText.includes('game')) {
-                if (lowerText.includes('flappy')) {
-                    speak("Starting Flappy Voice.");
-                    onClose();
-                    onSelectGame('flappy');
-                } else if (lowerText.includes('river')) {
-                    speak("Starting Resonance River.");
-                    onClose();
-                    onSelectGame('river');
-                } else if (lowerText.includes('hopper') || lowerText.includes('cloud')) {
-                    speak("Starting Cloud Hopper.");
-                    onClose();
-                    onSelectGame('hopper');
-                } else {
-                    speak("Which game? You can say Flappy Voice, Resonance River, or Cloud Hopper.");
-                }
+
             }
         } else if (state.startsWith('EXERCISE_')) {
             if (lowerText.includes('stop') || lowerText.includes('cancel') || lowerText.includes('done')) {
@@ -556,7 +531,7 @@ const PracticeMode = ({
                 }
             }
         }
-    }, [state, speak, styleSpeak, dataRef, targetRange, goals, onSelectGame, onClose, onOpenSettings, onOpenJournal, onOpenStats, onNavigate, onUpdateRange, onSwitchProfile, routineActive, startRoutine, advanceRoutine, isRecording, startAnalysis, stopAnalysis, transcript]);
+    }, [state, speak, styleSpeak, dataRef, targetRange, onClose, onOpenSettings, onOpenJournal, onOpenStats, onNavigate, onUpdateRange, onSwitchProfile, routineActive, startRoutine, advanceRoutine, isRecording, startAnalysis, stopAnalysis, transcript]);
 
     const { start: startListen, stop: stopListen, listening, error: speechError, pushToTalkActive, startPushToTalk, stopPushToTalk, isSupported } = useSpeechRecognition(handleSpeechResult);
 
@@ -696,8 +671,6 @@ const PracticeMode = ({
                             styleSpeak("Great siren! That was a nice range.");
                             setFeedback("Great Job! ✨");
                             exercisesCompleted.current.push('siren');
-                            setStreak(s => s + 1);
-                            if (streak > 2) speak("You're on fire! That's 3 exercises in a row.");
                         }
                     }
                 }
@@ -734,7 +707,6 @@ const PracticeMode = ({
                                     styleSpeak("Excellent stability.");
                                     setFeedback("Perfect! ✨");
                                     exercisesCompleted.current.push('hold');
-                                    setStreak(s => s + 1);
                                 }
                             }
                         }
@@ -767,7 +739,6 @@ const PracticeMode = ({
                             styleSpeak("Excellent control over your resonance.", 'affirmation');
                             setFeedback("Resonance Master! ✨");
                             exercisesCompleted.current.push('resonance');
-                            setStreak(s => s + 1);
                         }
                     }
                 }

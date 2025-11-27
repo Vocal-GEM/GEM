@@ -21,7 +21,7 @@ export const SettingsProvider = ({ children }) => {
         triggerDarkRes: true,
         notation: 'hz',
         homeNote: 190,
-        gamificationEnabled: false,
+
         theme: 'dark', // 'dark' | 'light'
         ttsProvider: 'elevenlabs', // 'browser' | 'elevenlabs'
         elevenLabsKey: import.meta.env.VITE_ELEVENLABS_API_KEY || '',
@@ -63,12 +63,12 @@ export const SettingsProvider = ({ children }) => {
         indexedDB.saveSetting('app_settings', newSettings);
     };
 
-    const value = {
+    const value = React.useMemo(() => ({
         settings,
         updateSettings,
         showSettings,
         setShowSettings
-    };
+    }), [settings, showSettings]);
 
     return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
 };

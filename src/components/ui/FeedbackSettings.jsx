@@ -1,5 +1,5 @@
 import React from 'react';
-import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X, Stethoscope, Wifi, WifiOff, RefreshCw, Trash2, Mic2, Trophy } from 'lucide-react';
+import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X, Stethoscope, Wifi, WifiOff, RefreshCw, Trash2, Mic2 } from 'lucide-react';
 import { textToSpeechService } from '../../services/TextToSpeechService';
 import { syncManager } from '../../services/SyncManager';
 import { indexedDB, STORES } from '../../services/IndexedDBManager';
@@ -78,6 +78,36 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                         <div>
                             <div className="flex justify-between text-xs text-slate-400 mb-1"><span>Max Pitch</span> <span>{targetRange.max} Hz</span></div>
                             <input type="range" min="100" max="500" value={targetRange.max} onChange={(e) => onUpdateRange(targetRange.min, parseInt(e.target.value))} className="w-full accent-blue-500 h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer" />
+                        </div>
+                    </div>
+                </section>
+
+                {/* Spectral Tilt Target */}
+                <section>
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Spectral Tilt Target</h3>
+                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 space-y-4">
+                        <div className="text-xs text-slate-400 mb-2">Adjust the target range for spectral tilt (dB/octave).</div>
+                        <div>
+                            <div className="flex justify-between text-xs text-slate-400 mb-1"><span>Min Tilt (Steep)</span> <span>{settings.tiltTarget?.min || -12} dB</span></div>
+                            <input
+                                type="range"
+                                min="-24"
+                                max="0"
+                                value={settings.tiltTarget?.min || -12}
+                                onChange={(e) => setSettings({ ...settings, tiltTarget: { ...(settings.tiltTarget || { max: -6 }), min: parseInt(e.target.value) } })}
+                                className="w-full accent-blue-500 h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+                            />
+                        </div>
+                        <div>
+                            <div className="flex justify-between text-xs text-slate-400 mb-1"><span>Max Tilt (Flat)</span> <span>{settings.tiltTarget?.max || -6} dB</span></div>
+                            <input
+                                type="range"
+                                min="-24"
+                                max="0"
+                                value={settings.tiltTarget?.max || -6}
+                                onChange={(e) => setSettings({ ...settings, tiltTarget: { ...(settings.tiltTarget || { min: -12 }), max: parseInt(e.target.value) } })}
+                                className="w-full accent-blue-500 h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+                            />
                         </div>
                     </div>
                 </section>
@@ -311,39 +341,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                     </div>
                 </section>
 
-                {/* Gamification & Modes */}
-                <section>
-                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Gamification & Modes</h3>
-                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-lg ${settings.gamificationEnabled ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-700 text-slate-400'}`}>
-                                    <Trophy className="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <div className="text-sm font-bold text-white">Enable Gamification</div>
-                                    <div className="text-[10px] text-slate-400">XP, Levels, Streaks & Arcade Games</div>
-                                </div>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer p-2">
-                                <input
-                                    type="checkbox"
-                                    checked={settings.gamificationEnabled !== false}
-                                    onChange={(e) => setSettings({ ...settings, gamificationEnabled: e.target.checked })}
-                                    className="sr-only peer"
-                                />
-                                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-500"></div>
-                            </label>
-                        </div>
-                        {!settings.gamificationEnabled && (
-                            <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700/50">
-                                <p className="text-[10px] text-slate-400">
-                                    <span className="font-bold text-slate-300">Serious Mode Active:</span> All game-like elements are hidden. You can still track basic practice time in your profile.
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                </section>
+
 
                 {/* Advanced Calibration */}
                 <section>

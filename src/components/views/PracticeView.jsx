@@ -188,8 +188,13 @@ const PracticeView = () => {
                                     <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />
                                     <VowelSpacePlot dataRef={dataRef} userMode={userMode} />
                                 </div>
-                                <div className="h-48">
-                                    <HighResSpectrogram dataRef={dataRef} />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="h-48 bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden relative flex items-center justify-center">
+                                        <ResonanceOrb dataRef={dataRef} calibration={calibration} size={100} />
+                                    </div>
+                                    <div className="h-48">
+                                        <HighResSpectrogram dataRef={dataRef} />
+                                    </div>
                                 </div>
                             </div>
                         )}

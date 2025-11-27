@@ -96,12 +96,12 @@ export const AudioProvider = ({ children }) => {
         }
     };
 
-    const value = {
+    const value = React.useMemo(() => ({
         audioEngineRef,
         dataRef,
         isAudioActive,
         toggleAudio
-    };
+    }), [isAudioActive]);
 
     return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>;
 };
