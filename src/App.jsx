@@ -53,6 +53,8 @@ import VoiceQualityMeter from './components/viz/VoiceQualityMeter';
 import VowelSpacePlot from './components/viz/VowelSpacePlot';
 import HighResSpectrogram from './components/viz/HighResSpectrogram';
 import Spectrogram from './components/viz/Spectrogram';
+import ContourVisualizer from './components/viz/ContourVisualizer';
+import QualityVisualizer from './components/viz/QualityVisualizer';
 
 // Components - Games
 import GameHub from './components/games/GameHub';
@@ -285,7 +287,7 @@ const App = () => {
                             </div>
                             {/* Filter Menu */}
                             <div className="glass-panel-dark rounded-xl p-2 mb-6 flex gap-2 overflow-x-auto">
-                                {[{ id: 'all', label: 'Show All' }, { id: 'pitch', label: 'Pitch' }, { id: 'resonance', label: 'Resonance' }, { id: 'weight', label: 'Weight' }, { id: 'vowel', label: 'Vowel' }, { id: 'spectrogram', label: 'Spectrogram' }].map(view => (
+                                {[{ id: 'all', label: 'Show All' }, { id: 'pitch', label: 'Pitch' }, { id: 'resonance', label: 'Resonance' }, { id: 'weight', label: 'Weight' }, { id: 'vowel', label: 'Vowel' }, { id: 'articulation', label: 'Articulation' }, { id: 'contour', label: 'Contour' }, { id: 'quality', label: 'Quality' }, { id: 'spectrogram', label: 'Spectrogram' }].map(view => (
                                     <button key={view.id} onClick={() => setPracticeView(view.id)} className={`px-5 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap min-w-[80px] flex-shrink-0 ${practiceView === view.id ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white shadow-md shadow-teal-500/20' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/70 hover:text-white border border-slate-700/50'}`}>
                                         {view.label}
                                     </button>
@@ -356,6 +358,33 @@ const App = () => {
                                         </div>
                                     </div>
                                 )}
+
+                                {/* 6. Full Width: Articulation */}
+                                {(practiceView === 'articulation') && (
+                                    <div className="col-span-1 lg:col-span-2 space-y-4 h-full min-h-[500px]">
+                                        <div className="h-full bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden relative p-4">
+                                            <ArticulationView />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* 7. Full Width: Contour */}
+                                {(practiceView === 'contour') && (
+                                    <div className="col-span-1 lg:col-span-2 space-y-4 h-full min-h-[500px]">
+                                        <div className="h-full bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden relative">
+                                            <ContourVisualizer dataRef={dataRef} />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* 8. Full Width: Quality */}
+                                {(practiceView === 'quality') && (
+                                    <div className="col-span-1 lg:col-span-2 space-y-4 h-full min-h-[500px]">
+                                        <div className="h-full bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden relative">
+                                            <QualityVisualizer dataRef={dataRef} />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Full Width Tools Section */}
@@ -368,12 +397,6 @@ const App = () => {
                                                 <Wrench size={20} />
                                             </div>
                                             <span className="text-sm font-bold">All Tools</span>
-                                        </button>
-                                        <button onClick={() => setActiveTab('articulation')} className="p-4 bg-slate-800 rounded-xl flex flex-row items-center gap-3 hover:bg-slate-700 transition-colors group">
-                                            <div className="p-2 rounded-lg bg-pink-500/10 text-pink-400 group-hover:bg-pink-500 group-hover:text-white transition-all">
-                                                <Mic size={20} />
-                                            </div>
-                                            <span className="text-sm font-bold">Articulation</span>
                                         </button>
                                         <button onClick={() => setShowCamera(!showCamera)} className={`p-4 rounded-xl flex flex-row items-center gap-3 transition-colors group ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 hover:bg-slate-700'}`}>
                                             <div className={`p-2 rounded-lg transition-all ${showCamera ? 'bg-white/20 text-white' : 'bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white'}`}>
@@ -424,17 +447,7 @@ const App = () => {
                 {activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} calibration={calibration} />}
 
                 {activeTab === 'analysis' && <AnalysisView />}
-                {
-                    activeTab === 'articulation' && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div className="flex items-center gap-2 mb-4 px-4 pt-4">
-                                <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><ArrowLeft /></button>
-                                <h2 className="text-xl font-bold">Articulation Practice</h2>
-                            </div>
-                            <ArticulationView />
-                        </div>
-                    )
-                }
+
             </main >
 
             {/* Navigation */}
@@ -555,6 +568,7 @@ const App = () => {
                     onUpdateRange={updateTargetRange}
                     onSwitchProfile={switchProfile}
                     onUpdateUserMode={updateUserMode}
+                    settings={settings}
                 />
             )}
             <AchievementPopup />

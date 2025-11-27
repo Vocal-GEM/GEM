@@ -11,6 +11,7 @@ import { feedbackService } from '../../services/FeedbackService';
 import AnalysisReportView from '../ui/AnalysisReportView';
 
 import { textToSpeechService } from '../../services/TextToSpeechService';
+import { useSpeechRecognition } from '../../hooks/useSpeechRecognition';
 
 // Enhanced hook for Speech Synthesis with Voice Selection
 const useSpeechSynthesis = (onEnd) => {
@@ -38,44 +39,7 @@ const useSpeechSynthesis = (onEnd) => {
     return { speak, stop, speaking, isLoading };
 };
 
-// Simple hook for Speech Recognition
-const useSpeechRecognition = (onResult) => {
-    const [listening, setListening] = useState(false);
-    const recognitionRef = useRef(null);
 
-    useEffect(() => {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            const recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.lang = 'en-US';
-            recognition.onstart = () => setListening(true);
-            recognition.onend = () => setListening(false);
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                onResult(transcript);
-            };
-            recognitionRef.current = recognition;
-        }
-    }, [onResult]);
-
-    const start = useCallback(() => {
-        if (recognitionRef.current) {
-            try {
-                recognitionRef.current.start();
-            } catch (e) {
-                console.error("Recognition already started", e);
-            }
-        }
-    }, []);
-
-    const stop = useCallback(() => {
-        if (recognitionRef.current) recognitionRef.current.stop();
-    }, []);
-
-    return { start, stop, listening, isSupported: !!(window.SpeechRecognition || window.webkitSpeechRecognition) };
-};
 
 const PracticeMode = ({
     onClose,
@@ -92,8 +56,22 @@ const PracticeMode = ({
     onNavigate,
     onUpdateRange,
     onSwitchProfile,
-    onUpdateUserMode
+    onUpdateUserMode,
+    settings
 }) => {
+    // Initialize TTS with settings
+    useEffect(() => {
+        if (settings) {
+            console.log("Initializing TTS with settings:", settings);
+            textToSpeechService.updateSettings({
+                // Force ElevenLabs if key is present, otherwise fallback to browser
+                ttsProvider: settings.elevenLabsKey ? 'elevenlabs' : 'browser',
+                elevenLabsKey: settings.elevenLabsKey,
+                voiceId: settings.voiceId
+            });
+        }
+    }, [settings]);
+
     // State Machine
     const [state, setState] = useState('INIT');
     const [transcript, setTranscript] = useState('');
@@ -580,7 +558,7 @@ const PracticeMode = ({
         }
     }, [state, speak, styleSpeak, dataRef, targetRange, goals, onSelectGame, onClose, onOpenSettings, onOpenJournal, onOpenStats, onNavigate, onUpdateRange, onSwitchProfile, routineActive, startRoutine, advanceRoutine, isRecording, startAnalysis, stopAnalysis, transcript]);
 
-    const { start: startListen, stop: stopListen, listening, isSupported } = useSpeechRecognition(handleSpeechResult);
+    const { start: startListen, stop: stopListen, listening, error: speechError, pushToTalkActive, startPushToTalk, stopPushToTalk, isSupported } = useSpeechRecognition(handleSpeechResult);
 
     useEffect(() => {
         if (listening && !speaking) setAiState('LISTENING');
@@ -965,13 +943,51 @@ const PracticeMode = ({
     return (
         <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col animate-in fade-in duration-500">
             <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-20">
-                <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${aiState === 'LISTENING' ? 'bg-red-500 animate-pulse' : aiState === 'SPEAKING' ? 'bg-teal-400 animate-pulse' : 'bg-slate-500'}`} />
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        {aiState === 'LISTENING' ? 'Listening...' : aiState === 'SPEAKING' ? 'Speaking...' : 'Practice Mode'}
-                    </span>
+                <div className="flex items-center gap-3">
+                    {/* Microphone Status Indicator */}
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/50 border border-white/10">
+                        <div className={`w-2 h-2 rounded-full ${listening ? 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]' : 'bg-slate-500'}`} />
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                            {listening ? '🎤 Listening' : aiState === 'SPEAKING' ? '🔊 Speaking' : '⏸️ Idle'}
+                        </span>
+                    </div>
+
+                    {/* Error Message */}
+                    {speechError && (
+                        <div className="px-3 py-1.5 rounded-full bg-red-500/20 border border-red-500/30 text-red-400 text-xs font-bold animate-in fade-in">
+                            {speechError === 'microphone-denied' && '🚫 Microphone access denied'}
+                            {speechError === 'network-error' && '📡 Network error'}
+                            {speechError === 'start-failed' && '⚠️ Failed to start'}
+                            {!['microphone-denied', 'network-error', 'start-failed'].includes(speechError) && `⚠️ ${speechError}`}
+                        </div>
+                    )}
+
+                    {/* Browser Support Warning */}
+                    {!isSupported && (
+                        <div className="px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-bold">
+                            ⚠️ Browser not supported (Use Chrome/Edge)
+                        </div>
+                    )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
+                    {/* Push-to-Talk Button */}
+                    <button
+                        disabled={!isSupported}
+                        onMouseDown={startPushToTalk}
+                        onMouseUp={stopPushToTalk}
+                        onMouseLeave={stopPushToTalk}
+                        onTouchStart={startPushToTalk}
+                        onTouchEnd={stopPushToTalk}
+                        className={`px-4 py-2 rounded-full font-bold text-sm transition-all ${!isSupported
+                            ? 'bg-slate-800/50 text-slate-600 cursor-not-allowed border border-white/5'
+                            : pushToTalkActive
+                                ? 'bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.6)] scale-105'
+                                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-white/10'
+                            }`}
+                        title={isSupported ? "Hold to talk" : "Not supported in this browser"}
+                    >
+                        {pushToTalkActive ? '🎙️ Release to stop' : '🎙️ Push to Talk'}
+                    </button>
                     <button
                         onClick={() => setShowSettings(!showSettings)}
                         className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"

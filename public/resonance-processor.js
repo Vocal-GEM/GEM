@@ -241,7 +241,28 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                     break;
                 }
             }
-            this.smoothedCentroid = (this.lastResonance * (1 - alpha)) + (medianResonance * alpha);
+
+            // F2: strongest peak in 1200-3500Hz (must be different from F1)
+            for (let candidate of formantCandidates) {
+                if (candidate.freq >= 1200 && candidate.freq <= 3500 && candidate !== p1) {
+                    p2 = candidate;
+                    break;
+                }
+            }
+
+            // Calculate spectral centroid for resonance
+            let weightedSum = 0;
+            let totalMag = 0;
+            for (let i = 0; i < spectrum.length; i++) {
+                const freq = (i * TARGET_RATE) / (2 * spectrum.length);
+                weightedSum += freq * spectrum[i];
+                totalMag += spectrum[i];
+            }
+            const spectralCentroid = totalMag > 0 ? weightedSum / totalMag : 0;
+
+            // Smooth resonance
+            const resonanceAlpha = 0.2;
+            this.smoothedCentroid = (this.lastResonance * (1 - resonanceAlpha)) + (spectralCentroid * resonanceAlpha);
             this.lastResonance = this.smoothedCentroid;
 
             // FEATURE: TRUE VOCAL WEIGHT (H1-H2 Harmonic Difference)

@@ -260,7 +260,7 @@ const ArticulationView = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 text-white p-4 pb-24">
+        <div className="bg-slate-950 text-white p-4 pb-24">
             <div className="max-w-4xl mx-auto space-y-6">
                 {/* Header & Mode Switch */}
                 <div className="flex flex-col md:flex-row justify-between items-end gap-4">
