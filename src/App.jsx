@@ -278,191 +278,196 @@ const App = () => {
                                     )}
 
                                     {practiceView === 'pitch' && (
-                                                <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all">
-                                                    <Wrench size={20} />
-                                                </div>
-                                                <span className="text-sm font-bold">All Tools</span>
-                                            </button>
-                                <button onClick={() => setShowCamera(!showCamera)} className={`p-4 rounded-xl flex flex-row items-center gap-3 transition-colors group ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 hover:bg-slate-700'}`}>
-                                    <div className={`p-2 rounded-lg transition-all ${showCamera ? 'bg-white/20 text-white' : 'bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white'}`}>
-                                        <Camera size={20} />
+                                        <div className="h-full">
+                                            <PitchVisualizer dataRef={dataRef} />
+                                        </div>
+                                    )}
+
+                                    <div className="grid grid-cols-2 gap-4 mt-4">
+                                        <button onClick={() => setActiveTab('tools')} className="p-4 rounded-xl flex flex-row items-center gap-3 transition-colors group bg-slate-800 hover:bg-slate-700">
+                                            <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all">
+                                                <Wrench size={20} />
+                                            </div>
+                                            <span className="text-sm font-bold">All Tools</span>
+                                        </button>
+                                        <button onClick={() => setShowCamera(!showCamera)} className={`p-4 rounded-xl flex flex-row items-center gap-3 transition-colors group ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 hover:bg-slate-700'}`}>
+                                            <div className={`p-2 rounded-lg transition-all ${showCamera ? 'bg-white/20 text-white' : 'bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white'}`}>
+                                                <Camera size={20} />
+                                            </div>
+                                            <span className="text-sm font-bold">Mirror</span>
+                                        </button>
                                     </div>
-                                    <span className="text-sm font-bold">Mirror</span>
-                                </button>
+                                </div>
                             </div>
                         </div>
+                    )
+                    }
+                    {activeTab === 'history' && <HistoryView stats={stats} journals={journals} onLogClick={() => setShowJournalForm(true)} />}
+                    {
+                        activeTab === 'tools' && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><ArrowLeft /></button>
+                                    <h2 className="text-xl font-bold">Tools</h2>
                                 </div>
+                                <AudioLibrary audioEngine={audioEngineRef} />
+                                <ComparisonTool />
+                                <PitchPipe audioEngine={audioEngineRef} />
+                                <BreathPacer />
+                                <div className="p-4 bg-slate-800 rounded-xl flex flex-row items-center justify-between gap-3 hover:bg-slate-700 transition-colors cursor-pointer" onClick={() => setShowVocalFolds(true)}>
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-lg bg-pink-500/10 text-pink-400">
+                                            <Activity size={20} />
+                                        </div>
+                                        <div className="text-left">
+                                            <h3 className="text-sm font-bold text-white">Vocal Folds Simulation</h3>
+                                            <p className="text-xs text-slate-400">Interactive physics model</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <MirrorComponent />
+                            </div>
+                        )
+                    }
+                    {activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} calibration={calibration} />}
 
+                    {activeTab === 'coach' && <CoachView />}
 
-        </div>
-    )
-}
-{ activeTab === 'history' && <HistoryView stats={stats} journals={journals} onLogClick={() => setShowJournalForm(true)} /> }
-{
-    activeTab === 'tools' && (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center gap-2 mb-4">
-                <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><ArrowLeft /></button>
-                <h2 className="text-xl font-bold">Tools</h2>
-            </div>
-            <AudioLibrary audioEngine={audioEngineRef} />
-            <ComparisonTool />
-            <PitchPipe audioEngine={audioEngineRef} />
-            <BreathPacer />
-            <div className="p-4 bg-slate-800 rounded-xl flex flex-row items-center justify-between gap-3 hover:bg-slate-700 transition-colors cursor-pointer" onClick={() => setShowVocalFolds(true)}>
-                <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-pink-500/10 text-pink-400">
-                        <Activity size={20} />
-                    </div>
-                    <div className="text-left">
-                        <h3 className="text-sm font-bold text-white">Vocal Folds Simulation</h3>
-                        <p className="text-xs text-slate-400">Interactive physics model</p>
-                    </div>
-                </div>
-            </div>
-            <MirrorComponent />
-        </div>
-    )
-}
-{ activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} calibration={calibration} /> }
-
-{ activeTab === 'coach' && <CoachView /> }
-
-{ activeTab === 'analysis' && <AnalysisView /> }
+                    {activeTab === 'analysis' && <AnalysisView />}
                 </Suspense >
             </main >
 
-    {/* Navigation */ }
-    < nav className = "fixed bottom-0 inset-x-0 bg-slate-950/90 backdrop-blur-lg border-t border-white/5 pb-safe z-40" role = "navigation" aria - label="Main navigation" >
-        <div className="flex justify-around items-center p-2 max-w-[1600px] mx-auto">
-            <button onClick={() => { setActiveTab('practice'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all relative ${activeTab === 'practice' ? 'text-teal-400' : 'text-slate-500 hover:text-slate-300'}`}>
-                <Mic2 className="w-6 h-6" />
-                <span className="text-[10px] font-bold">Practice</span>
-                {activeTab === 'practice' && <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-teal-500 to-violet-500 rounded-full" />}
-            </button>
+            {/* Navigation */}
+            <nav className="fixed bottom-0 inset-x-0 bg-slate-950/90 backdrop-blur-lg border-t border-white/5 pb-safe z-40" role="navigation" aria-label="Main navigation">
+                <div className="flex justify-around items-center p-2 max-w-[1600px] mx-auto">
+                    <button onClick={() => { setActiveTab('practice'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all relative ${activeTab === 'practice' ? 'text-teal-400' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <Mic2 className="w-6 h-6" />
+                        <span className="text-[10px] font-bold">Practice</span>
+                        {activeTab === 'practice' && <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-teal-500 to-violet-500 rounded-full" />}
+                    </button>
 
-            <button onClick={() => { setActiveTab('mixing'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'mixing' ? 'text-pink-400 bg-pink-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
-                <Wrench className="w-6 h-6" />
-                <span className="text-[10px] font-bold">Mixer</span>
-            </button>
-            <button onClick={() => { setActiveTab('coach'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'coach' ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
-                <Bot className="w-6 h-6" />
-                <span className="text-[10px] font-bold">Coach</span>
-            </button>
-            <button onClick={() => { setActiveTab('history'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'history' ? 'text-orange-400 bg-orange-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
-                <BarChart2 className="w-6 h-6" />
-                <span className="text-[10px] font-bold">Progress</span>
-            </button>
-            <button onClick={() => { setActiveTab('analysis'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'analysis' ? 'text-cyan-400 bg-cyan-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
-                <Activity className="w-6 h-6" />
-                <span className="text-[10px] font-bold">Analysis</span>
-            </button>
-        </div>
+                    <button onClick={() => { setActiveTab('mixing'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'mixing' ? 'text-pink-400 bg-pink-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <Wrench className="w-6 h-6" />
+                        <span className="text-[10px] font-bold">Mixer</span>
+                    </button>
+                    <button onClick={() => { setActiveTab('coach'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'coach' ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <Bot className="w-6 h-6" />
+                        <span className="text-[10px] font-bold">Coach</span>
+                    </button>
+                    <button onClick={() => { setActiveTab('history'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'history' ? 'text-orange-400 bg-orange-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <BarChart2 className="w-6 h-6" />
+                        <span className="text-[10px] font-bold">Progress</span>
+                    </button>
+                    <button onClick={() => { setActiveTab('analysis'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'analysis' ? 'text-cyan-400 bg-cyan-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <Activity className="w-6 h-6" />
+                        <span className="text-[10px] font-bold">Analysis</span>
+                    </button>
+                </div>
             </nav >
 
-    {/* Modals */ }
-    < FeedbackSettings
-isOpen = { showSettings }
-onClose = {() => setShowSettings(false)}
-settings = { settings }
-setSettings = { updateSettings }
-targetRange = { targetRange }
-userMode = { userMode }
-setUserMode = { updateUserMode }
-onSetGoal = {(type) => {
-    let r = { min: 170, max: 220 };
-    if (type === 'fem') r = { min: 165, max: 255 };
-    if (type === 'masc') r = { min: 85, max: 145 };
-    if (type === 'androg') r = { min: 145, max: 175 };
-    updateTargetRange(r);
-}}
-onUpdateRange = {(min, max) => updateTargetRange({ min, max })}
-calibration = { calibration }
-onUpdateCalibration = { updateCalibration }
-onOpenTutorial = {() => { setShowSettings(false); setShowTutorial(true); }}
-onExportData = {() => {
-    const data = { journals, stats, goals, settings, targetRange, calibration };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'vocal-gem-data.json'; a.click();
-}}
+            {/* Modals */}
+            <FeedbackSettings
+                isOpen={showSettings}
+                onClose={() => setShowSettings(false)}
+                settings={settings}
+                setSettings={updateSettings}
+                targetRange={targetRange}
+
+                onSetGoal={(type) => {
+                    let r = { min: 170, max: 220 };
+                    if (type === 'fem') r = { min: 165, max: 255 };
+                    if (type === 'masc') r = { min: 85, max: 145 };
+                    if (type === 'androg') r = { min: 145, max: 175 };
+                    updateTargetRange(r);
+                }}
+                onUpdateRange={(min, max) => updateTargetRange({ min, max })}
+                calibration={calibration}
+                onUpdateCalibration={updateCalibration}
+                onOpenTutorial={() => { setShowSettings(false); setShowTutorial(true); }}
+                onExportData={() => {
+                    const data = { journals, stats, goals, settings, targetRange, calibration };
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a'); a.href = url; a.download = 'vocal-gem-data.json'; a.click();
+                }}
             />
-{ showMigration && <MigrationModal onComplete={() => setShowMigration(false)} /> }
+            {showMigration && <MigrationModal onComplete={() => setShowMigration(false)} />}
 
-{/* Onboarding Wizards */ }
-{
-    (showTutorial || showCompass || showCalibration) && (
-        <button
-            onClick={() => {
-                localStorage.setItem('gem_tutorial_seen', 'true');
-                localStorage.setItem('gem_compass_seen', 'true');
-                localStorage.setItem('gem_calibration_done', 'true');
-                setShowTutorial(false);
-                setShowCompass(false);
-                setShowCalibration(false);
-            }}
-            className="fixed top-4 right-4 z-[60] px-4 py-2 bg-slate-800/80 backdrop-blur-md text-slate-400 hover:text-white text-xs font-bold uppercase tracking-wider rounded-full border border-white/10 hover:bg-slate-700 transition-all"
-        >
-            Skip Setup
-        </button>
-    )
-}
+            {/* Onboarding Wizards */}
+            {
+                (showTutorial || showCompass || showCalibration) && (
+                    <button
+                        onClick={() => {
+                            localStorage.setItem('gem_tutorial_seen', 'true');
+                            localStorage.setItem('gem_compass_seen', 'true');
+                            localStorage.setItem('gem_calibration_done', 'true');
+                            setShowTutorial(false);
+                            setShowCompass(false);
+                            setShowCalibration(false);
+                        }}
+                        className="fixed top-4 right-4 z-[60] px-4 py-2 bg-slate-800/80 backdrop-blur-md text-slate-400 hover:text-white text-xs font-bold uppercase tracking-wider rounded-full border border-white/10 hover:bg-slate-700 transition-all"
+                    >
+                        Skip Setup
+                    </button>
+                )
+            }
 
-{ showTutorial && <TutorialWizard onComplete={handleTutorialComplete} onSkip={() => { setShowTutorial(false); setShowCompass(true); }} /> }
-{ !showTutorial && showCompass && <CompassWizard onComplete={handleCompassComplete} /> }
-{ showCalibration && <CalibrationWizard onComplete={handleCalibrationComplete} onSkip={handleCalibrationComplete} audioEngine={audioEngineRef} /> }
-{
-    showJournalForm && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="w-full max-w-md">
-                <JournalForm onSubmit={addJournalEntry} onCancel={() => setShowJournalForm(false)} />
-            </div>
-        </div>
-    )
-}
-{ showLogin && <Login onSwitchToSignup={() => { setShowLogin(false); setShowSignup(true); }} onClose={() => setShowLogin(false)} /> }
-{ showSignup && <Signup onSwitchToLogin={() => { setShowSignup(false); setShowLogin(true); }} onClose={() => setShowSignup(false)} /> }
-{ showProfile && <UserProfile user={user} onClose={() => setShowProfile(false)} onLogout={() => { logout(); setShowProfile(false); }} /> }
-{ showVocalHealthTips && <VocalHealthTips onClose={() => setShowVocalHealthTips(false)} /> }
-{ showAssessment && <AssessmentModule onClose={() => setShowAssessment(false)} /> }
-{ showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} /> }
-{ showForwardFocus && <ForwardFocusDrill onClose={() => setShowForwardFocus(false)} /> }
-{ showIncognito && <IncognitoScreen onClose={() => setShowIncognito(false)} /> }
-{ showCamera && <FloatingCamera onClose={() => setShowCamera(false)} /> }
-{
-    showVocalFolds && (
-        <Suspense fallback={<LoadingSpinner />}>
-            <VocalFoldsView onClose={() => setShowVocalFolds(false)} />
-        </Suspense>
-    )
-}
-{
-    showCourse && (
-        <Suspense fallback={<LoadingSpinner />}>
-            <FeminizationCourse onClose={() => setShowCourse(false)} />
-        </Suspense>
-    )
-}
-showPracticeMode && (
-    <Suspense fallback={<LoadingSpinner />}>
-        <PracticeMode
-            onClose={() => setShowPracticeMode(false)}
-            dataRef={dataRef}
-            calibration={calibration}
-            targetRange={targetRange}
-            goals={goals}
-            activeTab={activeTab}
-            onOpenSettings={() => setShowSettings(true)}
-            onOpenJournal={() => { setActiveTab('history'); setShowJournalForm(true); }}
-            onOpenStats={() => setActiveTab('history')}
-            onNavigate={setActiveTab}
-            onUpdateRange={updateTargetRange}
-            onSwitchProfile={switchProfile}
-            settings={settings}
-        />
-    </Suspense>
-)
-}
+            {showTutorial && <TutorialWizard onComplete={handleTutorialComplete} onSkip={() => { setShowTutorial(false); setShowCompass(true); }} />}
+            {!showTutorial && showCompass && <CompassWizard onComplete={handleCompassComplete} />}
+            {showCalibration && <CalibrationWizard onComplete={handleCalibrationComplete} onSkip={handleCalibrationComplete} audioEngine={audioEngineRef} />}
+            {
+                showJournalForm && (
+                    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                        <div className="w-full max-w-md">
+                            <JournalForm onSubmit={addJournalEntry} onCancel={() => setShowJournalForm(false)} />
+                        </div>
+                    </div>
+                )
+            }
+            {showLogin && <Login onSwitchToSignup={() => { setShowLogin(false); setShowSignup(true); }} onClose={() => setShowLogin(false)} />}
+            {showSignup && <Signup onSwitchToLogin={() => { setShowSignup(false); setShowLogin(true); }} onClose={() => setShowSignup(false)} />}
+            {showProfile && <UserProfile user={user} onClose={() => setShowProfile(false)} onLogout={() => { logout(); setShowProfile(false); }} />}
+            {showVocalHealthTips && <VocalHealthTips onClose={() => setShowVocalHealthTips(false)} />}
+            {showAssessment && <AssessmentModule onClose={() => setShowAssessment(false)} />}
+            {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}
+            {showForwardFocus && <ForwardFocusDrill onClose={() => setShowForwardFocus(false)} />}
+            {showIncognito && <IncognitoScreen onClose={() => setShowIncognito(false)} />}
+            {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
+            {
+                showVocalFolds && (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <VocalFoldsView onClose={() => setShowVocalFolds(false)} />
+                    </Suspense>
+                )
+            }
+            {
+                showCourse && (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <FeminizationCourse onClose={() => setShowCourse(false)} />
+                    </Suspense>
+                )
+            }
+            {
+                showPracticeMode && (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <PracticeMode
+                            onClose={() => setShowPracticeMode(false)}
+                            dataRef={dataRef}
+                            calibration={calibration}
+                            targetRange={targetRange}
+                            goals={goals}
+                            activeTab={activeTab}
+                            onOpenSettings={() => setShowSettings(true)}
+                            onOpenJournal={() => { setActiveTab('history'); setShowJournalForm(true); }}
+                            onOpenStats={() => setActiveTab('history')}
+                            onNavigate={setActiveTab}
+                            onUpdateRange={updateTargetRange}
+                            onSwitchProfile={switchProfile}
+                            settings={settings}
+                        />
+                    </Suspense>
+                )
+            }
 
         </div >
     );

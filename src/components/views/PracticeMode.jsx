@@ -48,14 +48,12 @@ const PracticeMode = ({
     targetRange,
 
     activeTab,
-    userMode,
     onOpenSettings,
     onOpenJournal,
     onOpenStats,
     onNavigate,
     onUpdateRange,
     onSwitchProfile,
-    onUpdateUserMode,
     settings
 }) => {
     // Initialize TTS with settings

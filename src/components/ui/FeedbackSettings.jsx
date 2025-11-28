@@ -360,21 +360,8 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                             <span className="text-sm font-bold text-white">Warm-Up Exercises</span>
                         </button>
                         <button onClick={() => { onClose(); setTimeout(() => window.dispatchEvent(new CustomEvent('openForwardFocus')), 100); }} className="w-full p-3 bg-purple-800 hover:bg-purple-700 rounded-xl text-left flex items-center gap-3 transition-colors">
-                            <div className="text-[10px] text-slate-400">170-220 Hz</div>
-                        </button>
-                        <button
-                            onClick={() => window.dispatchEvent(new CustomEvent('switchProfile', { detail: 'neutral' }))}
-                            className="p-3 rounded-xl bg-purple-900/20 border border-purple-500/30 hover:bg-purple-900/40 transition-colors text-center"
-                        >
-                            <div className="text-purple-400 font-bold text-sm">Neutral</div>
-                            <div className="text-[10px] text-slate-400">145-175 Hz</div>
-                        </button>
-                        <button
-                            onClick={() => window.dispatchEvent(new CustomEvent('switchProfile', { detail: 'masc' }))}
-                            className="p-3 rounded-xl bg-blue-900/20 border border-blue-500/30 hover:bg-blue-900/40 transition-colors text-center"
-                        >
-                            <div className="text-blue-400 font-bold text-sm">Masc</div>
-                            <div className="text-[10px] text-slate-400">85-145 Hz</div>
+                            <Target className="w-5 h-5 text-purple-400" />
+                            <span className="text-sm font-bold text-white">Forward Focus Resonance</span>
                         </button>
                     </div>
                 </section>
