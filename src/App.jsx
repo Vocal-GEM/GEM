@@ -207,23 +207,23 @@ const App = () => {
     return (
         <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-blue-500/30 pb-20">
             {/* Header */}
-            <header className="p-4 pt-safe bg-slate-900/50 backdrop-blur-md sticky top-0 z-30 border-b border-white/5">
+            <header className="p-4 pt-safe bg-slate-900/50 backdrop-blur-md sticky top-0 z-30 border-b border-white/5" role="banner">
                 <div className="w-full max-w-[1600px] mx-auto flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20" aria-hidden="true">
                             <Mic className="w-5 h-5 text-white" />
                         </div>
                         <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Vocal GEM</h1>
                     </div>
                     <div className="flex items-center gap-2">
                         <OfflineIndicator />
-                        <button onClick={() => setShowSettings(true)} className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700">
-                            <span className="text-sm font-bold text-white">⚙️ Settings</span>
+                        <button onClick={() => setShowSettings(true)} className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700" aria-label="Open settings">
+                            <span className="text-sm font-bold text-white" aria-hidden="true">⚙️ Settings</span>
                         </button>
-                        <button onClick={() => user ? setShowProfile(true) : setShowLogin(true)} className="w-10 h-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors">
-                            <span className="text-lg">👤</span>
+                        <button onClick={() => user ? setShowProfile(true) : setShowLogin(true)} className="w-10 h-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors" aria-label={user ? "Open profile" : "Login"}>
+                            <span className="text-lg" aria-hidden="true">👤</span>
                         </button>
-                        <button onClick={() => setShowCamera(!showCamera)} className={`w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transition-colors ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
+                        <button onClick={() => setShowCamera(!showCamera)} className={`w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transition-colors ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`} aria-label={showCamera ? "Close camera" : "Open camera"} aria-pressed={showCamera}>
                             <Camera className="w-5 h-5" />
                         </button>
                     </div>
@@ -231,7 +231,7 @@ const App = () => {
             </header>
 
             {/* Main Content */}
-            <main className={userMode === 'slp' ? "h-[calc(100vh-80px)]" : "p-6 max-w-[1600px] mx-auto"}>
+            <main className={userMode === 'slp' ? "h-[calc(100vh-80px)]" : "p-6 max-w-[1600px] mx-auto"} role="main">
                 <Suspense fallback={<LoadingSpinner />}>
                     {activeTab === 'practice' && (
                         userMode === 'slp' ? (
@@ -245,8 +245,8 @@ const App = () => {
                                         <button onClick={() => setShowPracticeMode(true)} className="px-4 py-2.5 rounded-full text-sm font-bold bg-slate-800 hover:bg-slate-700 text-purple-400 border border-purple-500/30 transition-all flex items-center gap-2">
                                             <Mic2 className="w-4 h-4" /> Voice Mode
                                         </button>
-                                        <button onClick={toggleAudio} className={`px-6 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all shadow-lg ${isAudioActive ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30' : 'bg-gradient-to-r from-teal-500 to-violet-500 hover:from-teal-400 hover:to-violet-400 text-white hover:shadow-xl hover:shadow-teal-500/30 animate-glow-pulse'}`}>
-                                            {isAudioActive ? <><span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" /> LIVE</> : <><Mic className="w-4 h-4" /> START LISTENING</>}
+                                        <button onClick={toggleAudio} className={`px-6 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all shadow-lg ${isAudioActive ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30' : 'bg-gradient-to-r from-teal-500 to-violet-500 hover:from-teal-400 hover:to-violet-400 text-white hover:shadow-xl hover:shadow-teal-500/30 animate-glow-pulse'}`} aria-label={isAudioActive ? "Stop listening" : "Start listening"} aria-pressed={isAudioActive}>
+                                            {isAudioActive ? <><span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" aria-hidden="true" /> LIVE</> : <><Mic className="w-4 h-4" aria-hidden="true" /> START LISTENING</>}
                                         </button>
                                     </div>
                                 </div>
@@ -257,6 +257,9 @@ const App = () => {
                                             {view.label}
                                         </button>
                                     ))}
+                                    <button onClick={() => setShowCourse(true)} className="px-5 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap min-w-[80px] flex-shrink-0 bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-400 hover:to-purple-500 shadow-md shadow-pink-500/20 flex items-center gap-2">
+                                        <BookOpen className="w-4 h-4" /> Course
+                                    </button>
                                 </div>
 
                                 {/* Dashboard Grid - 2x2 Layout for Top Section */}
@@ -266,9 +269,13 @@ const App = () => {
                                     <div className="flex flex-col">
                                         {/* Dynamic Orb (Show All) or Legacy Resonance Orb (Resonance Tab) */}
                                         {practiceView === 'all' ? (
-                                            <div key="dynamic-orb-container" className="h-80 lg:h-[500px] w-full mb-6 relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5">
-                                                <DynamicOrb dataRef={dataRef} calibration={calibration} />
-                                            </div>
+                                            <>
+                                                <div key="dynamic-orb-container" className="h-80 lg:h-[500px] w-full mb-6 relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5">
+                                                    <DynamicOrb dataRef={dataRef} calibration={calibration} />
+                                                </div>
+                                                {/* Live Metrics Bar */}
+                                                <LiveMetricsBar dataRef={dataRef} />
+                                            </>
                                         ) : (
                                             practiceView === 'resonance' && (
                                                 <div key="resonance-orb-container" className="w-full mb-6 relative z-20">
@@ -276,12 +283,15 @@ const App = () => {
                                                 </div>
                                             )
                                         )}
-                                        {/* Live Metrics Bar */}
-                                        {practiceView === 'all' && <LiveMetricsBar dataRef={dataRef} />}
                                     </div>
 
-                                    {/* 2. Top Right: Pitch Tracking */}
+                                    {/* 2. Top Right: Pitch Tracking OR Resonance Orb in Show All */}
                                     <div className="flex flex-col">
+                                        {practiceView === 'all' && (
+                                            <div className="mb-6">
+                                                <ResonanceOrb dataRef={dataRef} calibration={calibration} showDebug={false} />
+                                            </div>
+                                        )}
                                         {(practiceView === 'all' || practiceView === 'pitch') && (
                                             <div className="h-80 lg:h-[500px] flex flex-col">
                                                 <div className="flex justify-between items-center mb-2">
@@ -303,28 +313,37 @@ const App = () => {
                                     </div>
 
                                     {/* 3. Bottom Left: Voice Quality */}
-                                    <div className="space-y-4 h-full min-h-[400px]">
+                                    <div className="space-y-4">
                                         {(practiceView === 'all' || practiceView === 'weight') && <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />}
-                                        {(practiceView === 'all' || practiceView === 'tilt') && <SpectralTiltMeter dataRef={dataRef} userMode={userMode} targetRange={settings.tiltTarget} />}
                                     </div>
 
                                     {/* 4. Bottom Right: Vowel Space */}
-                                    <div className="space-y-4 h-full min-h-[400px]">
+                                    <div className="space-y-4">
                                         {(practiceView === 'all' || practiceView === 'vowel') && <VowelSpacePlot dataRef={dataRef} userMode={userMode} />}
                                     </div>
+                                </div>
 
-                                    {/* 5. Full Width: Spectrogram */}
-                                    {(practiceView === 'all' || practiceView === 'spectrogram') && (
-                                        <div className="col-span-1 lg:col-span-2 space-y-4 h-full min-h-[300px]">
-                                            <div className="h-full bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden relative">
-                                                <HighResSpectrogram dataRef={dataRef} />
-                                                <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-mono text-blue-400 border border-blue-500/30">
-                                                    Spectrogram
-                                                </div>
+                                {/* 5. Full Width: Spectrogram (Outside the 2x2 grid) */}
+                                {(practiceView === 'all' || practiceView === 'spectrogram') && (
+                                    <div className="mb-8">
+                                        <div className="h-[300px] bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden relative">
+                                            <HighResSpectrogram dataRef={dataRef} />
+                                            <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-mono text-blue-400 border border-blue-500/30">
+                                                Spectrogram
                                             </div>
                                         </div>
-                                    )}
+                                    </div>
+                                )}
 
+                                {/* 6. Full Width: Spectral Tilt */}
+                                {(practiceView === 'all' || practiceView === 'tilt') && (
+                                    <div className="mb-8">
+                                        <SpectralTiltMeter dataRef={dataRef} userMode={userMode} targetRange={settings.tiltTarget} />
+                                    </div>
+                                )}
+
+                                {/* 6-8: Single View Components (Articulation, Contour, Quality) */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                                     {/* 6. Full Width: Articulation */}
                                     {(practiceView === 'articulation') && (
                                         <div className="col-span-1 lg:col-span-2 space-y-4 h-full min-h-[500px]">
@@ -351,27 +370,6 @@ const App = () => {
                                             </div>
                                         </div>
                                     )}
-                                </div>
-
-                                {/* Full Width Tools Section */}
-                                <div className="w-full mb-8">
-                                    <div className="p-6 bg-gradient-to-br from-pink-600/20 to-purple-600/20 rounded-2xl border border-pink-500/30 relative overflow-hidden group cursor-pointer" onClick={() => setShowCourse(true)}>
-                                        <div className="absolute inset-0 bg-gradient-to-r from-pink-600/10 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                        <div className="relative z-10 flex items-center justify-between">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center shadow-lg shadow-pink-500/20">
-                                                    <BookOpen className="w-6 h-6 text-white" />
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-lg font-bold text-white group-hover:text-pink-200 transition-colors">Start Feminization Course</h3>
-                                                    <p className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">Structured lessons for pitch, resonance, and weight</p>
-                                                </div>
-                                            </div>
-                                            <div className="px-4 py-2 bg-white/10 rounded-full text-sm font-bold text-white group-hover:bg-white/20 transition-colors flex items-center gap-2">
-                                                Start Learning <ChevronRight className="w-4 h-4" />
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
 
                                 {/* Full Width Tools Section */}
@@ -410,7 +408,6 @@ const App = () => {
                                     <h2 className="text-xl font-bold">Tools</h2>
                                 </div>
                                 <AudioLibrary audioEngine={audioEngineRef} />
-                                <IntonationExercise />
                                 <ComparisonTool />
                                 <PitchPipe audioEngine={audioEngineRef} />
                                 <BreathPacer />
@@ -431,12 +428,14 @@ const App = () => {
                     }
                     {activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} calibration={calibration} />}
 
+                    {activeTab === 'coach' && <CoachView />}
+
                     {activeTab === 'analysis' && <AnalysisView />}
                 </Suspense>
-            </main >
+            </main>
 
             {/* Navigation */}
-            < nav className="fixed bottom-0 inset-x-0 bg-slate-950/90 backdrop-blur-lg border-t border-white/5 pb-safe z-40" >
+            <nav className="fixed bottom-0 inset-x-0 bg-slate-950/90 backdrop-blur-lg border-t border-white/5 pb-safe z-40" role="navigation" aria-label="Main navigation">
                 <div className="flex justify-around items-center p-2 max-w-[1600px] mx-auto">
                     <button onClick={() => { setActiveTab('practice'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all relative ${activeTab === 'practice' ? 'text-teal-400' : 'text-slate-500 hover:text-slate-300'}`}>
                         <Mic2 className="w-6 h-6" />
@@ -461,7 +460,7 @@ const App = () => {
                         <span className="text-[10px] font-bold">Analysis</span>
                     </button>
                 </div>
-            </nav >
+            </nav>
 
             {/* Modals */}
             < FeedbackSettings
@@ -493,21 +492,23 @@ const App = () => {
             {showMigration && <MigrationModal onComplete={() => setShowMigration(false)} />}
 
             {/* Onboarding Wizards */}
-            {(showTutorial || showCompass || showCalibration) && (
-                <button
-                    onClick={() => {
-                        localStorage.setItem('gem_tutorial_seen', 'true');
-                        localStorage.setItem('gem_compass_seen', 'true');
-                        localStorage.setItem('gem_calibration_done', 'true');
-                        setShowTutorial(false);
-                        setShowCompass(false);
-                        setShowCalibration(false);
-                    }}
-                    className="fixed top-4 right-4 z-[60] px-4 py-2 bg-slate-800/80 backdrop-blur-md text-slate-400 hover:text-white text-xs font-bold uppercase tracking-wider rounded-full border border-white/10 hover:bg-slate-700 transition-all"
-                >
-                    Skip Setup
-                </button>
-            )}
+            {
+                (showTutorial || showCompass || showCalibration) && (
+                    <button
+                        onClick={() => {
+                            localStorage.setItem('gem_tutorial_seen', 'true');
+                            localStorage.setItem('gem_compass_seen', 'true');
+                            localStorage.setItem('gem_calibration_done', 'true');
+                            setShowTutorial(false);
+                            setShowCompass(false);
+                            setShowCalibration(false);
+                        }}
+                        className="fixed top-4 right-4 z-[60] px-4 py-2 bg-slate-800/80 backdrop-blur-md text-slate-400 hover:text-white text-xs font-bold uppercase tracking-wider rounded-full border border-white/10 hover:bg-slate-700 transition-all"
+                    >
+                        Skip Setup
+                    </button>
+                )
+            }
 
             {showTutorial && <TutorialWizard onComplete={handleTutorialComplete} onSkip={() => { setShowTutorial(false); setShowCompass(true); }} />}
             {!showTutorial && showCompass && <CompassWizard onComplete={handleCompassComplete} />}
@@ -530,37 +531,43 @@ const App = () => {
             {showForwardFocus && <ForwardFocusDrill onClose={() => setShowForwardFocus(false)} />}
             {showIncognito && <IncognitoScreen onClose={() => setShowIncognito(false)} />}
             {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
-            {showVocalFolds && (
-                <Suspense fallback={<LoadingSpinner />}>
-                    <VocalFoldsView onClose={() => setShowVocalFolds(false)} />
-                </Suspense>
-            )}
-            {showCourse && (
-                <Suspense fallback={<LoadingSpinner />}>
-                    <FeminizationCourse onClose={() => setShowCourse(false)} />
-                </Suspense>
-            )}
-            {showPracticeMode && (
-                <Suspense fallback={<LoadingSpinner />}>
-                    <PracticeMode
-                        onClose={() => setShowPracticeMode(false)}
-                        dataRef={dataRef}
-                        calibration={calibration}
-                        targetRange={targetRange}
-                        goals={goals}
-                        activeTab={activeTab}
-                        userMode={userMode}
-                        onOpenSettings={() => setShowSettings(true)}
-                        onOpenJournal={() => { setActiveTab('history'); setShowJournalForm(true); }}
-                        onOpenStats={() => setActiveTab('history')}
-                        onNavigate={setActiveTab}
-                        onUpdateRange={updateTargetRange}
-                        onSwitchProfile={switchProfile}
-                        onUpdateUserMode={updateUserMode}
-                        settings={settings}
-                    />
-                </Suspense>
-            )}
+            {
+                showVocalFolds && (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <VocalFoldsView onClose={() => setShowVocalFolds(false)} />
+                    </Suspense>
+                )
+            }
+            {
+                showCourse && (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <FeminizationCourse onClose={() => setShowCourse(false)} />
+                    </Suspense>
+                )
+            }
+            {
+                showPracticeMode && (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <PracticeMode
+                            onClose={() => setShowPracticeMode(false)}
+                            dataRef={dataRef}
+                            calibration={calibration}
+                            targetRange={targetRange}
+                            goals={goals}
+                            activeTab={activeTab}
+                            userMode={userMode}
+                            onOpenSettings={() => setShowSettings(true)}
+                            onOpenJournal={() => { setActiveTab('history'); setShowJournalForm(true); }}
+                            onOpenStats={() => setActiveTab('history')}
+                            onNavigate={setActiveTab}
+                            onUpdateRange={updateTargetRange}
+                            onSwitchProfile={switchProfile}
+                            onUpdateUserMode={updateUserMode}
+                            settings={settings}
+                        />
+                    </Suspense>
+                )
+            }
 
         </div >
     );

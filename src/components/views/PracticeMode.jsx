@@ -780,7 +780,6 @@ const PracticeMode = ({
                                 styleSpeak("Good intonation! You matched the pattern.");
                                 setFeedback("Matched! ✨");
                                 exercisesCompleted.current.push('mimic');
-                                setStreak(s => s + 1);
                             }
                         } else {
                             if (routineActive) {
@@ -790,7 +789,6 @@ const PracticeMode = ({
                                 setState('PRACTICE_ACTIVE');
                                 styleSpeak("That was a bit flat. Try to exaggerate the high note next time.");
                                 setFeedback("Try again!");
-                                setStreak(0);
                             }
                         }
                     }

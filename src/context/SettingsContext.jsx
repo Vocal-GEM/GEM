@@ -23,9 +23,9 @@ export const SettingsProvider = ({ children }) => {
         homeNote: 190,
 
         theme: 'dark', // 'dark' | 'light'
-        ttsProvider: 'elevenlabs', // 'browser' | 'elevenlabs'
-        elevenLabsKey: import.meta.env.VITE_ELEVENLABS_API_KEY || '',
-        voiceId: '21m00Tcm4TlvDq8ikWAM' // Default Rachel
+        ttsProvider: 'browser', // 'browser' | 'elevenlabs'
+        voiceId: '21m00Tcm4TlvDq8ikWAM', // Default Rachel
+        tiltTarget: { min: -12, max: -6 } // Spectral tilt target range
     });
 
     const [showSettings, setShowSettings] = useState(false);

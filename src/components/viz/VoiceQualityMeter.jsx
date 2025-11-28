@@ -65,7 +65,7 @@ const VoiceQualityMeter = ({ dataRef, userMode }) => {
             {/* Meter Bar */}
             <div className="relative h-10 bg-slate-900/80 rounded-full overflow-hidden shadow-inner border border-white/5 mb-6">
                 {/* Dynamic Gradient Background */}
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-emerald-500/20 to-red-500/20"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 via-emerald-500/20 to-blue-500/20"></div>
 
                 {/* Grid Lines */}
                 <div className="absolute left-[30%] top-0 bottom-0 w-px bg-white/10 dashed-line"></div>

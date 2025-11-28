@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useProfile } from '../../context/ProfileContext';
+import { RotateCcw } from 'lucide-react';
 
 const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, settings }) => {
     const { voiceProfiles } = useProfile();
@@ -9,6 +10,7 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
     const gameRef = useRef({ score: 0, lastUpdate: Date.now(), lastPitch: 0 });
 
     const [zoomRange, setZoomRange] = useState({ min: 50, max: 350 });
+    const [averagePitchRange, setAveragePitchRange] = useState({ lowest: null, highest: null });
 
     useEffect(() => {
         balloonRef.current.src = '/assets/balloon.png';
@@ -33,6 +35,10 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
             const newRange = range * 1.25;
             return { min: Math.max(0, center - newRange / 2), max: center + newRange / 2 }; // Prevent negative freq
         });
+    };
+
+    const handleResetAverage = () => {
+        setAveragePitchRange({ lowest: null, highest: null });
     };
 
     useEffect(() => {
@@ -228,6 +234,15 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
 
             ctx.shadowBlur = 0;
             const currentP = history[history.length - 1];
+
+            // Update average pitch range (only for speaking pitches > 0)
+            if (currentP > 0) {
+                setAveragePitchRange(prev => ({
+                    lowest: prev.lowest === null ? currentP : Math.min(prev.lowest, currentP),
+                    highest: prev.highest === null ? currentP : Math.max(prev.highest, currentP)
+                }));
+            }
+
             if (currentP > 0) { ctx.fillStyle = '#60a5fa'; ctx.font = 'bold 20px monospace'; ctx.textAlign = 'right'; ctx.fillText(Math.round(currentP) + " Hz", width - 10, 30); }
             requestAnimationFrame(loop);
         };
@@ -239,6 +254,27 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
     return (
         <div className="w-full h-full relative overflow-hidden group">
             <div className="absolute top-3 left-10 text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</div>
+
+            {/* Average Pitch Range Display */}
+            <div className="absolute top-3 right-3 flex items-center gap-2 bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2">
+                <div className="flex flex-col items-end">
+                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Average Pitch</div>
+                    {averagePitchRange.lowest !== null && averagePitchRange.highest !== null ? (
+                        <div className="text-sm font-mono font-bold text-emerald-400">
+                            {Math.round(averagePitchRange.lowest)} - {Math.round(averagePitchRange.highest)} Hz
+                        </div>
+                    ) : (
+                        <div className="text-sm font-mono text-slate-500">-- Hz</div>
+                    )}
+                </div>
+                <button
+                    onClick={handleResetAverage}
+                    className="w-7 h-7 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-slate-700/50"
+                    title="Reset Average"
+                >
+                    <RotateCcw size={14} />
+                </button>
+            </div>
 
             {/* Zoom Controls */}
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

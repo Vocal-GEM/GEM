@@ -1,22 +1,21 @@
-flask
-flask-cors
-flask-login
-flask-sqlalchemy
-google-generativeai
-werkzeug
-python-dotenv
-gunicorn
-# psycopg2-binary
-# faster-whisper>=1.0.0
-praat-parselmouth>=0.4.3
-librosa>=0.10.0
-numpy>=1.24.0
-scipy>=1.11.0
-soundfile>=0.12.0
-pypdf
-librosa
-
-email-validator
-bleach
-Flask-Limiter
-Flask-WTF
+flask==3.0.0
+flask-cors==4.0.0
+flask-login==0.6.3
+flask-sqlalchemy==3.1.1
+google-generativeai==0.3.2
+werkzeug==3.0.1
+python-dotenv==1.0.0
+gunicorn==21.2.0
+requests==2.31.0
+# psycopg2-binary==2.9.9
+# faster-whisper==1.0.0
+praat-parselmouth==0.4.3
+librosa==0.10.1
+numpy==1.26.2
+scipy==1.11.4
+soundfile==0.12.1
+pypdf==3.17.4
+email-validator==2.1.0
+bleach==6.1.0
+Flask-Limiter==3.5.0
+Flask-WTF==1.2.1

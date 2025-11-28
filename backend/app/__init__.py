@@ -98,7 +98,7 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     limiter.init_app(app)
-    # csrf.init_app(app) # Temporarily disabled until frontend is ready
+    csrf.init_app(app)
 
 
     # Register Blueprints
@@ -107,12 +107,14 @@ def create_app():
     from .routes.ai import ai_bp
     from .routes.main import main_bp
     from .routes.analysis import analysis_bp
+    from .routes.tts import tts_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(data_bp)
     app.register_blueprint(ai_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(analysis_bp)
+    app.register_blueprint(tts_bp)
 
     with app.app_context():
         db.create_all()

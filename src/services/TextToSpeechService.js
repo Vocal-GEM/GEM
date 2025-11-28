@@ -3,11 +3,11 @@ export const textToSpeechService = {
     // Configuration
     config: {
         ttsProvider: 'browser', // 'browser' | 'elevenlabs'
-        elevenLabsKey: '',
         voiceId: '21m00Tcm4TlvDq8ikWAM', // Default Rachel
         volume: 1.0,
         rate: 1.0,
-        pitch: 1.0
+        pitch: 1.0,
+        backendUrl: import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'
     },
 
     // State
@@ -31,7 +31,7 @@ export const textToSpeechService = {
 
         const provider = options.ttsProvider || this.config.ttsProvider;
 
-        if (provider === 'elevenlabs' && this.config.elevenLabsKey) {
+        if (provider === 'elevenlabs') {
             return this.speakWithElevenLabs(text, options);
         } else {
             return this.speakWithBrowser(text, options);
@@ -86,9 +86,8 @@ export const textToSpeechService = {
         });
     },
 
-    // ElevenLabs TTS Implementation
+    // ElevenLabs TTS Implementation (via backend proxy)
     async speakWithElevenLabs(text, options = {}) {
-        const apiKey = this.config.elevenLabsKey;
         const voiceId = options.voiceId || this.config.voiceId;
         const cacheKey = `${voiceId}-${text}`;
 
@@ -99,29 +98,25 @@ export const textToSpeechService = {
             if (this.audioCache.has(cacheKey)) {
                 audioUrl = this.audioCache.get(cacheKey);
             } else {
-                // Fetch from API
+                // Fetch from backend proxy
                 if (options.onStartLoading) options.onStartLoading();
 
-                const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+                const response = await fetch(`${this.config.backendUrl}/api/tts/synthesize`, {
                     method: 'POST',
                     headers: {
-                        'Accept': 'audio/mpeg',
                         'Content-Type': 'application/json',
-                        'xi-api-key': apiKey
                     },
+                    credentials: 'include', // Include cookies for CSRF
                     body: JSON.stringify({
                         text: text,
-                        model_id: "eleven_turbo_v2_5",
-                        voice_settings: {
-                            stability: 0.5,
-                            similarity_boost: 0.75
-                        }
+                        voiceId: voiceId,
+                        modelId: "eleven_turbo_v2_5"
                     })
                 });
 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`ElevenLabs API request failed: ${response.status} ${errorText}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Backend TTS request failed: ${response.status}`);
                 }
 
                 const blob = await response.blob();
@@ -168,19 +163,20 @@ export const textToSpeechService = {
         }
     },
 
-    // Helper to get available voices from ElevenLabs
-    async getElevenLabsVoices(apiKey) {
+    // Helper to get available voices from ElevenLabs via backend
+    async getElevenLabsVoices() {
         try {
-            const response = await fetch('https://api.elevenlabs.io/v1/voices', {
-                headers: {
-                    'xi-api-key': apiKey
-                }
+            const response = await fetch(`${this.config.backendUrl}/api/tts/voices`, {
+                credentials: 'include' // Include cookies for CSRF
             });
-            if (!response.ok) throw new Error('Failed to fetch voices');
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || 'Failed to fetch voices');
+            }
             const data = await response.json();
-            return data.voices;
+            return data.voices || [];
         } catch (e) {
-            console.error(e);
+            console.error('Error fetching ElevenLabs voices:', e);
             return [];
         }
     }

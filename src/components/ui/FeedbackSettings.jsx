@@ -19,15 +19,15 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
     const [isLoadingVoices, setIsLoadingVoices] = React.useState(false);
 
     React.useEffect(() => {
-        if (settings.ttsProvider === 'elevenlabs' && settings.elevenLabsKey) {
+        if (settings.ttsProvider === 'elevenlabs') {
             setIsLoadingVoices(true);
-            textToSpeechService.getElevenLabsVoices(settings.elevenLabsKey)
+            textToSpeechService.getElevenLabsVoices()
                 .then(voices => {
                     setAvailableVoices(voices);
                     setIsLoadingVoices(false);
                 });
         }
-    }, [settings.ttsProvider, settings.elevenLabsKey]);
+    }, [settings.ttsProvider]);
 
     if (!isOpen) return null;
 
@@ -232,16 +232,10 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
 
                         {settings.ttsProvider === 'elevenlabs' && (
                             <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                                <div>
-                                    <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">ElevenLabs API Key</label>
-                                    <input
-                                        type="password"
-                                        value={settings.elevenLabsKey || ''}
-                                        onChange={(e) => setSettings({ ...settings, elevenLabsKey: e.target.value })}
-                                        placeholder="sk_..."
-                                        className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-white focus:border-purple-500 focus:outline-none transition-colors"
-                                    />
-                                    <div className="text-[10px] text-slate-500 mt-1">Key is stored locally on your device.</div>
+                                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                                    <div className="text-xs text-blue-200">
+                                        ℹ️ ElevenLabs API key is configured on the server. If voices don't load, contact your administrator.
+                                    </div>
                                 </div>
 
                                 <div>
@@ -250,7 +244,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                                         value={settings.voiceId || ''}
                                         onChange={(e) => setSettings({ ...settings, voiceId: e.target.value })}
                                         className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-white focus:border-purple-500 focus:outline-none transition-colors appearance-none"
-                                        disabled={isLoadingVoices || !settings.elevenLabsKey}
+                                        disabled={isLoadingVoices}
                                     >
                                         {isLoadingVoices ? (
                                             <option>Loading voices...</option>

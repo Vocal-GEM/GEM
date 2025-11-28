@@ -373,6 +373,11 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
   const [showDebug, setShowDebug] = useState(false);
   const [debugInfo, setDebugInfo] = useState(null);
   const [genderPerception, setGenderPerception] = useState({ label: '—', color: 'text-slate-500' });
+  const [metricClassifications, setMetricClassifications] = useState({
+    pitch: { label: '—', color: 'text-slate-500' },
+    resonance: { label: '—', color: 'text-slate-500' },
+    weight: { label: '—', color: 'text-slate-500' }
+  });
 
   const modes = [
     { id: 'gem', icon: Diamond, label: 'Gem' },
@@ -503,6 +508,19 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
         }
 
         setGenderPerception({ label, color });
+
+        // Set individual metric classifications
+        const getClassification = (score) => {
+          if (score < 0.40) return { label: 'Masculine', color: 'text-blue-400' };
+          if (score > 0.60) return { label: 'Feminine', color: 'text-pink-400' };
+          return { label: 'Androgynous', color: 'text-purple-400' };
+        };
+
+        setMetricClassifications({
+          pitch: getClassification(pitchScore),
+          resonance: getClassification(resScore),
+          weight: getClassification(weightScore)
+        });
       }
     }, 200);
     return () => clearInterval(interval);
@@ -607,6 +625,30 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
           </div>
         </div>
       )}
+
+      {/* Metric Classifications Row */}
+      <div className="absolute bottom-20 left-0 right-0 px-4 pointer-events-none">
+        <div className="flex justify-center gap-4 text-xs">
+          <div className="text-center">
+            <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Pitch</div>
+            <div className={`font-bold ${metricClassifications.pitch.color} transition-colors duration-300`}>
+              {metricClassifications.pitch.label}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Resonance</div>
+            <div className={`font-bold ${metricClassifications.resonance.color} transition-colors duration-300`}>
+              {metricClassifications.resonance.label}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Weight</div>
+            <div className={`font-bold ${metricClassifications.weight.color} transition-colors duration-300`}>
+              {metricClassifications.weight.label}
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Gender Perception Label */}
       <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
