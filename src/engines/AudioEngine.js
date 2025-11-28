@@ -51,7 +51,18 @@ export class AudioEngine {
         try {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             this.audioContext = new AudioContext({ latencyHint: 'interactive' });
-            if (this.audioContext.state === 'suspended') await this.audioContext.resume();
+
+            // MOBILE UNLOCK: Play a silent buffer immediately to unlock the AudioContext
+            // This is critical for iOS and some Android browsers
+            const buffer = this.audioContext.createBuffer(1, 1, 22050);
+            const source = this.audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(this.audioContext.destination);
+            source.start(0);
+
+            if (this.audioContext.state === 'suspended') {
+                await this.audioContext.resume();
+            }
             this.toneEngine = new ToneEngine(this.audioContext);
 
             // Load Worklet from public file with cache busting
@@ -123,7 +134,15 @@ export class AudioEngine {
             this.workletNode.connect(this.audioContext.destination);
             this.mediaRecorder = new MediaRecorder(stream); this.mediaRecorder.ondataavailable = (e) => this.chunks.push(e.data);
             this.isActive = true;
-        } catch (err) { console.error("Audio init error:", err); alert("Mic access denied or Worklet error: " + err.message); }
+        } catch (err) {
+            console.error("Audio init error:", err);
+            console.error("Error details:", {
+                name: err.name,
+                message: err.message,
+                state: this.audioContext ? this.audioContext.state : 'no-context'
+            });
+            alert("Mic access denied or Worklet error: " + err.message);
+        }
     }
     analyzeProsody(currentPitch) {
         if (currentPitch > 0) this.pitchBuffer.push(currentPitch); else if (this.pitchBuffer.length > 0) this.pitchBuffer.push(0);
