@@ -42,35 +42,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
             <div className="p-6 space-y-8 pb-20">
 
 
-                {/* Spectral Tilt Target */}
-                <section>
-                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Spectral Tilt Target</h3>
-                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 space-y-4">
-                        <div className="text-xs text-slate-400 mb-2">Adjust the target range for spectral tilt (dB/octave).</div>
-                        <div>
-                            <div className="flex justify-between text-xs text-slate-400 mb-1"><span>Min Tilt (Steep)</span> <span>{settings.tiltTarget?.min || -12} dB</span></div>
-                            <input
-                                type="range"
-                                min="-24"
-                                max="0"
-                                value={settings.tiltTarget?.min || -12}
-                                onChange={(e) => setSettings({ ...settings, tiltTarget: { ...(settings.tiltTarget || { max: -6 }), min: parseInt(e.target.value) } })}
-                                className="w-full accent-blue-500 h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer"
-                            />
-                        </div>
-                        <div>
-                            <div className="flex justify-between text-xs text-slate-400 mb-1"><span>Max Tilt (Flat)</span> <span>{settings.tiltTarget?.max || -6} dB</span></div>
-                            <input
-                                type="range"
-                                min="-24"
-                                max="0"
-                                value={settings.tiltTarget?.max || -6}
-                                onChange={(e) => setSettings({ ...settings, tiltTarget: { ...(settings.tiltTarget || { min: -12 }), max: parseInt(e.target.value) } })}
-                                className="w-full accent-blue-500 h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer"
-                            />
-                        </div>
-                    </div>
-                </section>
+
 
                 {/* Voice Profiles */}
                 <section>
