@@ -35,6 +35,7 @@ import MirrorComponent from './components/ui/MirrorComponent';
 import CoachView from './components/ui/CoachView';
 import HistoryView from './components/ui/HistoryView';
 import LoadingSpinner from './components/ui/LoadingSpinner';
+import DebugOverlay from './components/ui/DebugOverlay';
 
 // Lazy Loaded Components - Views
 const SLPDashboard = lazy(() => import('./components/views/SLPDashboard'));
@@ -469,6 +470,7 @@ const App = () => {
                 )
             }
 
+            <DebugOverlay audioEngine={audioEngineRef.current} />
         </div >
     );
 };

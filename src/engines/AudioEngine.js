@@ -72,6 +72,13 @@ export class AudioEngine {
             if (this.audioContext.state === 'suspended') {
                 await this.audioContext.resume();
             }
+
+            // Re-check state after resume attempt
+            if (this.audioContext.state === 'suspended') {
+                console.warn("AudioContext still suspended. Waiting for user gesture.");
+                // We can't force it, but we can log it.
+            }
+
             this.debugInfo.contextState = this.audioContext.state;
             this.toneEngine = new ToneEngine(this.audioContext);
 
