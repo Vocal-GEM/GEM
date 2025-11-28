@@ -1,7 +1,8 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Diamond, Flame, Bug } from 'lucide-react';
+import { Diamond, Flame, Bug, Box } from 'lucide-react';
+import { useGLTF } from '@react-three/drei';
 import OrbLegend from './OrbLegend';
 
 // Shared Noise Function
@@ -121,11 +122,11 @@ varying float vNoise;
 varying vec3 vViewPosition;
 
 void main() {
-  // Color Palette - Deep, Rich Gem Tones
-  vec3 colorDeep = vec3(0.02, 0.05, 0.2); // Deep Sapphire
-  vec3 colorMasc = vec3(0.0, 0.6, 0.8); // Blue Topaz
-  vec3 colorFem = vec3(0.8, 0.0, 0.6); // Rubellite
-  vec3 colorBright = vec3(0.9, 0.7, 0.9); // Pink Diamond
+  // Color Palette - Deep, Rich Gem Tones (Brightened)
+  vec3 colorDeep = vec3(0.1, 0.2, 0.5); // Brighter Sapphire
+  vec3 colorMasc = vec3(0.0, 0.7, 0.9); // Blue Topaz
+  vec3 colorFem = vec3(0.9, 0.1, 0.7); // Rubellite
+  vec3 colorBright = vec3(1.0, 0.8, 1.0); // Pink Diamond
 
   vec3 baseColor;
   if (u_pitch_norm < 0.33) baseColor = mix(colorDeep, colorMasc, u_pitch_norm * 3.0);
@@ -142,7 +143,7 @@ void main() {
   
   // Fresnel - Sharp and glass-like
   // Enhanced for "Frosted Glass" look - wider rim
-  float fresnel = pow(1.0 - abs(dot(finalNormal, viewDir)), 2.5);
+  float fresnel = pow(1.0 - abs(dot(finalNormal, viewDir)), 2.0); // Reduced power for wider rim
   
   // Lighting
   vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
@@ -178,7 +179,7 @@ void main() {
   vec3 finalColor = baseColor;
   
   // Add dispersion sparkles (Less sparkles if rough/heavy)
-  finalColor += refractColor * 0.8 * (1.0 - u_roughness * 0.5);
+  finalColor += refractColor * 1.2 * (1.0 - u_roughness * 0.5); // Boosted refraction
   
   // Add sharp specular + bloom
   // Resonance affects specular intensity (Bright = Sparkly, Dark = Dull)
@@ -186,7 +187,7 @@ void main() {
   finalColor += vec3(1.0) * spec * (1.5 + u_intensity) * resBrightness;
   
   // Add Fresnel rim
-  finalColor += baseColor * fresnel * 3.0 * resBrightness; // Boosted Fresnel with Resonance
+  finalColor += baseColor * fresnel * 4.0 * resBrightness; // Boosted Fresnel
   
   // Add Resonance Glow (Pulse)
   // Pulse the resonance color with time for organic feel
@@ -197,9 +198,12 @@ void main() {
   // Resonance affects inner glow (Bright = Glowing, Dark = Dim)
   finalColor += finalColor * u_intensity * (0.5 + u_resonance_norm);
 
+  // Ambient Boost - Ensure it's never too dark
+  finalColor += vec3(0.15);
+
   // Alpha - Frosted glass is slightly more opaque
   // Heavy weight (Rough) -> More opaque/matte
-  float alpha = 0.85 + u_roughness * 0.15;
+  float alpha = 0.92 + u_roughness * 0.08; // Higher base alpha
   
   gl_FragColor = vec4(finalColor, alpha);
 }
@@ -248,6 +252,28 @@ void main() {
 }
 `;
 
+const CustomGemGeometry = () => {
+  const { nodes } = useGLTF('/orb.glb');
+  // Find the first mesh in the loaded model
+  const geometry = useMemo(() => {
+    let foundGeo = null;
+    Object.values(nodes).forEach((node) => {
+      if (node.isMesh && !foundGeo) {
+        foundGeo = node.geometry;
+      }
+    });
+    return foundGeo;
+  }, [nodes]);
+
+  if (!geometry) return <octahedronGeometry args={[2.0, 0]} />; // Fallback
+
+  return <primitive object={geometry} attach="geometry" />;
+};
+
+// Preload the model to avoid suspense on first switch if possible, 
+// though it might still suspend if not ready.
+useGLTF.preload('/orb.glb');
+
 const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration }) => {
   const mesh = useRef();
   const material = useRef();
@@ -266,6 +292,7 @@ const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration }) => {
     switch (mode) {
       case 'fire': return { v: fireVertex, f: fireFragment };
       case 'gem':
+      case 'custom':
       default: return { v: gemVertex, f: gemFragment };
     }
   }, [mode]);
@@ -349,10 +376,14 @@ const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration }) => {
 
   return (
     <mesh ref={mesh}>
-      {mode === 'gem' ? (
+      {mode === 'gem' && (
         <octahedronGeometry args={[2.0, 0]} /> // Classic 8-sided Gem shape
-      ) : (
+      )}
+      {mode === 'fire' && (
         <icosahedronGeometry args={[1.6, 30]} />
+      )}
+      {mode === 'custom' && (
+        <CustomGemGeometry />
       )}
       <shaderMaterial
         ref={material}
@@ -382,6 +413,7 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
   const modes = [
     { id: 'gem', icon: Diamond, label: 'Gem' },
     { id: 'fire', icon: Flame, label: 'Fire' },
+    { id: 'custom', icon: Box, label: 'Custom' },
   ];
 
   // Keyboard shortcut: D to toggle debug

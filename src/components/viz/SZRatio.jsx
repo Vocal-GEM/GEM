@@ -36,8 +36,18 @@ const SZRatio = ({ dataRef, isActive }) => {
             animationRef.current = requestAnimationFrame(checkAudio);
         };
 
-        animationRef.current = requestAnimationFrame(checkAudio);
-        return () => cancelAnimationFrame(animationRef.current);
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                'sz-ratio',
+                checkAudio,
+                renderCoordinator.PRIORITY.LOW
+            );
+        });
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
     }, [autoMode, isActive, isRecording, threshold, dataRef]);
 
     // Timer update

@@ -82,8 +82,18 @@ const ContourVisualizer = ({ dataRef }) => {
             requestAnimationFrame(loop);
         };
 
-        const id = requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(id);
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                'contour-visualizer',
+                loop,
+                renderCoordinator.PRIORITY.HIGH
+            );
+        });
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
     }, [dataRef]);
 
     // Helper for slope icon

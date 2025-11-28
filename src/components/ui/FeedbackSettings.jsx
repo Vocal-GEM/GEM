@@ -3,8 +3,9 @@ import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrat
 import { textToSpeechService } from '../../services/TextToSpeechService';
 import { syncManager } from '../../services/SyncManager';
 import { indexedDB, STORES } from '../../services/IndexedDBManager';
+import MicrophoneCalibration from './MicrophoneCalibration';
 
-const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange, onSetGoal, onOpenTutorial, calibration, onUpdateRange, onUpdateCalibration, onExportData, userMode, setUserMode }) => {
+const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange, onSetGoal, onOpenTutorial, calibration, onUpdateRange, onUpdateCalibration, onExportData, userMode, setUserMode, audioEngine }) => {
     const defaultGenderRanges = {
         masc: { min: 85, max: 145 },
         androg: { min: 145, max: 175 },
@@ -340,6 +341,14 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                 {/* Advanced Calibration */}
                 <section>
                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Advanced Calibration</h3>
+
+                    {/* Microphone Calibration */}
+                    {audioEngine && (
+                        <div className="mb-4">
+                            <MicrophoneCalibration audioEngine={audioEngine} />
+                        </div>
+                    )}
+
                     <div className="bg-slate-800 p-4 rounded-xl space-y-4">
                         <div>
                             <div className="flex justify-between text-xs text-slate-400 mb-1"><span>Noise Gate Threshold</span> <span>{Math.round(settings.noiseGate * 100)}%</span></div>

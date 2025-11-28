@@ -47,8 +47,19 @@ const VowelSpacePlot = ({ f1, f2, dataRef }) => {
             }
             requestAnimationFrame(loop);
         };
-        const id = requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(id);
+
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                'vowel-space-plot',
+                loop,
+                renderCoordinator.PRIORITY.MEDIUM
+            );
+        });
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
     }, [dataRef]);
 
     return (

@@ -41,8 +41,19 @@ const VoiceQualityMeter = ({ dataRef, userMode }) => {
             }
             requestAnimationFrame(loop);
         };
-        const id = requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(id);
+
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                'voice-quality-meter',
+                loop,
+                renderCoordinator.PRIORITY.CRITICAL
+            );
+        });
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
     }, [dataRef]);
 
     const labels = userMode === 'slp' ? ['Low Energy', 'Vocal Weight', 'High Energy'] : ['Light / Airy', 'Vocal Weight', 'Heavy / Pressed'];

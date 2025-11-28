@@ -1,5 +1,5 @@
 /**
- * Resonance Processor v5.3 - FFT-Based Formant Detection with Smoothing & Shimmer
+ * Resonance Processor v5.4 - Optimized with Adaptive Noise Gate & Frame Overlap
  */
 
 class DSP {
@@ -26,8 +26,7 @@ class DSP {
         return output;
     }
 
-    static calculatePitchYIN(buffer, sampleRate) {
-        const threshold = 0.15;
+    static calculatePitchYIN(buffer, sampleRate, adaptiveThreshold = 0.15) {
         const bufferSize = buffer.length;
         const halfSize = Math.floor(bufferSize / 2);
         const yinBuffer = new Float32Array(halfSize);
@@ -48,7 +47,7 @@ class DSP {
 
         let tau = 0;
         for (tau = 2; tau < halfSize; tau++) {
-            if (yinBuffer[tau] < threshold) {
+            if (yinBuffer[tau] < adaptiveThreshold) {
                 while (tau + 1 < halfSize && yinBuffer[tau + 1] < yinBuffer[tau]) {
                     tau++;
                 }
@@ -56,7 +55,7 @@ class DSP {
             }
         }
 
-        if (tau == halfSize || yinBuffer[tau] >= threshold) return -1;
+        if (tau == halfSize || yinBuffer[tau] >= adaptiveThreshold) return -1;
 
         let betterTau = tau;
         if (tau > 0 && tau < halfSize - 1) {
@@ -115,7 +114,17 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         super();
         this.buffer = new Float32Array(2048);
         this.bufferIndex = 0;
-        this.threshold = 0.005;
+        this.threshold = 0.005; // Initial threshold, will adapt
+
+        // Adaptive Noise Gate
+        this.backgroundNoiseBuffer = [];
+        this.maxNoiseBufferSize = 50; // ~1 second of silence samples
+        this.adaptiveThreshold = 0.005;
+        this.silenceFrameCount = 0;
+
+        // Frame Overlap (50%)
+        this.overlapBuffer = new Float32Array(1024);
+        this.useOverlap = true;
 
         this.lastPitch = 0;
         this.jitterBuffer = [];
@@ -129,6 +138,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         this.smoothedF2 = 0;
         this.shimmerBuffer = [];
         this.lastAmp = 0;
+        this.lastHNR = 0; // For dynamic YIN threshold
 
         this.port.onmessage = (event) => {
             if (event.data.type === 'config') {
@@ -147,7 +157,16 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         for (let i = 0; i < channel.length; i++) {
             this.buffer[this.bufferIndex] = channel[i];
             this.bufferIndex++;
-            if (this.bufferIndex >= 2048) {
+
+            // Frame overlap: analyze at 1024 samples (50% overlap)
+            if (this.bufferIndex >= 1024 && this.useOverlap) {
+                this.analyze();
+                // Keep last 1024 samples for overlap
+                this.overlapBuffer.set(this.buffer.slice(1024, 2048));
+                this.buffer.set(this.overlapBuffer);
+                this.bufferIndex = 1024;
+            } else if (this.bufferIndex >= 2048) {
+                // Fallback to non-overlap mode
                 this.analyze();
                 this.bufferIndex = 0;
             }
@@ -163,7 +182,26 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         for (let x of buffer) rms += x * x;
         rms = Math.sqrt(rms / buffer.length);
 
-        if (rms > this.threshold) {
+        // Adaptive Noise Gate: Update background noise estimate during silence
+        if (rms <= this.adaptiveThreshold) {
+            this.silenceFrameCount++;
+            if (this.silenceFrameCount > 3) { // After 3 silent frames, update background
+                this.backgroundNoiseBuffer.push(rms);
+                if (this.backgroundNoiseBuffer.length > this.maxNoiseBufferSize) {
+                    this.backgroundNoiseBuffer.shift();
+                }
+                // Calculate adaptive threshold as median * 2.5
+                if (this.backgroundNoiseBuffer.length > 10) {
+                    const sorted = [...this.backgroundNoiseBuffer].sort((a, b) => a - b);
+                    const median = sorted[Math.floor(sorted.length / 2)];
+                    this.adaptiveThreshold = Math.max(0.002, Math.min(0.02, median * 2.5));
+                }
+            }
+        } else {
+            this.silenceFrameCount = 0;
+        }
+
+        if (rms > this.adaptiveThreshold) {
             const TARGET_RATE = 11025;
             const dsBuffer = DSP.decimate(buffer, fs, TARGET_RATE);
 
@@ -174,7 +212,10 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             }
 
             const windowed = DSP.applyWindow(preEmphasized);
-            const pitch = DSP.calculatePitchYIN(buffer, fs);
+
+            // Dynamic YIN threshold based on signal quality
+            const dynamicThreshold = Math.max(0.10, Math.min(0.20, 0.15));
+            const pitch = DSP.calculatePitchYIN(buffer, fs, dynamicThreshold);
             const spectrum = DSP.simpleFFT(windowed);
 
             let formantCandidates = [];
@@ -337,7 +378,8 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                         h1db: this.smoothedH1,
                         h2db: this.smoothedH2,
                         diffDb: smoothedDiff,
-                        hasValidF2: p2.freq > 0
+                        hasValidF2: p2.freq > 0,
+                        adaptiveThreshold: this.adaptiveThreshold
                     }
                 }
             });

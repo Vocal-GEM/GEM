@@ -49,6 +49,7 @@ const FeminizationCourse = lazy(() => import('./components/ui/FeminizationCourse
 const DynamicOrb = lazy(() => import('./components/viz/DynamicOrb'));
 const ResonanceOrb = lazy(() => import('./components/viz/ResonanceOrb'));
 const LiveMetricsBar = lazy(() => import('./components/viz/LiveMetricsBar'));
+const GenderPerceptionDashboard = lazy(() => import('./components/ui/GenderPerceptionDashboard'));
 const PitchVisualizer = lazy(() => import('./components/viz/PitchVisualizer'));
 const PitchOrb = lazy(() => import('./components/viz/PitchOrb'));
 const VoiceQualityMeter = lazy(() => import('./components/viz/VoiceQualityMeter'));
@@ -262,38 +263,32 @@ const App = () => {
                                     </button>
                                 </div>
 
-                                {/* Dashboard Grid - 2x2 Layout for Top Section */}
+                                {/* Dashboard Grid - Simplified for Performance */}
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
 
-                                    {/* 1. Top Left: Visualization (Orb) */}
-                                    <div className="flex flex-col">
-                                        {/* Dynamic Orb (Show All) or Legacy Resonance Orb (Resonance Tab) */}
-                                        {practiceView === 'all' ? (
-                                            <>
-                                                <div key="dynamic-orb-container" className="h-80 lg:h-[500px] w-full mb-6 relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5">
+                                    {/* 1. Left: Dynamic Orb */}
+                                    <div className="flex flex-col h-[500px]">
+                                        {(practiceView === 'all' || practiceView === 'resonance') && (
+                                            <div key="dynamic-orb-container" className="h-full w-full relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5">
+                                                {practiceView === 'all' ? (
                                                     <DynamicOrb dataRef={dataRef} calibration={calibration} />
-                                                </div>
-                                                {/* Live Metrics Bar */}
-                                                <LiveMetricsBar dataRef={dataRef} />
-                                            </>
-                                        ) : (
-                                            practiceView === 'resonance' && (
-                                                <div key="resonance-orb-container" className="w-full mb-6 relative z-20">
-                                                    <ResonanceOrb dataRef={dataRef} calibration={calibration} showDebug={true} />
-                                                </div>
-                                            )
+                                                ) : (
+                                                    <ResonanceOrb dataRef={dataRef} calibration={calibration} showDebug={true} size={400} />
+                                                )}
+                                            </div>
                                         )}
                                     </div>
 
-                                    {/* 2. Top Right: Pitch Tracking OR Resonance Orb in Show All */}
-                                    <div className="flex flex-col">
+                                    {/* 2. Right: Dashboard or Pitch Tracking */}
+                                    <div className="flex flex-col h-[500px]">
                                         {practiceView === 'all' && (
-                                            <div className="mb-6">
-                                                <ResonanceOrb dataRef={dataRef} calibration={calibration} showDebug={false} />
+                                            <div className="h-full">
+                                                <GenderPerceptionDashboard dataRef={dataRef} />
                                             </div>
                                         )}
-                                        {(practiceView === 'all' || practiceView === 'pitch') && (
-                                            <div className="h-80 lg:h-[500px] flex flex-col">
+
+                                        {practiceView === 'pitch' && (
+                                            <div className="h-full flex flex-col">
                                                 <div className="flex justify-between items-center mb-2">
                                                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pitch Tracking</h3>
                                                     <div className="glass-panel-dark rounded-lg p-1 flex gap-1">
@@ -311,20 +306,27 @@ const App = () => {
                                             </div>
                                         )}
                                     </div>
-
-                                    {/* 3. Bottom Left: Voice Quality */}
-                                    <div className="space-y-4">
-                                        {(practiceView === 'all' || practiceView === 'weight') && <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />}
-                                    </div>
-
-                                    {/* 4. Bottom Right: Vowel Space */}
-                                    <div className="space-y-4">
-                                        {(practiceView === 'all' || practiceView === 'vowel') && <VowelSpacePlot dataRef={dataRef} userMode={userMode} />}
-                                    </div>
                                 </div>
 
-                                {/* 5. Full Width: Spectrogram (Outside the 2x2 grid) */}
-                                {(practiceView === 'all' || practiceView === 'spectrogram') && (
+                                {/* 3. Bottom Section: Other Views (Only when specifically selected) */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                                    {/* Voice Quality */}
+                                    {practiceView === 'weight' && (
+                                        <div className="space-y-4 relative z-10">
+                                            <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />
+                                        </div>
+                                    )}
+
+                                    {/* Vowel Space */}
+                                    {practiceView === 'vowel' && (
+                                        <div className="space-y-4 relative z-10">
+                                            <VowelSpacePlot dataRef={dataRef} userMode={userMode} />
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Full Width: Spectrogram (Only when selected) */}
+                                {practiceView === 'spectrogram' && (
                                     <div className="mb-8">
                                         <div className="h-[300px] bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden relative">
                                             <HighResSpectrogram dataRef={dataRef} />
@@ -335,8 +337,8 @@ const App = () => {
                                     </div>
                                 )}
 
-                                {/* 6. Full Width: Spectral Tilt */}
-                                {(practiceView === 'all' || practiceView === 'tilt') && (
+                                {/* Full Width: Spectral Tilt (Only when selected) */}
+                                {practiceView === 'tilt' && (
                                     <div className="mb-8">
                                         <SpectralTiltMeter dataRef={dataRef} userMode={userMode} targetRange={settings.tiltTarget} />
                                     </div>

@@ -156,8 +156,18 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             requestAnimationFrame(loop);
         };
 
-        const animId = requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(animId);
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                'pitch-orb',
+                loop,
+                renderCoordinator.PRIORITY.CRITICAL
+            );
+        });
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
     }, [dataRef, showSemitones, genderRanges]);
 
     return (

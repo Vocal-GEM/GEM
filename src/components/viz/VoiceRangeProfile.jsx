@@ -179,8 +179,18 @@ const VoiceRangeProfile = ({ dataRef, isActive, staticData }) => {
             animationId = requestAnimationFrame(draw);
         };
 
-        draw();
-        return () => cancelAnimationFrame(animationId);
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                'voice-range-profile',
+                draw,
+                renderCoordinator.PRIORITY.LOW
+            );
+        });
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
     }, [dataRef, isActive, staticData]);
 
     const handleReset = () => {

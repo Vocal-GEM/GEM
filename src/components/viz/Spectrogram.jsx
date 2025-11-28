@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const Spectrogram = ({ dataRef, audioRef }) => {
     const canvasRef = useRef(null);
@@ -14,9 +15,6 @@ const Spectrogram = ({ dataRef, audioRef }) => {
             analyserRef.current = audioContextRef.current.createAnalyser();
             analyserRef.current.fftSize = 2048;
 
-            // Connect audio element to analyser
-            // Note: This requires the audio element to have crossorigin="anonymous" if loading from external source
-            // and might need user interaction to start context.
             try {
                 sourceRef.current = audioContextRef.current.createMediaElementSource(audioRef.current);
                 sourceRef.current.connect(analyserRef.current);
@@ -58,23 +56,14 @@ const Spectrogram = ({ dataRef, audioRef }) => {
                 spectrum = dataRef.current.spectrum;
             }
             // Priority 2: Playback Data from Analyser
-            else if (analyserRef.current && !audioRef.current.paused) {
+            else if (analyserRef.current && audioRef?.current && !audioRef.current.paused) {
                 const bufferLength = analyserRef.current.frequencyBinCount;
                 const dataArray = new Uint8Array(bufferLength);
                 analyserRef.current.getByteFrequencyData(dataArray);
-                // Convert to format expected by renderer (0-1 float or similar? Original code used raw magnitude)
-                // Original code: val = spectrum[specIndex] || 0; intensity = Math.log10(val + 1) * 50;
-                // ByteFreqData is 0-255 (dB-like). 
-                // Let's normalize to match expected input or adjust renderer.
-                // The original code expects linear magnitude roughly. 
-                // Let's just use the byte data directly but adjust intensity calc.
                 spectrum = dataArray;
             }
 
-            if (!spectrum) {
-                requestAnimationFrame(loop);
-                return;
-            }
+            if (!spectrum) return;
 
             const width = canvas.width;
             const height = canvas.height;
@@ -86,17 +75,9 @@ const Spectrogram = ({ dataRef, audioRef }) => {
             const data = new Uint32Array(imgData.data.buffer);
 
             for (let y = 0; y < height; y++) {
-                const specIndex = Math.floor(y * (spectrum.length / 2 / height)); // Map height to freq range (approx half sample rate)
-                // Actually original code: specIndex = Math.floor(y * (350 / height)); which is weirdly specific index mapping
-                // Let's assume standard mapping: 0 to Nyquist.
-                // If spectrum is from Analyser (1024 bins for 2048 FFT), it covers 0-SampleRate/2.
-                // We want 0-4kHz usually for voice.
-                // If SampleRate is 44100, 4kHz is roughly index 185 out of 1024.
-
-                // Let's use a mapping that focuses on 0-8kHz
-                const maxIndex = spectrum.length; // 1024
+                const maxIndex = spectrum.length;
                 const targetMaxFreq = 8000;
-                const sampleRate = 44100; // Approx
+                const sampleRate = 44100;
                 const maxTargetIndex = Math.floor(maxIndex * targetMaxFreq / (sampleRate / 2));
 
                 const mappedIndex = Math.floor(y / height * maxTargetIndex);
@@ -105,10 +86,8 @@ const Spectrogram = ({ dataRef, audioRef }) => {
 
                 let intensity;
                 if (dataRef?.current) {
-                    // Linear magnitude from custom analyzer
                     intensity = Math.log10(val + 1) * 50;
                 } else {
-                    // Byte data (0-255) from Web Audio Analyser
                     intensity = val;
                 }
 
@@ -121,14 +100,26 @@ const Spectrogram = ({ dataRef, audioRef }) => {
             }
 
             ctx.putImageData(imgData, width - scrollSpeed, 0);
-            requestAnimationFrame(loop);
         };
 
-        const id = requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(id);
+        // Use RenderCoordinator instead of individual RAF
+        const unsubscribe = renderCoordinator.subscribe(
+            'spectrogram',
+            loop,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+
+        return () => {
+            unsubscribe();
+        };
     }, [dataRef, audioRef]);
 
-    return (<div className="h-32 w-full relative overflow-hidden rounded-xl bg-black"> <canvas ref={canvasRef} className="w-full h-full"></canvas> <div className="absolute bottom-1 right-2 text-[9px] text-white/50 font-mono">0 - 8kHz</div> </div>);
+    return (
+        <div className="h-32 w-full relative overflow-hidden rounded-xl bg-black">
+            <canvas ref={canvasRef} className="w-full h-full"></canvas>
+            <div className="absolute bottom-1 right-2 text-[9px] text-white/50 font-mono">0 - 8kHz</div>
+        </div>
+    );
 };
 
 export default Spectrogram;

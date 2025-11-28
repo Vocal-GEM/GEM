@@ -135,8 +135,18 @@ const IntonationTrainer = ({ dataRef, isActive }) => {
             animationId = requestAnimationFrame(draw);
         };
 
-        draw();
-        return () => cancelAnimationFrame(animationId);
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                'intonation-trainer',
+                draw,
+                renderCoordinator.PRIORITY.MEDIUM
+            );
+        });
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
     }, [selectedPattern, isActive, isTracing]);
 
     const nextPattern = () => {

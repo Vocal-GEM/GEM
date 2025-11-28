@@ -25,8 +25,30 @@ export const SettingsProvider = ({ children }) => {
         theme: 'dark', // 'dark' | 'light'
         ttsProvider: 'browser', // 'browser' | 'elevenlabs'
         voiceId: '21m00Tcm4TlvDq8ikWAM', // Default Rachel
-        tiltTarget: { min: -12, max: -6 } // Spectral tilt target range
+        tiltTarget: { min: -12, max: -6 }, // Spectral tilt target range
+
+        // Performance Settings
+        performanceMode: 'high', // 'low' | 'medium' | 'high'
+        visualizationQuality: {
+            fpsTarget: 60,
+            fftSize: 2048,
+            spectrumDetail: 'high'
+        },
+
+        // Visualization Toggles
+        enabledVisualizations: {
+            spectrogram: true,
+            highResSpectrogram: true,
+            dynamicOrb: true,
+            pitchVisualizer: true,
+            contour: true,
+            quality: true,
+            spectralTilt: true,
+            vowelSpace: true,
+            spectrum: true
+        }
     });
+
 
     const [showSettings, setShowSettings] = useState(false);
 
@@ -57,6 +79,29 @@ export const SettingsProvider = ({ children }) => {
     useEffect(() => {
         textToSpeechService.init(settings);
     }, [settings]);
+
+    // Sync performance mode with RenderCoordinator
+    useEffect(() => {
+        import('../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            renderCoordinator.setPerformanceMode(settings.performanceMode);
+
+            // Update quality settings based on mode
+            const qualityPresets = {
+                low: { fpsTarget: 30, fftSize: 1024, spectrumDetail: 'low' },
+                medium: { fpsTarget: 45, fftSize: 2048, spectrumDetail: 'medium' },
+                high: { fpsTarget: 60, fftSize: 2048, spectrumDetail: 'high' }
+            };
+
+            const newQuality = qualityPresets[settings.performanceMode] || qualityPresets.high;
+            if (JSON.stringify(settings.visualizationQuality) !== JSON.stringify(newQuality)) {
+                setSettings(prev => ({
+                    ...prev,
+                    visualizationQuality: newQuality
+                }));
+            }
+        });
+    }, [settings.performanceMode]);
+
 
     const updateSettings = (newSettings) => {
         setSettings(newSettings);

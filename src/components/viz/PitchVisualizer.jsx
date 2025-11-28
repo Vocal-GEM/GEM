@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useProfile } from '../../context/ProfileContext';
 import { RotateCcw } from 'lucide-react';
+import { frequencyToNote, getCentsDeviation } from '../../utils/musicUtils';
 
 const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, settings }) => {
     const { voiceProfiles } = useProfile();
@@ -244,9 +245,20 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
             }
 
             if (currentP > 0) { ctx.fillStyle = '#60a5fa'; ctx.font = 'bold 20px monospace'; ctx.textAlign = 'right'; ctx.fillText(Math.round(currentP) + " Hz", width - 10, 30); }
-            requestAnimationFrame(loop);
         };
-        const animId = requestAnimationFrame(loop); return () => cancelAnimationFrame(animId);
+
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                'pitch-visualizer',
+                loop,
+                renderCoordinator.PRIORITY.HIGH
+            );
+        });
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
     }, [targetRange, exercise, zoomRange, voiceProfiles, settings]);
 
     const label = userMode === 'slp' ? 'Fundamental Frequency (F0)' : 'Pitch';
@@ -254,6 +266,24 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
     return (
         <div className="w-full h-full relative overflow-hidden group">
             <div className="absolute top-3 left-10 text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</div>
+
+            {/* Current Note Display */}
+            {dataRef.current?.pitch > 50 && (
+                <div className="absolute top-3 left-3 bg-slate-900/90 backdrop-blur-sm border border-blue-500/50 rounded-lg px-4 py-2 shadow-lg">
+                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Current Note</div>
+                    <div className="text-2xl font-bold text-blue-400 font-mono">
+                        {frequencyToNote(dataRef.current.pitch)}
+                    </div>
+                    <div className="text-[10px] text-slate-500 font-mono">
+                        {Math.round(dataRef.current.pitch)} Hz
+                        {getCentsDeviation(dataRef.current.pitch) !== 0 && (
+                            <span className={`ml-1 ${getCentsDeviation(dataRef.current.pitch) > 0 ? 'text-orange-400' : 'text-cyan-400'}`}>
+                                {getCentsDeviation(dataRef.current.pitch) > 0 ? '+' : ''}{getCentsDeviation(dataRef.current.pitch)}¢
+                            </span>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* Average Pitch Range Display */}
             <div className="absolute top-3 right-3 flex items-center gap-2 bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2">

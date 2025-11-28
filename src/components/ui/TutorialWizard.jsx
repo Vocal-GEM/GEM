@@ -6,7 +6,7 @@ const TutorialWizard = ({ onComplete, onSkip }) => {
     const steps = [
         {
             title: "Welcome to Vocal GEM",
-            content: "Your AI-powered companion for gender-affirming voice training. We'll help you find a voice that feels authentic to you.",
+            content: "Your personal companion for gender-affirming voice training. We'll help you find a voice that feels authentic to you.",
             icon: "👋"
         },
         {

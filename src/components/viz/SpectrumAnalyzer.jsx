@@ -127,9 +127,18 @@ const SpectrumAnalyzer = ({ dataRef, userMode }) => {
             animationId = requestAnimationFrame(draw);
         };
 
-        draw();
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                'spectrum-analyzer',
+                draw,
+                renderCoordinator.PRIORITY.MEDIUM
+            );
+        });
 
-        return () => cancelAnimationFrame(animationId);
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
     }, [dataRef, userMode]);
 
     return (

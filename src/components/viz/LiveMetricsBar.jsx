@@ -12,10 +12,21 @@ const LiveMetricsBar = ({ dataRef }) => {
                     w: Math.round(dataRef.current.weight)
                 });
             }
-            requestAnimationFrame(loop);
         };
-        const id = requestAnimationFrame(loop); return () => cancelAnimationFrame(id);
-    }, []);
+
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                'live-metrics-bar',
+                loop,
+                renderCoordinator.PRIORITY.CRITICAL
+            );
+        });
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
+    }, [dataRef]);
     return (
         <div className="glass-panel rounded-xl p-3 mb-4 flex justify-between text-xs font-mono text-blue-300">
             <span>F0: {metrics.f0 > 0 ? metrics.f0 : '--'}Hz</span>

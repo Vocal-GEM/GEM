@@ -147,8 +147,18 @@ const HighResSpectrogram = ({ dataRef }) => {
             animationId = requestAnimationFrame(loop);
         };
 
-        animationId = requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(animationId);
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                'high-res-spectrogram',
+                loop,
+                renderCoordinator.PRIORITY.MEDIUM
+            );
+        });
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
     }, [dataRef]);
 
     return (

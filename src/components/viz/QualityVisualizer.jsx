@@ -43,8 +43,19 @@ const QualityVisualizer = ({ dataRef }) => {
 
             requestAnimationFrame(loop);
         };
-        const id = requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(id);
+
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                'quality-visualizer',
+                loop,
+                renderCoordinator.PRIORITY.MEDIUM
+            );
+        });
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
     }, [dataRef]);
 
     // Helper to render sparkline
