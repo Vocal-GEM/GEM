@@ -309,7 +309,14 @@ const App = () => {
                                                     colorBlindMode={settings.colorBlindMode}
                                                 />
                                             ) : practiceView === 'pitch' ? (
-                                                <PitchVisualizer dataRef={dataRef} />
+                                                <div className="h-full flex flex-col">
+                                                    <div className="flex-1">
+                                                        <PitchVisualizer dataRef={dataRef} />
+                                                    </div>
+                                                    <div className="mt-4">
+                                                        <PitchPipe audioEngine={audioEngineRef} />
+                                                    </div>
+                                                </div>
                                             ) : practiceView === 'weight' ? (
                                                 <VoiceQualityMeter dataRef={dataRef} userMode="user" />
                                             ) : practiceView === 'tilt' ? (
@@ -369,7 +376,6 @@ const App = () => {
                                     <h2 className="text-xl font-bold">Tools</h2>
                                 </div>
                                 <AudioLibrary audioEngine={audioEngineRef} />
-                                <PitchPipe audioEngine={audioEngineRef} />
                                 <BreathPacer />
                                 <div className="p-4 bg-slate-800 rounded-xl flex flex-row items-center justify-between gap-3 hover:bg-slate-700 transition-colors cursor-pointer" onClick={() => setShowVocalFolds(true)}>
                                     <div className="flex items-center gap-3">
