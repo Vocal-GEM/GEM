@@ -1,6 +1,9 @@
 import React from 'react';
 import ForwardFocusDrill from './ForwardFocusDrill';
 import PitchPipe from './PitchPipe';
+import BreathPacer from './BreathPacer';
+import WarmUpModule from './WarmUpModule';
+import TwisterCard from './TwisterCard';
 
 const ToolExercises = ({ tool, audioEngine }) => {
     const renderExercise = () => {
