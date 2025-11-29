@@ -182,13 +182,14 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         for (let x of buffer) rms += x * x;
         rms = Math.sqrt(rms / buffer.length);
 
-        // DEBUG: Log RMS and buffer stats every 30 frames (~1 second)
+        // DEBUG: Send buffer stats via postMessage (console.log doesn't work in worklets)
         if (!this.debugCounter) this.debugCounter = 0;
         this.debugCounter++;
-        if (this.debugCounter % 30 === 0) {
-            const maxSample = Math.max(...buffer.map(Math.abs));
-            console.log(`[Worklet DEBUG] RMS: ${rms.toFixed(6)}, Max Sample: ${maxSample.toFixed(6)}, Buffer Length: ${buffer.length}`);
-        }
+        const debugData = this.debugCounter % 30 === 0 ? {
+            rms: rms.toFixed(6),
+            maxSample: Math.max(...buffer.map(Math.abs)).toFixed(6),
+            bufferLength: buffer.length
+        } : null;
 
         // Adaptive Noise Gate: Update background noise estimate during silence
         if (rms <= this.adaptiveThreshold) {
@@ -388,7 +389,8 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                         h2db: this.smoothedH2,
                         diffDb: smoothedDiff,
                         hasValidF2: p2.freq > 0,
-                        adaptiveThreshold: this.adaptiveThreshold
+                        adaptiveThreshold: this.adaptiveThreshold,
+                        bufferDiag: debugData
                     }
                 },
                 audioBuffer: dsBuffer // Send raw audio for streaming
@@ -412,7 +414,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                     tilt: 0,
                     vowel: '',
                     spectrum: null,
-                    debug: null
+                    debug: debugData ? { bufferDiag: debugData } : null
                 }
             });
         }
