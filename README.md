@@ -4,7 +4,6 @@ A personal voice coaching application for gender-affirming voice training.
 
 ## ✨ Features
 - **Real-time Biofeedback**: Visualize Pitch, Resonance, and Vocal Weight.
-- **Gamified Practice**: Play games like Flappy Voice and Resonance River using your voice.
 - **AI Coach**: Chat with a specialized assistant for guidance.
 - **Progress Tracking**: Level up, earn high scores, and track your daily streaks.
 - **Tools**: Pitch Pipe, Intonation Guide, Voice Comparison, and Audio Journal.
