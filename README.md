@@ -1,6 +1,6 @@
 # Vocal GEM 💎
 
-An AI-powered voice coaching application for gender-affirming voice training.
+A personal voice coaching application for gender-affirming voice training.
 
 ## ✨ Features
 - **Real-time Biofeedback**: Visualize Pitch, Resonance, and Vocal Weight.
