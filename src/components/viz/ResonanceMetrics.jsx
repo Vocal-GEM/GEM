@@ -14,12 +14,14 @@ const ResonanceMetrics = ({ dataRef }) => {
     useEffect(() => {
         const updateMetrics = () => {
             if (dataRef.current) {
-                const { formants, spectralCentroid, resonance } = dataRef.current;
+                // resonanceScore is now the RBI (0-100) from backend
+                // resonance is the spectral centroid (Hz)
+                const { f1, f2, resonance, resonanceScore } = dataRef.current;
                 setMetrics({
-                    f1: formants ? Math.round(formants.f1) : 0,
-                    f2: formants ? Math.round(formants.f2) : 0,
-                    centroid: Math.round(spectralCentroid || 0),
-                    resonanceScore: Math.round((resonance || 0) * 100)
+                    f1: f1 ? Math.round(f1) : 0,
+                    f2: f2 ? Math.round(f2) : 0,
+                    centroid: Math.round(resonance || 0),
+                    resonanceScore: Math.round(resonanceScore || 0)
                 });
             }
             requestRef.current = requestAnimationFrame(updateMetrics);
@@ -44,7 +46,7 @@ const ResonanceMetrics = ({ dataRef }) => {
             <div className={`text-2xl font-bold ${color}`}>
                 {value} <span className="text-sm text-slate-500 font-normal">{unit}</span>
             </div>
-            
+
             {showTooltip === id && (
                 <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg z-50 text-xs text-slate-300 shadow-xl">
                     {tooltip}
@@ -81,11 +83,11 @@ const ResonanceMetrics = ({ dataRef }) => {
             />
             <MetricCard
                 id="score"
-                label="Resonance"
+                label="RBI Score"
                 value={metrics.resonanceScore}
                 unit="%"
                 color="text-purple-400"
-                tooltip="Overall resonance score based on a combination of acoustic metrics."
+                tooltip="Resonance Brightness Index (RBI). A composite score (0-100) indicating how bright and forward your resonance is. Target: 60-80."
             />
         </div>
     );

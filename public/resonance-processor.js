@@ -1,5 +1,5 @@
 /**
- * Resonance Processor v5.4 - Optimized with Adaptive Noise Gate & Frame Overlap
+ * Resonance Processor v5.5 - Optimized with Adaptive Noise Gate & Frame Overlap & Streaming Support
  */
 
 class DSP {
@@ -202,7 +202,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         }
 
         if (rms > this.adaptiveThreshold) {
-            const TARGET_RATE = 11025;
+            const TARGET_RATE = 16000; // Changed to 16kHz for RBI compatibility
             const dsBuffer = DSP.decimate(buffer, fs, TARGET_RATE);
 
             const preEmphasized = new Float32Array(dsBuffer.length);
@@ -381,7 +381,8 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                         hasValidF2: p2.freq > 0,
                         adaptiveThreshold: this.adaptiveThreshold
                     }
-                }
+                },
+                audioBuffer: dsBuffer // Send raw audio for streaming
             });
         } else {
             this.lastPitch = 0;

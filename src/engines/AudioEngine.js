@@ -1,3 +1,5 @@
+import { io } from 'socket.io-client';
+
 export const MainDSP = {
     hzToSemitones: (hz) => 12 * Math.log2(hz / 440) + 69,
     // FEATURE: MEDIAN SMOOTHING
@@ -45,13 +47,23 @@ export class AudioEngine {
         this.smoothPitchBuffer = [];
         this.isRecordingForAnalysis = false;
 
+        // Socket.IO
+        this.socket = null;
+        this.latestBackendAnalysis = {
+            rbi_score: 50,
+            breathiness_score: 0,
+            roughness_score: 0,
+            strain_score: 0
+        };
+
         // DEBUG STATE
         this.debugInfo = {
             state: 'init',
             error: null,
             workletLoaded: false,
             micActive: false,
-            contextState: 'unknown'
+            contextState: 'unknown',
+            socketConnected: false
         };
     }
 
@@ -81,6 +93,23 @@ export class AudioEngine {
 
             this.debugInfo.contextState = this.audioContext.state;
             this.toneEngine = new ToneEngine(this.audioContext);
+
+            // Initialize Socket
+            this.socket = io('http://localhost:5000');
+            this.socket.on('connect', () => {
+                console.log("[AudioEngine] Socket connected");
+                this.debugInfo.socketConnected = true;
+            });
+            this.socket.on('disconnect', () => {
+                console.log("[AudioEngine] Socket disconnected");
+                this.debugInfo.socketConnected = false;
+            });
+            this.socket.on('analysis_update', (data) => {
+                this.latestBackendAnalysis = data;
+            });
+            this.socket.on('analysis_error', (err) => {
+                console.error("[AudioEngine] Backend analysis error:", err);
+            });
 
             // Load Worklet from public file with cache busting
             const workletPath = '/resonance-processor.js';
@@ -132,6 +161,14 @@ export class AudioEngine {
             }
 
             this.workletNode.port.onmessage = (event) => {
+                // Handle streaming audio buffer
+                if (event.data.audioBuffer && this.socket && this.socket.connected) {
+                    this.socket.emit('audio_chunk', {
+                        pcm: event.data.audioBuffer.buffer, // Send ArrayBuffer
+                        sr: 16000
+                    });
+                }
+
                 if (event.data.type === 'update') {
                     // Log first message to confirm worklet is processing
                     if (!this.hasReceivedFirstMessage) {
@@ -154,10 +191,16 @@ export class AudioEngine {
 
                     const prosody = this.analyzeProsody(smoothPitch);
 
+                    // Merge backend analysis
+                    // We map backend 'rbi_score' to 'resonanceScore' (0-100)
+                    // And we can also expose 'rbi' explicitly if needed
+                    const backendRBI = this.latestBackendAnalysis.rbi_score || 50;
+
                     this.onAudioUpdate({
                         pitch: smoothPitch,
-                        resonance,
-                        resonanceScore,
+                        resonance: spectralCentroid, // Keep raw centroid as 'resonance' (Hz)
+                        resonanceScore: backendRBI, // Use RBI for the score (0-100)
+                        rbi: backendRBI,
                         spectralCentroid,
                         f1,
                         f2,
@@ -168,7 +211,7 @@ export class AudioEngine {
                         vowel,
                         prosody,
                         spectrum,
-                        debug
+                        debug: { ...debug, backend: this.latestBackendAnalysis }
                     });
                 }
             };
@@ -296,7 +339,17 @@ export class AudioEngine {
         const arrayBuffer = await blob.arrayBuffer();
         return await this.audioContext.decodeAudioData(arrayBuffer);
     }
-    stop() { if (!this.isActive) return; this.workletNode.disconnect(); this.microphone.disconnect(); this.audioContext.close(); this.isActive = false; }
+    stop() {
+        if (!this.isActive) return;
+        this.workletNode.disconnect();
+        this.microphone.disconnect();
+        this.audioContext.close();
+        if (this.socket) {
+            this.socket.disconnect();
+            this.socket = null;
+        }
+        this.isActive = false;
+    }
 
     setNoiseGate(threshold) {
         if (this.workletNode) {

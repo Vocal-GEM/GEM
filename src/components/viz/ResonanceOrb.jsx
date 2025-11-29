@@ -4,7 +4,7 @@ import { Info } from 'lucide-react';
 /**
  * ResonanceOrb - Visual feedback for voice resonance
  * 
- * Uses resonanceScore (0-1) from the processor:
+ * Uses resonanceScore (0-1) derived from RBI (0-100):
  * - 0.0 - 0.35: Dark (masculine resonance)
  * - 0.35 - 0.65: Balanced (androgynous resonance)  
  * - 0.65 - 1.0: Bright (feminine resonance)
@@ -36,17 +36,12 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
 
         const loop = () => {
             if (orbRef.current && dataRef.current) {
-                const { resonance, pitch, volume, f1, f2, debug, weight } = dataRef.current;
+                const { resonance, pitch, volume, f1, f2, debug, weight, resonanceScore } = dataRef.current;
 
-                // Calculate resonance score locally since processor doesn't send it
-                // Map resonance (Hz) to 0-1 score based on calibration
-                // Dark (Low Hz) -> 0, Bright (High Hz) -> 1
-                let calculatedScore = 0.5;
+                // Use backend RBI score (0-100) mapped to 0-1
+                let calculatedScore = (resonanceScore !== undefined ? resonanceScore : 50) / 100.0;
+
                 if (calibration) {
-                    const { dark, bright } = calibration;
-                    // Simple linear mapping for now, can be improved
-                    calculatedScore = Math.max(0, Math.min(1, (resonance - dark) / (bright - dark)));
-
                     historyRef.current.push({
                         f1: f1 || 0,
                         f2: f2 || 0,

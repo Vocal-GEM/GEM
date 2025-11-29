@@ -9,7 +9,13 @@ from werkzeug.utils import secure_filename
 import os
 import tempfile
 import numpy as np
-import librosa
+try:
+    import librosa
+    LIBROSA_AVAILABLE = True
+except ImportError:
+    librosa = None
+    LIBROSA_AVAILABLE = False
+
 from scipy import signal
 from scipy.stats import skew, kurtosis
 from faster_whisper import WhisperModel
@@ -249,6 +255,9 @@ def analyze_audio():
     Expected: multipart/form-data with 'audio' file field
     Returns: JSON with transcript, word-level metrics, and overall statistics
     """
+    if not LIBROSA_AVAILABLE:
+        return jsonify({'error': 'Librosa not installed. Legacy analysis unavailable.'}), 503
+
     # Check if file was uploaded
     if 'audio' not in request.files:
         return jsonify({'error': 'No audio file provided'}), 400

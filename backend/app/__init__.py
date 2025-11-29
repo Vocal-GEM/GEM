@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect
 from flask_cors import CORS
-from .extensions import db, login_manager, limiter, csrf
+from .extensions import db, login_manager, limiter, csrf, socketio
 from .models import User
 import os
 from dotenv import load_dotenv
@@ -115,6 +115,14 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(analysis_bp)
     app.register_blueprint(tts_bp)
+
+    from .routes.voice_quality import voice_quality_bp
+    app.register_blueprint(voice_quality_bp)
+
+    socketio.init_app(app)
+    
+    # Import socket handlers to register them
+    from . import sockets
 
     with app.app_context():
         db.create_all()

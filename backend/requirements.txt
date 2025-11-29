@@ -8,9 +8,9 @@ python-dotenv==1.0.0
 gunicorn==21.2.0
 requests==2.31.0
 psycopg2-binary
-faster-whisper
-praat-parselmouth==0.4.3
-librosa
+
+praat-parselmouth==0.4.7
+
 numpy
 scipy
 soundfile
@@ -19,3 +19,5 @@ email-validator==2.1.0
 bleach==6.1.0
 Flask-Limiter==3.5.0
 Flask-WTF==1.2.1
+flask-socketio
+eventlet

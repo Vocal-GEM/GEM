@@ -41,6 +41,7 @@ const MixingBoardView = lazy(() => import('./components/views/MixingBoardView'))
 const AnalysisView = lazy(() => import('./components/views/AnalysisView'));
 const ArticulationView = lazy(() => import('./components/views/ArticulationView'));
 const VocalFoldsView = lazy(() => import('./components/views/VocalFoldsView'));
+const VoiceQualityView = lazy(() => import('./components/views/VoiceQualityView'));
 const FeminizationCourse = lazy(() => import('./components/ui/FeminizationCourse'));
 
 // Lazy Loaded Components - Visualizations
@@ -117,6 +118,7 @@ const App = () => {
     const [showWarmUp, setShowWarmUp] = useState(false);
     const [showForwardFocus, setShowForwardFocus] = useState(false);
     const [showVocalFolds, setShowVocalFolds] = useState(false);
+    const [showVoiceQuality, setShowVoiceQuality] = useState(false);
     const [showCourse, setShowCourse] = useState(false);
     const [isDataLoaded, setIsDataLoaded] = useState(true); // Simplified for now
 
@@ -415,6 +417,17 @@ const App = () => {
                                         </div>
                                     </div>
                                 </div>
+                                <div className="p-4 bg-slate-800 rounded-xl flex flex-row items-center justify-between gap-3 hover:bg-slate-700 transition-colors cursor-pointer" onClick={() => setShowVoiceQuality(true)}>
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-lg bg-teal-500/10 text-teal-400">
+                                            <Activity size={20} />
+                                        </div>
+                                        <div className="text-left">
+                                            <h3 className="text-sm font-bold text-white">Voice Quality Analysis</h3>
+                                            <p className="text-xs text-slate-400">Breathiness, Strain, Roughness</p>
+                                        </div>
+                                    </div>
+                                </div>
                                 <MirrorComponent />
                             </div>
                         )
@@ -528,6 +541,23 @@ const App = () => {
                     <Suspense fallback={<LoadingSpinner />}>
                         <VocalFoldsView onClose={() => setShowVocalFolds(false)} />
                     </Suspense>
+                )
+            }
+            {
+                showVoiceQuality && (
+                    <div className="fixed inset-0 z-50 bg-slate-950 overflow-y-auto">
+                        <div className="max-w-[1600px] mx-auto p-4 min-h-screen">
+                            <button
+                                onClick={() => setShowVoiceQuality(false)}
+                                className="mb-4 flex items-center gap-2 text-slate-400 hover:text-white"
+                            >
+                                <ArrowLeft size={20} /> Back to Tools
+                            </button>
+                            <Suspense fallback={<LoadingSpinner />}>
+                                <VoiceQualityView />
+                            </Suspense>
+                        </div>
+                    </div>
                 )
             }
             {
