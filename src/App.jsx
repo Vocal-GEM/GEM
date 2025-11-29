@@ -257,126 +257,85 @@ const App = () => {
                                 </button>
                             </div>
 
-                            {/* Dashboard Grid - Dynamic Columns */}
-                            <div className={`grid grid-cols-1 ${(practiceView === 'all' || practiceView === 'resonance') ? 'lg:grid-cols-2' : 'lg:grid-cols-1'} gap-8 mb-8`}>
+                            {/* Dashboard Grid - Fixed 2 Columns */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
 
-                                {/* 1. Left: Dynamic Orb or Mixer */}
-                                {(practiceView === 'all' || practiceView === 'resonance') && (
-                                    <div className="flex flex-col h-[500px] relative">
-                                        {/* Toggle for 'all' view */}
-                                        {practiceView === 'all' && (
-                                            <div className="absolute top-4 left-4 z-30">
-                                                <button
-                                                    onClick={() => setShowMixerInDashboard(!showMixerInDashboard)}
-                                                    className="p-2 bg-slate-800/80 backdrop-blur rounded-lg border border-white/10 text-white hover:bg-slate-700 transition-colors flex items-center gap-2"
-                                                    title={showMixerInDashboard ? "Switch to Orb" : "Switch to Mixer"}
-                                                >
-                                                    {showMixerInDashboard ? <Activity size={16} /> : <Sliders size={16} />}
-                                                    <span className="text-xs font-bold">{showMixerInDashboard ? "Orb" : "Mixer"}</span>
-                                                </button>
-                                            </div>
-                                        )}
-
-                                        <div key="dynamic-orb-container" className="h-full w-full relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5">
-                                            <ErrorBoundary fallback={
-                                                <div className="w-full h-full flex items-center justify-center text-red-400 p-4 text-center">
-                                                    <div>
-                                                        <p className="font-bold mb-2">Visualization Error</p>
-                                                        <p className="text-xs">The 3D view crashed. Try refreshing or switching views.</p>
-                                                    </div>
-                                                </div>
-                                            }>
-                                                {practiceView === 'all' ? (
-                                                    showMixerInDashboard ? (
-                                                        <div className="h-full w-full p-2 pt-12">
-                                                            <MixingBoardView
-                                                                dataRef={dataRef}
-                                                                audioEngine={audioEngineRef.current}
-                                                                calibration={calibration}
-                                                                compact={true}
-                                                            />
-                                                        </div>
-                                                    ) : (
-                                                        <DynamicOrb
-                                                            dataRef={dataRef}
-                                                            calibration={{ ...calibration, disable3D: settings.disable3D }}
-                                                        />
-                                                    )
-                                                ) : (
-                                                    <ResonanceOrb
-                                                        dataRef={dataRef}
-                                                        calibration={calibration}
-                                                        showDebug={false}
-                                                        colorBlindMode={settings.colorBlindMode}
-                                                    />
-                                                )}
-                                            </ErrorBoundary>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* 2. Right: Dashboard or Pitch Tracking */}
-                                <div className="flex flex-col h-[500px] overflow-y-auto custom-scrollbar pr-2">
+                                {/* 1. Left: Tool Visualization */}
+                                <div className="flex flex-col h-[500px] relative">
+                                    {/* Toggle for 'all' view */}
                                     {practiceView === 'all' && (
-                                        <div className="h-full min-h-[400px]">
-                                            <GenderPerceptionDashboard dataRef={dataRef} />
+                                        <div className="absolute top-4 left-4 z-30">
+                                            <button
+                                                onClick={() => setShowMixerInDashboard(!showMixerInDashboard)}
+                                                className="p-2 bg-slate-800/80 backdrop-blur rounded-lg border border-white/10 text-white hover:bg-slate-700 transition-colors flex items-center gap-2"
+                                                title={showMixerInDashboard ? "Switch to Orb" : "Switch to Mixer"}
+                                            >
+                                                {showMixerInDashboard ? <Activity size={16} /> : <Sliders size={16} />}
+                                                <span className="text-xs font-bold">{showMixerInDashboard ? "Orb" : "Mixer"}</span>
+                                            </button>
                                         </div>
                                     )}
 
-                                    {practiceView === 'pitch' && (
-                                        <div className="h-full min-h-[300px]">
-                                            <PitchVisualizer dataRef={dataRef} />
-                                        </div>
-                                    )}
+                                    <div key="tool-container" className="h-full w-full relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5">
+                                        <ErrorBoundary fallback={
+                                            <div className="w-full h-full flex items-center justify-center text-red-400 p-4 text-center">
+                                                <div>
+                                                    <p className="font-bold mb-2">Visualization Error</p>
+                                                    <p className="text-xs">The view crashed. Try refreshing.</p>
+                                                </div>
+                                            </div>
+                                        }>
+                                            {practiceView === 'all' ? (
+                                                showMixerInDashboard ? (
+                                                    <div className="h-full w-full p-2 pt-12">
+                                                        <MixingBoardView
+                                                            dataRef={dataRef}
+                                                            audioEngine={audioEngineRef.current}
+                                                            calibration={calibration}
+                                                            compact={true}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <DynamicOrb
+                                                        dataRef={dataRef}
+                                                        calibration={{ ...calibration, disable3D: settings.disable3D }}
+                                                    />
+                                                )
+                                            ) : practiceView === 'resonance' ? (
+                                                <ResonanceOrb
+                                                    dataRef={dataRef}
+                                                    calibration={calibration}
+                                                    showDebug={false}
+                                                    colorBlindMode={settings.colorBlindMode}
+                                                />
+                                            ) : practiceView === 'pitch' ? (
+                                                <PitchVisualizer dataRef={dataRef} />
+                                            ) : practiceView === 'weight' ? (
+                                                <VoiceQualityMeter dataRef={dataRef} userMode="user" />
+                                            ) : practiceView === 'tilt' ? (
+                                                <SpectralTiltMeter dataRef={dataRef} />
+                                            ) : practiceView === 'vowel' ? (
+                                                <VowelSpacePlot dataRef={dataRef} />
+                                            ) : practiceView === 'articulation' ? (
+                                                <div className="h-full overflow-y-auto custom-scrollbar">
+                                                    <ArticulationView />
+                                                </div>
+                                            ) : practiceView === 'contour' ? (
+                                                <ContourVisualizer dataRef={dataRef} />
+                                            ) : practiceView === 'quality' ? (
+                                                <QualityVisualizer dataRef={dataRef} />
+                                            ) : practiceView === 'spectrogram' ? (
+                                                <Spectrogram dataRef={dataRef} />
+                                            ) : null}
+                                        </ErrorBoundary>
+                                    </div>
+                                </div>
 
-                                    {practiceView === 'weight' && (
-                                        <div className="h-full min-h-[300px]">
-                                            <VoiceQualityMeter dataRef={dataRef} userMode="user" />
-                                        </div>
-                                    )}
-
-                                    {practiceView === 'tilt' && (
-                                        <div className="h-full min-h-[300px]">
-                                            <SpectralTiltMeter dataRef={dataRef} />
-                                        </div>
-                                    )}
-
-                                    {practiceView === 'vowel' && (
-                                        <div className="h-full min-h-[300px]">
-                                            <VowelSpacePlot dataRef={dataRef} />
-                                        </div>
-                                    )}
-
-                                    {practiceView === 'articulation' && (
-                                        <div className="h-full min-h-[300px] overflow-y-auto custom-scrollbar rounded-3xl border border-white/5 bg-slate-900/30">
-                                            <ArticulationView />
-                                        </div>
-                                    )}
-
-                                    {practiceView === 'contour' && (
-                                        <div className="h-full min-h-[300px]">
-                                            <ContourVisualizer dataRef={dataRef} />
-                                        </div>
-                                    )}
-
-                                    {practiceView === 'quality' && (
-                                        <div className="h-full min-h-[300px]">
-                                            <QualityVisualizer dataRef={dataRef} />
-                                        </div>
-                                    )}
-
-                                    {practiceView === 'spectrogram' && (
-                                        <div className="h-full min-h-[300px]">
-                                            <Spectrogram dataRef={dataRef} />
-                                        </div>
-                                    )}
-
-                                    {/* Resonance Metrics (Desktop 'Alongside' View) */}
-                                    {practiceView === 'resonance' && (
-                                        <div className="mb-6">
-                                            <ResonanceMetrics dataRef={dataRef} />
-                                        </div>
-                                    )}
+                                {/* 2. Right: Dashboard & Advice */}
+                                <div className="flex flex-col h-[500px] overflow-y-auto custom-scrollbar pr-2">
+                                    <div className="h-full min-h-[400px] mb-6">
+                                        <GenderPerceptionDashboard dataRef={dataRef} view={practiceView} />
+                                    </div>
 
                                     {/* Exercises Section */}
                                     <ToolExercises tool={practiceView} audioEngine={audioEngineRef.current} />

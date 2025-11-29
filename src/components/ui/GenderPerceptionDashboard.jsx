@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Activity } from 'lucide-react';
+import { Activity, Target, Lightbulb } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
+import { useProfile } from '../../context/ProfileContext';
 
-const GenderPerceptionDashboard = ({ dataRef }) => {
+const GenderPerceptionDashboard = ({ dataRef, view }) => {
     const { settings } = useSettings();
+    const { activeProfile, targetRange } = useProfile();
     const { colorBlindMode } = settings;
 
     const [metrics, setMetrics] = useState({
@@ -85,6 +87,80 @@ const GenderPerceptionDashboard = ({ dataRef }) => {
         return 'Balanced';
     };
 
+    // --- New Logic for Targets and Advice ---
+
+    const getTargetInfo = () => {
+        if (!activeProfile) return null;
+        const isFem = activeProfile === 'fem';
+        const isMasc = activeProfile === 'masc';
+
+        switch (view) {
+            case 'pitch':
+                return { label: 'Target Pitch', value: `${targetRange.min}-${targetRange.max} Hz` };
+            case 'resonance':
+                return { label: 'Target Resonance', value: isFem ? 'Bright (High R1)' : isMasc ? 'Dark (Low R1)' : 'Balanced' };
+            case 'weight':
+                return { label: 'Target Weight', value: isFem ? 'Light / Soft' : isMasc ? 'Heavy / Full' : 'Balanced' };
+            case 'tilt':
+                return { label: 'Target Tilt', value: isFem ? '-6dB (Less Steep)' : isMasc ? '-12dB (Steeper)' : '-9dB' };
+            case 'vowel':
+                return { label: 'Target Vowel', value: 'Clear Formants' };
+            case 'quality':
+                return { label: 'Target Quality', value: 'High Stability' };
+            default:
+                return null;
+        }
+    };
+
+    const getAdvice = () => {
+        if (!activeProfile) return null;
+        const isFem = activeProfile === 'fem';
+        const isMasc = activeProfile === 'masc';
+        const { pitch, resonance, weight, tilt } = metrics;
+
+        if (view === 'pitch') {
+            if (pitch === 0) return "Speak to see your pitch.";
+            if (pitch < targetRange.min) return "Pitch is too low. Try sliding up.";
+            if (pitch > targetRange.max) return "Pitch is too high. Relax down.";
+            return "Perfect pitch! Hold it steady.";
+        }
+
+        if (view === 'resonance') {
+            if (resonance === 0) return "Speak to see resonance.";
+            if (isFem) {
+                if (resonance < 2500) return "Resonance is dark. Raise your larynx (smile/swallow).";
+                return "Great brightness! Keep it forward.";
+            }
+            if (isMasc) {
+                if (resonance > 2000) return "Resonance is bright. Lower your larynx (yawn).";
+                return "Nice dark resonance.";
+            }
+        }
+
+        if (view === 'weight') {
+            if (isFem) {
+                if (weight > 60) return "Voice is heavy. Add breathiness, soften the onset.";
+                return "Good light weight.";
+            }
+            if (isMasc) {
+                if (weight < 40) return "Voice is too light. Add vocal fold closure.";
+                return "Good heavy weight.";
+            }
+        }
+
+        if (view === 'tilt') {
+            if (isFem) {
+                if (tilt < -10) return "Sound is too breathy/steep. Project more.";
+                return "Good projection.";
+            }
+        }
+
+        return "Practice consistently to build muscle memory.";
+    };
+
+    const targetInfo = getTargetInfo();
+    const advice = getAdvice();
+
     return (
         <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 h-full flex flex-col">
             {/* Header */}
@@ -99,18 +175,41 @@ const GenderPerceptionDashboard = ({ dataRef }) => {
                 <div className="text-2xl font-bold">{metrics.perception}</div>
             </div>
 
-            {/* Scrollable Content Area if needed, or just flex-1 */}
+            {/* Target & Advice Section (New) */}
+            {(targetInfo || advice) && (
+                <div className="mb-4 space-y-2 shrink-0">
+                    {targetInfo && (
+                        <div className="bg-slate-800/80 rounded-lg p-3 border border-slate-700/50 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Target className="w-4 h-4 text-emerald-400" />
+                                <span className="text-xs font-bold text-slate-300">{targetInfo.label}</span>
+                            </div>
+                            <span className="text-xs font-mono text-emerald-400">{targetInfo.value}</span>
+                        </div>
+                    )}
+                    {advice && (
+                        <div className="bg-blue-500/10 rounded-lg p-3 border border-blue-500/20">
+                            <div className="flex items-start gap-2">
+                                <Lightbulb className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
+                                <p className="text-xs text-blue-200 leading-relaxed">{advice}</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Scrollable Content Area */}
             <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar">
                 {/* Primary Metrics Grid */}
                 <div className="grid grid-cols-2 gap-3 text-xs mb-3">
                     {/* Pitch */}
-                    <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/30">
+                    <div className={`bg-slate-800/50 rounded-lg p-3 border ${view === 'pitch' ? 'border-teal-500/50 shadow-[0_0_10px_rgba(20,184,166,0.1)]' : 'border-slate-700/30'}`}>
                         <div className="text-slate-500 uppercase tracking-wider mb-1 text-[10px]">Pitch (F0)</div>
                         <div className="text-lg font-bold text-white font-mono">{Math.round(metrics.pitch)} Hz</div>
                     </div>
 
                     {/* Resonance */}
-                    <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/30">
+                    <div className={`bg-slate-800/50 rounded-lg p-3 border ${view === 'resonance' ? 'border-teal-500/50 shadow-[0_0_10px_rgba(20,184,166,0.1)]' : 'border-slate-700/30'}`}>
                         <div className="text-slate-500 uppercase tracking-wider mb-1 text-[10px]">Resonance</div>
                         <div className="text-lg font-bold text-cyan-400 font-mono">{Math.round(metrics.resonance)} Hz</div>
                         <div className="text-[9px] text-slate-500 mt-0.5">{getResonanceLabel()}</div>
@@ -129,7 +228,7 @@ const GenderPerceptionDashboard = ({ dataRef }) => {
                     </div>
 
                     {/* Weight */}
-                    <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/30 col-span-2">
+                    <div className={`bg-slate-800/50 rounded-lg p-3 border ${view === 'weight' ? 'border-teal-500/50 shadow-[0_0_10px_rgba(20,184,166,0.1)]' : 'border-slate-700/30'} col-span-2`}>
                         <div className="text-slate-500 uppercase tracking-wider mb-1 text-[10px]">Weight</div>
                         <div className="flex items-center gap-2">
                             <div className="text-lg font-bold text-yellow-400 font-mono">{Math.round(metrics.weight)}</div>
@@ -155,14 +254,12 @@ const GenderPerceptionDashboard = ({ dataRef }) => {
                         </div>
 
                         {/* Spectral Tilt */}
-                        <div className="bg-slate-800/30 rounded p-2 border border-slate-700/20">
+                        <div className={`bg-slate-800/30 rounded p-2 border ${view === 'tilt' ? 'border-teal-500/50' : 'border-slate-700/20'}`}>
                             <div className="text-slate-500 text-[9px] mb-0.5">Tilt</div>
                             <div className="text-sm font-mono text-purple-400">{metrics.tilt.toFixed(1)} dB</div>
                         </div>
                     </div>
                 </div>
-
-
             </div>
 
             {/* Info Footer */}
