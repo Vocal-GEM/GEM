@@ -95,7 +95,11 @@ export class AudioEngine {
             this.toneEngine = new ToneEngine(this.audioContext);
 
             // Initialize Socket
-            this.socket = io('http://localhost:5000');
+            // Use VITE_API_URL from environment or fallback to localhost
+            const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            console.log(`[AudioEngine] Connecting to backend at: ${BACKEND_URL}`);
+
+            this.socket = io(BACKEND_URL);
             this.socket.on('connect', () => {
                 console.log("[AudioEngine] Socket connected");
                 this.debugInfo.socketConnected = true;
