@@ -43,12 +43,8 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
         formData.append('file', file);
 
         try {
-            // Determine API URL (use localhost if not configured, or relative path if proxied)
-            // For now, assuming relative path /api/train works if proxy is set up, 
-            // or we need to use the full URL if running separately.
-            // Since user is running backend locally on 5000 and frontend on 5173 (likely),
-            // we might need full URL.
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            // Determine API URL (use Render URL for easier local dev without running local backend)
+            const API_URL = import.meta.env.VITE_API_URL || 'https://vocalgem.onrender.com';
 
             const response = await fetch(`${API_URL}/api/train`, {
                 method: 'POST',
