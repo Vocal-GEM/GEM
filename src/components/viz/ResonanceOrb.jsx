@@ -18,7 +18,6 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
     // Debug state
     const [debugInfo, setDebugInfo] = useState(null);
     const [showTooltip, setShowTooltip] = useState(false);
-    const [isOffline, setIsOffline] = useState(false);
 
     // Smoothing ref
     const currentScore = useRef(0.5);
@@ -38,13 +37,6 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
         const loop = () => {
             if (orbRef.current && dataRef.current) {
                 const { resonance, pitch, volume, f1, f2, debug, weight, resonanceScore, isBackendActive } = dataRef.current;
-
-                // Update offline state
-                if (isBackendActive !== undefined && !isBackendActive) {
-                    setIsOffline(true);
-                } else {
-                    setIsOffline(false);
-                }
 
                 // Use backend RBI score (0-100) mapped to 0-1
                 let calculatedScore = (resonanceScore !== undefined ? resonanceScore : 50) / 100.0;
@@ -141,15 +133,8 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                 if (orbRef.current) {
                     orbRef.current.style.backgroundColor = color;
                     orbRef.current.style.boxShadow = `0 0 ${size * 0.5}px ${color}, 0 0 ${size}px ${color}40`;
-
-                    // Offline visual cue
-                    if (isOffline) {
-                        orbRef.current.style.opacity = "0.7";
-                        orbRef.current.style.border = "2px solid #ef4444"; // Red border for offline
-                    } else {
-                        orbRef.current.style.opacity = "1";
-                        orbRef.current.style.border = "none";
-                    }
+                    orbRef.current.style.opacity = "1";
+                    orbRef.current.style.border = "none";
                 }
 
                 // Label Logic
@@ -243,14 +228,6 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                         boxShadow: `0 0 ${size * 0.5}px rgb(59, 130, 246), 0 0 ${size}px rgba(59, 130, 246, 0.25)`
                     }}
                 ></div>
-
-                {/* Offline Indicator */}
-                {isOffline && (
-                    <div className="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500/90 text-white text-[10px] px-2 py-0.5 rounded-full shadow-lg flex items-center gap-1 z-20">
-                        <WifiOff size={10} />
-                        <span>Offline</span>
-                    </div>
-                )}
 
                 <div
                     ref={labelRef}
