@@ -8,10 +8,14 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null); // { id, username }
     const [isAuthLoading, setIsAuthLoading] = useState(true);
 
+    // Determine API URL:
+    // 1. Use VITE_API_URL if set
+    // 2. Fallback to Render URL for easier local dev without running local backend
+    const API_URL = import.meta.env.VITE_API_URL || 'https://vocalgem.onrender.com';
+
     useEffect(() => {
         const initAuth = async () => {
             try {
-                const API_URL = import.meta.env.VITE_API_URL || '';
                 const res = await fetch(`${API_URL}/api/me`);
                 if (res.ok) {
                     const data = await res.json();
@@ -20,7 +24,7 @@ export const AuthProvider = ({ children }) => {
                     }
                 }
             } catch (e) {
-                console.warn("Backend not reachable");
+                console.warn("Backend not reachable at " + API_URL);
             } finally {
                 setIsAuthLoading(false);
             }
@@ -30,7 +34,6 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, password) => {
         try {
-            const API_URL = import.meta.env.VITE_API_URL || '';
             const res = await fetch(`${API_URL}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -47,7 +50,7 @@ export const AuthProvider = ({ children }) => {
 
     const signup = async (username, password) => {
         try {
-            const API_URL = import.meta.env.VITE_API_URL || '';
+            console.log("Signing up to:", `${API_URL}/api/signup`);
             const res = await fetch(`${API_URL}/api/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -63,14 +66,13 @@ export const AuthProvider = ({ children }) => {
                 return { success: false, error: data.error || 'Signup failed' };
             }
         } catch (e) {
-            console.error(e);
-            return { success: false, error: 'Network error. Is the backend running?' };
+            console.error("Signup error:", e);
+            return { success: false, error: `Network error connecting to ${API_URL}. Is the backend running?` };
         }
     };
 
     const logout = async () => {
         try {
-            const API_URL = import.meta.env.VITE_API_URL || '';
             await fetch(`${API_URL}/api/logout`, { method: 'POST' });
             setUser(null);
         } catch (e) { console.error(e); }

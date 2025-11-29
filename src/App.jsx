@@ -7,7 +7,7 @@ import { useStats } from './context/StatsContext';
 import { useJournal } from './context/JournalContext';
 
 // Icons
-import { Mic, Mic2, Camera, ArrowLeft, Wrench, Bot, BarChart2, Activity, BookOpen, ChevronRight, Sliders } from 'lucide-react';
+import { Mic, Mic2, Camera, ArrowLeft, Wrench, Bot, BarChart2, Activity, BookOpen, ChevronRight } from 'lucide-react';
 
 // Components - UI
 import ErrorBoundary from './components/ui/ErrorBoundary';
@@ -42,6 +42,7 @@ const AnalysisView = lazy(() => import('./components/views/AnalysisView'));
 const ArticulationView = lazy(() => import('./components/views/ArticulationView'));
 const VocalFoldsView = lazy(() => import('./components/views/VocalFoldsView'));
 const VoiceQualityView = lazy(() => import('./components/views/VoiceQualityView'));
+const QualityVisualizer = lazy(() => import('./components/viz/QualityVisualizer'));
 const FeminizationCourse = lazy(() => import('./components/ui/FeminizationCourse'));
 
 // Lazy Loaded Components - Visualizations
@@ -56,7 +57,7 @@ const VowelSpacePlot = lazy(() => import('./components/viz/VowelSpacePlot'));
 const HighResSpectrogram = lazy(() => import('./components/viz/HighResSpectrogram'));
 const Spectrogram = lazy(() => import('./components/viz/Spectrogram'));
 const ContourVisualizer = lazy(() => import('./components/viz/ContourVisualizer'));
-const QualityVisualizer = lazy(() => import('./components/viz/QualityVisualizer'));
+
 const SpectralTiltMeter = lazy(() => import('./components/viz/SpectralTiltMeter'));
 const ResonanceMetrics = lazy(() => import('./components/viz/ResonanceMetrics'));
 const ToolExercises = lazy(() => import('./components/ui/ToolExercises'));
@@ -68,10 +69,10 @@ import DebugOverlay from './components/ui/DebugOverlay';
 
 const App = () => {
     const {
-        isAudioActive,
-        toggleAudio,
+        audioEngineRef,
         dataRef,
-        audioEngineRef
+        isAudioActive,
+        toggleAudio
     } = useAudio();
 
     const {
@@ -138,7 +139,7 @@ const App = () => {
     const [showMigration, setShowMigration] = useState(true);
     const [practiceView, setPracticeView] = useState('all'); // all, pitch, resonance, weight, vowel
     const [pitchViewMode, setPitchViewMode] = useState('graph'); // graph or orb
-    const [showMixerInDashboard, setShowMixerInDashboard] = useState(false);
+
 
 
 
@@ -221,232 +222,207 @@ const App = () => {
                         <button onClick={() => user ? setShowProfile(true) : setShowLogin(true)} className="w-10 h-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors" aria-label={user ? "Open profile" : "Login"}>
                             <span className="text-lg" aria-hidden="true">👤</span>
                         </button>
-                        <button onClick={() => setShowCamera(!showCamera)} className={`w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transition-colors ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`} aria-label={showCamera ? "Close camera" : "Open camera"} aria-pressed={showCamera}>
-                            <Camera className="w-5 h-5" />
-                        </button>
                     </div>
                 </div>
             </header>
 
-            {/* Main Content */}
-            <main className="p-6 max-w-[1600px] mx-auto" role="main">
-                <Suspense fallback={<LoadingSpinner />}>
-                    {activeTab === 'practice' && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Real-time Analysis</h2>
-                                <div className="flex gap-2">
-                                    <button onClick={() => setShowPracticeMode(true)} className="px-4 py-2.5 rounded-full text-sm font-bold bg-slate-800 hover:bg-slate-700 text-purple-400 border border-purple-500/30 transition-all flex items-center gap-2">
-                                        <Mic2 className="w-4 h-4" /> Voice Mode
-                                    </button>
-                                    <button onClick={toggleAudio} className={`px-6 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all shadow-lg ${isAudioActive ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30' : 'bg-gradient-to-r from-teal-500 to-violet-500 hover:from-teal-400 hover:to-violet-400 text-white hover:shadow-xl hover:shadow-teal-500/30 animate-glow-pulse'}`} aria-label={isAudioActive ? "Stop listening" : "Start listening"} aria-pressed={isAudioActive}>
-                                        {isAudioActive ? <><span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" aria-hidden="true" /> LIVE</> : <><Mic className="w-4 h-4" aria-hidden="true" /> START LISTENING</>}
-                                    </button>
-                                </div>
-                            </div>
-                            {/* Filter Menu */}
-                            <div className="glass-panel-dark rounded-xl p-2 mb-6 flex gap-2 overflow-x-auto">
-                                {[{ id: 'all', label: 'Show All' }, { id: 'pitch', label: 'Pitch' }, { id: 'resonance', label: 'Resonance' }, { id: 'weight', label: 'Weight' }, { id: 'tilt', label: 'Tilt' }, { id: 'vowel', label: 'Vowel' }, { id: 'articulation', label: 'Articulation' }, { id: 'contour', label: 'Contour' }, { id: 'quality', label: 'Quality' }, { id: 'spectrogram', label: 'Spectrogram' }].map(view => (
-                                    <button key={view.id} onClick={() => setPracticeView(view.id)} className={`px-5 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap min-w-[80px] flex-shrink-0 ${practiceView === view.id ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white shadow-md shadow-teal-500/20' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/70 hover:text-white border border-slate-700/50'}`}>
-                                        {view.label}
-                                    </button>
-                                ))}
-                                <button onClick={() => setShowCourse(true)} className="px-5 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap min-w-[80px] flex-shrink-0 bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-400 hover:to-purple-500 shadow-md shadow-pink-500/20 flex items-center gap-2">
-                                    <BookOpen className="w-4 h-4" /> Course
+            <main className="flex-1 max-w-[1600px] mx-auto w-full p-4 pb-24">
+                {activeTab === 'practice' && (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Real-time Analysis</h2>
+                            <div className="flex gap-2">
+                                <button onClick={() => setShowPracticeMode(true)} className="px-4 py-2.5 rounded-full text-sm font-bold bg-slate-800 hover:bg-slate-700 text-purple-400 border border-purple-500/30 transition-all flex items-center gap-2">
+                                    <Mic2 className="w-4 h-4" /> Voice Mode
+                                </button>
+                                <button onClick={toggleAudio} className={`px-6 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all shadow-lg ${isAudioActive ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30' : 'bg-gradient-to-r from-teal-500 to-violet-500 hover:from-teal-400 hover:to-violet-400 text-white hover:shadow-xl hover:shadow-teal-500/30 animate-glow-pulse'}`} aria-label={isAudioActive ? "Stop listening" : "Start listening"} aria-pressed={isAudioActive}>
+                                    {isAudioActive ? <><span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" aria-hidden="true" /> LIVE</> : <><Mic className="w-4 h-4" aria-hidden="true" /> START LISTENING</>}
                                 </button>
                             </div>
+                        </div>
 
-                            {/* Dashboard Grid - Fixed 2 Columns */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                        {/* Filter Menu */}
+                        <div className="glass-panel-dark rounded-xl p-2 mb-6 flex gap-2 overflow-x-auto">
+                            {[{ id: 'all', label: 'Show All' }, { id: 'mixer', label: 'Mixer' }, { id: 'gauges', label: 'Gauges' }, { id: 'pitch', label: 'Pitch' }, { id: 'resonance', label: 'Resonance' }, { id: 'weight', label: 'Weight' }, { id: 'tilt', label: 'Tilt' }, { id: 'vowel', label: 'Vowel' }, { id: 'articulation', label: 'Articulation' }, { id: 'contour', label: 'Contour' }, { id: 'quality', label: 'Quality' }, { id: 'spectrogram', label: 'Spectrogram' }].map(view => (
+                                <button key={view.id} onClick={() => setPracticeView(view.id)} className={`px-5 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap min-w-[80px] flex-shrink-0 ${practiceView === view.id ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white shadow-md shadow-teal-500/20' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/70 hover:text-white border border-slate-700/50'}`}>
+                                    {view.label}
+                                </button>
+                            ))}
+                            <button onClick={() => setShowCourse(true)} className="px-5 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap min-w-[80px] flex-shrink-0 bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-400 hover:to-purple-500 shadow-md shadow-pink-500/20 flex items-center gap-2">
+                                <BookOpen className="w-4 h-4" /> Course
+                            </button>
+                        </div>
 
-                                {/* 1. Left: Tool Visualization */}
-                                <div className="flex flex-col h-[500px] relative">
-                                    {/* Toggle for 'all' view */}
-                                    {practiceView === 'all' && (
-                                        <div className="absolute top-4 left-4 z-30">
-                                            <button
-                                                onClick={() => setShowMixerInDashboard(!showMixerInDashboard)}
-                                                className="p-2 bg-slate-800/80 backdrop-blur rounded-lg border border-white/10 text-white hover:bg-slate-700 transition-colors flex items-center gap-2"
-                                                title={showMixerInDashboard ? "Switch to Orb" : "Switch to Mixer"}
-                                            >
-                                                {showMixerInDashboard ? <Activity size={16} /> : <Sliders size={16} />}
-                                                <span className="text-xs font-bold">{showMixerInDashboard ? "Orb" : "Mixer"}</span>
-                                            </button>
+                        {/* Dashboard Grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                            {/* Left: Tool Visualization */}
+                            <div className="flex flex-col h-[500px] relative">
+                                <div key="tool-container" className="h-full w-full relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5">
+                                    <ErrorBoundary fallback={
+                                        <div className="w-full h-full flex items-center justify-center text-red-400 p-4 text-center">
+                                            <div>
+                                                <p className="font-bold mb-2">Visualization Error</p>
+                                                <p className="text-xs">The view crashed. Try refreshing.</p>
+                                            </div>
                                         </div>
-                                    )}
-
-                                    <div key="tool-container" className="h-full w-full relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5">
-                                        <ErrorBoundary fallback={
-                                            <div className="w-full h-full flex items-center justify-center text-red-400 p-4 text-center">
-                                                <div>
-                                                    <p className="font-bold mb-2">Visualization Error</p>
-                                                    <p className="text-xs">The view crashed. Try refreshing.</p>
+                                    }>
+                                        {practiceView === 'all' ? (
+                                            <DynamicOrb
+                                                dataRef={dataRef}
+                                                calibration={{ ...calibration, disable3D: settings.disable3D }}
+                                            />
+                                        ) : practiceView === 'mixer' ? (
+                                            <div className="h-full w-full p-2 pt-12">
+                                                <MixingBoardView
+                                                    dataRef={dataRef}
+                                                    audioEngine={audioEngineRef.current}
+                                                    calibration={calibration}
+                                                    compact={true}
+                                                    viewMode="sliders"
+                                                />
+                                            </div>
+                                        ) : practiceView === 'gauges' ? (
+                                            <div className="h-full w-full p-2 pt-12">
+                                                <MixingBoardView
+                                                    dataRef={dataRef}
+                                                    audioEngine={audioEngineRef.current}
+                                                    calibration={calibration}
+                                                    compact={true}
+                                                    viewMode="gauges"
+                                                />
+                                            </div>
+                                        ) : practiceView === 'resonance' ? (
+                                            <ResonanceOrb
+                                                dataRef={dataRef}
+                                                calibration={calibration}
+                                                showDebug={false}
+                                                colorBlindMode={settings.colorBlindMode}
+                                            />
+                                        ) : practiceView === 'pitch' ? (
+                                            <div className="h-full flex flex-col">
+                                                <div className="flex-1">
+                                                    <PitchVisualizer dataRef={dataRef} />
+                                                </div>
+                                                <div className="mt-4">
+                                                    <PitchPipe audioEngine={audioEngineRef} />
                                                 </div>
                                             </div>
-                                        }>
-                                            {practiceView === 'all' ? (
-                                                showMixerInDashboard ? (
-                                                    <div className="h-full w-full p-2 pt-12">
-                                                        <MixingBoardView
-                                                            dataRef={dataRef}
-                                                            audioEngine={audioEngineRef.current}
-                                                            calibration={calibration}
-                                                            compact={true}
-                                                        />
-                                                    </div>
-                                                ) : (
-                                                    <DynamicOrb
-                                                        dataRef={dataRef}
-                                                        calibration={{ ...calibration, disable3D: settings.disable3D }}
-                                                    />
-                                                )
-                                            ) : practiceView === 'resonance' ? (
-                                                <ResonanceOrb
-                                                    dataRef={dataRef}
-                                                    calibration={calibration}
-                                                    showDebug={false}
-                                                    colorBlindMode={settings.colorBlindMode}
-                                                />
-                                            ) : practiceView === 'pitch' ? (
-                                                <div className="h-full flex flex-col">
-                                                    <div className="flex-1">
-                                                        <PitchVisualizer dataRef={dataRef} />
-                                                    </div>
-                                                    <div className="mt-4">
-                                                        <PitchPipe audioEngine={audioEngineRef} />
-                                                    </div>
-                                                </div>
-                                            ) : practiceView === 'weight' ? (
-                                                <VoiceQualityMeter dataRef={dataRef} userMode="user" />
-                                            ) : practiceView === 'tilt' ? (
-                                                <SpectralTiltMeter dataRef={dataRef} />
-                                            ) : practiceView === 'vowel' ? (
-                                                <VowelSpacePlot dataRef={dataRef} />
-                                            ) : practiceView === 'articulation' ? (
-                                                <div className="h-full overflow-y-auto custom-scrollbar">
-                                                    <ArticulationView />
-                                                </div>
-                                            ) : practiceView === 'contour' ? (
-                                                <ContourVisualizer dataRef={dataRef} />
-                                            ) : practiceView === 'quality' ? (
-                                                <QualityVisualizer dataRef={dataRef} />
-                                            ) : practiceView === 'spectrogram' ? (
-                                                <Spectrogram dataRef={dataRef} />
-                                            ) : null}
-                                        </ErrorBoundary>
-                                    </div>
-
-                                    {/* Comparison Tool (Integrated) */}
-                                    {(practiceView !== 'all' && practiceView !== 'resonance') && (
-                                        <div className="mt-6">
-                                            <ComparisonTool />
-                                        </div>
-                                    )}
+                                        ) : practiceView === 'weight' ? (
+                                            <VoiceQualityMeter dataRef={dataRef} userMode="user" />
+                                        ) : practiceView === 'tilt' ? (
+                                            <SpectralTiltMeter dataRef={dataRef} />
+                                        ) : practiceView === 'vowel' ? (
+                                            <VowelSpacePlot dataRef={dataRef} />
+                                        ) : practiceView === 'articulation' ? (
+                                            <div className="h-full overflow-y-auto custom-scrollbar">
+                                                <ArticulationView />
+                                            </div>
+                                        ) : practiceView === 'contour' ? (
+                                            <ContourVisualizer dataRef={dataRef} />
+                                        ) : practiceView === 'quality' ? (
+                                            <VoiceQualityView />
+                                        ) : practiceView === 'spectrogram' ? (
+                                            <Spectrogram dataRef={dataRef} />
+                                        ) : null}
+                                    </ErrorBoundary>
                                 </div>
 
-                                {/* 2. Right: Dashboard & Advice */}
-                                <div className="flex flex-col h-[500px] overflow-y-auto custom-scrollbar pr-2">
-                                    <div className="h-full min-h-[400px] mb-6">
-                                        <GenderPerceptionDashboard dataRef={dataRef} view={practiceView} />
+                                {/* Comparison Tool */}
+                                {(practiceView !== 'all' && practiceView !== 'resonance') && (
+                                    <div className="mt-6">
+                                        <ComparisonTool />
                                     </div>
+                                )}
+                            </div>
 
-                                    {/* Exercises Section */}
-                                    <ToolExercises tool={practiceView} audioEngine={audioEngineRef.current} />
+                            {/* Right: Dashboard & Advice */}
+                            <div className="flex flex-col h-[500px] overflow-y-auto custom-scrollbar pr-2">
+                                <div className="h-full min-h-[400px] mb-6">
+                                    <GenderPerceptionDashboard dataRef={dataRef} view={practiceView} />
+                                </div>
 
-                                    <div className="mt-4 flex-shrink-0">
-                                        <button onClick={() => setActiveTab('tools')} className="w-full p-4 rounded-xl flex flex-row items-center justify-center gap-3 transition-colors group bg-slate-800 hover:bg-slate-700">
-                                            <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all">
-                                                <Wrench size={20} />
-                                            </div>
-                                            <span className="text-sm font-bold">All Tools</span>
-                                        </button>
-                                    </div>
+                                <ToolExercises tool={practiceView} audioEngine={audioEngineRef.current} />
+
+                                <div className="mt-4 flex-shrink-0">
+                                    <button onClick={() => setActiveTab('tools')} className="w-full p-4 rounded-xl flex flex-row items-center justify-center gap-3 transition-colors group bg-slate-800 hover:bg-slate-700">
+                                        <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all">
+                                            <Wrench size={20} />
+                                        </div>
+                                        <span className="text-sm font-bold">All Tools</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    )
-                    }
-                    {activeTab === 'history' && <HistoryView stats={stats} journals={journals} onLogClick={() => setShowJournalForm(true)} />}
-                    {
-                        activeTab === 'tools' && (
-                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><ArrowLeft /></button>
-                                    <h2 className="text-xl font-bold">Tools</h2>
+                    </div>
+                )}
+
+                {activeTab === 'history' && <HistoryView stats={stats} journals={journals} onLogClick={() => setShowJournalForm(true)} />}
+
+                {activeTab === 'coach' && <CoachView />}
+
+                {activeTab === 'analysis' && (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <AnalysisView />
+                    </Suspense>
+                )}
+
+                {activeTab === 'tools' && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex items-center gap-2 mb-4">
+                            <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><ArrowLeft /></button>
+                            <h2 className="text-xl font-bold">Tools</h2>
+                        </div>
+                        <AudioLibrary audioEngine={audioEngineRef} />
+                        <BreathPacer />
+                        <div className="p-4 bg-slate-800 rounded-xl flex flex-row items-center justify-between gap-3 hover:bg-slate-700 transition-colors cursor-pointer" onClick={() => setShowVocalFolds(true)}>
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-lg bg-pink-500/10 text-pink-400">
+                                    <Activity size={20} />
                                 </div>
-                                <AudioLibrary audioEngine={audioEngineRef} />
-                                <BreathPacer />
-                                <div className="p-4 bg-slate-800 rounded-xl flex flex-row items-center justify-between gap-3 hover:bg-slate-700 transition-colors cursor-pointer" onClick={() => setShowVocalFolds(true)}>
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 rounded-lg bg-pink-500/10 text-pink-400">
-                                            <Activity size={20} />
-                                        </div>
-                                        <div className="text-left">
-                                            <h3 className="text-sm font-bold text-white">Vocal Folds Simulation</h3>
-                                            <p className="text-xs text-slate-400">Interactive physics model</p>
-                                        </div>
-                                    </div>
+                                <div className="text-left">
+                                    <h3 className="text-sm font-bold text-white">Vocal Folds Simulation</h3>
+                                    <p className="text-xs text-slate-400">Visualize vocal fold vibration patterns</p>
                                 </div>
-                                <div className="p-4 bg-slate-800 rounded-xl flex flex-row items-center justify-between gap-3 hover:bg-slate-700 transition-colors cursor-pointer" onClick={() => setShowVoiceQuality(true)}>
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 rounded-lg bg-teal-500/10 text-teal-400">
-                                            <Activity size={20} />
-                                        </div>
-                                        <div className="text-left">
-                                            <h3 className="text-sm font-bold text-white">Voice Quality Analysis</h3>
-                                            <p className="text-xs text-slate-400">Breathiness, Strain, Roughness</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <MirrorComponent />
                             </div>
-                        )
-                    }
-                    {activeTab === 'mixing' && <MixingBoardView dataRef={dataRef} audioEngine={audioEngineRef.current} calibration={calibration} />}
+                            <ChevronRight className="text-slate-500" />
+                        </div>
+                    </div>
+                )}
+            </main>
 
-                    {activeTab === 'coach' && <CoachView />}
-
-                    {activeTab === 'analysis' && <AnalysisView />}
-                </Suspense >
-            </main >
-
-            {/* Navigation */}
-            <nav className="fixed bottom-0 inset-x-0 bg-slate-950/90 backdrop-blur-lg border-t border-white/5 pb-safe z-40" role="navigation" aria-label="Main navigation">
+            {/* Bottom Navigation */}
+            <nav className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/80 backdrop-blur-lg border-t border-white/5 pb-safe">
                 <div className="flex justify-around items-center p-2 max-w-[1600px] mx-auto">
-                    <button onClick={() => { setActiveTab('practice'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all relative ${activeTab === 'practice' ? 'text-teal-400' : 'text-slate-500 hover:text-slate-300'}`}>
+                    <button onClick={() => setActiveTab('practice')} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all relative ${activeTab === 'practice' ? 'text-teal-400' : 'text-slate-500 hover:text-slate-300'}`}>
                         <Mic2 className="w-6 h-6" />
                         <span className="text-[10px] font-bold">Practice</span>
                         {activeTab === 'practice' && <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-teal-500 to-violet-500 rounded-full" />}
                     </button>
 
-                    <button onClick={() => { setActiveTab('mixing'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'mixing' ? 'text-pink-400 bg-pink-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
-                        <Wrench className="w-6 h-6" />
-                        <span className="text-[10px] font-bold">Mixer</span>
-                    </button>
-                    <button onClick={() => { setActiveTab('coach'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'coach' ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+                    <button onClick={() => setActiveTab('coach')} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'coach' ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
                         <Bot className="w-6 h-6" />
                         <span className="text-[10px] font-bold">Coach</span>
                     </button>
-                    <button onClick={() => { setActiveTab('history'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'history' ? 'text-orange-400 bg-orange-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+
+                    <button onClick={() => setActiveTab('history')} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'history' ? 'text-orange-400 bg-orange-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
                         <BarChart2 className="w-6 h-6" />
                         <span className="text-[10px] font-bold">Progress</span>
                     </button>
-                    <button onClick={() => { setActiveTab('analysis'); }} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'analysis' ? 'text-cyan-400 bg-cyan-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
+
+                    <button onClick={() => setActiveTab('analysis')} className={`p-3 rounded-2xl flex flex-col items-center gap-1 transition-all ${activeTab === 'analysis' ? 'text-cyan-400 bg-cyan-500/10' : 'text-slate-500 hover:text-slate-300'}`}>
                         <Activity className="w-6 h-6" />
                         <span className="text-[10px] font-bold">Analysis</span>
                     </button>
                 </div>
-            </nav >
+            </nav>
 
-            {/* Modals */}
+            {/* Modals & Overlays */}
             <FeedbackSettings
                 isOpen={showSettings}
                 onClose={() => setShowSettings(false)}
                 settings={settings}
                 setSettings={updateSettings}
                 targetRange={targetRange}
-
                 onSetGoal={(type) => {
                     let r = { min: 170, max: 220 };
                     if (type === 'fem') r = { min: 165, max: 255 };
@@ -464,40 +440,40 @@ const App = () => {
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a'); a.href = url; a.download = 'vocal-gem-data.json'; a.click();
                 }}
+                user={user}
             />
+
             {showMigration && <MigrationModal onComplete={() => setShowMigration(false)} />}
 
             {/* Onboarding Wizards */}
-            {
-                (showTutorial || showCompass || showCalibration) && (
-                    <button
-                        onClick={() => {
-                            localStorage.setItem('gem_tutorial_seen', 'true');
-                            localStorage.setItem('gem_compass_seen', 'true');
-                            localStorage.setItem('gem_calibration_done', 'true');
-                            setShowTutorial(false);
-                            setShowCompass(false);
-                            setShowCalibration(false);
-                        }}
-                        className="fixed top-4 right-4 z-[60] px-4 py-2 bg-slate-800/80 backdrop-blur-md text-slate-400 hover:text-white text-xs font-bold uppercase tracking-wider rounded-full border border-white/10 hover:bg-slate-700 transition-all"
-                    >
-                        Skip Setup
-                    </button>
-                )
-            }
+            {(showTutorial || showCompass || showCalibration) && (
+                <button
+                    onClick={() => {
+                        localStorage.setItem('gem_tutorial_seen', 'true');
+                        localStorage.setItem('gem_compass_seen', 'true');
+                        localStorage.setItem('gem_calibration_done', 'true');
+                        setShowTutorial(false);
+                        setShowCompass(false);
+                        setShowCalibration(false);
+                    }}
+                    className="fixed top-4 right-4 z-[60] px-4 py-2 bg-slate-800/80 backdrop-blur-md text-slate-400 hover:text-white text-xs font-bold uppercase tracking-wider rounded-full border border-white/10 hover:bg-slate-700 transition-all"
+                >
+                    Skip Setup
+                </button>
+            )}
 
             {showTutorial && <TutorialWizard onComplete={handleTutorialComplete} onSkip={() => { setShowTutorial(false); setShowCompass(true); }} />}
             {!showTutorial && showCompass && <CompassWizard onComplete={handleCompassComplete} />}
             {showCalibration && <CalibrationWizard onComplete={handleCalibrationComplete} onSkip={handleCalibrationComplete} audioEngine={audioEngineRef} />}
-            {
-                showJournalForm && (
-                    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-                        <div className="w-full max-w-md">
-                            <JournalForm onSubmit={addJournalEntry} onCancel={() => setShowJournalForm(false)} />
-                        </div>
+
+            {showJournalForm && (
+                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="w-full max-w-md">
+                        <JournalForm onSubmit={addJournalEntry} onCancel={() => setShowJournalForm(false)} />
                     </div>
-                )
-            }
+                </div>
+            )}
+
             {showLogin && <Login onSwitchToSignup={() => { setShowLogin(false); setShowSignup(true); }} onClose={() => setShowLogin(false)} />}
             {showSignup && <Signup onSwitchToLogin={() => { setShowSignup(false); setShowLogin(true); }} onClose={() => setShowSignup(false)} />}
             {showProfile && <UserProfile user={user} onClose={() => setShowProfile(false)} onLogout={() => { logout(); setShowProfile(false); }} />}
@@ -507,61 +483,57 @@ const App = () => {
             {showForwardFocus && <ForwardFocusDrill onClose={() => setShowForwardFocus(false)} />}
             {showIncognito && <IncognitoScreen onClose={() => setShowIncognito(false)} />}
             {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
-            {
-                showVocalFolds && (
-                    <Suspense fallback={<LoadingSpinner />}>
-                        <VocalFoldsView onClose={() => setShowVocalFolds(false)} />
-                    </Suspense>
-                )
-            }
-            {
-                showVoiceQuality && (
-                    <div className="fixed inset-0 z-50 bg-slate-950 overflow-y-auto">
-                        <div className="max-w-[1600px] mx-auto p-4 min-h-screen">
-                            <button
-                                onClick={() => setShowVoiceQuality(false)}
-                                className="mb-4 flex items-center gap-2 text-slate-400 hover:text-white"
-                            >
-                                <ArrowLeft size={20} /> Back to Tools
-                            </button>
-                            <Suspense fallback={<LoadingSpinner />}>
-                                <VoiceQualityView />
-                            </Suspense>
-                        </div>
+
+            {showVocalFolds && (
+                <Suspense fallback={<LoadingSpinner />}>
+                    <VocalFoldsView onClose={() => setShowVocalFolds(false)} />
+                </Suspense>
+            )}
+
+            {showVoiceQuality && (
+                <div className="fixed inset-0 z-50 bg-slate-950 overflow-y-auto">
+                    <div className="max-w-[1600px] mx-auto p-4 min-h-screen">
+                        <button
+                            onClick={() => setShowVoiceQuality(false)}
+                            className="mb-4 flex items-center gap-2 text-slate-400 hover:text-white"
+                        >
+                            <ArrowLeft size={20} /> Back to Tools
+                        </button>
+                        <Suspense fallback={<LoadingSpinner />}>
+                            <VoiceQualityView />
+                        </Suspense>
                     </div>
-                )
-            }
-            {
-                showCourse && (
-                    <Suspense fallback={<LoadingSpinner />}>
-                        <FeminizationCourse onClose={() => setShowCourse(false)} />
-                    </Suspense>
-                )
-            }
-            {
-                showPracticeMode && (
-                    <Suspense fallback={<LoadingSpinner />}>
-                        <PracticeMode
-                            onClose={() => setShowPracticeMode(false)}
-                            dataRef={dataRef}
-                            calibration={calibration}
-                            targetRange={targetRange}
-                            goals={goals}
-                            activeTab={activeTab}
-                            onOpenSettings={() => setShowSettings(true)}
-                            onOpenJournal={() => { setActiveTab('history'); setShowJournalForm(true); }}
-                            onOpenStats={() => setActiveTab('history')}
-                            onNavigate={setActiveTab}
-                            onUpdateRange={updateTargetRange}
-                            onSwitchProfile={switchProfile}
-                            settings={settings}
-                        />
-                    </Suspense>
-                )
-            }
+                </div>
+            )}
+
+            {showCourse && (
+                <Suspense fallback={<LoadingSpinner />}>
+                    <FeminizationCourse onClose={() => setShowCourse(false)} />
+                </Suspense>
+            )}
+
+            {showPracticeMode && (
+                <Suspense fallback={<LoadingSpinner />}>
+                    <PracticeMode
+                        onClose={() => setShowPracticeMode(false)}
+                        dataRef={dataRef}
+                        calibration={calibration}
+                        targetRange={targetRange}
+                        goals={goals}
+                        activeTab={activeTab}
+                        onOpenSettings={() => setShowSettings(true)}
+                        onOpenJournal={() => { setActiveTab('history'); setShowJournalForm(true); }}
+                        onOpenStats={() => setActiveTab('history')}
+                        onNavigate={setActiveTab}
+                        onUpdateRange={updateTargetRange}
+                        onSwitchProfile={switchProfile}
+                        settings={settings}
+                    />
+                </Suspense>
+            )}
 
             <DebugOverlay audioEngine={audioEngineRef.current} />
-        </div >
+        </div>
     );
 };
 

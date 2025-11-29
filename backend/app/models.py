@@ -36,3 +36,10 @@ class Settings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     preferences = db.Column(db.JSON, default={}) # Store all settings as JSON
+
+class KnowledgeDocument(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    source = db.Column(db.String(255), nullable=False)
+    embedding = db.Column(db.JSON)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

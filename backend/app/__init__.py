@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, jsonify
 from flask_cors import CORS
 from .extensions import db, login_manager, limiter, csrf, socketio
 from .models import User
@@ -19,6 +19,7 @@ def create_app():
 
     # Configuration
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-prod')
+    app.config['WTF_CSRF_ENABLED'] = False # Disable CSRF for API-only backend
     
     # Database - support both PostgreSQL (production) and SQLite (development)
     database_url = os.environ.get('DATABASE_URL')
@@ -100,6 +101,12 @@ def create_app():
     limiter.init_app(app)
     csrf.init_app(app)
 
+    @app.errorhandler(400)
+    def bad_request(e):
+        if request.accept_mimetypes.accept_json and not request.accept_mimetypes.accept_html:
+            return jsonify(error=str(e)), 400
+        return jsonify(error="Bad Request"), 400
+
 
     # Register Blueprints
     from .routes.auth import auth_bp
@@ -109,6 +116,13 @@ def create_app():
     from .routes.analysis import analysis_bp
     from .routes.tts import tts_bp
 
+    csrf.exempt(auth_bp)
+    csrf.exempt(data_bp)
+    csrf.exempt(ai_bp)
+    csrf.exempt(main_bp)
+    csrf.exempt(analysis_bp)
+    csrf.exempt(tts_bp)
+
     app.register_blueprint(auth_bp)
     app.register_blueprint(data_bp)
     app.register_blueprint(ai_bp)
@@ -117,6 +131,7 @@ def create_app():
     app.register_blueprint(tts_bp)
 
     from .routes.voice_quality import voice_quality_bp
+    csrf.exempt(voice_quality_bp)
     app.register_blueprint(voice_quality_bp)
 
     socketio.init_app(app)

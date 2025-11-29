@@ -1,11 +1,10 @@
 from flask import Blueprint, request, jsonify
-from flask_login import login_required
+from flask_login import login_required, current_user
 import google.generativeai as genai
 import os
 from werkzeug.utils import secure_filename
-# Temporarily disabled due to numpy dependency issues
-# from ..utils.rag import rag_system
-rag_system = None
+from ..utils.rag import rag_system
+# rag_system = None
 
 ai_bp = Blueprint('ai', __name__, url_prefix='/api')
 
@@ -21,6 +20,11 @@ else:
 @ai_bp.route('/train', methods=['POST'])
 @login_required
 def train_coach():
+    # Security Check: Only allow admin to upload
+    admin_username = os.environ.get('ADMIN_USERNAME')
+    if not admin_username or current_user.username != admin_username:
+        return jsonify({"error": "Unauthorized. Only the admin can upload to the knowledge base."}), 403
+
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
     

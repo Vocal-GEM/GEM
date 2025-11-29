@@ -3,31 +3,13 @@ import os
 import numpy as np
 import google.generativeai as genai
 from pypdf import PdfReader
+from ..models import KnowledgeDocument
+from ..extensions import db
 
 class SimpleRAG:
-    def __init__(self, storage_path='knowledge_base.json'):
-        self.storage_path = storage_path
-        self.documents = []
-        self.load()
-
-    def load(self):
-        if os.path.exists(self.storage_path):
-            try:
-                with open(self.storage_path, 'r', encoding='utf-8') as f:
-                    self.documents = json.load(f)
-                print(f"Loaded {len(self.documents)} documents from knowledge base.")
-            except Exception as e:
-                print(f"Error loading knowledge base: {e}")
-                self.documents = []
-        else:
-            self.documents = []
-
-    def save(self):
-        try:
-            with open(self.storage_path, 'w', encoding='utf-8') as f:
-                json.dump(self.documents, f)
-        except Exception as e:
-            print(f"Error saving knowledge base: {e}")
+    def __init__(self):
+        # No local storage needed anymore
+        pass
 
     def get_embedding(self, text):
         try:
@@ -45,7 +27,7 @@ class SimpleRAG:
 
     def add_document(self, text, source="unknown"):
         # Chunking (simple split by paragraphs or length)
-        # For simplicity, let's chunk by 500 characters overlap
+        # For simplicity, let's chunk by 1000 characters overlap
         chunk_size = 1000
         overlap = 100
         
@@ -59,14 +41,21 @@ class SimpleRAG:
             
             embedding = self.get_embedding(chunk)
             if embedding:
-                self.documents.append({
-                    "text": chunk,
-                    "source": source,
-                    "embedding": embedding
-                })
+                doc = KnowledgeDocument(
+                    content=chunk,
+                    source=source,
+                    embedding=embedding
+                )
+                db.session.add(doc)
                 count += 1
         
-        self.save()
+        try:
+            db.session.commit()
+        except Exception as e:
+            print(f"Database error: {e}")
+            db.session.rollback()
+            return 0
+            
         return count
 
     def add_pdf(self, file_path):
@@ -81,7 +70,15 @@ class SimpleRAG:
             return 0
 
     def query(self, query_text, k=3):
-        if not self.documents:
+        # Fetch all documents (naive approach for small datasets)
+        # In production with large datasets, use pgvector
+        try:
+            documents = KnowledgeDocument.query.all()
+        except Exception as e:
+            print(f"Database query error: {e}")
+            return []
+
+        if not documents:
             return []
 
         # Embed query
@@ -99,12 +96,14 @@ class SimpleRAG:
         query_vec = np.array(query_embedding)
         results = []
 
-        for doc in self.documents:
-            doc_vec = np.array(doc['embedding'])
+        for doc in documents:
+            if not doc.embedding: continue
+            
+            doc_vec = np.array(doc.embedding)
             similarity = np.dot(query_vec, doc_vec) / (np.linalg.norm(query_vec) * np.linalg.norm(doc_vec))
             results.append({
-                "text": doc['text'],
-                "source": doc['source'],
+                "text": doc.content,
+                "source": doc.source,
                 "score": float(similarity)
             })
 
@@ -113,4 +112,4 @@ class SimpleRAG:
         return results[:k]
 
 # Singleton instance
-rag_system = SimpleRAG(os.path.join(os.getcwd(), 'instance', 'knowledge_base.json'))
+rag_system = SimpleRAG()

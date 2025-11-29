@@ -1,11 +1,11 @@
 import React from 'react';
-import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X, Wifi, WifiOff, RefreshCw, Trash2, Mic2, Eye, Activity } from 'lucide-react';
+import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X, Wifi, WifiOff, RefreshCw, Trash2, Mic2, Eye, Activity, Upload, Book, FileText } from 'lucide-react';
 import { textToSpeechService } from '../../services/TextToSpeechService';
 import { syncManager } from '../../services/SyncManager';
 import { indexedDB, STORES } from '../../services/IndexedDBManager';
 import MicrophoneCalibration from './MicrophoneCalibration';
 
-const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange, onSetGoal, onOpenTutorial, calibration, onUpdateRange, onUpdateCalibration, onExportData, audioEngine }) => {
+const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange, onSetGoal, onOpenTutorial, calibration, onUpdateRange, onUpdateCalibration, onExportData, audioEngine, user }) => {
     const defaultGenderRanges = {
         masc: { min: 85, max: 145 },
         androg: { min: 145, max: 175 },
@@ -18,6 +18,8 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
     });
     const [availableVoices, setAvailableVoices] = React.useState([]);
     const [isLoadingVoices, setIsLoadingVoices] = React.useState(false);
+    const [isUploading, setIsUploading] = React.useState(false);
+    const [uploadStatus, setUploadStatus] = React.useState(null); // { type: 'success' | 'error', message: '' }
 
     React.useEffect(() => {
         if (settings.ttsProvider === 'elevenlabs') {
@@ -29,6 +31,47 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                 });
         }
     }, [settings.ttsProvider]);
+
+    const handleFileUpload = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        setUploadStatus(null);
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            // Determine API URL (use localhost if not configured, or relative path if proxied)
+            // For now, assuming relative path /api/train works if proxy is set up, 
+            // or we need to use the full URL if running separately.
+            // Since user is running backend locally on 5000 and frontend on 5173 (likely),
+            // we might need full URL.
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+            const response = await fetch(`${API_URL}/api/train`, {
+                method: 'POST',
+                body: formData,
+                // Don't set Content-Type header, let browser set it with boundary for FormData
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setUploadStatus({ type: 'success', message: data.message || 'File uploaded and processed successfully!' });
+            } else {
+                setUploadStatus({ type: 'error', message: data.error || 'Upload failed.' });
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            setUploadStatus({ type: 'error', message: 'Network error. Is the backend running?' });
+        } finally {
+            setIsUploading(false);
+            // Clear input
+            event.target.value = null;
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -414,6 +457,55 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                         </button>
                     </div>
                 </section>
+
+                {/* Knowledge Base Upload - Admin Only */}
+                {user?.username === 'riley' && (
+                    <section>
+                        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Knowledge Base (Admin)</h3>
+                        <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 space-y-4">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-lg bg-indigo-500/20 text-indigo-400">
+                                    <Book className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <div className="text-sm font-bold text-white">Train AI Coach</div>
+                                    <div className="text-[10px] text-slate-400">Upload textbooks or articles (PDF, TXT)</div>
+                                </div>
+                            </div>
+
+                            <div className="bg-slate-900/50 rounded-lg p-4 border border-dashed border-slate-700 hover:border-indigo-500/50 transition-colors text-center relative group">
+                                <input
+                                    type="file"
+                                    accept=".pdf,.txt,.md"
+                                    onChange={handleFileUpload}
+                                    disabled={isUploading}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                                />
+                                <div className="flex flex-col items-center gap-2">
+                                    {isUploading ? (
+                                        <RefreshCw className="w-8 h-8 text-indigo-400 animate-spin" />
+                                    ) : (
+                                        <Upload className="w-8 h-8 text-slate-500 group-hover:text-indigo-400 transition-colors" />
+                                    )}
+                                    <div className="text-xs font-bold text-slate-300">
+                                        {isUploading ? 'Processing...' : 'Click to Upload File'}
+                                    </div>
+                                    <div className="text-[10px] text-slate-500">
+                                        Max 10MB. PDF or Text files.
+                                    </div>
+                                </div>
+                            </div>
+
+                            {uploadStatus && (
+                                <div className={`p-3 rounded-lg text-xs flex items-center gap-2 ${uploadStatus.type === 'success' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                                    {uploadStatus.type === 'success' ? <ClipboardCheck className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                                    {uploadStatus.message}
+                                </div>
+                            )}
+                        </div>
+
+                    </section>
+                )}
 
                 {/* About Section */}
                 <section>

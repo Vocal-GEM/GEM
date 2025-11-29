@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Volume2, Mic, Gauge, Sliders } from 'lucide-react';
 
-const MixingBoardView = ({ dataRef, audioEngine, calibration, compact = false }) => {
-    const [toneMode, setToneMode] = useState(false);
-    const [viewMode, setViewMode] = useState('sliders'); // 'sliders' or 'gauges'
+const MixingBoardView = ({ dataRef, audioEngine, calibration, compact = false, viewMode: propViewMode }) => {
+    const [internalViewMode, setInternalViewMode] = useState('sliders'); // 'sliders' or 'gauges'
+    const viewMode = propViewMode || internalViewMode;
     const [sliderValues, setSliderValues] = useState({
         pitch: 200,
         resonance: 0.5, // Now a score 0-1
@@ -23,62 +23,13 @@ const MixingBoardView = ({ dataRef, audioEngine, calibration, compact = false })
         pitch: 200, resonance: 0.5, weight: 50, contour: 0.5, volume: 0
     });
 
-    // Audio Context Refs
-    const oscillatorRef = useRef(null);
-    const gainNodeRef = useRef(null);
-    const audioContextRef = useRef(null);
+
 
     // Helper: Linear Interpolation
     const lerp = (start, end, factor) => start + (end - start) * factor;
 
-    // Start/Stop Tone Mode
-    useEffect(() => {
-        if (toneMode && audioEngine?.audioContext) {
-            const ctx = audioEngine.audioContext;
-            audioContextRef.current = ctx;
-
-            // Create oscillator and gain node
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(sliderValues.pitch, ctx.currentTime);
-            gain.gain.setValueAtTime(sliderValues.volume / 100 * 0.3, ctx.currentTime);
-
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-
-            oscillatorRef.current = osc;
-            gainNodeRef.current = gain;
-        } else {
-            // Stop tone
-            if (oscillatorRef.current) {
-                oscillatorRef.current.stop();
-                oscillatorRef.current = null;
-                gainNodeRef.current = null;
-            }
-        }
-
-        return () => {
-            if (oscillatorRef.current) {
-                oscillatorRef.current.stop();
-            }
-        };
-    }, [toneMode, audioEngine]);
-
-    // Update tone in real-time when sliders change (Tone Mode)
-    useEffect(() => {
-        if (toneMode && oscillatorRef.current && gainNodeRef.current && audioContextRef.current) {
-            const ctx = audioContextRef.current;
-            oscillatorRef.current.frequency.setValueAtTime(sliderValues.pitch, ctx.currentTime);
-            gainNodeRef.current.gain.setValueAtTime(sliderValues.volume / 100 * 0.3, ctx.currentTime);
-        }
-    }, [sliderValues, toneMode]);
-
     // Animation Loop for Voice Mode
     useEffect(() => {
-        if (toneMode) return;
 
         const loop = () => {
             if (!dataRef.current) return;
@@ -158,57 +109,9 @@ const MixingBoardView = ({ dataRef, audioEngine, calibration, compact = false })
 
         const id = requestAnimationFrame(loop);
         return () => cancelAnimationFrame(id);
-    }, [toneMode, dataRef, calibration, viewMode]);
+    }, [dataRef, calibration, viewMode]);
 
-    const handleSliderChange = (param, value) => {
-        if (toneMode) {
-            setSliderValues(prev => ({ ...prev, [param]: parseFloat(value) }));
-            // Also update DOM for immediate feedback in tone mode
-            const slider = sliders.find(s => s.id === param);
-            if (slider) {
-                const percentage = ((value - slider.min) / (slider.max - slider.min)) * 100;
-                if (fillRefs.current[param]) fillRefs.current[param].style.height = `${percentage}%`;
-                if (knobRefs.current[param]) knobRefs.current[param].style.bottom = `calc(${percentage}% - 12px)`;
-                if (valueRefs.current[param]) valueRefs.current[param].innerText = Math.round(value * 10) / 10;
-            }
-        }
-    };
 
-    // Custom Drag Handler for Vertical Sliders
-    const handleDragStart = (e, param, min, max) => {
-        if (!toneMode) return;
-
-        const track = e.currentTarget.getBoundingClientRect();
-
-        const updateValue = (clientY) => {
-            const relativeY = clientY - track.top;
-            const height = track.height;
-            // Inverted Y (bottom is 0%)
-            let percentage = 1 - (relativeY / height);
-            percentage = Math.max(0, Math.min(1, percentage));
-
-            const value = min + percentage * (max - min);
-            handleSliderChange(param, value);
-        };
-
-        updateValue(e.clientY || e.touches[0].clientY);
-
-        const handleMove = (moveEvent) => {
-            updateValue(moveEvent.clientY || moveEvent.touches[0].clientY);
-        };
-
-        const handleEnd = () => {
-            document.removeEventListener('mousemove', handleMove);
-            document.removeEventListener('mouseup', handleEnd);
-            document.removeEventListener('touchmove', handleMove);
-            document.removeEventListener('touchend', handleEnd);
-        };
-
-        document.addEventListener('mousemove', handleMove);
-        document.addEventListener('mouseup', handleEnd);
-        document.addEventListener('touchmove', handleMove);
-        document.addEventListener('touchend', handleEnd);
-    };
 
     const sliders = [
         { id: 'pitch', label: 'Pitch', min: 50, max: 350, top: 'HIGH', bottom: 'LOW', unit: 'Hz' },
@@ -227,29 +130,19 @@ const MixingBoardView = ({ dataRef, audioEngine, calibration, compact = false })
                         <div>
                             <h2 className="text-2xl font-bold text-white mb-2">Mixing Board</h2>
                             <p className="text-slate-400 text-sm">
-                                {toneMode
-                                    ? 'Interactive Mode - Drag sliders to generate tone'
-                                    : 'Voice Mode - Visualizes your voice in real-time'}
+                                Voice Mode - Visualizes your voice in real-time
                             </p>
                         </div>
                         <div className="flex gap-2">
-                            <button
-                                onClick={() => setViewMode(viewMode === 'sliders' ? 'gauges' : 'sliders')}
-                                className="p-3 bg-slate-800 rounded-xl text-slate-400 hover:text-white transition-colors"
-                                title="Toggle View"
-                            >
-                                {viewMode === 'sliders' ? <Gauge size={20} /> : <Sliders size={20} />}
-                            </button>
-                            <button
-                                onClick={() => setToneMode(!toneMode)}
-                                className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${toneMode
-                                    ? 'bg-purple-500 hover:bg-purple-600 text-white'
-                                    : 'glass-panel hover:bg-white/10 text-white'
-                                    }`}
-                            >
-                                {toneMode ? <Volume2 size={20} /> : <Mic size={20} />}
-                                {toneMode ? 'Tone Mode' : 'Voice Mode'}
-                            </button>
+                            {!propViewMode && (
+                                <button
+                                    onClick={() => setInternalViewMode(viewMode === 'sliders' ? 'gauges' : 'sliders')}
+                                    className="p-3 bg-slate-800 rounded-xl text-slate-400 hover:text-white transition-colors"
+                                    title="Toggle View"
+                                >
+                                    {viewMode === 'sliders' ? <Gauge size={20} /> : <Sliders size={20} />}
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -257,22 +150,14 @@ const MixingBoardView = ({ dataRef, audioEngine, calibration, compact = false })
                 <div className="flex items-center justify-between mb-4 flex-shrink-0 px-2 pt-2">
                     <h3 className="font-bold text-slate-300">Mixing Board</h3>
                     <div className="flex gap-2">
-                        <button
-                            onClick={() => setViewMode(viewMode === 'sliders' ? 'gauges' : 'sliders')}
-                            className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
-                        >
-                            {viewMode === 'sliders' ? <Gauge size={16} /> : <Sliders size={16} />}
-                        </button>
-                        <button
-                            onClick={() => setToneMode(!toneMode)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${toneMode
-                                ? 'bg-purple-500 text-white'
-                                : 'bg-slate-800 text-slate-300'
-                                }`}
-                        >
-                            {toneMode ? <Volume2 size={14} /> : <Mic size={14} />}
-                            {toneMode ? 'Tone' : 'Voice'}
-                        </button>
+                        {!propViewMode && (
+                            <button
+                                onClick={() => setInternalViewMode(viewMode === 'sliders' ? 'gauges' : 'sliders')}
+                                className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
+                            >
+                                {viewMode === 'sliders' ? <Gauge size={16} /> : <Sliders size={16} />}
+                            </button>
+                        )}
                     </div>
                 </div>
             )}
@@ -282,16 +167,14 @@ const MixingBoardView = ({ dataRef, audioEngine, calibration, compact = false })
                 {viewMode === 'sliders' ? (
                     <div className={`flex justify-around items-end gap-2 ${compact ? 'h-full' : 'h-[600px]'}`}>
                         {sliders.map(slider => {
-                            const val = toneMode ? sliderValues[slider.id] : 0;
+                            const val = 0; // Always 0 for initial render, updated by loop
                             const pct = ((val - slider.min) / (slider.max - slider.min)) * 100;
 
                             return (
                                 <div key={slider.id} className="flex flex-col items-center gap-2 flex-1 h-full">
                                     <div className="text-[10px] font-bold text-slate-500 tracking-widest">{slider.top}</div>
                                     <div
-                                        className={`relative flex-1 w-full max-w-[60px] flex flex-col items-center bg-slate-900/50 rounded-full border border-slate-700/50 p-1 ${toneMode ? 'cursor-pointer' : ''}`}
-                                        onMouseDown={(e) => handleDragStart(e, slider.id, slider.min, slider.max)}
-                                        onTouchStart={(e) => handleDragStart(e, slider.id, slider.min, slider.max)}
+                                        className="relative flex-1 w-full max-w-[60px] flex flex-col items-center bg-slate-900/50 rounded-full border border-slate-700/50 p-1"
                                     >
                                         <div className="absolute inset-x-0 top-4 bottom-4 w-1 mx-auto bg-slate-800 rounded-full"></div>
                                         {[0, 25, 50, 75, 100].map(tick => (
@@ -304,7 +187,7 @@ const MixingBoardView = ({ dataRef, audioEngine, calibration, compact = false })
                                         />
                                         <div
                                             ref={el => knobRefs.current[slider.id] = el}
-                                            className={`absolute w-full h-6 left-0 flex items-center justify-center transition-all duration-75 ease-out z-10 ${toneMode ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
+                                            className="absolute w-full h-6 left-0 flex items-center justify-center transition-all duration-75 ease-out z-10 pointer-events-none"
                                             style={{ bottom: `calc(${pct}% - 12px)` }}
                                         >
                                             <div className="w-8 h-4 rounded bg-gradient-to-b from-slate-600 to-slate-800 border border-slate-500 shadow-lg flex items-center justify-center">
