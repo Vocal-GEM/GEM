@@ -114,12 +114,12 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         super();
         this.buffer = new Float32Array(2048);
         this.bufferIndex = 0;
-        this.threshold = 0.005; // Initial threshold, will adapt
+        this.threshold = 0.0001; // Initial threshold, will adapt
 
         // Adaptive Noise Gate
         this.backgroundNoiseBuffer = [];
         this.maxNoiseBufferSize = 50; // ~1 second of silence samples
-        this.adaptiveThreshold = 0.005;
+        this.adaptiveThreshold = 0.0001;
         this.silenceFrameCount = 0;
 
         // Frame Overlap (50%)
