@@ -329,6 +329,13 @@ const App = () => {
                                             ) : null}
                                         </ErrorBoundary>
                                     </div>
+
+                                    {/* Comparison Tool (Integrated) */}
+                                    {(practiceView !== 'all' && practiceView !== 'resonance') && (
+                                        <div className="mt-6">
+                                            <ComparisonTool />
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* 2. Right: Dashboard & Advice */}
@@ -362,7 +369,6 @@ const App = () => {
                                     <h2 className="text-xl font-bold">Tools</h2>
                                 </div>
                                 <AudioLibrary audioEngine={audioEngineRef} />
-                                <ComparisonTool />
                                 <PitchPipe audioEngine={audioEngineRef} />
                                 <BreathPacer />
                                 <div className="p-4 bg-slate-800 rounded-xl flex flex-row items-center justify-between gap-3 hover:bg-slate-700 transition-colors cursor-pointer" onClick={() => setShowVocalFolds(true)}>
