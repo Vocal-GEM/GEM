@@ -53,7 +53,8 @@ export class AudioEngine {
             rbi_score: 50,
             breathiness_score: 0,
             roughness_score: 0,
-            strain_score: 0
+            strain_score: 0,
+            timestamp: 0
         };
 
         // DEBUG STATE
@@ -109,7 +110,7 @@ export class AudioEngine {
                 this.debugInfo.socketConnected = false;
             });
             this.socket.on('analysis_update', (data) => {
-                this.latestBackendAnalysis = data;
+                this.latestBackendAnalysis = { ...data, timestamp: Date.now() };
             });
             this.socket.on('analysis_error', (err) => {
                 console.error("[AudioEngine] Backend analysis error:", err);
@@ -195,16 +196,37 @@ export class AudioEngine {
 
                     const prosody = this.analyzeProsody(smoothPitch);
 
-                    // Merge backend analysis
-                    // We map backend 'rbi_score' to 'resonanceScore' (0-100)
-                    // And we can also expose 'rbi' explicitly if needed
-                    const backendRBI = this.latestBackendAnalysis.rbi_score || 50;
+                    // Merge backend analysis or Fallback
+                    let finalScore = 50;
+                    let isBackendActive = false;
+
+                    const now = Date.now();
+                    const lastUpdate = this.latestBackendAnalysis.timestamp || 0;
+
+                    if (this.socket && this.socket.connected && (now - lastUpdate < 2000)) {
+                        // Backend is active and sending data
+                        finalScore = this.latestBackendAnalysis.rbi_score || 50;
+                        isBackendActive = true;
+                    } else {
+                        // Fallback: Calculate local score from Spectral Centroid
+                        // Map 500Hz (Dark) - 2500Hz (Bright) to 0-100
+                        // This is a rough approximation
+                        if (spectralCentroid > 0) {
+                            const minC = 500;
+                            const maxC = 2500;
+                            const norm = Math.max(0, Math.min(1, (spectralCentroid - minC) / (maxC - minC)));
+                            finalScore = norm * 100;
+                        } else {
+                            finalScore = 0; // Silence
+                        }
+                    }
 
                     this.onAudioUpdate({
                         pitch: smoothPitch,
                         resonance: spectralCentroid, // Keep raw centroid as 'resonance' (Hz)
-                        resonanceScore: backendRBI, // Use RBI for the score (0-100)
-                        rbi: backendRBI,
+                        resonanceScore: finalScore, // Use RBI or Fallback
+                        rbi: finalScore,
+                        isBackendActive,
                         spectralCentroid,
                         f1,
                         f2,
