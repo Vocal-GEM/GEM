@@ -1,3 +1,5 @@
+from typing import Dict, Any, List
+
 try:
     from faster_whisper import WhisperModel
     _model_available = True
