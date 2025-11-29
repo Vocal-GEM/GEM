@@ -498,3 +498,75 @@ def analyze_file_with_transcript(path, goal_name="transfem_soft_slightly_breathy
         "words": aligned_words
     }
     return base
+
+# ----------------------
+# Live Analysis Helpers (for sockets.py)
+# ----------------------
+
+def compute_frame_features(y, sr, frame_length_s=0.04, hop_length_s=0.01, energy_threshold_db=-40.0):
+    """
+    Compute frame-level features for a chunk of audio (used in live streaming).
+    Returns a dictionary of lists.
+    """
+    sound = parselmouth.Sound(y, sr)
+    
+    # F0
+    pitch = sound.to_pitch(pitch_floor=75, pitch_ceiling=600)
+    f0_values = pitch.selected_array['frequency']
+    # Filter 0s
+    f0_valid = [f for f in f0_values if f > 0]
+    f0_mean = float(np.mean(f0_valid)) if f0_valid else None
+    
+    # CPP
+    cpp = compute_cpp_praat(sound)
+    
+    # HNR
+    hnr = compute_hnr(sound)
+    
+    # H1-H2
+    h1_h2 = compute_spectral_tilt_h1_h2(y, sr, f0_mean)
+    
+    # Jitter/Shimmer (might be unstable on short chunks)
+    jitter, shimmer = compute_jitter_shimmer(sound)
+    
+    # Align F0 with the hop size expected by RBI (10ms)
+    pitch_framed = sound.to_pitch(time_step=hop_length_s, pitch_floor=75, pitch_ceiling=600)
+    n_frames = pitch_framed.n_frames
+    f0_list = []
+    for i in range(n_frames):
+        val = pitch_framed.get_value_in_frame(i+1) # 1-based
+        f0_list.append(val if not np.isnan(val) else None)
+        
+    return {
+        "f0": f0_list,
+        "cpp": cpp, # Single value for window
+        "hnr": hnr, # Single value
+        "h1_h2": h1_h2, # Single value
+        "jitter": jitter,
+        "shimmer": shimmer
+    }
+
+def compute_chunk_scores_from_frames(frame_data):
+    """
+    Aggregate frame features into scores for the chunk.
+    """
+    # In this simplified implementation, frame_data already contains window-level averages for most metrics
+    cpp = frame_data["cpp"]
+    hnr = frame_data["hnr"]
+    h1_h2 = frame_data["h1_h2"]
+    jitter = frame_data["jitter"]
+    shimmer = frame_data["shimmer"]
+    
+    # Reuse classification logic
+    # We don't have RBI here yet, it's computed separately in sockets.py
+    scores = classify_voice_quality(cpp, hnr, h1_h2, jitter, shimmer, rbi_mean=None)
+    
+    return {
+        "label": scores["overall_label"],
+        "breathiness_score": scores["breathiness_score"],
+        "roughness_score": scores["roughness_score"],
+        "strain_score": scores["strain_score"],
+        "cpp_mean": cpp,
+        "hnr_mean": hnr,
+        "h1_h2_mean": h1_h2
+    }
