@@ -201,7 +201,8 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             this.silenceFrameCount = 0;
         }
 
-        if (rms > this.adaptiveThreshold) {
+        // TEMPORARY: Bypass noise gate for testing
+        if (rms >= 0) { // Always process audio (was: rms > this.adaptiveThreshold)
             const TARGET_RATE = 16000; // Changed to 16kHz for RBI compatibility
             const dsBuffer = DSP.decimate(buffer, fs, TARGET_RATE);
 
