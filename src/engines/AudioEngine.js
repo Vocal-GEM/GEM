@@ -104,8 +104,16 @@ export class AudioEngine {
                 }
             }
 
+
             console.log("[AudioEngine] Requesting microphone access...");
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false,
+                    channelCount: 1
+                }
+            });
             console.log("[AudioEngine] Microphone access granted");
 
             this.microphone = this.audioContext.createMediaStreamSource(stream);
@@ -125,6 +133,12 @@ export class AudioEngine {
 
             this.workletNode.port.onmessage = (event) => {
                 if (event.data.type === 'update') {
+                    // Log first message to confirm worklet is processing
+                    if (!this.hasReceivedFirstMessage) {
+                        console.log("[AudioEngine] ✅ First message received from worklet - audio processing active!");
+                        this.hasReceivedFirstMessage = true;
+                    }
+
                     const { pitch, resonance, resonanceScore, spectralCentroid, f1, f2, weight, spectrum, jitter, shimmer, vowel, volume, debug } = event.data.data;
 
                     // --- MEDIAN SMOOTHING LOGIC ---
@@ -168,10 +182,12 @@ export class AudioEngine {
             this.lowpass.type = 'lowpass';
             this.lowpass.frequency.value = 5000; // Cut hiss (Raised to 5k for resonance)
 
-            // Connect: Mic -> Highpass -> Lowpass -> Worklet
-            this.microphone.connect(this.highpass);
-            this.highpass.connect(this.lowpass);
-            this.lowpass.connect(this.workletNode);
+            // TEMPORARY: Connect directly to test if filters are causing attenuation
+            // Connect: Mic -> Worklet (bypassing filters for testing)
+            this.microphone.connect(this.workletNode);
+
+            console.log("[AudioEngine] ✅ Audio chain connected: Mic -> Worklet (FILTERS BYPASSED FOR TESTING)");
+            console.log("[AudioEngine] Waiting for audio data from worklet...");
 
             this.workletNode.connect(this.audioContext.destination);
             this.mediaRecorder = new MediaRecorder(stream); this.mediaRecorder.ondataavailable = (e) => this.chunks.push(e.data);

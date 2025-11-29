@@ -10,6 +10,7 @@ import { useJournal } from './context/JournalContext';
 import { Mic, Mic2, Camera, ArrowLeft, Wrench, Bot, BarChart2, Activity, BookOpen, ChevronRight, Sliders } from 'lucide-react';
 
 // Components - UI
+import ErrorBoundary from './components/ui/ErrorBoundary';
 import OfflineIndicator from './components/ui/OfflineIndicator';
 import FeedbackSettings from './components/ui/FeedbackSettings';
 import MigrationModal from './components/ui/MigrationModal';
@@ -25,6 +26,15 @@ import AssessmentModule from './components/ui/AssessmentModule';
 import WarmUpModule from './components/ui/WarmUpModule';
 import ForwardFocusDrill from './components/ui/ForwardFocusDrill';
 import IncognitoScreen from './components/ui/IncognitoScreen';
+import LoadingSpinner from './components/ui/LoadingSpinner';
+import HistoryView from './components/ui/HistoryView';
+import CoachView from './components/ui/CoachView';
+import AudioLibrary from './components/ui/AudioLibrary';
+import ComparisonTool from './components/ui/ComparisonTool';
+import PitchPipe from './components/ui/PitchPipe';
+import BreathPacer from './components/ui/BreathPacer';
+import MirrorComponent from './components/ui/MirrorComponent';
+import FloatingCamera from './components/ui/FloatingCamera';
 const SLPDashboard = lazy(() => import('./components/views/SLPDashboard'));
 const PracticeMode = lazy(() => import('./components/views/PracticeMode'));
 const MixingBoardView = lazy(() => import('./components/views/MixingBoardView'));
@@ -47,6 +57,7 @@ const Spectrogram = lazy(() => import('./components/viz/Spectrogram'));
 const ContourVisualizer = lazy(() => import('./components/viz/ContourVisualizer'));
 const QualityVisualizer = lazy(() => import('./components/viz/QualityVisualizer'));
 const SpectralTiltMeter = lazy(() => import('./components/viz/SpectralTiltMeter'));
+const ResonanceMetrics = lazy(() => import('./components/viz/ResonanceMetrics'));
 const ToolExercises = lazy(() => import('./components/ui/ToolExercises'));
 import DebugOverlay from './components/ui/DebugOverlay';
 
@@ -265,27 +276,39 @@ const App = () => {
                                         )}
 
                                         <div key="dynamic-orb-container" className="h-full w-full relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5">
-                                            {practiceView === 'all' ? (
-                                                showMixerInDashboard ? (
-                                                    <div className="h-full w-full p-2 pt-12">
-                                                        <MixingBoardView
-                                                            dataRef={dataRef}
-                                                            audioEngine={audioEngineRef.current}
-                                                            calibration={calibration}
-                                                            compact={true}
-                                                        />
+                                            <ErrorBoundary fallback={
+                                                <div className="w-full h-full flex items-center justify-center text-red-400 p-4 text-center">
+                                                    <div>
+                                                        <p className="font-bold mb-2">Visualization Error</p>
+                                                        <p className="text-xs">The 3D view crashed. Try refreshing or switching views.</p>
                                                     </div>
+                                                </div>
+                                            }>
+                                                {practiceView === 'all' ? (
+                                                    showMixerInDashboard ? (
+                                                        <div className="h-full w-full p-2 pt-12">
+                                                            <MixingBoardView
+                                                                dataRef={dataRef}
+                                                                audioEngine={audioEngineRef.current}
+                                                                calibration={calibration}
+                                                                compact={true}
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <DynamicOrb
+                                                            dataRef={dataRef}
+                                                            calibration={{ ...calibration, disable3D: settings.disable3D }}
+                                                        />
+                                                    )
                                                 ) : (
-                                                    <DynamicOrb dataRef={dataRef} calibration={calibration} />
-                                                )
-                                            ) : (
-                                                <ResonanceOrb
-                                                    dataRef={dataRef}
-                                                    calibration={calibration}
-                                                    showDebug={false}
-                                                    colorBlindMode={settings.colorBlindMode}
-                                                />
-                                            )}
+                                                    <ResonanceOrb
+                                                        dataRef={dataRef}
+                                                        calibration={calibration}
+                                                        showDebug={false}
+                                                        colorBlindMode={settings.colorBlindMode}
+                                                    />
+                                                )}
+                                            </ErrorBoundary>
                                         </div>
                                     </div>
                                 )}

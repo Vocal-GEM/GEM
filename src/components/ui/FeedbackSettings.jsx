@@ -1,5 +1,5 @@
 import React from 'react';
-import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X, Wifi, WifiOff, RefreshCw, Trash2, Mic2, Eye } from 'lucide-react';
+import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X, Wifi, WifiOff, RefreshCw, Trash2, Mic2, Eye, Activity } from 'lucide-react';
 import { textToSpeechService } from '../../services/TextToSpeechService';
 import { syncManager } from '../../services/SyncManager';
 import { indexedDB, STORES } from '../../services/IndexedDBManager';
@@ -249,6 +249,28 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                                     className="sr-only peer"
                                 />
                                 <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div>
+                            </label>
+                        </div>
+
+                        {/* Safe Mode (Disable 3D) */}
+                        <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                            <div className="flex items-center gap-3">
+                                <div className={`p-2 rounded-lg ${settings.disable3D ? 'bg-red-500/20 text-red-400' : 'bg-slate-700 text-slate-400'}`}>
+                                    <Activity className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <div className="text-sm font-bold text-white">Safe Mode (2D Only)</div>
+                                    <div className="text-[10px] text-slate-400">Disable 3D graphics to prevent crashes</div>
+                                </div>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer p-2">
+                                <input
+                                    type="checkbox"
+                                    checked={settings.disable3D || false}
+                                    onChange={(e) => setSettings({ ...settings, disable3D: e.target.checked })}
+                                    className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
                             </label>
                         </div>
                     </div>

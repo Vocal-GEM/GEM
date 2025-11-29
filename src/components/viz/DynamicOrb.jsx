@@ -1,7 +1,7 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Diamond, Flame, Bug, Box } from 'lucide-react';
+import { Diamond, Flame, Bug, Box, Activity } from 'lucide-react';
 import { useGLTF } from '@react-three/drei';
 import OrbLegend from './OrbLegend';
 
@@ -414,6 +414,7 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
     { id: 'gem', icon: Diamond, label: 'Gem' },
     { id: 'fire', icon: Flame, label: 'Fire' },
     { id: 'custom', icon: Box, label: 'Custom' },
+    { id: 'safe', icon: Activity, label: '2D Safe Mode' },
   ];
 
   // Keyboard shortcut: D to toggle debug
@@ -592,21 +593,64 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
         </button>
       </div>
 
-      <Canvas
-        className="w-full h-full"
-        camera={{ position: [0, 0, 6], fov: 50 }}
-        gl={{ antialias: true, powerPreference: "high-performance", alpha: true, preserveDrawingBuffer: false }}
-        dpr={1}
-        frameloop="always"
-        onCreated={(state) => {
-          state.gl.setClearColor('#020617', 0);
-          const canvas = state.gl.domElement;
-          canvas.addEventListener('webglcontextlost', (e) => e.preventDefault());
-        }}
-      >
-        <ambientLight intensity={0.5} />
-        <VisualizerMesh key={mode} mode={mode} dataRef={dataRef} externalDataRef={externalDataRef} calibration={calibration} />
-      </Canvas>
+      {/* Safe Mode Toggle */}
+      <div className="absolute top-4 right-4 z-30">
+        <button
+          onClick={() => {
+            // Force context loss simulation or just toggle mode
+            const newMode = !showDebug; // Reusing state for now, but let's make it explicit
+            // Actually, let's add a dedicated Safe Mode button
+          }}
+          className="hidden" // Hidden for now, logic below
+        >
+        </button>
+      </div>
+
+      {/* 2D Fallback (Safe Mode) */}
+      {mode === 'safe' || calibration?.disable3D ? (
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="relative w-64 h-64 flex items-center justify-center">
+            {/* Pulsing Circles */}
+            <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-ping" style={{ animationDuration: '2s' }}></div>
+            <div className="absolute inset-4 bg-purple-500/20 rounded-full animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.5s' }}></div>
+
+            {/* Core Circle */}
+            <div className="relative w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full shadow-[0_0_40px_rgba(59,130,246,0.5)] flex items-center justify-center transition-transform duration-100"
+              style={{
+                transform: `scale(${1 + (debugInfo?.volume || 0) / 100})`
+              }}
+            >
+              <div className="text-white font-bold text-xl">
+                {debugInfo?.pitch > 0 ? Math.round(debugInfo.pitch) + ' Hz' : '...'}
+              </div>
+            </div>
+          </div>
+
+          <div className="absolute bottom-20 text-slate-400 text-xs font-mono">
+            Safe Mode (2D Fallback)
+          </div>
+        </div>
+      ) : (
+        <Canvas
+          className="w-full h-full"
+          camera={{ position: [0, 0, 6], fov: 50 }}
+          gl={{ antialias: true, powerPreference: "high-performance", alpha: true, preserveDrawingBuffer: false }}
+          dpr={1}
+          frameloop="always"
+          onCreated={(state) => {
+            state.gl.setClearColor('#020617', 0);
+            const canvas = state.gl.domElement;
+            canvas.addEventListener('webglcontextlost', (e) => {
+              e.preventDefault();
+              console.warn("WebGL Context Lost! Switching to Safe Mode.");
+              setMode('safe');
+            });
+          }}
+        >
+          <ambientLight intensity={0.5} />
+          <VisualizerMesh key={mode} mode={mode} dataRef={dataRef} externalDataRef={externalDataRef} calibration={calibration} />
+        </Canvas>
+      )}
 
       {/* Debug Panel Overlay */}
       {showDebug && debugInfo && (

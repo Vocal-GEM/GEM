@@ -31,8 +31,10 @@ export const SettingsProvider = ({ children }) => {
         performanceMode: 'high', // 'low' | 'medium' | 'high'
         visualizationQuality: {
             fpsTarget: 60,
+            fpsTarget: 60,
             spectrum: true
-        }
+        },
+        disable3D: false // Safe Mode (2D Fallback)
     });
 
 

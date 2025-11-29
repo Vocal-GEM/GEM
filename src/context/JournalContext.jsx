@@ -9,6 +9,8 @@ export const useJournal = () => useContext(JournalContext);
 
 export const JournalProvider = ({ children }) => {
     const { user } = useAuth();
+    const [journals, setJournals] = useState([]);
+    const [showJournalForm, setShowJournalForm] = useState(false);
     const [journalEntryData, setJournalEntryData] = useState(null);
 
     useEffect(() => {

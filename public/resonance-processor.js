@@ -194,7 +194,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                 if (this.backgroundNoiseBuffer.length > 10) {
                     const sorted = [...this.backgroundNoiseBuffer].sort((a, b) => a - b);
                     const median = sorted[Math.floor(sorted.length / 2)];
-                    this.adaptiveThreshold = Math.max(0.002, Math.min(0.02, median * 2.5));
+                    this.adaptiveThreshold = Math.max(0.0001, Math.min(0.02, median * 2.5));
                 }
             }
         } else {
