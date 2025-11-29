@@ -182,6 +182,14 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         for (let x of buffer) rms += x * x;
         rms = Math.sqrt(rms / buffer.length);
 
+        // DEBUG: Log RMS and buffer stats every 30 frames (~1 second)
+        if (!this.debugCounter) this.debugCounter = 0;
+        this.debugCounter++;
+        if (this.debugCounter % 30 === 0) {
+            const maxSample = Math.max(...buffer.map(Math.abs));
+            console.log(`[Worklet DEBUG] RMS: ${rms.toFixed(6)}, Max Sample: ${maxSample.toFixed(6)}, Buffer Length: ${buffer.length}`);
+        }
+
         // Adaptive Noise Gate: Update background noise estimate during silence
         if (rms <= this.adaptiveThreshold) {
             this.silenceFrameCount++;
