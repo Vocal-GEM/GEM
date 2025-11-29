@@ -31,20 +31,6 @@ export const SettingsProvider = ({ children }) => {
         performanceMode: 'high', // 'low' | 'medium' | 'high'
         visualizationQuality: {
             fpsTarget: 60,
-            fftSize: 2048,
-            spectrumDetail: 'high'
-        },
-
-        // Visualization Toggles
-        enabledVisualizations: {
-            spectrogram: true,
-            highResSpectrogram: true,
-            dynamicOrb: true,
-            pitchVisualizer: true,
-            contour: true,
-            quality: true,
-            spectralTilt: true,
-            vowelSpace: true,
             spectrum: true
         }
     });

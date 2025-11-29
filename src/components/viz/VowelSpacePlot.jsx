@@ -1,11 +1,14 @@
 import React from 'react';
+import { useSettings } from '../../context/SettingsContext';
 
 const VowelSpacePlot = ({ f1, f2, dataRef }) => {
+    const { colorBlindMode } = useSettings();
+
     // Vowel targets (approximate for feminine resonance)
     const targets = [
-        { label: '/i/', f1: 300, f2: 2500, color: 'rgba(236, 72, 153, 0.2)' }, // Pink
-        { label: '/a/', f1: 850, f2: 1700, color: 'rgba(59, 130, 246, 0.2)' }, // Blue
-        { label: '/u/', f1: 300, f2: 800, color: 'rgba(16, 185, 129, 0.2)' }   // Green
+        { label: '/i/', f1: 300, f2: 2500, color: colorBlindMode ? 'rgba(147, 51, 234, 0.2)' : 'rgba(236, 72, 153, 0.2)' }, // Pink/Purple
+        { label: '/a/', f1: 850, f2: 1700, color: colorBlindMode ? 'rgba(13, 148, 136, 0.2)' : 'rgba(59, 130, 246, 0.2)' }, // Blue/Teal
+        { label: '/u/', f1: 300, f2: 800, color: colorBlindMode ? 'rgba(245, 158, 11, 0.2)' : 'rgba(16, 185, 129, 0.2)' }   // Green/Amber
     ];
 
     // Scales
@@ -76,10 +79,10 @@ const VowelSpacePlot = ({ f1, f2, dataRef }) => {
                 <div className="glass-panel-dark px-3 py-2 rounded-lg text-right">
                     <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Formants</div>
                     <div className="text-xs font-mono text-slate-300">
-                        F1: <span className="text-pink-400 font-bold">{currentF1 > 0 ? currentF1.toFixed(0) : '—'}</span> Hz
+                        F1: <span className={`font-bold ${colorBlindMode ? 'text-purple-400' : 'text-pink-400'}`}>{currentF1 > 0 ? currentF1.toFixed(0) : '—'}</span> Hz
                     </div>
                     <div className="text-xs font-mono text-slate-300">
-                        F2: <span className="text-blue-400 font-bold">{currentF2 > 0 ? currentF2.toFixed(0) : '—'}</span> Hz
+                        F2: <span className={`font-bold ${colorBlindMode ? 'text-teal-400' : 'text-blue-400'}`}>{currentF2 > 0 ? currentF2.toFixed(0) : '—'}</span> Hz
                     </div>
                 </div>
             </div>

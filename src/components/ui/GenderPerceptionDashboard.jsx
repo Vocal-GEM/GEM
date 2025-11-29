@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Activity } from 'lucide-react';
+import { useSettings } from '../../context/SettingsContext';
 
 const GenderPerceptionDashboard = ({ dataRef }) => {
+    const { settings } = useSettings();
+    const { colorBlindMode } = settings;
+
     const [metrics, setMetrics] = useState({
         perception: 'Androgynous',
         pitch: 0,
@@ -55,6 +59,13 @@ const GenderPerceptionDashboard = ({ dataRef }) => {
     }, [dataRef]);
 
     const getPerceptionColor = () => {
+        if (colorBlindMode) {
+            switch (metrics.perception) {
+                case 'Masculine': return 'text-teal-400 bg-teal-500/10 border-teal-500/30';
+                case 'Feminine': return 'text-purple-400 bg-purple-500/10 border-purple-500/30';
+                default: return 'text-white bg-slate-500/10 border-slate-500/30';
+            }
+        }
         switch (metrics.perception) {
             case 'Masculine': return 'text-blue-400 bg-blue-500/10 border-blue-500/30';
             case 'Feminine': return 'text-pink-400 bg-pink-500/10 border-pink-500/30';

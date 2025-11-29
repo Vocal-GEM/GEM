@@ -11,6 +11,8 @@
  * - Progress tracking support
  */
 
+import { KnowledgeService } from '../services/KnowledgeService';
+
 // Exercise mapping to actual app routes/components
 const EXERCISE_MAP = {
     'Pitch Pipe': { route: '/tools', component: 'PitchPipe', difficulty: 'beginner', duration: 5 },
@@ -23,120 +25,6 @@ const EXERCISE_MAP = {
     'Forward Focus': { route: '/tools', component: 'ForwardFocusDrill', difficulty: 'intermediate', duration: 5 },
     'Warm Up': { route: '/tools', component: 'WarmUpModule', difficulty: 'beginner', duration: 5 }
 };
-
-export const CoachEngine = {
-    /**
-     * Generate a full feedback report based on analysis results and user goals.
-     * @param {Object} analysisResults - The results from VoiceAnalyzer
-     * @param {Object} userSettings - User preferences (targetPitch, gender, etc.)
-     * @param {Object} calibration - User calibration data (optional)
-     * @returns {Object} Feedback report
-     */
-    generateFeedback: (analysisResults, userSettings, calibration = null) => {
-        const { overall } = analysisResults;
-        const targetPitch = userSettings?.targetPitch || { min: 170, max: 220 }; // Default fem
-        const genderGoal = userSettings?.gender || 'feminine'; // 'feminine', 'masculine', 'androgynous'
-
-        // 1. Evaluate Core Metrics
-        const pitchEval = evaluatePitch(overall.pitch?.mean, targetPitch);
-        const resonanceEval = evaluateResonance(overall.formants, genderGoal, calibration);
-        const stabilityEval = evaluateStability(overall.jitter, overall.shimmer);
-        const voiceQualityEval = evaluateVoiceQuality(overall.hnr, overall.shimmer);
-
-        // 2. Determine Primary Focus Area (The "One Thing" to fix)
-        const focusArea = determineFocusArea([pitchEval, resonanceEval, stabilityEval, voiceQualityEval]);
-
-        // 3. Generate Contextual Summary & Strengths
-        const summary = generateContextualSummary(pitchEval, resonanceEval, voiceQualityEval, focusArea);
-        const strengths = identifyStrengths([pitchEval, resonanceEval, stabilityEval, voiceQualityEval]);
-
-        // 4. Generate Contextual Tips
-        const tips = generateContextualTips(pitchEval, resonanceEval, voiceQualityEval, genderGoal);
-
-        return {
-            summary,
-            strengths,
-            focusArea,
-            tips,
-            details: {
-                pitch: pitchEval,
-                resonance: resonanceEval,
-                stability: stabilityEval,
-                voiceQuality: voiceQualityEval
-            }
-        };
-    },
-
-    /**
-     * Process a natural language query from the user.
-     * @param {string} query - The user's question
-     * @param {Object} context - Real-time context { metrics, history, settings }
-     * @returns {Object} { text, relatedTopics }
-     */
-    processUserQuery: (query, context) => {
-        const lowerQuery = query.toLowerCase();
-
-        // 1. Check for "Current State" questions (Real-time)
-        if (context?.metrics) {
-            if (lowerQuery.includes('pitch') && (lowerQuery.includes('now') || lowerQuery.includes('current') || lowerQuery.includes('right now'))) {
-                const pitch = context.metrics.pitch;
-                if (pitch && pitch > 0) {
-                    return {
-                        text: `Your pitch is currently around **${pitch.toFixed(0)} Hz**.`
-                    };
-                } else {
-                    return { text: "I can't detect your pitch right now. Make sure you're making sound!" };
-                }
-            }
-
-            if (lowerQuery.includes('resonance') && (lowerQuery.includes('now') || lowerQuery.includes('current'))) {
-                // Simplified resonance check
-                return { text: "I'm analyzing your resonance. Check the 'Analysis' tab for a detailed visualization!" };
-            }
-        }
-
-        // 2. Check for "Progress" questions (History)
-        if (lowerQuery.includes('progress') || lowerQuery.includes('how am i doing') || lowerQuery.includes('stats')) {
-            if (context?.history && context.history.length > 0) {
-                const lastSession = context.history[0];
-                const feedback = CoachEngine.generateFeedback(
-                    { overall: lastSession.overall },
-                    { targetPitch: context.settings?.targetRange, gender: context.settings?.genderGoal },
-                    context.settings?.calibration
-                );
-                return {
-                    text: `Based on your last session (${new Date(lastSession.date).toLocaleDateString()}):\n\n${feedback.summary}\n\n**Focus:** ${feedback.focusArea.title}`
-                };
-            } else {
-                return { text: "I don't have enough history yet. Record a session in the Analysis tab!" };
-            }
-        }
-
-        // 3. Fallback to Knowledge Base
-        const kbResults = KnowledgeService.search(query);
-        if (kbResults.length > 0) {
-            const topResult = kbResults[0];
-            return {
-                text: `**${topResult.question}**\n\n${topResult.answer}`,
-                relatedTopics: kbResults.slice(1, 3).map(r => r.category)
-            };
-        }
-
-        // 4. Default Fallback
-        return {
-            text: "I'm not sure about that. Try asking about 'pitch', 'resonance', or 'vocal weight'."
-        };
-    },
-
-    /**
-     * Get exercise details for navigation
-     */
-    getExerciseDetails: (exerciseName) => {
-        return EXERCISE_MAP[exerciseName] || null;
-    }
-};
-
-import { KnowledgeService } from '../services/KnowledgeService';
 
 // --- Helper Evaluation Functions ---
 
@@ -474,4 +362,97 @@ const generateContextualTips = (pitch, resonance, voiceQuality, genderGoal) => {
     }
 
     return tips;
+};
+
+export const CoachEngine = {
+    /**
+     * Generate a full feedback report based on analysis results and user goals.
+     * @param {Object} analysisResults - The results from VoiceAnalyzer
+     * @param {Object} userSettings - User preferences (targetPitch, gender, etc.)
+     * @param {Object} calibration - User calibration data (optional)
+     * @returns {Object} Feedback report
+     */
+    generateFeedback: (analysisResults, userSettings, calibration = null) => {
+        const { overall } = analysisResults;
+        const targetPitch = userSettings?.targetPitch || { min: 170, max: 220 }; // Default fem
+        const genderGoal = userSettings?.gender || 'feminine'; // 'feminine', 'masculine', 'androgynous'
+
+        // 1. Evaluate Core Metrics
+        const pitchEval = evaluatePitch(overall.pitch?.mean, targetPitch);
+        const resonanceEval = evaluateResonance(overall.formants, genderGoal, calibration);
+        const stabilityEval = evaluateStability(overall.jitter, overall.shimmer);
+        const voiceQualityEval = evaluateVoiceQuality(overall.hnr, overall.shimmer);
+
+        // 2. Determine Primary Focus Area (The "One Thing" to fix)
+        const focusArea = determineFocusArea([pitchEval, resonanceEval, stabilityEval, voiceQualityEval]);
+
+        // 3. Generate Contextual Summary & Strengths
+        const summary = generateContextualSummary(pitchEval, resonanceEval, voiceQualityEval, focusArea);
+        const strengths = identifyStrengths([pitchEval, resonanceEval, stabilityEval, voiceQualityEval]);
+
+        // 4. Generate Contextual Tips
+        const tips = generateContextualTips(pitchEval, resonanceEval, voiceQualityEval, genderGoal);
+
+        return {
+            summary,
+            strengths,
+            focusArea,
+            tips,
+            details: {
+                pitch: pitchEval,
+                resonance: resonanceEval,
+                stability: stabilityEval,
+                voiceQuality: voiceQualityEval
+            }
+        };
+    },
+
+    /**
+     * Process a natural language query from the user.
+     * @param {string} query - The user's question
+     * @param {Object} context - Real-time context { metrics, history, settings }
+     * @returns {Object} { text, relatedTopics }
+     */
+    processUserQuery: (query, context) => {
+        const lowerQuery = query.toLowerCase();
+
+        // 2. Check for "Progress" questions (History)
+        if (lowerQuery.includes('progress') || lowerQuery.includes('how am i doing') || lowerQuery.includes('stats')) {
+            if (context?.history && context.history.length > 0) {
+                const lastSession = context.history[0];
+                const feedback = CoachEngine.generateFeedback(
+                    { overall: lastSession.overall },
+                    { targetPitch: context.settings?.targetRange, gender: context.settings?.genderGoal },
+                    context.settings?.calibration
+                );
+                return {
+                    text: `Based on your last session (${new Date(lastSession.date).toLocaleDateString()}):\n\n${feedback.summary}\n\n**Focus:** ${feedback.focusArea.title}`
+                };
+            } else {
+                return { text: "I don't have enough history yet. Record a session in the Analysis tab!" };
+            }
+        }
+
+        // 3. Fallback to Knowledge Base
+        const kbResults = KnowledgeService.search(query);
+        if (kbResults.length > 0) {
+            const topResult = kbResults[0];
+            return {
+                text: `**${topResult.question}**\n\n${topResult.answer}`,
+                relatedTopics: kbResults.slice(1, 3).map(r => r.category)
+            };
+        }
+
+        // 4. Default Fallback
+        return {
+            text: "I'm not sure about that. Try asking about 'pitch', 'resonance', or 'vocal weight'."
+        };
+    },
+
+    /**
+     * Get exercise details for navigation
+     */
+    getExerciseDetails: (exerciseName) => {
+        return EXERCISE_MAP[exerciseName] || null;
+    }
 };

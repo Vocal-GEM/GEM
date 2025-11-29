@@ -9,8 +9,7 @@ export const useJournal = () => useContext(JournalContext);
 
 export const JournalProvider = ({ children }) => {
     const { user } = useAuth();
-    const [journals, setJournals] = useState([]);
-    const [showJournalForm, setShowJournalForm] = useState(false);
+    const [journalEntryData, setJournalEntryData] = useState(null);
 
     useEffect(() => {
         const loadJournals = async () => {
@@ -30,17 +29,31 @@ export const JournalProvider = ({ children }) => {
         await indexedDB.saveJournal(newEntry);
         setJournals(prev => [...prev, newEntry]);
         setShowJournalForm(false);
+        setJournalEntryData(null); // Clear data after save
 
         if (user) {
             syncManager.push('JOURNAL_ADD', newEntry);
         }
     };
 
+    const openJournal = (data = null) => {
+        setJournalEntryData(data);
+        setShowJournalForm(true);
+    };
+
+    const closeJournal = () => {
+        setJournalEntryData(null);
+        setShowJournalForm(false);
+    };
+
     const value = {
         journals,
         addJournalEntry,
         showJournalForm,
-        setShowJournalForm
+        setShowJournalForm,
+        journalEntryData,
+        openJournal,
+        closeJournal
     };
 
     return <JournalContext.Provider value={value}>{children}</JournalContext.Provider>;

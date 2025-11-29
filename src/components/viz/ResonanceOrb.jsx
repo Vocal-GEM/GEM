@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Info } from 'lucide-react';
 
 /**
  * ResonanceOrb - Visual feedback for voice resonance
@@ -10,12 +11,13 @@ import React, { useEffect, useRef, useState } from 'react';
  * 
  * Includes debug display for calibration (toggle with showDebug prop)
  */
-const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128 }) => {
+const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, colorBlindMode = false }) => {
     const orbRef = useRef(null);
     const labelRef = useRef(null);
 
     // Debug state
     const [debugInfo, setDebugInfo] = useState(null);
+    const [showTooltip, setShowTooltip] = useState(false);
 
     // Smoothing ref
     const currentScore = useRef(0.5);
@@ -42,6 +44,8 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128 }) =
                 let calculatedScore = 0.5;
                 if (calibration) {
                     const { dark, bright } = calibration;
+                    // Simple linear mapping for now, can be improved
+                    calculatedScore = Math.max(0, Math.min(1, (resonance - dark) / (bright - dark)));
 
                     historyRef.current.push({
                         f1: f1 || 0,
@@ -94,20 +98,40 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128 }) =
                 // Visual Color Mapping
                 // ============================================
                 let color;
-                if (score <= 0.5) {
-                    // Dark -> Balanced (deep purple-blue to blue)
-                    const t = score * 2;
-                    const r = Math.round(45 + (59 - 45) * t);
-                    const g = Math.round(35 + (130 - 35) * t);
-                    const b = Math.round(120 + (246 - 120) * t);
-                    color = `rgb(${r}, ${g}, ${b})`;
+                if (colorBlindMode) {
+                    // Color Blind Mode: Teal (Dark) -> White (Balanced) -> Purple (Bright)
+                    if (score <= 0.5) {
+                        // Teal -> White
+                        const t = score * 2;
+                        const r = Math.round(45 + (255 - 45) * t);
+                        const g = Math.round(212 + (255 - 212) * t);
+                        const b = Math.round(191 + (255 - 191) * t);
+                        color = `rgb(${r}, ${g}, ${b})`;
+                    } else {
+                        // White -> Purple
+                        const t = (score - 0.5) * 2;
+                        const r = Math.round(255 + (192 - 255) * t);
+                        const g = Math.round(255 + (132 - 255) * t);
+                        const b = Math.round(255 + (252 - 255) * t);
+                        color = `rgb(${r}, ${g}, ${b})`;
+                    }
                 } else {
-                    // Balanced -> Bright (blue to warm gold)
-                    const t = (score - 0.5) * 2;
-                    const r = Math.round(59 + (255 - 59) * t);
-                    const g = Math.round(130 + (204 - 130) * t);
-                    const b = Math.round(246 + (21 - 246) * t);
-                    color = `rgb(${r}, ${g}, ${b})`;
+                    // Standard Mode
+                    if (score <= 0.5) {
+                        // Dark -> Balanced (deep purple-blue to blue)
+                        const t = score * 2;
+                        const r = Math.round(45 + (59 - 45) * t);
+                        const g = Math.round(35 + (130 - 35) * t);
+                        const b = Math.round(120 + (246 - 120) * t);
+                        color = `rgb(${r}, ${g}, ${b})`;
+                    } else {
+                        // Balanced -> Bright (blue to warm gold)
+                        const t = (score - 0.5) * 2;
+                        const r = Math.round(59 + (255 - 59) * t);
+                        const g = Math.round(130 + (204 - 130) * t);
+                        const b = Math.round(246 + (21 - 246) * t);
+                        color = `rgb(${r}, ${g}, ${b})`;
+                    }
                 }
 
                 // Apply visual updates to orb
@@ -156,7 +180,7 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128 }) =
 
         const id = requestAnimationFrame(loop);
         return () => cancelAnimationFrame(id);
-    }, [calibration, dataRef, showDebug, size]);
+    }, [calibration, dataRef, showDebug, size, colorBlindMode]);
 
     // Helper to render sparkline
     const renderSparkline = (data, key, color, height = 30) => {
@@ -188,7 +212,7 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128 }) =
     };
 
     return (
-        <div className="relative flex flex-col items-center justify-center w-full h-full overflow-hidden">
+        <div className="relative flex flex-col items-center justify-center w-full h-full overflow-hidden py-8">
             {/* Main orb container */}
             <div
                 className="relative flex items-center justify-center shrink-0"
@@ -216,33 +240,58 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128 }) =
                 </div>
             </div>
 
-            {/* Debug Panel */}
+            {/* Values Panel (formerly Debug Panel) */}
             {showDebug && debugInfo && (
-                <div className="absolute top-4 left-4 p-4 bg-slate-800/90 backdrop-blur rounded-lg text-xs font-mono text-slate-300 w-64 z-50 border border-slate-700 shadow-xl">
-                    <div className="text-slate-500 uppercase tracking-wider mb-2 text-center">Debug Values</div>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                        <div>Centroid:</div>
-                        <div className="text-cyan-400">{debugInfo.centroid} Hz</div>
+                <div className="mt-12 p-4 bg-slate-800/50 backdrop-blur rounded-xl text-xs font-mono text-slate-300 w-64 border border-slate-700/50 shadow-lg relative">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="text-slate-500 uppercase tracking-wider font-bold">Values</div>
+                        <button
+                            onClick={() => setShowTooltip(!showTooltip)}
+                            className="text-slate-500 hover:text-white transition-colors"
+                            title="Information"
+                        >
+                            <Info size={14} />
+                        </button>
+                    </div>
 
-                        <div>Score:</div>
-                        <div className="text-yellow-400">{debugInfo.centroidScore}%</div>
+                    {/* Info Tooltip */}
+                    {showTooltip && (
+                        <div className="absolute bottom-full left-0 mb-2 w-64 bg-slate-900/95 border border-slate-600 rounded-lg p-3 shadow-xl z-50 text-[10px] leading-relaxed">
+                            <div className="font-bold text-white mb-1">Metrics Guide:</div>
+                            <ul className="space-y-1 text-slate-300">
+                                <li><span className="text-cyan-400">Centroid:</span> Center of mass of the spectrum. Higher = brighter.</li>
+                                <li><span className="text-yellow-400">Score:</span> Resonance brightness (0-100%).</li>
+                                <li><span className="text-green-400">F1:</span> Throat resonance (R1).</li>
+                                <li><span className="text-green-400">F2:</span> Mouth resonance (R2).</li>
+                                <li><span className="text-white">UI Score:</span> Smoothed display value.</li>
+                            </ul>
+                            <div className="absolute bottom-[-5px] left-4 w-2 h-2 bg-slate-900 border-b border-r border-slate-600 rotate-45"></div>
+                        </div>
+                    )}
 
-                        <div className="border-t border-slate-700 col-span-2 my-1"></div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                        <div className="text-slate-400">Centroid:</div>
+                        <div className="text-cyan-400 font-bold text-right">{debugInfo.centroid} Hz</div>
 
-                        <div>F1:</div>
-                        <div className="text-green-400">{debugInfo.f1} Hz</div>
+                        <div className="text-slate-400">Score:</div>
+                        <div className="text-yellow-400 font-bold text-right">{debugInfo.centroidScore}%</div>
 
-                        <div>F2:</div>
-                        <div className="text-green-400">{debugInfo.f2} Hz</div>
+                        <div className="border-t border-slate-700/50 col-span-2 my-1"></div>
 
-                        <div className="border-t border-slate-700 col-span-2 my-1"></div>
+                        <div className="text-slate-400">F1:</div>
+                        <div className="text-green-400 font-bold text-right">{debugInfo.f1} Hz</div>
 
-                        <div>UI Score:</div>
-                        <div className="text-white font-bold">{debugInfo.uiScore}%</div>
+                        <div className="text-slate-400">F2:</div>
+                        <div className="text-green-400 font-bold text-right">{debugInfo.f2} Hz</div>
+
+                        <div className="border-t border-slate-700/50 col-span-2 my-1"></div>
+
+                        <div className="text-slate-400">UI Score:</div>
+                        <div className="text-white font-bold text-right">{debugInfo.uiScore}%</div>
                     </div>
 
                     {/* History Sparklines */}
-                    <div className="mt-4 pt-2 border-t border-slate-700">
+                    <div className="mt-4 pt-2 border-t border-slate-700/50">
                         <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">F1 History</div>
                         {renderSparkline(debugInfo.history, 'f1', '#4ade80')}
                     </div>

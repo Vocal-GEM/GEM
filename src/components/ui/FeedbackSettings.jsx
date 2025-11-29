@@ -1,5 +1,5 @@
 import React from 'react';
-import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X, Wifi, WifiOff, RefreshCw, Trash2, Mic2 } from 'lucide-react';
+import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X, Wifi, WifiOff, RefreshCw, Trash2, Mic2, Eye } from 'lucide-react';
 import { textToSpeechService } from '../../services/TextToSpeechService';
 import { syncManager } from '../../services/SyncManager';
 import { indexedDB, STORES } from '../../services/IndexedDBManager';
@@ -196,6 +196,33 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                         <div className="flex items-center gap-2 p-2">
                             <input type="checkbox" checked={settings.triggerDarkRes} onChange={(e) => setSettings({ ...settings, triggerDarkRes: e.target.checked })} className="accent-blue-500 w-5 h-5 rounded" />
                             <span className="text-sm text-slate-300">Trigger when Resonance is too DARK</span>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Accessibility */}
+                <section>
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Accessibility</h3>
+                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className={`p-2 rounded-lg ${settings.colorBlindMode ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-700 text-slate-400'}`}>
+                                    <Eye size={20} />
+                                </div>
+                                <div>
+                                    <div className="text-sm font-bold text-white">Color Blind Mode</div>
+                                    <div className="text-[10px] text-slate-400">High contrast colors (Purple/Teal)</div>
+                                </div>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer p-2">
+                                <input
+                                    type="checkbox"
+                                    checked={settings.colorBlindMode || false}
+                                    onChange={(e) => setSettings({ ...settings, colorBlindMode: e.target.checked })}
+                                    className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-500"></div>
+                            </label>
                         </div>
                     </div>
                 </section>

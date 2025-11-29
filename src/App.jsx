@@ -7,7 +7,7 @@ import { useStats } from './context/StatsContext';
 import { useJournal } from './context/JournalContext';
 
 // Icons
-import { Mic, Mic2, Camera, ArrowLeft, Wrench, Bot, BarChart2, Activity, BookOpen, ChevronRight } from 'lucide-react';
+import { Mic, Mic2, Camera, ArrowLeft, Wrench, Bot, BarChart2, Activity, BookOpen, ChevronRight, Sliders } from 'lucide-react';
 
 // Components - UI
 import OfflineIndicator from './components/ui/OfflineIndicator';
@@ -25,19 +25,6 @@ import AssessmentModule from './components/ui/AssessmentModule';
 import WarmUpModule from './components/ui/WarmUpModule';
 import ForwardFocusDrill from './components/ui/ForwardFocusDrill';
 import IncognitoScreen from './components/ui/IncognitoScreen';
-import FloatingCamera from './components/ui/FloatingCamera';
-import AudioLibrary from './components/ui/AudioLibrary';
-import IntonationExercise from './components/ui/IntonationExercise';
-import ComparisonTool from './components/ui/ComparisonTool';
-import PitchPipe from './components/ui/PitchPipe';
-import BreathPacer from './components/ui/BreathPacer';
-import MirrorComponent from './components/ui/MirrorComponent';
-import CoachView from './components/ui/CoachView';
-import HistoryView from './components/ui/HistoryView';
-import LoadingSpinner from './components/ui/LoadingSpinner';
-import DebugOverlay from './components/ui/DebugOverlay';
-
-// Lazy Loaded Components - Views
 const SLPDashboard = lazy(() => import('./components/views/SLPDashboard'));
 const PracticeMode = lazy(() => import('./components/views/PracticeMode'));
 const MixingBoardView = lazy(() => import('./components/views/MixingBoardView'));
@@ -60,6 +47,8 @@ const Spectrogram = lazy(() => import('./components/viz/Spectrogram'));
 const ContourVisualizer = lazy(() => import('./components/viz/ContourVisualizer'));
 const QualityVisualizer = lazy(() => import('./components/viz/QualityVisualizer'));
 const SpectralTiltMeter = lazy(() => import('./components/viz/SpectralTiltMeter'));
+const ToolExercises = lazy(() => import('./components/ui/ToolExercises'));
+import DebugOverlay from './components/ui/DebugOverlay';
 
 
 
@@ -136,6 +125,7 @@ const App = () => {
     const [showMigration, setShowMigration] = useState(true);
     const [practiceView, setPracticeView] = useState('all'); // all, pitch, resonance, weight, vowel
     const [pitchViewMode, setPitchViewMode] = useState('graph'); // graph or orb
+    const [showMixerInDashboard, setShowMixerInDashboard] = useState(false);
 
 
 
@@ -257,45 +247,121 @@ const App = () => {
                             {/* Dashboard Grid - Simplified for Performance */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
 
-                                {/* 1. Left: Dynamic Orb */}
-                                <div className="flex flex-col h-[500px]">
-                                    {(practiceView === 'all' || practiceView === 'resonance') && (
+                                {/* 1. Left: Dynamic Orb or Mixer */}
+                                {(practiceView === 'all' || practiceView === 'resonance') && (
+                                    <div className="flex flex-col h-[500px] relative">
+                                        {/* Toggle for 'all' view */}
+                                        {practiceView === 'all' && (
+                                            <div className="absolute top-4 left-4 z-30">
+                                                <button
+                                                    onClick={() => setShowMixerInDashboard(!showMixerInDashboard)}
+                                                    className="p-2 bg-slate-800/80 backdrop-blur rounded-lg border border-white/10 text-white hover:bg-slate-700 transition-colors flex items-center gap-2"
+                                                    title={showMixerInDashboard ? "Switch to Orb" : "Switch to Mixer"}
+                                                >
+                                                    {showMixerInDashboard ? <Activity size={16} /> : <Sliders size={16} />}
+                                                    <span className="text-xs font-bold">{showMixerInDashboard ? "Orb" : "Mixer"}</span>
+                                                </button>
+                                            </div>
+                                        )}
+
                                         <div key="dynamic-orb-container" className="h-full w-full relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5">
                                             {practiceView === 'all' ? (
-                                                <DynamicOrb dataRef={dataRef} calibration={calibration} />
+                                                showMixerInDashboard ? (
+                                                    <div className="h-full w-full p-2 pt-12">
+                                                        <MixingBoardView
+                                                            dataRef={dataRef}
+                                                            audioEngine={audioEngineRef.current}
+                                                            calibration={calibration}
+                                                            compact={true}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <DynamicOrb dataRef={dataRef} calibration={calibration} />
+                                                )
                                             ) : (
-                                                <ResonanceOrb dataRef={dataRef} calibration={calibration} showDebug={true} size={400} />
+                                                <ResonanceOrb
+                                                    dataRef={dataRef}
+                                                    calibration={calibration}
+                                                    showDebug={false}
+                                                    colorBlindMode={settings.colorBlindMode}
+                                                />
                                             )}
                                         </div>
-                                    )}
-                                </div>
+                                    </div>
+                                )}
 
                                 {/* 2. Right: Dashboard or Pitch Tracking */}
-                                <div className="flex flex-col h-[500px]">
+                                <div className="flex flex-col h-[500px] overflow-y-auto custom-scrollbar pr-2">
                                     {practiceView === 'all' && (
-                                        <div className="h-full">
+                                        <div className="h-full min-h-[400px]">
                                             <GenderPerceptionDashboard dataRef={dataRef} />
                                         </div>
                                     )}
 
                                     {practiceView === 'pitch' && (
-                                        <div className="h-full">
+                                        <div className="h-full min-h-[300px]">
                                             <PitchVisualizer dataRef={dataRef} />
                                         </div>
                                     )}
 
-                                    <div className="grid grid-cols-2 gap-4 mt-4">
-                                        <button onClick={() => setActiveTab('tools')} className="p-4 rounded-xl flex flex-row items-center gap-3 transition-colors group bg-slate-800 hover:bg-slate-700">
+                                    {practiceView === 'weight' && (
+                                        <div className="h-full min-h-[300px]">
+                                            <VoiceQualityMeter dataRef={dataRef} userMode="user" />
+                                        </div>
+                                    )}
+
+                                    {practiceView === 'tilt' && (
+                                        <div className="h-full min-h-[300px]">
+                                            <SpectralTiltMeter dataRef={dataRef} />
+                                        </div>
+                                    )}
+
+                                    {practiceView === 'vowel' && (
+                                        <div className="h-full min-h-[300px]">
+                                            <VowelSpacePlot dataRef={dataRef} />
+                                        </div>
+                                    )}
+
+                                    {practiceView === 'articulation' && (
+                                        <div className="h-full min-h-[300px] overflow-y-auto custom-scrollbar rounded-3xl border border-white/5 bg-slate-900/30">
+                                            <ArticulationView />
+                                        </div>
+                                    )}
+
+                                    {practiceView === 'contour' && (
+                                        <div className="h-full min-h-[300px]">
+                                            <ContourVisualizer dataRef={dataRef} />
+                                        </div>
+                                    )}
+
+                                    {practiceView === 'quality' && (
+                                        <div className="h-full min-h-[300px]">
+                                            <QualityVisualizer dataRef={dataRef} />
+                                        </div>
+                                    )}
+
+                                    {practiceView === 'spectrogram' && (
+                                        <div className="h-full min-h-[300px]">
+                                            <Spectrogram dataRef={dataRef} />
+                                        </div>
+                                    )}
+
+                                    {/* Resonance Metrics (Desktop 'Alongside' View) */}
+                                    {practiceView === 'resonance' && (
+                                        <div className="mb-6">
+                                            <ResonanceMetrics dataRef={dataRef} />
+                                        </div>
+                                    )}
+
+                                    {/* Exercises Section */}
+                                    <ToolExercises tool={practiceView} audioEngine={audioEngineRef.current} />
+
+                                    <div className="mt-4 flex-shrink-0">
+                                        <button onClick={() => setActiveTab('tools')} className="w-full p-4 rounded-xl flex flex-row items-center justify-center gap-3 transition-colors group bg-slate-800 hover:bg-slate-700">
                                             <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all">
                                                 <Wrench size={20} />
                                             </div>
                                             <span className="text-sm font-bold">All Tools</span>
-                                        </button>
-                                        <button onClick={() => setShowCamera(!showCamera)} className={`p-4 rounded-xl flex flex-row items-center gap-3 transition-colors group ${showCamera ? 'bg-blue-600 text-white' : 'bg-slate-800 hover:bg-slate-700'}`}>
-                                            <div className={`p-2 rounded-lg transition-all ${showCamera ? 'bg-white/20 text-white' : 'bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white'}`}>
-                                                <Camera size={20} />
-                                            </div>
-                                            <span className="text-sm font-bold">Mirror</span>
                                         </button>
                                     </div>
                                 </div>

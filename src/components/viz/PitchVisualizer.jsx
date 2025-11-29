@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useProfile } from '../../context/ProfileContext';
+import { useSettings } from '../../context/SettingsContext';
 import { RotateCcw } from 'lucide-react';
 import { frequencyToNote, getCentsDeviation } from '../../utils/musicUtils';
 
 const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, settings }) => {
     const { voiceProfiles } = useProfile();
+    const { colorBlindMode } = useSettings();
     const canvasRef = useRef(null);
     const balloonRef = useRef(new Image());
     const birdRef = useRef(new Image());
@@ -59,9 +61,15 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
             const femRange = fem?.genderRange || fem?.targetRange;
             const mascRange = masc?.genderRange || masc?.targetRange;
 
-            if (femRange && freq >= femRange.min && freq <= femRange.max) return '#ec4899'; // Pink-500
-            if (mascRange && freq >= mascRange.min && freq <= mascRange.max) return '#3b82f6'; // Blue-500
-            return '#22c55e'; // Green-500 (Default)
+            if (colorBlindMode) {
+                if (femRange && freq >= femRange.min && freq <= femRange.max) return '#9333ea'; // Purple-600
+                if (mascRange && freq >= mascRange.min && freq <= mascRange.max) return '#0d9488'; // Teal-600
+                return '#f59e0b'; // Amber-500
+            } else {
+                if (femRange && freq >= femRange.min && freq <= femRange.max) return '#ec4899'; // Pink-500
+                if (mascRange && freq >= mascRange.min && freq <= mascRange.max) return '#3b82f6'; // Blue-500
+                return '#22c55e'; // Green-500 (Default)
+            }
         };
 
         const loop = () => {
@@ -259,7 +267,7 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
         return () => {
             if (unsubscribe) unsubscribe();
         };
-    }, [targetRange, exercise, zoomRange, voiceProfiles, settings]);
+    }, [targetRange, exercise, zoomRange, voiceProfiles, settings, colorBlindMode]);
 
     const label = userMode === 'slp' ? 'Fundamental Frequency (F0)' : 'Pitch';
 

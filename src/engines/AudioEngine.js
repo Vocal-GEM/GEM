@@ -83,22 +83,45 @@ export class AudioEngine {
             this.toneEngine = new ToneEngine(this.audioContext);
 
             // Load Worklet from public file with cache busting
+            const workletPath = '/resonance-processor.js';
+            console.log(`[AudioEngine] Attempting to load worklet from: ${workletPath}`);
+
             try {
                 const timestamp = Date.now();
-                await this.audioContext.audioWorklet.addModule(`/resonance-processor.js?v=${timestamp}`);
+                await this.audioContext.audioWorklet.addModule(`${workletPath}?v=${timestamp}`);
                 this.debugInfo.workletLoaded = true;
+                console.log("[AudioEngine] Worklet loaded successfully via absolute path");
             } catch (e) {
-                console.error("Failed to load worklet from /resonance-processor.js, trying relative path...", e);
-                // Fallback if needed
-                const timestamp = Date.now();
-                await this.audioContext.audioWorklet.addModule(`resonance-processor.js?v=${timestamp}`);
-                this.debugInfo.workletLoaded = true;
+                console.warn("[AudioEngine] Failed to load worklet from absolute path, trying relative...", e);
+                try {
+                    const timestamp = Date.now();
+                    await this.audioContext.audioWorklet.addModule(`resonance-processor.js?v=${timestamp}`);
+                    this.debugInfo.workletLoaded = true;
+                    console.log("[AudioEngine] Worklet loaded successfully via relative path");
+                } catch (e2) {
+                    console.error("[AudioEngine] CRITICAL: Failed to load worklet from both paths", e2);
+                    throw new Error(`Failed to load audio worklet: ${e2.message}`);
+                }
             }
 
+            console.log("[AudioEngine] Requesting microphone access...");
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            console.log("[AudioEngine] Microphone access granted");
+
             this.microphone = this.audioContext.createMediaStreamSource(stream);
             this.debugInfo.micActive = true;
-            this.workletNode = new AudioWorkletNode(this.audioContext, 'resonance-processor');
+
+            console.log("[AudioEngine] Creating AudioWorkletNode...");
+            try {
+                this.workletNode = new AudioWorkletNode(this.audioContext, 'resonance-processor');
+                this.workletNode.onprocessorerror = (err) => {
+                    console.error(`[AudioEngine] Worklet processor error:`, err);
+                };
+                console.log("[AudioEngine] AudioWorkletNode created successfully");
+            } catch (err) {
+                console.error("[AudioEngine] Failed to create AudioWorkletNode:", err);
+                throw err;
+            }
 
             this.workletNode.port.onmessage = (event) => {
                 if (event.data.type === 'update') {

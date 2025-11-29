@@ -1,7 +1,9 @@
 import React, { useEffect, useRef } from 'react';
+import { useSettings } from '../../context/SettingsContext';
 import { AlertTriangle, Activity, Info } from 'lucide-react';
 
 const VoiceQualityMeter = ({ dataRef, userMode }) => {
+    const { colorBlindMode } = useSettings();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
     const metricsRef = useRef({ h1: null, h2: null, diff: null });
@@ -20,12 +22,22 @@ const VoiceQualityMeter = ({ dataRef, userMode }) => {
                 indicatorRef.current.style.left = `${nextLeft}%`;
 
                 // Color based on position
-                if (nextLeft > 70) {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(255,100,100,0.8)] transition-colors duration-75 bg-red-500";
-                } else if (nextLeft < 30) {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-blue-400";
+                if (colorBlindMode) {
+                    if (nextLeft > 70) {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.8)] transition-colors duration-75 bg-orange-500";
+                    } else if (nextLeft < 30) {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.8)] transition-colors duration-75 bg-teal-400";
+                    } else {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)] transition-colors duration-75 bg-purple-500";
+                    }
                 } else {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 bg-emerald-500";
+                    if (nextLeft > 70) {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(255,100,100,0.8)] transition-colors duration-75 bg-red-500";
+                    } else if (nextLeft < 30) {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-blue-400";
+                    } else {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 bg-emerald-500";
+                    }
                 }
 
                 // Update value display
@@ -54,7 +66,7 @@ const VoiceQualityMeter = ({ dataRef, userMode }) => {
         return () => {
             if (unsubscribe) unsubscribe();
         };
-    }, [dataRef]);
+    }, [dataRef, colorBlindMode]);
 
     const labels = userMode === 'slp' ? ['Low Energy', 'Vocal Weight', 'High Energy'] : ['Light / Airy', 'Vocal Weight', 'Heavy / Pressed'];
 
@@ -68,7 +80,7 @@ const VoiceQualityMeter = ({ dataRef, userMode }) => {
                 <span className="w-24 text-left">{labels[0]}</span>
                 <div className="flex flex-col items-center">
                     <span className="text-slate-500 mb-1 uppercase tracking-widest text-[10px]">{labels[1]}</span>
-                    <span ref={valueRef} className="text-4xl font-mono text-emerald-400 font-bold tabular-nums leading-none">0</span>
+                    <span ref={valueRef} className={`text-4xl font-mono font-bold tabular-nums leading-none ${colorBlindMode ? 'text-purple-400' : 'text-emerald-400'}`}>0</span>
                 </div>
                 <span className="w-24 text-right">{labels[2]}</span>
             </div>
@@ -76,7 +88,7 @@ const VoiceQualityMeter = ({ dataRef, userMode }) => {
             {/* Meter Bar */}
             <div className="relative h-10 bg-slate-900/80 rounded-full overflow-hidden shadow-inner border border-white/5 mb-6">
                 {/* Dynamic Gradient Background */}
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 via-emerald-500/20 to-blue-500/20"></div>
+                <div className={`absolute inset-0 bg-gradient-to-r ${colorBlindMode ? 'from-orange-500/20 via-purple-500/20 to-teal-500/20' : 'from-red-500/20 via-emerald-500/20 to-blue-500/20'}`}></div>
 
                 {/* Grid Lines */}
                 <div className="absolute left-[30%] top-0 bottom-0 w-px bg-white/10 dashed-line"></div>
@@ -86,7 +98,7 @@ const VoiceQualityMeter = ({ dataRef, userMode }) => {
                 {/* Indicator */}
                 <div
                     ref={indicatorRef}
-                    className="absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_15px_rgba(100,255,100,0.6)] border border-white/50 transition-all duration-100 ease-out bg-emerald-500 z-10"
+                    className={`absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_15px_rgba(100,255,100,0.6)] border border-white/50 transition-all duration-100 ease-out z-10 ${colorBlindMode ? 'bg-purple-500' : 'bg-emerald-500'}`}
                     style={{ left: '0%' }}
                 ></div>
             </div>
@@ -99,16 +111,16 @@ const VoiceQualityMeter = ({ dataRef, userMode }) => {
                 <div className="grid grid-cols-3 gap-3">
                     <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-white/5">
                         <div className="text-[10px] text-slate-500 mb-1">H1 (Fund.)</div>
-                        <div ref={el => metricsRef.current.h1 = el} className="text-lg font-mono text-blue-300 font-bold">-</div>
+                        <div ref={el => metricsRef.current.h1 = el} className={`text-lg font-mono font-bold ${colorBlindMode ? 'text-teal-300' : 'text-blue-300'}`}>-</div>
                         <div className="text-[9px] text-slate-600">dB</div>
                     </div>
                     <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-white/5">
                         <div className="text-[10px] text-slate-500 mb-1">H2 (Harm.)</div>
-                        <div ref={el => metricsRef.current.h2 = el} className="text-lg font-mono text-purple-300 font-bold">-</div>
+                        <div ref={el => metricsRef.current.h2 = el} className={`text-lg font-mono font-bold ${colorBlindMode ? 'text-purple-300' : 'text-purple-300'}`}>-</div>
                         <div className="text-[9px] text-slate-600">dB</div>
                     </div>
                     <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-white/10 shadow-lg">
-                        <div className="text-[10px] text-emerald-500 mb-1 font-bold">Diff</div>
+                        <div className={`text-[10px] mb-1 font-bold ${colorBlindMode ? 'text-purple-500' : 'text-emerald-500'}`}>Diff</div>
                         <div ref={el => metricsRef.current.diff = el} className="text-lg font-mono text-white font-bold">-</div>
                         <div className="text-[9px] text-slate-600">dB</div>
                     </div>
@@ -118,16 +130,16 @@ const VoiceQualityMeter = ({ dataRef, userMode }) => {
                     <div>
                         Weight is calculated from the difference between H1 and H2.
                         <div className="mt-1 flex gap-2">
-                            <span className="text-blue-400 font-medium">&gt;10dB = Airy</span>
+                            <span className={`${colorBlindMode ? 'text-teal-400' : 'text-blue-400'} font-medium`}>&gt;10dB = Airy</span>
                             <span className="text-slate-600">•</span>
-                            <span className="text-red-400 font-medium">&lt;0dB = Pressed</span>
+                            <span className={`${colorBlindMode ? 'text-orange-400' : 'text-red-400'} font-medium`}>&lt;0dB = Pressed</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             {isStrained && (
-                <div className="mt-4 text-sm text-red-400 flex items-center justify-center gap-2 animate-pulse font-bold bg-red-500/10 py-3 rounded-xl border border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+                <div className={`mt-4 text-sm flex items-center justify-center gap-2 animate-pulse font-bold py-3 rounded-xl border shadow-[0_0_20px_rgba(239,68,68,0.2)] ${colorBlindMode ? 'text-orange-400 bg-orange-500/10 border-orange-500/20' : 'text-red-400 bg-red-500/10 border-red-500/20'}`}>
                     <AlertTriangle className="w-5 h-5" /> High Vocal Weight detected. Relax!
                 </div>
             )}

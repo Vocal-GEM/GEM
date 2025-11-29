@@ -1,9 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
+import { useJournal } from '../../context/JournalContext';
 
 const JournalForm = ({ onSubmit, onCancel }) => {
     const { audioEngineRef } = useAudio();
+    const { journalEntryData } = useJournal();
+
     const [notes, setNotes] = useState('');
     const [script, setScript] = useState('');
     const [effort, setEffort] = useState(5);
@@ -14,6 +17,19 @@ const JournalForm = ({ onSubmit, onCancel }) => {
     const [recordingTime, setRecordingTime] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const timerRef = useRef(null);
+
+    useEffect(() => {
+        if (journalEntryData) {
+            if (journalEntryData.notes) setNotes(journalEntryData.notes);
+            if (journalEntryData.script) setScript(journalEntryData.script);
+            if (journalEntryData.audioUrl) setAudioBlobUrl(journalEntryData.audioUrl);
+            // If we have analysis metrics, we can append them to notes if not already there
+            if (journalEntryData.metrics) {
+                const metricsText = `\n\nAnalysis Results:\n- Pitch: ${journalEntryData.metrics.pitch}\n- Resonance: ${journalEntryData.metrics.resonance}\n- Jitter: ${journalEntryData.metrics.jitter}`;
+                setNotes(prev => prev.includes('Analysis Results:') ? prev : prev + metricsText);
+            }
+        }
+    }, [journalEntryData]);
 
     const toggleRecording = async () => {
         if (!audioEngineRef.current) return;

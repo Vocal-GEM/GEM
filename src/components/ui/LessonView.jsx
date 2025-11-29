@@ -11,10 +11,11 @@ import ArticulationView from '../views/ArticulationView';
 import ContourVisualizer from '../viz/ContourVisualizer';
 import QualityVisualizer from '../viz/QualityVisualizer';
 import HighResSpectrogram from '../viz/HighResSpectrogram';
-import IntonationExercise from './IntonationExercise';
-import BreathPacer from './BreathPacer';
 import VocalFoldsView from '../views/VocalFoldsView';
 import ComparisonTool from './ComparisonTool';
+import ForwardFocusDrill from './ForwardFocusDrill';
+import BreathPacer from './BreathPacer';
+import TwisterCard from './TwisterCard';
 
 import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
