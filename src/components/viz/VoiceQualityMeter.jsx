@@ -72,9 +72,6 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
 
     // Strain Check
     const isStrained = dataRef.current?.weight > 80;
-
-    // Strain Check
-    const isStrained = dataRef.current?.weight > 80;
     const isSilent = dataRef.current?.isSilent;
 
     return (
