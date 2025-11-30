@@ -230,8 +230,29 @@ class ResonanceProcessor extends AudioWorkletProcessor {
 
     process(inputs, outputs, parameters) {
         const input = inputs[0];
-        if (!input || !input.length) return true;
+        if (!input || !input.length) {
+            // Log this occasionally to see if we're getting NO inputs
+            if (!this.noInputCounter) this.noInputCounter = 0;
+            this.noInputCounter++;
+            if (this.noInputCounter % 100 === 0) {
+                this.port.postMessage({
+                    type: 'diagnostic',
+                    message: `No input received (count: ${this.noInputCounter})`
+                });
+            }
+            return true;
+        }
         const channel = input[0];
+
+        // Log that we're receiving data
+        if (!this.processCounter) this.processCounter = 0;
+        this.processCounter++;
+        if (this.processCounter === 1 || this.processCounter % 100 === 0) {
+            this.port.postMessage({
+                type: 'diagnostic',
+                message: `Processing audio: frame ${this.processCounter}, samples: ${channel.length}`
+            });
+        }
 
         for (let i = 0; i < channel.length; i++) {
             this.buffer[this.bufferIndex] = channel[i];

@@ -131,6 +131,14 @@ export class AudioEngine {
             });
             console.log("[AudioEngine] Microphone access granted");
 
+            // Verify stream is active
+            const audioTracks = stream.getAudioTracks();
+            console.log(`[AudioEngine] Audio tracks: ${audioTracks.length}, Active: ${audioTracks.map(t => t.enabled && t.readyState === 'live').join(', ')}`);
+
+            if (audioTracks.length === 0 || !audioTracks[0].enabled) {
+                throw new Error("Microphone stream has no active audio tracks");
+            }
+
             // Initialize MediaRecorder
             if (stream) {
                 try {
@@ -145,6 +153,13 @@ export class AudioEngine {
 
             this.microphone = this.audioContext.createMediaStreamSource(stream);
             this.debugInfo.micActive = true;
+
+            // CRITICAL: Ensure AudioContext is running after creating microphone source
+            if (this.audioContext.state !== 'running') {
+                console.log("[AudioEngine] AudioContext not running, resuming...");
+                await this.audioContext.resume();
+            }
+            console.log(`[AudioEngine] AudioContext state: ${this.audioContext.state}`);
 
             // --- WORKLET SETUP ---
             try {
@@ -168,6 +183,8 @@ export class AudioEngine {
                         payload.pcm = event.data.audioBuffer;
                     }
                     this.handleWorkletUpdate(payload);
+                } else if (event.data.type === 'diagnostic') {
+                    console.log(`[Worklet Diagnostic] ${event.data.message}`);
                 }
             };
 
