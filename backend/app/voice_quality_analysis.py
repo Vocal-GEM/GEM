@@ -1,8 +1,17 @@
-import numpy as np
-import parselmouth
-from parselmouth.praat import call
-import soundfile as sf
-import scipy.signal
+try:
+    import numpy as np
+    import parselmouth
+    from parselmouth.praat import call
+    import soundfile as sf
+    import scipy.signal
+    _deps_available = True
+except ImportError:
+    _deps_available = False
+    np = None
+    parselmouth = None
+    call = None
+    sf = None
+    scipy = None
 
 # ----------------------
 # Goal presets
@@ -363,6 +372,15 @@ def compare_to_goal(summary, features_global, goal_name):
     return comparison
 
 def analyze_file(path, goal_name="transfem_soft_slightly_breathy"):
+    if not _deps_available:
+        return {
+            "error": "Analysis dependencies (numpy, scipy, parselmouth) not installed.",
+            "summary": {},
+            "features_global": {},
+            "timeline": {},
+            "goals": {}
+        }
+
     y, sr = load_audio(path) # 16kHz
     
     # Standard metrics

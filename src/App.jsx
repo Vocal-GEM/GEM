@@ -5,6 +5,7 @@ import { useAuth } from './context/AuthContext';
 import { useProfile } from './context/ProfileContext';
 import { useStats } from './context/StatsContext';
 import { useJournal } from './context/JournalContext';
+import { useNavigation } from './context/NavigationContext';
 import MigrationModal from './components/ui/MigrationModal';
 import TutorialWizard from './components/ui/TutorialWizard';
 import CompassWizard from './components/ui/CompassWizard';
@@ -109,35 +110,74 @@ const App = () => {
     } = useJournal();
 
     // Local state for UI only
-    // Local state for UI only
     // userMode removed as per request
 
-    // Other UI state
-    const [showVocalHealthTips, setShowVocalHealthTips] = useState(false);
-    const [showAssessment, setShowAssessment] = useState(false);
-    const [showWarmUp, setShowWarmUp] = useState(false);
-    const [showForwardFocus, setShowForwardFocus] = useState(false);
-    const [showVocalFolds, setShowVocalFolds] = useState(false);
-    const [showVoiceQuality, setShowVoiceQuality] = useState(false);
-    const [showCourse, setShowCourse] = useState(false);
-    const [isDataLoaded, setIsDataLoaded] = useState(true); // Simplified for now
+    const {
+        activeView: activeTab,
+        navigate: setActiveTab,
+        practiceTab: practiceView,
+        switchPracticeTab: setPracticeView,
+        modals,
+        openModal,
+        closeModal
+    } = useNavigation();
 
+    // Derived state for backward compatibility
+    const showSettings = modals.settings;
+    const setShowSettings = (v) => v ? openModal('settings') : closeModal('settings');
 
-    const [activeTab, setActiveTab] = useState('practice');
-    // showSettings moved to SettingsContext
-    const [showTutorial, setShowTutorial] = useState(false);
-    const [showCompass, setShowCompass] = useState(false);
-    // showCalibration moved to ProfileContext
-    // showJournalForm moved to JournalContext
-    const [showLogin, setShowLogin] = useState(false);
-    const [showSignup, setShowSignup] = useState(false);
-    const [showProfile, setShowProfile] = useState(false);
-    const [showIncognito, setShowIncognito] = useState(false);
-    const [showCamera, setShowCamera] = useState(false);
-    const [showPracticeMode, setShowPracticeMode] = useState(false);
-    const [showMigration, setShowMigration] = useState(true);
-    const [practiceView, setPracticeView] = useState('all'); // all, pitch, resonance, weight, vowel
-    const [pitchViewMode, setPitchViewMode] = useState('graph'); // graph or orb
+    const showTutorial = modals.tutorial;
+    const setShowTutorial = (v) => v ? openModal('tutorial') : closeModal('tutorial');
+
+    const showCompass = modals.compass;
+    const setShowCompass = (v) => v ? openModal('compass') : closeModal('compass');
+
+    const showCalibration = modals.calibration;
+    const setShowCalibration = (v) => v ? openModal('calibration') : closeModal('calibration');
+
+    const showLogin = modals.login;
+    const setShowLogin = (v) => v ? openModal('login') : closeModal('login');
+
+    const showSignup = modals.signup;
+    const setShowSignup = (v) => v ? openModal('signup') : closeModal('signup');
+
+    const showProfile = modals.profile;
+    const setShowProfile = (v) => v ? openModal('profile') : closeModal('profile');
+
+    const showIncognito = modals.incognito;
+    const setShowIncognito = (v) => v ? openModal('incognito') : closeModal('incognito');
+
+    const showCamera = modals.camera;
+    const setShowCamera = (v) => v ? openModal('camera') : closeModal('camera');
+
+    const showPracticeMode = modals.practiceMode;
+    const setShowPracticeMode = (v) => v ? openModal('practiceMode') : closeModal('practiceMode');
+
+    const showMigration = modals.migration;
+    const setShowMigration = (v) => v ? openModal('migration') : closeModal('migration');
+
+    const showVocalHealthTips = modals.vocalHealth;
+    const setShowVocalHealthTips = (v) => v ? openModal('vocalHealth') : closeModal('vocalHealth');
+
+    const showAssessment = modals.assessment;
+    const setShowAssessment = (v) => v ? openModal('assessment') : closeModal('assessment');
+
+    const showWarmUp = modals.warmup;
+    const setShowWarmUp = (v) => v ? openModal('warmup') : closeModal('warmup');
+
+    const showForwardFocus = modals.forwardFocus;
+    const setShowForwardFocus = (v) => v ? openModal('forwardFocus') : closeModal('forwardFocus');
+
+    const showVocalFolds = modals.vocalFolds;
+    const setShowVocalFolds = (v) => v ? openModal('vocalFolds') : closeModal('vocalFolds');
+
+    const showVoiceQuality = modals.voiceQuality;
+    const setShowVoiceQuality = (v) => v ? openModal('voiceQuality') : closeModal('voiceQuality');
+
+    const showCourse = modals.course;
+    const setShowCourse = (v) => v ? openModal('course') : closeModal('course');
+
+    const [isDataLoaded, setIsDataLoaded] = useState(true);
 
 
 
@@ -175,23 +215,7 @@ const App = () => {
         localStorage.setItem('gem_calibration_done', 'true');
     };
 
-    // Settings events
-    useEffect(() => {
-        const handleOpenVocalHealth = () => setShowVocalHealthTips(true);
-        const handleOpenAssessment = () => setShowAssessment(true);
-        const handleOpenWarmUp = () => setShowWarmUp(true);
-        const handleOpenForwardFocus = () => setShowForwardFocus(true);
-        window.addEventListener('openVocalHealth', handleOpenVocalHealth);
-        window.addEventListener('openAssessment', handleOpenAssessment);
-        window.addEventListener('openWarmUp', handleOpenWarmUp);
-        window.addEventListener('openForwardFocus', handleOpenForwardFocus);
-        return () => {
-            window.removeEventListener('openVocalHealth', handleOpenVocalHealth);
-            window.removeEventListener('openAssessment', handleOpenAssessment);
-            window.removeEventListener('openWarmUp', handleOpenWarmUp);
-            window.removeEventListener('openForwardFocus', handleOpenForwardFocus);
-        };
-    }, []);
+    // Settings events - moved to NavigationContext
 
     // Profile switching
     useEffect(() => {
@@ -283,7 +307,7 @@ const App = () => {
                                             {practiceView === 'all' ? (
                                                 <DynamicOrb
                                                     dataRef={dataRef}
-                                                    calibration={{ ...calibration, disable3D: settings.disable3D }}
+                                                    calibration={{ ...calibration, disable3D: settings.liteMode || settings.disable3D }}
                                                     audioEngine={audioEngineRef.current}
                                                 />
                                             ) : practiceView === 'resonance' ? (
@@ -310,7 +334,11 @@ const App = () => {
                                             ) : practiceView === 'quality' ? (
                                                 <VoiceQualityView />
                                             ) : practiceView === 'spectrogram' ? (
-                                                <Spectrogram dataRef={dataRef} />
+                                                settings.liteMode ? (
+                                                    <Spectrogram dataRef={dataRef} />
+                                                ) : (
+                                                    <HighResSpectrogram dataRef={dataRef} />
+                                                )
                                             ) : null}
 
                                         </Suspense>

@@ -15,10 +15,10 @@ export const NavigationProvider = ({ children }) => {
     // Primary Views: 'practice', 'journal', 'stats', 'settings'
     const [activeView, setActiveView] = useState('practice');
 
-    // Practice Tabs: 'overview', 'pitch', 'resonance', 'weight', 'vowel'
-    const [practiceTab, setPracticeTab] = useState('overview');
+    // Practice Tabs: 'overview', 'pitch', 'resonance', 'weight', 'vowel', 'tilt', 'articulation', 'contour', 'quality', 'spectrogram', 'all'
+    const [practiceTab, setPracticeTab] = useState('pitch'); // Changed default from 'overview' (which didn't exist) to 'pitch' for lighter load
 
-    // Modals State
+    // Modals & Overlays State
     const [modals, setModals] = useState({
         settings: false,
         tutorial: false,
@@ -29,12 +29,41 @@ export const NavigationProvider = ({ children }) => {
         signup: false,
         profile: false,
         assessment: false,
-        warmup: false
+        warmup: false,
+        forwardFocus: false,
+        vocalHealth: false,
+        incognito: false,
+        camera: false,
+        practiceMode: false,
+        migration: true, // Default to true as in App.jsx
+        vocalFolds: false,
+        voiceQuality: false,
+        course: false
     });
 
     // Initialize Analytics
     useEffect(() => {
         analyticsService.init();
+    }, []);
+
+    // Global Event Listeners (moved from App.jsx)
+    useEffect(() => {
+        const handleOpenVocalHealth = () => openModal('vocalHealth');
+        const handleOpenAssessment = () => openModal('assessment');
+        const handleOpenWarmUp = () => openModal('warmup');
+        const handleOpenForwardFocus = () => openModal('forwardFocus');
+
+        window.addEventListener('openVocalHealth', handleOpenVocalHealth);
+        window.addEventListener('openAssessment', handleOpenAssessment);
+        window.addEventListener('openWarmUp', handleOpenWarmUp);
+        window.addEventListener('openForwardFocus', handleOpenForwardFocus);
+
+        return () => {
+            window.removeEventListener('openVocalHealth', handleOpenVocalHealth);
+            window.removeEventListener('openAssessment', handleOpenAssessment);
+            window.removeEventListener('openWarmUp', handleOpenWarmUp);
+            window.removeEventListener('openForwardFocus', handleOpenForwardFocus);
+        };
     }, []);
 
     // Navigation Actions

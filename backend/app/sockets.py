@@ -1,9 +1,16 @@
 from flask import request
 from flask_socketio import emit
-import numpy as np
 from .voice_quality_analysis import compute_frame_features, compute_chunk_scores_from_frames, compute_raw_rbi_features, pre_emphasis
 from .extensions import socketio
-import scipy.signal
+
+try:
+    import numpy as np
+    import scipy.signal
+    _deps_available = True
+except ImportError:
+    _deps_available = False
+    np = None
+    scipy = None
 
 # In-memory buffer per client
 CLIENT_BUFFERS = {}
@@ -61,6 +68,10 @@ def handle_audio_chunk(data):
       - 'sr': original sample rate (number)
     """
     sid = request.sid
+
+    if not _deps_available:
+        emit("analysis_error", {"error": "Server missing analysis dependencies."})
+        return
 
     try:
         pcm_bytes = data.get("pcm", None)
