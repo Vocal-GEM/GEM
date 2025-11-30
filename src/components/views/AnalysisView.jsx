@@ -342,10 +342,10 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
                                 <div>
                                     <h3 className="font-bold text-lg mb-4">Pitch Contour</h3>
                                     <PitchTrace
-                                        data={analysisResults.pitchSeries || []}
+                                        data={analysisResults?.pitchSeries || []}
                                         targetRange={targetRange}
                                         currentTime={currentPlayTime}
-                                        duration={analysisResults.duration}
+                                        duration={analysisResults?.duration}
                                     />
                                 </div>
                             )}
@@ -368,7 +368,7 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
                                     <VoiceRangeProfile
                                         isActive={isPlaying}
                                         dataRef={analyzerRef}
-                                        staticData={analysisResults.pitchSeries}
+                                        staticData={analysisResults?.pitchSeries}
                                     />
                                     <p className="text-xs text-slate-500 mt-2">
                                         Phonetogram showing your pitch vs volume range. Brighter areas indicate more frequent usage.
