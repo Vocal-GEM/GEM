@@ -39,19 +39,14 @@ def create_app():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
     # CORS Configuration
-    allowed_origins_raw = os.environ.get('ALLOWED_ORIGINS', '')
-    allowed_origins = [o.strip() for o in allowed_origins_raw.split(',') if o.strip()]
-    
-    # Always allow localhost for local development against prod backend
-    allowed_origins.extend([
-        'http://localhost:3000',
-        'http://localhost:5173',
-        'http://127.0.0.1:5173'
-    ])
-    
-    # Add regex for Vercel previews
+    # Always allow localhost (any port) for local development
     import re
-    allowed_origins.append(re.compile(r'^https://vocal-.*\.vercel\.app$'))
+    allowed_origins.extend([
+        re.compile(r'^http://localhost:\d+$'),
+        re.compile(r'^http://127\.0\.0\.1:\d+$'),
+        re.compile(r'^https://localhost:\d+$'), # In case of HTTPS local
+        re.compile(r'^https://vocal-.*\.vercel\.app$') # Vercel previews
+    ])
 
     # Initialize CORS with credentials support
     CORS(app, supports_credentials=True, origins=allowed_origins)
