@@ -20,6 +20,9 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
     const [isLoadingVoices, setIsLoadingVoices] = React.useState(false);
     const [isUploading, setIsUploading] = React.useState(false);
     const [uploadStatus, setUploadStatus] = React.useState(null); // { type: 'success' | 'error', message: '' }
+    const [knowledgeBaseData, setKnowledgeBaseData] = React.useState(null);
+    const [showDirectory, setShowDirectory] = React.useState(false);
+    const [isLoadingDirectory, setIsLoadingDirectory] = React.useState(false);
 
     React.useEffect(() => {
         if (settings.ttsProvider === 'elevenlabs') {
@@ -31,6 +34,27 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                 });
         }
     }, [settings.ttsProvider]);
+
+    const fetchKnowledgeBase = async () => {
+        setIsLoadingDirectory(true);
+        try {
+            const API_URL = import.meta.env.VITE_API_URL || 'https://vocalgem.onrender.com';
+            const response = await fetch(`${API_URL}/api/knowledge-base/list`, {
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setKnowledgeBaseData(data);
+            } else {
+                console.error('Failed to fetch knowledge base');
+            }
+        } catch (error) {
+            console.error('Error fetching knowledge base:', error);
+        } finally {
+            setIsLoadingDirectory(false);
+        }
+    };
 
     const handleFileUpload = async (event) => {
         const file = event.target.files[0];
@@ -57,6 +81,10 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
 
             if (response.ok) {
                 setUploadStatus({ type: 'success', message: data.message || 'File uploaded and processed successfully!' });
+                // Refresh directory after successful upload
+                if (showDirectory) {
+                    fetchKnowledgeBase();
+                }
             } else {
                 setUploadStatus({ type: 'error', message: data.error || 'Upload failed.' });
             }
@@ -499,6 +527,82 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                                     {uploadStatus.message}
                                 </div>
                             )}
+
+                            {/* Directory Viewer */}
+                            <div className="border-t border-white/5 pt-4">
+                                <button
+                                    onClick={() => {
+                                        setShowDirectory(!showDirectory);
+                                        if (!showDirectory && !knowledgeBaseData) {
+                                            fetchKnowledgeBase();
+                                        }
+                                    }}
+                                    className="w-full p-3 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-left flex items-center justify-between transition-colors"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <FileText className="w-4 h-4 text-indigo-400" />
+                                        <span className="text-sm font-bold text-white">View Uploaded Documents</span>
+                                    </div>
+                                    <span className="text-xs text-slate-400">{showDirectory ? '▼' : '▶'}</span>
+                                </button>
+
+                                {showDirectory && (
+                                    <div className="mt-3 space-y-2">
+                                        {isLoadingDirectory ? (
+                                            <div className="text-center py-4 text-slate-400 text-xs">
+                                                <RefreshCw className="w-4 h-4 animate-spin mx-auto mb-2" />
+                                                Loading...
+                                            </div>
+                                        ) : knowledgeBaseData ? (
+                                            <>
+                                                <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700">
+                                                    <div className="grid grid-cols-3 gap-2 text-xs">
+                                                        <div>
+                                                            <div className="text-slate-500 uppercase">Documents</div>
+                                                            <div className="text-white font-bold">{knowledgeBaseData.total_documents}</div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-slate-500 uppercase">Total Size</div>
+                                                            <div className="text-white font-bold">{knowledgeBaseData.total_storage_mb} MB</div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-slate-500 uppercase">Storage</div>
+                                                            <div className="text-white font-bold">{knowledgeBaseData.total_storage_kb} KB</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="max-h-60 overflow-y-auto space-y-2">
+                                                    {knowledgeBaseData.documents.map((doc, idx) => (
+                                                        <div key={idx} className="bg-slate-900/30 rounded-lg p-3 border border-slate-700/50">
+                                                            <div className="flex items-start justify-between gap-2">
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="text-xs font-bold text-white truncate">{doc.source}</div>
+                                                                    <div className="text-[10px] text-slate-400 mt-1">
+                                                                        {doc.chunks} chunks • {doc.size_kb} KB
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                <button
+                                                    onClick={fetchKnowledgeBase}
+                                                    className="w-full p-2 bg-indigo-600/20 hover:bg-indigo-600/30 rounded-lg text-xs font-bold text-indigo-400 flex items-center justify-center gap-2 transition-colors"
+                                                >
+                                                    <RefreshCw className="w-3 h-3" />
+                                                    Refresh
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <div className="text-center py-4 text-slate-400 text-xs">
+                                                No documents found
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                     </section>

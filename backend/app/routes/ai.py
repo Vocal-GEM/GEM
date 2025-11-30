@@ -54,6 +54,46 @@ def train_coach():
             
         return jsonify({"message": f"Successfully trained on {count} chunks from {filename}"})
 
+@ai_bp.route('/knowledge-base/list', methods=['GET'])
+@login_required
+def list_knowledge_base():
+    # Security Check: Only allow admin to view
+    admin_username = os.environ.get('ADMIN_USERNAME')
+    if not admin_username or current_user.username != admin_username:
+        return jsonify({"error": "Unauthorized"}), 403
+    
+    from ..models import KnowledgeDocument
+    from sqlalchemy import func
+    
+    # Get all unique sources with their chunk counts and total size
+    documents = db.session.query(
+        KnowledgeDocument.source,
+        func.count(KnowledgeDocument.id).label('chunk_count'),
+        func.sum(func.length(KnowledgeDocument.content)).label('total_size')
+    ).group_by(KnowledgeDocument.source).all()
+    
+    result = []
+    total_storage = 0
+    
+    for doc in documents:
+        size_bytes = doc.total_size or 0
+        total_storage += size_bytes
+        result.append({
+            'source': doc.source,
+            'chunks': doc.chunk_count,
+            'size_bytes': size_bytes,
+            'size_kb': round(size_bytes / 1024, 2)
+        })
+    
+    return jsonify({
+        'documents': result,
+        'total_documents': len(result),
+        'total_storage_bytes': total_storage,
+        'total_storage_kb': round(total_storage / 1024, 2),
+        'total_storage_mb': round(total_storage / (1024 * 1024), 2)
+    })
+
+
 @ai_bp.route('/chat', methods=['POST'])
 @login_required
 def chat():
