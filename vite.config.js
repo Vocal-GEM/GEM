@@ -31,7 +31,22 @@ export default defineConfig({
             },
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,glb}'],
+                globIgnores: ['**/assets/transformers-*.js', '**/assets/pdf-*.js'],
                 runtimeCaching: [
+                    {
+                        urlPattern: ({ url }) => url.pathname.includes('transformers-') || url.pathname.includes('pdf-'),
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'large-assets-cache',
+                            expiration: {
+                                maxEntries: 10,
+                                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                            },
+                            cacheableResponse: {
+                                statuses: [0, 200]
+                            }
+                        }
+                    },
                     {
                         urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
                         handler: 'CacheFirst',
