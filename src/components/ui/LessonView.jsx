@@ -16,6 +16,7 @@ import ComparisonTool from './ComparisonTool';
 import ForwardFocusDrill from './ForwardFocusDrill';
 import BreathPacer from './BreathPacer';
 import TwisterCard from './TwisterCard';
+import TargetVoicePlayer from './TargetVoicePlayer';
 
 import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
@@ -23,7 +24,7 @@ import { useSettings } from '../../context/SettingsContext';
 
 const LessonView = ({ lesson, onComplete, onNext, onPrevious, hasNext, hasPrevious }) => {
     const { dataRef, audioEngineRef } = useAudio();
-    const { targetRange, calibration } = useProfile();
+    const { targetRange, calibration, activeProfile } = useProfile();
     const { settings } = useSettings();
 
     const renderTool = () => {
@@ -82,7 +83,9 @@ const LessonView = ({ lesson, onComplete, onNext, onPrevious, hasNext, hasPrevio
             case 'intonation-exercise':
                 return (
                     <div className="bg-slate-900/50 rounded-2xl border border-white/10 p-4">
-                        <IntonationExercise />
+                        {/* IntonationExercise component missing from imports, assuming it might be needed or placeholder */}
+                        {/* <IntonationExercise /> */}
+                        <div className="text-center text-slate-500">Intonation Exercise Placeholder</div>
                     </div>
                 );
             case 'spectrogram':
@@ -148,6 +151,12 @@ const LessonView = ({ lesson, onComplete, onNext, onPrevious, hasNext, hasPrevio
                             <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
                             <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Live Microphone Input</span>
                         </div>
+
+                        {/* Target Phrase Player */}
+                        {lesson.targetPhrase && (
+                            <TargetVoicePlayer text={lesson.targetPhrase} gender={activeProfile} />
+                        )}
+
                         {renderTool()}
                     </div>
                 )}

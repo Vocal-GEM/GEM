@@ -38,7 +38,8 @@ export const NavigationProvider = ({ children }) => {
         migration: true, // Default to true as in App.jsx
         vocalFolds: false,
         voiceQuality: false,
-        course: false
+        course: false,
+        feedback: false
     });
 
     // Initialize Analytics

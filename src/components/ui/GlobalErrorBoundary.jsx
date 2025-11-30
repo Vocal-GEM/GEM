@@ -1,10 +1,11 @@
 import React from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Bug } from 'lucide-react';
+import FeedbackModal from './FeedbackModal';
 
 class GlobalErrorBoundary extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { hasError: false, error: null, errorInfo: null };
+        this.state = { hasError: false, error: null, errorInfo: null, showFeedback: false };
     }
 
     static getDerivedStateFromError(error) {
@@ -65,19 +66,28 @@ class GlobalErrorBoundary extends React.Component {
                             </div>
                         )}
 
-                        <div className="flex gap-3">
+                        <div className="flex flex-col gap-3">
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={this.handleReset}
+                                    className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors font-medium"
+                                >
+                                    Try Again
+                                </button>
+                                <button
+                                    onClick={this.handleReload}
+                                    className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
+                                >
+                                    <RefreshCw className="w-4 h-4" />
+                                    Reload App
+                                </button>
+                            </div>
                             <button
-                                onClick={this.handleReset}
-                                className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors font-medium"
+                                onClick={() => this.setState({ showFeedback: true })}
+                                className="w-full px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-300 rounded-lg transition-colors font-medium flex items-center justify-center gap-2 border border-red-500/20"
                             >
-                                Try Again
-                            </button>
-                            <button
-                                onClick={this.handleReload}
-                                className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
-                            >
-                                <RefreshCw className="w-4 h-4" />
-                                Reload App
+                                <Bug className="w-4 h-4" />
+                                Report Bug
                             </button>
                         </div>
 
@@ -85,6 +95,13 @@ class GlobalErrorBoundary extends React.Component {
                             If this problem persists, please contact support
                         </p>
                     </div>
+
+                    <FeedbackModal
+                        isOpen={this.state.showFeedback}
+                        onClose={() => this.setState({ showFeedback: false })}
+                        initialType="bug"
+                        errorDetails={this.state.error}
+                    />
                 </div>
             );
         }

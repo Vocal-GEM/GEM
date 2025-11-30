@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect, jsonify
 from flask_cors import CORS
-from .extensions import db, login_manager, limiter, csrf, socketio
+from .extensions import db, login_manager, limiter, csrf, socketio, migrate
 from .models import User
 import os
 from dotenv import load_dotenv
@@ -101,6 +101,7 @@ def create_app():
     login_manager.init_app(app)
     limiter.init_app(app)
     csrf.init_app(app)
+    migrate.init_app(app, db)
 
     @app.errorhandler(400)
     def bad_request(e):

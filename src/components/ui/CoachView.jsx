@@ -126,6 +126,24 @@ const CoachView = () => {
                 <div ref={messagesEndRef} />
             </div>
 
+            {/* Contextual Tip (Simulated for now, would be real-time in prod) */}
+            <div className="px-4 mb-4">
+                <div className="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 border border-indigo-500/30 rounded-xl p-3 flex items-start gap-3">
+                    <div className="p-2 bg-indigo-500/20 rounded-lg text-indigo-300">
+                        <Zap size={16} />
+                    </div>
+                    <div>
+                        <h4 className="text-xs font-bold text-indigo-200 uppercase tracking-wider mb-1">Coach's Observation</h4>
+                        <p className="text-sm text-indigo-100">
+                            I noticed your pitch was a bit low in the last session. Try the "Pitch Staircase" exercise to warm up!
+                        </p>
+                    </div>
+                    <button className="ml-auto text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg transition-colors">
+                        Go
+                    </button>
+                </div>
+            </div>
+
             {/* Suggestions */}
             {messages.length === 1 && (
                 <div className="flex flex-wrap gap-2 mb-4 px-4">

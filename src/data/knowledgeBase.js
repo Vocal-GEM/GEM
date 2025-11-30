@@ -92,5 +92,40 @@ export const KNOWLEDGE_BASE = [
         question: "Why is intonation important?",
         answer: "Intonation is the 'melody' of your speech. \n\n- **Feminine speech** often has more pitch variation and upward inflections.\n- **Masculine speech** tends to be flatter or have downward inflections.\n\nVarying your pitch makes you sound more expressive and engaging.",
         category: "Technique"
+    },
+    {
+        id: 'brt_01',
+        tags: ['breath', 'support', 'diaphragm', 'power'],
+        question: "How do I improve breath support?",
+        answer: "Breath support comes from the diaphragm and intercostal muscles, not the shoulders.\n\n**Technique:**\n1. Place a hand on your belly.\n2. Inhale deeply; feel your belly expand outward.\n3. Exhale slowly on a 'hiss', keeping your belly engaged and resisting the collapse.\n\n*Think of your breath as the fuel for your voice.*",
+        category: "Technique"
+    },
+    {
+        id: 'vow_01',
+        tags: ['vowel', 'modification', 'bright', 'dark'],
+        question: "How do vowels affect my voice gender?",
+        answer: "Vowels are shaped by the vocal tract. \n\n- **Feminization:** Brighten vowels by spreading lips and keeping the tongue forward (e.g., 'ee' is naturally bright).\n- **Masculinization:** Darken vowels by rounding lips and creating space in the back (e.g., 'oh' or 'aw').\n\n*Modifying vowels can shift the perceived gender of your entire voice.*",
+        category: "Technique"
+    },
+    {
+        id: 'fem_01',
+        tags: ['feminization', 'tips', 'summary', 'trans woman'],
+        question: "What are the key pillars of voice feminization?",
+        answer: "The three main pillars are:\n\n1. **Resonance (R1):** Shortening the vocal tract for a brighter sound (most important).\n2. **Pitch:** Raising the average fundamental frequency (usually above 165Hz).\n3. **Weight:** Reducing vocal weight to avoid 'buzziness'.\n\n*Intonation and articulation also play major roles.*",
+        category: "Feminization"
+    },
+    {
+        id: 'masc_01',
+        tags: ['masculinization', 'tips', 'summary', 'trans man'],
+        question: "What are the key pillars of voice masculinization?",
+        answer: "The three main pillars are:\n\n1. **Resonance (R1):** Lengthening the vocal tract for a darker, deeper sound.\n2. **Pitch:** Lowering the average fundamental frequency (usually below 145Hz).\n3. **Weight:** Increasing vocal weight for a fuller, buzzier tone.\n\n*Monotone delivery can also help perceive masculinity.*",
+        category: "Masculinization"
+    },
+    {
+        id: 'pitfall_01',
+        tags: ['strain', 'pain', 'hoarse', 'danger'],
+        question: "Why does my throat hurt?",
+        answer: "Throat pain usually indicates **strain** or **tension**.\n\n- **False Vocal Folds:** You might be squeezing your throat. Retract the false folds (laugh gently or inhale on a 'k').\n- **Larynx Height:** You might be forcing your larynx too high or low without relaxation.\n\n*Stop immediately if it hurts. Rest and hydrate.*",
+        category: "Health"
     }
 ];

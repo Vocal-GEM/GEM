@@ -196,8 +196,10 @@ const PracticeMode = ({
                                 ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white shadow-lg shadow-teal-500/20'
                                 : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700/50'
                                 }`}
+                            aria-label={`Switch to ${tab.label} view`}
+                            aria-current={practiceTab === tab.id ? 'page' : undefined}
                         >
-                            <tab.icon size={14} />
+                            <tab.icon size={14} aria-hidden="true" />
                             {tab.label}
                         </button>
                     ))}
@@ -210,6 +212,8 @@ const PracticeMode = ({
                             ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30'
                             : 'bg-gradient-to-r from-teal-500 to-violet-500 hover:from-teal-400 hover:to-violet-400 text-white hover:shadow-xl hover:shadow-teal-500/30 animate-glow-pulse'
                             }`}
+                        aria-label={isAudioActive ? "Stop Microphone" : "Start Microphone"}
+                        aria-pressed={isAudioActive}
                     >
                         {isAudioActive ? (
                             <><span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" /> LIVE</>

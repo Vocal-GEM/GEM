@@ -46,6 +46,9 @@
     "vite-plugin-pwa": "^1.2.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "fake-indexeddb": "^6.2.5",
     "jsdom": "^27.2.0",
     "rollup-plugin-visualizer": "^6.0.5",
     "vitest": "^4.0.14"

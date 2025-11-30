@@ -1,4 +1,4 @@
-export const COURSE_DATA = [
+export const FEMINIZATION_COURSE = [
     {
         id: 'module-1',
         title: 'Module 1: Foundations',
@@ -316,3 +316,91 @@ The best way to progress is to listen to yourself objectively.
         ]
     }
 ];
+
+export const MASCULINIZATION_COURSE = [
+    {
+        id: 'module-m-1',
+        title: 'Module 1: Foundations (Masc)',
+        description: 'Core pillars of vocal masculinization.',
+        lessons: [
+            {
+                id: 'lesson-m-1-1',
+                title: 'The 3 Pillars of Masculinization',
+                type: 'theory',
+                duration: '5 min',
+                description: 'Pitch, Resonance, and Weight for masculine voices.',
+                content: `
+# The 3 Pillars of Vocal Masculinization
+
+To achieve a natural-sounding masculine voice, we focus on:
+
+1. **Pitch**: Lowering the fundamental frequency.
+2. **Resonance**: Darkening the voice by creating more space in the vocal tract.
+3. **Vocal Weight**: Increasing the "buzz" or weight of the voice.
+
+**Goal**: Lower pitch, darker resonance, heavier weight.
+                `
+            },
+            {
+                id: 'lesson-m-1-2',
+                title: 'Finding Your Lower Range',
+                type: 'interactive',
+                toolId: 'pitch-visualizer',
+                duration: '10 min',
+                description: 'Visualize your pitch and find a comfortable lower range.',
+                content: `
+# Lowering Pitch
+
+1. **Speak naturally**.
+2. **Watch the graph**.
+3. **Target Range**: Aim for **85Hz to 145Hz**.
+
+**Exercise**: Hum a low note and feel the vibration in your chest.
+                `
+            }
+        ]
+    }
+];
+
+export const ANDROGYNY_COURSE = [
+    {
+        id: 'module-n-1',
+        title: 'Module 1: Foundations (Neutral)',
+        description: 'Achieving a balanced, androgynous voice.',
+        lessons: [
+            {
+                id: 'lesson-n-1-1',
+                title: 'The Balance Point',
+                type: 'theory',
+                duration: '5 min',
+                description: 'Balancing Pitch, Resonance, and Weight.',
+                content: `
+# The Androgynous Voice
+
+An androgynous voice sits in the overlap between masculine and feminine characteristics.
+
+1. **Pitch**: **145Hz to 175Hz**.
+2. **Resonance**: Balanced - not too bright, not too dark.
+3. **Weight**: Moderate.
+
+**Goal**: Flexibility and control to shift between ranges.
+                `
+            }
+        ]
+    }
+];
+
+export const getCourseForProfile = (profileId) => {
+    switch (profileId) {
+        case 'masc':
+            return MASCULINIZATION_COURSE;
+        case 'neutral':
+            return ANDROGYNY_COURSE;
+        case 'fem':
+        default:
+            return FEMINIZATION_COURSE;
+    }
+};
+
+// Backward compatibility
+export const COURSE_DATA = FEMINIZATION_COURSE;

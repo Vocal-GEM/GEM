@@ -2,7 +2,7 @@ import React, { useRef, useMemo, useState, useEffect, Suspense, lazy } from 'rea
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Diamond, Flame, Bug, Box, Activity, Sliders, Gauge } from 'lucide-react';
-import { useGLTF } from '@react-three/drei';
+import { useGLTF, OrbitControls } from '@react-three/drei';
 import { useSettings } from '../../context/SettingsContext';
 import OrbLegend from './OrbLegend';
 
@@ -683,6 +683,7 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
         >
           <ambientLight intensity={0.5} />
           <VisualizerMesh key={mode} mode={mode} dataRef={dataRef} externalDataRef={externalDataRef} calibration={calibration} />
+          <OrbitControls enableZoom={false} enablePan={false} autoRotate={false} />
         </Canvas>
       )}
 

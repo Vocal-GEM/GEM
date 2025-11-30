@@ -96,17 +96,44 @@ export const AudioProvider = ({ children }) => {
             audioEngineRef.current.setNoiseGate(settings.noiseGate);
         }
 
-        return () => { if (audioEngineRef.current) audioEngineRef.current.stop(); };
+        // iOS Audio Unlock
+        const unlockAudio = () => {
+            if (audioEngineRef.current && audioEngineRef.current.context && audioEngineRef.current.context.state === 'suspended') {
+                audioEngineRef.current.context.resume().then(() => {
+                    console.log("[AudioContext] Audio unlocked/resumed via touch");
+                });
+            }
+        };
+
+        window.addEventListener('touchstart', unlockAudio, { passive: true });
+        window.addEventListener('click', unlockAudio, { passive: true });
+
+        return () => {
+            if (audioEngineRef.current) audioEngineRef.current.stop();
+            window.removeEventListener('touchstart', unlockAudio);
+            window.removeEventListener('click', unlockAudio);
+        };
     }, []);
+
+    const [audioError, setAudioError] = useState(null);
 
     const toggleAudio = async () => {
         if (!audioEngineRef.current) return;
-        if (audioEngineRef.current.isActive) {
-            audioEngineRef.current.stop();
+
+        setAudioError(null);
+
+        try {
+            if (audioEngineRef.current.isActive) {
+                audioEngineRef.current.stop();
+                setIsAudioActive(false);
+            } else {
+                await audioEngineRef.current.start();
+                setIsAudioActive(true);
+            }
+        } catch (err) {
+            console.error("[AudioContext] Failed to toggle audio:", err);
+            setAudioError(err.message || "Failed to start audio engine");
             setIsAudioActive(false);
-        } else {
-            await audioEngineRef.current.start();
-            setIsAudioActive(true);
         }
     };
 
@@ -139,8 +166,9 @@ export const AudioProvider = ({ children }) => {
         runEnvironmentCheck,
         startRecording,
         stopRecording,
-        isRecording
-    }), [isAudioActive, isRecording]);
+        isRecording,
+        audioError
+    }), [isAudioActive, isRecording, audioError]);
 
     return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>;
 };

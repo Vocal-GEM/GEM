@@ -416,6 +416,34 @@ export const CoachEngine = {
     processUserQuery: (query, context) => {
         const lowerQuery = query.toLowerCase();
 
+        // 1. Check for "Real-time" questions (Metrics)
+        if (lowerQuery.includes('how do i sound') || lowerQuery.includes('current') || lowerQuery.includes('am i')) {
+            if (context?.metrics && context.metrics.pitch) {
+                const metrics = context.metrics;
+                const target = context.settings?.targetRange || { min: 170, max: 220 };
+
+                let feedback = "";
+
+                // Pitch Check
+                if (metrics.pitch < target.min) {
+                    feedback += `Your pitch is currently ${Math.round(metrics.pitch)}Hz, which is a bit low. Aim for above ${target.min}Hz. `;
+                } else if (metrics.pitch > target.max) {
+                    feedback += `Your pitch is ${Math.round(metrics.pitch)}Hz, which is a bit high. Relax it down to below ${target.max}Hz. `;
+                } else {
+                    feedback += `Your pitch is great at ${Math.round(metrics.pitch)}Hz! `;
+                }
+
+                // Resonance Check (Simple proxy)
+                if (metrics.resonance) {
+                    feedback += `Resonance seems ${metrics.resonance > 1000 ? 'bright' : 'dark'}. `;
+                }
+
+                return { text: feedback + "\n\nNeed a specific exercise?" };
+            } else {
+                return { text: "I can't hear you right now. Make sure your microphone is on in the Practice tab!" };
+            }
+        }
+
         // 2. Check for "Progress" questions (History)
         if (lowerQuery.includes('progress') || lowerQuery.includes('how am i doing') || lowerQuery.includes('stats')) {
             if (context?.history && context.history.length > 0) {
@@ -445,7 +473,7 @@ export const CoachEngine = {
 
         // 4. Default Fallback
         return {
-            text: "I'm not sure about that. Try asking about 'pitch', 'resonance', or 'vocal weight'."
+            text: "I'm not sure about that. Try asking about 'pitch', 'resonance', 'breath support', or 'vowels'."
         };
     },
 

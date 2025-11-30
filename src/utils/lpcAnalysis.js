@@ -137,6 +137,10 @@ export class LPCAnalyzer {
         const magnitude = new Float32Array(numPoints);
         const gain = Math.sqrt(error); // Gain G
 
+        if (gain < 1e-10) {
+            return new Float32Array(numPoints).fill(-100); // Return low dB floor
+        }
+
         for (let i = 0; i < numPoints; i++) {
             const omega = (Math.PI * i) / (numPoints - 1); // 0 to Pi
 

@@ -4,9 +4,11 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_wtf.csrf import CSRFProtect
 from flask_socketio import SocketIO
+from flask_migrate import Migrate
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 limiter = Limiter(key_func=get_remote_address)
 csrf = CSRFProtect()
-socketio = SocketIO(cors_allowed_origins="*")
+socketio = SocketIO(cors_allowed_origins="*") # Allow all for now, restrict in prod
+migrate = Migrate()

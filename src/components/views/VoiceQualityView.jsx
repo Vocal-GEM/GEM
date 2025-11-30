@@ -111,42 +111,40 @@ const VoiceQualityView = () => {
             streamRef.current = stream;
 
             audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+
+            // Load AudioWorklet
+            try {
+                await audioContextRef.current.audioWorklet.addModule(new URL('../../audio/voice-quality-processor.js', import.meta.url));
+            } catch (e) {
+                console.error("Failed to load AudioWorklet:", e);
+                throw new Error("AudioWorklet support is required.");
+            }
+
             const source = audioContextRef.current.createMediaStreamSource(stream);
+            const workletNode = new AudioWorkletNode(audioContextRef.current, 'voice-quality-processor');
 
-            // Use ScriptProcessor for simplicity in prototype (AudioWorklet is better for prod)
-            const bufferSize = 4096;
-            processorRef.current = audioContextRef.current.createScriptProcessor(bufferSize, 1, 1);
+            // Configure the worklet
+            workletNode.port.postMessage({
+                type: 'config',
+                sampleRate: audioContextRef.current.sampleRate,
+                targetSamples: Math.round(audioContextRef.current.sampleRate * 0.25)
+            });
 
-            let chunkBuffers = [];
-            let chunkTargetSamples = Math.round(audioContextRef.current.sampleRate * 0.25); // ~250ms
-
-            processorRef.current.onaudioprocess = (e) => {
-                const input = e.inputBuffer.getChannelData(0);
-                const copy = new Float32Array(input);
-                chunkBuffers.push(copy);
-
-                let totalSamples = chunkBuffers.reduce((acc, buf) => acc + buf.length, 0);
-
-                if (totalSamples >= chunkTargetSamples) {
-                    const chunk = new Float32Array(totalSamples);
-                    let offset = 0;
-                    for (const buf of chunkBuffers) {
-                        chunk.set(buf, offset);
-                        offset += buf.length;
-                    }
-                    chunkBuffers = [];
-
+            workletNode.port.onmessage = (e) => {
+                if (e.data.type === 'chunk') {
                     if (socketRef.current && socketRef.current.connected) {
                         socketRef.current.emit('audio_chunk', {
-                            pcm: chunk.buffer,
-                            sr: audioContextRef.current.sampleRate
+                            pcm: e.data.pcm,
+                            sr: e.data.sr
                         });
                     }
                 }
             };
 
-            source.connect(processorRef.current);
-            processorRef.current.connect(audioContextRef.current.destination);
+            source.connect(workletNode);
+            workletNode.connect(audioContextRef.current.destination);
+
+            processorRef.current = workletNode;
 
             setIsLive(true);
         } catch (err) {
@@ -195,7 +193,7 @@ const VoiceQualityView = () => {
                         <div key={metric} className="p-3 bg-slate-900/50 rounded-lg">
                             <div className="text-xs uppercase text-slate-400 mb-1">{metric}</div>
                             <div className={`font-bold ${goals[`${metric}_flag`] === 'within_target' ? 'text-green-400' :
-                                    goals[`${metric}_flag`] === 'unknown' ? 'text-slate-400' : 'text-yellow-400'
+                                goals[`${metric}_flag`] === 'unknown' ? 'text-slate-400' : 'text-yellow-400'
                                 }`}>
                                 {goals[`${metric}_flag`]?.replace('_', ' ')}
                             </div>

@@ -8,7 +8,9 @@ const MirrorComponent = () => {
         let stream = null;
         const startCamera = async () => {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user' }
+                });
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
                 }
