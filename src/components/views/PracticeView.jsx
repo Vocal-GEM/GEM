@@ -37,6 +37,7 @@ const PracticeView = () => {
 
     const [activeGame, setActiveGame] = useState('pitch'); // Reusing this for tab state: 'pitch' | 'resonance' | 'range' | 'spectrogram' | 'clinical'
     const [showTools, setShowTools] = useState(false);
+    const [showAllTools, setShowAllTools] = useState(false); // For temporarily revealing all tools in beginner mode
 
     // Hero Principle: Orb takes up most space
     // Mobile Ergonomics: Controls at bottom
@@ -95,12 +96,15 @@ const PracticeView = () => {
                     <div className="flex gap-2 px-4 mb-4 overflow-x-auto shrink-0 pb-2 no-scrollbar">
                         {[
                             { id: 'pitch', label: 'Pitch', icon: 'Activity' },
-                            { id: 'weight', label: 'Weight', icon: 'Anchor' },
-                            { id: 'vowel', label: 'Vowel', icon: 'Aperture' },
                             { id: 'range', label: 'Range', icon: 'Maximize2' },
-                            { id: 'spectrogram', label: 'Spectrogram', icon: 'Waves' },
-                            { id: 'all', label: 'Show All', icon: 'LayoutGrid' },
-                            ...(userMode === 'slp' ? [{ id: 'clinical', label: 'Clinical', icon: 'Stethoscope' }] : [])
+                            // Hide advanced tools in beginner mode unless "Show All" is clicked
+                            ...((!settings.beginnerMode || showAllTools) ? [
+                                { id: 'weight', label: 'Weight', icon: 'Anchor' },
+                                { id: 'vowel', label: 'Vowel', icon: 'Aperture' },
+                                { id: 'spectrogram', label: 'Spectrogram', icon: 'Waves' },
+                                { id: 'all', label: 'Show All', icon: 'LayoutGrid' },
+                                ...(userMode === 'slp' ? [{ id: 'clinical', label: 'Clinical', icon: 'Stethoscope' }] : [])
+                            ] : [])
                         ].map(tab => {
                             const Icon = {
                                 'Activity': Activity,
@@ -126,6 +130,19 @@ const PracticeView = () => {
                                 </button>
                             );
                         })}
+                        );
+                        })}
+
+                        {/* Show More Tools Button for Beginners */}
+                        {settings.beginnerMode && !showAllTools && (
+                            <button
+                                onClick={() => setShowAllTools(true)}
+                                className="px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200 transition-all whitespace-nowrap flex items-center gap-2"
+                            >
+                                <LayoutGrid className="w-4 h-4" />
+                                More...
+                            </button>
+                        )}
                     </div>
 
                     {/* Content Area */}

@@ -1,0 +1,28 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.14 [39m[90mC:/Users/riley/Desktop/GEM[39m
+
+ [31mΓ¥»[39m src/utils/lpcAnalysis.test.js [2m([22m[2m3 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 13495[2mms[22m[39m
+     [32mΓ£ô[39m should initialize with default parameters[32m 1[2mms[22m[39m
+[31m     [31m├ù[31m should analyze a buffer and return formants[39m[33m 6917[2mms[22m[39m
+     [33m[2mΓ£ô[22m[39m should handle silence gracefully [33m 6575[2mms[22m[39m
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 1 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  src/utils/lpcAnalysis.test.js > LPCAnalyzer > should analyze a buffer and return formants
+AssertionError: expected 234.8336594911937 to be greater than 500
+ Γ¥» src/utils/lpcAnalysis.test.js:39:24
+     37|             const f2 = result.formants[1].freq;
+     38| 
+     39|             expect(f1).toBeGreaterThan(500);
+       |                        ^
+     40|             expect(f1).toBeLessThan(900);
+     41|         } else {
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/1]ΓÄ»
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m2 passed[39m[22m[90m (3)[39m
+[2m   Start at [22m 01:06:41
+[2m   Duration [22m 15.43s[2m (transform 36ms, setup 0ms, import 55ms, tests 13.49s, environment 1.19s)[22m
+

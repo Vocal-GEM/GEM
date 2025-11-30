@@ -95,6 +95,11 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
                 <div className="absolute left-[70%] top-0 bottom-0 w-px bg-white/10 dashed-line"></div>
                 <div className="absolute left-[50%] top-2 bottom-2 w-px bg-white/5"></div>
 
+                {/* Target Zone (30-70%) */}
+                <div className="absolute left-[30%] right-[30%] top-0 bottom-0 bg-white/5 border-x border-white/10">
+                    <div className="absolute top-1 left-1/2 -translate-x-1/2 text-[8px] font-bold text-white/30 uppercase tracking-widest">Target</div>
+                </div>
+
                 {/* Indicator */}
                 <div
                     ref={indicatorRef}

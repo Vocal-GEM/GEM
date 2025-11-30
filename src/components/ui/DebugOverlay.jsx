@@ -75,6 +75,39 @@ const DebugOverlay = ({ audioEngine }) => {
                     </div>
                 </div>
 
+                {/* Socket State */}
+                <div className="bg-slate-800 rounded-xl p-4 border border-white/10">
+                    <h3 className="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wider">Backend Connection</h3>
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                            <span className="text-white">Socket Connected</span>
+                            <span className={`px-2 py-1 rounded text-xs font-bold ${debugInfo?.socketConnected ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                                {debugInfo?.socketConnected ? 'Yes' : 'No'}
+                            </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-white">Buffered Chunks</span>
+                            <span className={`px-2 py-1 rounded text-xs font-bold ${debugInfo?.bufferSize > 0 ? 'bg-yellow-500/20 text-yellow-400' : 'bg-slate-700 text-slate-300'}`}>
+                                {debugInfo?.bufferSize || 0}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Connection Log */}
+                    {debugInfo?.connectionLog && debugInfo.connectionLog.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-white/5">
+                            <h4 className="text-xs font-bold text-slate-500 mb-2">Recent Events</h4>
+                            <div className="space-y-1 max-h-32 overflow-y-auto custom-scrollbar">
+                                {debugInfo.connectionLog.map((log, i) => (
+                                    <div key={i} className="text-[10px] font-mono text-slate-400 truncate">
+                                        {log}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
                 {/* Errors */}
                 {debugInfo?.error && (
                     <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/30">

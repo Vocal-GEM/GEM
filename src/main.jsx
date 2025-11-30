@@ -10,7 +10,18 @@ import { ProfileProvider } from './context/ProfileContext'
 import { StatsProvider } from './context/StatsContext'
 import { JournalProvider } from './context/JournalContext'
 import { ClientProvider } from './context/ClientContext'
+import { NavigationProvider } from './context/NavigationContext'
 import GlobalErrorBoundary from './components/ui/GlobalErrorBoundary'
+
+import { registerSW } from 'virtual:pwa-register'
+
+const updateSW = registerSW({
+    onNeedRefresh() {
+        if (confirm('New content available. Reload?')) {
+            updateSW(true)
+        }
+    },
+})
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <GlobalErrorBoundary>
@@ -18,15 +29,17 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <AudioProvider>
                 <AuthProvider>
                     <ProfileProvider>
-                        <StatsProvider>
-                            <JournalProvider>
-                                <ClientProvider>
-                                    <HashRouter>
-                                        <App />
-                                    </HashRouter>
-                                </ClientProvider>
-                            </JournalProvider>
-                        </StatsProvider>
+                        <NavigationProvider>
+                            <StatsProvider>
+                                <JournalProvider>
+                                    <ClientProvider>
+                                        <HashRouter>
+                                            <App />
+                                        </HashRouter>
+                                    </ClientProvider>
+                                </JournalProvider>
+                            </StatsProvider>
+                        </NavigationProvider>
                     </ProfileProvider>
                 </AuthProvider>
             </AudioProvider>

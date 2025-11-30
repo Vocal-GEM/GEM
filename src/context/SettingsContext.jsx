@@ -33,7 +33,12 @@ export const SettingsProvider = ({ children }) => {
             fpsTarget: 60,
             spectrum: true
         },
-        disable3D: false // Safe Mode (2D Fallback)
+        visualizationQuality: {
+            fpsTarget: 60,
+            spectrum: true
+        },
+        disable3D: false, // Safe Mode (2D Fallback)
+        beginnerMode: true // Default to true for new users
     });
 
 

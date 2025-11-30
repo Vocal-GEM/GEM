@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
+import { useSettings } from '../../context/SettingsContext';
 
-const Spectrogram = ({ dataRef, audioRef }) => {
+const Spectrogram = React.memo(({ dataRef, audioRef }) => {
     const canvasRef = useRef(null);
     const analyserRef = useRef(null);
     const sourceRef = useRef(null);
@@ -31,6 +32,8 @@ const Spectrogram = ({ dataRef, audioRef }) => {
         };
     }, [audioRef]);
 
+    const { colorBlindMode } = useSettings();
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d', { willReadFrequently: true, alpha: false });
@@ -42,10 +45,32 @@ const Spectrogram = ({ dataRef, audioRef }) => {
         const colormap = new Uint32Array(256);
         for (let i = 0; i < 256; i++) {
             const t = i / 255;
-            const r = Math.min(255, Math.max(0, t * 400 - 100));
-            const g = Math.min(255, Math.max(0, t * 400 - 200));
-            const b = Math.min(255, Math.max(0, t * 400 - 50));
-            colormap[i] = (255 << 24) | (b << 16) | (g << 8) | r;
+            let r, g, b;
+
+            if (colorBlindMode) {
+                // Accessible Palette (Viridis-like: Purple -> Teal -> Yellow)
+                // Simple approximation
+                if (t < 0.5) {
+                    // Purple to Teal
+                    const tt = t * 2;
+                    r = 75 + (30 - 75) * tt;
+                    g = 0 + (150 - 0) * tt;
+                    b = 130 + (130 - 130) * tt;
+                } else {
+                    // Teal to Yellow
+                    const tt = (t - 0.5) * 2;
+                    r = 30 + (255 - 30) * tt;
+                    g = 150 + (255 - 150) * tt;
+                    b = 130 + (0 - 130) * tt;
+                }
+            } else {
+                // Standard Heatmap (Dark -> Red/Orange -> White)
+                r = Math.min(255, Math.max(0, t * 400 - 100));
+                g = Math.min(255, Math.max(0, t * 400 - 200));
+                b = Math.min(255, Math.max(0, t * 400 - 50));
+            }
+
+            colormap[i] = (255 << 24) | (Math.floor(b) << 16) | (Math.floor(g) << 8) | Math.floor(r);
         }
 
         const loop = () => {
@@ -120,6 +145,6 @@ const Spectrogram = ({ dataRef, audioRef }) => {
             <div className="absolute bottom-1 right-2 text-[9px] text-white/50 font-mono">0 - 8kHz</div>
         </div>
     );
-};
+});
 
 export default Spectrogram;

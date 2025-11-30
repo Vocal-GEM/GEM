@@ -4,7 +4,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { RotateCcw } from 'lucide-react';
 import { frequencyToNote, getCentsDeviation } from '../../utils/musicUtils';
 
-const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, settings }) => {
+const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, onScore, settings }) => {
     const { voiceProfiles } = useProfile();
     const { colorBlindMode } = useSettings();
     const canvasRef = useRef(null);
@@ -53,6 +53,7 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
         if (exercise) gameRef.current = { score: 0, lastUpdate: Date.now(), lastPitch: 0 };
 
         // Helper to get color based on frequency
+        // Helper to get color based on frequency
         const getPitchColor = (freq) => {
             const fem = voiceProfiles.find(p => p.id === 'fem');
             const masc = voiceProfiles.find(p => p.id === 'masc');
@@ -61,15 +62,24 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
             const femRange = fem?.genderRange || fem?.targetRange;
             const mascRange = masc?.genderRange || masc?.targetRange;
 
-            if (colorBlindMode) {
-                if (femRange && freq >= femRange.min && freq <= femRange.max) return '#9333ea'; // Purple-600
-                if (mascRange && freq >= mascRange.min && freq <= mascRange.max) return '#0d9488'; // Teal-600
-                return '#f59e0b'; // Amber-500
-            } else {
-                if (femRange && freq >= femRange.min && freq <= femRange.max) return '#ec4899'; // Pink-500
-                if (mascRange && freq >= mascRange.min && freq <= mascRange.max) return '#3b82f6'; // Blue-500
-                return '#22c55e'; // Green-500 (Default)
+            // Check if within target range (primary success)
+            if (targetRange && freq >= targetRange.min && freq <= targetRange.max) {
+                if (colorBlindMode) return '#0d9488'; // Teal-600 (Safe)
+                return '#22c55e'; // Green-500
             }
+
+            // Check if within tolerance (near miss) - e.g. +/- 10%
+            if (targetRange) {
+                const tolerance = (targetRange.max - targetRange.min) * 0.5;
+                if (freq >= targetRange.min - tolerance && freq <= targetRange.max + tolerance) {
+                    if (colorBlindMode) return '#f59e0b'; // Amber-500 (Safe)
+                    return '#eab308'; // Yellow-500
+                }
+            }
+
+            // Out of range
+            if (colorBlindMode) return '#9333ea'; // Purple-600 (Safe for contrast against teal/amber)
+            return '#ef4444'; // Red-500
         };
 
         const loop = () => {
@@ -115,21 +125,38 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
                 const botY = mapY(targetRange.min);
                 const h = Math.abs(botY - topY);
 
-                // Only draw if visible
+                // Tolerance Band (lighter, wider)
+                const tolerance = (targetRange.max - targetRange.min) * 0.5;
+                const tolTopY = mapY(targetRange.max + tolerance);
+                const tolBotY = mapY(targetRange.min - tolerance);
+                const tolH = Math.abs(tolBotY - tolTopY);
+
+                if (tolTopY < height && tolBotY > 0) {
+                    ctx.fillStyle = colorBlindMode ? 'rgba(245, 158, 11, 0.05)' : 'rgba(234, 179, 8, 0.05)'; // Amber/Yellow tint
+                    ctx.fillRect(30, tolTopY, width - 30, tolH);
+                }
+
+                // Target Band (Success Zone)
                 if (topY < height && botY > 0) {
-                    ctx.fillStyle = 'rgba(16, 185, 129, 0.05)';
+                    // Shaded region
+                    ctx.fillStyle = colorBlindMode ? 'rgba(13, 148, 136, 0.1)' : 'rgba(34, 197, 94, 0.1)'; // Teal/Green tint
                     ctx.fillRect(30, topY, width - 30, h);
 
-                    ctx.strokeStyle = 'rgba(16, 185, 129, 0.3)';
-                    ctx.setLineDash([5, 5]);
-                    ctx.lineWidth = 1;
+                    // Border lines
+                    ctx.strokeStyle = colorBlindMode ? 'rgba(13, 148, 136, 0.5)' : 'rgba(34, 197, 94, 0.5)';
+                    ctx.lineWidth = 2;
                     ctx.beginPath();
                     ctx.moveTo(30, topY);
                     ctx.lineTo(width, topY);
                     ctx.moveTo(30, botY);
                     ctx.lineTo(width, botY);
                     ctx.stroke();
-                    ctx.setLineDash([]);
+
+                    // Label
+                    ctx.fillStyle = colorBlindMode ? '#0d9488' : '#22c55e';
+                    ctx.font = 'bold 10px sans-serif';
+                    ctx.textAlign = 'left';
+                    ctx.fillText('TARGET ZONE', 35, topY - 5);
                 }
 
                 // Draw Home Note Anchor
@@ -253,6 +280,37 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
             }
 
             if (currentP > 0) { ctx.fillStyle = '#60a5fa'; ctx.font = 'bold 20px monospace'; ctx.textAlign = 'right'; ctx.fillText(Math.round(currentP) + " Hz", width - 10, 30); }
+
+            // Stability Indicator (Standard Deviation of last 10 frames)
+            if (history.length > 10 && currentP > 0) {
+                const recent = history.slice(-10).filter(p => p > 0);
+                if (recent.length > 5) {
+                    const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
+                    const variance = recent.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / recent.length;
+                    const stdDev = Math.sqrt(variance);
+
+                    // Stability Score (0-100), lower stdDev is better
+                    // Assume stdDev < 2Hz is perfect (100%), > 20Hz is unstable (0%)
+                    const stability = Math.max(0, Math.min(100, 100 - (stdDev * 5)));
+
+                    // Draw Stability Bar
+                    const barW = 100;
+                    const barH = 6;
+                    const barX = width - barW - 10;
+                    const barY = 45;
+
+                    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                    ctx.fillRect(barX, barY, barW, barH);
+
+                    ctx.fillStyle = stability > 80 ? '#4ade80' : stability > 50 ? '#facc15' : '#f87171';
+                    ctx.fillRect(barX, barY, barW * (stability / 100), barH);
+
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                    ctx.font = '9px sans-serif';
+                    ctx.textAlign = 'right';
+                    ctx.fillText('STABILITY', barX - 5, barY + 6);
+                }
+            }
         };
 
         let unsubscribe;
@@ -335,6 +393,6 @@ const PitchVisualizer = ({ dataRef, targetRange, userMode, exercise, onScore, se
             <canvas ref={canvasRef} className="w-full h-full"></canvas>
         </div>
     );
-};
+});
 
 export default PitchVisualizer;

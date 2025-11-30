@@ -4,6 +4,9 @@
  * Provides pitch tracking, formant estimation, and voice quality metrics
  */
 
+import { PitchDetector } from './pitch';
+import { lpcAnalyzer } from './lpcAnalysis';
+
 export class VoiceAnalyzer {
     constructor(audioContext) {
         this.audioContext = audioContext;
@@ -93,64 +96,35 @@ export class VoiceAnalyzer {
     }
 
     /**
-     * Extract pitch using autocorrelation (YIN-like algorithm)
+     * Extract pitch using YIN algorithm (via shared utility)
      */
     extractPitch(samples, sampleRate) {
-        const minPeriod = Math.floor(sampleRate / 600); // Max 600 Hz
-        const maxPeriod = Math.floor(sampleRate / 75);  // Min 75 Hz
+        const pitch = PitchDetector.calculateYIN(samples, sampleRate);
 
-        // Autocorrelation
-        const correlations = new Array(maxPeriod).fill(0);
-        for (let lag = minPeriod; lag < maxPeriod; lag++) {
-            let sum = 0;
-            for (let i = 0; i < samples.length - lag; i++) {
-                sum += samples[i] * samples[i + lag];
-            }
-            correlations[lag] = sum;
-        }
+        if (pitch === -1) return null;
 
-        // Find peak
-        let maxCorr = -Infinity;
-        let bestLag = 0;
-        for (let lag = minPeriod; lag < maxPeriod; lag++) {
-            if (correlations[lag] > maxCorr) {
-                maxCorr = correlations[lag];
-                bestLag = lag;
-            }
-        }
-
-        if (maxCorr < 0.3) return null; // Low confidence
-
-        const frequency = sampleRate / bestLag;
         return {
-            mean: frequency,
-            confidence: maxCorr
+            mean: pitch,
+            confidence: 1.0 // YIN is generally high confidence if it returns a value
         };
     }
 
     /**
-     * Estimate formants using LPC (simplified)
+     * Estimate formants using LPC
      */
     estimateFormants(samples, sampleRate) {
-        // Pre-emphasis filter
-        const preEmphasized = new Float32Array(samples.length);
-        preEmphasized[0] = samples[0];
-        for (let i = 1; i < samples.length; i++) {
-            preEmphasized[i] = samples[i] - 0.97 * samples[i - 1];
+        // Use the shared LPC analyzer
+        // Note: LPCAnalyzer expects a Float32Array
+        const result = lpcAnalyzer.analyze(samples);
+
+        if (!result || !result.formants) {
+            return { f1: null, f2: null, f3: null };
         }
 
-        // Simplified formant estimation using spectral peaks
-        const fftSize = 2048;
-        const fft = this.performFFT(preEmphasized.slice(0, fftSize));
-        const spectrum = fft.map(c => Math.sqrt(c.real * c.real + c.imag * c.imag));
-
-        // Find peaks in spectrum
-        const peaks = this.findSpectralPeaks(spectrum, sampleRate, fftSize);
-
         return {
-            f1: peaks[0] || null,
-            f2: peaks[1] || null,
-            f3: peaks[2] || null
+            f1: result.formants[0] || null,
+            f2: result.formants[1] || null,
+            f3: result.formants[2] || null
         };
     }
 

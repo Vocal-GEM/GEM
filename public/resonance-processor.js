@@ -99,6 +99,85 @@ class DSP {
         return spectrum;
     }
 
+    static computeAutocorrelation(signal, order) {
+        const R = new Float32Array(order + 1);
+        const N = signal.length;
+        for (let k = 0; k <= order; k++) {
+            let sum = 0;
+            for (let i = 0; i < N - k; i++) {
+                sum += signal[i] * signal[i + k];
+            }
+            R[k] = sum;
+        }
+        return R;
+    }
+
+    static levinsonDurbin(R, order) {
+        const a = new Float32Array(order + 1);
+        const E = new Float32Array(order + 1);
+
+        E[0] = R[0];
+        a[0] = 1;
+
+        const a_prev = new Float32Array(order + 1);
+
+        for (let i = 1; i <= order; i++) {
+            let sum = 0;
+            for (let j = 1; j < i; j++) {
+                sum += a_prev[j] * R[i - j];
+            }
+
+            const k = (R[i] - sum) / E[i - 1];
+
+            a[i] = k;
+            for (let j = 1; j < i; j++) {
+                a[j] = a_prev[j] - k * a_prev[i - j];
+            }
+
+            E[i] = E[i - 1] * (1 - k * k);
+
+            for (let j = 0; j <= i; j++) a_prev[j] = a[j];
+        }
+
+        return { a: a.slice(1), error: E[order] };
+    }
+
+    static computeLPCSpectrum(a, error, numPoints) {
+        const magnitude = new Float32Array(numPoints);
+        const gain = Math.sqrt(error);
+
+        for (let i = 0; i < numPoints; i++) {
+            const omega = (Math.PI * i) / (numPoints - 1);
+            let real = 1.0;
+            let imag = 0.0;
+
+            for (let k = 0; k < a.length; k++) {
+                const angle = -omega * (k + 1);
+                real += a[k] * Math.cos(angle);
+                imag += a[k] * Math.sin(angle);
+            }
+
+            const magA = Math.sqrt(real * real + imag * imag);
+            magnitude[i] = 20 * Math.log10(gain / (magA + 1e-10));
+        }
+        return magnitude;
+    }
+
+    static findPeaks(envelope, sampleRate) {
+        const peaks = [];
+        const numPoints = envelope.length;
+
+        for (let i = 1; i < numPoints - 1; i++) {
+            if (envelope[i] > envelope[i - 1] && envelope[i] > envelope[i + 1]) {
+                const freq = (i / (numPoints - 1)) * (sampleRate / 2);
+                if (freq > 200) {
+                    peaks.push({ freq, amp: envelope[i] });
+                }
+            }
+        }
+        return peaks;
+    }
+
     static estimateVowel(f1, f2) {
         if (!f1 || !f2 || f1 === 0 || f2 === 0) return '';
         if (f1 < 550 && f2 > 1900) return 'i';
@@ -228,40 +307,31 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             const pitch = DSP.calculatePitchYIN(buffer, fs, dynamicThreshold);
             const spectrum = DSP.simpleFFT(windowed);
 
-            let formantCandidates = [];
-            let maxAmp = 0;
-            for (let i = 0; i < spectrum.length; i++) {
-                if (spectrum[i] > maxAmp) maxAmp = spectrum[i];
-            }
+            // LPC Analysis for Formants
+            const lpcOrder = 12;
+            const r = DSP.computeAutocorrelation(windowed, lpcOrder);
+            const { a, error } = DSP.levinsonDurbin(r, lpcOrder);
+            const lpcEnvelope = DSP.computeLPCSpectrum(a, error, 512);
+            const formantCandidates = DSP.findPeaks(lpcEnvelope, TARGET_RATE);
 
-            const magnitudeThreshold = maxAmp * 0.15;
+            let p1 = { freq: 0, amp: -Infinity };
+            let p2 = { freq: 0, amp: -Infinity };
 
-            for (let i = 2; i < spectrum.length - 2; i++) {
-                if (spectrum[i] > spectrum[i - 1] && spectrum[i] > spectrum[i + 1] &&
-                    spectrum[i] > spectrum[i - 2] && spectrum[i] > spectrum[i + 2]) {
-                    const freq = (i * TARGET_RATE) / (2 * spectrum.length);
-                    if (freq > 150 && freq < 4000 && spectrum[i] > magnitudeThreshold) {
-                        formantCandidates.push({ freq, amp: spectrum[i] });
+            // Find F1 (200-1200Hz)
+            for (let candidate of formantCandidates) {
+                if (candidate.freq >= 200 && candidate.freq <= 1200) {
+                    if (candidate.amp > p1.amp) {
+                        p1 = candidate;
                     }
                 }
             }
 
-            formantCandidates.sort((a, b) => b.amp - a.amp);
-
-            let p1 = { freq: 0, amp: 0 };
-            let p2 = { freq: 0, amp: 0 };
-
+            // Find F2 (1200-3500Hz)
             for (let candidate of formantCandidates) {
-                if (candidate.freq >= 200 && candidate.freq <= 1200) {
-                    p1 = candidate;
-                    break;
-                }
-            }
-
-            for (let candidate of formantCandidates) {
-                if (candidate.freq >= 1200 && candidate.freq <= 3500 && candidate !== p1) {
-                    p2 = candidate;
-                    break;
+                if (candidate.freq >= 1200 && candidate.freq <= 3500) {
+                    if (candidate.amp > p2.amp) {
+                        p2 = candidate;
+                    }
                 }
             }
 

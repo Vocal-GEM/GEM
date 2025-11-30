@@ -1,0 +1,44 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.14 [39m[90mC:/Users/riley/Desktop/GEM[39m
+
+[90mstdout[2m | src/utils/lpcAnalysis.test.js[2m > [22m[2mLPCAnalyzer[2m > [22m[2mshould analyze a buffer and return formants
+[22m[39mFound formants: []
+
+ [31mΓ¥»[39m src/utils/lpcAnalysis.test.js [2m([22m[2m3 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 12826[2mms[22m[39m
+     [32mΓ£ô[39m should initialize with default parameters[32m 1[2mms[22m[39m
+[31m     [31m├ù[31m should analyze a buffer and return formants[39m[33m 6050[2mms[22m[39m
+[31m     [31m├ù[31m should handle silence gracefully[39m[33m 6774[2mms[22m[39m
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 2 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  src/utils/lpcAnalysis.test.js > LPCAnalyzer > should analyze a buffer and return formants
+AssertionError: expected 0 to be greater than or equal to 2
+ Γ¥» src/utils/lpcAnalysis.test.js:44:44
+     42|             // but let's see what it found
+     43|             console.log('Found formants:', result.formants);
+     44|             expect(result.formants.length).toBeGreaterThanOrEqual(2);
+       |                                            ^
+     45|         }
+     46|     });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/2]ΓÄ»
+
+ FAIL  src/utils/lpcAnalysis.test.js > LPCAnalyzer > should handle silence gracefully
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ Γ¥» src/utils/lpcAnalysis.test.js:48:7
+     46|     });
+     47| 
+     48|     it('should handle silence gracefully', () => {
+       |       ^
+     49|         const analyzer = new LPCAnalyzer(48000);
+     50|         const buffer = new Float32Array(1024).fill(0);
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/2]ΓÄ»
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (3)[39m
+[2m   Start at [22m 01:03:59
+[2m   Duration [22m 14.83s[2m (transform 45ms, setup 0ms, import 69ms, tests 12.83s, environment 1.01s)[22m
+

@@ -16,7 +16,8 @@ const STORES = {
     PROFILES: 'profiles',
     SYNC_QUEUE: 'sync_queue',
     SYNC_METADATA: 'sync_metadata',
-    CLIENTS: 'clients'
+    CLIENTS: 'clients',
+    SESSIONS: 'sessions'
 };
 
 class IndexedDBManager {
@@ -74,6 +75,12 @@ class IndexedDBManager {
                 if (!db.objectStoreNames.contains(STORES.CLIENTS)) {
                     const clientStore = db.createObjectStore(STORES.CLIENTS, { keyPath: 'id' });
                     clientStore.createIndex('name', 'name', { unique: false });
+                }
+
+                if (!db.objectStoreNames.contains(STORES.SESSIONS)) {
+                    const sessionStore = db.createObjectStore(STORES.SESSIONS, { keyPath: 'id', autoIncrement: true });
+                    sessionStore.createIndex('timestamp', 'timestamp', { unique: false });
+                    sessionStore.createIndex('date', 'date', { unique: false });
                 }
             };
         });
@@ -225,6 +232,17 @@ class IndexedDBManager {
 
     async deleteClient(id) {
         return await this.delete(STORES.CLIENTS, id);
+    }
+
+    async saveSession(session) {
+        if (!session.timestamp) session.timestamp = Date.now();
+        if (!session.date) session.date = new Date().toISOString().split('T')[0];
+        return await this.add(STORES.SESSIONS, session);
+    }
+
+    async getSessions(limit = 50) {
+        const sessions = await this.getAll(STORES.SESSIONS);
+        return sessions.sort((a, b) => b.timestamp - a.timestamp).slice(0, limit);
     }
 
     // Migration helper: Import from localStorage

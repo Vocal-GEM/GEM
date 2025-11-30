@@ -203,23 +203,26 @@ const App = () => {
                         className="flex items-center gap-3 cursor-pointer"
                         onClick={() => { setActiveTab('practice'); setPracticeView('all'); }}
                     >
-                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20" aria-hidden="true">
+                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20 flex-shrink-0" aria-hidden="true">
                             <Mic className="w-5 h-5 text-white" />
                         </div>
-                        <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Vocal GEM</h1>
+                        <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 hidden sm:block">Vocal GEM</h1>
                     </div>
                     <div className="flex items-center gap-2">
                         <OfflineIndicator />
                         <button onClick={() => setShowSettings(true)} className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700" aria-label="Open settings">
-                            <span className="text-sm font-bold text-white" aria-hidden="true">⚙️ Settings</span>
+                            <span className="text-sm font-bold text-white flex items-center gap-2">
+                                <span aria-hidden="true">⚙️</span>
+                                <span className="hidden sm:inline">Settings</span>
+                            </span>
                         </button>
-                        <button onClick={() => user ? setShowProfile(true) : setShowLogin(true)} className="w-10 h-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors" aria-label={user ? "Open profile" : "Login"}>
+                        <button onClick={() => user ? setShowProfile(true) : setShowLogin(true)} className="w-10 h-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors flex-shrink-0" aria-label={user ? "Open profile" : "Login"}>
                             <span className="text-lg" aria-hidden="true">👤</span>
                         </button>
                         {user && (
                             <span
                                 onClick={() => setShowProfile(true)}
-                                className="text-sm font-bold text-slate-300 hover:text-white cursor-pointer"
+                                className="text-sm font-bold text-slate-300 hover:text-white cursor-pointer hidden md:block"
                             >
                                 {user.username}
                             </span>

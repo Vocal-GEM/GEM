@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Info, Play, Pause, RotateCcw, Download, Share2, ChevronLeft, FileText, Activity, BarChart2, Bot } from 'lucide-react';
+import { useSettings } from '../../context/SettingsContext';
+import { Sparkles, Info, Play, Pause, RotateCcw, Download, Share2, ChevronLeft, FileText, Activity, BarChart2, Bot, ChevronDown, ChevronUp } from 'lucide-react';
 import MetricCard from '../viz/MetricCard';
 import PitchTrace from '../viz/PitchTrace';
 import VowelSpacePlot from '../viz/VowelSpacePlot';
@@ -10,12 +11,14 @@ import Toast from '../ui/Toast';
 import { CoachEngine } from '../../utils/coachEngine';
 
 const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
+    const { settings } = useSettings();
     const [activeTab, setActiveTab] = useState('transcript');
     const [vizSubTab, setVizSubTab] = useState('pitch');
     const [coachFeedback, setCoachFeedback] = useState(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentPlayTime, setCurrentPlayTime] = useState(0);
     const [toast, setToast] = useState(null);
+    const [showAdvancedMetrics, setShowAdvancedMetrics] = useState(!settings.beginnerMode);
 
     const audioRef = useRef(null);
     const analyzerRef = useRef(null);
@@ -196,55 +199,6 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
                                     details="F1: Throat size / F2: Tongue position"
                                 />
 
-                                {/* Jitter */}
-                                <MetricCard
-                                    label="Pitch Stability (Jitter)"
-                                    value={analysisResults.overall.jitter?.toFixed(2) || 'N/A'}
-                                    unit="%"
-                                    status={
-                                        !analysisResults.overall.jitter ? 'neutral' :
-                                            analysisResults.overall.jitter > 1.5 ? 'bad' :
-                                                analysisResults.overall.jitter > 1.0 ? 'warning' : 'good'
-                                    }
-                                    description="Measures how steady your pitch is. Lower values mean a clearer voice."
-                                    details="Target: < 1.0%"
-                                />
-
-                                {/* HNR */}
-                                <MetricCard
-                                    label="Voice Quality (HNR)"
-                                    value={analysisResults.overall.hnr?.toFixed(1) || 'N/A'}
-                                    unit="dB"
-                                    status={
-                                        !analysisResults.overall.hnr ? 'neutral' :
-                                            analysisResults.overall.hnr < 15 ? 'warning' : 'good'
-                                    }
-                                    description="Harmonics-to-Noise Ratio. Higher values mean a clearer voice with less breathiness or hoarseness."
-                                    details="Target: > 15 dB"
-                                />
-
-                                {/* Shimmer */}
-                                <MetricCard
-                                    label="Amplitude Stability (Shimmer)"
-                                    value={analysisResults.overall.shimmer?.toFixed(2) || 'N/A'}
-                                    unit="%"
-                                    status={
-                                        !analysisResults.overall.shimmer ? 'neutral' :
-                                            analysisResults.overall.shimmer > 3.8 ? 'warning' : 'good'
-                                    }
-                                    description="Measures how steady your volume is. Lower values mean a more stable voice."
-                                    details="Target: < 3.8%"
-                                />
-
-                                {/* CPPS */}
-                                <MetricCard
-                                    label="Breathiness (CPPS)"
-                                    value={analysisResults.overall.cpps?.toFixed(1) || 'N/A'}
-                                    unit="dB"
-                                    status="neutral"
-                                    description="Cepstral Peak Prominence. Higher values indicate a clearer, more resonant voice."
-                                />
-
                                 {/* Speech Rate */}
                                 <MetricCard
                                     label="Speech Rate"
@@ -262,38 +216,102 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
                                     status="neutral"
                                     description="Average of your formant frequencies. Higher average correlates with feminine perception."
                                 />
-
-                                {/* SPI */}
-                                <MetricCard
-                                    label="Soft Phonation (SPI)"
-                                    value={analysisResults.overall.spi?.toFixed(2) || 'N/A'}
-                                    unit=""
-                                    status="neutral"
-                                    description="Soft Phonation Index. Higher values indicate a softer, breathier voice quality."
-                                />
-
-                                {/* Spectral Slope */}
-                                <MetricCard
-                                    label="Spectral Slope"
-                                    value={analysisResults.overall.spectralSlope?.toFixed(1) || 'N/A'}
-                                    unit="dB/dec"
-                                    status="neutral"
-                                    description="How quickly energy drops off at higher frequencies. Steeper slope (more negative) sounds softer/flutier."
-                                />
-
-                                {/* Formant Mismatch Alert */}
-                                {analysisResults.overall.formantMismatch && (
-                                    <div className="col-span-full bg-yellow-500/10 border border-yellow-500/50 rounded-xl p-4 flex items-start gap-3">
-                                        <Info className="w-5 h-5 text-yellow-400 mt-0.5" />
-                                        <div>
-                                            <h4 className="font-bold text-yellow-400">Resonance Mismatch Detected</h4>
-                                            <p className="text-sm text-yellow-200/80">
-                                                Your pitch is high, but your resonance (formants) is relatively low. This can sometimes sound "hollow" or unnatural. Try brightening your resonance by smiling slightly or raising your tongue.
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
+
+                            {/* Advanced Metrics Toggle */}
+                            <div className="flex justify-center">
+                                <button
+                                    onClick={() => setShowAdvancedMetrics(!showAdvancedMetrics)}
+                                    className="flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors bg-slate-800/50 hover:bg-slate-800 px-4 py-2 rounded-full border border-white/5"
+                                >
+                                    {showAdvancedMetrics ? 'Hide Advanced Metrics' : 'Show Advanced Metrics'}
+                                    {showAdvancedMetrics ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                </button>
+                            </div>
+
+                            {showAdvancedMetrics && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                                    {/* Jitter */}
+                                    <MetricCard
+                                        label="Pitch Stability (Jitter)"
+                                        value={analysisResults.overall.jitter?.toFixed(2) || 'N/A'}
+                                        unit="%"
+                                        status={
+                                            !analysisResults.overall.jitter ? 'neutral' :
+                                                analysisResults.overall.jitter > 1.5 ? 'bad' :
+                                                    analysisResults.overall.jitter > 1.0 ? 'warning' : 'good'
+                                        }
+                                        description="Measures how steady your pitch is. Lower values mean a clearer voice."
+                                        details="Target: < 1.0%"
+                                    />
+
+                                    {/* HNR */}
+                                    <MetricCard
+                                        label="Voice Quality (HNR)"
+                                        value={analysisResults.overall.hnr?.toFixed(1) || 'N/A'}
+                                        unit="dB"
+                                        status={
+                                            !analysisResults.overall.hnr ? 'neutral' :
+                                                analysisResults.overall.hnr < 15 ? 'warning' : 'good'
+                                        }
+                                        description="Harmonics-to-Noise Ratio. Higher values mean a clearer voice with less breathiness or hoarseness."
+                                        details="Target: > 15 dB"
+                                    />
+
+                                    {/* Shimmer */}
+                                    <MetricCard
+                                        label="Amplitude Stability (Shimmer)"
+                                        value={analysisResults.overall.shimmer?.toFixed(2) || 'N/A'}
+                                        unit="%"
+                                        status={
+                                            !analysisResults.overall.shimmer ? 'neutral' :
+                                                analysisResults.overall.shimmer > 3.8 ? 'warning' : 'good'
+                                        }
+                                        description="Measures how steady your volume is. Lower values mean a more stable voice."
+                                        details="Target: < 3.8%"
+                                    />
+
+                                    {/* CPPS */}
+                                    <MetricCard
+                                        label="Breathiness (CPPS)"
+                                        value={analysisResults.overall.cpps?.toFixed(1) || 'N/A'}
+                                        unit="dB"
+                                        status="neutral"
+                                        description="Cepstral Peak Prominence. Higher values indicate a clearer, more resonant voice."
+                                    />
+
+                                    {/* SPI */}
+                                    <MetricCard
+                                        label="Soft Phonation (SPI)"
+                                        value={analysisResults.overall.spi?.toFixed(2) || 'N/A'}
+                                        unit=""
+                                        status="neutral"
+                                        description="Soft Phonation Index. Higher values indicate a softer, breathier voice quality."
+                                    />
+
+                                    {/* Spectral Slope */}
+                                    <MetricCard
+                                        label="Spectral Slope"
+                                        value={analysisResults.overall.spectralSlope?.toFixed(1) || 'N/A'}
+                                        unit="dB/dec"
+                                        status="neutral"
+                                        description="How quickly energy drops off at higher frequencies. Steeper slope (more negative) sounds softer/flutier."
+                                    />
+                                </div>
+                            )}
+
+                            {/* Formant Mismatch Alert */}
+                            {analysisResults.overall.formantMismatch && (
+                                <div className="bg-yellow-500/10 border border-yellow-500/50 rounded-xl p-4 flex items-start gap-3">
+                                    <Info className="w-5 h-5 text-yellow-400 mt-0.5" />
+                                    <div>
+                                        <h4 className="font-bold text-yellow-400">Resonance Mismatch Detected</h4>
+                                        <p className="text-sm text-yellow-200/80">
+                                            Your pitch is high, but your resonance (formants) is relatively low. This can sometimes sound "hollow" or unnatural. Try brightening your resonance by smiling slightly or raising your tongue.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
 

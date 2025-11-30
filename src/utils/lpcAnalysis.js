@@ -102,8 +102,12 @@ export class LPCAnalyzer {
                 sum += a_prev[j] * R[i - j];
             }
 
-            const k = (R[i] - sum) / E[i - 1]; // Reflection coefficient
-            k_coeff[i] = k;
+            if (Math.abs(E[i - 1]) < 1e-10) {
+                k_coeff[i] = 0;
+            } else {
+                k_coeff[i] = (R[i] - sum) / E[i - 1];
+            }
+            const k = k_coeff[i];
 
             a[i] = k; // a[i] in this iteration is just k
 

@@ -403,6 +403,8 @@ const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration }) => {
 };
 
 const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEngine }) => {
+  const { settings } = useSettings();
+  const beginnerMode = settings?.beginnerMode;
   const [mode, setMode] = useState('gem');
   const [showDebug, setShowDebug] = useState(false);
   const [debugInfo, setDebugInfo] = useState(null);
@@ -589,13 +591,15 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
           );
         })}
         <div className="w-px bg-white/10 mx-1"></div>
-        <button
-          onClick={() => setShowDebug(!showDebug)}
-          className={`p-2 rounded-full transition-all ${showDebug ? 'bg-amber-500 text-white shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
-          title="Toggle Debug Panel"
-        >
-          <Bug size={18} />
-        </button>
+        {!beginnerMode && (
+          <button
+            onClick={() => setShowDebug(!showDebug)}
+            className={`p-2 rounded-full transition-all ${showDebug ? 'bg-amber-500 text-white shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
+            title="Toggle Debug Panel"
+          >
+            <Bug size={18} />
+          </button>
+        )}
       </div>
 
       {/* Safe Mode Toggle */}
@@ -732,28 +736,30 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
       )}
 
       {/* Metric Classifications Row */}
-      <div className="absolute bottom-20 left-0 right-0 px-4 pointer-events-none">
-        <div className="flex justify-center gap-4 text-xs">
-          <div className="text-center">
-            <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Pitch</div>
-            <div className={`font-bold ${metricClassifications.pitch.color} transition-colors duration-300`}>
-              {metricClassifications.pitch.label}
+      {!beginnerMode && (
+        <div className="absolute bottom-20 left-0 right-0 px-4 pointer-events-none">
+          <div className="flex justify-center gap-4 text-xs">
+            <div className="text-center">
+              <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Pitch</div>
+              <div className={`font-bold ${metricClassifications.pitch.color} transition-colors duration-300`}>
+                {metricClassifications.pitch.label}
+              </div>
             </div>
-          </div>
-          <div className="text-center">
-            <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Resonance</div>
-            <div className={`font-bold ${metricClassifications.resonance.color} transition-colors duration-300`}>
-              {metricClassifications.resonance.label}
+            <div className="text-center">
+              <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Resonance</div>
+              <div className={`font-bold ${metricClassifications.resonance.color} transition-colors duration-300`}>
+                {metricClassifications.resonance.label}
+              </div>
             </div>
-          </div>
-          <div className="text-center">
-            <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Weight</div>
-            <div className={`font-bold ${metricClassifications.weight.color} transition-colors duration-300`}>
-              {metricClassifications.weight.label}
+            <div className="text-center">
+              <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Weight</div>
+              <div className={`font-bold ${metricClassifications.weight.color} transition-colors duration-300`}>
+                {metricClassifications.weight.label}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Gender Perception Label */}
       <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">

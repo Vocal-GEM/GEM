@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Info, WifiOff } from 'lucide-react';
+import { useProfile } from '../../context/ProfileContext';
 
 /**
  * ResonanceOrb - Visual feedback for voice resonance
@@ -12,6 +13,7 @@ import { Info, WifiOff } from 'lucide-react';
  * Includes debug display for calibration (toggle with showDebug prop)
  */
 const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, colorBlindMode = false }) => {
+    const { activeProfile } = useProfile();
     const orbRef = useRef(null);
     const labelRef = useRef(null);
 
@@ -30,6 +32,14 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
 
     // History for sparklines
     const historyRef = useRef([]);
+
+    // Determine target zone based on profile
+    const getTargetZone = () => {
+        if (activeProfile === 'fem') return { min: 0.65, max: 1.0, label: 'Bright' };
+        if (activeProfile === 'masc') return { min: 0.0, max: 0.35, label: 'Dark' };
+        return { min: 0.35, max: 0.65, label: 'Balanced' };
+    };
+    const targetZone = getTargetZone();
 
     useEffect(() => {
         let frameCount = 0;
@@ -132,9 +142,17 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                 // Apply visual updates to orb
                 if (orbRef.current) {
                     orbRef.current.style.backgroundColor = color;
-                    orbRef.current.style.boxShadow = `0 0 ${size * 0.5}px ${color}, 0 0 ${size}px ${color}40`;
+                    orbRef.current.style.boxShadow = `0 0 ${size * 0.35}px ${color}, 0 0 ${size * 0.7}px ${color}40`;
                     orbRef.current.style.opacity = "1";
                     orbRef.current.style.border = "none";
+
+                    // Update Gauge Rotation
+                    const gaugeNeedle = document.getElementById('resonance-gauge-needle');
+                    if (gaugeNeedle) {
+                        // Map 0-1 to -90 to 90 degrees
+                        const deg = (score * 180) - 90;
+                        gaugeNeedle.style.transform = `rotate(${deg}deg)`;
+                    }
                 }
 
                 // Label Logic
@@ -208,6 +226,33 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
         );
     };
 
+    // Gauge Calculations
+    const radius = size * 0.6;
+    const center = size / 2;
+    // We'll use a slightly larger SVG to contain the gauge
+    const svgSize = size * 1.4;
+    const svgCenter = svgSize / 2;
+    const gaugeRadius = svgSize * 0.45;
+
+    // Helper to create arc path
+    const describeArc = (x, y, radius, startAngle, endAngle) => {
+        const start = polarToCartesian(x, y, radius, endAngle);
+        const end = polarToCartesian(x, y, radius, startAngle);
+        const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+        return [
+            "M", start.x, start.y,
+            "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
+        ].join(" ");
+    };
+
+    const polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
+        const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+        return {
+            x: centerX + (radius * Math.cos(angleInRadians)),
+            y: centerY + (radius * Math.sin(angleInRadians))
+        };
+    };
+
     return (
         <div className="relative flex flex-col items-center justify-center w-full h-full overflow-hidden py-8">
             {/* Main orb container */}
@@ -215,17 +260,50 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                 className="relative flex items-center justify-center shrink-0"
                 style={{ width: size, height: size }}
             >
+                {/* Gauge Background */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ width: svgSize, height: svgSize, left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
+                    <svg width={svgSize} height={svgSize} viewBox={`0 0 ${svgSize} ${svgSize}`}>
+                        {/* Track */}
+                        <path d={describeArc(svgCenter, svgCenter, gaugeRadius, -90, 90)} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="6" strokeLinecap="round" />
+
+                        {/* Target Zone */}
+                        <path
+                            d={describeArc(svgCenter, svgCenter, gaugeRadius, (targetZone.min * 180) - 90, (targetZone.max * 180) - 90)}
+                            fill="none"
+                            stroke={colorBlindMode ? "rgba(13, 148, 136, 0.4)" : "rgba(34, 197, 94, 0.4)"}
+                            strokeWidth="6"
+                            strokeLinecap="round"
+                        />
+
+                        {/* Ticks */}
+                        <line x1={svgCenter} y1={svgCenter - gaugeRadius + 10} x2={svgCenter} y2={svgCenter - gaugeRadius - 5} stroke="rgba(255,255,255,0.2)" strokeWidth="2" transform={`rotate(-45 ${svgCenter} ${svgCenter})`} />
+                        <line x1={svgCenter} y1={svgCenter - gaugeRadius + 10} x2={svgCenter} y2={svgCenter - gaugeRadius - 5} stroke="rgba(255,255,255,0.2)" strokeWidth="2" transform={`rotate(45 ${svgCenter} ${svgCenter})`} />
+                        <line x1={svgCenter} y1={svgCenter - gaugeRadius + 10} x2={svgCenter} y2={svgCenter - gaugeRadius - 5} stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
+                    </svg>
+
+                    {/* Needle/Indicator */}
+                    <div
+                        id="resonance-gauge-needle"
+                        className="absolute top-0 left-0 w-full h-full transition-transform duration-100 ease-out origin-center"
+                        style={{ transform: 'rotate(-90deg)' }}
+                    >
+                        <div
+                            className={`absolute top-[5%] left-1/2 -translate-x-1/2 w-1.5 h-3 rounded-full ${colorBlindMode ? 'bg-white' : 'bg-white'} shadow-lg`}
+                        ></div>
+                    </div>
+                </div>
+
                 <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-purple-500/5 rounded-full blur-3xl"></div>
 
                 <div
                     ref={orbRef}
                     className="rounded-full transition-all duration-150 z-10 relative"
                     style={{
-                        width: size,
-                        height: size,
+                        width: size * 0.7, // Slightly smaller to fit inside gauge
+                        height: size * 0.7,
                         transitionProperty: 'transform, opacity',
                         backgroundColor: 'rgb(59, 130, 246)',
-                        boxShadow: `0 0 ${size * 0.5}px rgb(59, 130, 246), 0 0 ${size}px rgba(59, 130, 246, 0.25)`
+                        boxShadow: `0 0 ${size * 0.35}px rgb(59, 130, 246), 0 0 ${size * 0.7}px rgba(59, 130, 246, 0.25)`
                     }}
                 ></div>
 
@@ -234,6 +312,11 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                     className="absolute bottom-0 translate-y-full text-xs font-bold tracking-widest text-slate-400 uppercase mt-4 transition-opacity duration-200 whitespace-nowrap"
                 >
                     Listening...
+                </div>
+
+                {/* Target Label */}
+                <div className="absolute top-full mt-8 text-[10px] text-slate-500 uppercase tracking-wider font-mono">
+                    Target: <span className={colorBlindMode ? "text-teal-400" : "text-emerald-400"}>{targetZone.label}</span>
                 </div>
             </div>
 

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { AudioEngine } from '../engines/AudioEngine';
 import { useSettings } from './SettingsContext';
+import { useProfile } from './ProfileContext';
 
 const AudioContext = createContext();
 
@@ -21,8 +22,10 @@ export const AudioProvider = ({ children }) => {
         lastValidPitch: 0
     });
     const [isAudioActive, setIsAudioActive] = useState(false);
+    const [isRecording, setIsRecording] = useState(false);
 
     const { settings } = useSettings();
+    const { filterSettings, calibration } = useProfile();
     const settingsRef = useRef(settings);
 
     useEffect(() => {
@@ -31,6 +34,18 @@ export const AudioProvider = ({ children }) => {
             audioEngineRef.current.setNoiseGate(settings.noiseGate);
         }
     }, [settings]);
+
+    useEffect(() => {
+        if (audioEngineRef.current && filterSettings) {
+            audioEngineRef.current.setFilters(filterSettings.min, filterSettings.max);
+        }
+    }, [filterSettings]);
+
+    useEffect(() => {
+        if (audioEngineRef.current && calibration) {
+            audioEngineRef.current.setCalibration(calibration.dark, calibration.bright);
+        }
+    }, [calibration]);
 
     useEffect(() => {
         const isFirstTime = !localStorage.getItem('hasVisited');
@@ -95,12 +110,37 @@ export const AudioProvider = ({ children }) => {
         }
     };
 
+    const runEnvironmentCheck = async () => {
+        if (!audioEngineRef.current) return null;
+        return await audioEngineRef.current.analyzeEnvironment();
+    };
+
+    const startRecording = () => {
+        if (audioEngineRef.current) {
+            audioEngineRef.current.startRecording();
+            setIsRecording(true);
+        }
+    };
+
+    const stopRecording = async () => {
+        if (audioEngineRef.current) {
+            const result = await audioEngineRef.current.stopRecording();
+            setIsRecording(false);
+            return result;
+        }
+        return null;
+    };
+
     const value = React.useMemo(() => ({
         audioEngineRef,
         dataRef,
         isAudioActive,
-        toggleAudio
-    }), [isAudioActive]);
+        toggleAudio,
+        runEnvironmentCheck,
+        startRecording,
+        stopRecording,
+        isRecording
+    }), [isAudioActive, isRecording]);
 
     return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>;
 };
