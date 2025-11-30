@@ -122,24 +122,16 @@ export class AudioEngine {
 
             console.log("[AudioEngine] Requesting microphone access...");
 
-            // Try with minimal constraints first - some mobile browsers don't like specific constraints
-            let stream;
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    audio: true  // Simplified - let browser choose best settings
-                });
-            } catch (e) {
-                console.error("[AudioEngine] Failed with simple constraints, trying detailed:", e);
-                // Fallback to detailed constraints
-                stream = await navigator.mediaDevices.getUserMedia({
-                    audio: {
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        autoGainControl: false,
-                        channelCount: 1
-                    }
-                });
-            }
+            // CRITICAL: Explicitly disable audio processing features
+            // The browser's noise suppression can be too aggressive and filter out all audio
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false,
+                    channelCount: 1
+                }
+            });
 
             console.log("[AudioEngine] Microphone access granted");
 
