@@ -256,15 +256,20 @@ export class AudioEngine {
             const muteGain = this.audioContext.createGain();
             muteGain.gain.value = 0;
 
-            // DEBUG: BYPASS FILTERS TEMPORARILY
-            // Original: this.microphone.connect(this.highpass); this.highpass.connect(this.lowpass); this.lowpass.connect(this.workletNode);
-            console.log("[AudioEngine] ⚠️ DEBUG MODE: Bypassing filters (Mic -> Worklet directly)");
-            this.microphone.connect(this.workletNode);
-
+            // CRITICAL FIX: Delay worklet connection to fix Chrome AudioWorklet bug
+            // The worklet can get "stuck" receiving zeros if connected before the mic stream fully initializes
+            // The AnalyserNode probe confirmed the mic works, so this is purely a timing issue
+            console.log("[AudioEngine] ⏱️ Waiting 200ms for stream initialization...");
+            await new Promise(resolve => setTimeout(resolve, 200));
+            console.log("[AudioEngine] 🔗 Connecting audio chain...");
+            
+            this.microphone.connect(this.highpass);
+            this.highpass.connect(this.lowpass);
+            this.lowpass.connect(this.workletNode);
             this.workletNode.connect(muteGain);
             muteGain.connect(this.audioContext.destination);
 
-            console.log("[AudioEngine] ✅ Audio chain connected: Mic -> Worklet (Filters Bypassed)");
+            console.log("[AudioEngine] ✅ Audio chain connected: Mic -> Filters -> Worklet");
 
             this.isActive = true;
             this.debugInfo.state = 'active';
