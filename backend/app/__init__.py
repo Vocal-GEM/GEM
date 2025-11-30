@@ -13,6 +13,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 def create_app():
+    print("Backend Starting...")
     # Gunicorn runs from root, so 'build' should be in os.getcwd()
     static_folder = os.path.join(os.getcwd(), 'build')
     app = Flask(__name__, static_folder=static_folder, static_url_path='')
@@ -37,30 +38,16 @@ def create_app():
     # Ensure upload folder exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-    # CORS Configuration with Vercel preview support
-    def is_allowed_origin(origin):
-        allowed_origins = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
-        
-        # Check exact matches
-        if origin in allowed_origins or '*' in allowed_origins:
-            return True
-        
-        # Allow Vercel preview deployments (vocal-*.vercel.app)
-        if origin and origin.endswith('.vercel.app'):
-            return True
-        
-        return False
+    # CORS Configuration
+    allowed_origins_raw = os.environ.get('ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:5173,https://vocalgem.vercel.app')
+    allowed_origins = [o.strip() for o in allowed_origins_raw.split(',') if o.strip()]
     
-    # Custom CORS handler
-    @app.after_request
-    def handle_cors(response):
-        origin = request.headers.get('Origin')
-        if origin and is_allowed_origin(origin):
-            response.headers['Access-Control-Allow-Origin'] = origin
-            response.headers['Access-Control-Allow-Credentials'] = 'true'
-            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-        return response
+    # Add regex for Vercel previews
+    import re
+    allowed_origins.append(re.compile(r'^https://vocal-.*\.vercel\.app$'))
+
+    # Initialize CORS with credentials support
+    CORS(app, supports_credentials=True, origins=allowed_origins)
     
     # Security Headers
     @app.after_request
