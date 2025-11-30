@@ -150,6 +150,11 @@ export class AudioEngine {
                     autoGainControl: settings.autoGainControl,
                     deviceId: settings.deviceId
                 });
+                // Check if track is muted at the browser/OS level
+                console.log(`[AudioEngine] Track muted: ${track.muted}`);
+
+                track.onmute = () => console.log("[AudioEngine] Track muted event fired!");
+                track.onunmute = () => console.log("[AudioEngine] Track unmuted event fired!");
             }
 
             if (audioTracks.length === 0 || !audioTracks[0].enabled) {
@@ -170,6 +175,31 @@ export class AudioEngine {
 
             this.microphone = this.audioContext.createMediaStreamSource(stream);
             this.debugInfo.micActive = true;
+
+            // PROBE: AnalyserNode to check raw input
+            const analyser = this.audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            this.microphone.connect(analyser);
+
+            // Check for signal every 1s
+            setInterval(() => {
+                if (!this.isActive) return;
+                const dataArray = new Float32Array(analyser.fftSize);
+                analyser.getFloatTimeDomainData(dataArray);
+
+                let rms = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    rms += dataArray[i] * dataArray[i];
+                }
+                rms = Math.sqrt(rms / dataArray.length);
+
+                if (rms > 0.001) {
+                    console.log(`[AudioEngine Probe] 🔊 Signal detected! RMS: ${rms.toFixed(4)}`);
+                } else {
+                    // Only log silence occasionally to avoid spam
+                    if (Math.random() < 0.1) console.log(`[AudioEngine Probe] 🔇 Silence detected at source. RMS: ${rms.toFixed(6)}`);
+                }
+            }, 1000);
 
             // CRITICAL: Ensure AudioContext is running after creating microphone source
             if (this.audioContext.state !== 'running') {
