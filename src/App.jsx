@@ -35,6 +35,7 @@ import PitchPipe from './components/ui/PitchPipe';
 import BreathPacer from './components/ui/BreathPacer';
 import MirrorComponent from './components/ui/MirrorComponent';
 import FloatingCamera from './components/ui/FloatingCamera';
+import PitchTargets from './components/ui/PitchTargets';
 const SLPDashboard = lazy(() => import('./components/views/SLPDashboard'));
 const PracticeMode = lazy(() => import('./components/views/PracticeMode'));
 const MixingBoardView = lazy(() => import('./components/views/MixingBoardView'));
@@ -208,7 +209,10 @@ const App = () => {
             {/* Header */}
             <header className="p-4 pt-safe bg-slate-900/50 backdrop-blur-md sticky top-0 z-30 border-b border-white/5" role="banner">
                 <div className="w-full max-w-[1600px] mx-auto flex justify-between items-center">
-                    <div className="flex items-center gap-3">
+                    <div
+                        className="flex items-center gap-3 cursor-pointer"
+                        onClick={() => { setActiveTab('practice'); setPracticeView('all'); }}
+                    >
                         <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20" aria-hidden="true">
                             <Mic className="w-5 h-5 text-white" />
                         </div>
@@ -222,6 +226,14 @@ const App = () => {
                         <button onClick={() => user ? setShowProfile(true) : setShowLogin(true)} className="w-10 h-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors" aria-label={user ? "Open profile" : "Login"}>
                             <span className="text-lg" aria-hidden="true">👤</span>
                         </button>
+                        {user && (
+                            <span
+                                onClick={() => setShowProfile(true)}
+                                className="text-sm font-bold text-slate-300 hover:text-white cursor-pointer"
+                            >
+                                {user.username}
+                            </span>
+                        )}
                     </div>
                 </div>
             </header>
@@ -243,7 +255,7 @@ const App = () => {
 
                         {/* Filter Menu */}
                         <div className="glass-panel-dark rounded-xl p-2 mb-6 flex gap-2 overflow-x-auto">
-                            {[{ id: 'all', label: 'Show All' }, { id: 'mixer', label: 'Mixer' }, { id: 'gauges', label: 'Gauges' }, { id: 'pitch', label: 'Pitch' }, { id: 'resonance', label: 'Resonance' }, { id: 'weight', label: 'Weight' }, { id: 'tilt', label: 'Tilt' }, { id: 'vowel', label: 'Vowel' }, { id: 'articulation', label: 'Articulation' }, { id: 'contour', label: 'Contour' }, { id: 'quality', label: 'Quality' }, { id: 'spectrogram', label: 'Spectrogram' }].map(view => (
+                            {[{ id: 'all', label: 'Show All' }, { id: 'pitch', label: 'Pitch' }, { id: 'resonance', label: 'Resonance' }, { id: 'weight', label: 'Weight' }, { id: 'tilt', label: 'Tilt' }, { id: 'vowel', label: 'Vowel' }, { id: 'articulation', label: 'Articulation' }, { id: 'contour', label: 'Contour' }, { id: 'quality', label: 'Quality' }, { id: 'spectrogram', label: 'Spectrogram' }].map(view => (
                                 <button key={view.id} onClick={() => setPracticeView(view.id)} className={`px-5 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap min-w-[80px] flex-shrink-0 ${practiceView === view.id ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white shadow-md shadow-teal-500/20' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/70 hover:text-white border border-slate-700/50'}`}>
                                     {view.label}
                                 </button>
@@ -266,64 +278,49 @@ const App = () => {
                                             </div>
                                         </div>
                                     }>
-                                        {practiceView === 'all' ? (
-                                            <DynamicOrb
-                                                dataRef={dataRef}
-                                                calibration={{ ...calibration, disable3D: settings.disable3D }}
-                                            />
-                                        ) : practiceView === 'mixer' ? (
-                                            <div className="h-full w-full p-2 pt-12">
-                                                <MixingBoardView
+                                        <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><LoadingSpinner /></div>}>
+                                            {practiceView === 'all' ? (
+                                                <DynamicOrb
                                                     dataRef={dataRef}
+                                                    calibration={{ ...calibration, disable3D: settings.disable3D }}
                                                     audioEngine={audioEngineRef.current}
-                                                    calibration={calibration}
-                                                    compact={true}
-                                                    viewMode="sliders"
                                                 />
-                                            </div>
-                                        ) : practiceView === 'gauges' ? (
-                                            <div className="h-full w-full p-2 pt-12">
-                                                <MixingBoardView
+                                            ) : practiceView === 'resonance' ? (
+                                                <ResonanceOrb
                                                     dataRef={dataRef}
-                                                    audioEngine={audioEngineRef.current}
                                                     calibration={calibration}
-                                                    compact={true}
-                                                    viewMode="gauges"
+                                                    showDebug={false}
+                                                    colorBlindMode={settings.colorBlindMode}
                                                 />
-                                            </div>
-                                        ) : practiceView === 'resonance' ? (
-                                            <ResonanceOrb
-                                                dataRef={dataRef}
-                                                calibration={calibration}
-                                                showDebug={false}
-                                                colorBlindMode={settings.colorBlindMode}
-                                            />
-                                        ) : practiceView === 'pitch' ? (
-                                            <div className="h-full flex flex-col">
-                                                <div className="flex-1">
-                                                    <PitchVisualizer dataRef={dataRef} />
+                                            ) : practiceView === 'pitch' ? (
+                                                <div className="h-full flex flex-col">
+                                                    <div className="flex-1">
+                                                        <PitchVisualizer dataRef={dataRef} />
+                                                    </div>
+                                                    <div className="mt-4">
+                                                        <PitchTargets audioEngine={audioEngineRef} />
+                                                        <PitchPipe audioEngine={audioEngineRef} />
+                                                    </div>
                                                 </div>
-                                                <div className="mt-4">
-                                                    <PitchPipe audioEngine={audioEngineRef} />
+                                            ) : practiceView === 'weight' ? (
+                                                <VoiceQualityMeter dataRef={dataRef} userMode="user" />
+                                            ) : practiceView === 'tilt' ? (
+                                                <SpectralTiltMeter dataRef={dataRef} />
+                                            ) : practiceView === 'vowel' ? (
+                                                <VowelSpacePlot dataRef={dataRef} />
+                                            ) : practiceView === 'articulation' ? (
+                                                <div className="h-full overflow-y-auto custom-scrollbar">
+                                                    <ArticulationView />
                                                 </div>
-                                            </div>
-                                        ) : practiceView === 'weight' ? (
-                                            <VoiceQualityMeter dataRef={dataRef} userMode="user" />
-                                        ) : practiceView === 'tilt' ? (
-                                            <SpectralTiltMeter dataRef={dataRef} />
-                                        ) : practiceView === 'vowel' ? (
-                                            <VowelSpacePlot dataRef={dataRef} />
-                                        ) : practiceView === 'articulation' ? (
-                                            <div className="h-full overflow-y-auto custom-scrollbar">
-                                                <ArticulationView />
-                                            </div>
-                                        ) : practiceView === 'contour' ? (
-                                            <ContourVisualizer dataRef={dataRef} />
-                                        ) : practiceView === 'quality' ? (
-                                            <VoiceQualityView />
-                                        ) : practiceView === 'spectrogram' ? (
-                                            <Spectrogram dataRef={dataRef} />
-                                        ) : null}
+                                            ) : practiceView === 'contour' ? (
+                                                <ContourVisualizer dataRef={dataRef} />
+                                            ) : practiceView === 'quality' ? (
+                                                <VoiceQualityView />
+                                            ) : practiceView === 'spectrogram' ? (
+                                                <Spectrogram dataRef={dataRef} />
+                                            ) : null}
+                                            ) : null}
+                                        </Suspense>
                                     </ErrorBoundary>
                                 </div>
 

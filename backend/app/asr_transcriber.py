@@ -8,28 +8,34 @@ except ImportError:
     _model_available = False
     WhisperModel = None
 
-# Load once at import.
-try:
-    if _model_available:
-        _model = WhisperModel("base", device="cpu", compute_type="int8")
-    else:
-        _model = None
-except Exception as e:
-    print(f"Warning: Failed to load Whisper model: {e}")
-    _model = None
+# Lazy loading variable
+_model = None
+
+def get_model():
+    global _model
+    if _model is None and _model_available:
+        try:
+            print("Loading Whisper model...")
+            # Use tiny model to save memory on Render free tier
+            _model = WhisperModel("tiny", device="cpu", compute_type="int8")
+        except Exception as e:
+            print(f"Warning: Failed to load Whisper model: {e}")
+            _model = None
+    return _model
 
 def transcribe_audio_with_words(path: str, language: str = "en") -> Dict[str, Any]:
     """
     Run ASR on the audio file and return word-level timestamps.
     """
-    if _model is None:
+    model = get_model()
+    if model is None:
         return {
             "full_text": "ASR model not loaded.",
             "language": language,
             "words": []
         }
 
-    segments, info = _model.transcribe(
+    segments, info = model.transcribe(
         path,
         language=language,
         beam_size=5,

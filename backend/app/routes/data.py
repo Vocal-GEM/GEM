@@ -133,5 +133,8 @@ def upload_file():
         # Add timestamp to make unique
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         filename = f"{timestamp}_{filename}"
-        file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
-        return jsonify({"url": f"/uploads/{filename}"})
+        
+        from ..utils.storage import storage_service
+        url = storage_service.upload_file(file, filename, content_type=file.content_type)
+        
+        return jsonify({"url": url})

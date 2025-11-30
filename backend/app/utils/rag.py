@@ -25,6 +25,14 @@ class SimpleRAG:
             print(f"Embedding error: {e}")
             return None
 
+    def document_exists(self, source):
+        try:
+            exists = db.session.query(KnowledgeDocument.id).filter_by(source=source).first() is not None
+            return exists
+        except Exception as e:
+            print(f"Error checking document existence: {e}")
+            return False
+
     def add_document(self, text, source="unknown"):
         # Chunking (simple split by paragraphs or length)
         # For simplicity, let's chunk by 1000 characters overlap

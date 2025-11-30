@@ -34,6 +34,7 @@ def create_app():
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = 'uploads'
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16MB limit
 
     # Ensure upload folder exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -138,8 +139,11 @@ def create_app():
     
     # Import socket handlers to register them
     from . import sockets
+    from .utils.auto_loader import load_knowledge_base
 
     with app.app_context():
         db.create_all()
+        # Auto-load knowledge base files
+        load_knowledge_base(app)
 
     return app

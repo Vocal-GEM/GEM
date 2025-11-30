@@ -35,8 +35,11 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
         }
     }, [settings.ttsProvider]);
 
+    const [error, setError] = React.useState(null);
+
     const fetchKnowledgeBase = async () => {
         setIsLoadingDirectory(true);
+        setError(null);
         try {
             const API_URL = import.meta.env.VITE_API_URL || 'https://vocalgem.onrender.com';
             const response = await fetch(`${API_URL}/api/knowledge-base/list`, {
@@ -48,9 +51,11 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                 setKnowledgeBaseData(data);
             } else {
                 console.error('Failed to fetch knowledge base');
+                setError('Failed to load documents. Backend might be offline.');
             }
         } catch (error) {
             console.error('Error fetching knowledge base:', error);
+            setError('Network error. Check your connection.');
         } finally {
             setIsLoadingDirectory(false);
         }
@@ -595,6 +600,11 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                                                     Refresh
                                                 </button>
                                             </>
+                                        ) : error ? (
+                                            <div className="text-center py-4 text-red-400 text-xs bg-red-900/20 rounded-lg border border-red-500/20">
+                                                <div className="font-bold mb-1">Error</div>
+                                                {error}
+                                            </div>
                                         ) : (
                                             <div className="text-center py-4 text-slate-400 text-xs">
                                                 No documents found

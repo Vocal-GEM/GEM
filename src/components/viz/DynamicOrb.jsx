@@ -1,9 +1,12 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Diamond, Flame, Bug, Box, Activity } from 'lucide-react';
+import { Diamond, Flame, Bug, Box, Activity, Sliders, Gauge } from 'lucide-react';
 import { useGLTF } from '@react-three/drei';
 import OrbLegend from './OrbLegend';
+import React, { Suspense, lazy } from 'react';
+
+const MixingBoardView = lazy(() => import('../views/MixingBoardView'));
 
 // Shared Noise Function
 const noiseChunk = `
@@ -399,7 +402,7 @@ const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration }) => {
   );
 };
 
-const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
+const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEngine }) => {
   const [mode, setMode] = useState('gem');
   const [showDebug, setShowDebug] = useState(false);
   const [debugInfo, setDebugInfo] = useState(null);
@@ -413,6 +416,8 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
   const modes = [
     { id: 'gem', icon: Diamond, label: 'Gem' },
     { id: 'fire', icon: Flame, label: 'Fire' },
+    { id: 'mixer', icon: Sliders, label: 'Mixer' },
+    { id: 'gauges', icon: Gauge, label: 'Gauges' },
     { id: 'custom', icon: Box, label: 'Custom' },
     { id: 'safe', icon: Activity, label: '2D Safe Mode' },
   ];
@@ -607,7 +612,7 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
       </div>
 
       {/* 2D Fallback (Safe Mode) */}
-      {mode === 'safe' || calibration?.disable3D ? (
+      {(mode === 'safe' || calibration?.disable3D) && mode !== 'mixer' && mode !== 'gauges' ? (
         <div className="w-full h-full flex items-center justify-center">
           <div className="relative w-64 h-64 flex items-center justify-center">
             {/* Pulsing Circles */}
@@ -629,6 +634,30 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef }) => {
           <div className="absolute bottom-20 text-slate-400 text-xs font-mono">
             Safe Mode (2D Fallback)
           </div>
+        </div>
+      ) : mode === 'mixer' ? (
+        <div className="w-full h-full p-4 pt-16">
+          <Suspense fallback={<div className="text-white">Loading...</div>}>
+            <MixingBoardView
+              dataRef={dataRef}
+              audioEngine={audioEngine}
+              calibration={calibration}
+              compact={true}
+              viewMode="sliders"
+            />
+          </Suspense>
+        </div>
+      ) : mode === 'gauges' ? (
+        <div className="w-full h-full p-4 pt-16">
+          <Suspense fallback={<div className="text-white">Loading...</div>}>
+            <MixingBoardView
+              dataRef={dataRef}
+              audioEngine={audioEngine}
+              calibration={calibration}
+              compact={true}
+              viewMode="gauges"
+            />
+          </Suspense>
         </div>
       ) : (
         <Canvas
