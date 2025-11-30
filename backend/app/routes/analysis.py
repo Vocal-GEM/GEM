@@ -8,26 +8,36 @@ from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
 import os
 import tempfile
-import numpy as np
 try:
+    import numpy as np
     import librosa
-    LIBROSA_AVAILABLE = True
+    from scipy import signal
+    from scipy.stats import skew, kurtosis
+    from faster_whisper import WhisperModel
+    _deps_available = True
 except ImportError:
+    _deps_available = False
+    np = None
     librosa = None
-    LIBROSA_AVAILABLE = False
-
-from scipy import signal
-from scipy.stats import skew, kurtosis
-from faster_whisper import WhisperModel
+    signal = None
+    skew = None
+    kurtosis = None
+    WhisperModel = None
 
 analysis_bp = Blueprint('analysis', __name__)
 
 # Load Whisper model once at startup
 whisper_model = None
 
+
+
 def get_whisper_model():
     """Lazy load Faster Whisper model"""
     global whisper_model
+    if WhisperModel is None:
+        print("Faster Whisper not installed.")
+        return None
+        
     if whisper_model is None:
         print("Loading Faster Whisper model (base)...")
         # Use base model, runs on CPU efficiently
@@ -255,8 +265,9 @@ def analyze_audio():
     Expected: multipart/form-data with 'audio' file field
     Returns: JSON with transcript, word-level metrics, and overall statistics
     """
-    if not LIBROSA_AVAILABLE:
-        return jsonify({'error': 'Librosa not installed. Legacy analysis unavailable.'}), 503
+
+    if not _deps_available:
+        return jsonify({'error': 'Analysis dependencies (numpy, librosa, etc.) not installed.'}), 503
 
     # Check if file was uploaded
     if 'audio' not in request.files:

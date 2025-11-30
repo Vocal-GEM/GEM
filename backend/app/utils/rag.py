@@ -1,6 +1,11 @@
 import json
 import os
-import numpy as np
+try:
+    import numpy as np
+    _numpy_available = True
+except ImportError:
+    np = None
+    _numpy_available = False
 import google.generativeai as genai
 from pypdf import PdfReader
 from ..models import KnowledgeDocument
@@ -101,6 +106,10 @@ class SimpleRAG:
             return []
 
         # Calculate Cosine Similarity
+        if not _numpy_available:
+            print("Numpy not available for vector similarity.")
+            return []
+
         query_vec = np.array(query_embedding)
         results = []
 
