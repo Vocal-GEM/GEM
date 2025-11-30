@@ -61,6 +61,26 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
         return `Your average pitch was ${pitch.toFixed(0)}Hz.`;
     };
 
+    // If no analysis results, show a placeholder/recording interface
+    if (!analysisResults) {
+        return (
+            <div className="h-full flex items-center justify-center p-8">
+                <div className="text-center max-w-md space-y-6">
+                    <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-cyan-500/20">
+                        <Activity className="w-10 h-10 text-white" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white">Voice Analysis</h2>
+                    <p className="text-slate-400">
+                        Record a voice sample to get detailed analysis of your pitch, resonance, and voice quality.
+                    </p>
+                    <p className="text-sm text-slate-500">
+                        This feature requires the backend server. Please check the Tools tab for recording options.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto">
             {/* Header */}
