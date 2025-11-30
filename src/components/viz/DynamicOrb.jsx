@@ -1,10 +1,10 @@
-import React, { useRef, useMemo, useState, useEffect } from 'react';
+import React, { useRef, useMemo, useState, useEffect, Suspense, lazy } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Diamond, Flame, Bug, Box, Activity, Sliders, Gauge } from 'lucide-react';
 import { useGLTF } from '@react-three/drei';
 import OrbLegend from './OrbLegend';
-import React, { Suspense, lazy } from 'react';
+
 
 const MixingBoardView = lazy(() => import('../views/MixingBoardView'));
 

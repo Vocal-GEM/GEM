@@ -319,7 +319,7 @@ const App = () => {
                                             ) : practiceView === 'spectrogram' ? (
                                                 <Spectrogram dataRef={dataRef} />
                                             ) : null}
-                                            ) : null}
+
                                         </Suspense>
                                     </ErrorBoundary>
                                 </div>
