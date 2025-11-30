@@ -1,6 +1,10 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useAudio } from './context/AudioContext';
 import { useSettings } from './context/SettingsContext';
+import { useAuth } from './context/AuthContext';
+import { useProfile } from './context/ProfileContext';
+import { useStats } from './context/StatsContext';
+import { useJournal } from './context/JournalContext';
 import MigrationModal from './components/ui/MigrationModal';
 import TutorialWizard from './components/ui/TutorialWizard';
 import CompassWizard from './components/ui/CompassWizard';
@@ -53,6 +57,10 @@ const SpectralTiltMeter = lazy(() => import('./components/viz/SpectralTiltMeter'
 const ResonanceMetrics = lazy(() => import('./components/viz/ResonanceMetrics'));
 const ToolExercises = lazy(() => import('./components/ui/ToolExercises'));
 import DebugOverlay from './components/ui/DebugOverlay';
+import FeedbackSettings from './components/ui/FeedbackSettings';
+import OfflineIndicator from './components/ui/OfflineIndicator';
+import ErrorBoundary from './components/ui/ErrorBoundary';
+import { Mic, Mic2, Bot, BarChart2, Activity, ArrowLeft, ChevronRight, Wrench, BookOpen } from 'lucide-react';
 
 
 
