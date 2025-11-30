@@ -121,19 +121,44 @@ export class AudioEngine {
             });
 
             console.log("[AudioEngine] Requesting microphone access...");
-            const stream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                    echoCancellation: false,
-                    noiseSuppression: false,
-                    autoGainControl: false,
-                    channelCount: 1
-                }
-            });
+
+            // Try with minimal constraints first - some mobile browsers don't like specific constraints
+            let stream;
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    audio: true  // Simplified - let browser choose best settings
+                });
+            } catch (e) {
+                console.error("[AudioEngine] Failed with simple constraints, trying detailed:", e);
+                // Fallback to detailed constraints
+                stream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false,
+                        channelCount: 1
+                    }
+                });
+            }
+
             console.log("[AudioEngine] Microphone access granted");
 
-            // Verify stream is active
+            // Verify stream is active and log detailed info
             const audioTracks = stream.getAudioTracks();
             console.log(`[AudioEngine] Audio tracks: ${audioTracks.length}, Active: ${audioTracks.map(t => t.enabled && t.readyState === 'live').join(', ')}`);
+
+            if (audioTracks.length > 0) {
+                const track = audioTracks[0];
+                const settings = track.getSettings();
+                console.log(`[AudioEngine] Track settings:`, {
+                    sampleRate: settings.sampleRate,
+                    channelCount: settings.channelCount,
+                    echoCancellation: settings.echoCancellation,
+                    noiseSuppression: settings.noiseSuppression,
+                    autoGainControl: settings.autoGainControl,
+                    deviceId: settings.deviceId
+                });
+            }
 
             if (audioTracks.length === 0 || !audioTracks[0].enabled) {
                 throw new Error("Microphone stream has no active audio tracks");
