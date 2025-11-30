@@ -219,17 +219,22 @@ export class AudioEngine {
             this.lowpass.type = 'lowpass';
             this.lowpass.frequency.value = this.filterSettings.max;
 
+            console.log(`[AudioEngine] Filter Config - Highpass: ${this.highpass.frequency.value}Hz, Lowpass: ${this.lowpass.frequency.value}Hz`);
+            console.log(`[AudioEngine] Sample Rates - Context: ${this.audioContext.sampleRate}Hz, Mic: ${stream.getAudioTracks()[0].getSettings().sampleRate}Hz`);
+
             // Connect Chain: Mic -> Highpass -> Lowpass -> Worklet -> Destination (Muted)
             const muteGain = this.audioContext.createGain();
             muteGain.gain.value = 0;
 
-            this.microphone.connect(this.highpass);
-            this.highpass.connect(this.lowpass);
-            this.lowpass.connect(this.workletNode);
+            // DEBUG: BYPASS FILTERS TEMPORARILY
+            // Original: this.microphone.connect(this.highpass); this.highpass.connect(this.lowpass); this.lowpass.connect(this.workletNode);
+            console.log("[AudioEngine] ⚠️ DEBUG MODE: Bypassing filters (Mic -> Worklet directly)");
+            this.microphone.connect(this.workletNode);
+
             this.workletNode.connect(muteGain);
             muteGain.connect(this.audioContext.destination);
 
-            console.log("[AudioEngine] ✅ Audio chain connected: Mic -> Filters -> Worklet");
+            console.log("[AudioEngine] ✅ Audio chain connected: Mic -> Worklet (Filters Bypassed)");
 
             this.isActive = true;
             this.debugInfo.state = 'active';
