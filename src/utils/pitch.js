@@ -9,7 +9,7 @@ export const PitchDetector = {
      * @param {Float32Array} buffer - Audio data
      * @param {number} sampleRate - Sample rate
      * @param {number} adaptiveThreshold - Threshold for peak picking (default 0.15)
-     * @returns {number} Pitch in Hz, or -1 if not found
+     * @returns {Object} { pitch: number, confidence: number } - Pitch in Hz and confidence (0-1)
      */
     calculateYIN(buffer, sampleRate, adaptiveThreshold = 0.15) {
         const bufferSize = buffer.length;
@@ -43,7 +43,7 @@ export const PitchDetector = {
             }
         }
 
-        if (tau == halfSize || yinBuffer[tau] >= adaptiveThreshold) return -1;
+        if (tau == halfSize || yinBuffer[tau] >= adaptiveThreshold) return { pitch: -1, confidence: 0 };
 
         // Parabolic interpolation
         let betterTau = tau;
@@ -56,7 +56,13 @@ export const PitchDetector = {
         }
 
         const pitch = sampleRate / betterTau;
-        if (pitch < 50 || pitch > 800) return -1;
-        return pitch;
+        if (pitch < 50 || pitch > 800) return { pitch: -1, confidence: 0 };
+
+        // Confidence is roughly 1 - minDifference (normalized)
+        // yinBuffer[tau] is the normalized difference at the chosen period
+        // Lower difference = higher confidence
+        const confidence = Math.max(0, 1 - yinBuffer[tau]);
+
+        return { pitch, confidence };
     }
 };

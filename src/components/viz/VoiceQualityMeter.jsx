@@ -73,8 +73,12 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
     // Strain Check
     const isStrained = dataRef.current?.weight > 80;
 
+    // Strain Check
+    const isStrained = dataRef.current?.weight > 80;
+    const isSilent = dataRef.current?.isSilent;
+
     return (
-        <div className="glass-panel rounded-2xl p-6 h-full flex flex-col justify-center">
+        <div className={`glass-panel rounded-2xl p-6 h-full flex flex-col justify-center transition-opacity duration-300 ${isSilent ? 'opacity-30 grayscale' : 'opacity-100'}`}>
             {/* Header */}
             <div className="flex justify-between items-end text-xs font-bold text-slate-400 tracking-wider mb-4">
                 <span className="w-24 text-left">{labels[0]}</span>

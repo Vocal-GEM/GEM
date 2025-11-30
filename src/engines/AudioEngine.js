@@ -44,7 +44,12 @@ export class AudioEngine {
         // DSP State
         this.pitchBuffer = [];
         this.smoothPitchBuffer = [];
+        this.pitchBuffer = [];
+        this.smoothPitchBuffer = [];
         this.lastPitch = 0;
+        this.lastValidPitch = 0; // For octave jump protection
+        this.pitchConfidenceThreshold = 0.6; // Minimum confidence to accept pitch
+        this.jitterBuffer = [];
         this.jitterBuffer = [];
         this.weightBuffer = [];
         this.smoothedH1 = 0;
@@ -245,125 +250,85 @@ export class AudioEngine {
 
             // Pitch
             const dynamicThreshold = 0.15;
-            const pitch = DSP.calculatePitchYIN(buffer, fs, dynamicThreshold); // Use original buffer for pitch for better resolution? No, YIN works on raw.
-            // Note: resonance-processor used 'buffer' (original) for YIN.
+            const { pitch: rawPitch, confidence: pitchConfidence } = DSP.calculatePitchYIN(buffer, fs, dynamicThreshold);
+
+            let pitch = rawPitch;
+
+            // Octave Jump Protection & Confidence Check
+            if (pitch > 0 && pitchConfidence > this.pitchConfidenceThreshold) {
+                // Check for octave jumps if we have a valid previous pitch
+                if (this.lastValidPitch > 0) {
+                    const ratio = pitch / this.lastValidPitch;
+                    // If pitch jumps ~2x (octave up) or ~0.5x (octave down) suddenly
+                    // We only allow it if confidence is VERY high, otherwise we might stick to previous
+                    // or if it persists (handled by smoothing buffer usually, but here we reject outliers)
+
+                    const isOctaveJump = (ratio > 1.8 && ratio < 2.2) || (ratio > 0.4 && ratio < 0.6);
+
+                    if (isOctaveJump && pitchConfidence < 0.9) {
+                        // Likely an octave error, ignore this frame's pitch or use last valid
+                        pitch = -1;
+                    } else {
+                        this.lastValidPitch = pitch;
+                    }
+                } else {
+                    this.lastValidPitch = pitch;
+                }
+            } else {
+                pitch = -1; // Treat low confidence as no pitch
+            }
 
             const spectrum = DSP.simpleFFT(windowed);
 
-            // LPC / Formants
-            const lpcOrder = 12;
-            const r = DSP.computeAutocorrelation(windowed, lpcOrder);
-            const { a, error } = DSP.levinsonDurbin(r, lpcOrder);
-            const lpcEnvelope = DSP.computeLPCSpectrum(a, error, 512);
-            const formantCandidates = DSP.findPeaks(lpcEnvelope, TARGET_RATE);
+            // Vowel Analysis (Only if not silent and has pitch/resonance)
+            let vowel = '';
+            // Only run expensive formant analysis if we have significant signal
+            if (rms > this.adaptiveThreshold * 2) {
+                const lpcOrder = 12;
+                const r = DSP.computeAutocorrelation(windowed, lpcOrder);
+                const { a, error } = DSP.levinsonDurbin(r, lpcOrder);
+                const lpcEnvelope = DSP.computeLPCSpectrum(a, error, 512);
+                const formantCandidates = DSP.findPeaks(lpcEnvelope, TARGET_RATE);
 
-            let p1 = { freq: 0, amp: -Infinity };
-            let p2 = { freq: 0, amp: -Infinity };
+                let p1 = { freq: 0, amp: -Infinity };
+                let p2 = { freq: 0, amp: -Infinity };
 
-            for (let candidate of formantCandidates) {
-                if (candidate.freq >= 200 && candidate.freq <= 1200) {
-                    if (candidate.amp > p1.amp) p1 = candidate;
+                for (let candidate of formantCandidates) {
+                    if (candidate.freq >= 200 && candidate.freq <= 1200) {
+                        if (candidate.amp > p1.amp) p1 = candidate;
+                    }
                 }
-            }
-            for (let candidate of formantCandidates) {
-                if (candidate.freq >= 1200 && candidate.freq <= 3500) {
-                    if (candidate.amp > p2.amp) p2 = candidate;
+                for (let candidate of formantCandidates) {
+                    if (candidate.freq >= 1200 && candidate.freq <= 3500) {
+                        if (candidate.amp > p2.amp) p2 = candidate;
+                    }
                 }
-            }
 
-            // Spectral Centroid
-            let weightedSum = 0;
-            let totalMag = 0;
-            for (let i = 0; i < spectrum.length; i++) {
-                const freq = (i * TARGET_RATE) / (2 * spectrum.length);
-                weightedSum += freq * spectrum[i];
-                totalMag += spectrum[i];
-            }
-            const spectralCentroid = totalMag > 0 ? weightedSum / totalMag : 0;
+                // Formant Smoothing
+                if (!this.smoothedF1) this.smoothedF1 = p1.freq;
+                if (!this.smoothedF2) this.smoothedF2 = p2.freq;
 
-            // Smoothing
-            const resonanceAlpha = 0.2;
-            this.smoothedCentroid = (this.lastResonance * (1 - resonanceAlpha)) + (spectralCentroid * resonanceAlpha);
-            this.lastResonance = this.smoothedCentroid;
-
-            // Weight
-            let weight = 50;
-            if (pitch > 50) {
-                const h1Mag = DSP.getMagnitudeAtFrequency(windowed, pitch, TARGET_RATE);
-                const h2Mag = DSP.getMagnitudeAtFrequency(windowed, pitch * 2, TARGET_RATE);
-                if (h1Mag > 0 && h2Mag > 0) {
-                    const h1db = 20 * Math.log10(h1Mag);
-                    const h2db = 20 * Math.log10(h2Mag);
-                    const diffDb = h1db - h2db;
-                    const clampedDiff = Math.max(-5, Math.min(15, diffDb));
-                    weight = (1.0 - ((clampedDiff + 5) / 20.0)) * 100;
+                if (p1.freq > 0) {
+                    const diff = Math.abs(p1.freq - this.smoothedF1);
+                    const alpha = diff > 100 ? 0.3 : 0.1;
+                    this.smoothedF1 = this.smoothedF1 * (1 - alpha) + p1.freq * alpha;
                 }
-            }
-            this.weightBuffer.push(weight);
-            if (this.weightBuffer.length > 5) this.weightBuffer.shift();
-            const avgWeight = this.weightBuffer.reduce((a, b) => a + b, 0) / this.weightBuffer.length;
+                if (p2.freq > 0) {
+                    const diff = Math.abs(p2.freq - this.smoothedF2);
+                    const alpha = diff > 150 ? 0.3 : 0.1;
+                    this.smoothedF2 = this.smoothedF2 * (1 - alpha) + p2.freq * alpha;
+                }
 
-            // Jitter
-            let jitter = 0;
-            if (pitch > 0 && this.lastPitch > 0) {
-                const diff = Math.abs(pitch - this.lastPitch);
-                this.jitterBuffer.push(diff);
-                if (this.jitterBuffer.length > 5) this.jitterBuffer.shift();
-                jitter = this.jitterBuffer.reduce((a, b) => a + b, 0) / this.jitterBuffer.length;
+                vowel = DSP.estimateVowel(this.smoothedF1, this.smoothedF2);
+            } else {
+                // Reset formants on silence to prevent "ghost" dots
+                this.smoothedF1 = 0;
+                this.smoothedF2 = 0;
+                vowel = '';
             }
-            this.lastPitch = pitch;
-
-            // Shimmer
-            let shimmer = 0;
-            if (rms > 0 && this.lastAmp > 0) {
-                const diff = Math.abs(rms - this.lastAmp);
-                const avg = (rms + this.lastAmp) / 2;
-                const localShimmer = (diff / avg) * 100;
-                this.shimmerBuffer.push(localShimmer);
-                if (this.shimmerBuffer.length > 5) this.shimmerBuffer.shift();
-                shimmer = this.shimmerBuffer.reduce((a, b) => a + b, 0) / this.shimmerBuffer.length;
-            }
-            this.lastAmp = rms;
-
-            // Formant Smoothing
-            if (!this.smoothedF1) this.smoothedF1 = p1.freq;
-            if (!this.smoothedF2) this.smoothedF2 = p2.freq;
-
-            if (p1.freq > 0) {
-                const diff = Math.abs(p1.freq - this.smoothedF1);
-                const alpha = diff > 100 ? 0.3 : 0.1;
-                this.smoothedF1 = this.smoothedF1 * (1 - alpha) + p1.freq * alpha;
-            }
-            if (p2.freq > 0) {
-                const diff = Math.abs(p2.freq - this.smoothedF2);
-                const alpha = diff > 150 ? 0.3 : 0.1;
-                this.smoothedF2 = this.smoothedF2 * (1 - alpha) + p2.freq * alpha;
-            }
-
-            const vowel = DSP.estimateVowel(this.smoothedF1, this.smoothedF2);
 
             // Prepare Update
             this.handleUpdate({
-                pitch,
-                resonance: this.smoothedCentroid,
-                volume: rms,
-                jitter,
-                shimmer,
-                vowel,
-                spectrum,
-                weight: avgWeight,
-                f1: this.smoothedF1,
-                f2: this.smoothedF2,
-                isSilent: rms < this.adaptiveThreshold
-            });
-
-        } else {
-            // Silence
-            this.handleUpdate({
-                pitch: -1,
-                resonance: 0,
-                volume: 0,
-                isSilent: true
             });
         }
     }
@@ -371,7 +336,7 @@ export class AudioEngine {
     handleUpdate(data) {
         if (!this.isActive) return;
 
-        const { pitch, resonance, volume, jitter, shimmer, vowel, spectrum, isSilent, weight, f1, f2 } = data;
+        const { pitch, pitchConfidence, resonance, resonanceConfidence, volume, jitter, shimmer, vowel, spectrum, isSilent, weight, f1, f2 } = data;
 
         // Smoothing for UI
         let smoothPitch = pitch;
@@ -409,7 +374,9 @@ export class AudioEngine {
 
         this.onAudioUpdate({
             pitch: smoothPitch,
+            pitchConfidence,
             resonance: resonance,
+            resonanceConfidence,
             resonanceScore: finalScore,
             rbi: finalScore,
             isBackendActive,
@@ -425,7 +392,9 @@ export class AudioEngine {
             spectrum: spectrum,
             debug: {
                 backend: this.latestBackendAnalysis,
-                method: 'MainThread (YIN)'
+                method: 'MainThread (YIN)',
+                pitchConfidence,
+                resonanceConfidence
             }
         });
     }

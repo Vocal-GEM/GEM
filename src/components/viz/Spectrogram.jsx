@@ -110,7 +110,10 @@ const Spectrogram = React.memo(({ dataRef, audioRef }) => {
                 const val = spectrum[mappedIndex] || 0;
 
                 let intensity;
-                if (dataRef?.current) {
+                // Silence Check
+                if (dataRef?.current?.isSilent) {
+                    intensity = 0;
+                } else if (dataRef?.current) {
                     intensity = Math.log10(val + 1) * 50;
                 } else {
                     intensity = val;

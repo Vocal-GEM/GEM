@@ -541,7 +541,7 @@ const App = () => {
                 </Suspense>
             )}
 
-            <DebugOverlay audioEngine={audioEngineRef.current} />
+            <DebugOverlay audioEngine={audioEngineRef.current} dataRef={dataRef} />
         </div>
     );
 };

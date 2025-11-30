@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { X, Activity, Mic, AlertTriangle, CheckCircle } from 'lucide-react';
 
-const DebugOverlay = ({ audioEngine }) => {
+const DebugOverlay = ({ audioEngine, dataRef }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [debugInfo, setDebugInfo] = useState(null);
+
+    const [realtimeData, setRealtimeData] = useState({});
 
     useEffect(() => {
         if (!isOpen) return;
@@ -14,8 +16,19 @@ const DebugOverlay = ({ audioEngine }) => {
             }
         }, 500);
 
-        return () => clearInterval(interval);
-    }, [isOpen, audioEngine]);
+        const loop = () => {
+            if (dataRef && dataRef.current) {
+                setRealtimeData({ ...dataRef.current });
+            }
+            requestAnimationFrame(loop);
+        };
+        const rafId = requestAnimationFrame(loop);
+
+        return () => {
+            clearInterval(interval);
+            cancelAnimationFrame(rafId);
+        };
+    }, [isOpen, audioEngine, dataRef]);
 
     if (!isOpen) {
         return (
@@ -42,6 +55,50 @@ const DebugOverlay = ({ audioEngine }) => {
             </div>
 
             <div className="space-y-6">
+                {/* Real-time Metrics */}
+                <div className="bg-slate-800 rounded-xl p-4 border border-white/10">
+                    <h3 className="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wider flex items-center gap-2">
+                        <Activity size={14} /> Live Metrics
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4 text-xs font-mono">
+                        <div>
+                            <div className="text-slate-500">Pitch</div>
+                            <div className="text-xl font-bold text-white">
+                                {realtimeData.pitch > 0 ? realtimeData.pitch.toFixed(1) : '--'} <span className="text-xs text-slate-500">Hz</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div className="text-slate-500">Confidence</div>
+                            <div className={`text-xl font-bold ${realtimeData.pitchConfidence > 0.8 ? 'text-green-400' : realtimeData.pitchConfidence > 0.5 ? 'text-yellow-400' : 'text-red-400'}`}>
+                                {(realtimeData.pitchConfidence * 100).toFixed(0)}%
+                            </div>
+                        </div>
+                        <div>
+                            <div className="text-slate-500">Resonance</div>
+                            <div className="text-lg font-bold text-cyan-400">
+                                {realtimeData.resonance ? realtimeData.resonance.toFixed(0) : '--'} <span className="text-xs text-slate-500">Hz</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div className="text-slate-500">Res. Conf.</div>
+                            <div className="text-lg font-bold text-cyan-400">
+                                {(realtimeData.resonanceConfidence * 100).toFixed(0)}%
+                            </div>
+                        </div>
+                        <div>
+                            <div className="text-slate-500">Volume (RMS)</div>
+                            <div className="text-lg font-bold text-emerald-400">
+                                {(realtimeData.volume * 100).toFixed(1)}
+                            </div>
+                        </div>
+                        <div>
+                            <div className="text-slate-500">Status</div>
+                            <div className={`text-lg font-bold ${realtimeData.isSilent ? 'text-slate-500' : 'text-green-400'}`}>
+                                {realtimeData.isSilent ? 'SILENT' : 'ACTIVE'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {/* Audio Context State */}
                 <div className="bg-slate-800 rounded-xl p-4 border border-white/10">
                     <h3 className="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wider">Audio Context</h3>
