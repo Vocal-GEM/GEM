@@ -105,7 +105,7 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
                     {activeTab === 'transcript' && (
                         <div className="space-y-4 animate-in fade-in duration-300">
                             <h3 className="font-bold text-lg mb-4">Color-Coded Transcript</h3>
-                            {analysisResults.words && analysisResults.words.length > 0 ? (
+                            {analysisResults?.words && analysisResults.words.length > 0 ? (
                                 <>
                                     <div className="text-lg leading-relaxed">
                                         {analysisResults.words.map((word, i) => (
@@ -149,7 +149,7 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
                             ) : (
                                 <div className="text-slate-400 bg-slate-800/50 rounded-xl p-6 border border-slate-700">
                                     <p className="mb-2">
-                                        <strong>Transcript:</strong> {analysisResults.transcript}
+                                        <strong>Transcript:</strong> {analysisResults?.transcript || 'No transcript available'}
                                     </p>
                                     <p className="text-sm text-slate-500 mt-4">
                                         Word-level analysis is unavailable. The transcription model could not be loaded.
@@ -177,10 +177,10 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
                                 {/* Pitch Metrics */}
                                 <MetricCard
                                     label="Average Pitch"
-                                    value={analysisResults.overall.pitch?.mean?.toFixed(1) || 'N/A'}
+                                    value={analysisResults?.overall?.pitch?.mean?.toFixed(1) || 'N/A'}
                                     unit="Hz"
                                     status={
-                                        !analysisResults.overall.pitch?.mean ? 'neutral' :
+                                        !analysisResults?.overall?.pitch?.mean ? 'neutral' :
                                             targetRange && (analysisResults.overall.pitch.mean < targetRange.min || analysisResults.overall.pitch.mean > targetRange.max)
                                                 ? 'warning'
                                                 : 'good'
@@ -192,7 +192,7 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
                                 {/* Formants */}
                                 <MetricCard
                                     label="Resonance (F1/F2)"
-                                    value={`${analysisResults.overall.formants?.f1?.toFixed(0) || 'N/A'} / ${analysisResults.overall.formants?.f2?.toFixed(0) || 'N/A'}`}
+                                    value={`${analysisResults?.overall?.formants?.f1?.toFixed(0) || 'N/A'} / ${analysisResults?.overall?.formants?.f2?.toFixed(0) || 'N/A'}`}
                                     unit="Hz"
                                     status="neutral"
                                     description="The 'brightness' or 'darkness' of your voice. Higher resonance typically sounds brighter and more feminine."
@@ -202,7 +202,7 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
                                 {/* Speech Rate */}
                                 <MetricCard
                                     label="Speech Rate"
-                                    value={analysisResults.overall.speechRate?.toFixed(1) || 'N/A'}
+                                    value={analysisResults?.overall?.speechRate?.toFixed(1) || 'N/A'}
                                     unit="syl/s"
                                     status="neutral"
                                     description="How fast you are speaking. Normal conversation is usually 3-5 syllables per second."
@@ -211,7 +211,7 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
                                 {/* Avg Formant */}
                                 <MetricCard
                                     label="Avg Resonance"
-                                    value={analysisResults.overall.avgFormantFreq?.toFixed(0) || 'N/A'}
+                                    value={analysisResults?.overall?.avgFormantFreq?.toFixed(0) || 'N/A'}
                                     unit="Hz"
                                     status="neutral"
                                     description="Average of your formant frequencies. Higher average correlates with feminine perception."
@@ -301,7 +301,7 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
                             )}
 
                             {/* Formant Mismatch Alert */}
-                            {analysisResults.overall.formantMismatch && (
+                            {analysisResults?.overall?.formantMismatch && (
                                 <div className="bg-yellow-500/10 border border-yellow-500/50 rounded-xl p-4 flex items-start gap-3">
                                     <Info className="w-5 h-5 text-yellow-400 mt-0.5" />
                                     <div>
@@ -354,8 +354,8 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
                                 <div>
                                     <h3 className="font-bold text-lg mb-4">Vowel Space (Resonance)</h3>
                                     <VowelSpacePlot
-                                        f1={analysisResults.overall.formants?.f1}
-                                        f2={analysisResults.overall.formants?.f2}
+                                        f1={analysisResults?.overall?.formants?.f1}
+                                        f2={analysisResults?.overall?.formants?.f2}
                                     />
                                     <p className="text-xs text-slate-500 mt-2">
                                         Shows your average resonance position relative to standard vowel targets.
