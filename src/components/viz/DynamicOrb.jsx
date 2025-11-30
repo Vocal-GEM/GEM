@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Diamond, Flame, Bug, Box, Activity, Sliders, Gauge } from 'lucide-react';
 import { useGLTF } from '@react-three/drei';
+import { useSettings } from '../../context/SettingsContext';
 import OrbLegend from './OrbLegend';
 
 

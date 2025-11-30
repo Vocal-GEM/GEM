@@ -2,15 +2,16 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { indexedDB } from '../services/IndexedDBManager';
 import { textToSpeechService } from '../services/TextToSpeechService';
 
-const SettingsContext = createContext();
+const SettingsContext = createContext(null);
 
-export const useSettings = () => {
+// Export the hook
+export function useSettings() {
     const context = useContext(SettingsContext);
     if (!context) {
         throw new Error('useSettings must be used within a SettingsProvider');
     }
     return context;
-};
+}
 
 export const SettingsProvider = ({ children }) => {
     const [settings, setSettings] = useState({
