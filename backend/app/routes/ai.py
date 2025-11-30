@@ -42,7 +42,8 @@ def train_coach():
         if filename.endswith('.pdf'):
             count = rag_system.add_pdf(temp_path)
         elif filename.endswith('.txt') or filename.endswith('.md'):
-            text = file.read().decode('utf-8')
+            with open(temp_path, 'r', encoding='utf-8') as f:
+                text = f.read()
             count = rag_system.add_document(text, source=filename)
             
         # Cleanup
