@@ -38,11 +38,27 @@ def create_app():
     # Ensure upload folder exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-    # CORS Configuration - Allow all origins for development
-    # In production, this should be restricted via ALLOWED_ORIGINS env var
+    # CORS Configuration
+    # Wildcard (*) doesn't work with credentials, so we need explicit origins
+    import re
+    allowed_origins = [
+        'https://vocalgem.vercel.app',
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+    ]
+    
+    # Add any additional origins from env var
+    env_origins = os.environ.get('ALLOWED_ORIGINS', '')
+    if env_origins:
+        allowed_origins.extend([o.strip() for o in env_origins.split(',') if o.strip()])
+    
+    # Add regex for Vercel preview deployments
+    allowed_origins.append(re.compile(r'^https://vocal-.*\.vercel\.app$'))
+    
     CORS(app, 
          supports_credentials=True,
-         origins='*',
+         origins=allowed_origins,
          allow_headers=['Content-Type', 'Authorization'],
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
     
