@@ -115,7 +115,7 @@ const Spectrogram = ({ dataRef, audioRef }) => {
     }, [dataRef, audioRef]);
 
     return (
-        <div className="h-32 w-full relative overflow-hidden rounded-xl bg-black">
+        <div className="h-full w-full relative overflow-hidden rounded-xl bg-black">
             <canvas ref={canvasRef} className="w-full h-full"></canvas>
             <div className="absolute bottom-1 right-2 text-[9px] text-white/50 font-mono">0 - 8kHz</div>
         </div>

@@ -1,18 +1,6 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useAudio } from './context/AudioContext';
 import { useSettings } from './context/SettingsContext';
-import { useAuth } from './context/AuthContext';
-import { useProfile } from './context/ProfileContext';
-import { useStats } from './context/StatsContext';
-import { useJournal } from './context/JournalContext';
-
-// Icons
-import { Mic, Mic2, Camera, ArrowLeft, Wrench, Bot, BarChart2, Activity, BookOpen, ChevronRight } from 'lucide-react';
-
-// Components - UI
-import ErrorBoundary from './components/ui/ErrorBoundary';
-import OfflineIndicator from './components/ui/OfflineIndicator';
-import FeedbackSettings from './components/ui/FeedbackSettings';
 import MigrationModal from './components/ui/MigrationModal';
 import TutorialWizard from './components/ui/TutorialWizard';
 import CompassWizard from './components/ui/CompassWizard';
@@ -36,6 +24,8 @@ import BreathPacer from './components/ui/BreathPacer';
 import MirrorComponent from './components/ui/MirrorComponent';
 import FloatingCamera from './components/ui/FloatingCamera';
 import PitchTargets from './components/ui/PitchTargets';
+import VoiceQualityAnalysis from './components/viz/VoiceQualityAnalysis';
+import VowelAnalysis from './components/viz/VowelAnalysis';
 const SLPDashboard = lazy(() => import('./components/views/SLPDashboard'));
 const PracticeMode = lazy(() => import('./components/views/PracticeMode'));
 const MixingBoardView = lazy(() => import('./components/views/MixingBoardView'));
@@ -268,7 +258,7 @@ const App = () => {
                         {/* Dashboard Grid */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                             {/* Left: Tool Visualization */}
-                            <div className="flex flex-col h-[500px] relative">
+                            <div className="flex flex-col h-[600px] relative">
                                 <div key="tool-container" className="h-full w-full relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5">
                                     <ErrorBoundary fallback={
                                         <div className="w-full h-full flex items-center justify-center text-red-400 p-4 text-center">
@@ -293,21 +283,13 @@ const App = () => {
                                                     colorBlindMode={settings.colorBlindMode}
                                                 />
                                             ) : practiceView === 'pitch' ? (
-                                                <div className="h-full flex flex-col">
-                                                    <div className="flex-1">
-                                                        <PitchVisualizer dataRef={dataRef} />
-                                                    </div>
-                                                    <div className="mt-4">
-                                                        <PitchTargets audioEngine={audioEngineRef} />
-                                                        <PitchPipe audioEngine={audioEngineRef} />
-                                                    </div>
-                                                </div>
+                                                <PitchVisualizer dataRef={dataRef} />
                                             ) : practiceView === 'weight' ? (
-                                                <VoiceQualityMeter dataRef={dataRef} userMode="user" />
+                                                <VoiceQualityMeter dataRef={dataRef} userMode="user" showAnalysis={false} />
                                             ) : practiceView === 'tilt' ? (
                                                 <SpectralTiltMeter dataRef={dataRef} />
                                             ) : practiceView === 'vowel' ? (
-                                                <VowelSpacePlot dataRef={dataRef} />
+                                                <VowelSpacePlot dataRef={dataRef} showAnalysis={false} />
                                             ) : practiceView === 'articulation' ? (
                                                 <div className="h-full overflow-y-auto custom-scrollbar">
                                                     <ArticulationView />
@@ -333,10 +315,29 @@ const App = () => {
                             </div>
 
                             {/* Right: Dashboard & Advice */}
-                            <div className="flex flex-col h-[500px] overflow-y-auto custom-scrollbar pr-2">
+                            <div className="flex flex-col h-[600px] overflow-y-auto custom-scrollbar pr-2">
                                 <div className="h-full min-h-[400px] mb-6">
                                     <GenderPerceptionDashboard dataRef={dataRef} view={practiceView} />
                                 </div>
+
+                                {practiceView === 'pitch' && (
+                                    <div className="mb-6">
+                                        <PitchTargets audioEngine={audioEngineRef} />
+                                        <PitchPipe audioEngine={audioEngineRef} />
+                                    </div>
+                                )}
+
+                                {practiceView === 'weight' && (
+                                    <div className="mb-6">
+                                        <VoiceQualityAnalysis dataRef={dataRef} colorBlindMode={settings.colorBlindMode} />
+                                    </div>
+                                )}
+
+                                {practiceView === 'vowel' && (
+                                    <div className="mb-6">
+                                        <VowelAnalysis dataRef={dataRef} colorBlindMode={settings.colorBlindMode} />
+                                    </div>
+                                )}
 
                                 <ToolExercises tool={practiceView} audioEngine={audioEngineRef.current} />
 

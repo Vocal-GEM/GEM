@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSettings } from '../../context/SettingsContext';
 
-const VowelSpacePlot = ({ f1, f2, dataRef }) => {
+const VowelSpacePlot = ({ f1, f2, dataRef, showAnalysis = true }) => {
     const { colorBlindMode } = useSettings();
 
     // Vowel targets (approximate for feminine resonance)
@@ -68,25 +68,27 @@ const VowelSpacePlot = ({ f1, f2, dataRef }) => {
     return (
         <div className="h-full bg-slate-900 rounded-xl border border-slate-800 relative overflow-hidden">
             {/* Vowel Detection Display */}
-            <div className="absolute top-2 left-2 right-2 z-10 flex items-center justify-between">
-                <div className="glass-panel-dark px-3 py-2 rounded-lg">
-                    <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Detected Vowel</div>
-                    <div className={`text-xl font-bold transition-all ${currentVowel ? 'text-teal-400 animate-pulse' : 'text-slate-600'
-                        }`}>
-                        {currentVowel ? `/${currentVowel}/` : '—'}
+            {showAnalysis && (
+                <div className="absolute top-2 left-2 right-2 z-10 flex items-center justify-between">
+                    <div className="glass-panel-dark px-3 py-2 rounded-lg">
+                        <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Detected Vowel</div>
+                        <div className={`text-xl font-bold transition-all ${currentVowel ? 'text-teal-400 animate-pulse' : 'text-slate-600'
+                            }`}>
+                            {currentVowel ? `/${currentVowel}/` : '—'}
+                        </div>
+                    </div>
+                    <div className="glass-panel-dark px-3 py-2 rounded-lg text-right">
+                        <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Formants</div>
+                        <div className="text-xs font-mono text-slate-300">
+                            F1: <span className={`font-bold ${colorBlindMode ? 'text-purple-400' : 'text-pink-400'}`}>{currentF1 > 0 ? currentF1.toFixed(0) : '—'}</span> Hz
+                        </div>
+                        <div className="text-xs font-mono text-slate-300">
+                            F2: <span className={`font-bold ${colorBlindMode ? 'text-teal-400' : 'text-blue-400'}`}>{currentF2 > 0 ? currentF2.toFixed(0) : '—'}</span> Hz
+                        </div>
                     </div>
                 </div>
-                <div className="glass-panel-dark px-3 py-2 rounded-lg text-right">
-                    <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Formants</div>
-                    <div className="text-xs font-mono text-slate-300">
-                        F1: <span className={`font-bold ${colorBlindMode ? 'text-purple-400' : 'text-pink-400'}`}>{currentF1 > 0 ? currentF1.toFixed(0) : '—'}</span> Hz
-                    </div>
-                    <div className="text-xs font-mono text-slate-300">
-                        F2: <span className={`font-bold ${colorBlindMode ? 'text-teal-400' : 'text-blue-400'}`}>{currentF2 > 0 ? currentF2.toFixed(0) : '—'}</span> Hz
-                    </div>
-                </div>
-            </div>
-            <div className="absolute inset-0 p-4 pt-20">
+            )}
+            <div className={`absolute inset-0 p-4 ${showAnalysis ? 'pt-20' : ''}`}>
                 {/* Grid & Labels */}
                 <div className="w-full h-full border-l border-b border-slate-700 relative">
                     <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-slate-500">
