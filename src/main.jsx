@@ -26,9 +26,9 @@ const updateSW = registerSW({
 ReactDOM.createRoot(document.getElementById('root')).render(
     <GlobalErrorBoundary>
         <SettingsProvider>
-            <AudioProvider>
-                <AuthProvider>
-                    <ProfileProvider>
+            <AuthProvider>
+                <ProfileProvider>
+                    <AudioProvider>
                         <NavigationProvider>
                             <StatsProvider>
                                 <JournalProvider>
@@ -40,9 +40,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                                 </JournalProvider>
                             </StatsProvider>
                         </NavigationProvider>
-                    </ProfileProvider>
-                </AuthProvider>
-            </AudioProvider>
+                    </AudioProvider>
+                </ProfileProvider>
+            </AuthProvider>
         </SettingsProvider>
     </GlobalErrorBoundary>,
 )
