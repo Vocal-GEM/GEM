@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrendingUp, Calendar, Clock } from 'lucide-react';
 import ProgressCharts from '../viz/ProgressCharts';
+import EmptyState from '../ui/EmptyState';
 import { useCourseProgress } from '../../hooks/useCourseProgress';
 
 const ProgressView = () => {
@@ -39,9 +40,10 @@ const ProgressView = () => {
                     <Calendar className="w-5 h-5 text-purple-400" />
                     Recent Activity
                 </h3>
-                <div className="text-center py-8 text-slate-500 italic">
-                    Detailed session history coming soon...
-                </div>
+                <EmptyState
+                    title="Coming Soon"
+                    description="Detailed session history and advanced analytics will be available in a future update."
+                />
             </div>
         </div>
     );

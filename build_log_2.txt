@@ -4,43 +4,66 @@
 
 [36mvite v5.4.21 [32mbuilding for production...[36m[39m
 transforming...
-[32mΓ£ô[39m 2632 modules transformed.
+[32mΓ£ô[39m 3011 modules transformed.
 node_modules/onnxruntime-web/dist/ort-web.min.js (6:62546): Use of eval in "node_modules/onnxruntime-web/dist/ort-web.min.js" is strongly discouraged as it poses security risks and may cause issues with minification.
 rendering chunks...
 computing gzip size...
-[2mdist/[22m[32mindex.html                                    [39m[1m[2m  1.18 kB[22m[1m[22m[2m Γöé gzip:   0.54 kB[22m
-[2mdist/[22m[35massets/index-OvieRPJ2.css                     [39m[1m[2m 76.11 kB[22m[1m[22m[2m Γöé gzip:  12.13 kB[22m
-[2mdist/[22m[36massets/LiveMetricsBar-CjGvEvrK.js             [39m[1m[2m  0.92 kB[22m[1m[22m[2m Γöé gzip:   0.52 kB[22m
+[2mdist/[22m[32mmanifest.webmanifest                          [39m[1m[2m  0.35 kB[22m[1m[22m
+[2mdist/[22m[32mindex.html                                    [39m[1m[2m  1.16 kB[22m[1m[22m[2m Γöé gzip:   0.53 kB[22m
+[2mdist/[22m[35massets/index-DlZURxxt.css                     [39m[1m[2m 86.38 kB[22m[1m[22m[2m Γöé gzip:  13.36 kB[22m
+[2mdist/[22m[36massets/LiveMetricsBar-aLLE3n4c.js             [39m[1m[2m  0.92 kB[22m[1m[22m[2m Γöé gzip:   0.52 kB[22m
+[2mdist/[22m[36massets/AudioLibrary-B_AgdkU5.js               [39m[1m[2m  1.74 kB[22m[1m[22m[2m Γöé gzip:   0.83 kB[22m
 [2mdist/[22m[36massets/RenderCoordinator-gQBUuF49.js          [39m[1m[2m  1.86 kB[22m[1m[22m[2m Γöé gzip:   0.85 kB[22m
-[2mdist/[22m[36massets/Spectrogram-DKnCFmFV.js                [39m[1m[2m  2.12 kB[22m[1m[22m[2m Γöé gzip:   1.13 kB[22m
-[2mdist/[22m[36massets/HighResSpectrogram-DfAbABKI.js         [39m[1m[2m  2.64 kB[22m[1m[22m[2m Γöé gzip:   1.33 kB[22m
-[2mdist/[22m[36massets/PitchOrb-CSxrVnP8.js                   [39m[1m[2m  3.05 kB[22m[1m[22m[2m Γöé gzip:   1.57 kB[22m
-[2mdist/[22m[36massets/VowelSpacePlot-CbaWPr5x.js             [39m[1m[2m  3.68 kB[22m[1m[22m[2m Γöé gzip:   1.43 kB[22m
-[2mdist/[22m[36massets/SpectralTiltMeter-CPX0fZUV.js          [39m[1m[2m  4.24 kB[22m[1m[22m[2m Γöé gzip:   1.53 kB[22m
-[2mdist/[22m[36massets/ContourVisualizer-CcBoLweE.js          [39m[1m[2m  4.32 kB[22m[1m[22m[2m Γöé gzip:   1.65 kB[22m
-[2mdist/[22m[36massets/VoiceRangeProfile-BrRVvDt7.js          [39m[1m[2m  4.50 kB[22m[1m[22m[2m Γöé gzip:   1.76 kB[22m
-[2mdist/[22m[36massets/ResonanceOrb-Dl7Ay7Mb.js               [39m[1m[2m  4.81 kB[22m[1m[22m[2m Γöé gzip:   1.96 kB[22m
-[2mdist/[22m[36massets/GenderPerceptionDashboard-CzrAKiAG.js  [39m[1m[2m  5.11 kB[22m[1m[22m[2m Γöé gzip:   1.41 kB[22m
-[2mdist/[22m[36massets/VoiceQualityMeter-BRCLsCY5.js          [39m[1m[2m  5.31 kB[22m[1m[22m[2m Γöé gzip:   1.74 kB[22m
-[2mdist/[22m[36massets/QualityVisualizer-DOlLEnA_.js          [39m[1m[2m  6.15 kB[22m[1m[22m[2m Γöé gzip:   1.85 kB[22m
-[2mdist/[22m[36massets/transcriptionEngine-BY4quKyY.js        [39m[1m[2m  7.51 kB[22m[1m[22m[2m Γöé gzip:   3.06 kB[22m
-[2mdist/[22m[36massets/MixingBoardView-DWQHGMf1.js            [39m[1m[2m  8.14 kB[22m[1m[22m[2m Γöé gzip:   2.91 kB[22m
-[2mdist/[22m[36massets/PitchVisualizer-BSMG66YL.js            [39m[1m[2m  8.28 kB[22m[1m[22m[2m Γöé gzip:   3.16 kB[22m
-[2mdist/[22m[36massets/VocalFoldsView-BtDa48fx.js             [39m[1m[2m 12.68 kB[22m[1m[22m[2m Γöé gzip:   3.49 kB[22m
-[2mdist/[22m[36massets/ArticulationView-A7Cysotz.js           [39m[1m[2m 14.81 kB[22m[1m[22m[2m Γöé gzip:   5.31 kB[22m
-[2mdist/[22m[36massets/DynamicOrb-B58anYUt.js                 [39m[1m[2m 20.73 kB[22m[1m[22m[2m Γöé gzip:   6.76 kB[22m
+[2mdist/[22m[36massets/VowelAnalysis-DNlPTDQo.js              [39m[1m[2m  2.06 kB[22m[1m[22m[2m Γöé gzip:   0.80 kB[22m
+[2mdist/[22m[36massets/index-BRegxN55.js                      [39m[1m[2m  2.31 kB[22m[1m[22m[2m Γöé gzip:   1.10 kB[22m
+[2mdist/[22m[36massets/ResonanceMetrics-RBCudlKC.js           [39m[1m[2m  2.32 kB[22m[1m[22m[2m Γöé gzip:   1.10 kB[22m
+[2mdist/[22m[36massets/CompassWizard-BCsb5mJF.js              [39m[1m[2m  2.47 kB[22m[1m[22m[2m Γöé gzip:   0.80 kB[22m
+[2mdist/[22m[36massets/Spectrogram-CLxni-JY.js                [39m[1m[2m  2.49 kB[22m[1m[22m[2m Γöé gzip:   1.32 kB[22m
+[2mdist/[22m[36massets/HighResSpectrogram-BUdB9uD0.js         [39m[1m[2m  2.64 kB[22m[1m[22m[2m Γöé gzip:   1.33 kB[22m
+[2mdist/[22m[36massets/VoiceQualityAnalysis-DWZJ7fL-.js       [39m[1m[2m  2.91 kB[22m[1m[22m[2m Γöé gzip:   1.04 kB[22m
+[2mdist/[22m[36massets/ToolExercises-z0Xpz7D0.js              [39m[1m[2m  3.01 kB[22m[1m[22m[2m Γöé gzip:   1.04 kB[22m
+[2mdist/[22m[36massets/PitchOrb-D2k-aHVi.js                   [39m[1m[2m  3.05 kB[22m[1m[22m[2m Γöé gzip:   1.57 kB[22m
+[2mdist/[22m[36massets/VowelSpacePlot-DN8jJ1M8.js             [39m[1m[2m  3.97 kB[22m[1m[22m[2m Γöé gzip:   1.59 kB[22m
+[2mdist/[22m[36massets/CalibrationWizard-Dl8YFhfu.js          [39m[1m[2m  3.99 kB[22m[1m[22m[2m Γöé gzip:   1.48 kB[22m
+[2mdist/[22m[36massets/ContourVisualizer-BWZ87iGM.js          [39m[1m[2m  4.32 kB[22m[1m[22m[2m Γöé gzip:   1.65 kB[22m
+[2mdist/[22m[36massets/TutorialWizard-CSXNk3-y.js             [39m[1m[2m  4.53 kB[22m[1m[22m[2m Γöé gzip:   1.70 kB[22m
+[2mdist/[22m[36massets/SpectralTiltMeter-F6avSZ-3.js          [39m[1m[2m  4.61 kB[22m[1m[22m[2m Γöé gzip:   1.67 kB[22m
+[2mdist/[22m[36massets/ProgressView-C5pOrnwC.js               [39m[1m[2m  5.59 kB[22m[1m[22m[2m Γöé gzip:   2.17 kB[22m
+[2mdist/[22m[36massets/workbox-window.prod.es5-vqzQaGvo.js    [39m[1m[2m  5.72 kB[22m[1m[22m[2m Γöé gzip:   2.35 kB[22m
+[2mdist/[22m[36massets/VoiceQualityMeter-C1elWblW.js          [39m[1m[2m  6.53 kB[22m[1m[22m[2m Γöé gzip:   2.08 kB[22m
+[2mdist/[22m[36massets/MixingBoardView-506JBTu_.js            [39m[1m[2m  6.73 kB[22m[1m[22m[2m Γöé gzip:   2.39 kB[22m
+[2mdist/[22m[36massets/ComparisonTool-DE8l3Qqc.js             [39m[1m[2m  7.07 kB[22m[1m[22m[2m Γöé gzip:   2.40 kB[22m
+[2mdist/[22m[36massets/GenderPerceptionDashboard-Dcz2oxLw.js  [39m[1m[2m  8.02 kB[22m[1m[22m[2m Γöé gzip:   2.40 kB[22m
+[2mdist/[22m[36massets/ResonanceOrb-UNo7eWhw.js               [39m[1m[2m  8.94 kB[22m[1m[22m[2m Γöé gzip:   3.17 kB[22m
+[2mdist/[22m[36massets/PitchVisualizer-cN9Yw1GF.js            [39m[1m[2m  9.14 kB[22m[1m[22m[2m Γöé gzip:   3.53 kB[22m
+[2mdist/[22m[36massets/CoachView-n_bmoOGn.js                  [39m[1m[2m  9.68 kB[22m[1m[22m[2m Γöé gzip:   3.28 kB[22m
+[2mdist/[22m[36massets/PracticeMode-BB7NUoVv.js               [39m[1m[2m 10.33 kB[22m[1m[22m[2m Γöé gzip:   3.41 kB[22m
+[2mdist/[22m[36massets/courseData-BYf6KDTg.js                 [39m[1m[2m 10.86 kB[22m[1m[22m[2m Γöé gzip:   3.92 kB[22m
+[2mdist/[22m[36massets/VocalFoldsView-BaRN-xm6.js             [39m[1m[2m 12.68 kB[22m[1m[22m[2m Γöé gzip:   3.49 kB[22m
+[2mdist/[22m[36massets/VoiceQualityView-CYEzFZVS.js           [39m[1m[2m 14.68 kB[22m[1m[22m[2m Γöé gzip:   5.09 kB[22m
+[2mdist/[22m[36massets/HistoryView-B09cgPD1.js                [39m[1m[2m 15.68 kB[22m[1m[22m[2m Γöé gzip:   5.34 kB[22m
+[2mdist/[22m[36massets/FeminizationCourse-DsxV8DxX.js         [39m[1m[2m 16.85 kB[22m[1m[22m[2m Γöé gzip:   4.50 kB[22m
 [2mdist/[22m[36massets/purify.es-B6FQ9oRL.js                  [39m[1m[2m 22.57 kB[22m[1m[22m[2m Γöé gzip:   8.74 kB[22m
-[2mdist/[22m[36massets/FeminizationCourse-C1JScaFn.js         [39m[1m[2m 23.98 kB[22m[1m[22m[2m Γöé gzip:   7.70 kB[22m
-[2mdist/[22m[36massets/ui-icons-BZ4RkQlo.js                   [39m[1m[2m 27.97 kB[22m[1m[22m[2m Γöé gzip:   5.53 kB[22m
-[2mdist/[22m[36massets/AnalysisView-BhiWFDaW.js               [39m[1m[2m 30.66 kB[22m[1m[22m[2m Γöé gzip:   9.07 kB[22m
-[2mdist/[22m[36massets/react-vendor-LzARHRN1.js               [39m[1m[2m 30.92 kB[22m[1m[22m[2m Γöé gzip:  11.56 kB[22m
-[2mdist/[22m[36massets/SLPDashboard-C0M-pI79.js               [39m[1m[2m 33.56 kB[22m[1m[22m[2m Γöé gzip:   8.98 kB[22m
-[2mdist/[22m[36massets/PracticeMode-BBTcTFte.js               [39m[1m[2m 37.29 kB[22m[1m[22m[2m Γöé gzip:  12.61 kB[22m
-[2mdist/[22m[36massets/index.es-D_iyLDi1.js                   [39m[1m[2m150.51 kB[22m[1m[22m[2m Γöé gzip:  51.45 kB[22m
+[2mdist/[22m[36massets/DynamicOrb-CrVrpQSt.js                 [39m[1m[2m 23.25 kB[22m[1m[22m[2m Γöé gzip:   7.55 kB[22m
+[2mdist/[22m[36massets/ArticulationView-D2204vLZ.js           [39m[1m[2m 24.09 kB[22m[1m[22m[2m Γöé gzip:   8.80 kB[22m
+[2mdist/[22m[36massets/AnalysisView-B94b_oLC.js               [39m[1m[2m 24.45 kB[22m[1m[22m[2m Γöé gzip:   7.24 kB[22m
+[2mdist/[22m[36massets/coachEngine-Bp1P6Ecu.js                [39m[1m[2m 25.38 kB[22m[1m[22m[2m Γöé gzip:   9.14 kB[22m
+[2mdist/[22m[36massets/ui-icons-IO9AWhYu.js                   [39m[1m[2m 29.30 kB[22m[1m[22m[2m Γöé gzip:   6.48 kB[22m
+[2mdist/[22m[36massets/react-vendor-DQ5HLSK3.js               [39m[1m[2m 30.92 kB[22m[1m[22m[2m Γöé gzip:  11.56 kB[22m
+[2mdist/[22m[36massets/index-rnGwDKCF.js                      [39m[1m[2m117.40 kB[22m[1m[22m[2m Γöé gzip:  36.05 kB[22m
+[2mdist/[22m[36massets/index.es-Lmy2WwSO.js                   [39m[1m[2m150.51 kB[22m[1m[22m[2m Γöé gzip:  51.45 kB[22m
+[2mdist/[22m[36massets/chart-DPFeTzUf.js                      [39m[1m[2m173.73 kB[22m[1m[22m[2m Γöé gzip:  60.75 kB[22m
 [2mdist/[22m[36massets/html2canvas.esm-CBrSDip1.js            [39m[1m[2m201.42 kB[22m[1m[22m[2m Γöé gzip:  48.03 kB[22m
-[2mdist/[22m[36massets/index-DTYdSAjB.js                      [39m[1m[2m289.91 kB[22m[1m[22m[2m Γöé gzip:  80.28 kB[22m
-[2mdist/[22m[36massets/three-fiber-CRd_1cSz.js                [39m[1m[2m352.39 kB[22m[1m[22m[2m Γöé gzip: 111.67 kB[22m
-[2mdist/[22m[36massets/pdf-CfEEHNgT.js                        [39m[1m[2m418.54 kB[22m[1m[22m[2m Γöé gzip: 136.71 kB[22m
-[2mdist/[22m[36massets/three-core-GZsPmsKS.js                 [39m[1m[2m719.08 kB[22m[1m[22m[2m Γöé gzip: 188.92 kB[22m
-[2mdist/[22m[36massets/transformers-C8kztv6l.js               [39m[1m[2m814.36 kB[22m[1m[22m[2m Γöé gzip: 198.04 kB[22m
-[32mΓ£ô built in 14.19s[39m
+[2mdist/[22m[36massets/index-CNVZXJYD.js                      [39m[1m[2m213.52 kB[22m[1m[22m[2m Γöé gzip:  57.91 kB[22m
+[2mdist/[22m[36massets/three-fiber-ZN1OABCh.js                [39m[1m[2m368.43 kB[22m[1m[22m[2m Γöé gzip: 116.44 kB[22m
+[2mdist/[22m[36massets/pdf-Ks0LsX0l.js                        [39m[1m[2m418.54 kB[22m[1m[22m[2m Γöé gzip: 136.71 kB[22m
+[2mdist/[22m[36massets/three-core--BK7ZjWg.js                 [39m[1m[2m719.13 kB[22m[1m[22m[2m Γöé gzip: 188.94 kB[22m
+[2mdist/[22m[36massets/transformers-DItQpqX6.js               [39m[1m[2m814.36 kB[22m[1m[22m[2m Γöé gzip: 198.04 kB[22m
+[32mΓ£ô built in 1m 23s[39m
+
+PWA v1.2.0
+mode      generateSW
+precache  60 entries (5643.94 KiB)
+files generated
+  dist/sw.js
+  dist/workbox-1d305bb8.js

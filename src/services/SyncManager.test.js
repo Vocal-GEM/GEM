@@ -61,14 +61,20 @@ describe('SyncManager', () => {
     });
 
     it('should retry on failure', async () => {
+        vi.useFakeTimers();
         global.fetch.mockRejectedValue(new Error('Network error'));
 
         await syncManager.push('journal', { text: 'test' });
 
+        // Wait for the initial sync attempt to fail
         await new Promise(resolve => setTimeout(resolve, 100));
 
         expect(global.fetch).toHaveBeenCalled();
         expect(syncManager.queue.length).toBe(1); // Should remain in queue
         expect(syncManager.retryAttempts.size).toBe(1);
+
+        // Clear any pending timeouts to prevent test hang
+        vi.clearAllTimers();
+        vi.useRealTimers();
     });
 });

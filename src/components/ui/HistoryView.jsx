@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Book, FileText, TrendingUp, Calendar, Clock, Activity, BarChart2, List, Mic } from 'lucide-react';
+import EmptyState from './EmptyState';
 import { useProfile } from '../../context/ProfileContext';
 import { pdfReportGenerator } from '../../utils/pdfReportGenerator';
 import {
@@ -274,9 +275,11 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
                 <div className="space-y-4">
                     <h3 className="text-lg font-bold mb-2 px-1">Recent Sessions</h3>
                     {sessions.length === 0 ? (
-                        <div className="text-center py-10 text-slate-500">
-                            <p>No practice sessions recorded yet.</p>
-                        </div>
+                        <EmptyState
+                            icon={Activity}
+                            title="No Sessions Yet"
+                            description="Your practice sessions will appear here once you start practicing."
+                        />
                     ) : (
                         sessions.map((session, i) => (
                             <div key={i} className="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl flex justify-between items-center">
@@ -325,9 +328,13 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
                     )}
 
                     {journals.length === 0 ? (
-                        <div className="text-center py-10 text-slate-500">
-                            <p>No journal entries yet.</p>
-                        </div>
+                        <EmptyState
+                            icon={Book}
+                            title="No Journal Entries"
+                            description="Keep track of your progress by adding journal entries."
+                            actionLabel="Create First Entry"
+                            onAction={onLogClick}
+                        />
                     ) : (
                         journals.slice().reverse().map((entry, i) => (
                             <div key={i} className="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl">
