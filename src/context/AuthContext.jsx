@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const initAuth = async () => {
             try {
-                const res = await fetch(`${API_URL}/api/me`);
+                const res = await fetch(`${API_URL}/api/me`, { credentials: 'include' });
                 if (res.ok) {
                     const data = await res.json();
                     if (data.user) {
@@ -37,7 +37,8 @@ export const AuthProvider = ({ children }) => {
             const res = await fetch(`${API_URL}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ username, password }),
+                credentials: 'include'
             });
             if (res.ok) {
                 const data = await res.json();
@@ -54,7 +55,8 @@ export const AuthProvider = ({ children }) => {
             const res = await fetch(`${API_URL}/api/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ username, password }),
+                credentials: 'include'
             });
 
             const data = await res.json();
@@ -73,7 +75,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await fetch(`${API_URL}/api/logout`, { method: 'POST' });
+            await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
             setUser(null);
         } catch (e) { console.error(e); }
     };

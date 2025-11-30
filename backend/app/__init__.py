@@ -91,9 +91,9 @@ def create_app():
         return response
     
     # Session Security
-    app.config['SESSION_COOKIE_SECURE'] = os.environ.get('FLASK_ENV') == 'production'
+    app.config['SESSION_COOKIE_SECURE'] = True # Required for SameSite=None
     app.config['SESSION_COOKIE_HTTPONLY'] = True
-    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    app.config['SESSION_COOKIE_SAMESITE'] = 'None' # Allow cross-origin (localhost -> render)
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
     db.init_app(app)

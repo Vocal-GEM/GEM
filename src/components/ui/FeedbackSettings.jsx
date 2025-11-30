@@ -49,6 +49,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
             const response = await fetch(`${API_URL}/api/train`, {
                 method: 'POST',
                 body: formData,
+                credentials: 'include',
                 // Don't set Content-Type header, let browser set it with boundary for FormData
             });
 
