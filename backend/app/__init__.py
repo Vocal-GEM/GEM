@@ -39,8 +39,11 @@ def create_app():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
     # CORS Configuration
-    # Always allow localhost (any port) for local development
     import re
+    allowed_origins_raw = os.environ.get('ALLOWED_ORIGINS', '')
+    allowed_origins = [o.strip() for o in allowed_origins_raw.split(',') if o.strip()]
+    
+    # Always allow localhost (any port) for local development
     allowed_origins.extend([
         re.compile(r'^http://localhost:\d+$'),
         re.compile(r'^http://127\.0\.0\.1:\d+$'),
