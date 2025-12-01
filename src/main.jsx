@@ -11,6 +11,7 @@ import { StatsProvider } from './context/StatsContext'
 import { JournalProvider } from './context/JournalContext'
 import { ClientProvider } from './context/ClientContext'
 import { NavigationProvider } from './context/NavigationContext'
+import { LayoutProvider } from './context/LayoutContext'
 import GlobalErrorBoundary from './components/ui/GlobalErrorBoundary'
 
 import { registerSW } from 'virtual:pwa-register'
@@ -30,15 +31,17 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 <ProfileProvider>
                     <AudioProvider>
                         <NavigationProvider>
-                            <StatsProvider>
-                                <JournalProvider>
-                                    <ClientProvider>
-                                        <HashRouter>
-                                            <App />
-                                        </HashRouter>
-                                    </ClientProvider>
-                                </JournalProvider>
-                            </StatsProvider>
+                            <LayoutProvider>
+                                <StatsProvider>
+                                    <JournalProvider>
+                                        <ClientProvider>
+                                            <HashRouter>
+                                                <App />
+                                            </HashRouter>
+                                        </ClientProvider>
+                                    </JournalProvider>
+                                </StatsProvider>
+                            </LayoutProvider>
                         </NavigationProvider>
                     </AudioProvider>
                 </ProfileProvider>

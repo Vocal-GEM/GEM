@@ -164,20 +164,20 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
     return (
         <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 h-full flex flex-col">
             {/* Header */}
-            <div className="flex items-center gap-2 mb-4 shrink-0">
+            <div className="flex items-center gap-2 mb-2 shrink-0">
                 <Activity className="w-4 h-4 text-slate-400" />
                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Gender Perception</h3>
             </div>
 
             {/* Perception Badge */}
-            <div className={`mb-4 px-4 py-3 rounded-lg border ${getPerceptionColor()} text-center shrink-0`}>
+            <div className={`mb-2 px-4 py-3 rounded-lg border ${getPerceptionColor()} text-center shrink-0`}>
                 <div className="text-xs font-bold uppercase tracking-wider opacity-60 mb-1">Current Perception</div>
                 <div className="text-2xl font-bold">{metrics.perception}</div>
             </div>
 
             {/* Target & Advice Section (New) */}
             {(targetInfo || advice) && (
-                <div className="mb-4 space-y-2 shrink-0">
+                <div className="mb-2 space-y-1 shrink-0">
                     {targetInfo && (
                         <div className="bg-slate-800/80 rounded-lg p-3 border border-slate-700/50 flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -201,7 +201,7 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
             {/* Scrollable Content Area */}
             <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar">
                 {/* Primary Metrics Grid */}
-                <div className="grid grid-cols-2 gap-3 text-xs mb-3">
+                <div className="grid grid-cols-2 gap-2 text-xs mb-2">
                     {/* Pitch */}
                     <div className={`bg-slate-800/50 rounded-lg p-3 border ${view === 'pitch' ? 'border-teal-500/50 shadow-[0_0_10px_rgba(20,184,166,0.1)]' : 'border-slate-700/30'}`}>
                         <div className="text-slate-500 uppercase tracking-wider mb-1 text-[10px]">Pitch (F0)</div>
@@ -238,7 +238,7 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
                 </div>
 
                 {/* Quality Metrics */}
-                <div className="border-t border-slate-700/30 pt-3 mb-3">
+                <div className="border-t border-slate-700/30 pt-2 mb-2">
                     <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Voice Quality</div>
                     <div className="grid grid-cols-3 gap-2 text-xs">
                         {/* Jitter */}
@@ -263,7 +263,7 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
             </div>
 
             {/* Info Footer */}
-            <div className="mt-3 pt-3 border-t border-slate-700/30 shrink-0">
+            <div className="mt-2 pt-2 border-t border-slate-700/30 shrink-0">
                 <div className="text-[9px] text-slate-500 text-center">
                     Comprehensive voice analysis metrics
                 </div>

@@ -78,8 +78,7 @@ import { useAchievements } from './hooks/useAchievements';
 
 import { TourProvider } from './context/TourContext';
 import TourOverlay from './components/ui/TourOverlay';
-import { TourProvider } from './context/TourContext';
-import TourOverlay from './components/ui/TourOverlay';
+
 import CommandPalette from './components/ui/CommandPalette';
 import Breadcrumbs from './components/ui/Breadcrumbs';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
@@ -143,6 +142,7 @@ const App = () => {
     } = useNavigation();
 
     const [showQuickSettings, setShowQuickSettings] = useState(false);
+    const [dismissedError, setDismissedError] = useState(false);
 
     // Initialize Analytics
     useEffect(() => {
@@ -179,6 +179,22 @@ const App = () => {
 
     const showAssessment = modals.assessment;
     const setShowAssessment = (v) => v ? openModal('assessment') : closeModal('assessment');
+
+    const showTutorial = modals.tutorial;
+    const setShowTutorial = (v) => v ? openModal('tutorial') : closeModal('tutorial');
+
+    const showCompass = modals.compass;
+    const setShowCompass = (v) => v ? openModal('compass') : closeModal('compass');
+
+    const showWarmUp = modals.warmup;
+    const setShowWarmUp = (v) => v ? openModal('warmup') : closeModal('warmup');
+
+    const showVocalFolds = modals.vocalFolds;
+    const setShowVocalFolds = (v) => v ? openModal('vocalFolds') : closeModal('vocalFolds');
+
+    // Onboarding hooks
+    const { unlockedAchievement, closeAchievement } = useAchievements();
+    const { handleTutorialComplete, handleCompassComplete, handleCalibrationComplete } = useOnboarding();
 
     return (
         <TourProvider>
@@ -238,7 +254,7 @@ const App = () => {
                     onDismiss={() => setDismissedError(true)}
                 />
 
-                <main id="main-content" className="flex-1 max-w-[1600px] mx-auto w-full p-4 pb-24">
+                <main id="main-content" className="flex-1 max-w-[1600px] mx-auto w-full p-3 pb-24">
                     <Breadcrumbs />
                     {activeTab === 'practice' && (
                         <Suspense fallback={<LoadingSpinner />}>
@@ -281,7 +297,7 @@ const App = () => {
 
                     {
                         activeTab === 'tools' && (
-                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <div className="flex items-center gap-2 mb-4">
                                     <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><ArrowLeft /></button>
                                     <h2 className="text-xl font-bold">Tools</h2>
@@ -407,8 +423,9 @@ const App = () => {
                         achievement={unlockedAchievement}
                         onClose={closeAchievement}
                     />
-                </main >
-            </div >
+                </main>
+                <BottomNav activeTab={activeTab} onNavigate={setActiveTab} />
+            </div>
         </TourProvider >
     );
 };

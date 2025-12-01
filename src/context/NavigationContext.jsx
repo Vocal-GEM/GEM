@@ -16,7 +16,7 @@ export const NavigationProvider = ({ children }) => {
     const [activeView, setActiveView] = useState('practice');
 
     // Practice Tabs: 'overview', 'pitch', 'resonance', 'weight', 'vowel', 'tilt', 'articulation', 'contour', 'quality', 'spectrogram', 'all'
-    const [practiceTab, setPracticeTab] = useState('pitch'); // Changed default from 'overview' (which didn't exist) to 'pitch' for lighter load
+    const [practiceTab, setPracticeTab] = useState('overview'); // Default to overview to show Dynamic Orb
 
     // History State for Breadcrumbs
     const [history, setHistory] = useState([]);

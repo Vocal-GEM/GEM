@@ -18,6 +18,9 @@ import VoiceRangeProfile from '../viz/VoiceRangeProfile';
 import MPTTracker from '../viz/MPTTracker';
 import SZRatio from '../viz/SZRatio';
 import IntonationTrainer from '../viz/IntonationTrainer';
+import ResizableToolGrid, { GridTool } from '../layout/ResizableToolGrid';
+import LayoutControls from '../ui/LayoutControls';
+import { useLayout } from '../../context/LayoutContext';
 
 
 const PracticeView = () => {
@@ -34,6 +37,7 @@ const PracticeView = () => {
     // But for this file, I'll access it from SettingsContext assuming I'll put it there.
     const { userMode } = settings; // Assuming userMode is part of settings object now.
     const navigate = useNavigate();
+    const { toggleTool, activeTools } = useLayout();
 
     const [activeGame, setActiveGame] = useState('pitch'); // Reusing this for tab state: 'pitch' | 'resonance' | 'range' | 'spectrogram' | 'clinical'
     const [showTools, setShowTools] = useState(false);
@@ -87,68 +91,51 @@ const PracticeView = () => {
 
             {/* Advanced Tools Drawer (Slide Up) */}
             {showTools && (
-                <div className="animate-in slide-in-from-bottom-10 fade-in duration-300 pt-4 pb-20 bg-slate-900/90 backdrop-blur-xl rounded-t-3xl border-t border-white/10 shadow-2xl absolute bottom-0 left-0 right-0 h-[60vh] flex flex-col z-40">
+                <div className="animate-in slide-in-from-bottom-10 fade-in duration-300 pt-4 pb-4 bg-slate-900/95 backdrop-blur-xl rounded-t-3xl border-t border-white/10 shadow-2xl absolute bottom-0 left-0 right-0 h-[75vh] flex flex-col z-40">
 
                     {/* Drawer Handle */}
-                    <div className="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-4 shrink-0" onClick={() => setShowTools(false)}></div>
+                    <div className="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-4 shrink-0 cursor-pointer hover:bg-slate-600 transition-colors" onClick={() => setShowTools(false)}></div>
 
-                    {/* Tabs */}
-                    <div className="flex gap-2 px-4 mb-4 overflow-x-auto shrink-0 pb-2 no-scrollbar">
-                        {[
-                            { id: 'pitch', label: 'Pitch', icon: 'Activity' },
-                            { id: 'range', label: 'Range', icon: 'Maximize2' },
-                            // Hide advanced tools in beginner mode unless "Show All" is clicked
-                            ...((!settings.beginnerMode || showAllTools) ? [
-                                { id: 'weight', label: 'Weight', icon: 'Anchor' },
-                                { id: 'vowel', label: 'Vowel', icon: 'Aperture' },
-                                { id: 'spectrogram', label: 'Spectrogram', icon: 'Waves' },
-                                { id: 'all', label: 'Show All', icon: 'LayoutGrid' },
-                                ...(userMode === 'slp' ? [{ id: 'clinical', label: 'Clinical', icon: 'Stethoscope' }] : [])
-                            ] : [])
-                        ].map(tab => {
-                            const Icon = {
-                                'Activity': Activity,
-                                'Anchor': Anchor,
-                                'Aperture': Aperture,
-                                'Maximize2': Maximize2,
-                                'Waves': Waves,
-                                'LayoutGrid': LayoutGrid,
-                                'Stethoscope': Stethoscope
-                            }[tab.icon];
-
-                            return (
+                    {/* Toolbar */}
+                    <div className="flex items-center justify-between px-4 mb-4 shrink-0 gap-4">
+                        {/* Tool Toggles */}
+                        <div className="flex gap-2 overflow-x-auto no-scrollbar flex-1 items-center">
+                            {[
+                                { id: 'pitch', label: 'Pitch', icon: Activity },
+                                { id: 'resonance', label: 'Resonance', icon: Activity },
+                                { id: 'range', label: 'Range', icon: Maximize2 },
+                                { id: 'weight', label: 'Weight', icon: Anchor },
+                                { id: 'vowel', label: 'Vowel', icon: Aperture },
+                                { id: 'spectrogram', label: 'Spectrogram', icon: Waves },
+                                ...(userMode === 'slp' ? [
+                                    { id: 'cpp', label: 'CPP', icon: Stethoscope },
+                                    { id: 'mpt', label: 'MPT', icon: Stethoscope },
+                                    { id: 'intonation', label: 'Intonation', icon: Activity }
+                                ] : [])
+                            ].map(tool => (
                                 <button
-                                    key={tab.id}
-                                    onClick={() => setActiveGame(tab.id === activeGame ? null : tab.id)}
-                                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${activeGame === tab.id
-                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
-                                        }`}
+                                    key={tool.id}
+                                    onClick={() => toggleTool(tool.id)}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                                        activeTools.includes(tool.id)
+                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                                    }`}
                                 >
-                                    {Icon && <Icon className="w-4 h-4" />}
-                                    {tab.label}
+                                    <tool.icon className="w-3 h-3" />
+                                    {tool.label}
                                 </button>
-                            );
-                        })}
-                        );
-                        })}
+                            ))}
+                        </div>
 
-                        {/* Show More Tools Button for Beginners */}
-                        {settings.beginnerMode && !showAllTools && (
-                            <button
-                                onClick={() => setShowAllTools(true)}
-                                className="px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200 transition-all whitespace-nowrap flex items-center gap-2"
-                            >
-                                <LayoutGrid className="w-4 h-4" />
-                                More...
-                            </button>
-                        )}
+                        {/* Layout Controls */}
+                        <LayoutControls />
                     </div>
 
-                    {/* Content Area */}
-                    <div className="flex-1 overflow-y-auto px-4 pb-4">
-                        {(!activeGame || activeGame === 'pitch') && (
-                            <div className="h-full min-h-[300px] bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden relative">
+                    {/* Grid Content */}
+                    <div className="flex-1 overflow-y-auto px-4 custom-scrollbar">
+                        <ResizableToolGrid className="min-h-full">
+                            <GridTool toolId="pitch" title="Pitch Visualizer">
                                 <PitchVisualizer
                                     dataRef={dataRef}
                                     targetRange={targetRange}
@@ -157,78 +144,42 @@ const PracticeView = () => {
                                     onScore={() => { }}
                                     settings={settings}
                                 />
-                            </div>
-                        )}
+                            </GridTool>
 
-                        {activeGame === 'weight' && (
-                            <div className="space-y-4">
+                            <GridTool toolId="resonance" title="Resonance">
+                                <div className="flex items-center justify-center h-full bg-slate-950">
+                                    <ResonanceOrb dataRef={dataRef} calibration={calibration} size={200} />
+                                </div>
+                            </GridTool>
+
+                            <GridTool toolId="weight" title="Voice Quality">
                                 <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />
-                                <div className="p-4 bg-slate-800/50 rounded-xl text-sm text-slate-400">
-                                    <p>Visualizes vocal weight (spectral tilt/closed quotient). Aim for the target zone.</p>
-                                </div>
-                            </div>
-                        )}
+                            </GridTool>
 
-                        {activeGame === 'vowel' && (
-                            <div className="space-y-4">
-                                <div className="h-64 bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden p-4 relative">
-                                    <h3 className="text-sm font-bold text-slate-400 mb-2 absolute top-4 left-4">Vowel Space</h3>
-                                    <VowelSpacePlot dataRef={dataRef} userMode={userMode} />
-                                </div>
-                                <div className="p-4 bg-slate-800/50 rounded-xl text-sm text-slate-400">
-                                    <p>Real-time formant tracking (F1 vs F2). Helps with vowel clarity and resonance.</p>
-                                </div>
-                            </div>
-                        )}
+                            <GridTool toolId="vowel" title="Vowel Space">
+                                <VowelSpacePlot dataRef={dataRef} userMode={userMode} />
+                            </GridTool>
 
-                        {activeGame === 'range' && (
-                            <div className="space-y-4">
+                            <GridTool toolId="range" title="Voice Range">
                                 <VoiceRangeProfile dataRef={dataRef} isActive={isAudioActive} />
-                                <div className="p-4 bg-slate-800/50 rounded-xl text-sm text-slate-400">
-                                    <p>Explore your full vocal range. Try sliding from your lowest note to your highest note, and from quiet to loud.</p>
-                                </div>
-                            </div>
-                        )}
+                            </GridTool>
 
-                        {activeGame === 'spectrogram' && (
-                            <div className="space-y-4">
+                            <GridTool toolId="spectrogram" title="Spectrogram">
                                 <HighResSpectrogram dataRef={dataRef} />
-                                <div className="p-4 bg-slate-800/50 rounded-xl text-sm text-slate-400">
-                                    <p>Visualizing frequency content up to 8kHz. Brighter colors indicate more energy.</p>
-                                </div>
-                            </div>
-                        )}
+                            </GridTool>
 
-                        {activeGame === 'all' && (
-                            <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />
-                                    <VowelSpacePlot dataRef={dataRef} userMode={userMode} />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="h-48 bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden relative flex items-center justify-center">
-                                        <ResonanceOrb dataRef={dataRef} calibration={calibration} size={100} />
-                                    </div>
-                                    <div className="h-48">
-                                        <HighResSpectrogram dataRef={dataRef} />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                            <GridTool toolId="cpp" title="CPP Meter">
+                                <CPPMeter dataRef={dataRef} isActive={isAudioActive} />
+                            </GridTool>
 
-                        {activeGame === 'clinical' && userMode === 'slp' && (
-                            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <SpectrumAnalyzer dataRef={dataRef} userMode={userMode} />
-                                    <CPPMeter dataRef={dataRef} isActive={isAudioActive} />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <MPTTracker dataRef={dataRef} isActive={isAudioActive} />
-                                    <SZRatio dataRef={dataRef} isActive={isAudioActive} />
-                                </div>
+                            <GridTool toolId="mpt" title="MPT Tracker">
+                                <MPTTracker dataRef={dataRef} isActive={isAudioActive} />
+                            </GridTool>
+                            
+                            <GridTool toolId="intonation" title="Intonation Trainer">
                                 <IntonationTrainer dataRef={dataRef} isActive={isAudioActive} />
-                            </div>
-                        )}
+                            </GridTool>
+                        </ResizableToolGrid>
                     </div>
                 </div>
             )}

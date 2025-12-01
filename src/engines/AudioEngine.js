@@ -280,6 +280,76 @@ export class AudioEngine {
 
             const spectrum = DSP.simpleFFT(windowed);
 
+            // Calculate Spectral Centroid (Resonance)
+            let spectralCentroid = 0;
+            let totalMagnitude = 0;
+            const nyquist = TARGET_RATE / 2;
+            for (let i = 0; i < spectrum.length; i++) {
+                const freq = (i / spectrum.length) * nyquist;
+                spectralCentroid += freq * spectrum[i];
+                totalMagnitude += spectrum[i];
+            }
+            spectralCentroid = totalMagnitude > 0 ? spectralCentroid / totalMagnitude : 0;
+
+            // Smooth resonance
+            if (spectralCentroid > 0) {
+                this.lastResonance = this.lastResonance * 0.7 + spectralCentroid * 0.3;
+            }
+            const resonance = this.lastResonance;
+            const resonanceConfidence = totalMagnitude > 0.01 ? 0.8 : 0.3;
+
+            // Calculate Jitter (pitch variation)
+            let jitter = 0;
+            if (pitch > 0) {
+                this.jitterBuffer.push(pitch);
+                if (this.jitterBuffer.length > 10) this.jitterBuffer.shift();
+                if (this.jitterBuffer.length >= 3) {
+                    const diffs = [];
+                    for (let i = 1; i < this.jitterBuffer.length; i++) {
+                        diffs.push(Math.abs(this.jitterBuffer[i] - this.jitterBuffer[i - 1]));
+                    }
+                    const avgDiff = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+                    const avgPitch = this.jitterBuffer.reduce((a, b) => a + b, 0) / this.jitterBuffer.length;
+                    jitter = avgPitch > 0 ? (avgDiff / avgPitch) * 100 : 0;
+                }
+            } else {
+                this.jitterBuffer = [];
+            }
+
+            // Calculate Shimmer (amplitude variation)
+            let shimmer = 0;
+            if (rms > this.adaptiveThreshold) {
+                this.shimmerBuffer.push(rms);
+                if (this.shimmerBuffer.length > 10) this.shimmerBuffer.shift();
+                if (this.shimmerBuffer.length >= 3) {
+                    const diffs = [];
+                    for (let i = 1; i < this.shimmerBuffer.length; i++) {
+                        diffs.push(Math.abs(this.shimmerBuffer[i] - this.shimmerBuffer[i - 1]));
+                    }
+                    const avgDiff = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+                    const avgAmp = this.shimmerBuffer.reduce((a, b) => a + b, 0) / this.shimmerBuffer.length;
+                    shimmer = avgAmp > 0 ? (avgDiff / avgAmp) * 100 : 0;
+                }
+            } else {
+                this.shimmerBuffer = [];
+            }
+
+            // Calculate Weight (spectral tilt / H1-H2)
+            let weight = 50;
+            if (pitch > 0) {
+                const h1Mag = DSP.getMagnitudeAtFrequency(buffer, pitch, fs);
+                const h2Mag = DSP.getMagnitudeAtFrequency(buffer, pitch * 2, fs);
+
+                if (h1Mag > 0 && h2Mag > 0) {
+                    const h1h2 = 20 * Math.log10(h1Mag / h2Mag);
+                    this.smoothedH1 = this.smoothedH1 * 0.8 + h1Mag * 0.2;
+                    this.smoothedH2 = this.smoothedH2 * 0.8 + h2Mag * 0.2;
+
+                    const smoothH1H2 = this.smoothedH2 > 0 ? 20 * Math.log10(this.smoothedH1 / this.smoothedH2) : 0;
+                    weight = Math.max(0, Math.min(100, 50 + smoothH1H2 * 5));
+                }
+            }
+
             // Vowel Analysis (Only if not silent and has pitch/resonance)
             let vowel = '';
             // Only run expensive formant analysis if we have significant signal
@@ -327,8 +397,21 @@ export class AudioEngine {
                 vowel = '';
             }
 
-            // Prepare Update
+            // Prepare Update - Pass all calculated values
             this.handleUpdate({
+                pitch: pitch > 0 ? pitch : -1,
+                pitchConfidence: pitchConfidence,
+                resonance: resonance,
+                resonanceConfidence: resonanceConfidence,
+                volume: rms,
+                jitter: jitter,
+                shimmer: shimmer,
+                weight: weight,
+                f1: this.smoothedF1,
+                f2: this.smoothedF2,
+                vowel: vowel,
+                spectrum: spectrum,
+                isSilent: rms < this.adaptiveThreshold
             });
         }
     }

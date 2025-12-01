@@ -56,7 +56,9 @@ export class DSP {
             }
         }
 
-        if (tau == halfSize || yinBuffer[tau] >= adaptiveThreshold) return -1;
+        if (tau == halfSize || yinBuffer[tau] >= adaptiveThreshold) {
+            return { pitch: -1, confidence: 0 };
+        }
 
         let betterTau = tau;
         if (tau > 0 && tau < halfSize - 1) {
@@ -68,8 +70,13 @@ export class DSP {
         }
 
         const pitch = sampleRate / betterTau;
-        if (pitch < 50 || pitch > 800) return -1;
-        return pitch;
+        const confidence = 1 - yinBuffer[tau];
+
+        if (pitch < 50 || pitch > 800) {
+            return { pitch: -1, confidence: 0 };
+        }
+
+        return { pitch, confidence };
     }
 
     static getMagnitudeAtFrequency(buffer, freq, sampleRate) {
