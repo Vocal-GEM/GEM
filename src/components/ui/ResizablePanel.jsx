@@ -7,11 +7,12 @@ const ResizablePanel = ({
     minWidth = 300,
     minHeight = 200,
     defaultHeight = 600,
+    defaultWidth = "50%",
     onResize
 }) => {
     // We only manage height and width. 
     // Initial width might be 'auto' or controlled by flex, so we might not set it initially.
-    const [dimensions, setDimensions] = useState({ width: null, height: defaultHeight });
+    const [dimensions, setDimensions] = useState({ width: defaultWidth, height: defaultHeight });
     const [isResizing, setIsResizing] = useState(false);
     const panelRef = useRef(null);
     const startPos = useRef({ x: 0, y: 0 });
