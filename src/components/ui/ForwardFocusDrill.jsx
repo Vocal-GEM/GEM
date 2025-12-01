@@ -3,7 +3,8 @@ import { X } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 
 const ForwardFocusDrill = ({ onClose, embedded = false }) => {
-    const { dataRef } = useAudio();
+    const audioContext = useAudio();
+    const dataRef = audioContext?.dataRef || { current: { resonance: 0 } };
     const [step, setStep] = useState(0);
 
     const steps = [

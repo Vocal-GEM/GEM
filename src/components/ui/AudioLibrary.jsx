@@ -4,7 +4,8 @@ import EmptyState from './EmptyState';
 import { useLanguage } from '../../context/LanguageContext';
 
 const AudioLibrary = ({ audioEngine }) => {
-    const { t } = useLanguage();
+    const languageContext = useLanguage();
+    const t = languageContext?.t || ((k) => k);
 
     const speak = (text) => {
         const utterance = new SpeechSynthesisUtterance(text);

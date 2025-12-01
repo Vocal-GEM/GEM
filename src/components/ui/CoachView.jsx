@@ -11,10 +11,17 @@ import ChatMessage from './ChatMessage';
 import EmptyState from './EmptyState';
 
 const CoachView = () => {
-    const { dataRef } = useAudio();
-    const { targetRange } = useProfile();
-    const { settings } = useSettings();
-    const { t } = useLanguage();
+    const audioContext = useAudio();
+    const dataRef = audioContext?.dataRef || { current: null };
+
+    const profileContext = useProfile();
+    const targetRange = profileContext?.targetRange || { min: 170, max: 220 };
+
+    const settingsContext = useSettings();
+    const settings = settingsContext?.settings || {};
+
+    const languageContext = useLanguage();
+    const t = languageContext?.t || ((k) => k);
     const [messages, setMessages] = useState([
         { role: 'assistant', content: t('coach.initialMessage') }
     ]);

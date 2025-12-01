@@ -3,7 +3,12 @@ import { useProfile } from '../context/ProfileContext';
 import { getCourseForProfile } from '../data/courseData';
 
 export const useCourseProgress = () => {
-    const { activeProfile } = useProfile();
+    const profileContext = useProfile();
+    const activeProfile = profileContext?.activeProfile || 'guest';
+
+    if (!profileContext) {
+        console.warn("useCourseProgress: ProfileContext is missing. Using 'guest' profile.");
+    }
     const [completedLessons, setCompletedLessons] = useState([]);
     const [currentCourse, setCurrentCourse] = useState([]);
 
