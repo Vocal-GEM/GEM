@@ -95,48 +95,68 @@ class IndexedDBManager {
     // Generic CRUD operations
     async get(storeName, key) {
         await this.ensureReady();
+        const start = performance.now();
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], 'readonly');
             const store = transaction.objectStore(storeName);
             const request = store.get(key);
 
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => {
+                const duration = performance.now() - start;
+                if (duration > 10) console.debug(`[IndexedDB] get ${storeName} took ${duration.toFixed(2)}ms`);
+                resolve(request.result);
+            };
             request.onerror = () => reject(request.error);
         });
     }
 
     async getAll(storeName) {
         await this.ensureReady();
+        const start = performance.now();
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], 'readonly');
             const store = transaction.objectStore(storeName);
             const request = store.getAll();
 
-            request.onsuccess = () => resolve(request.result || []);
+            request.onsuccess = () => {
+                const duration = performance.now() - start;
+                if (duration > 20) console.debug(`[IndexedDB] getAll ${storeName} took ${duration.toFixed(2)}ms`);
+                resolve(request.result || []);
+            };
             request.onerror = () => reject(request.error);
         });
     }
 
     async put(storeName, value) {
         await this.ensureReady();
+        const start = performance.now();
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], 'readwrite');
             const store = transaction.objectStore(storeName);
             const request = store.put(value);
 
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => {
+                const duration = performance.now() - start;
+                console.debug(`[IndexedDB] put ${storeName} took ${duration.toFixed(2)}ms`);
+                resolve(request.result);
+            };
             request.onerror = () => reject(request.error);
         });
     }
 
     async add(storeName, value) {
         await this.ensureReady();
+        const start = performance.now();
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], 'readwrite');
             const store = transaction.objectStore(storeName);
             const request = store.add(value);
 
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => {
+                const duration = performance.now() - start;
+                console.debug(`[IndexedDB] add ${storeName} took ${duration.toFixed(2)}ms`);
+                resolve(request.result);
+            };
             request.onerror = () => reject(request.error);
         });
     }

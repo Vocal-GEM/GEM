@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { X, Mic, Mic2, Volume2, VolumeX, Settings, Activity, BarChart2, BookOpen, ChevronRight, Play, Pause, RefreshCw } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
+import { useTour } from '../../context/TourContext';
 import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
 import DynamicOrb from '../viz/DynamicOrb';
@@ -46,6 +47,12 @@ const PracticeMode = ({
         isAudioActive,
         toggleAudio
     } = useAudio();
+
+    const { startTour } = useTour();
+
+    useEffect(() => {
+        startTour('practice_mode');
+    }, []);
 
     const { saveSession } = useProfile();
 
@@ -187,7 +194,7 @@ const PracticeMode = ({
 
             {/* Header / Controls */}
             <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                <div className="flex items-center gap-4 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
+                <div id="practice-tabs" className="flex items-center gap-4 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
                     {TABS.map(tab => (
                         <button
                             key={tab.id}
@@ -207,6 +214,7 @@ const PracticeMode = ({
 
                 <div className="flex items-center gap-2">
                     <button
+                        id="mic-button"
                         onClick={toggleAudio}
                         className={`px-6 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all shadow-lg ${isAudioActive
                             ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30'
@@ -227,7 +235,7 @@ const PracticeMode = ({
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 {/* Left Column: Visualization */}
-                <div className="flex flex-col h-[600px] relative">
+                <div id="visualization-area" className="flex flex-col h-[600px] relative">
                     <div className="h-full w-full relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5 shadow-2xl">
                         <ErrorBoundary fallback={<div className="flex items-center justify-center h-full text-red-400">Visualization Error</div>}>
                             <Suspense fallback={<div className="flex items-center justify-center h-full"><LoadingSpinner /></div>}>
@@ -263,7 +271,7 @@ const PracticeMode = ({
                 </div>
 
                 {/* Right Column: Dashboard & Tools */}
-                <div className="flex flex-col h-[600px] overflow-y-auto custom-scrollbar pr-2 space-y-6">
+                <div id="dashboard-area" className="flex flex-col h-[600px] overflow-y-auto custom-scrollbar pr-2 space-y-6">
                     {/* Gender Perception Dashboard */}
                     <div className="min-h-[300px]">
                         <GenderPerceptionDashboard dataRef={dataRef} view={practiceTab === 'overview' ? 'all' : practiceTab} />

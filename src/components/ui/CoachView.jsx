@@ -1,20 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Sparkles, User, History, BookOpen, ChevronRight, Mic, Play, Award, Zap } from 'lucide-react';
+import { Send, Sparkles, Zap } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { CoachEngine } from '../../utils/coachEngine';
-import { KnowledgeService } from '../../services/KnowledgeService';
 import { historyService } from '../../utils/historyService';
 
 import ChatMessage from './ChatMessage';
+import EmptyState from './EmptyState';
 
 const CoachView = () => {
     const { dataRef } = useAudio();
     const { targetRange } = useProfile();
     const { settings } = useSettings();
+    const { t } = useLanguage();
     const [messages, setMessages] = useState([
-        { role: 'assistant', content: "Hi! I'm your AI Vocal Coach. Ask me about your progress, or for tips on resonance and pitch!" }
+        { role: 'assistant', content: t('coach.initialMessage') }
     ]);
     const [chatInput, setChatInput] = useState('');
     const [isChatLoading, setIsChatLoading] = useState(false);
@@ -30,9 +32,6 @@ const CoachView = () => {
             if (savedSettings) {
                 setUserContext(prev => ({ ...prev, ...savedSettings }));
             }
-            if (savedSettings) {
-                setUserContext(prev => ({ ...prev, ...savedSettings }));
-            }
         };
         loadContext();
     }, []);
@@ -45,10 +44,8 @@ const CoachView = () => {
         scrollToBottom();
     }, [messages]);
 
-
-
     const handleClearChat = () => {
-        setMessages([{ role: 'assistant', content: "Chat cleared. What's on your mind?" }]);
+        setMessages([{ role: 'assistant', content: t('coach.clearedMessage') }]);
     };
 
     const handleChatSubmit = async (e) => {
@@ -85,16 +82,14 @@ const CoachView = () => {
 
                 // Append related topics if available
                 if (response.relatedTopics && response.relatedTopics.length > 0) {
-                    replyContent += `\n\n*Related topics: ${response.relatedTopics.join(', ')}*`;
+                    replyContent += `\n\n*${t('coach.relatedTopics')}: ${response.relatedTopics.join(', ')}*`;
                 }
 
                 setMessages(prev => [...prev, { role: 'assistant', content: replyContent }]);
 
-
-
             } catch (err) {
                 console.error(err);
-                setMessages(prev => [...prev, { role: 'assistant', content: "I encountered an error processing your request." }]);
+                setMessages(prev => [...prev, { role: 'assistant', content: t('coach.errorProcessing') }]);
             } finally {
                 setIsChatLoading(false);
             }
@@ -102,21 +97,29 @@ const CoachView = () => {
     };
 
     const suggestions = [
-        "How do I raise my pitch?",
-        "What is vocal weight?",
-        "Explain resonance",
-        "Give me a warmup"
+        t('coach.suggestion1'),
+        t('coach.suggestion2'),
+        t('coach.suggestion3'),
+        t('coach.suggestion4')
     ];
 
     return (
         <div className="h-full flex flex-col bg-slate-950 text-white relative overflow-hidden">
-
-
-            <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 p-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-                {messages.map((m, i) => <ChatMessage key={i} role={m.role} content={m.content} />)}
+            <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 p-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent" role="log" aria-live="polite" aria-label="Chat History">
+                {messages.length === 0 ? (
+                    <EmptyState
+                        icon={Sparkles}
+                        title={t('coach.title')}
+                        description={t('coach.description')}
+                        actionLabel={t('coach.sayHello')}
+                        onAction={() => setChatInput(t('coach.helloMessage'))}
+                    />
+                ) : (
+                    messages.map((m, i) => <ChatMessage key={i} role={m.role} content={m.content} />)
+                )}
                 {isChatLoading && (
                     <div className="flex justify-start">
-                        <div className="bg-slate-800 rounded-2xl rounded-tl-none p-4 text-slate-300 text-sm animate-pulse flex items-center gap-2">
+                        <div className="bg-slate-800 rounded-2xl rounded-tl-none p-4 text-slate-300 text-sm animate-pulse flex items-center gap-2" role="status" aria-label={t('common.loading')}>
                             <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                             <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
                             <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
@@ -130,16 +133,16 @@ const CoachView = () => {
             <div className="px-4 mb-4">
                 <div className="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 border border-indigo-500/30 rounded-xl p-3 flex items-start gap-3">
                     <div className="p-2 bg-indigo-500/20 rounded-lg text-indigo-300">
-                        <Zap size={16} />
+                        <Zap size={16} aria-hidden="true" />
                     </div>
                     <div>
-                        <h4 className="text-xs font-bold text-indigo-200 uppercase tracking-wider mb-1">Coach's Observation</h4>
+                        <h4 className="text-xs font-bold text-indigo-200 uppercase tracking-wider mb-1">{t('coach.observationTitle')}</h4>
                         <p className="text-sm text-indigo-100">
-                            I noticed your pitch was a bit low in the last session. Try the "Pitch Staircase" exercise to warm up!
+                            {t('coach.observationText')}
                         </p>
                     </div>
-                    <button className="ml-auto text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg transition-colors">
-                        Go
+                    <button className="ml-auto text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg transition-colors" aria-label="Go to exercise">
+                        {t('coach.go')}
                     </button>
                 </div>
             </div>
@@ -164,61 +167,65 @@ const CoachView = () => {
                     type="text"
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
-                    placeholder="Ask about your voice..."
+                    placeholder={t('coach.askPlaceholder')}
                     className="flex-1 bg-transparent border-none outline-none px-4 text-white placeholder-slate-500 h-12"
                     disabled={isChatLoading}
+                    aria-label={t('coach.inputPlaceholder')}
                 />
-                <button type="submit" disabled={isChatLoading} className="p-4 bg-blue-600 rounded-full text-white hover:bg-blue-500 disabled:opacity-50 transition-colors shadow-lg shadow-blue-500/20 min-w-[48px] min-h-[48px] flex items-center justify-center">
-                    {isChatLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <Send className="w-5 h-5" />}
+                <button type="submit" disabled={isChatLoading} className="p-4 bg-blue-600 rounded-full text-white hover:bg-blue-500 disabled:opacity-50 transition-colors shadow-lg shadow-blue-500/20 min-w-[48px] min-h-[48px] flex items-center justify-center" aria-label={t('common.send')}>
+                    {isChatLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <Send className="w-5 h-5" aria-hidden="true" />}
                 </button>
             </form>
 
             <div className="flex justify-between items-center px-4 mb-2">
                 <div className="text-[10px] text-slate-600">
-                    Curriculum based on WPATH & SES-VMTW guidelines.
+                    {t('coach.disclaimer')}
                 </div>
                 <div className="flex gap-4">
                     <button onClick={() => setShowPersonalize(true)} className="text-xs text-blue-400 hover:text-blue-300 transition-colors font-bold py-2">
-                        Personalize
+                        {t('coach.personalize')}
                     </button>
                     <button onClick={handleClearChat} className="text-xs text-slate-500 hover:text-white transition-colors py-2">
-                        Clear Chat
+                        {t('coach.clearChat')}
                     </button>
                 </div>
             </div>
 
             {/* Personalization Modal */}
             {showPersonalize && (
-                <div className="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-sm p-4 flex flex-col animate-in fade-in duration-200">
-                    <h3 className="text-lg font-bold text-white mb-4">Train Your Coach</h3>
+                <div className="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-sm p-4 flex flex-col animate-in fade-in duration-200" role="dialog" aria-modal="true" aria-labelledby="personalize-title">
+                    <h3 id="personalize-title" className="text-lg font-bold text-white mb-4">{t('coach.trainTitle')}</h3>
                     <div className="space-y-4 flex-1">
                         <div>
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">What should I call you?</label>
+                            <label htmlFor="name-input" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">{t('coach.nameLabel')}</label>
                             <input
+                                id="name-input"
                                 type="text"
                                 value={userContext.name}
                                 onChange={e => setUserContext({ ...userContext, name: e.target.value })}
                                 className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500"
-                                placeholder="Name"
+                                placeholder={t('coach.namePlaceholder')}
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Pronouns</label>
+                            <label htmlFor="pronouns-input" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">{t('coach.pronounsLabel')}</label>
                             <input
+                                id="pronouns-input"
                                 type="text"
                                 value={userContext.pronouns}
                                 onChange={e => setUserContext({ ...userContext, pronouns: e.target.value })}
                                 className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500"
-                                placeholder="e.g. she/her, they/them"
+                                placeholder={t('coach.pronounsPlaceholder')}
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Main Goal</label>
+                            <label htmlFor="goals-input" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">{t('coach.goalLabel')}</label>
                             <textarea
+                                id="goals-input"
                                 value={userContext.goals}
                                 onChange={e => setUserContext({ ...userContext, goals: e.target.value })}
                                 className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 min-h-[100px]"
-                                placeholder="What do you want to achieve with your voice?"
+                                placeholder={t('coach.goalPlaceholder')}
                             ></textarea>
                         </div>
                     </div>
@@ -229,7 +236,7 @@ const CoachView = () => {
                         }}
                         className="w-full py-3 bg-blue-600 rounded-xl font-bold text-white hover:bg-blue-500 transition-colors mt-4"
                     >
-                        Save & Close
+                        {t('coach.saveClose')}
                     </button>
                 </div>
             )}

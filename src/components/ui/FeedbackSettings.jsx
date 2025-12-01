@@ -1,9 +1,9 @@
 import React from 'react';
-import { ClipboardCheck, Download, Flame, HeartPulse, HelpCircle, Target, Vibrate, Volume2, X, Wifi, WifiOff, RefreshCw, Trash2, Mic2, Eye, Activity, Upload, Book, FileText } from 'lucide-react';
+import { X, Mic2, Vibrate, Volume2, Eye, Target, Activity, Wifi, WifiOff, RefreshCw, Trash2, HelpCircle, Download, HeartPulse, ClipboardCheck, Flame, Book, Upload, FileText } from 'lucide-react';
 import { textToSpeechService } from '../../services/TextToSpeechService';
-import { syncManager } from '../../services/SyncManager';
-import { indexedDB, STORES } from '../../services/IndexedDBManager';
+import { syncManager, STORES } from '../../services/SyncManager';
 import MicrophoneCalibration from './MicrophoneCalibration';
+import InfoTooltip from './InfoTooltip';
 
 const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange, onSetGoal, onOpenTutorial, calibration, onUpdateRange, onUpdateCalibration, filterSettings, onUpdateFilters, onExportData, audioEngine, user }) => {
     const defaultGenderRanges = {
@@ -386,6 +386,28 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
 
                     <div className="bg-slate-800 p-4 rounded-xl space-y-4">
                         <div>
+                            <div className="flex justify-between text-xs text-slate-400 mb-1">
+                                <div className="flex items-center gap-1">
+                                    <span>Smoothing</span>
+                                    <InfoTooltip content="Higher values make the pitch line smoother but less responsive to quick changes." />
+                                </div>
+                                <span>{settings.smoothing || 5}</span>
+                            </div>
+                            <input type="range" min="1" max="20" step="1" value={settings.smoothing || 5} onChange={(e) => setSettings({ ...settings, smoothing: parseInt(e.target.value) })} className="w-full accent-slate-500 h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer" />
+                        </div>
+
+                        <div>
+                            <div className="flex justify-between text-xs text-slate-400 mb-1">
+                                <div className="flex items-center gap-1">
+                                    <span>Sensitivity</span>
+                                    <InfoTooltip content="Adjusts how easily the app detects your voice. Lower values are more sensitive." />
+                                </div>
+                                <span>{settings.sensitivity || 50}%</span>
+                            </div>
+                            <input type="range" min="0" max="100" step="1" value={settings.sensitivity || 50} onChange={(e) => setSettings({ ...settings, sensitivity: parseInt(e.target.value) })} className="w-full accent-slate-500 h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer" />
+                        </div>
+
+                        <div>
                             <div className="flex justify-between text-xs text-slate-400 mb-1"><span>Noise Gate Threshold</span> <span>{Math.round(settings.noiseGate * 100)}%</span></div>
                             <input type="range" min="0" max="30" step="1" value={settings.noiseGate * 100} onChange={(e) => setSettings({ ...settings, noiseGate: e.target.value / 100 })} className="w-full accent-slate-500 h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer" />
                         </div>
@@ -407,7 +429,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                         )}
                     </div>
                     {filterSettings && (
-                        <div className="pt-2 border-t border-white/5">
+                        <div className="pt-2 border-t border-white/5 mt-4">
                             <div className="text-xs font-bold text-slate-400 mb-2">Audio Filters</div>
                             <div className="space-y-3">
                                 <div>
@@ -443,7 +465,6 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                             </div>
                         </div>
                     )}
-
                 </section>
 
                 {/* Offline Data & Sync */}
@@ -514,7 +535,6 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                             <Download className="w-5 h-5 text-slate-400" />
                             <span className="text-sm font-bold text-slate-200">Export My Data (JSON)</span>
                         </button>
-
                     </div>
                 </section>
 
@@ -549,136 +569,133 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                 </section>
 
                 {/* Knowledge Base Upload - Admin Only */}
-                {
-                    user?.username === 'riley' && (
-                        <section>
-                            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Knowledge Base (Admin)</h3>
-                            <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 space-y-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 rounded-lg bg-indigo-500/20 text-indigo-400">
-                                        <Book className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <div className="text-sm font-bold text-white">Train AI Coach</div>
-                                        <div className="text-[10px] text-slate-400">Upload textbooks or articles (PDF, TXT)</div>
-                                    </div>
+                {user?.username === 'riley' && (
+                    <section>
+                        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Knowledge Base (Admin)</h3>
+                        <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 space-y-4">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-lg bg-indigo-500/20 text-indigo-400">
+                                    <Book className="w-5 h-5" />
                                 </div>
-
-                                <div className="bg-slate-900/50 rounded-lg p-4 border border-dashed border-slate-700 hover:border-indigo-500/50 transition-colors text-center relative group">
-                                    <input
-                                        type="file"
-                                        accept=".pdf,.txt,.md"
-                                        onChange={handleFileUpload}
-                                        disabled={isUploading}
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                                    />
-                                    <div className="flex flex-col items-center gap-2">
-                                        {isUploading ? (
-                                            <RefreshCw className="w-8 h-8 text-indigo-400 animate-spin" />
-                                        ) : (
-                                            <Upload className="w-8 h-8 text-slate-500 group-hover:text-indigo-400 transition-colors" />
-                                        )}
-                                        <div className="text-xs font-bold text-slate-300">
-                                            {isUploading ? 'Processing...' : 'Click to Upload File'}
-                                        </div>
-                                        <div className="text-[10px] text-slate-500">
-                                            Max 10MB. PDF or Text files.
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {uploadStatus && (
-                                    <div className={`p-3 rounded-lg text-xs flex items-center gap-2 ${uploadStatus.type === 'success' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
-                                        {uploadStatus.type === 'success' ? <ClipboardCheck className="w-4 h-4" /> : <X className="w-4 h-4" />}
-                                        {uploadStatus.message}
-                                    </div>
-                                )}
-
-                                {/* Directory Viewer */}
-                                <div className="border-t border-white/5 pt-4">
-                                    <button
-                                        onClick={() => {
-                                            setShowDirectory(!showDirectory);
-                                            if (!showDirectory && !knowledgeBaseData) {
-                                                fetchKnowledgeBase();
-                                            }
-                                        }}
-                                        className="w-full p-3 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-left flex items-center justify-between transition-colors"
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-indigo-400" />
-                                            <span className="text-sm font-bold text-white">View Uploaded Documents</span>
-                                        </div>
-                                        <span className="text-xs text-slate-400">{showDirectory ? '▼' : '▶'}</span>
-                                    </button>
-
-                                    {showDirectory && (
-                                        <div className="mt-3 space-y-2">
-                                            {isLoadingDirectory ? (
-                                                <div className="text-center py-4 text-slate-400 text-xs">
-                                                    <RefreshCw className="w-4 h-4 animate-spin mx-auto mb-2" />
-                                                    Loading...
-                                                </div>
-                                            ) : knowledgeBaseData ? (
-                                                <>
-                                                    <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700">
-                                                        <div className="grid grid-cols-3 gap-2 text-xs">
-                                                            <div>
-                                                                <div className="text-slate-500 uppercase">Documents</div>
-                                                                <div className="text-white font-bold">{knowledgeBaseData.total_documents}</div>
-                                                            </div>
-                                                            <div>
-                                                                <div className="text-slate-500 uppercase">Total Size</div>
-                                                                <div className="text-white font-bold">{knowledgeBaseData.total_storage_mb} MB</div>
-                                                            </div>
-                                                            <div>
-                                                                <div className="text-slate-500 uppercase">Storage</div>
-                                                                <div className="text-white font-bold">{knowledgeBaseData.total_storage_kb} KB</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="max-h-60 overflow-y-auto space-y-2">
-                                                        {knowledgeBaseData.documents.map((doc, idx) => (
-                                                            <div key={idx} className="bg-slate-900/30 rounded-lg p-3 border border-slate-700/50">
-                                                                <div className="flex items-start justify-between gap-2">
-                                                                    <div className="flex-1 min-w-0">
-                                                                        <div className="text-xs font-bold text-white truncate">{doc.source}</div>
-                                                                        <div className="text-[10px] text-slate-400 mt-1">
-                                                                            {doc.chunks} chunks • {doc.size_kb} KB
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-
-                                                    <button
-                                                        onClick={fetchKnowledgeBase}
-                                                        className="w-full p-2 bg-indigo-600/20 hover:bg-indigo-600/30 rounded-lg text-xs font-bold text-indigo-400 flex items-center justify-center gap-2 transition-colors"
-                                                    >
-                                                        <RefreshCw className="w-3 h-3" />
-                                                        Refresh
-                                                    </button>
-                                                </>
-                                            ) : error ? (
-                                                <div className="text-center py-4 text-red-400 text-xs bg-red-900/20 rounded-lg border border-red-500/20">
-                                                    <div className="font-bold mb-1">Error</div>
-                                                    {error}
-                                                </div>
-                                            ) : (
-                                                <div className="text-center py-4 text-slate-400 text-xs">
-                                                    No documents found
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
+                                <div>
+                                    <div className="text-sm font-bold text-white">Train AI Coach</div>
+                                    <div className="text-[10px] text-slate-400">Upload textbooks or articles (PDF, TXT)</div>
                                 </div>
                             </div>
 
-                        </section>
-                    )
-                }
+                            <div className="bg-slate-900/50 rounded-lg p-4 border border-dashed border-slate-700 hover:border-indigo-500/50 transition-colors text-center relative group">
+                                <input
+                                    type="file"
+                                    accept=".pdf,.txt,.md"
+                                    onChange={handleFileUpload}
+                                    disabled={isUploading}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                                />
+                                <div className="flex flex-col items-center gap-2">
+                                    {isUploading ? (
+                                        <RefreshCw className="w-8 h-8 text-indigo-400 animate-spin" />
+                                    ) : (
+                                        <Upload className="w-8 h-8 text-slate-500 group-hover:text-indigo-400 transition-colors" />
+                                    )}
+                                    <div className="text-xs font-bold text-slate-300">
+                                        {isUploading ? 'Processing...' : 'Click to Upload File'}
+                                    </div>
+                                    <div className="text-[10px] text-slate-500">
+                                        Max 10MB. PDF or Text files.
+                                    </div>
+                                </div>
+                            </div>
+
+                            {uploadStatus && (
+                                <div className={`p-3 rounded-lg text-xs flex items-center gap-2 ${uploadStatus.type === 'success' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                                    {uploadStatus.type === 'success' ? <ClipboardCheck className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                                    {uploadStatus.message}
+                                </div>
+                            )}
+
+                            {/* Directory Viewer */}
+                            <div className="border-t border-white/5 pt-4">
+                                <button
+                                    onClick={() => {
+                                        setShowDirectory(!showDirectory);
+                                        if (!showDirectory && !knowledgeBaseData) {
+                                            fetchKnowledgeBase();
+                                        }
+                                    }}
+                                    className="w-full p-3 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-left flex items-center justify-between transition-colors"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <FileText className="w-4 h-4 text-indigo-400" />
+                                        <span className="text-sm font-bold text-white">View Uploaded Documents</span>
+                                    </div>
+                                    <span className="text-xs text-slate-400">{showDirectory ? '▼' : '▶'}</span>
+                                </button>
+
+                                {showDirectory && (
+                                    <div className="mt-3 space-y-2">
+                                        {isLoadingDirectory ? (
+                                            <div className="text-center py-4 text-slate-400 text-xs">
+                                                <RefreshCw className="w-4 h-4 animate-spin mx-auto mb-2" />
+                                                Loading...
+                                            </div>
+                                        ) : knowledgeBaseData ? (
+                                            <>
+                                                <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700">
+                                                    <div className="grid grid-cols-3 gap-2 text-xs">
+                                                        <div>
+                                                            <div className="text-slate-500 uppercase">Documents</div>
+                                                            <div className="text-white font-bold">{knowledgeBaseData.total_documents}</div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-slate-500 uppercase">Total Size</div>
+                                                            <div className="text-white font-bold">{knowledgeBaseData.total_storage_mb} MB</div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-slate-500 uppercase">Storage</div>
+                                                            <div className="text-white font-bold">{knowledgeBaseData.total_storage_kb} KB</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="max-h-60 overflow-y-auto space-y-2">
+                                                    {knowledgeBaseData.documents.map((doc, idx) => (
+                                                        <div key={idx} className="bg-slate-900/30 rounded-lg p-3 border border-slate-700/50">
+                                                            <div className="flex items-start justify-between gap-2">
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="text-xs font-bold text-white truncate">{doc.source}</div>
+                                                                    <div className="text-[10px] text-slate-400 mt-1">
+                                                                        {doc.chunks} chunks • {doc.size_kb} KB
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                <button
+                                                    onClick={fetchKnowledgeBase}
+                                                    className="w-full p-2 bg-indigo-600/20 hover:bg-indigo-600/30 rounded-lg text-xs font-bold text-indigo-400 flex items-center justify-center gap-2 transition-colors"
+                                                >
+                                                    <RefreshCw className="w-3 h-3" />
+                                                    Refresh
+                                                </button>
+                                            </>
+                                        ) : error ? (
+                                            <div className="text-center py-4 text-red-400 text-xs bg-red-900/20 rounded-lg border border-red-500/20">
+                                                <div className="font-bold mb-1">Error</div>
+                                                {error}
+                                            </div>
+                                        ) : (
+                                            <div className="text-center py-4 text-slate-400 text-xs">
+                                                No documents found
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </section>
+                )}
 
                 {/* About Section */}
                 <section>
@@ -693,8 +710,8 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                         </div>
                     </div>
                 </section>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 };
 

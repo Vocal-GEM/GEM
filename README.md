@@ -2,6 +2,30 @@
 
 A personal voice coaching application for gender-affirming voice training.
 
+## 🚀 Quick Start (5 Steps)
+
+1.  **Install Node.js** (v16+) and **Python** (3.8+).
+2.  **Clone & Install**:
+    ```bash
+    git clone <repo-url>
+    cd GEM
+    npm install
+    pip install -r backend/requirements.txt
+    ```
+3.  **Start Backend**:
+    ```bash
+    python backend/app.py
+    ```
+4.  **Start Frontend**:
+    ```bash
+    npm run dev
+    ```
+5.  **Open App**: Go to `http://localhost:3000` and allow microphone access.
+
+![Getting Started Flow](https://via.placeholder.com/600x400?text=Getting+Started+GIF+Placeholder)
+
+👉 **[Full Setup & Troubleshooting Guide](docs/getting-started.md)**
+
 ## ✨ Features
 - **Real-time Biofeedback**: Visualize Pitch, Resonance, and Vocal Weight.
 - **AI Coach**: Chat with a specialized assistant for guidance.
@@ -18,37 +42,6 @@ Before you begin, ensure you have the following installed on your computer:
 2.  **Python 3.8+** (Required for the backend)
     *   Download and install from: [https://python.org/](https://python.org/)
     *   Verify by running `python --version` in your terminal.
-
-## 🚀 Installation
-
-1.  **Install Frontend Dependencies**:
-    Open a terminal in the project folder (`c:\Users\riley\Desktop\GEM`) and run:
-    ```bash
-    npm install
-    ```
-
-2.  **Install Backend Dependencies**:
-    ```bash
-    pip install -r backend/requirements.txt
-    ```
-
-## ▶️ How to Run
-
-You need to run both the frontend and backend servers.
-
-### 1. Start the Frontend (React App)
-Run this command to start the user interface:
-```bash
-npm run dev
-```
-> Access the app at: `http://localhost:3000` (or the URL shown in the terminal)
-
-### 2. Start the Backend (API)
-Open a **new terminal window** and run:
-```bash
-python backend/app.py
-```
-> The backend runs on: `http://localhost:5000`
 
 ## 🛠️ Troubleshooting
 

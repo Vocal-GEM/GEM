@@ -18,6 +18,9 @@ export const NavigationProvider = ({ children }) => {
     // Practice Tabs: 'overview', 'pitch', 'resonance', 'weight', 'vowel', 'tilt', 'articulation', 'contour', 'quality', 'spectrogram', 'all'
     const [practiceTab, setPracticeTab] = useState('pitch'); // Changed default from 'overview' (which didn't exist) to 'pitch' for lighter load
 
+    // History State for Breadcrumbs
+    const [history, setHistory] = useState([]);
+
     // Modals & Overlays State
     const [modals, setModals] = useState({
         settings: false,
@@ -39,7 +42,8 @@ export const NavigationProvider = ({ children }) => {
         vocalFolds: false,
         voiceQuality: false,
         course: false,
-        feedback: false
+        feedback: false,
+        commandPalette: false // New Command Palette
     });
 
     // Initialize Analytics
@@ -99,15 +103,28 @@ export const NavigationProvider = ({ children }) => {
         });
     };
 
+    const addToHistory = (label, action) => {
+        setHistory(prev => {
+            // Prevent duplicates if clicking the same thing twice
+            if (prev.length > 0 && prev[prev.length - 1].label === label) return prev;
+            // Keep history manageable (max 5 items)
+            const newHistory = [...prev, { label, action }];
+            if (newHistory.length > 5) return newHistory.slice(newHistory.length - 5);
+            return newHistory;
+        });
+    };
+
     const value = {
         activeView,
         practiceTab,
         modals,
+        history,
         navigate,
         switchPracticeTab,
         openModal,
         closeModal,
-        closeAllModals
+        closeAllModals,
+        addToHistory
     };
 
     return <NavigationContext.Provider value={value}>{children}</NavigationContext.Provider>;
