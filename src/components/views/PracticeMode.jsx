@@ -233,10 +233,10 @@ const PracticeMode = ({
                 </div>
 
                 {/* Main Content Grid */}
-                <div className="flex flex-col lg:flex-row gap-4 mb-4">
+                <div className="flex flex-col md:flex-row gap-4 mb-4">
                     {/* Left Column: Visualization */}
                     <ResizablePanel
-                        className="flex flex-col relative flex-shrink-0 w-full lg:w-1/2"
+                        className="flex flex-col relative flex-shrink-0 w-full md:w-1/2"
                         defaultHeight={600}
                         defaultWidth={null}
                         minWidth={400}
