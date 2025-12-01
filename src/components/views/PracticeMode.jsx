@@ -231,13 +231,13 @@ const PracticeMode = ({
                         )}
                     </button>
                 </div>
+
                 {/* Main Content Grid */}
                 <div className="flex flex-col lg:flex-row gap-4 mb-4">
                     {/* Left Column: Visualization */}
                     <ResizablePanel
-                        className="flex flex-col relative flex-shrink-0"
-                        defaultHeight={550}
-                        defaultWidth="45%"
+                        className="flex flex-col relative flex-shrink-0 w-full lg:w-1/2"
+                        defaultHeight={600}
                         minWidth={400}
                     >
                         <div id="visualization-area" className="flex flex-col h-full relative">
@@ -265,7 +265,7 @@ const PracticeMode = ({
                                         {practiceTab === 'spectrogram' && <Spectrogram dataRef={dataRef} />}
                                     </Suspense>
                                 </ErrorBoundary>
-                            </div >
+                            </div>
 
                             {/* Comparison Tool (hidden on overview/resonance to save space/redundancy) */}
                             {

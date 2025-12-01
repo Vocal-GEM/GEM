@@ -53,7 +53,6 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
         if (exercise) gameRef.current = { score: 0, lastUpdate: Date.now(), lastPitch: 0 };
 
         // Helper to get color based on frequency
-        // Helper to get color based on frequency
         const getPitchColor = (freq) => {
             const fem = voiceProfiles.find(p => p.id === 'fem');
             const masc = voiceProfiles.find(p => p.id === 'masc');
@@ -75,6 +74,15 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                     if (colorBlindMode) return '#f59e0b'; // Amber-500 (Safe)
                     return '#eab308'; // Yellow-500
                 }
+            }
+
+            // Check Gender Ranges
+            if (femRange && freq >= femRange.min && freq <= femRange.max) {
+                return '#e879f9'; // Fuchsia-400 (Feminine)
+            }
+
+            if (mascRange && freq >= mascRange.min && freq <= mascRange.max) {
+                return '#60a5fa'; // Blue-400 (Masculine)
             }
 
             // Out of range

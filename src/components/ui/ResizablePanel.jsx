@@ -77,7 +77,7 @@ const ResizablePanel = ({
             className={`relative group ${className}`}
             style={{
                 height: dimensions.height,
-                width: dimensions.width || '100%',
+                width: dimensions.width,
                 transition: isResizing ? 'none' : 'width 0.2s, height 0.2s'
             }}
         >
@@ -94,10 +94,12 @@ const ResizablePanel = ({
             </div>
 
             {/* Resize Overlay to prevent iframe/interaction interference during resize */}
-            {isResizing && (
-                <div className="absolute inset-0 z-40 bg-transparent" />
-            )}
-        </div>
+            {
+                isResizing && (
+                    <div className="absolute inset-0 z-40 bg-transparent" />
+                )
+            }
+        </div >
     );
 };
 
