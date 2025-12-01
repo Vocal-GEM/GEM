@@ -191,6 +191,18 @@ def compute_raw_rbi_features(frame, sr, f0):
     
     return ratio_hl, centroid, tilt_flipped
 
+# RBI Weights - Tuned for balanced contribution
+# Ratio (0.4): Primary indicator of brightness/darkness (spectral slope proxy)
+# Centroid (0.25): Center of mass, correlates well with resonance
+# Tilt (0.25): Spectral tilt, differentiates breathy/pressed and resonance
+# F0 (0.1): Minor contribution to account for pitch-dependent brightness perception
+RBI_WEIGHTS = {
+    "ratio": 0.4,
+    "centroid": 0.25,
+    "tilt": 0.25,
+    "f0": 0.10
+}
+
 def compute_rbi_series(y, sr, frame_length_s=0.04, hop_length_s=0.01):
     """
     Compute RBI for the entire file using the 3-pass approach.
@@ -209,9 +221,21 @@ def compute_rbi_series(y, sr, frame_length_s=0.04, hop_length_s=0.01):
     raw_features = []
     valid_indices = []
     
-    # Pass 1: Extract Raw Features
+    # Pass 1: Extract Raw Features & Calculate Adaptive Threshold
     idx = 0
     times = []
+    energies = []
+    
+    # First pass to collect energies for adaptive threshold
+    for start in range(0, len(y_pre) - frame_len, hop_len):
+        end = start + frame_len
+        frame = y_pre[start:end]
+        rms = np.sqrt(np.mean(frame**2) + 1e-12)
+        energies.append(20 * np.log10(rms))
+        
+    # Adaptive Threshold: Mean energy - 20dB, but clamped to reasonable noise floor
+    mean_energy = np.mean(energies) if energies else -100
+    energy_threshold = max(mean_energy - 20, -50) 
     
     for start in range(0, len(y_pre) - frame_len, hop_len):
         end = start + frame_len
@@ -220,17 +244,15 @@ def compute_rbi_series(y, sr, frame_length_s=0.04, hop_length_s=0.01):
         times.append(t)
         
         # RMS Gate
-        rms = np.sqrt(np.mean(frame**2))
-        energy_db = 20 * np.log10(rms + 1e-9)
+        rms = np.sqrt(np.mean(frame**2) + 1e-12)
+        energy_db = 20 * np.log10(rms)
         
         # F0 Gate
         f0 = pitch_obj.get_value_at_time(t + frame_length_s/2)
         if np.isnan(f0): f0 = 0
         
         # Validity check
-        # Thresholds: Energy > -50dB (relative? let's use absolute for now or dynamic)
-        # For simplicity, let's assume normalized audio and use -40dB
-        is_voiced = (energy_db > -40) and (f0 > 80) and (f0 < 400)
+        is_voiced = (energy_db > energy_threshold) and (f0 > 75) and (f0 < 500)
         
         if is_voiced:
             ratio, cent, tilt = compute_raw_rbi_features(frame, sr, f0)
@@ -245,18 +267,18 @@ def compute_rbi_series(y, sr, frame_length_s=0.04, hop_length_s=0.01):
         
         idx += 1
         
-    # Pass 2: Global Stats
+    # Pass 2: Global Stats (Percentile-based for robustness)
     if not raw_features:
-        return [None] * idx # Return all Nones
+        return [None] * idx, {} # Return all Nones
         
     ratios = [f["ratio"] for f in raw_features]
     centroids = [f["centroid"] for f in raw_features]
     tilts = [f["tilt"] for f in raw_features]
     
     stats = {
-        "ratio_min": np.min(ratios), "ratio_max": np.max(ratios),
-        "centroid_min": np.min(centroids), "centroid_max": np.max(centroids),
-        "tilt_min": np.min(tilts), "tilt_max": np.max(tilts)
+        "ratio_min": np.percentile(ratios, 5), "ratio_max": np.percentile(ratios, 95),
+        "centroid_min": np.percentile(centroids, 5), "centroid_max": np.percentile(centroids, 95),
+        "tilt_min": np.percentile(tilts, 5), "tilt_max": np.percentile(tilts, 95)
     }
     
     # Pass 3: Normalize and Compute RBI
@@ -283,8 +305,11 @@ def compute_rbi_series(y, sr, frame_length_s=0.04, hop_length_s=0.01):
             f0_norm = (f0_clip - 120) / (300 - 120)
             
             # Weighted Sum
-            # Weights: Ratio 0.4, Centroid 0.25, Tilt 0.25, F0 0.1
-            raw_score = (0.4 * r_norm) + (0.25 * c_norm) + (0.25 * t_norm) + (0.10 * f0_norm)
+            raw_score = (RBI_WEIGHTS["ratio"] * r_norm) + \
+                        (RBI_WEIGHTS["centroid"] * c_norm) + \
+                        (RBI_WEIGHTS["tilt"] * t_norm) + \
+                        (RBI_WEIGHTS["f0"] * f0_norm)
+                        
             current_rbi = np.clip(raw_score * 100, 0, 100)
             
             # Smoothing (EMA)
@@ -294,9 +319,8 @@ def compute_rbi_series(y, sr, frame_length_s=0.04, hop_length_s=0.01):
             
             rbi_values[i] = smoothed_rbi
         else:
-            # Decay or hold? User suggested hold or decay. Let's hold for short gaps, decay for long.
-            # For simplicity, just hold last valid for now to avoid dropping to 0
-            rbi_values[i] = last_rbi # Or None if we want to show gaps
+            # Return None for unvoiced frames to indicate silence/noise
+            rbi_values[i] = None 
             
     return rbi_values, stats
 
@@ -332,13 +356,22 @@ def classify_voice_quality(cpp, hnr, h1_h2, jitter, shimmer, rbi_mean=None):
     elif roughness_score > 60: label = "Rough/irregular"
     else: label = "Mostly modal/clean"
 
+    # Confidence Score (0-100)
+    # Based on signal clarity (HNR) and periodicity strength (CPP)
+    # HNR > 20dB is excellent, < 10dB is poor
+    # CPP > 14dB is excellent, < 6dB is poor
+    hnr_score = min(max((hnr - 5) / 15, 0), 1) # 5-20 range
+    cpp_score = min(max((cpp - 4) / 10, 0), 1) # 4-14 range
+    confidence = int((hnr_score * 0.6 + cpp_score * 0.4) * 100)
+
     return {
         "breathiness_score": int(breathiness_score),
         "roughness_score": int(roughness_score),
         "strain_score": int(strain_score),
         "rbi_score": int(rbi_mean) if rbi_mean is not None else 0,
         "overall_label": label,
-        "resonance_label": resonance_label
+        "resonance_label": resonance_label,
+        "confidence_score": confidence
     }
 
 def compare_to_goal(summary, features_global, goal_name):
@@ -383,6 +416,17 @@ def analyze_file(path, goal_name="transfem_soft_slightly_breathy"):
 
     y, sr = load_audio(path) # 16kHz
     
+    # Check duration
+    duration = len(y) / sr
+    if duration < 1.0:
+        return {
+            "error": "Audio too short (< 1.0s). Please record at least 1 second for reliable analysis.",
+            "summary": {},
+            "features_global": {},
+            "timeline": {},
+            "goals": {}
+        }
+
     # Standard metrics
     sound = parselmouth.Sound(y, sr)
     cpp = compute_cpp_praat(sound)

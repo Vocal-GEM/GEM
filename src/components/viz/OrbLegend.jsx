@@ -44,7 +44,8 @@ const OrbLegend = ({ mode = 'gem' }) => {
                                 <span>{current.pitch.left}</span>
                                 <span>{current.pitch.right}</span>
                             </div>
-                            <div className="h-4 w-full rounded-full bg-gradient-to-r from-[rgb(0,100,128)] via-[rgb(0,200,200)] to-[rgb(255,100,200)] shadow-inner border border-white/5" />
+                            {/* Blue -> Purple -> Pink */}
+                            <div className="h-4 w-full rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 shadow-inner border border-white/5" />
                             <div className="text-xs text-white/60 mt-1.5 text-center font-medium">{current.pitch.label}</div>
                         </div>
 

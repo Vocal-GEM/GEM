@@ -91,7 +91,7 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
                 <span className="w-24 text-left">{labels[0]}</span>
                 <div className="flex flex-col items-center">
                     <span className="text-slate-500 mb-1 uppercase tracking-widest text-[10px]">{labels[1]}</span>
-                    <span ref={valueRef} className={`text-4xl font-mono font-bold tabular-nums leading-none ${colorBlindMode ? 'text-purple-400' : 'text-emerald-400'}`}>0</span>
+                    <span ref={valueRef} className={`text-2xl md:text-4xl font-mono font-bold tabular-nums leading-none ${colorBlindMode ? 'text-purple-400' : 'text-emerald-400'}`}>0</span>
                 </div>
                 <span className="w-24 text-right">{labels[2]}</span>
             </div>
