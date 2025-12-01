@@ -21,32 +21,72 @@ const TourOverlay = () => {
                 const rect = element.getBoundingClientRect();
                 setTargetRect(rect);
 
-                // Calculate tooltip position
-                // Default spacing
-                const gap = 12;
-                let top = 0;
-                let left = 0;
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                const tooltipWidth = 320; // w-80 = 20rem = 320px
+                const padding = 16; // Screen edge padding
 
-                // Simple positioning logic (can be enhanced)
-                if (step.placement === 'top') {
-                    top = rect.top - gap;
-                    left = rect.left + rect.width / 2;
-                } else if (step.placement === 'bottom') {
-                    top = rect.bottom + gap;
-                    left = rect.left + rect.width / 2;
-                } else if (step.placement === 'left') {
-                    top = rect.top + rect.height / 2;
-                    left = rect.left - gap;
-                } else if (step.placement === 'right') {
-                    top = rect.top + rect.height / 2;
-                    left = rect.right + gap;
-                } else {
-                    // Default to bottom
-                    top = rect.bottom + gap;
-                    left = rect.left + rect.width / 2;
+                // 1. Determine Placement
+                let placement = step.placement || 'bottom';
+
+                // On mobile (< 768px), force top/bottom to avoid horizontal overflow from side tooltips
+                if (viewportWidth < 768 && (placement === 'left' || placement === 'right')) {
+                    placement = 'bottom';
                 }
 
-                setPosition({ top, left, placement: step.placement || 'bottom' });
+                // 2. Calculate ideal coordinates (unclamped)
+                let top = 0;
+                let left = 0;
+                const gap = 12;
+
+                // Helper to calculate coords based on placement
+                const getCoords = (p) => {
+                    if (p === 'top') return { t: rect.top - gap, l: rect.left + rect.width / 2 };
+                    if (p === 'bottom') return { t: rect.bottom + gap, l: rect.left + rect.width / 2 };
+                    if (p === 'left') return { t: rect.top + rect.height / 2, l: rect.left - gap };
+                    if (p === 'right') return { t: rect.top + rect.height / 2, l: rect.right + gap };
+                    return { t: rect.bottom + gap, l: rect.left + rect.width / 2 };
+                };
+
+                let coords = getCoords(placement);
+                top = coords.t;
+                left = coords.l;
+
+                // 3. Flip if out of bounds (Vertical)
+                // If top placement goes off screen top, flip to bottom
+                if (placement === 'top' && top < 100) {
+                    placement = 'bottom';
+                    coords = getCoords(placement);
+                    top = coords.t;
+                    left = coords.l;
+                }
+                // If bottom placement goes off screen bottom, flip to top
+                else if (placement === 'bottom' && top > viewportHeight - 150) {
+                    placement = 'top';
+                    coords = getCoords(placement);
+                    top = coords.t;
+                    left = coords.l;
+                }
+
+                // 4. Clamp Horizontal Position (Critical for Mobile)
+                // We want the tooltip center (left) to be such that the tooltip body (width 320) is in view.
+                // Tooltip left edge = left - 160. Right edge = left + 160.
+                const halfWidth = tooltipWidth / 2;
+                const minLeft = halfWidth + padding;
+                const maxLeft = viewportWidth - halfWidth - padding;
+
+                const clampedLeft = Math.max(minLeft, Math.min(left, maxLeft));
+
+                // Calculate arrow offset (how much we shifted from the ideal target center)
+                // Positive means we shifted tooltip left, so arrow needs to shift right (positive) relative to tooltip center
+                const arrowOffset = left - clampedLeft;
+
+                setPosition({
+                    top,
+                    left: clampedLeft,
+                    placement,
+                    arrowOffset
+                });
             };
 
             updatePosition();
@@ -133,6 +173,10 @@ const TourOverlay = () => {
                             position.placement === 'left' ? 'right-[-8px] top-1/2 -translate-y-1/2' :
                                 'left-[-8px] top-1/2 -translate-y-1/2'
                         }`}
+                    style={{
+                        marginLeft: position.placement === 'top' || position.placement === 'bottom' ? position.arrowOffset : 0,
+                        marginTop: position.placement === 'left' || position.placement === 'right' ? 0 : 0 // Could add vertical clamping later
+                    }}
                 />
             </div>
         </div>,

@@ -238,6 +238,7 @@ const PracticeMode = ({
                     <ResizablePanel
                         className="flex flex-col relative flex-shrink-0 w-full lg:w-1/2"
                         defaultHeight={600}
+                        defaultWidth={null}
                         minWidth={400}
                     >
                         <div id="visualization-area" className="flex flex-col h-full relative">
@@ -338,7 +339,8 @@ const PracticeMode = ({
                     </div>
                 </div>
             </div>
-            );
+        </div>
+    );
 };
 
-            export default PracticeMode;
+export default PracticeMode;
