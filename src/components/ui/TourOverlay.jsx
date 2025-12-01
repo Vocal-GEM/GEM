@@ -113,6 +113,14 @@ const TourOverlay = () => {
             {/* For simplicity, we'll just use a dimmed background and highlight the target with a border overlay */}
             <div className="absolute inset-0 bg-black/50 transition-opacity duration-300 pointer-events-auto" />
 
+            {/* Global Skip Button (Safety Hatch) */}
+            <button
+                onClick={skipTour}
+                className="absolute top-4 right-4 z-[10000] px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md border border-white/20 text-sm font-medium transition-all pointer-events-auto"
+            >
+                Skip Tour
+            </button>
+
             {/* Target Highlight */}
             {targetRect && (
                 <div

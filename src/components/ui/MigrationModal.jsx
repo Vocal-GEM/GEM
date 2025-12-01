@@ -11,8 +11,17 @@ const MigrationModal = ({ onComplete }) => {
     }, []);
 
     const checkAndMigrate = async () => {
+        // Safety timeout to ensure modal doesn't stick forever
+        const timeoutId = setTimeout(() => {
+            console.warn('Migration check timed out, forcing completion');
+            setStatus('complete');
+            setMessage('Taking too long? Skipping check.');
+            setTimeout(onComplete, 1000);
+        }, 5000); // 5 seconds max
+
         try {
             const needsMigration = await indexedDB.needsMigration();
+            clearTimeout(timeoutId);
 
             if (!needsMigration) {
                 setStatus('complete');
@@ -35,6 +44,7 @@ const MigrationModal = ({ onComplete }) => {
                 setMessage('Migration failed. Your data is safe in the old storage.');
             }
         } catch (error) {
+            clearTimeout(timeoutId);
             console.error('Migration error:', error);
             setStatus('error');
             setMessage('An error occurred during migration.');
