@@ -7,14 +7,26 @@
 class AnalyticsService {
     constructor() {
         this.initialized = false;
+        this.enabled = false;
         this.events = [];
         this.MAX_EVENTS = 100;
     }
 
-    init() {
-        if (this.initialized) return;
+    init(enabled = false) {
+        if (this.initialized) {
+            this.setEnabled(enabled);
+            return;
+        }
         this.initialized = true;
-        this.logEvent('app_init');
+        this.enabled = enabled;
+        if (enabled) this.logEvent('app_init');
+    }
+
+    setEnabled(enabled) {
+        this.enabled = enabled;
+        if (enabled && !this.events.find(e => e.name === 'analytics_enabled')) {
+            this.logEvent('analytics_enabled');
+        }
     }
 
     /**
@@ -23,6 +35,8 @@ class AnalyticsService {
      * @param {object} properties - Additional data for the event
      */
     logEvent(eventName, properties = {}) {
+        if (!this.enabled) return;
+
         const event = {
             name: eventName,
             properties,
@@ -41,8 +55,26 @@ class AnalyticsService {
         console.log('Properties:', properties);
         console.log('Timestamp:', event.date);
         console.groupEnd();
+    }
 
-        // TODO: Send to backend/PostHog/Mixpanel here
+    /**
+     * Get buffered events
+     */
+    getEvents() {
+        return this.events;
+    }
+
+    /**
+     * Calculate basic funnel stats
+     */
+    getFunnelStats() {
+        const starts = this.events.filter(e => e.name === 'tutorial_start').length;
+        const completes = this.events.filter(e => e.name === 'tutorial_complete').length;
+        return {
+            tutorialStart: starts,
+            tutorialComplete: completes,
+            conversionRate: starts > 0 ? Math.round((completes / starts) * 100) : 0
+        };
     }
 
     /**

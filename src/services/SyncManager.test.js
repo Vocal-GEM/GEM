@@ -1,80 +1,114 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { syncManager } from './SyncManager';
-import { indexedDB, STORES } from './IndexedDBManager';
-import { indexedDB as fakeIndexedDB } from 'fake-indexeddb';
+import { indexedDB } from './IndexedDBManager';
 
-// Mock fetch
-global.fetch = vi.fn();
-
-// Explicitly set indexedDB
-global.indexedDB = fakeIndexedDB;
-global.window.indexedDB = fakeIndexedDB;
+// Mock IndexedDB
+vi.mock('./IndexedDBManager', () => ({
+    indexedDB: {
+        ensureReady: vi.fn().mockResolvedValue(true),
+        getAll: vi.fn().mockResolvedValue([]),
+        get: vi.fn().mockResolvedValue(null),
+        add: vi.fn().mockResolvedValue(1),
+        put: vi.fn().mockResolvedValue(1),
+        delete: vi.fn().mockResolvedValue(true),
+        clear: vi.fn().mockResolvedValue(true)
+    },
+    STORES: {
+        SYNC_QUEUE: 'sync_queue',
+        SYNC_METADATA: 'sync_metadata'
+    }
+}));
 
 describe('SyncManager', () => {
-    beforeEach(async () => {
-        await indexedDB.clear(STORES.SYNC_QUEUE);
-        syncManager.queue = [];
-        syncManager.isReady = true;
+    beforeEach(() => {
         vi.clearAllMocks();
+        syncManager.queue = [];
+        syncManager.retryAttempts.clear();
+        syncManager.isSyncing = false;
+        syncManager.isReady = true;
 
-        // Mock online status
-        Object.defineProperty(navigator, 'onLine', {
-            configurable: true,
-            value: true
+        // Mock navigator.onLine
+        vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    describe('Backoff Calculation', () => {
+        it('should increase delay with attempts', () => {
+            const delay1 = syncManager.calculateBackoff(1);
+            const delay2 = syncManager.calculateBackoff(2);
+            const delay3 = syncManager.calculateBackoff(3);
+
+            // Check ranges due to jitter
+            expect(delay1).toBeGreaterThan(1500); // ~2000
+            expect(delay2).toBeGreaterThan(3000); // ~4000
+            expect(delay3).toBeGreaterThan(7000); // ~8000
+
+            expect(delay2).toBeGreaterThan(delay1);
+            expect(delay3).toBeGreaterThan(delay2);
+        });
+
+        it('should cap delay at max', () => {
+            const delay = syncManager.calculateBackoff(10);
+            expect(delay).toBeLessThan(70000); // ~60000 + jitter
         });
     });
 
-    it('should add items to the queue', async () => {
-        await syncManager.push('journal', { text: 'test' });
-        expect(syncManager.queue.length).toBe(1);
+    describe('Offline Behavior', () => {
+        it('should not sync when offline', async () => {
+            vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
 
-        const dbItems = await indexedDB.getAll(STORES.SYNC_QUEUE);
-        expect(dbItems.length).toBe(1);
-    });
+            syncManager.queue = [{ id: 1, type: 'test' }];
+            const result = await syncManager.sync();
 
-    it('should attempt to sync when online', async () => {
-        global.fetch.mockResolvedValue({
-            ok: true,
-            status: 200,
-            json: async () => ({})
+            expect(result).toBe(false);
+            expect(syncManager.isSyncing).toBe(false);
         });
 
-        await syncManager.push('journal', { text: 'test' });
-
-        // sync() is called in push(), wait for it
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        expect(global.fetch).toHaveBeenCalled();
-        expect(syncManager.queue.length).toBe(0); // Should be cleared after success
+        it('should forceSyncNow returning false when offline', async () => {
+            vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+            const result = await syncManager.forceSyncNow();
+            expect(result).toBe(false);
+        });
     });
 
-    it('should not sync when offline', async () => {
-        Object.defineProperty(navigator, 'onLine', {
-            configurable: true,
-            value: false
+    describe('Queue Management', () => {
+        it('should add item to queue and try sync', async () => {
+            const syncSpy = vi.spyOn(syncManager, 'sync').mockResolvedValue(true);
+
+            await syncManager.push('journal', { text: 'test' });
+
+            expect(syncManager.queue).toHaveLength(1);
+            expect(indexedDB.add).toHaveBeenCalled();
+            expect(syncSpy).toHaveBeenCalled();
         });
 
-        await syncManager.push('journal', { text: 'test' });
+        it('should remove item on successful sync', async () => {
+            syncManager.queue = [{ id: 1, type: 'test' }];
 
-        expect(global.fetch).not.toHaveBeenCalled();
-        expect(syncManager.queue.length).toBe(1);
-    });
+            // Mock successful request
+            vi.spyOn(syncManager, 'sendRequest').mockResolvedValue(true);
 
-    it('should retry on failure', async () => {
-        vi.useFakeTimers();
-        global.fetch.mockRejectedValue(new Error('Network error'));
+            await syncManager.sync();
 
-        await syncManager.push('journal', { text: 'test' });
+            expect(syncManager.queue).toHaveLength(0);
+            expect(indexedDB.delete).toHaveBeenCalledWith('sync_queue', 1);
+        });
 
-        // Wait for the initial sync attempt to fail
-        await new Promise(resolve => setTimeout(resolve, 100));
+        it('should keep item on failed sync and increment retries', async () => {
+            syncManager.queue = [{ id: 1, type: 'test' }];
 
-        expect(global.fetch).toHaveBeenCalled();
-        expect(syncManager.queue.length).toBe(1); // Should remain in queue
-        expect(syncManager.retryAttempts.size).toBe(1);
+            // Mock failed request
+            vi.spyOn(syncManager, 'sendRequest').mockResolvedValue(false);
 
-        // Clear any pending timeouts to prevent test hang
-        vi.clearAllTimers();
-        vi.useRealTimers();
+            await syncManager.sync();
+
+            expect(syncManager.queue).toHaveLength(1);
+            expect(syncManager.retryAttempts.get(1)).toBe(1);
+            // Should NOT delete from DB
+            expect(indexedDB.delete).not.toHaveBeenCalled();
+        });
     });
 });

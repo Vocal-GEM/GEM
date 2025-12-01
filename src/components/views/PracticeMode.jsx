@@ -220,13 +220,13 @@ const PracticeMode = ({
                             ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30'
                             : 'bg-gradient-to-r from-teal-500 to-violet-500 hover:from-teal-400 hover:to-violet-400 text-white hover:shadow-xl hover:shadow-teal-500/30 animate-glow-pulse'
                             }`}
-                        aria-label={isAudioActive ? "Stop Microphone" : "Start Microphone"}
+                        aria-label={isAudioActive ? "Stop Session" : "Start Session"}
                         aria-pressed={isAudioActive}
                     >
                         {isAudioActive ? (
-                            <><span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" /> LIVE</>
+                            <><span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" /> STOP SESSION</>
                         ) : (
-                            <><Mic className="w-4 h-4" /> START MIC</>
+                            <><Play className="w-4 h-4" /> START SESSION</>
                         )}
                     </button>
                 </div>

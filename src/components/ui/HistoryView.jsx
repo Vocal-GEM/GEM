@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Book, FileText, TrendingUp, Calendar, Clock, Activity, BarChart2, Mic } from 'lucide-react';
+import { Book, FileText, TrendingUp, Calendar, Clock, Activity, BarChart2, Mic, Settings } from 'lucide-react';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
 import { useProfile } from '../../context/ProfileContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useSettings } from '../../context/SettingsContext';
 import { useTour } from '../../context/TourContext';
 import { pdfReportGenerator } from '../../utils/pdfReportGenerator';
 import {
@@ -33,6 +34,7 @@ ChartJS.register(
 const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
     const { getSessions } = useProfile();
     const { t } = useLanguage();
+    const { settings } = useSettings();
     const { startTour } = useTour();
     const [sessions, setSessions] = useState([]);
     const [isGenerating, setIsGenerating] = useState(false);
@@ -235,54 +237,71 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
             {/* Overview Tab */}
             {activeTab === 'overview' && (
                 <div className="space-y-6" role="tabpanel" id="overview-panel">
+                    <div className="flex justify-end">
+                        <button
+                            onClick={() => window.dispatchEvent(new CustomEvent('openDashboardConfig'))}
+                            className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
+                        >
+                            <Settings size={12} /> Customize Dashboard
+                        </button>
+                    </div>
+
                     {/* Stats Cards */}
                     <div id="history-stats" className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-                            <div className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">{t('history.streak')}</div>
-                            <div className="text-3xl font-bold text-white flex items-baseline gap-1">
-                                {streak} <span className="text-sm text-slate-500 font-normal">{t('history.days')}</span>
+                        {(settings.dashboardConfig?.showStreak ?? true) && (
+                            <div className="bg-slate-800 p-4 rounded-2xl border border-slate-700">
+                                <div className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">{t('history.streak')}</div>
+                                <div className="text-3xl font-bold text-white flex items-baseline gap-1">
+                                    {streak} <span className="text-sm text-slate-500 font-normal">{t('history.days')}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div className="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-                            <div className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">{t('history.totalPractice')}</div>
-                            <div className="text-3xl font-bold text-white flex items-baseline gap-1">
-                                {Math.floor(stats.totalSeconds / 60)} <span className="text-sm text-slate-500 font-normal">{t('history.mins')}</span>
+                        )}
+                        {(settings.dashboardConfig?.showTotalPractice ?? true) && (
+                            <div className="bg-slate-800 p-4 rounded-2xl border border-slate-700">
+                                <div className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">{t('history.totalPractice')}</div>
+                                <div className="text-3xl font-bold text-white flex items-baseline gap-1">
+                                    {Math.floor(stats.totalSeconds / 60)} <span className="text-sm text-slate-500 font-normal">{t('history.mins')}</span>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
 
                     {/* Weekly Activity Chart */}
-                    <div className="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl">
-                        <h3 className="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2"><Calendar size={16} aria-hidden="true" /> {t('history.weeklyActivity')}</h3>
-                        <div className="h-48">
-                            <Bar
-                                data={weeklyData}
-                                options={{
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: { legend: { display: false } },
-                                    scales: {
-                                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
-                                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
-                                    }
-                                }}
-                            />
+                    {(settings.dashboardConfig?.showWeeklyActivity ?? true) && (
+                        <div className="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl">
+                            <h3 className="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2"><Calendar size={16} aria-hidden="true" /> {t('history.weeklyActivity')}</h3>
+                            <div className="h-48">
+                                <Bar
+                                    data={weeklyData}
+                                    options={{
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: { legend: { display: false } },
+                                        scales: {
+                                            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
+                                            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                                        }
+                                    }}
+                                />
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Progress Trends Chart */}
-                    <div id="history-charts" className="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl">
-                        <h3 className="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2"><BarChart2 size={16} aria-hidden="true" /> {t('history.progressTrends')}</h3>
-                        <div className="h-64">
-                            {sessions.length > 0 ? (
-                                <Line options={chartOptions} data={chartData} />
-                            ) : (
-                                <div className="h-full flex items-center justify-center text-slate-500 text-sm">
-                                    {t('history.noSessions')}
-                                </div>
-                            )}
+                    {(settings.dashboardConfig?.showProgressTrends ?? true) && (
+                        <div id="history-charts" className="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl">
+                            <h3 className="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2"><BarChart2 size={16} aria-hidden="true" /> {t('history.progressTrends')}</h3>
+                            <div className="h-64">
+                                {sessions.length > 0 ? (
+                                    <Line options={chartOptions} data={chartData} />
+                                ) : (
+                                    <div className="h-full flex items-center justify-center text-slate-500 text-sm">
+                                        {t('history.noSessions')}
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             )}
 

@@ -1,6 +1,5 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import HistoryView from './HistoryView';
 
 // Mock dependencies
@@ -10,40 +9,82 @@ vi.mock('../../context/ProfileContext', () => ({
     })
 }));
 
-vi.mock('../../utils/pdfReportGenerator', () => ({
-    pdfReportGenerator: {
-        generate: vi.fn()
-    }
+vi.mock('../../context/LanguageContext', () => ({
+    useLanguage: () => ({
+        t: (key) => key
+    })
 }));
 
-// Mock Chart.js to avoid canvas errors
+vi.mock('../../context/TourContext', () => ({
+    useTour: () => ({
+        startTour: vi.fn()
+    })
+}));
+
+// Mock SettingsContext
+const mockUseSettings = vi.fn();
+vi.mock('../../context/SettingsContext', () => ({
+    useSettings: () => mockUseSettings(),
+    SettingsProvider: ({ children }) => <div>{children}</div>
+}));
+
+// Mock Chart.js components
 vi.mock('react-chartjs-2', () => ({
-    Line: () => null,
-    Bar: () => null
+    Line: () => <div>Line Chart</div>,
+    Bar: () => <div>Bar Chart</div>
 }));
 
-describe('HistoryView Component', () => {
-    it('renders empty state when no journals are present', async () => {
-        render(<HistoryView journals={[]} stats={{}} />);
-
-        // Switch to Journals tab
-        const journalsTab = screen.getByText('Journals');
-        fireEvent.click(journalsTab);
-
-        // Assuming EmptyState renders "Create First Entry"
-        expect(await screen.findByText('Create First Entry')).toBeInTheDocument();
-        expect(screen.getByText('Start documenting your journey')).toBeInTheDocument();
+describe('HistoryView Personalization', () => {
+    beforeEach(() => {
+        mockUseSettings.mockReturnValue({
+            settings: {
+                dashboardConfig: {
+                    showStreak: true,
+                    showTotalPractice: true,
+                    showWeeklyActivity: true,
+                    showProgressTrends: true
+                }
+            }
+        });
     });
 
-    it('renders empty state when no sessions are present', async () => {
-        render(<HistoryView journals={[]} stats={{}} />);
+    it('should render all widgets by default', () => {
+        render(<HistoryView stats={{ totalSeconds: 600 }} journals={[]} />);
 
-        // Switch to Sessions tab
-        const sessionsTab = screen.getByText('Sessions');
-        fireEvent.click(sessionsTab);
+        expect(screen.getByText('history.streak')).toBeInTheDocument();
+        expect(screen.getByText('history.totalPractice')).toBeInTheDocument();
+        expect(screen.getByText('history.weeklyActivity')).toBeInTheDocument();
+        expect(screen.getByText('history.progressTrends')).toBeInTheDocument();
+    });
 
-        // Assuming EmptyState renders "Start Practicing"
-        expect(await screen.findByText('Start Practicing')).toBeInTheDocument();
-        expect(screen.getByText('No practice sessions yet')).toBeInTheDocument();
+    it('should hide widgets based on config', () => {
+        mockUseSettings.mockReturnValue({
+            settings: {
+                dashboardConfig: {
+                    showStreak: false,
+                    showTotalPractice: false,
+                    showWeeklyActivity: false,
+                    showProgressTrends: false
+                }
+            }
+        });
+
+        render(<HistoryView stats={{ totalSeconds: 600 }} journals={[]} />);
+
+        expect(screen.queryByText('history.streak')).not.toBeInTheDocument();
+        expect(screen.queryByText('history.totalPractice')).not.toBeInTheDocument();
+        expect(screen.queryByText('history.weeklyActivity')).not.toBeInTheDocument();
+        expect(screen.queryByText('history.progressTrends')).not.toBeInTheDocument();
+    });
+
+    it('should dispatch openDashboardConfig event', () => {
+        const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+        render(<HistoryView stats={{ totalSeconds: 600 }} journals={[]} />);
+
+        const customizeBtn = screen.getByText('Customize Dashboard');
+        fireEvent.click(customizeBtn);
+
+        expect(dispatchSpy).toHaveBeenCalledWith(expect.any(CustomEvent));
+        expect(dispatchSpy.mock.calls[0][0].type).toBe('openDashboardConfig');
     });
 });

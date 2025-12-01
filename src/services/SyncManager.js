@@ -183,11 +183,22 @@ class SyncManager {
         // Exponential backoff for retries
         if (this.queue.length > 0) {
             const maxAttempts = Math.max(...Array.from(this.retryAttempts.values()));
-            const delay = Math.min(30000 * Math.pow(2, maxAttempts - 1), 300000); // Max 5 min
+            const delay = this.calculateBackoff(maxAttempts);
             setTimeout(() => this.sync(), delay);
         }
 
         return successCount > 0;
+    }
+
+    calculateBackoff(attempts) {
+        // Start with 2s, cap at 60s
+        // 2s, 4s, 8s, 16s, 32s, 60s...
+        const baseDelay = 2000;
+        const maxDelay = 60000;
+        const delay = Math.min(baseDelay * Math.pow(2, attempts - 1), maxDelay);
+        // Add jitter (±10%)
+        const jitter = delay * 0.1 * (Math.random() * 2 - 1);
+        return Math.floor(delay + jitter);
     }
 
     async sendRequest(item) {

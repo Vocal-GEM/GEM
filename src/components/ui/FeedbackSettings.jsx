@@ -273,6 +273,49 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                     </div>
                 </section>
 
+                {/* Dashboard Configuration */}
+                <section>
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Dashboard Configuration</h3>
+                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 space-y-3">
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm font-bold text-white">Show Streak</span>
+                            <input
+                                type="checkbox"
+                                checked={settings.dashboardConfig?.showStreak ?? true}
+                                onChange={(e) => setSettings({ ...settings, dashboardConfig: { ...settings.dashboardConfig, showStreak: e.target.checked } })}
+                                className="accent-blue-500 w-5 h-5 rounded"
+                            />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm font-bold text-white">Show Total Practice</span>
+                            <input
+                                type="checkbox"
+                                checked={settings.dashboardConfig?.showTotalPractice ?? true}
+                                onChange={(e) => setSettings({ ...settings, dashboardConfig: { ...settings.dashboardConfig, showTotalPractice: e.target.checked } })}
+                                className="accent-blue-500 w-5 h-5 rounded"
+                            />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm font-bold text-white">Show Weekly Activity</span>
+                            <input
+                                type="checkbox"
+                                checked={settings.dashboardConfig?.showWeeklyActivity ?? true}
+                                onChange={(e) => setSettings({ ...settings, dashboardConfig: { ...settings.dashboardConfig, showWeeklyActivity: e.target.checked } })}
+                                className="accent-blue-500 w-5 h-5 rounded"
+                            />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm font-bold text-white">Show Progress Trends</span>
+                            <input
+                                type="checkbox"
+                                checked={settings.dashboardConfig?.showProgressTrends ?? true}
+                                onChange={(e) => setSettings({ ...settings, dashboardConfig: { ...settings.dashboardConfig, showProgressTrends: e.target.checked } })}
+                                className="accent-blue-500 w-5 h-5 rounded"
+                            />
+                        </div>
+                    </div>
+                </section>
+
                 {/* Accessibility */}
                 <section>
                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Accessibility</h3>
@@ -527,6 +570,34 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                 <section>
                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Data & System</h3>
                     <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-slate-800 rounded-xl">
+                            <div className="flex items-center gap-3">
+                                <div className={`p-2 rounded-lg ${settings.analyticsEnabled ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-700 text-slate-400'}`}>
+                                    <Activity className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <div className="text-sm font-bold text-white">Share Anonymous Usage</div>
+                                    <div className="text-[10px] text-slate-400">Help improve the app (Privacy First)</div>
+                                </div>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer p-2">
+                                <input
+                                    type="checkbox"
+                                    checked={settings.analyticsEnabled || false}
+                                    onChange={(e) => setSettings({ ...settings, analyticsEnabled: e.target.checked })}
+                                    className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                            </label>
+                        </div>
+
+                        {settings.analyticsEnabled && (
+                            <button onClick={() => { onClose(); setTimeout(() => window.dispatchEvent(new CustomEvent('openAnalytics')), 100); }} className="w-full p-4 bg-slate-800 hover:bg-slate-700 rounded-xl text-left flex items-center gap-3 transition-colors">
+                                <Activity className="w-5 h-5 text-slate-400" />
+                                <span className="text-sm font-bold text-slate-200">View Local Analytics</span>
+                            </button>
+                        )}
+
                         <button onClick={onOpenTutorial} className="w-full p-4 bg-slate-800 hover:bg-slate-700 rounded-xl text-left flex items-center gap-3 transition-colors">
                             <HelpCircle className="w-5 h-5 text-slate-400" />
                             <span className="text-sm font-bold text-slate-200">Replay Tutorial</span>

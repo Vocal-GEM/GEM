@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { Mic, MessageSquare, ArrowLeft, Activity, ChevronRight } from 'lucide-react';
 import { useAudio } from './context/AudioContext';
 import { useSettings } from './context/SettingsContext';
 import { useAuth } from './context/AuthContext';
@@ -77,8 +78,13 @@ import { useAchievements } from './hooks/useAchievements';
 
 import { TourProvider } from './context/TourContext';
 import TourOverlay from './components/ui/TourOverlay';
+import { TourProvider } from './context/TourContext';
+import TourOverlay from './components/ui/TourOverlay';
 import CommandPalette from './components/ui/CommandPalette';
 import Breadcrumbs from './components/ui/Breadcrumbs';
+import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
+import QuickSettings from './components/ui/QuickSettings';
+import { analyticsService } from './services/AnalyticsService';
 
 const App = () => {
     const {
@@ -136,6 +142,13 @@ const App = () => {
         closeModal
     } = useNavigation();
 
+    const [showQuickSettings, setShowQuickSettings] = useState(false);
+
+    // Initialize Analytics
+    useEffect(() => {
+        analyticsService.init(settings.analyticsEnabled);
+    }, [settings.analyticsEnabled]);
+
     // Derived state for backward compatibility
     // Derived state for backward compatibility - using modals state directly where possible
     // or ensuring no shadowing if variables are already declared above
@@ -156,8 +169,7 @@ const App = () => {
     const showCamera = modals.camera;
     const setShowCamera = (v) => v ? openModal('camera') : closeModal('camera');
 
-    const showPracticeMode = modals.practiceMode;
-    const setShowPracticeMode = (v) => v ? openModal('practiceMode') : closeModal('practiceMode');
+
 
     const showMigration = modals.migration;
     const setShowMigration = (v) => v ? openModal('migration') : closeModal('migration');
@@ -167,114 +179,6 @@ const App = () => {
 
     const showAssessment = modals.assessment;
     const setShowAssessment = (v) => v ? openModal('assessment') : closeModal('assessment');
-
-    const showWarmUp = modals.warmup;
-    const setShowWarmUp = (v) => v ? openModal('warmup') : closeModal('warmup');
-
-    const showForwardFocus = modals.forwardFocus;
-    const setShowForwardFocus = (v) => v ? openModal('forwardFocus') : closeModal('forwardFocus');
-
-    const showVocalFolds = modals.vocalFolds;
-    const setShowVocalFolds = (v) => v ? openModal('vocalFolds') : closeModal('vocalFolds');
-
-    const showVoiceQuality = modals.voiceQuality;
-    const setShowVoiceQuality = (v) => v ? openModal('voiceQuality') : closeModal('voiceQuality');
-
-    const showCourse = modals.course;
-    const setShowCourse = (v) => v ? openModal('course') : closeModal('course');
-
-    const showTutorial = modals.tutorial;
-    const setShowTutorial = (v) => v ? openModal('tutorial') : closeModal('tutorial');
-
-    const showCompass = modals.compass;
-    const setShowCompass = (v) => v ? openModal('compass') : closeModal('compass');
-
-    const [isDataLoaded, setIsDataLoaded] = useState(true);
-    const [dismissedError, setDismissedError] = useState(false);
-
-    // Onboarding Steps
-    const onboardingSteps = [
-        { target: '[data-tour="mic-button"]', title: 'Start Practicing', content: 'Tap here to start real-time analysis.' },
-        { target: '[data-tour="filter-menu"]', title: 'Change Views', content: 'Switch between different visualizations like Pitch, Resonance, and more.' },
-        { target: '[data-tour="settings-button"]', title: 'Customize', content: 'Adjust your target pitch range and other settings here.' },
-    ];
-
-    const {
-        isActive: isTourActive,
-        currentStep,
-        nextStep,
-        prevStep,
-        skipOnboarding,
-        startOnboarding,
-        isFirstStep,
-        isLastStep
-    } = useOnboarding(onboardingSteps);
-
-    const { unlockedAchievement, closeAchievement } = useAchievements(stats);
-
-
-
-
-
-    // Onboarding flow
-    useEffect(() => {
-        if (!isDataLoaded) return;
-        const hasSeenTutorial = localStorage.getItem('gem_tutorial_seen');
-        const hasSeenCompass = localStorage.getItem('gem_compass_seen');
-        const hasCalibrated = localStorage.getItem('gem_calibration_done');
-        const hasSeenOnboarding = localStorage.getItem('gem_onboarding_seen');
-
-        if (!hasSeenTutorial) {
-            setShowTutorial(true);
-        } else if (!hasSeenCompass) {
-            setShowCompass(true);
-        } else if (!hasCalibrated) {
-            setShowCalibration(true);
-        } else if (!hasSeenOnboarding) {
-            startOnboarding();
-        }
-    }, [isDataLoaded]);
-
-    const handleTutorialComplete = () => {
-        setShowTutorial(false);
-        localStorage.setItem('gem_tutorial_seen', 'true');
-        setShowCompass(true);
-    };
-
-    const handleCompassComplete = () => {
-        setShowCompass(false);
-        localStorage.setItem('gem_compass_seen', 'true');
-        setShowCalibration(true);
-    };
-
-    const handleCalibrationComplete = () => {
-        setShowCalibration(false);
-        localStorage.setItem('gem_calibration_done', 'true');
-        startOnboarding();
-    };
-
-    // Settings events - moved to NavigationContext
-
-    // Profile switching
-    useEffect(() => {
-        const handleSwitchProfile = () => window.location.reload();
-        window.addEventListener('switchProfile', handleSwitchProfile);
-        return () => window.removeEventListener('switchProfile', handleSwitchProfile);
-    }, []);
-
-    // Command Palette Shortcut
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                openModal('commandPalette');
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [openModal]);
-
-
 
     return (
         <TourProvider>
@@ -337,53 +241,22 @@ const App = () => {
                 <main id="main-content" className="flex-1 max-w-[1600px] mx-auto w-full p-4 pb-24">
                     <Breadcrumbs />
                     {activeTab === 'practice' && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Real-time Analysis</h2>
-                                <div className="flex gap-2">
-                                    <button onClick={() => setShowPracticeMode(true)} className="px-4 py-2.5 rounded-full text-sm font-bold bg-slate-800 hover:bg-slate-700 text-purple-400 border border-purple-500/30 transition-all flex items-center gap-2">
-                                        <BarChart2 size={16} />
-                                        <span>Practice Mode</span>
-                                    </button>
-                                </div>
-                            </div>
-                            {/* Right: Dashboard & Advice */}
-                            <div className="flex flex-col h-[600px] overflow-y-auto custom-scrollbar pr-2">
-                                <div className="h-full min-h-[400px] mb-6">
-                                    <GenderPerceptionDashboard dataRef={dataRef} view={practiceView} />
-                                </div>
-
-                                {practiceView === 'pitch' && (
-                                    <div className="mb-6">
-                                        <PitchTargets audioEngine={audioEngineRef} />
-                                        <PitchPipe audioEngine={audioEngineRef} />
-                                    </div>
-                                )}
-
-                                {practiceView === 'weight' && (
-                                    <div className="mb-6">
-                                        <VoiceQualityAnalysis dataRef={dataRef} colorBlindMode={settings.colorBlindMode} />
-                                    </div>
-                                )}
-
-                                {practiceView === 'vowel' && (
-                                    <div className="mb-6">
-                                        <VowelAnalysis dataRef={dataRef} colorBlindMode={settings.colorBlindMode} />
-                                    </div>
-                                )}
-
-                                <ToolExercises tool={practiceView} audioEngine={audioEngineRef.current} />
-
-                                <div className="mt-4 flex-shrink-0">
-                                    <button onClick={() => setActiveTab('tools')} className="w-full p-4 rounded-xl flex flex-row items-center justify-center gap-3 transition-colors group bg-slate-800 hover:bg-slate-700">
-                                        <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all">
-                                            <Wrench size={20} />
-                                        </div>
-                                        <span className="text-sm font-bold">All Tools</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <Suspense fallback={<LoadingSpinner />}>
+                            <PracticeMode
+                                dataRef={dataRef}
+                                calibration={calibration}
+                                targetRange={targetRange}
+                                goals={goals}
+                                activeTab={activeTab}
+                                onOpenSettings={() => setShowSettings(true)}
+                                onOpenJournal={() => { setActiveTab('history'); setShowJournalForm(true); }}
+                                onOpenStats={() => setActiveTab('history')}
+                                onNavigate={setActiveTab}
+                                onUpdateRange={updateTargetRange}
+                                onSwitchProfile={switchProfile}
+                                settings={settings}
+                            />
+                        </Suspense>
                     )}
 
                     {activeTab === 'history' && (
@@ -398,36 +271,40 @@ const App = () => {
                         </Suspense>
                     )}
 
-                    {activeTab === 'analysis' && (
-                        <Suspense fallback={<LoadingSpinner />}>
-                            <AnalysisView />
-                        </Suspense>
-                    )}
-
-                    {activeTab === 'tools' && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div className="flex items-center gap-2 mb-4">
-                                <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><ArrowLeft /></button>
-                                <h2 className="text-xl font-bold">Tools</h2>
-                            </div>
+                    {
+                        activeTab === 'analysis' && (
                             <Suspense fallback={<LoadingSpinner />}>
-                                <AudioLibrary audioEngine={audioEngineRef} />
+                                <AnalysisView />
                             </Suspense>
-                            <BreathPacer />
-                            <div className="p-4 bg-slate-800 rounded-xl flex flex-row items-center justify-between gap-3 hover:bg-slate-700 transition-colors cursor-pointer" onClick={() => setShowVocalFolds(true)}>
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 rounded-lg bg-pink-500/10 text-pink-400">
-                                        <Activity size={20} />
-                                    </div>
-                                    <div className="text-left">
-                                        <h3 className="text-sm font-bold text-white">Vocal Folds Simulation</h3>
-                                        <p className="text-xs text-slate-400">Visualize vocal fold vibration patterns</p>
-                                    </div>
+                        )
+                    }
+
+                    {
+                        activeTab === 'tools' && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <button onClick={() => setActiveTab('practice')} className="text-slate-400 hover:text-white"><ArrowLeft /></button>
+                                    <h2 className="text-xl font-bold">Tools</h2>
                                 </div>
-                                <ChevronRight className="text-slate-500" />
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    <AudioLibrary audioEngine={audioEngineRef} />
+                                </Suspense>
+                                <BreathPacer />
+                                <div className="p-4 bg-slate-800 rounded-xl flex flex-row items-center justify-between gap-3 hover:bg-slate-700 transition-colors cursor-pointer" onClick={() => setShowVocalFolds(true)}>
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-lg bg-pink-500/10 text-pink-400">
+                                            <Activity size={20} />
+                                        </div>
+                                        <div className="text-left">
+                                            <h3 className="text-sm font-bold text-white">Vocal Folds Simulation</h3>
+                                            <p className="text-xs text-slate-400">Visualize vocal fold vibration patterns</p>
+                                        </div>
+                                    </div>
+                                    <ChevronRight className="text-slate-500" />
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )
+                    }
 
                     {/* Modals & Overlays */}
                     <FeedbackSettings
@@ -520,97 +397,19 @@ const App = () => {
                     {showVocalHealthTips && <VocalHealthTips onClose={() => setShowVocalHealthTips(false)} />}
                     {showAssessment && <AssessmentModule onClose={() => setShowAssessment(false)} />}
                     {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}
-                    {showForwardFocus && <ForwardFocusDrill onClose={() => setShowForwardFocus(false)} />}
-                    {showIncognito && <IncognitoScreen onClose={() => setShowIncognito(false)} />}
-                    {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
-
-                    {
-                        showVocalFolds && (
-                            <Suspense fallback={<LoadingSpinner />}>
-                                <VocalFoldsView onClose={() => setShowVocalFolds(false)} />
-                            </Suspense>
-                        )
-                    }
-
-                    {
-                        showVoiceQuality && (
-                            <div className="fixed inset-0 z-50 bg-slate-950 overflow-y-auto">
-                                <div className="max-w-[1600px] mx-auto p-4 min-h-screen">
-                                    <button
-                                        onClick={() => setShowVoiceQuality(false)}
-                                        className="mb-4 flex items-center gap-2 text-slate-400 hover:text-white"
-                                    >
-                                        <ArrowLeft size={20} /> Back to Tools
-                                    </button>
-                                    <Suspense fallback={<LoadingSpinner />}>
-                                        <VoiceQualityView />
-                                    </Suspense>
-                                </div>
-                            </div>
-                        )
-                    }
-
-                    {
-                        showCourse && (
-                            <Suspense fallback={<LoadingSpinner />}>
-                                <FeminizationCourse onClose={() => setShowCourse(false)} />
-                            </Suspense>
-                        )
-                    }
-
-                    {
-                        showPracticeMode && (
-                            <Suspense fallback={<LoadingSpinner />}>
-                                <PracticeMode
-                                    onClose={() => setShowPracticeMode(false)}
-                                    dataRef={dataRef}
-                                    calibration={calibration}
-                                    targetRange={targetRange}
-                                    goals={goals}
-                                    activeTab={activeTab}
-                                    onOpenSettings={() => setShowSettings(true)}
-                                    onOpenJournal={() => { setActiveTab('history'); setShowJournalForm(true); }}
-                                    onOpenStats={() => setActiveTab('history')}
-                                    onNavigate={setActiveTab}
-                                    onUpdateRange={updateTargetRange}
-                                    onSwitchProfile={switchProfile}
-                                    settings={settings}
-                                />
-                            </Suspense>
-                        )
-                    }
-
-                    <DebugOverlay audioEngine={audioEngineRef.current} dataRef={dataRef} />
-
-                    <BottomNav activeTab={activeTab} onNavigate={setActiveTab} />
-
-                    <QuickActions onAction={(id) => {
-                        if (id === 'practice') { setActiveTab('practice'); toggleAudio(); }
-                        if (id === 'journal') { setActiveTab('history'); setShowJournalForm(true); }
-                        if (id === 'coach') setActiveTab('coach');
-                        if (id === 'warmup') setShowWarmUp(true);
-                    }} />
-
-                    <TooltipOverlay
-                        step={currentStep}
-                        isActive={isTourActive}
-                        onNext={nextStep}
-                        onPrev={prevStep}
-                        onSkip={skipOnboarding}
-                        isFirstStep={isFirstStep}
-                        isLastStep={isLastStep}
-                    />
 
                     <TourOverlay />
                     <CommandPalette />
+                    <QuickSettings isOpen={showQuickSettings} onClose={() => setShowQuickSettings(false)} />
+                    {modals.analytics && <AnalyticsDashboard onClose={() => closeModal('analytics')} />}
 
                     <CelebrationModal
                         achievement={unlockedAchievement}
                         onClose={closeAchievement}
                     />
-                </main>
-            </div>
-        </TourProvider>
+                </main >
+            </div >
+        </TourProvider >
     );
 };
 

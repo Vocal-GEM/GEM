@@ -36,7 +36,16 @@ export const SettingsProvider = ({ children }) => {
         },
 
         disable3D: false, // Safe Mode (2D Fallback)
-        beginnerMode: true // Default to true for new users
+        beginnerMode: true, // Default to true for new users
+        analyticsEnabled: false, // Privacy by default
+
+        // Dashboard Configuration
+        dashboardConfig: {
+            showStreak: true,
+            showTotalPractice: true,
+            showWeeklyActivity: true,
+            showProgressTrends: true
+        }
     });
 
 
@@ -96,6 +105,14 @@ export const SettingsProvider = ({ children }) => {
     const updateSettings = (newSettings) => {
         setSettings(newSettings);
         indexedDB.saveSetting('app_settings', newSettings);
+
+        // Debounced sync to server
+        if (window.syncTimeout) clearTimeout(window.syncTimeout);
+        window.syncTimeout = setTimeout(() => {
+            import('../services/SyncManager').then(({ syncManager }) => {
+                syncManager.push('SETTINGS_UPDATE', newSettings);
+            });
+        }, 2000);
     };
 
     const value = React.useMemo(() => ({
