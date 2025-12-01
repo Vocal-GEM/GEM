@@ -101,3 +101,4 @@ const MigrationModal = ({ onComplete }) => {
 };
 
 export default MigrationModal;
+// Verified mobile fixes
