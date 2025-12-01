@@ -53,7 +53,13 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
         if (exercise) gameRef.current = { score: 0, lastUpdate: Date.now(), lastPitch: 0 };
 
         // Helper to get color based on frequency
-        const getPitchColor = (freq) => {
+        const getPitchColor = (freq, clarity = 1.0) => {
+            // 1. Confidence Check
+            // If clarity is low (e.g. < 0.8), don't give "success" colors
+            if (clarity < 0.8) {
+                return colorBlindMode ? '#9333ea' : '#ef4444'; // Default to "Out of Range" / Unstable
+            }
+
             const fem = voiceProfiles.find(p => p.id === 'fem');
             const masc = voiceProfiles.find(p => p.id === 'masc');
 
@@ -67,10 +73,15 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                 return '#22c55e'; // Green-500
             }
 
-            // Check if within tolerance (near miss) - e.g. +/- 10%
+            // Check if within tolerance (near miss) - Cents based (e.g. +/- 50 cents)
+            // 50 cents is approx 3% frequency deviation (2^(50/1200) ~= 1.029)
             if (targetRange) {
-                const tolerance = (targetRange.max - targetRange.min) * 0.5;
-                if (freq >= targetRange.min - tolerance && freq <= targetRange.max + tolerance) {
+                // Calculate cents distance from nearest edge
+                const distMin = 1200 * Math.log2(freq / targetRange.min);
+                const distMax = 1200 * Math.log2(freq / targetRange.max);
+
+                // If within 50 cents of min (below) or max (above)
+                if ((distMin > -50 && distMin < 0) || (distMax > 0 && distMax < 50)) {
                     if (colorBlindMode) return '#f59e0b'; // Amber-500 (Safe)
                     return '#eab308'; // Yellow-500
                 }
@@ -244,6 +255,13 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
             for (let i = 1; i < history.length; i++) {
                 const p1 = history[i - 1];
                 const p2 = history[i];
+                // Assuming clarity is stored in history or accessible. 
+                // Since history is just numbers, we might need to assume high clarity for past points 
+                // OR update data structure. For now, let's use current clarity for the whole line 
+                // or just default to 1.0 for history to avoid breaking changes.
+                // Ideally, history should be objects { freq, clarity }.
+                // If history is just numbers, we can't retroactively know clarity.
+                // Let's use a safe default for history points.
 
                 if (p1 > 0 && p2 > 0) {
                     const x1 = 30 + ((i - 1) / (history.length - 1)) * (width - 30);
@@ -253,7 +271,7 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
 
                     // Create Gradient for this segment
                     const grad = ctx.createLinearGradient(x1, y1, x2, y2);
-                    grad.addColorStop(0, getPitchColor(p1));
+                    grad.addColorStop(0, getPitchColor(p1)); // Default clarity 1.0
                     grad.addColorStop(1, getPitchColor(p2));
 
                     ctx.strokeStyle = grad;
@@ -278,6 +296,7 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
 
             ctx.shadowBlur = 0;
             const currentP = history[history.length - 1];
+            const currentClarity = dataRef.current.clarity || 0; // Get current clarity
 
             // Update average pitch range (only for speaking pitches > 0)
             if (currentP > 0) {
@@ -287,7 +306,24 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                 }));
             }
 
-            if (currentP > 0) { ctx.fillStyle = '#60a5fa'; ctx.font = 'bold 20px monospace'; ctx.textAlign = 'right'; ctx.fillText(Math.round(currentP) + " Hz", width - 10, 30); }
+            if (currentP > 0) {
+                ctx.fillStyle = getPitchColor(currentP, currentClarity);
+                ctx.font = 'bold 20px monospace';
+                ctx.textAlign = 'right';
+                ctx.fillText(Math.round(currentP) + " Hz", width - 10, 30);
+            }
+
+            // Confidence Overlay
+            if (currentP > 0 && currentClarity < 0.8) {
+                // Draw "Low Confidence" indicator
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.1)'; // Red tint
+                ctx.fillRect(0, 0, width, height);
+
+                ctx.fillStyle = '#ef4444';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('⚠ UNSTABLE SIGNAL', width / 2, 20);
+            }
 
             // Stability Indicator (Standard Deviation of last 10 frames)
             if (history.length > 10 && currentP > 0) {

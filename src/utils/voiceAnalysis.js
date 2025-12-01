@@ -62,7 +62,8 @@ export class VoiceAnalyzer {
             sibilance: this.calculateSibilance(frame, sampleRate),
             spi: this.calculateSPI(this.calculateSpectralFeatures(frame, sampleRate).spectrum, sampleRate),
             spectralSlope: this.calculateSpectralSlope(this.calculateSpectralFeatures(frame, sampleRate).spectrum, sampleRate),
-            formantMismatch: pitch ? this.detectFormantMismatch(pitch.mean, formants.f2) : false
+            formantMismatch: pitch ? this.detectFormantMismatch(pitch.mean, formants.f2) : false,
+            clarity: pitch ? pitch.confidence : (this.calculateSibilance(frame, sampleRate).score > 0.3 ? 0.8 : 0) // Combined voiced/unvoiced confidence
         };
     }
 

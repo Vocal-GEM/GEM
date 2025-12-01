@@ -17,6 +17,7 @@ import ForwardFocusDrill from './ForwardFocusDrill';
 import BreathPacer from './BreathPacer';
 import TwisterCard from './TwisterCard';
 import TargetVoicePlayer from './TargetVoicePlayer';
+import IntonationTrainer from '../viz/IntonationTrainer';
 
 import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
@@ -26,6 +27,27 @@ const LessonView = ({ lesson, onComplete, onNext, onPrevious, hasNext, hasPrevio
     const { dataRef, audioEngineRef } = useAudio();
     const { targetRange, calibration, activeProfile } = useProfile();
     const { settings } = useSettings();
+    const [isLowConfidence, setIsLowConfidence] = React.useState(false);
+
+    // Monitor confidence
+    React.useEffect(() => {
+        if (lesson.type !== 'interactive') return;
+
+        const checkConfidence = () => {
+            if (dataRef.current) {
+                const { clarity, isSilent } = dataRef.current;
+                // If speaking (not silent) and clarity is low (< 0.5)
+                if (!isSilent && clarity !== undefined && clarity < 0.5) {
+                    setIsLowConfidence(true);
+                } else {
+                    setIsLowConfidence(false);
+                }
+            }
+        };
+
+        const interval = setInterval(checkConfidence, 500); // Check every 500ms
+        return () => clearInterval(interval);
+    }, [lesson.type, dataRef]);
 
     const renderTool = () => {
         switch (lesson.toolId) {
@@ -82,10 +104,8 @@ const LessonView = ({ lesson, onComplete, onNext, onPrevious, hasNext, hasPrevio
                 );
             case 'intonation-exercise':
                 return (
-                    <div className="bg-slate-900/50 rounded-2xl border border-white/10 p-4">
-                        {/* IntonationExercise component missing from imports, assuming it might be needed or placeholder */}
-                        {/* <IntonationExercise /> */}
-                        <div className="text-center text-slate-500">Intonation Exercise Placeholder</div>
+                    <div className="h-96 bg-slate-900/50 rounded-2xl border border-white/10 overflow-hidden relative">
+                        <IntonationTrainer dataRef={dataRef} />
                     </div>
                 );
             case 'spectrogram':
@@ -147,9 +167,17 @@ const LessonView = ({ lesson, onComplete, onNext, onPrevious, hasNext, hasPrevio
                 {/* Interactive Tool Area */}
                 {lesson.type === 'interactive' && (
                     <div className="mt-8 space-y-4">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-                            <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Live Microphone Input</span>
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                                <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Live Microphone Input</span>
+                            </div>
+                            {isLowConfidence && (
+                                <div className="px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded-full flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
+                                    <span className="text-[10px] font-bold text-yellow-400 uppercase tracking-wider">Low Signal Confidence</span>
+                                </div>
+                            )}
                         </div>
 
                         {/* Target Phrase Player */}

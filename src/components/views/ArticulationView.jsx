@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, Square, Volume2, Info, Trophy, Star, RefreshCw, ChevronRight } from 'lucide-react';
+import { Mic, Square, Volume2, Info, Trophy, Star, RefreshCw, ChevronRight, AlertTriangle } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { VoiceAnalyzer } from '../../utils/voiceAnalysis';
 import { transcriptionEngine } from '../../utils/transcriptionEngine';
@@ -144,9 +144,19 @@ const ArticulationView = () => {
     };
 
     const updateTargetFromAcoustics = (results) => {
-        // Simple heuristic mapping
+        // Simple heuristic mapping with Confidence Gating
         const { f1, f2 } = results.formants;
         const { isSibilant } = results.sibilance;
+        const clarity = results.clarity || 0;
+
+        // Thresholds
+        const CONFIDENCE_THRESHOLD = 0.6;
+
+        if (clarity < CONFIDENCE_THRESHOLD) {
+            // If low confidence, keep previous or set to neutral if very low
+            if (clarity < 0.3) setTargetPhone('neutral');
+            return;
+        }
 
         if (isSibilant) {
             setTargetPhone(results.sibilance.centroid > 6000 ? 's' : 'sh');
@@ -162,9 +172,13 @@ const ArticulationView = () => {
     };
 
     const [isTranscribing, setIsTranscribing] = useState(false);
+    const [transcriptionStatus, setTranscriptionStatus] = useState('idle'); // idle, recording, processing, success, error
+    const [transcriptionError, setTranscriptionError] = useState(null);
 
     const startRecording = async () => {
         if (!audioEngineRef.current) return;
+        setTranscriptionStatus('recording');
+        setTranscriptionError(null);
         await audioEngineRef.current.startAnalysisRecording();
     };
 
@@ -172,10 +186,12 @@ const ArticulationView = () => {
         if (!audioEngineRef.current) return;
 
         setIsTranscribing(true);
-        const result = await audioEngineRef.current.stopAnalysisRecording();
+        setTranscriptionStatus('processing');
 
-        if (result && result.blob) {
-            try {
+        try {
+            const result = await audioEngineRef.current.stopAnalysisRecording();
+
+            if (result && result.blob) {
                 const transcription = await transcriptionEngine.transcribe(result.blob);
 
                 // Process words
@@ -188,17 +204,31 @@ const ArticulationView = () => {
                         const fullText = transcription.text || transcription.words.map(w => w.word).join(' ');
                         scoreTwister(fullText);
                     }
+                    setTranscriptionStatus('success');
                 } else if (transcription.text) {
                     handleSimulatedWord(transcription.text);
                     if (viewMode === 'challenge') {
                         scoreTwister(transcription.text);
                     }
+                    setTranscriptionStatus('success');
+                } else {
+                    setTranscriptionStatus('error');
+                    setTranscriptionError("No speech detected.");
                 }
-            } catch (error) {
-                console.error("Transcription error:", error);
+            } else {
+                throw new Error("No audio recorded");
+            }
+        } catch (error) {
+            console.error("Transcription error:", error);
+            setTranscriptionStatus('error');
+            setTranscriptionError(error.message || "Transcription failed.");
+        } finally {
+            setIsTranscribing(false);
+            // Reset status after a delay if success
+            if (transcriptionStatus === 'success') {
+                setTimeout(() => setTranscriptionStatus('idle'), 3000);
             }
         }
-        setIsTranscribing(false);
     };
 
     // Helper to process words
@@ -321,9 +351,16 @@ const ArticulationView = () => {
 
                         {/* Real-time Transcript Stream */}
                         <div className="bg-slate-900 rounded-xl border border-slate-800 p-6 min-h-[120px]">
-                            <h3 className="text-slate-500 text-xs font-bold mb-4 uppercase tracking-wider">
-                                Live Transcription (IPA)
-                            </h3>
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider">
+                                    Live Transcription (IPA)
+                                </h3>
+                                {transcriptionStatus === 'error' && (
+                                    <span className="text-red-400 text-xs font-bold flex items-center gap-1">
+                                        <AlertTriangle size={12} /> {transcriptionError}
+                                    </span>
+                                )}
+                            </div>
                             <div className="flex flex-wrap gap-4 items-end">
                                 {transcript.length === 0 && !isRecording && (
                                     <span className="text-slate-600 italic">Start recording to see transcription...</span>
@@ -368,7 +405,7 @@ const ArticulationView = () => {
 
                             {/* Transcription Control */}
                             {isRecording && (
-                                <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-4">
+                                <div className="flex flex-col items-center gap-2 animate-in fade-in slide-in-from-bottom-4">
                                     <button
                                         onMouseDown={startRecording}
                                         onMouseUp={stopRecording}
@@ -389,6 +426,9 @@ const ArticulationView = () => {
                                             </>
                                         )}
                                     </button>
+                                    {transcriptionStatus === 'error' && (
+                                        <span className="text-red-400 text-xs">{transcriptionError}</span>
+                                    )}
                                 </div>
                             )}
                         </div>

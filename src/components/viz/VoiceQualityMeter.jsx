@@ -11,14 +11,24 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
     useEffect(() => {
         const loop = () => {
             if (indicatorRef.current && valueRef.current) {
-                const weight = dataRef.current.weight || 0;
+                const { weight, isSilent } = dataRef.current;
                 const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
 
+                // If silent, freeze the indicator (or drift very slowly to neutral if desired)
+                // Here we just freeze it to prevent spikes
+                if (isSilent) {
+                    // Optional: Drift slowly to 50% if silence persists? 
+                    // For now, just freeze to avoid "drop to zero" artifacts
+                    requestAnimationFrame(loop);
+                    return;
+                }
+
                 // Map Weight: 0 (Airy) -> 0%, 100 (Pressed) -> 100%
-                let target = weight;
+                let target = weight || 0;
                 target = Math.max(0, Math.min(100, target));
 
-                const nextLeft = curLeft + (target - curLeft) * 0.1;
+                // Smoother interpolation (0.05 instead of 0.1)
+                const nextLeft = curLeft + (target - curLeft) * 0.05;
                 indicatorRef.current.style.left = `${nextLeft}%`;
 
                 // Color based on position
@@ -41,7 +51,7 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
                 }
 
                 // Update value display
-                valueRef.current.innerText = Math.round(weight);
+                valueRef.current.innerText = Math.round(weight || 0);
 
                 // Update metrics display
                 if (dataRef.current.debug) {
@@ -87,18 +97,24 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
             </div>
 
             {/* Meter Bar */}
-            <div className="relative h-10 bg-slate-900/80 rounded-full overflow-hidden shadow-inner border border-white/5 mb-6">
+            <div className="relative h-12 bg-slate-900/80 rounded-full overflow-hidden shadow-inner border border-white/5 mb-6">
                 {/* Dynamic Gradient Background */}
                 <div className={`absolute inset-0 bg-gradient-to-r ${colorBlindMode ? 'from-orange-500/20 via-purple-500/20 to-teal-500/20' : 'from-red-500/20 via-emerald-500/20 to-blue-500/20'}`}></div>
 
-                {/* Grid Lines */}
+                {/* Grid Lines & Labels */}
                 <div className="absolute left-[30%] top-0 bottom-0 w-px bg-white/10 dashed-line"></div>
+                <div className="absolute left-[30%] top-1 text-[8px] text-slate-500 -translate-x-1/2 font-mono">30</div>
+
                 <div className="absolute left-[70%] top-0 bottom-0 w-px bg-white/10 dashed-line"></div>
+                <div className="absolute left-[70%] top-1 text-[8px] text-slate-500 -translate-x-1/2 font-mono">70</div>
+
                 <div className="absolute left-[50%] top-2 bottom-2 w-px bg-white/5"></div>
 
-                {/* Target Zone (30-70%) */}
-                <div className="absolute left-[30%] right-[30%] top-0 bottom-0 bg-white/5 border-x border-white/10">
-                    <div className="absolute top-1 left-1/2 -translate-x-1/2 text-[8px] font-bold text-white/30 uppercase tracking-widest">Target</div>
+                {/* Target Zone Labels */}
+                <div className="absolute top-1/2 -translate-y-1/2 w-full flex justify-between px-4 pointer-events-none">
+                    <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest w-[30%] text-center">Light</div>
+                    <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest w-[40%] text-center">Neutral</div>
+                    <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest w-[30%] text-center">Heavy</div>
                 </div>
 
                 {/* Indicator */}

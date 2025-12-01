@@ -118,6 +118,7 @@ uniform float u_pitch_norm;
 uniform float u_weight;
 uniform float u_intensity;
 uniform float u_resonance_norm;
+uniform float u_resonance_confidence; // New Uniform
 uniform float u_roughness;
 uniform float u_time;
 varying float vDisplacement;
@@ -172,10 +173,12 @@ void main() {
   
   // Resonance Glow
   vec3 resonanceColor = vec3(0.0);
-  if (u_resonance_norm < 0.4) {
-      resonanceColor = vec3(0.0, 0.3, 1.0); // Blue glow
-  } else if (u_resonance_norm > 0.6) {
-      resonanceColor = vec3(1.0, 0.0, 0.8); // Pink glow
+  if (u_resonance_norm < 0.35) {
+      resonanceColor = vec3(0.0, 0.3, 1.0); // Blue glow (Dark)
+  } else if (u_resonance_norm > 0.65) {
+      resonanceColor = vec3(1.0, 0.0, 0.8); // Pink glow (Bright)
+  } else {
+      resonanceColor = vec3(0.5, 1.0, 0.5); // Green/Teal glow (Balanced)
   }
   float resIntensity = abs(u_resonance_norm - 0.5) * 2.0;
   
@@ -208,6 +211,12 @@ void main() {
   // Alpha - Frosted glass is slightly more opaque
   // Heavy weight (Rough) -> More opaque/matte
   float alpha = 0.92 + u_roughness * 0.08; // Higher base alpha
+  
+  // --- CONFIDENCE MODULATION ---
+  // If confidence is low, dim the orb and reduce alpha to make it "ghostly"
+  float confidence = clamp(u_resonance_confidence, 0.0, 1.0);
+  finalColor *= (0.3 + 0.7 * confidence); // Dim down to 30% brightness
+  alpha *= (0.5 + 0.5 * confidence);      // Fade out to 50% opacity
   
   gl_FragColor = vec4(finalColor, alpha);
 }
@@ -289,7 +298,8 @@ const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration }) => {
     u_pitch_norm: { value: 0 },
     u_weight: { value: 0.5 },
     u_intensity: { value: 0 },
-    u_resonance_norm: { value: 0.5 }
+    u_resonance_norm: { value: 0.5 },
+    u_resonance_confidence: { value: 1.0 } // Default to high confidence
   }), []);
 
   const shaders = useMemo(() => {
@@ -304,7 +314,7 @@ const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration }) => {
   useFrame((state, delta) => {
     if (!mesh.current || !material.current || !dataRef.current) return;
 
-    const { pitch, resonance, weight, volume } = dataRef.current;
+    const { pitch, resonance, weight, volume, resonanceConfidence } = dataRef.current;
     const extVol = externalDataRef?.current?.volume || 0;
     const vol = Math.max(volume || 0, extVol);
 
@@ -338,12 +348,17 @@ const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration }) => {
     const weightVal = weight !== undefined ? weight : 0.5;
     const smoothedWeight = THREE.MathUtils.lerp(uniforms.u_weight.value, weightVal, damping);
 
+    // Smooth Confidence
+    const confVal = resonanceConfidence !== undefined ? resonanceConfidence : 1.0;
+    const smoothedConf = THREE.MathUtils.lerp(uniforms.u_resonance_confidence.value, confVal, damping * 2.0); // Faster response
+
     uniforms.u_time.value = state.clock.elapsedTime;
     uniforms.u_amplitude.value = smoothedVol;
     uniforms.u_pitch_norm.value = smoothedPitch;
     uniforms.u_weight.value = smoothedWeight;
     uniforms.u_intensity.value = smoothedVol;
     uniforms.u_resonance_norm.value = smoothedResonanceNorm;
+    uniforms.u_resonance_confidence.value = smoothedConf;
 
     // Map Weight to Roughness (Texture)
     // Light (0) -> Smooth/Glassy (0.0)
@@ -770,6 +785,35 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
           {genderPerception.label}
         </div>
       </div>
+
+      {/* Resonance Target Zones Overlay */}
+      {mode === 'gem' && (
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Circular Tick Marks or Labels positioned around the center */}
+          {/* We can use absolute positioning with transforms to place them */}
+
+          {/* Dark Zone (Left/Bottom-Left) */}
+          <div className="absolute top-1/2 left-4 -translate-y-1/2 flex flex-col items-center gap-1 opacity-50">
+            <div className="text-[9px] uppercase tracking-widest text-blue-400 font-bold rotate-[-90deg]">Dark</div>
+            <div className="h-16 w-1 bg-gradient-to-b from-blue-900 to-blue-500 rounded-full"></div>
+            <div className="text-[8px] text-slate-500">0.0 - 0.35</div>
+          </div>
+
+          {/* Balanced Zone (Center/Bottom) */}
+          <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-50">
+            <div className="text-[8px] text-slate-500">0.35 - 0.65</div>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 via-green-400 to-pink-500 rounded-full"></div>
+            <div className="text-[9px] uppercase tracking-widest text-green-400 font-bold mt-1">Balanced</div>
+          </div>
+
+          {/* Bright Zone (Right/Bottom-Right) */}
+          <div className="absolute top-1/2 right-4 -translate-y-1/2 flex flex-col items-center gap-1 opacity-50">
+            <div className="text-[9px] uppercase tracking-widest text-pink-400 font-bold rotate-[90deg]">Bright</div>
+            <div className="h-16 w-1 bg-gradient-to-t from-pink-900 to-pink-500 rounded-full"></div>
+            <div className="text-[8px] text-slate-500">0.65 - 1.0</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 });

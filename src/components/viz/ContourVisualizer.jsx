@@ -17,23 +17,28 @@ const ContourVisualizer = ({ dataRef }) => {
         const loop = () => {
             if (!dataRef.current) return;
 
-            const { prosody } = dataRef.current;
-            if (!prosody) return;
+            const { prosody, isSilent, clarity } = dataRef.current;
 
-            // Update local state for UI text
-            setMetrics({
-                contour: prosody.contour || 0,
-                slopeDirection: prosody.slopeDirection || 'flat',
-                semitoneRange: prosody.semitoneRange || 0
-            });
+            // Only update history if speaking and confident
+            // This prevents "monotone" penalties during silence
+            const shouldUpdate = !isSilent && (clarity === undefined || clarity > 0.5);
 
-            // Update history
-            historyRef.current.push(prosody.contour || 0);
-            if (historyRef.current.length > maxHistory) {
-                historyRef.current.shift();
+            if (prosody && shouldUpdate) {
+                // Update local state for UI text
+                setMetrics({
+                    contour: prosody.contour || 0,
+                    slopeDirection: prosody.slopeDirection || 'flat',
+                    semitoneRange: prosody.semitoneRange || 0
+                });
+
+                // Update history
+                historyRef.current.push(prosody.contour || 0);
+                if (historyRef.current.length > maxHistory) {
+                    historyRef.current.shift();
+                }
             }
 
-            // Draw Graph
+            // Draw Graph (Always draw, even if paused, to maintain visual)
             const canvas = canvasRef.current;
             if (canvas) {
                 const ctx = canvas.getContext('2d');
@@ -42,17 +47,35 @@ const ContourVisualizer = ({ dataRef }) => {
 
                 ctx.clearRect(0, 0, width, height);
 
-                // Draw Grid Lines
-                ctx.strokeStyle = '#334155'; // slate-700
+                // Draw Target Band (0.25 - 0.6)
+                const yTop = height - (0.6 * height);
+                const yBottom = height - (0.25 * height);
+                const bandHeight = yBottom - yTop;
+
+                ctx.fillStyle = 'rgba(45, 212, 191, 0.05)'; // Very faint teal
+                ctx.fillRect(0, yTop, width, bandHeight);
+
+                // Draw Grid Lines & Labels
                 ctx.lineWidth = 1;
+
+                // 0.6 Line (Upper Natural Limit)
+                ctx.strokeStyle = 'rgba(45, 212, 191, 0.3)';
+                ctx.setLineDash([5, 5]);
                 ctx.beginPath();
-                // 0.25 line (Monotone boundary)
-                let y = height - (0.25 * height);
-                ctx.moveTo(0, y); ctx.lineTo(width, y);
-                // 0.75 line (Expressive boundary)
-                y = height - (0.75 * height);
-                ctx.moveTo(0, y); ctx.lineTo(width, y);
+                ctx.moveTo(0, yTop); ctx.lineTo(width, yTop);
                 ctx.stroke();
+
+                // 0.25 Line (Lower Natural Limit)
+                ctx.strokeStyle = 'rgba(45, 212, 191, 0.3)';
+                ctx.beginPath();
+                ctx.moveTo(0, yBottom); ctx.lineTo(width, yBottom);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Target Zone Label
+                ctx.fillStyle = 'rgba(45, 212, 191, 0.5)';
+                ctx.font = '10px monospace';
+                ctx.fillText('TARGET ZONE', 10, yTop + 15);
 
                 // Draw History Line
                 if (historyRef.current.length > 1) {

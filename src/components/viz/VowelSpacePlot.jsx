@@ -1,19 +1,26 @@
-import React from 'react';
-import { useSettings } from '../../context/SettingsContext';
+import { useProfile } from '../../context/ProfileContext';
 
 const VowelSpacePlot = ({ f1, f2, dataRef, showAnalysis = true }) => {
     const { colorBlindMode } = useSettings();
+    const { profile } = useProfile();
 
-    // Vowel targets (approximate for feminine resonance)
+    // Determine ranges based on profile (default to feminine if unknown or not set)
+    const isMasc = profile?.gender === 'masc';
+
+    // Scales - Adaptive
+    // Feminine: F1 200-1000, F2 500-3000
+    // Masculine: F1 150-850, F2 500-2500
+    const minF1 = isMasc ? 150 : 200;
+    const maxF1 = isMasc ? 850 : 1000;
+    const minF2 = isMasc ? 500 : 500;
+    const maxF2 = isMasc ? 2500 : 3000;
+
+    // Vowel targets (approximate) - Could also adapt these positions slightly if needed
     const targets = [
-        { label: '/i/', f1: 300, f2: 2500, color: colorBlindMode ? 'rgba(147, 51, 234, 0.2)' : 'rgba(236, 72, 153, 0.2)' }, // Pink/Purple
-        { label: '/a/', f1: 850, f2: 1700, color: colorBlindMode ? 'rgba(13, 148, 136, 0.2)' : 'rgba(59, 130, 246, 0.2)' }, // Blue/Teal
-        { label: '/u/', f1: 300, f2: 800, color: colorBlindMode ? 'rgba(245, 158, 11, 0.2)' : 'rgba(16, 185, 129, 0.2)' }   // Green/Amber
+        { label: '/i/', f1: isMasc ? 270 : 300, f2: isMasc ? 2200 : 2500, color: colorBlindMode ? 'rgba(147, 51, 234, 0.2)' : 'rgba(236, 72, 153, 0.2)' }, // Pink/Purple
+        { label: '/a/', f1: isMasc ? 750 : 850, f2: isMasc ? 1200 : 1700, color: colorBlindMode ? 'rgba(13, 148, 136, 0.2)' : 'rgba(59, 130, 246, 0.2)' }, // Blue/Teal
+        { label: '/u/', f1: isMasc ? 270 : 300, f2: isMasc ? 700 : 800, color: colorBlindMode ? 'rgba(245, 158, 11, 0.2)' : 'rgba(16, 185, 129, 0.2)' }   // Green/Amber
     ];
-
-    // Scales
-    const minF1 = 200, maxF1 = 1000;
-    const minF2 = 500, maxF2 = 3000;
 
     const getXPos = (val) => 100 - ((val - minF2) / (maxF2 - minF2)) * 100;
     const getYPos = (val) => ((val - minF1) / (maxF1 - minF1)) * 100;
@@ -29,7 +36,7 @@ const VowelSpacePlot = ({ f1, f2, dataRef, showAnalysis = true }) => {
 
         const loop = () => {
             if (pointRef.current && dataRef.current) {
-                const { f1: currentF1, f2: currentF2, vowel } = dataRef.current;
+                const { f1: currentF1, f2: currentF2, vowel, clarity } = dataRef.current;
 
                 // Update state for vowel display
                 setCurrentVowel(vowel || '');
@@ -37,9 +44,18 @@ const VowelSpacePlot = ({ f1, f2, dataRef, showAnalysis = true }) => {
                 setCurrentF2(currentF2 || 0);
 
                 if (currentF1 && currentF2 && currentF1 > 0 && currentF2 > 0) {
-                    pointRef.current.style.opacity = '1';
-                    pointRef.current.style.left = `${getXPos(currentF2)}%`;
-                    pointRef.current.style.top = `${getYPos(currentF1)}%`;
+                    // Confidence Gating
+                    const conf = clarity !== undefined ? clarity : 1.0;
+
+                    // If confidence is very low, hide or dim significantly
+                    if (conf < 0.4) {
+                        pointRef.current.style.opacity = '0.1';
+                        // Don't update position if extremely unstable to prevent jumping
+                    } else {
+                        pointRef.current.style.opacity = conf < 0.7 ? '0.5' : '1';
+                        pointRef.current.style.left = `${getXPos(currentF2)}%`;
+                        pointRef.current.style.top = `${getYPos(currentF1)}%`;
+                    }
 
                     if (labelRef.current) {
                         labelRef.current.innerText = `${currentF1.toFixed(0)} / ${currentF2.toFixed(0)} Hz`;
@@ -63,7 +79,7 @@ const VowelSpacePlot = ({ f1, f2, dataRef, showAnalysis = true }) => {
         return () => {
             if (unsubscribe) unsubscribe();
         };
-    }, [dataRef]);
+    }, [dataRef, minF1, maxF1, minF2, maxF2]); // Re-run if axes change
 
     return (
         <div className="h-full bg-slate-900 rounded-xl border border-slate-800 relative overflow-hidden">
