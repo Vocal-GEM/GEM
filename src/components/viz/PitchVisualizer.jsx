@@ -353,7 +353,8 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
     }, [targetRange, exercise, zoomRange, voiceProfiles, settings, colorBlindMode]);
 
     const label = userMode === 'slp' ? 'Fundamental Frequency (F0)' : 'Pitch';
-    const [feedbackSettings, setFeedbackSettings] = useFeedback();
+    const { audioEngineRef } = useAudio();
+    const { settings: feedbackSettings, setSettings: setFeedbackSettings } = useFeedback(audioEngineRef, dataRef);
 
     return (
         <div className="w-full h-full relative overflow-hidden group">

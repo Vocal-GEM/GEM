@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { WARMUP_IMAGES } from '../../data/WarmupImages';
+import ResizablePanel from './ResizablePanel';
 
 const WarmUpModule = ({ onComplete, onSkip, embedded = false }) => {
     const [mode, setMode] = useState('guided'); // 'guided' or 'visual'
@@ -47,20 +48,20 @@ const WarmUpModule = ({ onComplete, onSkip, embedded = false }) => {
     const exercise = exercises[currentStep];
 
     const renderGuided = () => (
-        <div className="relative z-10">
+        <div className="relative z-10 flex flex-col h-full">
             <div className="text-center mb-6">
                 <div className="text-5xl mb-4 animate-bounce">{exercise.icon}</div>
                 <h2 className="text-xl font-bold text-white mb-2">{exercise.title}</h2>
                 <p className="text-slate-300 text-sm leading-relaxed">{exercise.instructions}</p>
             </div>
 
-            <div className="bg-slate-800/50 p-3 rounded-xl border border-white/5 mb-6 text-center">
+            <div className="bg-slate-800/50 p-3 rounded-xl border border-white/5 mb-6 text-center flex-shrink-0">
                 <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-2">Example</div>
                 <div className="text-xl font-serif text-blue-300">{exercise.demo}</div>
             </div>
 
             {/* Progress Dots */}
-            <div className="flex justify-center gap-2 mb-6">
+            <div className="flex justify-center gap-2 mb-6 flex-shrink-0">
                 {exercises.map((_, i) => (
                     <div
                         key={i}
@@ -70,7 +71,7 @@ const WarmUpModule = ({ onComplete, onSkip, embedded = false }) => {
                 ))}
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-4 mt-auto">
                 {!embedded && (
                     <button
                         onClick={onSkip}
@@ -91,8 +92,8 @@ const WarmUpModule = ({ onComplete, onSkip, embedded = false }) => {
 
     const renderVisualList = () => (
         <div className="relative z-10 h-full flex flex-col">
-            <h2 className="text-xl font-bold text-white mb-4 text-center">Visual Guides</h2>
-            <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2 max-h-[400px]">
+            <h2 className="text-xl font-bold text-white mb-4 text-center flex-shrink-0">Visual Guides</h2>
+            <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2 min-h-0">
                 {visualWarmups.length > 0 ? (
                     visualWarmups.map((item) => (
                         <button
@@ -121,7 +122,7 @@ const WarmUpModule = ({ onComplete, onSkip, embedded = false }) => {
                     </div>
                 )}
             </div>
-            <div className="mt-4 pt-4 border-t border-white/5">
+            <div className="mt-4 pt-4 border-t border-white/5 flex-shrink-0">
                 <button
                     onClick={onSkip}
                     className="w-full py-2 rounded-xl text-slate-400 hover:bg-white/5 transition-colors font-bold text-xs uppercase tracking-wider"
@@ -142,14 +143,14 @@ const WarmUpModule = ({ onComplete, onSkip, embedded = false }) => {
             </button>
 
             <div className="flex-1 flex flex-col items-center justify-center min-h-0">
-                <div className="relative w-full max-h-[60vh] rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-black/40">
+                <div className="relative w-full h-full max-h-[60vh] rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-black/40 flex items-center justify-center">
                     <img
                         src={`/assets/warmups/${selectedVisual.filename}`}
                         alt={selectedVisual.title}
-                        className="w-full h-full object-contain"
+                        className="max-w-full max-h-full object-contain"
                     />
                 </div>
-                <div className="mt-4 text-center">
+                <div className="mt-4 text-center flex-shrink-0">
                     <h3 className="text-lg font-bold text-white">{selectedVisual.title}</h3>
                     <p className="text-sm text-slate-300 mt-1">{selectedVisual.description}</p>
                 </div>
@@ -158,13 +159,13 @@ const WarmUpModule = ({ onComplete, onSkip, embedded = false }) => {
     );
 
     const content = (
-        <div className={`glass-panel w-full p-6 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden ${embedded ? 'bg-slate-900/50' : 'max-w-md w-full'}`}>
+        <div className={`glass-panel w-full h-full p-6 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden flex flex-col ${embedded ? 'bg-slate-900/50' : ''}`}>
             {/* Background Glow */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl -mr-20 -mt-20 animate-pulse"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl -mr-20 -mt-20 animate-pulse pointer-events-none"></div>
 
             {/* Mode Switcher */}
             {!selectedVisual && (
-                <div className="relative z-20 flex justify-center mb-6 bg-slate-900/50 p-1 rounded-full w-max mx-auto border border-white/5">
+                <div className="relative z-20 flex justify-center mb-6 bg-slate-900/50 p-1 rounded-full w-max mx-auto border border-white/5 flex-shrink-0">
                     <button
                         onClick={() => setMode('guided')}
                         className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mode === 'guided' ? 'bg-orange-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
@@ -180,11 +181,13 @@ const WarmUpModule = ({ onComplete, onSkip, embedded = false }) => {
                 </div>
             )}
 
-            {mode === 'guided' && renderGuided()}
-            {mode === 'visual' && !selectedVisual && renderVisualList()}
-            {mode === 'visual' && selectedVisual && renderVisualDetail()}
+            <div className="flex-1 min-h-0 relative">
+                {mode === 'guided' && renderGuided()}
+                {mode === 'visual' && !selectedVisual && renderVisualList()}
+                {mode === 'visual' && selectedVisual && renderVisualDetail()}
+            </div>
 
-            <div className="mt-4 text-center text-[10px] text-slate-500 relative z-10">
+            <div className="mt-4 text-center text-[10px] text-slate-500 relative z-10 flex-shrink-0">
                 💡 Warm-ups protect your voice and improve performance
             </div>
         </div>
@@ -194,7 +197,15 @@ const WarmUpModule = ({ onComplete, onSkip, embedded = false }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in duration-300">
-            {content}
+            <ResizablePanel
+                className="relative"
+                defaultWidth={500}
+                defaultHeight={600}
+                minWidth={350}
+                minHeight={400}
+            >
+                {content}
+            </ResizablePanel>
         </div>
     );
 };

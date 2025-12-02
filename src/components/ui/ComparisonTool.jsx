@@ -47,7 +47,9 @@ const ComparisonTool = () => {
 
         if (isRecording) {
             // Stop
-            const url = await audioEngineRef.current.stopRecording();
+            const result = await audioEngineRef.current.stopRecording();
+            if (!result) return;
+            const { url } = result;
             const metrics = await analyzeClip(url);
 
             if (recordingTarget === 'A') {
