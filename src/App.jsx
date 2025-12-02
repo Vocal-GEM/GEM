@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { Mic, MessageSquare, ArrowLeft, Activity, ChevronRight } from 'lucide-react';
+import { Mic, MessageSquare, ArrowLeft, Activity, ChevronRight, Camera } from 'lucide-react';
 import { useAudio } from './context/AudioContext';
 import { useSettings } from './context/SettingsContext';
 import { useAuth } from './context/AuthContext';
@@ -225,6 +225,12 @@ const App = () => {
                                     <span className="hidden sm:inline">Feedback</span>
                                 </span>
                             </button>
+                            <button onClick={() => setShowCamera(!showCamera)} className={`px-3 py-2 rounded-lg transition-colors border border-slate-700 ${showCamera ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-800 hover:bg-slate-700 text-white'}`} aria-label="Toggle Mirror">
+                                <span className="text-sm font-bold flex items-center gap-2">
+                                    <Camera className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Mirror</span>
+                                </span>
+                            </button>
                             <button onClick={() => setShowSettings(true)} className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700" aria-label="Open settings" data-tour="settings-button">
                                 <span className="text-sm font-bold text-white flex items-center gap-2">
                                     <span aria-hidden="true">⚙️</span>
@@ -417,6 +423,7 @@ const App = () => {
                     <TourOverlay />
                     <CommandPalette />
                     <QuickSettings isOpen={showQuickSettings} onClose={() => setShowQuickSettings(false)} />
+                    {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
                     {modals.analytics && <AnalyticsDashboard onClose={() => closeModal('analytics')} />}
 
                     <CelebrationModal

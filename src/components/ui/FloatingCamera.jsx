@@ -65,12 +65,14 @@ const FloatingCamera = ({ onClose }) => {
     }, [isDragging]);
 
     const handleZoom = (delta) => {
-        setZoom(prev => Math.max(1, Math.min(3, prev + delta)));
+        setZoom(prev => Math.max(1, Math.min(4, prev + delta)));
     };
 
     const toggleSize = () => {
-        if (size.width === 160) setSize({ width: 240, height: 180 });
-        else setSize({ width: 160, height: 120 });
+        // Cycle: Small -> Medium -> Large -> Small
+        if (size.width === 160) setSize({ width: 320, height: 240 });      // Medium
+        else if (size.width === 320) setSize({ width: 480, height: 360 }); // Large (requested for lips)
+        else setSize({ width: 160, height: 120 });                         // Small
     };
 
     if (error) return null;
