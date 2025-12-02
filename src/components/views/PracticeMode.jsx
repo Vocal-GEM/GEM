@@ -293,7 +293,12 @@ const PracticeMode = ({
                         {
                             practiceTab === 'weight' && (
                                 <div className="animate-in slide-in-from-right-4 fade-in duration-300">
-                                    <VoiceQualityAnalysis dataRef={dataRef} colorBlindMode={settings.colorBlindMode} />
+                                    <VoiceQualityAnalysis
+                                        dataRef={dataRef}
+                                        colorBlindMode={settings.colorBlindMode}
+                                        toggleAudio={toggleAudio}
+                                        isAudioActive={isAudioActive}
+                                    />
                                 </div>
                             )
                         }

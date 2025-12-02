@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Activity, Info } from 'lucide-react';
 
-const VoiceQualityAnalysis = ({ dataRef, colorBlindMode }) => {
+const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioActive }) => {
     const metricsRef = useRef({ h1: null, h2: null, diff: null });
 
     useEffect(() => {
@@ -62,6 +62,17 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Record Button */}
+            <button
+                onClick={toggleAudio}
+                className={`w-full mt-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${isAudioActive
+                    ? 'bg-red-500/20 text-red-400 border border-red-500/50 hover:bg-red-500/30'
+                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white'
+                    }`}
+            >
+                {isAudioActive ? 'Stop Analysis' : 'Start Analysis'}
+            </button>
         </div>
     );
 };
