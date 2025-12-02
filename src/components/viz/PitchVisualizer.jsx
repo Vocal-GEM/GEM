@@ -417,18 +417,18 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
 
             {/* Zoom Controls */}
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                    onClick={handleZoomIn}
-                    className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-white flex items-center justify-center backdrop-blur-sm border border-slate-700"
-                    title="Zoom In"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
-                </button>
-                <button
-                    onClick={handleZoomOut}
-                    className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-white flex items-center justify-center backdrop-blur-sm border border-slate-700"
-                    title="Zoom Out"
-```javascript
+                ctx.stroke(); ctx.setLineDash([]);
+
+                const currentPitch = dataRef.current.history[dataRef.current.history.length - 1];
+                if (currentPitch > 0) {
+                    const playerY = mapY(currentPitch);
+                // Draw Balloon
+                if (balloonRef.current.complete) {
+                    ctx.drawImage(balloonRef.current, width - 60, playerY - 25, 50, 50);
+                    } else {
+                    // Fallback circle
+                    ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(width - 40, playerY, 15, 0, Math.PI * 2); ctx.fill();
+                    }
 
                 const diff = Math.abs(currentPitch - targetFreqAtCurrent);
                 if (diff < 20) {
@@ -513,18 +513,17 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
             }
 
             // Confidence Overlay handled via DOM now
-        };
 
-        // Stability Indicator (Standard Deviation of last 10 frames)
-        if (history.length > 10 && currentP > 0) {
-            const recent = history.slice(-10).filter(p => p > 0);
-            if (recent.length > 5) {
-                const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
-                const variance = recent.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / recent.length;
+            // Stability Indicator (Standard Deviation of last 10 frames)
+            if (history.length > 10 && currentP > 0) {
+                const recent = history.slice(-10).filter(p => p > 0);
+                if (recent.length > 5) {
+                    const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
+                    const variance = recent.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / recent.length;
                 const stdDev = Math.sqrt(variance);
 
-                // Stability Score (0-100), lower stdDev is better
-                // Assume stdDev < 2Hz is perfect (100%), > 20Hz is unstable (0%)
+                    // Stability Score (0-100), lower stdDev is better
+                    // Assume stdDev < 2Hz is perfect (100%), > 20Hz is unstable (0%)
                 const stability = Math.max(0, Math.min(100, 100 - (stdDev * 5)));
 
                 // Draw Stability Bar
@@ -536,16 +535,16 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                 ctx.fillStyle = 'rgba(255,255,255,0.2)';
                 ctx.fillRect(barX, barY, barW, barH);
 
-                ctx.fillStyle = stability > 80 ? '#4ade80' : stability > 50 ? '#facc15' : '#f87171';
+                    ctx.fillStyle = stability > 80 ? '#4ade80' : stability > 50 ? '#facc15' : '#f87171';
                 ctx.fillRect(barX, barY, barW * (stability / 100), barH);
 
                 ctx.fillStyle = 'rgba(255,255,255,0.6)';
                 ctx.font = '9px sans-serif';
                 ctx.textAlign = 'right';
                 ctx.fillText('STABILITY', barX - 5, barY + 6);
+                }
             }
-        }
-    };
+        };
 
                 let unsubscribe;
                 import('../../services/RenderCoordinator').then(({renderCoordinator}) => {
@@ -554,12 +553,12 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                         loop,
                         renderCoordinator.PRIORITY.HIGH
                     );
-    });
+        });
 
-    return () => {
-        if (unsubscribe) unsubscribe();
-    };
-}, [targetRange, exercise, zoomRange, voiceProfiles, settings, colorBlindMode]);
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
+    }, [targetRange, exercise, zoomRange, voiceProfiles, settings, colorBlindMode]);
 
                 const label = userMode === 'slp' ? 'Fundamental Frequency (F0)' : 'Pitch';
 
@@ -698,4 +697,3 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
 });
 
                 export default PitchVisualizer;
-                ```
