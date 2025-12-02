@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Book, FileText, TrendingUp, Calendar, Clock, Activity, BarChart2, Mic, Settings } from 'lucide-react';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
@@ -55,7 +55,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
     }, []);
 
     // Calculate Streak Dynamically
-    const streak = React.useMemo(() => {
+    const streak = useMemo(() => {
         if (sessions.length === 0) return 0;
         const dates = [...new Set(sessions.map(s => new Date(s.timestamp).toDateString()))];
         // Sort descending
@@ -87,7 +87,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
     }, [sessions]);
 
     // Weekly Activity Data
-    const weeklyData = React.useMemo(() => {
+    const weeklyData = useMemo(() => {
         const last7Days = [...Array(7)].map((_, i) => {
             const d = new Date();
             d.setDate(d.getDate() - (6 - i));

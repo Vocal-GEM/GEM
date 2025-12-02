@@ -213,7 +213,79 @@ void main() {
 }
 `;
 
-// ... (fireVertex and fireFragment omitted for brevity, unchanged)
+// FIRE SHADER
+const fireVertex = `
+${noiseChunk}
+uniform float u_time;
+uniform float u_amplitude;
+varying vec2 vUv;
+varying float vNoise;
+varying vec3 vViewPosition;
+
+void main() {
+  vUv = uv;
+  
+  // Fire movement
+  float time = u_time * 2.0;
+  
+  // Upward flow
+  float noise = snoise(vec3(position.x * 1.5, position.y * 1.5 - time, position.z * 1.5));
+  vNoise = noise;
+  
+  // Displacement based on amplitude (volume)
+  float displacement = noise * (0.2 + u_amplitude * 0.5);
+  
+  // Taper at top
+  float taper = 1.0 - smoothstep(0.0, 1.5, position.y + 0.5);
+  displacement *= taper;
+  
+  vec3 newPosition = position + normal * displacement;
+  
+  vec4 mvPosition = modelViewMatrix * vec4(newPosition, 1.0);
+  vViewPosition = -mvPosition.xyz;
+  gl_Position = projectionMatrix * mvPosition;
+}
+`;
+
+const fireFragment = `
+uniform float u_time;
+uniform float u_pitch_norm;
+uniform float u_amplitude;
+varying float vNoise;
+varying vec2 vUv;
+
+void main() {
+  // Fire Color Ramp
+  vec3 color1 = vec3(0.1, 0.0, 0.0); // Dark Red/Black
+  vec3 color2 = vec3(1.0, 0.2, 0.0); // Red/Orange
+  vec3 color3 = vec3(1.0, 0.8, 0.0); // Yellow
+  vec3 color4 = vec3(1.0, 1.0, 1.0); // White hot
+  
+  // Base gradient on vertical position + noise
+  float t = vUv.y + vNoise * 0.2;
+  
+  // Pitch affects color shift (Blue fire for low pitch?)
+  // Let's keep it classic fire for now, maybe subtle hue shift
+  
+  vec3 finalColor = mix(color1, color2, smoothstep(0.0, 0.4, t));
+  finalColor = mix(finalColor, color3, smoothstep(0.4, 0.7, t));
+  finalColor = mix(finalColor, color4, smoothstep(0.7, 1.0, t));
+  
+  // Pulse with volume
+  finalColor *= (0.8 + u_amplitude * 0.5);
+  
+  // Alpha fade at edges/top
+  float alpha = 1.0 - smoothstep(0.8, 1.0, vUv.y);
+  
+  gl_FragColor = vec4(finalColor, alpha);
+}
+`;
+
+const CustomGemGeometry = () => {
+  return (
+    <dodecahedronGeometry args={[1.8, 0]} />
+  );
+};
 
 const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration, targetRange }) => {
   const mesh = useRef();
