@@ -17,7 +17,7 @@ export class VoiceAnalyzer {
      * @param {AudioBuffer} audioBuffer - The audio to analyze
      * @param {number} startTime - Optional start time in seconds
      * @param {number} endTime - Optional end time in seconds
-     * @returns {Object} Voice metrics
+     * @returns {Object} Voice metrics with error/warning information
      */
     analyzeBuffer(audioBuffer, startTime = 0, endTime = null) {
         const sampleRate = audioBuffer.sampleRate;
@@ -29,13 +29,106 @@ export class VoiceAnalyzer {
         const segment = channelData.slice(startSample, endSample);
 
         const duration = segment.length / sampleRate;
+
+        // Validation checks
+        const warnings = [];
+        const errors = [];
+
+        // 1. Check duration
+        if (duration < 0.3) {
+            errors.push('Audio too short (< 0.3s). Need at least 0.5s for reliable analysis.');
+        } else if (duration < 0.5) {
+            warnings.push('Audio is very short (< 0.5s). Results may be less accurate.');
+        }
+
+        // 2. Check for silence
+        const rmsEnergy = Math.sqrt(segment.reduce((sum, val) => sum + val * val, 0) / segment.length);
+        const silenceThreshold = 0.001;
+        if (rmsEnergy < silenceThreshold) {
+            errors.push('Audio appears to be silent or too quiet. Speak louder or check microphone.');
+        }
+
+        // 3. Check for clipping
+        const maxAmplitude = Math.max(...segment.map(Math.abs));
+        if (maxAmplitude >= 0.99) {
+            warnings.push('Audio may be clipped (too loud). Reduce input volume for better quality.');
+        }
+
+        // 4. Check signal-to-noise ratio (rough estimate)
+        const sortedAmps = [...segment].map(Math.abs).sort((a, b) => a - b);
+        const noiseFloor = sortedAmps[Math.floor(sortedAmps.length * 0.1)]; // 10th percentile
+        const signalPeak = sortedAmps[Math.floor(sortedAmps.length * 0.99)]; // 99th percentile
+        const snr = signalPeak / (noiseFloor + 1e-10);
+
+        if (snr < 5) {
+            warnings.push('High background noise detected. Results may be less accurate.');
+        }
+
+        // If critical errors, return early
+        if (errors.length > 0) {
+            return {
+                error: errors[0],
+                errors: errors,
+                warnings: warnings,
+                duration: duration,
+                quality: 'error'
+            };
+        }
+
+        // Perform analysis
         const frameResults = this.analyzeFrame(segment, sampleRate);
+
+        // Calculate overall confidence score
+        const confidence = this.calculateConfidence(frameResults, duration, rmsEnergy, snr);
 
         return {
             ...frameResults,
             speechRate: this.calculateSpeechRate(segment, sampleRate, duration),
-            duration: duration
+            duration: duration,
+            warnings: warnings,
+            quality: this.getQualityLevel(confidence, warnings.length),
+            confidence: confidence,
+            snr: snr
         };
+    }
+
+    /**
+     * Calculate overall confidence score for analysis
+     */
+    calculateConfidence(metrics, duration, rmsEnergy, snr) {
+        let confidence = 100;
+
+        // Penalize based on pitch confidence
+        if (metrics.pitch && metrics.pitch.confidence) {
+            confidence *= metrics.pitch.confidence;
+        }
+
+        // Penalize for short duration
+        if (duration < 1.0) {
+            confidence *= (duration / 1.0);
+        }
+
+        // Penalize for low SNR
+        if (snr < 10) {
+            confidence *= (snr / 10);
+        }
+
+        // Penalize for low energy
+        if (rmsEnergy < 0.01) {
+            confidence *= (rmsEnergy / 0.01);
+        }
+
+        return Math.max(0, Math.min(100, confidence));
+    }
+
+    /**
+     * Get quality level description
+     */
+    getQualityLevel(confidence, warningCount) {
+        if (confidence >= 80 && warningCount === 0) return 'excellent';
+        if (confidence >= 60 && warningCount <= 1) return 'good';
+        if (confidence >= 40) return 'fair';
+        return 'poor';
     }
 
     /**

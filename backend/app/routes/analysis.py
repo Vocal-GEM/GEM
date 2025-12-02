@@ -342,11 +342,22 @@ def analyze_audio():
     # Check if file was uploaded
     if 'audio' not in request.files:
         return jsonify({'error': 'No audio file provided'}), 400
-    
+
     file = request.files['audio']
     if file.filename == '':
         return jsonify({'error': 'Empty filename'}), 400
-    
+
+    # Check file size (max 50MB)
+    file.seek(0, 2)  # Seek to end
+    file_size = file.tell()
+    file.seek(0)  # Reset to beginning
+    MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
+
+    if file_size > MAX_FILE_SIZE:
+        return jsonify({
+            'error': f'File too large ({file_size / (1024*1024):.1f}MB). Maximum size is {MAX_FILE_SIZE / (1024*1024):.0f}MB.'
+        }), 400
+
     # Save to temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_file:
         temp_path = temp_file.name
@@ -356,7 +367,29 @@ def analyze_audio():
         # Load audio with librosa
         print("Loading audio...")
         y, sr = librosa.load(temp_path, sr=None)  # Keep original sample rate
-        
+
+        # Validate audio duration
+        duration = len(y) / sr
+        MIN_DURATION = 0.5  # seconds
+        MAX_DURATION = 300  # 5 minutes
+
+        if duration < MIN_DURATION:
+            return jsonify({
+                'error': f'Audio too short ({duration:.1f}s). Minimum duration is {MIN_DURATION}s for reliable analysis.'
+            }), 400
+
+        if duration > MAX_DURATION:
+            return jsonify({
+                'error': f'Audio too long ({duration:.1f}s). Maximum duration is {MAX_DURATION}s ({MAX_DURATION/60:.0f} minutes).'
+            }), 400
+
+        # Check for silence
+        rms_energy = np.sqrt(np.mean(y**2))
+        if rms_energy < 0.001:
+            return jsonify({
+                'error': 'Audio appears to be silent or too quiet. Please check your microphone and try again.'
+            }), 400
+
         # Get overall metrics
         print("Extracting overall metrics...")
         overall_metrics = extract_voice_metrics(y, sr)

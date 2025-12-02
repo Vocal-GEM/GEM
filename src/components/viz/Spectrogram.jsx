@@ -145,7 +145,18 @@ const Spectrogram = React.memo(({ dataRef, audioRef }) => {
     return (
         <div className="h-full w-full relative overflow-hidden rounded-xl bg-black">
             <canvas ref={canvasRef} className="w-full h-full"></canvas>
-            <div className="absolute bottom-1 right-2 text-[9px] text-white/50 font-mono">0 - 8kHz</div>
+            {/* Frequency axis labels */}
+            <div className="absolute top-0 left-0 h-full flex flex-col justify-between py-1 pointer-events-none">
+                <div className="text-[9px] text-white/50 font-mono pl-1">8kHz</div>
+                <div className="text-[9px] text-white/50 font-mono pl-1">6kHz</div>
+                <div className="text-[9px] text-white/50 font-mono pl-1">4kHz</div>
+                <div className="text-[9px] text-white/50 font-mono pl-1">2kHz</div>
+                <div className="text-[9px] text-white/50 font-mono pl-1">0Hz</div>
+            </div>
+            {/* Time indicator */}
+            <div className="absolute bottom-1 right-2 text-[9px] text-white/50 font-mono">
+                Time →
+            </div>
         </div>
     );
 });
