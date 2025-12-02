@@ -102,7 +102,7 @@ const Spectrogram = React.memo(({ dataRef, audioRef }) => {
             for (let y = 0; y < height; y++) {
                 const maxIndex = spectrum.length;
                 const targetMaxFreq = 8000;
-                const sampleRate = 44100;
+                const sampleRate = 16000;
                 const maxTargetIndex = Math.floor(maxIndex * targetMaxFreq / (sampleRate / 2));
 
                 const mappedIndex = Math.floor(y / height * maxTargetIndex);

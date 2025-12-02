@@ -213,80 +213,6 @@ void main() {
 }
 `;
 
-// FIRE SHADER
-const fireVertex = `
-${noiseChunk}
-uniform float u_time;
-uniform float u_amplitude;
-varying vec2 vUv;
-varying float vNoise;
-varying vec3 vViewPosition;
-
-void main() {
-  vUv = uv;
-  
-  // Fire movement
-  float time = u_time * 2.0;
-  
-  // Upward flow
-  float noise = snoise(vec3(position.x * 1.5, position.y * 1.5 - time, position.z * 1.5));
-  vNoise = noise;
-  
-  // Displacement based on amplitude (volume)
-  float displacement = noise * (0.2 + u_amplitude * 0.5);
-  
-  // Taper at top
-  float taper = 1.0 - smoothstep(0.0, 1.5, position.y + 0.5);
-  displacement *= taper;
-  
-  vec3 newPosition = position + normal * displacement;
-  
-  vec4 mvPosition = modelViewMatrix * vec4(newPosition, 1.0);
-  vViewPosition = -mvPosition.xyz;
-  gl_Position = projectionMatrix * mvPosition;
-}
-`;
-
-const fireFragment = `
-uniform float u_time;
-uniform float u_pitch_norm;
-uniform float u_amplitude;
-varying float vNoise;
-varying vec2 vUv;
-
-void main() {
-  // Fire Color Ramp
-  vec3 color1 = vec3(0.1, 0.0, 0.0); // Dark Red/Black
-  vec3 color2 = vec3(1.0, 0.2, 0.0); // Red/Orange
-  vec3 color3 = vec3(1.0, 0.8, 0.0); // Yellow
-  vec3 color4 = vec3(1.0, 1.0, 1.0); // White hot
-  
-  // Base gradient on vertical position + noise
-  float t = vUv.y + vNoise * 0.2;
-  
-  // Pitch affects color shift (Blue fire for low pitch?)
-  // Let's keep it classic fire for now, maybe subtle hue shift
-  
-  vec3 finalColor = mix(color1, color2, smoothstep(0.0, 0.4, t));
-  finalColor = mix(finalColor, color3, smoothstep(0.4, 0.7, t));
-  finalColor = mix(finalColor, color4, smoothstep(0.7, 1.0, t));
-  
-  // Pulse with volume
-  finalColor *= (0.8 + u_amplitude * 0.5);
-  
-  // Alpha fade at edges/top
-  float alpha = 1.0 - smoothstep(0.8, 1.0, vUv.y);
-  
-  gl_FragColor = vec4(finalColor, alpha);
-}
-`;
-
-const CustomGemGeometry = () => {
-  return (
-    <dodecahedronGeometry args={[1.8, 0]} />
-  );
-};
-
 const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration, targetRange }) => {
   const mesh = useRef();
   const material = useRef();
@@ -305,9 +231,8 @@ const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration, targetRan
 
   const shaders = useMemo(() => {
     switch (mode) {
-      case 'fire': return { v: fireVertex, f: fireFragment };
+
       case 'gem':
-      case 'custom':
       default: return { v: gemVertex, f: gemFragment };
     }
   }, [mode]);
@@ -401,12 +326,7 @@ const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration, targetRan
       {mode === 'gem' && (
         <octahedronGeometry args={[2.0, 0]} /> // Classic 8-sided Gem shape
       )}
-      {mode === 'fire' && (
-        <icosahedronGeometry args={[1.6, 30]} />
-      )}
-      {mode === 'custom' && (
-        <CustomGemGeometry />
-      )}
+
       <shaderMaterial
         ref={material}
         vertexShader={shaders.v}
@@ -453,10 +373,9 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
 
   const modes = [
     { id: 'gem', icon: Diamond, label: 'Gem' },
-    { id: 'fire', icon: Flame, label: 'Fire' },
+
     { id: 'mixer', icon: Sliders, label: 'Mixer' },
     { id: 'gauges', icon: Gauge, label: 'Gauges' },
-    { id: 'custom', icon: Box, label: 'Custom' },
     { id: 'safe', icon: Activity, label: '2D Safe Mode' },
   ];
 
@@ -680,29 +599,51 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
             Safe Mode (2D Fallback)
           </div>
         </div>
-      ) : mode === 'mixer' ? (
-        <div className="w-full h-full p-4 pt-16">
-          <Suspense fallback={<div className="text-white">Loading...</div>}>
-            <MixingBoardView
-              dataRef={dataRef}
-              audioEngine={audioEngine}
-              calibration={calibration}
-              compact={true}
-              viewMode="sliders"
-            />
-          </Suspense>
-        </div>
-      ) : mode === 'gauges' ? (
-        <div className="w-full h-full p-4 pt-16">
-          <Suspense fallback={<div className="text-white">Loading...</div>}>
-            <MixingBoardView
-              dataRef={dataRef}
-              audioEngine={audioEngine}
-              calibration={calibration}
-              compact={true}
-              viewMode="gauges"
-            />
-          </Suspense>
+      ) : mode === 'mixer' || mode === 'gauges' ? (
+        <div className="w-full h-full flex flex-col">
+          <div className="flex-1 min-h-0 p-4 pt-16">
+            <Suspense fallback={<div className="text-white">Loading...</div>}>
+              <MixingBoardView
+                dataRef={dataRef}
+                audioEngine={audioEngine}
+                calibration={calibration}
+                compact={true}
+                viewMode={mode === 'mixer' ? 'sliders' : 'gauges'}
+              />
+            </Suspense>
+          </div>
+
+          {/* Metrics Below Mixer */}
+          {!beginnerMode && (
+            <div className="flex-shrink-0 py-4 bg-slate-900/30 border-t border-white/5">
+              <div className="flex justify-center gap-4 text-xs mb-2">
+                <div className="text-center">
+                  <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Pitch</div>
+                  <div className={`font-bold ${metricClassifications.pitch.color} transition-colors duration-300`}>
+                    {metricClassifications.pitch.label}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Resonance</div>
+                  <div className={`font-bold ${metricClassifications.resonance.color} transition-colors duration-300`}>
+                    {metricClassifications.resonance.label}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Weight</div>
+                  <div className={`font-bold ${metricClassifications.weight.color} transition-colors duration-300`}>
+                    {metricClassifications.weight.label}
+                  </div>
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Gender Perception</div>
+                <div className={`text-lg font-bold ${genderPerception.color} transition-colors duration-300`}>
+                  {genderPerception.label}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <Canvas
@@ -777,9 +718,9 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
         </div>
       )}
 
-      {/* Metric Classifications Row */}
-      {!beginnerMode && (
-        <div className="absolute bottom-20 left-0 right-0 px-4 pointer-events-none">
+      {/* Metric Classifications Row - ONLY FOR ORB MODES */}
+      {!beginnerMode && mode !== 'mixer' && mode !== 'gauges' && (
+        <div className="absolute bottom-12 left-0 right-0 px-4 pointer-events-none">
           <div className="flex justify-center gap-4 text-xs">
             <div className="text-center">
               <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Pitch</div>
@@ -803,13 +744,15 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
         </div>
       )}
 
-      {/* Gender Perception Label */}
-      <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
-        <div className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Gender Perception</div>
-        <div className={`text-lg font-bold ${genderPerception.color} transition-colors duration-300`}>
-          {genderPerception.label}
+      {/* Gender Perception Label - ONLY FOR ORB MODES */}
+      {mode !== 'mixer' && mode !== 'gauges' && (
+        <div className="absolute bottom-2 left-0 right-0 text-center pointer-events-none">
+          <div className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Gender Perception</div>
+          <div className={`text-lg font-bold ${genderPerception.color} transition-colors duration-300`}>
+            {genderPerception.label}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Resonance Target Zones Overlay */}
       {mode === 'gem' && (
@@ -844,5 +787,3 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
 });
 
 export default DynamicOrb;
-
-
