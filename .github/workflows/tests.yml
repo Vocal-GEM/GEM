@@ -1,0 +1,101 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  frontend-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run tests with coverage
+      run: npm run test:coverage
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage/lcov.info
+        flags: frontend
+        name: frontend-coverage
+
+    - name: Archive coverage report
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-coverage-report
+        path: coverage/
+
+  backend-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        pip install -r requirements-dev.txt
+        pip install Flask==3.0.3 Flask-Cors==4.0.0 Flask-SQLAlchemy==3.1.1 Flask-SocketIO==5.3.6 Flask-Limiter==3.6.0 Flask-WTF==1.2.1 Werkzeug==3.0.2 SQLAlchemy python-dotenv==1.0.1 eventlet==0.36.1 bleach==6.1.0 Flask-Migrate==4.0.7 email-validator pypdf
+
+    - name: Run tests with coverage
+      run: |
+        cd backend
+        pytest --cov=app --cov-report=xml --cov-report=html
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./backend/coverage.xml
+        flags: backend
+        name: backend-coverage
+
+    - name: Archive coverage report
+      uses: actions/upload-artifact@v3
+      with:
+        name: backend-coverage-report-py${{ matrix.python-version }}
+        path: backend/htmlcov/
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run ESLint
+      run: npm run lint

@@ -5,6 +5,12 @@ node_modules
 
 # Testing
 coverage
+htmlcov/
+.coverage
+*.cover
+backend/coverage.xml
+backend/coverage.lcov
+backend/.coverage
 
 # Production
 dist
