@@ -1,5 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { useSettings } from '../../context/SettingsContext';
+import { useAudio } from '../../context/AudioContext';
+import { useFeedback } from '../../hooks/useFeedback';
+import FeedbackControls from '../ui/FeedbackControls';
 import { AlertTriangle, Activity, Info } from 'lucide-react';
 
 const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
@@ -85,7 +88,10 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
     const isSilent = dataRef.current?.isSilent;
 
     return (
-        <div className={`glass-panel rounded-2xl p-6 h-full flex flex-col justify-center transition-opacity duration-300 ${isSilent ? 'opacity-30 grayscale' : 'opacity-100'}`}>
+        <div className={`glass-panel rounded-2xl p-6 h-full flex flex-col justify-center transition-opacity duration-300 ${isSilent ? 'opacity-30 grayscale' : 'opacity-100'} relative`}>
+            <div className="absolute top-4 right-4 z-20">
+                <FeedbackControls settings={feedbackSettings} setSettings={setFeedbackSettings} />
+            </div>
             {/* Header */}
             <div className="flex justify-between items-end text-xs font-bold text-slate-400 tracking-wider mb-4">
                 <span className="w-24 text-left">{labels[0]}</span>

@@ -3,6 +3,9 @@ import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
 import { RotateCcw } from 'lucide-react';
 import { frequencyToNote, getCentsDeviation } from '../../utils/musicUtils';
+import { useAudio } from '../../context/AudioContext';
+import { useFeedback } from '../../hooks/useFeedback';
+import FeedbackControls from '../ui/FeedbackControls';
 
 const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, onScore, settings }) => {
     const { voiceProfiles } = useProfile();
@@ -394,6 +397,11 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                     </div>
                 </div>
             )}
+
+            {/* Feedback Controls */}
+            <div className="absolute top-3 right-48 z-20">
+                <FeedbackControls settings={feedbackSettings} setSettings={setFeedbackSettings} />
+            </div>
 
             {/* Average Pitch Range Display */}
             <div className="absolute top-3 right-3 flex items-center gap-2 bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2">

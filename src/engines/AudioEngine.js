@@ -113,6 +113,7 @@ export class AudioEngine {
             }
 
             this.toneEngine = new ToneEngine(this.audioContext);
+            this.hapticEngine = new HapticEngine();
 
             // Initialize Socket
             const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -495,6 +496,8 @@ export class AudioEngine {
     }
 
     playFeedbackTone(freq) { if (this.toneEngine) this.toneEngine.play(freq, 0.15, 'sine'); }
+
+    triggerVibration(pattern) { if (this.hapticEngine) this.hapticEngine.trigger(pattern); }
 
     startRecording() {
         if (this.mediaRecorder && this.mediaRecorder.state === 'inactive') {

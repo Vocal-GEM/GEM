@@ -194,8 +194,8 @@ const PracticeMode = ({
             )}
 
             {/* Header / Controls */}
-            <div className="flex flex-col xl:flex-row justify-between items-center mb-3 gap-3">
-                <div id="practice-tabs" className="flex items-center gap-4 overflow-x-auto w-full xl:w-auto pb-2 xl:pb-0">
+            <div className="flex flex-col justify-between items-center mb-3 gap-3">
+                <div id="practice-tabs" className="flex items-center gap-4 overflow-x-auto w-full pb-2">
                     {TABS.map(tab => (
                         <button
                             key={tab.id}
@@ -213,7 +213,7 @@ const PracticeMode = ({
                     ))}
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full justify-end">
                     <button
                         id="mic-button"
                         onClick={toggleAudio}

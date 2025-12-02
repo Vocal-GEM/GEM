@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Info, WifiOff } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
+import { useAudio } from '../../context/AudioContext';
+import { useFeedback } from '../../hooks/useFeedback';
+import FeedbackControls from '../ui/FeedbackControls';
 
 /**
  * ResonanceOrb - Visual feedback for voice resonance
@@ -40,6 +43,13 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
         return { min: 0.35, max: 0.65, label: 'Balanced' };
     };
     const targetZone = getTargetZone();
+
+    const { audioEngineRef } = useAudio();
+    const { settings: feedbackSettings, setSettings: setFeedbackSettings } = useFeedback(audioEngineRef, dataRef, {
+        metric: 'resonanceScore', // Use the score (0-100)
+        target: { min: targetZone.min * 100, max: targetZone.max * 100 },
+        targetFreq: activeProfile === 'fem' ? 800 : 400 // Higher tone for bright, lower for dark
+    });
 
     useEffect(() => {
         let frameCount = 0;
@@ -256,6 +266,9 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
 
     return (
         <div className="relative flex flex-col items-center justify-center w-full h-full overflow-hidden py-8">
+            <div className="absolute top-4 right-4 z-20">
+                <FeedbackControls settings={feedbackSettings} setSettings={setFeedbackSettings} />
+            </div>
             {/* Main orb container */}
             <div
                 className="relative flex items-center justify-center shrink-0"
