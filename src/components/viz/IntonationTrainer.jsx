@@ -164,7 +164,52 @@ const IntonationTrainer = ({ dataRef, isActive }) => {
     const reset = () => {
         traceRef.current = [];
         setIsTracing(false);
+        setScore(0);
     };
+
+    // Calculate score using Dynamic Time Warping (DTW)
+    const calculateScore = (userTrace, targetPattern) => {
+        if (userTrace.length === 0 || targetPattern.length === 0) return 0;
+
+        // Simple DTW implementation
+        const n = userTrace.length;
+        const m = targetPattern.length;
+        const dtw = Array(n + 1).fill(null).map(() => Array(m + 1).fill(Infinity));
+        dtw[0][0] = 0;
+
+        for (let i = 1; i <= n; i++) {
+            for (let j = 1; j <= m; j++) {
+                // Find closest point in target pattern by x-coordinate
+                const targetX = targetPattern[j - 1].x;
+                const targetY = targetPattern[j - 1].y;
+                const userY = userTrace[i - 1].y;
+
+                // Euclidean distance between y-values (pitch)
+                const cost = Math.abs(targetY - userY);
+
+                dtw[i][j] = cost + Math.min(
+                    dtw[i - 1][j],     // insertion
+                    dtw[i][j - 1],     // deletion
+                    dtw[i - 1][j - 1]  // match
+                );
+            }
+        }
+
+        // Normalize score to 0-100 (lower DTW distance = higher score)
+        const maxDistance = 2.0; // Maximum expected distance
+        const normalizedDistance = Math.min(dtw[n][m] / Math.max(n, m), maxDistance);
+        const score = Math.max(0, Math.min(100, 100 - (normalizedDistance * 50)));
+
+        return Math.round(score);
+    };
+
+    // Check if tracing just completed and calculate score
+    useEffect(() => {
+        if (!isTracing && traceRef.current.length > 5) {
+            const calculatedScore = calculateScore(traceRef.current, patterns[selectedPattern].points);
+            setScore(calculatedScore);
+        }
+    }, [isTracing, selectedPattern]);
 
     return (
         <div className="bg-slate-900 rounded-xl border border-slate-800 p-4">
@@ -204,10 +249,30 @@ const IntonationTrainer = ({ dataRef, isActive }) => {
             </div>
 
             <div className="flex items-center justify-between">
-                <div>
+                <div className="flex-1">
                     <div className="text-xs font-bold text-white">{patterns[selectedPattern].name}</div>
                     <div className="text-[10px] text-slate-500">{patterns[selectedPattern].description}</div>
                 </div>
+
+                {score > 0 && (
+                    <div className="flex items-center gap-2 mr-3">
+                        <div className="text-right">
+                            <div className="text-xs text-slate-400">Score</div>
+                            <div className={`text-lg font-bold ${
+                                score >= 80 ? 'text-green-400' :
+                                score >= 60 ? 'text-yellow-400' :
+                                'text-orange-400'
+                            }`}>
+                                {score}%
+                            </div>
+                        </div>
+                        <div className={`text-2xl ${
+                            score >= 80 ? '🎉' :
+                            score >= 60 ? '👍' :
+                            '💪'
+                        }`} />
+                    </div>
+                )}
 
                 <button
                     onClick={reset}

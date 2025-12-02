@@ -18,7 +18,13 @@ export class HapticEngine {
 }
 
 export class ToneEngine {
-    constructor(audioContext) { this.ctx = audioContext; this.lastTrigger = 0; }
+    constructor(audioContext) {
+        this.ctx = audioContext;
+        this.lastTrigger = 0;
+        this.sustainedOsc = null;
+        this.sustainedGain = null;
+    }
+
     play(freq, duration = 0.1, type = 'sine') {
         if (!this.ctx || this.ctx.state !== 'running') return;
         const now = Date.now(); if (now - this.lastTrigger < 200) return; this.lastTrigger = now;
@@ -26,6 +32,47 @@ export class ToneEngine {
         osc.type = type; osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
         gain.gain.setValueAtTime(0.1, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
         osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + duration);
+    }
+
+    startSustained(freq, type = 'sine', volume = 0.1) {
+        if (!this.ctx || this.ctx.state !== 'running') return;
+
+        // Stop any existing sustained tone
+        this.stopSustained();
+
+        // Create oscillator and gain
+        this.sustainedOsc = this.ctx.createOscillator();
+        this.sustainedGain = this.ctx.createGain();
+
+        this.sustainedOsc.type = type;
+        this.sustainedOsc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+        // Fade in to avoid click
+        this.sustainedGain.gain.setValueAtTime(0, this.ctx.currentTime);
+        this.sustainedGain.gain.linearRampToValueAtTime(volume, this.ctx.currentTime + 0.05);
+
+        this.sustainedOsc.connect(this.sustainedGain);
+        this.sustainedGain.connect(this.ctx.destination);
+        this.sustainedOsc.start();
+    }
+
+    stopSustained() {
+        if (this.sustainedOsc && this.sustainedGain) {
+            // Fade out to avoid click
+            this.sustainedGain.gain.cancelScheduledValues(this.ctx.currentTime);
+            this.sustainedGain.gain.setValueAtTime(this.sustainedGain.gain.value, this.ctx.currentTime);
+            this.sustainedGain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.05);
+
+            this.sustainedOsc.stop(this.ctx.currentTime + 0.05);
+            this.sustainedOsc = null;
+            this.sustainedGain = null;
+        }
+    }
+
+    updateFrequency(freq) {
+        if (this.sustainedOsc) {
+            this.sustainedOsc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        }
     }
 }
 
@@ -495,6 +542,18 @@ export class AudioEngine {
     }
 
     playFeedbackTone(freq) { if (this.toneEngine) this.toneEngine.play(freq, 0.15, 'sine'); }
+
+    startSustainedTone(freq, type = 'sine', volume = 0.1) {
+        if (this.toneEngine) this.toneEngine.startSustained(freq, type, volume);
+    }
+
+    stopSustainedTone() {
+        if (this.toneEngine) this.toneEngine.stopSustained();
+    }
+
+    updateToneFrequency(freq) {
+        if (this.toneEngine) this.toneEngine.updateFrequency(freq);
+    }
 
     startRecording() {
         if (this.mediaRecorder && this.mediaRecorder.state === 'inactive') {

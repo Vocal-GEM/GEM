@@ -197,40 +197,52 @@ def compute_rbi_series(y, sr, frame_length_s=0.04, hop_length_s=0.01):
     """
     # Pre-processing
     y_pre = pre_emphasis(y)
-    
+
     # Frame generator
     frame_len = int(frame_length_s * sr)
     hop_len = int(hop_length_s * sr)
-    
+
     # Pitch tracking for the whole file
     sound = parselmouth.Sound(y, sr)
     pitch_obj = sound.to_pitch(time_step=hop_length_s, pitch_floor=75, pitch_ceiling=600)
-    
+
+    # Pass 0: Calculate adaptive energy threshold
+    # Compute energy for all frames to set dynamic threshold
+    all_energy = []
+    for start in range(0, len(y_pre) - frame_len, hop_len):
+        frame = y_pre[start:start + frame_len]
+        rms = np.sqrt(np.mean(frame**2))
+        energy_db = 20 * np.log10(rms + 1e-9)
+        all_energy.append(energy_db)
+
+    # Set threshold at 30th percentile (below this is likely silence/noise)
+    energy_threshold = np.percentile(all_energy, 30) + 5  # Add 5dB margin
+    # Ensure reasonable bounds
+    energy_threshold = max(-50, min(-20, energy_threshold))
+
     raw_features = []
     valid_indices = []
-    
+
     # Pass 1: Extract Raw Features
     idx = 0
     times = []
-    
+
     for start in range(0, len(y_pre) - frame_len, hop_len):
         end = start + frame_len
         frame = y_pre[start:end]
         t = start / sr
         times.append(t)
-        
+
         # RMS Gate
         rms = np.sqrt(np.mean(frame**2))
         energy_db = 20 * np.log10(rms + 1e-9)
-        
+
         # F0 Gate
         f0 = pitch_obj.get_value_at_time(t + frame_length_s/2)
         if np.isnan(f0): f0 = 0
-        
-        # Validity check
-        # Thresholds: Energy > -50dB (relative? let's use absolute for now or dynamic)
-        # For simplicity, let's assume normalized audio and use -40dB
-        is_voiced = (energy_db > -40) and (f0 > 80) and (f0 < 400)
+
+        # Validity check with adaptive energy threshold
+        is_voiced = (energy_db > energy_threshold) and (f0 > 80) and (f0 < 400)
         
         if is_voiced:
             ratio, cent, tilt = compute_raw_rbi_features(frame, sr, f0)
@@ -261,43 +273,60 @@ def compute_rbi_series(y, sr, frame_length_s=0.04, hop_length_s=0.01):
     
     # Pass 3: Normalize and Compute RBI
     rbi_values = [None] * idx
-    
+
     def norm(val, vmin, vmax):
         if vmax <= vmin: return 0.5
         return np.clip((val - vmin) / (vmax - vmin + 1e-9), 0.0, 1.0)
-    
+
     last_rbi = 50.0 # Start neutral
-    
+    frames_since_last_voiced = 0
+    decay_threshold = 5  # Start decaying after 5 unvoiced frames (50ms)
+    decay_rate = 0.85    # Decay factor per frame
+
     # Map valid indices back to full timeline
     feature_map = {f["idx"]: f for f in raw_features}
-    
+
     for i in range(idx):
         if i in feature_map:
+            # Voiced frame - compute RBI normally
             f = feature_map[i]
-            
+
             r_norm = norm(f["ratio"], stats["ratio_min"], stats["ratio_max"])
             c_norm = norm(f["centroid"], stats["centroid_min"], stats["centroid_max"])
             t_norm = norm(f["tilt"], stats["tilt_min"], stats["tilt_max"])
-            
+
             f0_clip = min(max(f["f0"], 120), 300)
             f0_norm = (f0_clip - 120) / (300 - 120)
-            
+
             # Weighted Sum
-            # Weights: Ratio 0.4, Centroid 0.25, Tilt 0.25, F0 0.1
+            # Weights optimize for resonance detection:
+            # - Ratio (HF/LF): 0.4 (primary indicator of brightness)
+            # - Centroid: 0.25 (spectral center of mass)
+            # - Tilt: 0.25 (spectral slope, higher = brighter)
+            # - F0: 0.1 (pitch contributes minimally to resonance)
             raw_score = (0.4 * r_norm) + (0.25 * c_norm) + (0.25 * t_norm) + (0.10 * f0_norm)
             current_rbi = np.clip(raw_score * 100, 0, 100)
-            
+
             # Smoothing (EMA)
             alpha = 0.2
             smoothed_rbi = (alpha * current_rbi) + ((1 - alpha) * last_rbi)
             last_rbi = smoothed_rbi
-            
+
             rbi_values[i] = smoothed_rbi
+            frames_since_last_voiced = 0
         else:
-            # Decay or hold? User suggested hold or decay. Let's hold for short gaps, decay for long.
-            # For simplicity, just hold last valid for now to avoid dropping to 0
-            rbi_values[i] = last_rbi # Or None if we want to show gaps
-            
+            # Unvoiced frame - use decay strategy
+            frames_since_last_voiced += 1
+
+            if frames_since_last_voiced <= decay_threshold:
+                # Short gap - hold last value (likely pause within speech)
+                rbi_values[i] = last_rbi
+            else:
+                # Long gap - apply decay toward neutral (silence)
+                last_rbi = last_rbi * decay_rate
+                # Return None for truly silent segments (below threshold)
+                rbi_values[i] = last_rbi if last_rbi > 10 else None
+
     return rbi_values, stats
 
 # ----------------------

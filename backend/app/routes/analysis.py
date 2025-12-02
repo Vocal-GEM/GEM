@@ -74,32 +74,71 @@ def extract_pitch_librosa(y, sr):
 
 
 def estimate_formants_lpc(y, sr, n_formants=3):
-    """Estimate formants using Linear Predictive Coding"""
+    """Estimate formants using Linear Predictive Coding with validation"""
     try:
         # Pre-emphasis filter
         pre_emphasis = 0.97
         y_emphasized = np.append(y[0], y[1:] - pre_emphasis * y[:-1])
-        
+
         # LPC analysis
         lpc_order = 2 + sr // 1000  # Rule of thumb: 2 + (sample_rate / 1000)
         a = librosa.lpc(y_emphasized, order=lpc_order)
-        
+
         # Find roots of LPC polynomial
         roots = np.roots(a)
         roots = roots[np.imag(roots) >= 0]  # Keep only positive frequencies
-        
-        # Convert to frequencies
+
+        # Convert to frequencies and calculate bandwidths
         angles = np.arctan2(np.imag(roots), np.real(roots))
-        freqs = sorted(angles * (sr / (2 * np.pi)))
-        
-        # Extract first n_formants
-        formants = {}
-        for i in range(min(n_formants, len(freqs))):
-            if freqs[i] > 0:  # Valid formant
-                formants[f'f{i+1}'] = float(freqs[i])
-        
-        return formants if formants else {'f1': None, 'f2': None, 'f3': None}
-        
+        freqs = angles * (sr / (2 * np.pi))
+
+        # Calculate bandwidth (related to distance from unit circle)
+        bandwidths = -0.5 * (sr / (2 * np.pi)) * np.log(np.abs(roots))
+
+        # Combine frequencies and bandwidths
+        formant_candidates = list(zip(freqs, bandwidths))
+        formant_candidates = [(f, bw) for f, bw in formant_candidates if f > 0]
+        formant_candidates.sort(key=lambda x: x[0])  # Sort by frequency
+
+        # Physiological formant ranges (Hz) based on speech research
+        # These ranges accommodate both male and female voices
+        formant_ranges = {
+            'f1': (200, 1200),    # F1: jaw height
+            'f2': (600, 3500),    # F2: tongue frontness/backness
+            'f3': (1400, 4500),   # F3: lip rounding
+        }
+
+        # Maximum reasonable bandwidth (Hz)
+        max_bandwidth = 500
+
+        # Validate and assign formants
+        formants = {'f1': None, 'f2': None, 'f3': None}
+
+        for i in range(1, n_formants + 1):
+            formant_key = f'f{i}'
+            min_freq, max_freq = formant_ranges.get(formant_key, (0, 10000))
+
+            # Find first candidate in valid range with reasonable bandwidth
+            for freq, bw in formant_candidates:
+                # Check if frequency is in expected range
+                if min_freq <= freq <= max_freq:
+                    # Check bandwidth constraint
+                    if bw < max_bandwidth:
+                        # Check it's not too close to already assigned formants
+                        too_close = False
+                        for assigned_f in formants.values():
+                            if assigned_f and abs(freq - assigned_f) < 200:
+                                too_close = True
+                                break
+
+                        if not too_close:
+                            formants[formant_key] = float(freq)
+                            # Remove this candidate to avoid reusing
+                            formant_candidates = [(f, b) for f, b in formant_candidates if f != freq]
+                            break
+
+        return formants
+
     except Exception as e:
         print(f"Formant extraction error: {e}")
         return {'f1': None, 'f2': None, 'f3': None}
@@ -139,22 +178,53 @@ def calculate_jitter_shimmer(y, sr, f0_contour):
 
 
 def calculate_hnr(y, sr):
-    """Estimate Harmonics-to-Noise Ratio"""
+    """Estimate Harmonics-to-Noise Ratio with pitch-based lag validation"""
     try:
         # Autocorrelation method
         autocorr = librosa.autocorrelate(y)
-        
-        # Find first peak (fundamental period)
-        peaks = signal.find_peaks(autocorr)[0]
-        if len(peaks) == 0:
+
+        # Define lag range based on expected pitch (75-600 Hz)
+        min_lag = int(sr / 600)  # Highest pitch = shortest period
+        max_lag = int(sr / 75)   # Lowest pitch = longest period
+
+        # Ensure we stay within autocorrelation bounds
+        max_lag = min(max_lag, len(autocorr) - 1)
+
+        if min_lag >= max_lag:
             return None
-        
-        # HNR approximation: ratio of autocorrelation peak to mean
-        hnr_linear = autocorr[peaks[0]] / np.mean(np.abs(autocorr))
-        hnr_db = 10 * np.log10(hnr_linear) if hnr_linear > 0 else None
-        
-        return float(hnr_db) if hnr_db else None
-        
+
+        # Search for peak within valid lag range
+        search_region = autocorr[min_lag:max_lag]
+        if len(search_region) == 0:
+            return None
+
+        peak_idx = np.argmax(search_region) + min_lag
+
+        # HNR calculation
+        # Signal power = autocorr at lag 0
+        # Periodic power = autocorr at fundamental period
+        # Noise power = signal power - periodic power
+        signal_power = autocorr[0]
+        periodic_power = autocorr[peak_idx]
+
+        if signal_power <= 0 or periodic_power <= 0:
+            return None
+
+        # HNR = 10 * log10(periodic / noise)
+        # where noise = signal - periodic
+        noise_power = signal_power - periodic_power
+
+        if noise_power <= 0:
+            # Very clean signal, return high HNR
+            return 30.0
+
+        hnr_db = 10 * np.log10(periodic_power / noise_power)
+
+        # Clamp to reasonable range (typical HNR: 0-30 dB)
+        hnr_db = np.clip(hnr_db, 0, 30)
+
+        return float(hnr_db)
+
     except Exception as e:
         print(f"HNR calculation error: {e}")
         return None
