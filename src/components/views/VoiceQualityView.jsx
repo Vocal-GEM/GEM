@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Upload, Play, Square, Activity, FileText, BarChart2, Info } from 'lucide-react';
+import ClipCapture from '../ui/ClipCapture';
 import { io } from 'socket.io-client';
 import {
     Chart as ChartJS,
@@ -334,17 +335,29 @@ const VoiceQualityView = () => {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-slate-400 mb-2">Upload Recording</label>
-                                <div className="relative">
-                                    <input
-                                        type="file"
-                                        accept="audio/*"
-                                        onChange={handleFileChange}
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                    />
-                                    <div className="w-full p-3 bg-slate-900 border border-white/10 rounded-lg text-slate-300 flex items-center gap-2 hover:bg-slate-900/80 transition-colors">
-                                        <Upload className="w-4 h-4" />
-                                        <span className="truncate">{file ? file.name : "Choose WAV file..."}</span>
+                                <label className="block text-sm font-bold text-slate-400 mb-2">Upload or Record</label>
+                                <div className="flex items-center gap-4">
+                                    <div className="relative flex-1">
+                                        <input
+                                            type="file"
+                                            accept="audio/*"
+                                            onChange={handleFileChange}
+                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                        />
+                                        <div className="w-full p-3 bg-slate-900 border border-white/10 rounded-lg text-slate-300 flex items-center gap-2 hover:bg-slate-900/80 transition-colors">
+                                            <Upload className="w-4 h-4" />
+                                            <span className="truncate">{file ? file.name : "Choose WAV file..."}</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex-shrink-0">
+                                        <ClipCapture onCapture={(result) => {
+                                            if (result && result.blob) {
+                                                const recordedFile = new File([result.blob], "recording.ogg", { type: "audio/ogg" });
+                                                setFile(recordedFile);
+                                                setResults(null);
+                                                setError(null);
+                                            }
+                                        }} />
                                     </div>
                                 </div>
                             </div>
