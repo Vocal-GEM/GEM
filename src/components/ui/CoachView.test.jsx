@@ -16,12 +16,24 @@ vi.mock('../../context/SettingsContext', () => ({
     useSettings: () => ({ settings: {} })
 }));
 
+vi.mock('../../context/LanguageContext', () => ({
+    useLanguage: () => ({
+        t: (key) => {
+            if (key === 'coach.initialMessage') return "Hi! I'm your AI Vocal Coach. Ask me about your progress, or for tips on resonance and pitch!";
+            return key;
+        }
+    })
+}));
+
 // Mock services
 vi.mock('../../utils/historyService', () => ({
     historyService: {
         getSettings: vi.fn().mockResolvedValue({})
     }
 }));
+
+// Mock scrollIntoView
+Element.prototype.scrollIntoView = vi.fn();
 
 describe('CoachView Component', () => {
     it('renders empty state when messages are cleared or initial', async () => {

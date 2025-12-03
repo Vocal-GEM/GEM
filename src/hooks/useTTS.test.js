@@ -17,7 +17,7 @@ describe('useTTS', () => {
             onerror: null
         };
 
-        global.SpeechSynthesisUtterance = vi.fn(() => mockUtterance);
+        global.SpeechSynthesisUtterance = vi.fn(function() { return mockUtterance; });
 
         mockSpeechSynthesis = {
             getVoices: vi.fn().mockReturnValue([

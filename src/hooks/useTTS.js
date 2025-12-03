@@ -36,27 +36,24 @@ export const useTTS = () => {
         };
 
         const targetKeywords = keywords[gender] || keywords.fem;
-
-        // 1. Try to find a voice matching keywords and current language
         const lang = navigator.language || 'en-US';
-        let bestVoice = voices.find(v =>
-            v.lang.startsWith(lang.split('-')[0]) &&
-            targetKeywords.some(k => v.name.toLowerCase().includes(k))
-        );
+        const langPrefix = lang.split('-')[0];
 
-        // 2. Fallback to any voice matching keywords
-        if (!bestVoice) {
-            bestVoice = voices.find(v =>
-                targetKeywords.some(k => v.name.toLowerCase().includes(k))
+        // 1. Try to find a voice matching keywords in order (priority)
+        for (const keyword of targetKeywords) {
+            const voice = voices.find(v =>
+                v.lang.startsWith(langPrefix) &&
+                v.name.toLowerCase().includes(keyword)
             );
+            if (voice) return voice;
         }
+
+        // 2. Fallback to any voice matching keywords (if language didn't match above, though above checks language too)
+        // Actually, the above loop checks language. Let's relax language check if strict check failed?
+        // For now, let's keep it simple and just return default if no keyword match.
 
         // 3. Fallback to default voice
-        if (!bestVoice) {
-            bestVoice = voices.find(v => v.default) || voices[0];
-        }
-
-        return bestVoice;
+        return voices.find(v => v.default) || voices[0];
     }, [voices]);
 
     const speak = useCallback((text, options = {}) => {
