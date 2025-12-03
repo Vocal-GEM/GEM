@@ -229,7 +229,9 @@ const App = () => {
                             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20 flex-shrink-0" aria-hidden="true">
                                 <Mic className="w-5 h-5 text-white" />
                             </div>
-                            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 hidden sm:block">Vocal GEM</h1>
+                            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 hidden sm:block">
+                                Vocal GEM <span className="text-[10px] text-slate-500 font-mono ml-2 border border-slate-700 rounded px-1">{__APP_VERSION__}</span>
+                            </h1>
                         </button>
                         <div className="flex items-center gap-2">
                             <OfflineIndicator />

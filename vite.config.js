@@ -3,9 +3,21 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { execSync } from 'child_process'
+
+// Get git version
+let version = '0.0.0';
+try {
+    version = execSync('git rev-parse --short HEAD').toString().trim();
+} catch (e) {
+    console.warn('Failed to get git version', e);
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
+    define: {
+        __APP_VERSION__: JSON.stringify(`v0.1.0-${version}`)
+    },
     base: './',
     plugins: [
         react(),

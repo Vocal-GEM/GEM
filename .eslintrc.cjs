@@ -16,7 +16,10 @@ module.exports = {
             'warn',
             { allowConstantExport: true },
         ],
-        'react/prop-types': 'off', // Disable prop-types as we're moving fast, can enable later or use TS
+        'react/prop-types': 'off',
         'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    },
+    globals: {
+        __APP_VERSION__: 'readonly',
     },
 }

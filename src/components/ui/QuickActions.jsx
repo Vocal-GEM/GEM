@@ -33,7 +33,7 @@ const QuickActions = ({ onAction }) => {
     };
 
     return (
-        <div className="fixed bottom-24 right-6 z-50">
+        <div className="fixed bottom-28 right-6 z-[100]">
             {/* Menu Items */}
             <div className={`flex flex-col gap-3 mb-4 transition-all duration-300 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
                 {actions.map((action, index) => (
