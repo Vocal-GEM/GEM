@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, BookOpen, PlayCircle, CheckCircle, Lock, Star } from 'lucide-react';
 import { COURSE_DATA } from '../../data/courseData';
 import LessonView from './LessonView';
+import FeedbackModal from './FeedbackModal';
 
 const FeminizationCourse = ({ onClose }) => {
     const [activeLesson, setActiveLesson] = useState(null);
     const [completedLessons, setCompletedLessons] = useState([]);
+    const [showFeedback, setShowFeedback] = useState(false);
 
     // Load progress from local storage
     useEffect(() => {
@@ -20,6 +22,11 @@ const FeminizationCourse = ({ onClose }) => {
             const newProgress = [...completedLessons, lessonId];
             setCompletedLessons(newProgress);
             localStorage.setItem('gem_course_progress', JSON.stringify(newProgress));
+
+            // Trigger feedback for every 3rd lesson or just randomly for engagement
+            if (newProgress.length % 3 === 0) {
+                setShowFeedback(true);
+            }
         }
     };
 
@@ -246,7 +253,14 @@ const FeminizationCourse = ({ onClose }) => {
                     </div>
                 </div>
             </div>
-        </div>
+
+
+            <FeedbackModal
+                isOpen={showFeedback}
+                onClose={() => setShowFeedback(false)}
+                initialType="feedback"
+            />
+        </div >
     );
 };
 

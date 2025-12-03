@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import { useSettings } from '../../context/SettingsContext';
+const Spectrogram3D = React.lazy(() => import('./Spectrogram3D'));
 
 const Spectrogram = React.memo(({ dataRef, audioRef }) => {
     const canvasRef = useRef(null);
@@ -88,42 +89,49 @@ const Spectrogram = React.memo(({ dataRef, audioRef }) => {
                 spectrum = dataArray;
             }
 
-            if (!spectrum) return;
-
             const width = canvas.width;
             const height = canvas.height;
             const scrollSpeed = 2;
 
+            // Shift canvas left
             ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
 
             const imgData = ctx.createImageData(scrollSpeed, height);
             const data = new Uint32Array(imgData.data.buffer);
 
-            for (let y = 0; y < height; y++) {
-                const maxIndex = spectrum.length;
-                const targetMaxFreq = 8000;
-                const sampleRate = 16000;
-                const maxTargetIndex = Math.floor(maxIndex * targetMaxFreq / (sampleRate / 2));
+            if (spectrum) {
+                // Draw Spectrum
+                for (let y = 0; y < height; y++) {
+                    const maxIndex = spectrum.length;
+                    const targetMaxFreq = 8000;
+                    const sampleRate = 16000;
+                    const maxTargetIndex = Math.floor(maxIndex * targetMaxFreq / (sampleRate / 2));
 
-                const mappedIndex = Math.floor(y / height * maxTargetIndex);
+                    const mappedIndex = Math.floor(y / height * maxTargetIndex);
+                    const val = spectrum[mappedIndex] || 0;
 
-                const val = spectrum[mappedIndex] || 0;
+                    let intensity;
+                    // Silence Check
+                    if (dataRef?.current?.isSilent) {
+                        intensity = 0;
+                    } else if (dataRef?.current) {
+                        intensity = Math.log10(val + 1) * 50;
+                    } else {
+                        intensity = val;
+                    }
 
-                let intensity;
-                // Silence Check
-                if (dataRef?.current?.isSilent) {
-                    intensity = 0;
-                } else if (dataRef?.current) {
-                    intensity = Math.log10(val + 1) * 50;
-                } else {
-                    intensity = val;
+                    intensity = Math.min(255, Math.max(0, intensity));
+                    const color = colormap[Math.floor(intensity)];
+
+                    for (let x = 0; x < scrollSpeed; x++) {
+                        data[(height - 1 - y) * scrollSpeed + x] = color;
+                    }
                 }
-
-                intensity = Math.min(255, Math.max(0, intensity));
-                const color = colormap[Math.floor(intensity)];
-
-                for (let x = 0; x < scrollSpeed; x++) {
-                    data[(height - 1 - y) * scrollSpeed + x] = color;
+            } else {
+                // Draw Silence (Black)
+                const black = (255 << 24) | (0 << 16) | (0 << 8) | 0;
+                for (let i = 0; i < data.length; i++) {
+                    data[i] = black;
                 }
             }
 
@@ -142,10 +150,27 @@ const Spectrogram = React.memo(({ dataRef, audioRef }) => {
         };
     }, [dataRef, audioRef]);
 
+    const [is3D, setIs3D] = React.useState(false);
+
     return (
-        <div className="h-full w-full relative overflow-hidden rounded-xl bg-black">
-            <canvas ref={canvasRef} className="w-full h-full"></canvas>
-            <div className="absolute bottom-1 right-2 text-[9px] text-white/50 font-mono">0 - 8kHz</div>
+        <div className="h-full w-full relative overflow-hidden rounded-xl bg-black group">
+            {is3D ? (
+                <React.Suspense fallback={<div className="text-white p-4">Loading 3D...</div>}>
+                    <Spectrogram3D dataRef={dataRef} />
+                </React.Suspense>
+            ) : (
+                <>
+                    <canvas ref={canvasRef} className="w-full h-full"></canvas>
+                    <div className="absolute bottom-1 right-2 text-[9px] text-white/50 font-mono">0 - 8kHz</div>
+                </>
+            )}
+
+            <button
+                onClick={() => setIs3D(!is3D)}
+                className="absolute top-2 right-2 bg-white/10 hover:bg-white/20 text-white/70 hover:text-white text-xs px-2 py-1 rounded backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100"
+            >
+                {is3D ? "2D View" : "3D View"}
+            </button>
         </div>
     );
 });
