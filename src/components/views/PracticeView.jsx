@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { Book, EyeOff, Mic, Wrench, Activity, Anchor, Aperture, Maximize2, Waves, LayoutGrid, Stethoscope } from 'lucide-react';
+import { useState } from 'react';
+import { Mic, Activity, Anchor, Aperture, Maximize2, Waves, Stethoscope } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
 import { useStats } from '../../context/StatsContext';
 import { useSettings } from '../../context/SettingsContext';
-import { useNavigate } from 'react-router-dom';
+
 import ResonanceOrb from '../viz/ResonanceOrb';
 import LiveMetricsBar from '../viz/LiveMetricsBar';
 import PitchVisualizer from '../viz/PitchVisualizer';
-import Spectrogram from '../viz/Spectrogram';
+
 import VoiceQualityMeter from '../viz/VoiceQualityMeter';
 import VowelSpacePlot from '../viz/VowelSpacePlot';
 import CPPMeter from '../viz/CPPMeter';
 import HighResSpectrogram from '../viz/HighResSpectrogram';
-import SpectrumAnalyzer from '../viz/SpectrumAnalyzer';
+import HighResSpectrogram from '../viz/HighResSpectrogram';
 import VoiceRangeProfile from '../viz/VoiceRangeProfile';
 import MPTTracker from '../viz/MPTTracker';
-import SZRatio from '../viz/SZRatio';
+
 import IntonationTrainer from '../viz/IntonationTrainer';
 import ResizableToolGrid, { GridTool } from '../layout/ResizableToolGrid';
 import LayoutControls from '../ui/LayoutControls';
@@ -36,7 +36,7 @@ const PracticeView = () => {
     // Actually, I should probably add userMode to SettingsContext.
     // But for this file, I'll access it from SettingsContext assuming I'll put it there.
     const { userMode } = settings; // Assuming userMode is part of settings object now.
-    const navigate = useNavigate();
+
     const { toggleTool, activeTools } = useLayout();
 
     const [activeGame, setActiveGame] = useState('pitch'); // Reusing this for tab state: 'pitch' | 'resonance' | 'range' | 'spectrogram' | 'clinical'
@@ -116,11 +116,10 @@ const PracticeView = () => {
                                 <button
                                     key={tool.id}
                                     onClick={() => toggleTool(tool.id)}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
-                                        activeTools.includes(tool.id)
-                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
-                                    }`}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTools.includes(tool.id)
+                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                                        }`}
                                 >
                                     <tool.icon className="w-3 h-3" />
                                     {tool.label}
@@ -175,7 +174,7 @@ const PracticeView = () => {
                             <GridTool toolId="mpt" title="MPT Tracker">
                                 <MPTTracker dataRef={dataRef} isActive={isAudioActive} />
                             </GridTool>
-                            
+
                             <GridTool toolId="intonation" title="Intonation Trainer">
                                 <IntonationTrainer dataRef={dataRef} isActive={isAudioActive} />
                             </GridTool>

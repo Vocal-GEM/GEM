@@ -45,7 +45,10 @@ export const SettingsProvider = ({ children }) => {
             showTotalPractice: true,
             showWeeklyActivity: true,
             showProgressTrends: true
-        }
+        },
+
+        // Audio Settings
+        listenMode: false, // Monitor own voice (requires headphones)
     });
 
 

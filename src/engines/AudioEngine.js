@@ -1,7 +1,10 @@
 import { io } from 'socket.io-client';
 import { DSP } from '../utils/DSP';
+import { PitchDetector } from '../utils/PitchDetector';
+import { ResonanceCalculator } from '../utils/ResonanceCalculator';
+import { FormantAnalyzer } from '../utils/FormantAnalyzer';
 
-export const MainDSP = {
+const MainDSP = {
     hzToSemitones: (hz) => 12 * Math.log2(hz / 440) + 69,
     median: (values) => {
         if (values.length === 0) return 0;
@@ -44,12 +47,9 @@ export class AudioEngine {
         // DSP State
         this.pitchBuffer = [];
         this.smoothPitchBuffer = [];
-        this.pitchBuffer = [];
-        this.smoothPitchBuffer = [];
-        this.lastPitch = 0;
-        this.lastValidPitch = 0; // For octave jump protection
-        this.pitchConfidenceThreshold = 0.6; // Minimum confidence to accept pitch
-        this.jitterBuffer = [];
+        this.pitchDetector = new PitchDetector({ minConfidence: 0.6 });
+        this.resonanceCalculator = new ResonanceCalculator();
+        this.formantAnalyzer = new FormantAnalyzer();
         this.jitterBuffer = [];
         this.weightBuffer = [];
         this.smoothedH1 = 0;
@@ -180,10 +180,18 @@ export class AudioEngine {
             this.analyser.fftSize = 2048;
             this.analyser.smoothingTimeConstant = 0;
 
+            // Monitor Gain (Listen Mode)
+            this.monitorGain = this.audioContext.createGain();
+            this.monitorGain.gain.value = 0; // Default to off
+
             // Connect Chain: Mic -> Highpass -> Lowpass -> Analyser
             this.microphone.connect(this.highpass);
             this.highpass.connect(this.lowpass);
             this.lowpass.connect(this.analyser);
+
+            // Connect Monitor: Mic -> MonitorGain -> Destination
+            this.microphone.connect(this.monitorGain);
+            this.monitorGain.connect(this.audioContext.destination);
 
             console.log("[AudioEngine] ✅ Audio chain connected: Mic -> Filters -> Analyser (Main Thread)");
 
@@ -250,54 +258,19 @@ export class AudioEngine {
             const windowed = DSP.applyWindow(preEmphasized);
 
             // Pitch
-            const dynamicThreshold = 0.15;
-            const { pitch: rawPitch, confidence: pitchConfidence } = DSP.calculatePitchYIN(buffer, fs, dynamicThreshold);
-
-            let pitch = rawPitch;
-
-            // Octave Jump Protection & Confidence Check
-            if (pitch > 0 && pitchConfidence > this.pitchConfidenceThreshold) {
-                // Check for octave jumps if we have a valid previous pitch
-                if (this.lastValidPitch > 0) {
-                    const ratio = pitch / this.lastValidPitch;
-                    // If pitch jumps ~2x (octave up) or ~0.5x (octave down) suddenly
-                    // We only allow it if confidence is VERY high, otherwise we might stick to previous
-                    // or if it persists (handled by smoothing buffer usually, but here we reject outliers)
-
-                    const isOctaveJump = (ratio > 1.8 && ratio < 2.2) || (ratio > 0.4 && ratio < 0.6);
-
-                    if (isOctaveJump && pitchConfidence < 0.9) {
-                        // Likely an octave error, ignore this frame's pitch or use last valid
-                        pitch = -1;
-                    } else {
-                        this.lastValidPitch = pitch;
-                    }
-                } else {
-                    this.lastValidPitch = pitch;
-                }
-            } else {
-                pitch = -1; // Treat low confidence as no pitch
-            }
+            const { pitch, confidence: pitchConfidence } = this.pitchDetector.detect(buffer, fs);
 
             const spectrum = DSP.simpleFFT(windowed);
 
             // Calculate Spectral Centroid (Resonance)
-            let spectralCentroid = 0;
-            let totalMagnitude = 0;
             const nyquist = TARGET_RATE / 2;
-            for (let i = 0; i < spectrum.length; i++) {
-                const freq = (i / spectrum.length) * nyquist;
-                spectralCentroid += freq * spectrum[i];
-                totalMagnitude += spectrum[i];
-            }
-            spectralCentroid = totalMagnitude > 0 ? spectralCentroid / totalMagnitude : 0;
+            const { resonance: spectralCentroid, confidence: resonanceConfidence } = this.resonanceCalculator.calculate(spectrum, nyquist);
 
             // Smooth resonance
             if (spectralCentroid > 0) {
                 this.lastResonance = this.lastResonance * 0.7 + spectralCentroid * 0.3;
             }
             const resonance = this.lastResonance;
-            const resonanceConfidence = totalMagnitude > 0.01 ? 0.8 : 0.3;
 
             // Calculate Jitter (pitch variation)
             let jitter = 0;
@@ -353,49 +326,17 @@ export class AudioEngine {
 
             // Vowel Analysis (Only if not silent and has pitch/resonance)
             let vowel = '';
+            let f1 = 0;
+            let f2 = 0;
+
             // Only run expensive formant analysis if we have significant signal
             if (rms > this.adaptiveThreshold * 2) {
-                const lpcOrder = 12;
-                const r = DSP.computeAutocorrelation(windowed, lpcOrder);
-                const { a, error } = DSP.levinsonDurbin(r, lpcOrder);
-                const lpcEnvelope = DSP.computeLPCSpectrum(a, error, 512);
-                const formantCandidates = DSP.findPeaks(lpcEnvelope, TARGET_RATE);
-
-                let p1 = { freq: 0, amp: -Infinity };
-                let p2 = { freq: 0, amp: -Infinity };
-
-                for (let candidate of formantCandidates) {
-                    if (candidate.freq >= 200 && candidate.freq <= 1200) {
-                        if (candidate.amp > p1.amp) p1 = candidate;
-                    }
-                }
-                for (let candidate of formantCandidates) {
-                    if (candidate.freq >= 1200 && candidate.freq <= 3500) {
-                        if (candidate.amp > p2.amp) p2 = candidate;
-                    }
-                }
-
-                // Formant Smoothing
-                if (!this.smoothedF1) this.smoothedF1 = p1.freq;
-                if (!this.smoothedF2) this.smoothedF2 = p2.freq;
-
-                if (p1.freq > 0) {
-                    const diff = Math.abs(p1.freq - this.smoothedF1);
-                    const alpha = diff > 100 ? 0.3 : 0.1;
-                    this.smoothedF1 = this.smoothedF1 * (1 - alpha) + p1.freq * alpha;
-                }
-                if (p2.freq > 0) {
-                    const diff = Math.abs(p2.freq - this.smoothedF2);
-                    const alpha = diff > 150 ? 0.3 : 0.1;
-                    this.smoothedF2 = this.smoothedF2 * (1 - alpha) + p2.freq * alpha;
-                }
-
-                vowel = DSP.estimateVowel(this.smoothedF1, this.smoothedF2);
+                const result = this.formantAnalyzer.analyze(windowed, TARGET_RATE);
+                f1 = result.f1;
+                f2 = result.f2;
+                vowel = result.vowel;
             } else {
-                // Reset formants on silence to prevent "ghost" dots
-                this.smoothedF1 = 0;
-                this.smoothedF2 = 0;
-                vowel = '';
+                this.formantAnalyzer.reset();
             }
 
             // Prepare Update - Pass all calculated values
@@ -459,6 +400,7 @@ export class AudioEngine {
         this.onAudioUpdate({
             pitch: smoothPitch,
             pitchConfidence,
+            clarity: pitchConfidence,
             resonance: resonance,
             resonanceConfidence,
             resonanceScore: finalScore,
@@ -551,6 +493,17 @@ export class AudioEngine {
 
     setNoiseGate(threshold) {
         // No-op for now, or update adaptiveThreshold logic
+    }
+
+    setListenMode(enabled) {
+        if (this.monitorGain) {
+            // Smooth transition to avoid clicks
+            const now = this.audioContext.currentTime;
+            const target = enabled ? 1.0 : 0.0;
+            this.monitorGain.gain.cancelScheduledValues(now);
+            this.monitorGain.gain.linearRampToValueAtTime(target, now + 0.1);
+            console.log(`[AudioEngine] Listen Mode: ${enabled ? 'ON' : 'OFF'}`);
+        }
     }
 
     getDebugState() {

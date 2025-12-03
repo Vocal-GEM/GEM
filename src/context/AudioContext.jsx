@@ -48,6 +48,12 @@ export const AudioProvider = ({ children }) => {
     }, [calibration]);
 
     useEffect(() => {
+        if (audioEngineRef.current) {
+            audioEngineRef.current.setListenMode(settings.listenMode);
+        }
+    }, [settings.listenMode]);
+
+    useEffect(() => {
         const isFirstTime = !localStorage.getItem('hasVisited');
         if (isFirstTime) { localStorage.setItem('hasVisited', 'true'); }
 

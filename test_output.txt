@@ -1,45 +1,154 @@
 
-> vocal-gem@0.1.0 test
-> vitest src/utils/lpcAnalysis.test.js --run
-
-
 [1m[46m RUN [49m[22m [36mv4.0.14 [39m[90mC:/Users/riley/Desktop/GEM[39m
 
- [31mΓ¥»[39m src/utils/lpcAnalysis.test.js [2m([22m[2m3 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 12230[2mms[22m[39m
-     [32mΓ£ô[39m should initialize with default parameters[32m 2[2mms[22m[39m
-[31m     [31m├ù[31m should analyze a buffer and return formants[39m[32m 5[2mms[22m[39m
-[31m     [31m├ù[31m should handle silence gracefully[39m[33m 12221[2mms[22m[39m
+[90mstdout[2m | src/context/AudioContext.test.jsx[2m > [22m[2mAudioContext Integration[2m > [22m[2mshould initialize AudioEngine on mount
+[22m[39m[AudioContext] Initializing AudioEngine...
 
-ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 2 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+stderr | src/context/AudioContext.test.jsx > AudioContext Integration > should initialize AudioEngine on mount
+Failed to load onboarding status: TypeError: Cannot read properties of undefined (reading 'open')
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:31:46
+    at new Promise (<anonymous>)
+    at IndexedDBManager.init (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:30:16)
+    at new IndexedDBManager (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:26:33)
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:327:26
+    at VitestModuleEvaluator._runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:190:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:62
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+    at VitestModuleEvaluator.runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:21)
+    at VitestModuleRunner.directRequest (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1146:80)
+Failed to load profiles: TypeError: Cannot read properties of undefined (reading 'open')
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:31:46
+    at new Promise (<anonymous>)
+    at IndexedDBManager.init (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:30:16)
+    at new IndexedDBManager (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:26:33)
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:327:26
+    at VitestModuleEvaluator._runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:190:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:62
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+    at VitestModuleEvaluator.runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:21)
+    at VitestModuleRunner.directRequest (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1146:80)
+Failed to load settings: TypeError: Cannot read properties of undefined (reading 'open')
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:31:46
+    at new Promise (<anonymous>)
+    at IndexedDBManager.init (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:30:16)
+    at new IndexedDBManager (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:26:33)
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:327:26
+    at VitestModuleEvaluator._runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:190:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:62
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+    at VitestModuleEvaluator.runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:21)
+    at VitestModuleRunner.directRequest (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1146:80)
 
- FAIL  src/utils/lpcAnalysis.test.js > LPCAnalyzer > should analyze a buffer and return formants
-ReferenceError: f0 is not defined
- Γ¥» src/utils/lpcAnalysis.test.js:21:54
-     19|             // Limit harmonics for performance in test environment
-     20|             for (let k = 1; k <= 10; k++) {
-     21|                 source += Math.sin(2 * Math.PI * k * f0 * i / sampleRaΓÇª
-       |                                                      ^
-     22|             }
-     23|             buffer[i] =
+[90mstdout[2m | src/context/AudioContext.test.jsx[2m > [22m[2mAudioContext Integration[2m > [22m[2mshould toggle audio state
+[22m[39m[AudioContext] Initializing AudioEngine...
 
-ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/2]ΓÄ»
+stderr | src/context/AudioContext.test.jsx > AudioContext Integration > should toggle audio state
+Failed to load onboarding status: TypeError: Cannot read properties of undefined (reading 'open')
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:31:46
+    at new Promise (<anonymous>)
+    at IndexedDBManager.init (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:30:16)
+    at new IndexedDBManager (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:26:33)
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:327:26
+    at VitestModuleEvaluator._runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:190:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:62
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+    at VitestModuleEvaluator.runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:21)
+    at VitestModuleRunner.directRequest (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1146:80)
+Failed to load profiles: TypeError: Cannot read properties of undefined (reading 'open')
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:31:46
+    at new Promise (<anonymous>)
+    at IndexedDBManager.init (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:30:16)
+    at new IndexedDBManager (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:26:33)
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:327:26
+    at VitestModuleEvaluator._runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:190:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:62
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+    at VitestModuleEvaluator.runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:21)
+    at VitestModuleRunner.directRequest (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1146:80)
+Failed to load settings: TypeError: Cannot read properties of undefined (reading 'open')
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:31:46
+    at new Promise (<anonymous>)
+    at IndexedDBManager.init (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:30:16)
+    at new IndexedDBManager (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:26:33)
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:327:26
+    at VitestModuleEvaluator._runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:190:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:62
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+    at VitestModuleEvaluator.runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:21)
+    at VitestModuleRunner.directRequest (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1146:80)
 
- FAIL  src/utils/lpcAnalysis.test.js > LPCAnalyzer > should handle silence gracefully
-Error: Test timed out in 10000ms.
-If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
- Γ¥» src/utils/lpcAnalysis.test.js:36:7
-     34|     }, 15000);
-     35| 
-     36|     it('should handle silence gracefully', () => {
-       |       ^
-     37|         const analyzer = new LPCAnalyzer(48000);
-     38|         const buffer = new Float32Array(1024).fill(0);
+(node:10928) PromiseRejectionHandledWarning: Promise rejection was handled asynchronously (rejection id: 2)
+(Use `node --trace-warnings ...` to show where the warning was created)
+[90mstdout[2m | src/context/AudioContext.test.jsx[2m > [22m[2mAudioContext Integration[2m > [22m[2mshould update dataRef when AudioEngine sends updates
+[22m[39m[AudioContext] Initializing AudioEngine...
+[AudioContext] ≡ƒÄñ Audio detected - Pitch: 440.0Hz, Volume: 50.0%, Resonance: 1000.0Hz
 
-ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/2]ΓÄ»
+stderr | src/context/AudioContext.test.jsx > AudioContext Integration > should update dataRef when AudioEngine sends updates
+Failed to load onboarding status: TypeError: Cannot read properties of undefined (reading 'open')
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:31:46
+    at new Promise (<anonymous>)
+    at IndexedDBManager.init (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:30:16)
+    at new IndexedDBManager (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:26:33)
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:327:26
+    at VitestModuleEvaluator._runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:190:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:62
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+    at VitestModuleEvaluator.runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:21)
+    at VitestModuleRunner.directRequest (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1146:80)
+Failed to load profiles: TypeError: Cannot read properties of undefined (reading 'open')
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:31:46
+    at new Promise (<anonymous>)
+    at IndexedDBManager.init (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:30:16)
+    at new IndexedDBManager (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:26:33)
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:327:26
+    at VitestModuleEvaluator._runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:190:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:62
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+    at VitestModuleEvaluator.runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:21)
+    at VitestModuleRunner.directRequest (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1146:80)
+Failed to load settings: TypeError: Cannot read properties of undefined (reading 'open')
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:31:46
+    at new Promise (<anonymous>)
+    at IndexedDBManager.init (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:30:16)
+    at new IndexedDBManager (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:26:33)
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:327:26
+    at VitestModuleEvaluator._runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:190:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:62
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+    at VitestModuleEvaluator.runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:21)
+    at VitestModuleRunner.directRequest (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1146:80)
+
+ [32mΓ£ô[39m src/context/AudioContext.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 41[2mms[22m[39m
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Unhandled Errors ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ» Unhandled Rejection ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+TypeError: Cannot read properties of undefined (reading 'open')
+ Γ¥» src/services/IndexedDBManager.js:31:46
+     29|     async init() {
+     30|         return new Promise((resolve, reject) => {
+     31|             const request = window.indexedDB.open(DB_NAME, DB_VERSION);
+       |                                              ^
+     32| 
+     33|             request.onerror = () => reject(request.error);
+ Γ¥» IndexedDBManager.init src/services/IndexedDBManager.js:30:16
+ Γ¥» new IndexedDBManager src/services/IndexedDBManager.js:26:33
+ Γ¥» src/services/IndexedDBManager.js:327:26
+ Γ¥» VitestModuleEvaluator._runInlinedModule node_modules/vitest/dist/module-evaluator.js:190:10
+ Γ¥» node_modules/vitest/dist/module-evaluator.js:98:62
+ Γ¥» Traces.$ node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27
+ Γ¥» VitestModuleEvaluator.runInlinedModule node_modules/vitest/dist/module-evaluator.js:98:21
+ Γ¥» VitestModuleRunner.directRequest node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1146:80
+
+This error originated in "src/context/AudioContext.test.jsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
 
 
-[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
-[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (3)[39m
-[2m   Start at [22m 18:44:53
-[2m   Duration [22m 14.71s[2m (transform 53ms, setup 226ms, import 27ms, tests 12.23s, environment 1.85s)[22m
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m3 passed[39m[22m[90m (3)[39m
+[2m     Errors [22m [1m[31m1 error[39m[22m
+[2m   Start at [22m 11:19:41
+[2m   Duration [22m 2.60s[2m (transform 222ms, setup 177ms, import 342ms, tests 41ms, environment 1.22s)[22m
 

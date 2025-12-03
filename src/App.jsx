@@ -196,6 +196,20 @@ const App = () => {
     const { unlockedAchievement, closeAchievement } = useAchievements();
     const { handleTutorialComplete, handleCompassComplete, handleCalibrationComplete } = useOnboarding();
 
+    // Sync Listen Mode
+    useEffect(() => {
+        if (audioEngineRef.current) {
+            audioEngineRef.current.setListenMode(settings.listenMode);
+        }
+    }, [settings.listenMode, audioEngineRef.current]);
+
+    // Handle QuickSettings -> Advanced Settings transition
+    useEffect(() => {
+        const handleOpenSettings = () => setShowSettings(true);
+        window.addEventListener('openSettings', handleOpenSettings);
+        return () => window.removeEventListener('openSettings', handleOpenSettings);
+    }, [setShowSettings]);
+
     return (
         <TourProvider>
             <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-blue-500/30 pb-20">
@@ -231,7 +245,7 @@ const App = () => {
                                     <span className="hidden sm:inline">Mirror</span>
                                 </span>
                             </button>
-                            <button onClick={() => setShowSettings(true)} className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700" aria-label="Open settings" data-tour="settings-button">
+                            <button onClick={() => setShowQuickSettings(true)} className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700" aria-label="Open settings" data-tour="settings-button">
                                 <span className="text-sm font-bold text-white flex items-center gap-2">
                                     <span aria-hidden="true">⚙️</span>
                                     <span className="hidden sm:inline">Settings</span>
@@ -422,6 +436,12 @@ const App = () => {
 
                     <TourOverlay />
                     <CommandPalette />
+                    <QuickActions onAction={(id) => {
+                        if (id === 'practice') setActiveTab('practice');
+                        if (id === 'journal') { setActiveTab('history'); setShowJournalForm(true); }
+                        if (id === 'coach') setActiveTab('coach');
+                        if (id === 'warmup') setShowWarmUp(true);
+                    }} />
                     <QuickSettings isOpen={showQuickSettings} onClose={() => setShowQuickSettings(false)} />
                     {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
                     {modals.analytics && <AnalyticsDashboard onClose={() => closeModal('analytics')} />}

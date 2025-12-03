@@ -1,0 +1,185 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.14 [39m[90mC:/Users/riley/Desktop/GEM[39m
+
+Not implemented: Window's alert() method
+stderr | src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should initialize socket on start
+[vitest] The vi.fn() mock did not use 'function' or 'class' in its implementation, see https://vitest.dev/api/vi#vi-spyon for examples.
+Audio init error: TypeError: () => mockAudioContext is not a constructor
+    at new Mock (file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/spy/dist/index.js:262:27)
+    at AudioEngine.start (C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.js:100:33)
+    at C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.socket.test.js:89:22
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:145:11
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:919:26
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1244:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1210:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1654:37
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+
+Not implemented: Window's alert() method
+stderr | src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should handle socket connection events
+[vitest] The vi.fn() mock did not use 'function' or 'class' in its implementation, see https://vitest.dev/api/vi#vi-spyon for examples.
+Audio init error: TypeError: () => mockAudioContext is not a constructor
+    at new Mock (file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/spy/dist/index.js:262:27)
+    at AudioEngine.start (C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.js:100:33)
+    at C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.socket.test.js:95:22
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:145:11
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:919:26
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1244:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1210:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1654:37
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+
+Not implemented: Window's alert() method
+stderr | src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should emit audio_chunk when connected
+[vitest] The vi.fn() mock did not use 'function' or 'class' in its implementation, see https://vitest.dev/api/vi#vi-spyon for examples.
+Audio init error: TypeError: () => mockAudioContext is not a constructor
+    at new Mock (file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/spy/dist/index.js:262:27)
+    at AudioEngine.start (C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.js:100:33)
+    at C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.socket.test.js:111:22
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:145:11
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:919:26
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1244:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1210:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1654:37
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+
+Not implemented: Window's alert() method
+stderr | src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should buffer chunks when disconnected and flush on connect
+[vitest] The vi.fn() mock did not use 'function' or 'class' in its implementation, see https://vitest.dev/api/vi#vi-spyon for examples.
+Audio init error: TypeError: () => mockAudioContext is not a constructor
+    at new Mock (file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/spy/dist/index.js:262:27)
+    at AudioEngine.start (C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.js:100:33)
+    at C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.socket.test.js:124:22
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:145:11
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:919:26
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1244:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1210:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1654:37
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+
+Not implemented: Window's alert() method
+ [31mΓ¥»[39m src/engines/AudioEngine.socket.test.js [2m([22m[2m5 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[32m 36[2mms[22m[39m
+[31m     [31m├ù[31m should initialize socket on start[39m[32m 14[2mms[22m[39m
+[31m     [31m├ù[31m should handle socket connection events[39m[32m 8[2mms[22m[39m
+[31m     [31m├ù[31m should emit audio_chunk when connected[39m[32m 4[2mms[22m[39m
+[31m     [31m├ù[31m should buffer chunks when disconnected and flush on connect[39m[32m 3[2mms[22m[39m
+[31m     [31m├ù[31m should update latestBackendAnalysis on analysis_update[39m[32m 5[2mms[22m[39m
+stderr | src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should update latestBackendAnalysis on analysis_update
+[vitest] The vi.fn() mock did not use 'function' or 'class' in its implementation, see https://vitest.dev/api/vi#vi-spyon for examples.
+Audio init error: TypeError: () => mockAudioContext is not a constructor
+    at new Mock (file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/spy/dist/index.js:262:27)
+    at AudioEngine.start (C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.js:100:33)
+    at C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.socket.test.js:146:22
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:145:11
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:919:26
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1244:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1210:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:1654:37
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 5 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should initialize socket on start
+AssertionError: expected "vi.fn()" to be called at least once
+ Γ¥» src/engines/AudioEngine.socket.test.js:90:20
+     88|     it('should initialize socket on start', async () => {
+     89|         await engine.start();
+     90|         expect(io).toHaveBeenCalled();
+       |                    ^
+     91|         expect(engine.socket).toBe(mockSocket);
+     92|     });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/5]ΓÄ»
+
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should handle socket connection events
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ Γ¥» src/engines/AudioEngine.socket.test.js:101:50
+     99|         if (socketCallbacks['connect']) socketCallbacks['connect']();
+    100| 
+    101|         expect(engine.debugInfo.socketConnected).toBe(true);
+       |                                                  ^
+    102| 
+    103|         // Simulate disconnect
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/5]ΓÄ»
+
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should emit audio_chunk when connected
+AssertionError: expected "vi.fn()" to be called with arguments: [ 'audio_chunk', ObjectContaining{ΓÇª} ]
+
+Number of calls: 0
+
+ Γ¥» src/engines/AudioEngine.socket.test.js:117:33
+    115|         engine.sendAudioChunk(pcmData);
+    116| 
+    117|         expect(mockSocket.emit).toHaveBeenCalledWith('audio_chunk', exΓÇª
+       |                                 ^
+    118|             pcm: pcmData,
+    119|             sr: 16000
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[3/5]ΓÄ»
+
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should buffer chunks when disconnected and flush on connect
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ Γ¥» src/engines/AudioEngine.socket.test.js:132:44
+    130|         // Should NOT emit yet
+    131|         expect(mockSocket.emit).not.toHaveBeenCalled();
+    132|         expect(engine.socketBuffer.length).toBe(1);
+       |                                            ^
+    133| 
+    134|         // Simulate connection
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[4/5]ΓÄ»
+
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should update latestBackendAnalysis on analysis_update
+AssertionError: expected { rbi_score: 50, ΓÇª(4) } to match object { rbi_score: 85, ΓÇª(3) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "breathiness_score": 10,
+-   "rbi_score": 85,
+-   "roughness_score": 5,
++   "breathiness_score": 0,
++   "rbi_score": 50,
++   "roughness_score": 0,
+    "strain_score": 0,
+  }
+
+ Γ¥» src/engines/AudioEngine.socket.test.js:159:46
+    157|         }
+    158| 
+    159|         expect(engine.latestBackendAnalysis).toMatchObject(analysisDatΓÇª
+       |                                              ^
+    160|         expect(engine.latestBackendAnalysis.timestamp).toBeGreaterThanΓÇª
+    161|     });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[5/5]ΓÄ»
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[90m (5)[39m
+[2m   Start at [22m 11:30:06
+[2m   Duration [22m 1.82s[2m (transform 166ms, setup 205ms, import 268ms, tests 36ms, environment 1.05s)[22m
+

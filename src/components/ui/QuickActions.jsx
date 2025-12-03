@@ -1,18 +1,34 @@
 import React, { useState } from 'react';
-import { Plus, Mic, Book, Bot, Zap, X } from 'lucide-react';
+import { Plus, Mic, Book, Bot, Zap, X, Volume2, VolumeX } from 'lucide-react';
+
+import { useSettings } from '../../context/SettingsContext';
 
 const QuickActions = ({ onAction }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const { settings, updateSettings } = useSettings();
 
     const actions = [
         { id: 'practice', label: 'Practice', icon: Mic, color: 'bg-blue-500' },
         { id: 'journal', label: 'Journal', icon: Book, color: 'bg-emerald-500' },
         { id: 'coach', label: 'Ask Coach', icon: Bot, color: 'bg-purple-500' },
         { id: 'warmup', label: 'Warm Up', icon: Zap, color: 'bg-orange-500' },
+        {
+            id: 'listen',
+            label: settings.listenMode ? 'Stop Listening' : 'Listen Mode',
+            icon: settings.listenMode ? VolumeX : Volume2,
+            color: settings.listenMode ? 'bg-red-500' : 'bg-indigo-500',
+            isToggle: true
+        },
     ];
 
-    const handleAction = (id) => {
-        onAction(id);
+    const handleAction = (action) => {
+        if (action.isToggle) {
+            if (action.id === 'listen') {
+                updateSettings({ ...settings, listenMode: !settings.listenMode });
+            }
+        } else {
+            onAction(action.id);
+        }
         setIsOpen(false);
     };
 
@@ -23,7 +39,7 @@ const QuickActions = ({ onAction }) => {
                 {actions.map((action, index) => (
                     <button
                         key={action.id}
-                        onClick={() => handleAction(action.id)}
+                        onClick={() => handleAction(action)}
                         className="flex items-center justify-end gap-3 group"
                         style={{ transitionDelay: `${index * 50}ms` }}
                     >
