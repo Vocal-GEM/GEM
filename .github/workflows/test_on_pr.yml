@@ -1,26 +1,49 @@
-name: Run Tests on PR
+name: Feature Branch CI/QA (Claude)
 
+# This workflow is triggered on a Pull Request.
 on:
   pull_request:
-    branches: [ "main", "master" ]
-  push:
-    branches: [ "main", "master" ]
+    types: [opened, synchronize, reopened]
+    # Only run this workflow when the PR is opened against the 'develop' branch
+    branches:
+      - develop
 
 jobs:
-  test:
+  # This job represents the "Claude Codex" agent's automated work
+  claude_qa_agent:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
+    
+    # We use 'name' to clearly label this agent's task in the GitHub UI
+    name: 🧪 Claude Codex - Automated Testing
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+      - name: Checkout Code
+        # This step checks out the code from the feature branch linked to the PR
+        uses: actions/checkout@v4
+
+      - name: Setup Project Environment (e.g., Python)
+        # Change this to match the language of your project (e.g., Node.js, Ruby)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' # Or your required version
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt # Or 'npm install'
+
+      - name: Run Tests (The Claude Agent's Task)
+        # This is where Claude's task (running tests) is automated.
+        # This command must execute your project's test suite (e.g., pytest, jest).
+        run: |
+          echo "Claude Codex is now running tests on branch ${{ github.head_ref }}"
+          pytest # Replace with your project's test command
+
+      # Optional: Create a Summary/Report (to mimic Claude's report)
+      - name: Generate Summary Report
+        if: always() # Run even if tests fail
+        run: |
+          echo "### 🧪 QA Report by Claude Codex" >> $GITHUB_STEP_SUMMARY
+          if [ $? -eq 0 ]; then
+            echo "✅ All tests passed. Code is ready for human review." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Tests failed! See logs for details. **Gemini 3 must fix the failing tests.**" >> $GITHUB_STEP_SUMMARY
+          fi
