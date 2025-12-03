@@ -1,0 +1,26 @@
+name: Feature Branch CI/QA (Claude)
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - develop # This ensures it only runs on PRs targeting develop
+
+jobs:
+  claude_qa_agent: # <--- THIS IS THE JOB ID WE NEED TO SEE
+    runs-on: ubuntu-latest
+    name: 🧪 Claude Codex - Automated Testing
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Project Environment (e.g., Python)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' 
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt 
+
+      - name: Run Tests (The Claude Agent's Task)
+        run: pytest # Replace with your project's test command
