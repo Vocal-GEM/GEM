@@ -210,10 +210,10 @@ const VoiceQualityView = () => {
 
         const getColor = (label) => {
             switch (label) {
-                case 'breathy': return 'bg-pink-500/20 text-pink-200 border-pink-500/30';
-                case 'pressed': return 'bg-red-500/20 text-red-200 border-red-500/30';
-                case 'rough': return 'bg-orange-500/20 text-orange-200 border-orange-500/30';
-                case 'modal': return 'bg-green-500/20 text-green-200 border-green-500/30';
+                case 'back_dark': return 'bg-blue-500/20 text-blue-200 border-blue-500/30';
+                case 'neutral': return 'bg-green-500/20 text-green-200 border-green-500/30';
+                case 'bright_forward': return 'bg-yellow-500/20 text-yellow-200 border-yellow-500/30';
+                case 'sharp': return 'bg-pink-500/20 text-pink-200 border-pink-500/30';
                 default: return 'bg-slate-700/30 text-slate-400 border-transparent';
             }
         };
@@ -233,10 +233,8 @@ const VoiceQualityView = () => {
                             {word.text}
                             {/* Tooltip */}
                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 rounded-lg border border-white/10 text-xs text-white opacity-0 group-hover:opacity-100 pointer-events-none z-10 shadow-xl">
-                                <div className="font-bold mb-1 capitalize">{word.label}</div>
-                                <div>Breathiness: {word.breathiness_score}</div>
-                                <div>Strain: {word.strain_score}</div>
-                                <div>Roughness: {word.roughness_score}</div>
+                                <div className="font-bold mb-1 capitalize">{word.label.replace('_', ' ')}</div>
+                                <div>RBI Score: {word.rbi_score}</div>
                             </div>
                         </div>
                     ))}
