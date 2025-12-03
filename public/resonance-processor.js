@@ -1,5 +1,5 @@
 /**
- * Resonance Processor v5.5 - Optimized with Adaptive Noise Gate & Frame Overlap & Streaming Support
+ * Resonance Processor v6.0 - Synced with Main Thread DSP & Optimized
  */
 
 class DSP {
@@ -55,7 +55,9 @@ class DSP {
             }
         }
 
-        if (tau == halfSize || yinBuffer[tau] >= adaptiveThreshold) return -1;
+        if (tau == halfSize || yinBuffer[tau] >= adaptiveThreshold) {
+            return { pitch: -1, confidence: 0 };
+        }
 
         let betterTau = tau;
         if (tau > 0 && tau < halfSize - 1) {
@@ -67,8 +69,13 @@ class DSP {
         }
 
         const pitch = sampleRate / betterTau;
-        if (pitch < 50 || pitch > 800) return -1;
-        return pitch;
+        const confidence = 1 - yinBuffer[tau];
+
+        if (pitch < 50 || pitch > 800) {
+            return { pitch: -1, confidence: 0 };
+        }
+
+        return { pitch, confidence };
     }
 
     static getMagnitudeAtFrequency(buffer, freq, sampleRate) {
@@ -206,6 +213,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         this.useOverlap = true;
 
         this.lastPitch = 0;
+        this.lastValidPitch = 0; // For octave jump protection
         this.jitterBuffer = [];
         this.weightBuffer = [];
         this.smoothedH1 = 0;
@@ -217,7 +225,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         this.smoothedF2 = 0;
         this.shimmerBuffer = [];
         this.lastAmp = 0;
-        this.lastHNR = 0; // For dynamic YIN threshold
+        this.pitchConfidenceThreshold = 0.6;
 
         this.port.onmessage = (event) => {
             if (event.data.type === 'config') {
@@ -231,28 +239,9 @@ class ResonanceProcessor extends AudioWorkletProcessor {
     process(inputs, outputs, parameters) {
         const input = inputs[0];
         if (!input || !input.length) {
-            // Log this occasionally to see if we're getting NO inputs
-            if (!this.noInputCounter) this.noInputCounter = 0;
-            this.noInputCounter++;
-            if (this.noInputCounter % 100 === 0) {
-                this.port.postMessage({
-                    type: 'diagnostic',
-                    message: `No input received (count: ${this.noInputCounter})`
-                });
-            }
             return true;
         }
         const channel = input[0];
-
-        // Log that we're receiving data
-        if (!this.processCounter) this.processCounter = 0;
-        this.processCounter++;
-        if (this.processCounter === 1 || this.processCounter % 100 === 0) {
-            this.port.postMessage({
-                type: 'diagnostic',
-                message: `Processing audio: frame ${this.processCounter}, samples: ${channel.length}`
-            });
-        }
 
         for (let i = 0; i < channel.length; i++) {
             this.buffer[this.bufferIndex] = channel[i];
@@ -282,15 +271,6 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         for (let x of buffer) rms += x * x;
         rms = Math.sqrt(rms / buffer.length);
 
-        // DEBUG: Send buffer stats via postMessage (console.log doesn't work in worklets)
-        if (!this.debugCounter) this.debugCounter = 0;
-        this.debugCounter++;
-        const debugData = this.debugCounter % 30 === 0 ? {
-            rms: rms.toFixed(6),
-            maxSample: Math.max(...buffer.map(Math.abs)).toFixed(6),
-            bufferLength: buffer.length
-        } : null;
-
         // Adaptive Noise Gate: Update background noise estimate during silence
         if (rms <= this.adaptiveThreshold) {
             this.silenceFrameCount++;
@@ -310,9 +290,8 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             this.silenceFrameCount = 0;
         }
 
-        // TEMPORARY: Bypass noise gate for testing
-        if (rms >= 0) { // Always process audio (was: rms > this.adaptiveThreshold)
-            const TARGET_RATE = 16000; // Changed to 16kHz for RBI compatibility
+        if (rms >= 0) { // Always process to keep state consistent
+            const TARGET_RATE = 16000;
             const dsBuffer = DSP.decimate(buffer, fs, TARGET_RATE);
 
             const preEmphasized = new Float32Array(dsBuffer.length);
@@ -323,39 +302,57 @@ class ResonanceProcessor extends AudioWorkletProcessor {
 
             const windowed = DSP.applyWindow(preEmphasized);
 
-            // Dynamic YIN threshold based on signal quality
-            const dynamicThreshold = Math.max(0.10, Math.min(0.20, 0.15));
-            const pitch = DSP.calculatePitchYIN(buffer, fs, dynamicThreshold);
+            // Pitch Detection
+            const dynamicThreshold = 0.15;
+            const { pitch: rawPitch, confidence: pitchConfidence } = DSP.calculatePitchYIN(buffer, fs, dynamicThreshold);
+
+            let pitch = rawPitch;
+
+            // Octave Jump Protection
+            if (pitch > 0 && pitchConfidence > this.pitchConfidenceThreshold) {
+                if (this.lastValidPitch > 0) {
+                    const ratio = pitch / this.lastValidPitch;
+                    const isOctaveJump = (ratio > 1.8 && ratio < 2.2) || (ratio > 0.4 && ratio < 0.6);
+
+                    if (isOctaveJump && pitchConfidence < 0.9) {
+                        pitch = -1; // Reject jump
+                    } else {
+                        this.lastValidPitch = pitch;
+                    }
+                } else {
+                    this.lastValidPitch = pitch;
+                }
+            } else {
+                pitch = -1;
+            }
+
             const spectrum = DSP.simpleFFT(windowed);
 
-            // LPC Analysis for Formants
-            const lpcOrder = 12;
-            const r = DSP.computeAutocorrelation(windowed, lpcOrder);
-            const { a, error } = DSP.levinsonDurbin(r, lpcOrder);
-            const lpcEnvelope = DSP.computeLPCSpectrum(a, error, 512);
-            const formantCandidates = DSP.findPeaks(lpcEnvelope, TARGET_RATE);
-
+            // LPC Analysis for Formants (Only if loud enough)
             let p1 = { freq: 0, amp: -Infinity };
             let p2 = { freq: 0, amp: -Infinity };
+            let vowel = '';
 
-            // Find F1 (200-1200Hz)
-            for (let candidate of formantCandidates) {
-                if (candidate.freq >= 200 && candidate.freq <= 1200) {
-                    if (candidate.amp > p1.amp) {
-                        p1 = candidate;
+            if (rms > this.adaptiveThreshold * 2) {
+                const lpcOrder = 12;
+                const r = DSP.computeAutocorrelation(windowed, lpcOrder);
+                const { a, error } = DSP.levinsonDurbin(r, lpcOrder);
+                const lpcEnvelope = DSP.computeLPCSpectrum(a, error, 512);
+                const formantCandidates = DSP.findPeaks(lpcEnvelope, TARGET_RATE);
+
+                for (let candidate of formantCandidates) {
+                    if (candidate.freq >= 200 && candidate.freq <= 1200) {
+                        if (candidate.amp > p1.amp) p1 = candidate;
+                    }
+                }
+                for (let candidate of formantCandidates) {
+                    if (candidate.freq >= 1200 && candidate.freq <= 3500) {
+                        if (candidate.amp > p2.amp) p2 = candidate;
                     }
                 }
             }
 
-            // Find F2 (1200-3500Hz)
-            for (let candidate of formantCandidates) {
-                if (candidate.freq >= 1200 && candidate.freq <= 3500) {
-                    if (candidate.amp > p2.amp) {
-                        p2 = candidate;
-                    }
-                }
-            }
-
+            // Resonance (Spectral Centroid)
             let weightedSum = 0;
             let totalMag = 0;
             for (let i = 0; i < spectrum.length; i++) {
@@ -364,38 +361,31 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                 totalMag += spectrum[i];
             }
             const spectralCentroid = totalMag > 0 ? weightedSum / totalMag : 0;
+            const resonanceConfidence = totalMag > 0.01 ? 0.8 : 0.3;
 
             const resonanceAlpha = 0.2;
             this.smoothedCentroid = (this.lastResonance * (1 - resonanceAlpha)) + (spectralCentroid * resonanceAlpha);
             this.lastResonance = this.smoothedCentroid;
 
+            // Weight (Spectral Tilt)
             let weight = 50;
-            let h1db = 0, h2db = 0, diffDb = 0;
-
             if (pitch > 50) {
                 const h1Mag = DSP.getMagnitudeAtFrequency(windowed, pitch, TARGET_RATE);
                 const h2Mag = DSP.getMagnitudeAtFrequency(windowed, pitch * 2, TARGET_RATE);
 
                 if (h1Mag > 0 && h2Mag > 0) {
-                    h1db = 20 * Math.log10(h1Mag);
-                    h2db = 20 * Math.log10(h2Mag);
-                    diffDb = h1db - h2db;
+                    const h1db = 20 * Math.log10(h1Mag);
+                    const h2db = 20 * Math.log10(h2Mag);
 
-                    const clampedDiff = Math.max(-5, Math.min(15, diffDb));
-                    weight = (1.0 - ((clampedDiff + 5) / 20.0)) * 100;
+                    this.smoothedH1 = this.smoothedH1 * 0.9 + h1db * 0.1;
+                    this.smoothedH2 = this.smoothedH2 * 0.9 + h2db * 0.1;
+
+                    const smoothH1H2 = this.smoothedH2 > 0 ? (this.smoothedH1 - this.smoothedH2) : 0;
+                    weight = Math.max(0, Math.min(100, 50 + smoothH1H2 * 5));
                 }
             }
 
-            this.weightBuffer.push(weight);
-            if (this.weightBuffer.length > 5) this.weightBuffer.shift();
-            const avgWeight = this.weightBuffer.reduce((a, b) => a + b, 0) / this.weightBuffer.length;
-
-            if (!this.smoothedH1) this.smoothedH1 = h1db;
-            if (!this.smoothedH2) this.smoothedH2 = h2db;
-            this.smoothedH1 = this.smoothedH1 * 0.9 + h1db * 0.1;
-            this.smoothedH2 = this.smoothedH2 * 0.9 + h2db * 0.1;
-            const smoothedDiff = this.smoothedH1 - this.smoothedH2;
-
+            // Jitter
             let jitter = 0;
             if (pitch > 0 && this.lastPitch > 0) {
                 const diff = Math.abs(pitch - this.lastPitch);
@@ -405,6 +395,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             }
             this.lastPitch = pitch;
 
+            // Shimmer
             let shimmer = 0;
             if (rms > 0 && this.lastAmp > 0) {
                 const diff = Math.abs(rms - this.lastAmp);
@@ -417,6 +408,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             }
             this.lastAmp = rms;
 
+            // Formant Smoothing
             if (!this.smoothedF1) this.smoothedF1 = p1.freq;
             if (!this.smoothedF2) this.smoothedF2 = p2.freq;
 
@@ -432,57 +424,24 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                 this.smoothedF2 = this.smoothedF2 * (1 - alpha) + p2.freq * alpha;
             }
 
-            const vowel = DSP.estimateVowel(this.smoothedF1, this.smoothedF2);
-
-            let tilt = 0;
-            if (spectrum && spectrum.length > 0) {
-                let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
-                let n = 0;
-                const binWidth = TARGET_RATE / (2 * spectrum.length);
-
-                for (let i = 1; i < spectrum.length; i++) {
-                    const freq = i * binWidth;
-                    if (freq < 100) continue;
-                    if (freq > 5000) break;
-
-                    const logFreq = Math.log10(freq);
-                    const db = 20 * Math.log10(spectrum[i] + 1e-10);
-
-                    sumX += logFreq;
-                    sumY += db;
-                    sumXY += logFreq * db;
-                    sumXX += logFreq * logFreq;
-                    n++;
-                }
-
-                if (n > 0) {
-                    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-                    tilt = slope * 0.301;
-                }
-            }
+            vowel = DSP.estimateVowel(this.smoothedF1, this.smoothedF2);
 
             this.port.postMessage({
                 type: 'update',
                 data: {
-                    pitch,
+                    pitch: pitch > 0 ? pitch : -1,
+                    pitchConfidence,
                     resonance: this.smoothedCentroid,
+                    resonanceConfidence,
                     f1: this.smoothedF1,
                     f2: this.smoothedF2,
-                    weight: avgWeight,
+                    weight,
                     volume: rms,
                     jitter,
                     shimmer,
-                    tilt,
                     vowel,
-                    spectrum: spectrum,
-                    debug: {
-                        h1db: this.smoothedH1,
-                        h2db: this.smoothedH2,
-                        diffDb: smoothedDiff,
-                        hasValidF2: p2.freq > 0,
-                        adaptiveThreshold: this.adaptiveThreshold,
-                        bufferDiag: debugData
-                    }
+                    spectrum,
+                    isSilent: rms < this.adaptiveThreshold
                 },
                 audioBuffer: dsBuffer // Send raw audio for streaming
             });
@@ -495,17 +454,18 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                 type: 'update',
                 data: {
                     pitch: -1,
+                    pitchConfidence: 0,
                     resonance: this.smoothedCentroid,
+                    resonanceConfidence: 0,
                     f1: 0,
                     f2: 0,
-                    weight: 0,
+                    weight: 50,
                     volume: 0,
                     jitter: 0,
                     shimmer: 0,
-                    tilt: 0,
                     vowel: '',
                     spectrum: null,
-                    debug: debugData ? { bufferDiag: debugData } : null
+                    isSilent: true
                 }
             });
         }

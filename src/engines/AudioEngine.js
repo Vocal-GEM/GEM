@@ -1,5 +1,5 @@
 import { io } from 'socket.io-client';
-import { DSP } from '../utils/DSP';
+
 
 export const MainDSP = {
     hzToSemitones: (hz) => 12 * Math.log2(hz / 440) + 69,
@@ -33,38 +33,22 @@ export class AudioEngine {
     constructor(onAudioUpdate) {
         this.audioContext = null;
         this.microphone = null;
-        this.analyser = null;
+        this.workletNode = null;
         this.onAudioUpdate = onAudioUpdate;
         this.isActive = false;
         this.mediaRecorder = null;
         this.chunks = [];
         this.toneEngine = null;
-        this.animationFrameId = null;
 
-        // DSP State
+        // DSP State (Smoothing only)
         this.pitchBuffer = [];
         this.smoothPitchBuffer = [];
-        this.pitchBuffer = [];
-        this.smoothPitchBuffer = [];
-        this.lastPitch = 0;
-        this.lastValidPitch = 0; // For octave jump protection
-        this.pitchConfidenceThreshold = 0.6; // Minimum confidence to accept pitch
-        this.jitterBuffer = [];
-        this.jitterBuffer = [];
-        this.weightBuffer = [];
-        this.smoothedH1 = 0;
-        this.smoothedH2 = 0;
         this.lastResonance = 0;
-        this.smoothedCentroid = 0;
-        this.smoothedF1 = 0;
-        this.smoothedF2 = 0;
-        this.shimmerBuffer = [];
-        this.lastAmp = 0;
 
-        // Noise Gate
-        this.adaptiveThreshold = 0.0001;
-        this.backgroundNoiseBuffer = [];
-        this.silenceFrameCount = 0;
+        // Network Optimization
+        this.audioBatch = [];
+        this.lastBatchTime = 0;
+        this.BATCH_INTERVAL = 100; // ms
 
         // Socket.IO
         this.socket = null;
@@ -110,6 +94,15 @@ export class AudioEngine {
 
             if (this.audioContext.state === 'suspended') {
                 await this.audioContext.resume();
+            }
+
+            // Load AudioWorklet
+            try {
+                await this.audioContext.audioWorklet.addModule('resonance-processor.js');
+                console.log("[AudioEngine] AudioWorklet module loaded successfully");
+            } catch (e) {
+                console.error("[AudioEngine] Failed to load AudioWorklet:", e);
+                throw new Error("Failed to load audio processor. Please refresh.");
             }
 
             this.toneEngine = new ToneEngine(this.audioContext);
@@ -175,245 +168,38 @@ export class AudioEngine {
             this.lowpass.type = 'lowpass';
             this.lowpass.frequency.value = this.filterSettings.max;
 
-            // Analyser for Main Thread Processing
-            this.analyser = this.audioContext.createAnalyser();
-            this.analyser.fftSize = 2048;
-            this.analyser.smoothingTimeConstant = 0;
+            // Initialize AudioWorkletNode
+            this.workletNode = new AudioWorkletNode(this.audioContext, 'resonance-processor');
 
-            // Connect Chain: Mic -> Highpass -> Lowpass -> Analyser
+            // Handle messages from Worklet
+            this.workletNode.port.onmessage = (event) => {
+                if (event.data.type === 'update') {
+                    this.handleUpdate(event.data.data);
+                    // Handle audio streaming if buffer is present
+                    if (event.data.audioBuffer) {
+                        this.sendAudioChunk(event.data.audioBuffer);
+                    }
+                } else if (event.data.type === 'diagnostic') {
+                    // console.log("[Worklet Diagnostic]", event.data.message);
+                }
+            };
+
+            // Connect Chain: Mic -> Highpass -> Lowpass -> Worklet -> Destination (mute)
             this.microphone.connect(this.highpass);
             this.highpass.connect(this.lowpass);
-            this.lowpass.connect(this.analyser);
+            this.lowpass.connect(this.workletNode);
+            this.workletNode.connect(this.audioContext.destination); // Keep graph alive
 
-            console.log("[AudioEngine] ✅ Audio chain connected: Mic -> Filters -> Analyser (Main Thread)");
+            console.log("[AudioEngine] ✅ Audio chain connected: Mic -> Filters -> Worklet");
 
             this.isActive = true;
             this.debugInfo.state = 'active';
-
-            // Start Processing Loop
-            this.processAudioFrame();
 
         } catch (err) {
             console.error("Audio init error:", err);
             this.debugInfo.error = err.message;
             this.debugInfo.state = 'error';
             alert("Mic access denied or Audio error: " + err.message);
-        }
-    }
-
-    processAudioFrame() {
-        if (!this.isActive) return;
-
-        this.animationFrameId = requestAnimationFrame(() => this.processAudioFrame());
-
-        const buffer = new Float32Array(this.analyser.fftSize);
-        this.analyser.getFloatTimeDomainData(buffer);
-
-        // Calculate RMS
-        let rms = 0;
-        for (let x of buffer) rms += x * x;
-        rms = Math.sqrt(rms / buffer.length);
-
-        // Adaptive Noise Gate
-        if (rms <= this.adaptiveThreshold) {
-            this.silenceFrameCount++;
-            if (this.silenceFrameCount > 10) { // ~160ms
-                this.backgroundNoiseBuffer.push(rms);
-                if (this.backgroundNoiseBuffer.length > 50) this.backgroundNoiseBuffer.shift();
-                if (this.backgroundNoiseBuffer.length > 10) {
-                    const median = DSP.median(this.backgroundNoiseBuffer);
-                    this.adaptiveThreshold = Math.max(0.0001, Math.min(0.02, median * 2.5));
-                }
-            }
-        } else {
-            this.silenceFrameCount = 0;
-        }
-
-        // Process if signal present (or always for now to be safe)
-        if (rms >= 0) {
-            const fs = this.audioContext.sampleRate;
-            const TARGET_RATE = 16000;
-            const dsBuffer = DSP.decimate(buffer, fs, TARGET_RATE);
-
-            // Send to backend (decimated)
-            if (rms > this.adaptiveThreshold) {
-                this.sendAudioChunk(dsBuffer);
-            }
-
-            // DSP Analysis
-            const preEmphasized = new Float32Array(dsBuffer.length);
-            preEmphasized[0] = dsBuffer[0];
-            for (let i = 1; i < dsBuffer.length; i++) {
-                preEmphasized[i] = dsBuffer[i] - 0.97 * dsBuffer[i - 1];
-            }
-
-            const windowed = DSP.applyWindow(preEmphasized);
-
-            // Pitch
-            const dynamicThreshold = 0.15;
-            const { pitch: rawPitch, confidence: pitchConfidence } = DSP.calculatePitchYIN(buffer, fs, dynamicThreshold);
-
-            let pitch = rawPitch;
-
-            // Octave Jump Protection & Confidence Check
-            if (pitch > 0 && pitchConfidence > this.pitchConfidenceThreshold) {
-                // Check for octave jumps if we have a valid previous pitch
-                if (this.lastValidPitch > 0) {
-                    const ratio = pitch / this.lastValidPitch;
-                    // If pitch jumps ~2x (octave up) or ~0.5x (octave down) suddenly
-                    // We only allow it if confidence is VERY high, otherwise we might stick to previous
-                    // or if it persists (handled by smoothing buffer usually, but here we reject outliers)
-
-                    const isOctaveJump = (ratio > 1.8 && ratio < 2.2) || (ratio > 0.4 && ratio < 0.6);
-
-                    if (isOctaveJump && pitchConfidence < 0.9) {
-                        // Likely an octave error, ignore this frame's pitch or use last valid
-                        pitch = -1;
-                    } else {
-                        this.lastValidPitch = pitch;
-                    }
-                } else {
-                    this.lastValidPitch = pitch;
-                }
-            } else {
-                pitch = -1; // Treat low confidence as no pitch
-            }
-
-            const spectrum = DSP.simpleFFT(windowed);
-
-            // Calculate Spectral Centroid (Resonance)
-            let spectralCentroid = 0;
-            let totalMagnitude = 0;
-            const nyquist = TARGET_RATE / 2;
-            for (let i = 0; i < spectrum.length; i++) {
-                const freq = (i / spectrum.length) * nyquist;
-                spectralCentroid += freq * spectrum[i];
-                totalMagnitude += spectrum[i];
-            }
-            spectralCentroid = totalMagnitude > 0 ? spectralCentroid / totalMagnitude : 0;
-
-            // Smooth resonance
-            if (spectralCentroid > 0) {
-                this.lastResonance = this.lastResonance * 0.7 + spectralCentroid * 0.3;
-            }
-            const resonance = this.lastResonance;
-            const resonanceConfidence = totalMagnitude > 0.01 ? 0.8 : 0.3;
-
-            // Calculate Jitter (pitch variation)
-            let jitter = 0;
-            if (pitch > 0) {
-                this.jitterBuffer.push(pitch);
-                if (this.jitterBuffer.length > 10) this.jitterBuffer.shift();
-                if (this.jitterBuffer.length >= 3) {
-                    const diffs = [];
-                    for (let i = 1; i < this.jitterBuffer.length; i++) {
-                        diffs.push(Math.abs(this.jitterBuffer[i] - this.jitterBuffer[i - 1]));
-                    }
-                    const avgDiff = diffs.reduce((a, b) => a + b, 0) / diffs.length;
-                    const avgPitch = this.jitterBuffer.reduce((a, b) => a + b, 0) / this.jitterBuffer.length;
-                    jitter = avgPitch > 0 ? (avgDiff / avgPitch) * 100 : 0;
-                }
-            } else {
-                this.jitterBuffer = [];
-            }
-
-            // Calculate Shimmer (amplitude variation)
-            let shimmer = 0;
-            if (rms > this.adaptiveThreshold) {
-                this.shimmerBuffer.push(rms);
-                if (this.shimmerBuffer.length > 10) this.shimmerBuffer.shift();
-                if (this.shimmerBuffer.length >= 3) {
-                    const diffs = [];
-                    for (let i = 1; i < this.shimmerBuffer.length; i++) {
-                        diffs.push(Math.abs(this.shimmerBuffer[i] - this.shimmerBuffer[i - 1]));
-                    }
-                    const avgDiff = diffs.reduce((a, b) => a + b, 0) / diffs.length;
-                    const avgAmp = this.shimmerBuffer.reduce((a, b) => a + b, 0) / this.shimmerBuffer.length;
-                    shimmer = avgAmp > 0 ? (avgDiff / avgAmp) * 100 : 0;
-                }
-            } else {
-                this.shimmerBuffer = [];
-            }
-
-            // Calculate Weight (spectral tilt / H1-H2)
-            let weight = 50;
-            if (pitch > 0) {
-                const h1Mag = DSP.getMagnitudeAtFrequency(buffer, pitch, fs);
-                const h2Mag = DSP.getMagnitudeAtFrequency(buffer, pitch * 2, fs);
-
-                if (h1Mag > 0 && h2Mag > 0) {
-                    const h1h2 = 20 * Math.log10(h1Mag / h2Mag);
-                    this.smoothedH1 = this.smoothedH1 * 0.8 + h1Mag * 0.2;
-                    this.smoothedH2 = this.smoothedH2 * 0.8 + h2Mag * 0.2;
-
-                    const smoothH1H2 = this.smoothedH2 > 0 ? 20 * Math.log10(this.smoothedH1 / this.smoothedH2) : 0;
-                    weight = Math.max(0, Math.min(100, 50 + smoothH1H2 * 5));
-                }
-            }
-
-            // Vowel Analysis (Only if not silent and has pitch/resonance)
-            let vowel = '';
-            // Only run expensive formant analysis if we have significant signal
-            if (rms > this.adaptiveThreshold * 2) {
-                const lpcOrder = 12;
-                const r = DSP.computeAutocorrelation(windowed, lpcOrder);
-                const { a, error } = DSP.levinsonDurbin(r, lpcOrder);
-                const lpcEnvelope = DSP.computeLPCSpectrum(a, error, 512);
-                const formantCandidates = DSP.findPeaks(lpcEnvelope, TARGET_RATE);
-
-                let p1 = { freq: 0, amp: -Infinity };
-                let p2 = { freq: 0, amp: -Infinity };
-
-                for (let candidate of formantCandidates) {
-                    if (candidate.freq >= 200 && candidate.freq <= 1200) {
-                        if (candidate.amp > p1.amp) p1 = candidate;
-                    }
-                }
-                for (let candidate of formantCandidates) {
-                    if (candidate.freq >= 1200 && candidate.freq <= 3500) {
-                        if (candidate.amp > p2.amp) p2 = candidate;
-                    }
-                }
-
-                // Formant Smoothing
-                if (!this.smoothedF1) this.smoothedF1 = p1.freq;
-                if (!this.smoothedF2) this.smoothedF2 = p2.freq;
-
-                if (p1.freq > 0) {
-                    const diff = Math.abs(p1.freq - this.smoothedF1);
-                    const alpha = diff > 100 ? 0.3 : 0.1;
-                    this.smoothedF1 = this.smoothedF1 * (1 - alpha) + p1.freq * alpha;
-                }
-                if (p2.freq > 0) {
-                    const diff = Math.abs(p2.freq - this.smoothedF2);
-                    const alpha = diff > 150 ? 0.3 : 0.1;
-                    this.smoothedF2 = this.smoothedF2 * (1 - alpha) + p2.freq * alpha;
-                }
-
-                vowel = DSP.estimateVowel(this.smoothedF1, this.smoothedF2);
-            } else {
-                // Reset formants on silence to prevent "ghost" dots
-                this.smoothedF1 = 0;
-                this.smoothedF2 = 0;
-                vowel = '';
-            }
-
-            // Prepare Update - Pass all calculated values
-            this.handleUpdate({
-                pitch: pitch > 0 ? pitch : -1,
-                pitchConfidence: pitchConfidence,
-                resonance: resonance,
-                resonanceConfidence: resonanceConfidence,
-                volume: rms,
-                jitter: jitter,
-                shimmer: shimmer,
-                weight: weight,
-                f1: this.smoothedF1,
-                f2: this.smoothedF2,
-                vowel: vowel,
-                spectrum: spectrum,
-                isSilent: rms < this.adaptiveThreshold
-            });
         }
     }
 
@@ -476,7 +262,7 @@ export class AudioEngine {
             spectrum: spectrum,
             debug: {
                 backend: this.latestBackendAnalysis,
-                method: 'MainThread (YIN)',
+                method: 'AudioWorklet (YIN)',
                 pitchConfidence,
                 resonanceConfidence
             }
@@ -529,8 +315,11 @@ export class AudioEngine {
 
     stop() {
         if (!this.isActive) return;
-        if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
         if (this.microphone) this.microphone.disconnect();
+        if (this.workletNode) {
+            this.workletNode.disconnect();
+            this.workletNode = null;
+        }
         if (this.audioContext) this.audioContext.close();
         if (this.socket) {
             this.socket.disconnect();
@@ -550,7 +339,12 @@ export class AudioEngine {
     }
 
     setNoiseGate(threshold) {
-        // No-op for now, or update adaptiveThreshold logic
+        if (this.workletNode) {
+            this.workletNode.port.postMessage({
+                type: 'config',
+                config: { threshold }
+            });
+        }
     }
 
     getDebugState() {
@@ -568,7 +362,30 @@ export class AudioEngine {
 
     sendAudioChunk(pcm) {
         if (!this.socket) return;
-        const chunk = { pcm, sr: 16000 };
+
+        this.audioBatch.push(pcm);
+
+        const now = Date.now();
+        if (now - this.lastBatchTime > this.BATCH_INTERVAL) {
+            this.flushAudioBatch();
+        }
+    }
+
+    flushAudioBatch() {
+        if (this.audioBatch.length === 0) return;
+
+        // Calculate total length
+        const totalLength = this.audioBatch.reduce((acc, chunk) => acc + chunk.length, 0);
+        const merged = new Float32Array(totalLength);
+
+        let offset = 0;
+        for (const chunk of this.audioBatch) {
+            merged.set(chunk, offset);
+            offset += chunk.length;
+        }
+
+        const chunk = { pcm: merged, sr: 16000 };
+
         if (this.socket.connected) {
             this.socket.emit('audio_chunk', chunk);
         } else {
@@ -576,6 +393,9 @@ export class AudioEngine {
                 this.socketBuffer.push(chunk);
             }
         }
+
+        this.audioBatch = [];
+        this.lastBatchTime = Date.now();
     }
 
     flushSocketBuffer() {

@@ -57,10 +57,10 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
         if (exercise) gameRef.current = { score: 0, lastUpdate: Date.now(), lastPitch: 0 };
 
         // Helper to get color based on frequency
-        const getPitchColor = (freq, clarity = 1.0) => {
+        const getPitchColor = (freq, pitchConfidence = 1.0) => {
             // 1. Confidence Check
-            // If clarity is low (e.g. < 0.8), don't give "success" colors
-            if (clarity < 0.8) {
+            // If pitchConfidence is low (e.g. < 0.6), don't give "success" colors
+            if (pitchConfidence < 0.6) {
                 return colorBlindMode ? '#9333ea' : '#ef4444'; // Default to "Out of Range" / Unstable
             }
 
@@ -293,7 +293,7 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
 
             ctx.shadowBlur = 0;
             const currentP = history[history.length - 1];
-            const currentClarity = dataRef.current.clarity || 0;
+            const currentConfidence = dataRef.current.pitchConfidence || 0;
 
             // Update average pitch range
             if (currentP > 0) {
@@ -304,7 +304,7 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
             }
 
             if (currentP > 0) {
-                ctx.fillStyle = getPitchColor(currentP, currentClarity);
+                ctx.fillStyle = getPitchColor(currentP, currentConfidence);
                 ctx.font = 'bold 20px monospace';
                 ctx.textAlign = 'right';
                 ctx.fillText(Math.round(currentP) + " Hz", width - 10, 30);
@@ -425,7 +425,7 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
             <canvas ref={canvasRef} className="w-full h-full"></canvas>
 
             {/* Unstable Signal Overlay */}
-            {dataRef.current?.pitch > 0 && (dataRef.current?.clarity || 0) < 0.8 && (
+            {dataRef.current?.pitch > 0 && (dataRef.current?.pitchConfidence || 0) < 0.6 && (
                 <div className="absolute top-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-30">
                     <div className="flex items-center gap-2 bg-red-500/90 text-white px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
                         <AlertTriangle size={14} />
