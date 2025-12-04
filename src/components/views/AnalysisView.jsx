@@ -10,8 +10,13 @@ import AssessmentView from '../coach/AssessmentView';
 import Toast from '../ui/Toast';
 import { CoachEngine } from '../../utils/coachEngine';
 
-const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
+import ClipCapture from '../ui/ClipCapture';
+
+const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) => {
     const { settings } = useSettings();
+    const [localResults, setLocalResults] = useState(null);
+    const analysisResults = propResults || localResults;
+
     const [activeTab, setActiveTab] = useState('transcript');
     const [vizSubTab, setVizSubTab] = useState('pitch');
     const [coachFeedback, setCoachFeedback] = useState(null);
@@ -19,6 +24,7 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
     const [currentPlayTime, setCurrentPlayTime] = useState(0);
     const [toast, setToast] = useState(null);
     const [showAdvancedMetrics, setShowAdvancedMetrics] = useState(!settings.beginnerMode);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
 
     const audioRef = useRef(null);
     const analyzerRef = useRef(null);
@@ -26,6 +32,61 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
     const showToast = (message, type = 'info') => {
         setToast({ message, type });
         setTimeout(() => setToast(null), 3000);
+    };
+
+    const handleRecordingComplete = async (recordingResult) => {
+        setIsAnalyzing(true);
+        try {
+            // AudioEngine returns { blob, url }
+            const { blob, url } = recordingResult;
+
+            const formData = new FormData();
+            formData.append('audio', blob, 'recording.wav');
+
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                let errorMessage = 'Analysis failed';
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.error || errorMessage;
+                } catch (e) {
+                    // ignore json parse error
+                }
+                throw new Error(errorMessage);
+            }
+
+            const data = await response.json();
+
+            if (data.words) {
+                const center = targetRange ? (targetRange.min + targetRange.max) / 2 : 200;
+                data.words = data.words.map(word => {
+                    let deviations = 0;
+                    if (word.metrics && word.metrics.pitch && word.metrics.pitch.mean) {
+                        deviations = Math.abs(word.metrics.pitch.mean - center) / center;
+                    }
+                    return { ...word, deviations };
+                });
+            }
+
+            setLocalResults(data);
+
+            if (audioRef.current) {
+                audioRef.current.src = url;
+                audioRef.current.load();
+            }
+
+            showToast("Analysis complete!", "success");
+
+        } catch (error) {
+            console.error("Analysis error:", error);
+            showToast(`Error: ${error.message}`, "error");
+        } finally {
+            setIsAnalyzing(false);
+        }
     };
 
     const generateCoachFeedback = async () => {
@@ -73,8 +134,22 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
                     <p className="text-slate-400">
                         Record a voice sample to get detailed analysis of your pitch, resonance, and voice quality.
                     </p>
+
+                    <div className="flex justify-center py-4">
+                        {isAnalyzing ? (
+                            <div className="flex items-center gap-3 px-6 py-3 bg-slate-800 rounded-full border border-slate-700">
+                                <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                <span className="text-sm font-bold text-blue-400">Analyzing Audio...</span>
+                            </div>
+                        ) : (
+                            <div className="transform scale-125">
+                                <ClipCapture onCapture={handleRecordingComplete} />
+                            </div>
+                        )}
+                    </div>
+
                     <p className="text-sm text-slate-500">
-                        This feature requires the backend server. Please check the Tools tab for recording options.
+                        Press the microphone button to start recording. Speak a few sentences for best results.
                     </p>
                 </div>
             </div>
@@ -443,6 +518,12 @@ const AnalysisView = ({ analysisResults, onClose, targetRange }) => {
                     onClose={() => setToast(null)}
                 />
             )}
+            <audio
+                ref={audioRef}
+                className="hidden"
+                onTimeUpdate={() => setCurrentPlayTime(audioRef.current?.currentTime || 0)}
+                onEnded={() => setIsPlaying(false)}
+            />
         </div>
     );
 };
