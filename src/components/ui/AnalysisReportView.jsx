@@ -194,7 +194,7 @@ const AnalysisReportView = ({ report, audioBlob, onClose }) => {
                                 {issue.type === 'low' ? 'Pitch Drop' : 'High Pitch'}
                             </span>
                         </div>
-                        <div className="text-white text-sm font-medium">"{issue.words}"</div>
+                        <div className="text-white text-sm font-medium">&quot;{issue.words}&quot;</div>
                     </button>
                 ))}
                 {report.issues.length === 0 && (

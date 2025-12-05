@@ -478,4 +478,6 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
     );
 });
 
+PitchVisualizer.displayName = 'PitchVisualizer';
+
 export default PitchVisualizer;

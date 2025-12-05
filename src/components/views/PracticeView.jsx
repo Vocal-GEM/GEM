@@ -13,7 +13,6 @@ import VoiceQualityMeter from '../viz/VoiceQualityMeter';
 import VowelSpacePlot from '../viz/VowelSpacePlot';
 import CPPMeter from '../viz/CPPMeter';
 import HighResSpectrogram from '../viz/HighResSpectrogram';
-import HighResSpectrogram from '../viz/HighResSpectrogram';
 import VoiceRangeProfile from '../viz/VoiceRangeProfile';
 import MPTTracker from '../viz/MPTTracker';
 

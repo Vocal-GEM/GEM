@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, SkipForward, ThumbsUp, ThumbsDown, ArrowLeft, CheckCircle, RefreshCw } from 'lucide-react';
+import { Play, Pause, SkipForward, ThumbsUp, ThumbsDown, ArrowLeft, CheckCircle, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useAudio } from '../../context/AudioContext';
 import { PracticeRoutineGenerator } from '../../services/PracticeRoutineGenerator';
@@ -34,7 +34,39 @@ const AdaptivePracticeSession = ({ onClose }) => {
 
     // ... (Timer useEffect)
 
-    // ... (Handlers)
+    // Handlers
+    const handleRestart = () => {
+        setCurrentIndex(0);
+        setIsComplete(false);
+        setFeedbackGiven(false);
+        if (routine.length > 0) setTimeLeft(routine[0].duration);
+    };
+
+    const handlePlayPause = () => {
+        setIsPlaying(!isPlaying);
+        if (!isPlaying) {
+            // Logic to start audio engine or timer
+            toggleAudio();
+        }
+    };
+
+    const handleSkip = () => {
+        if (currentIndex < routine.length - 1) {
+            setCurrentIndex(currentIndex + 1);
+            setTimeLeft(routine[currentIndex + 1].duration);
+            setFeedbackGiven(false);
+        } else {
+            setIsComplete(true);
+        }
+    };
+
+    const handleFeedback = (type) => {
+        setFeedbackGiven(true);
+        // Log feedback logic here
+        console.log('Feedback:', type);
+        // Auto advance after feedback?
+        setTimeout(() => handleSkip(), 1000);
+    };
 
     if (!hasGenerated) {
         return (

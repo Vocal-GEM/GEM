@@ -1,4 +1,7 @@
+import React, { useState } from 'react';
 import IntonationTrainingModule from '../training/IntonationTrainingModule';
+import PitchTrainingModule from '../training/PitchTrainingModule';
+import ResonanceTrainingModule from '../training/ResonanceTrainingModule';
 import { Dumbbell, Music, Activity, ArrowLeft, Mic2, TrendingUp, TrendingDown, Waves } from 'lucide-react';
 
 const TrainingView = () => {

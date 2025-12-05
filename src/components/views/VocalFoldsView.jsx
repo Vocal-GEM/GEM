@@ -462,7 +462,7 @@ const VocalFoldsView = ({ onClose }) => {
                 </div>
             </div>
 
-            <style jsx>{`
+            <style>{`
                 @keyframes vibrate {
                     0% { transform: scaleX(1); }
                     25% { transform: scaleX(0.8); }

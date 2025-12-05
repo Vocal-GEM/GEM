@@ -1,5 +1,6 @@
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
+import React from 'react';
 
 const VowelSpacePlot = ({ f1, f2, dataRef, showAnalysis = true }) => {
     const { colorBlindMode } = useSettings();

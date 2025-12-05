@@ -102,15 +102,12 @@ class IndexedDBManager {
     // Generic CRUD operations
     async get(storeName, key) {
         await this.ensureReady();
-        const start = performance.now();
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], 'readonly');
             const store = transaction.objectStore(storeName);
             const request = store.get(key);
 
             request.onsuccess = () => {
-                const duration = performance.now() - start;
-
                 resolve(request.result);
             };
             request.onerror = () => reject(request.error);
@@ -119,15 +116,12 @@ class IndexedDBManager {
 
     async getAll(storeName) {
         await this.ensureReady();
-        const start = performance.now();
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], 'readonly');
             const store = transaction.objectStore(storeName);
             const request = store.getAll();
 
             request.onsuccess = () => {
-                const duration = performance.now() - start;
-
                 resolve(request.result || []);
             };
             request.onerror = () => reject(request.error);
@@ -136,15 +130,12 @@ class IndexedDBManager {
 
     async put(storeName, value) {
         await this.ensureReady();
-        const start = performance.now();
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], 'readwrite');
             const store = transaction.objectStore(storeName);
             const request = store.put(value);
 
             request.onsuccess = () => {
-                const duration = performance.now() - start;
-
                 resolve(request.result);
             };
             request.onerror = () => reject(request.error);
@@ -153,15 +144,12 @@ class IndexedDBManager {
 
     async add(storeName, value) {
         await this.ensureReady();
-        const start = performance.now();
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], 'readwrite');
             const store = transaction.objectStore(storeName);
             const request = store.add(value);
 
             request.onsuccess = () => {
-                const duration = performance.now() - start;
-
                 resolve(request.result);
             };
             request.onerror = () => reject(request.error);
