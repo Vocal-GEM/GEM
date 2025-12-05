@@ -2,6 +2,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 import { visualizer } from 'rollup-plugin-visualizer'
 import { execSync } from 'child_process'
 
@@ -43,6 +47,7 @@ export default defineConfig({
                 ]
             },
             workbox: {
+                maximumFileSizeToCacheInBytes: 6000000,
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,glb}'],
                 globIgnores: ['**/assets/transformers-*.js', '**/assets/pdf-*.js'],
                 runtimeCaching: [

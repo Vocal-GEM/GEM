@@ -12,13 +12,11 @@ class TranscriptionEngine {
 
         this.isLoading = true;
         try {
-            console.log('Loading Whisper model...');
             // Disable local models to force fetching from Hugging Face Hub
             // This prevents 404s on local files returning HTML (which causes JSON.parse error)
             env.allowLocalModels = false;
 
             this.pipe = await pipeline('automatic-speech-recognition', this.modelName);
-            console.log('Whisper model loaded successfully');
         } catch (error) {
             console.error('Failed to load Whisper model:', error);
             if (error.message.includes('JSON.parse') || error.message.includes('unexpected character')) {

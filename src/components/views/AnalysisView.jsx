@@ -8,7 +8,7 @@ import VoiceRangeProfile from '../viz/VoiceRangeProfile';
 import Spectrogram from '../viz/Spectrogram';
 import AssessmentView from '../coach/AssessmentView';
 import Toast from '../ui/Toast';
-import Toast from '../ui/Toast';
+
 import { CoachEngine } from '../../utils/coachEngine';
 import { getTargetNorms } from '../../data/VoiceNorms';
 

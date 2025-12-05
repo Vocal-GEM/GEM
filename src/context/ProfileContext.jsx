@@ -77,7 +77,6 @@ export const ProfileProvider = ({ children }) => {
                             calibration: lsCalibration
                         };
                         await indexedDB.saveSetting(key, status);
-                        console.log(`[ProfileContext] Migrated onboarding status for ${userId}`);
                     } else {
                         status = { tutorial: false, compass: false, calibration: false };
                     }

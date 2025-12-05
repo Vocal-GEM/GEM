@@ -268,6 +268,9 @@ Expected: `{"status": "ok"}`
 **Issue**: "Sync not working"
 - **Fix**: Check browser console for errors, verify user is logged in
 
+**Issue**: "Build fails on PWA generation"
+- **Fix**: If you see "Assets exceeding the limit", check `vite.config.js` and increase `maximumFileSizeToCacheInBytes` in the `workbox` configuration, or optimize your assets (e.g., icons).
+
 ---
 
 ## Security Checklist

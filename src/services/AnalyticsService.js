@@ -51,10 +51,6 @@ class AnalyticsService {
         }
 
         // Console log for dev visibility (could be gated by debug mode)
-        console.groupCollapsed(`[Analytics] ${eventName}`);
-        console.log('Properties:', properties);
-        console.log('Timestamp:', event.date);
-        console.groupEnd();
     }
 
     /**

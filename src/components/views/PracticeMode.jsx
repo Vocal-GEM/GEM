@@ -84,7 +84,6 @@ const PracticeMode = ({
                 stability: avgStability,
                 notes: 'Practice Session'
             });
-            console.log("Session saved:", { duration, avgPitch });
         } catch (e) {
             console.error("Failed to save session:", e);
         }

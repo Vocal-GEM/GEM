@@ -206,4 +206,18 @@ export class DSP {
     static hzToSemitones(hz) {
         return 12 * Math.log2(hz / 440) + 69;
     }
+
+    static calculateRMS(buffer) {
+        let sum = 0;
+        for (let i = 0; i < buffer.length; i++) {
+            sum += buffer[i] * buffer[i];
+        }
+        return Math.sqrt(sum / buffer.length);
+    }
+
+    static calculateDB(rms, offset = 0) {
+        if (rms <= 0) return -100; // Silence floor
+        const db = 20 * Math.log10(rms);
+        return db + offset;
+    }
 }

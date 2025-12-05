@@ -68,7 +68,7 @@ describe('ProfileContext Integration', () => {
             ]);
         });
 
-        it.skip('should switch profile', async () => {
+        it('should switch profile', async () => {
             const { result } = renderHook(() => useProfile(), { wrapper });
 
             // Wait for initial load

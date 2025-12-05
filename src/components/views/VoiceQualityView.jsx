@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Upload, Play, Square, Activity, FileText, BarChart2, Info } from 'lucide-react';
 import Spectrogram from '../viz/Spectrogram';
 import ClipCapture from '../ui/ClipCapture';
+import IntensityMeter from '../viz/IntensityMeter';
+import { DSP } from '../../utils/DSP';
 import { getNormsForGoal } from '../../data/norms';
-import { io } from 'socket.io-client';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -26,6 +27,8 @@ ChartJS.register(
     Legend
 );
 
+import { useAudio } from '../../context/AudioContext';
+
 const VoiceQualityView = () => {
     const [activeTab, setActiveTab] = useState('recorded'); // 'recorded' or 'live'
     const [file, setFile] = useState(null);
@@ -38,11 +41,10 @@ const VoiceQualityView = () => {
     // Live Analysis State
     const [isLive, setIsLive] = useState(false);
     const [liveMetrics, setLiveMetrics] = useState(null);
-    const [liveLabel, setLiveLabel] = useState('');
-    const socketRef = useRef(null);
-    const audioContextRef = useRef(null);
-    const processorRef = useRef(null);
-    const streamRef = useRef(null);
+
+    // Use Audio Engine
+    const { audioEngineRef } = useAudio();
+    const audioEngine = audioEngineRef.current;
 
     // --- Recorded Analysis ---
 
@@ -92,64 +94,26 @@ const VoiceQualityView = () => {
     // --- Live Analysis ---
 
     const startLiveAnalysis = async () => {
+        if (!audioEngine) {
+            setError("Audio Engine not initialized");
+            return;
+        }
+
         try {
             setError(null);
-            socketRef.current = io('http://localhost:5000');
-
-            socketRef.current.on('connect', () => {
-                console.log('Socket connected');
-            });
-
-            socketRef.current.on('analysis_update', (data) => {
-                setLiveMetrics(data);
-                setLiveLabel(data.label);
-            });
-
-            socketRef.current.on('analysis_error', (data) => {
-                console.error('Socket error:', data);
-                setError(data.error);
-            });
-
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            streamRef.current = stream;
-
-            audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-
-            // Load AudioWorklet
-            try {
-                await audioContextRef.current.audioWorklet.addModule(new URL('../../audio/voice-quality-processor.js', import.meta.url));
-            } catch (e) {
-                console.error("Failed to load AudioWorklet:", e);
-                throw new Error("AudioWorklet support is required.");
-            }
-
-            const source = audioContextRef.current.createMediaStreamSource(stream);
-            const workletNode = new AudioWorkletNode(audioContextRef.current, 'voice-quality-processor');
-
-            // Configure the worklet
-            workletNode.port.postMessage({
-                type: 'config',
-                sampleRate: audioContextRef.current.sampleRate,
-                targetSamples: Math.round(audioContextRef.current.sampleRate * 0.25)
-            });
-
-            workletNode.port.onmessage = (e) => {
-                if (e.data.type === 'chunk') {
-                    if (socketRef.current && socketRef.current.connected) {
-                        socketRef.current.emit('audio_chunk', {
-                            pcm: e.data.pcm,
-                            sr: e.data.sr
-                        });
-                    }
-                }
-            };
-
-            source.connect(workletNode);
-            workletNode.connect(audioContextRef.current.destination);
-
-            processorRef.current = workletNode;
-
+            await audioEngine.startLiveAnalysis();
             setIsLive(true);
+
+            // Subscribe to updates via a temporary listener or polling?
+            // AudioEngine calls onAudioUpdate which updates AudioContext state.
+            // But VoiceQualityView needs specific metrics.
+            // We can hook into the socket events on AudioEngine or just rely on the onAudioUpdate callback if we can register one.
+            // The current AudioEngine takes a single onAudioUpdate callback in constructor.
+            // We might need to add a listener mechanism to AudioEngine.
+
+            // For now, let's assume we can poll `audioEngine.latestBackendAnalysis` or add a listener.
+            // Let's add a listener method to AudioEngine? Or just use an interval to read `latestBackendAnalysis`.
+            // Interval is easiest for now without changing AudioEngine architecture too much.
         } catch (err) {
             console.error(err);
             setError('Failed to start live analysis: ' + err.message);
@@ -157,29 +121,28 @@ const VoiceQualityView = () => {
     };
 
     const stopLiveAnalysis = () => {
-        if (processorRef.current) {
-            processorRef.current.disconnect();
-            processorRef.current.onaudioprocess = null;
-        }
-        if (audioContextRef.current) {
-            audioContextRef.current.close();
-        }
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach(t => t.stop());
-        }
-        if (socketRef.current) {
-            socketRef.current.disconnect();
+        if (audioEngine) {
+            audioEngine.stopLiveAnalysis();
         }
         setIsLive(false);
         setLiveMetrics(null);
-        setLiveLabel('');
     };
 
     useEffect(() => {
+        let interval;
+        if (isLive && audioEngine) {
+            interval = setInterval(() => {
+                const data = audioEngine.latestBackendAnalysis;
+                if (data) {
+                    setLiveMetrics(data);
+                }
+            }, 100);
+        }
         return () => {
-            stopLiveAnalysis();
+            if (interval) clearInterval(interval);
+            if (isLive) stopLiveAnalysis(); // Cleanup on unmount
         };
-    }, []);
+    }, [isLive, audioEngine]);
 
     // --- Rendering Helpers ---
 
@@ -275,6 +238,10 @@ const VoiceQualityView = () => {
                 {renderBar('Breathiness', breathiness_score, breathiness_score > 75 ? 'bg-pink-500' : breathiness_score > 40 ? 'bg-green-500' : 'bg-slate-500')}
                 {renderBar('Strain', strain_score, strain_score > 60 ? 'bg-red-500' : 'bg-green-500')}
                 {renderBar('Roughness', roughness_score, roughness_score > 50 ? 'bg-orange-500' : 'bg-green-500')}
+
+                <div className="mt-4">
+                    <IntensityMeter intensity={liveMetrics.intensity || -100} />
+                </div>
 
                 <div className="mt-4 p-4 bg-slate-900/50 rounded-lg text-sm text-slate-300">
                     <Info className="w-4 h-4 inline mr-2 text-teal-400" />

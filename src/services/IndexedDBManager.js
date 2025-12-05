@@ -110,7 +110,7 @@ class IndexedDBManager {
 
             request.onsuccess = () => {
                 const duration = performance.now() - start;
-                if (duration > 10) console.debug(`[IndexedDB] get ${storeName} took ${duration.toFixed(2)}ms`);
+
                 resolve(request.result);
             };
             request.onerror = () => reject(request.error);
@@ -127,7 +127,7 @@ class IndexedDBManager {
 
             request.onsuccess = () => {
                 const duration = performance.now() - start;
-                if (duration > 20) console.debug(`[IndexedDB] getAll ${storeName} took ${duration.toFixed(2)}ms`);
+
                 resolve(request.result || []);
             };
             request.onerror = () => reject(request.error);
@@ -144,7 +144,7 @@ class IndexedDBManager {
 
             request.onsuccess = () => {
                 const duration = performance.now() - start;
-                console.debug(`[IndexedDB] put ${storeName} took ${duration.toFixed(2)}ms`);
+
                 resolve(request.result);
             };
             request.onerror = () => reject(request.error);
@@ -161,7 +161,7 @@ class IndexedDBManager {
 
             request.onsuccess = () => {
                 const duration = performance.now() - start;
-                console.debug(`[IndexedDB] add ${storeName} took ${duration.toFixed(2)}ms`);
+
                 resolve(request.result);
             };
             request.onerror = () => reject(request.error);
@@ -292,7 +292,7 @@ class IndexedDBManager {
             // Mark migration as complete
             localStorage.setItem('indexeddb_migrated', 'true');
 
-            console.log('✅ Migration from localStorage to IndexedDB complete');
+            localStorage.setItem('indexeddb_migrated', 'true');
             return true;
         } catch (error) {
             console.error('❌ Migration failed:', error);
