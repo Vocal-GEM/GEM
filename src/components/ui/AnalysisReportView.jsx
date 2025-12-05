@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Play, Pause, AlertCircle, CheckCircle, X } from 'lucide-react';
+import { SessionAnalyzer } from '../../utils/SessionAnalyzer';
 
 const AnalysisReportView = ({ report, audioBlob, onClose }) => {
     const canvasRef = useRef(null);
@@ -138,6 +139,27 @@ const AnalysisReportView = ({ report, audioBlob, onClose }) => {
                         </span>
                     </h3>
                     <p className="text-slate-400 text-sm mt-1">{report.summary}</p>
+
+                    {/* New Stats Row */}
+                    <div className="flex gap-4 mt-3">
+                        {(() => {
+                            const stats = SessionAnalyzer.analyze(report.metrics);
+                            if (!stats) return null;
+                            return (
+                                <>
+                                    <div className="px-3 py-1 bg-slate-800 rounded-lg border border-white/10 text-xs">
+                                        <span className="text-slate-400">Avg Pitch:</span> <span className="text-white font-bold">{stats.avgF0}Hz</span>
+                                    </div>
+                                    <div className="px-3 py-1 bg-slate-800 rounded-lg border border-white/10 text-xs">
+                                        <span className="text-slate-400">Range:</span> <span className="text-white font-bold">{stats.minF0}-{stats.maxF0}Hz</span>
+                                    </div>
+                                    <div className="px-3 py-1 bg-slate-800 rounded-lg border border-white/10 text-xs">
+                                        <span className="text-slate-400">Avg SPL:</span> <span className="text-white font-bold">{stats.avgSPL}dB</span>
+                                    </div>
+                                </>
+                            );
+                        })()}
+                    </div>
                 </div>
                 <button
                     onClick={onClose}

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Upload, Play, Square, Activity, FileText, BarChart2, Info } from 'lucide-react';
+import Spectrogram from '../viz/Spectrogram';
 import ClipCapture from '../ui/ClipCapture';
+import { getNormsForGoal } from '../../data/norms';
 import { io } from 'socket.io-client';
 import {
     Chart as ChartJS,
@@ -331,6 +333,23 @@ const VoiceQualityView = () => {
                                     <option value="clean_smooth">Clean & Smooth</option>
                                     <option value="light_and_bright">Light & Bright</option>
                                 </select>
+
+                                {/* Norms Info */}
+                                {(() => {
+                                    const norms = getNormsForGoal(goal);
+                                    return (
+                                        <div className="mt-3 p-3 bg-slate-900/50 rounded-lg border border-white/5 text-xs text-slate-400">
+                                            <div className="flex justify-between mb-1">
+                                                <span>Target Pitch:</span>
+                                                <span className="text-teal-400">{norms.pitch.min}-{norms.pitch.max}Hz</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span>Resonance:</span>
+                                                <span className="text-teal-400">{norms.resonance.description}</span>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-slate-400 mb-2">Upload or Record</label>
@@ -438,7 +457,15 @@ const VoiceQualityView = () => {
                         </p>
                     </div>
 
-                    {isLive && renderLiveBars()}
+                    {isLive && (
+                        <>
+                            {renderLiveBars()}
+                            <div className="mt-6">
+                                <h3 className="font-bold text-lg mb-2 text-slate-300">Real-time Spectrogram</h3>
+                                <Spectrogram height={150} />
+                            </div>
+                        </>
+                    )}
                 </div>
             )}
         </div>

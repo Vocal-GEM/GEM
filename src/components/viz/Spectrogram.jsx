@@ -1,153 +1,114 @@
 import React, { useEffect, useRef } from 'react';
-import { renderCoordinator } from '../../services/RenderCoordinator';
-import { useSettings } from '../../context/SettingsContext';
+import { useAudio } from '../../context/AudioContext';
 
-const Spectrogram = React.memo(({ dataRef, audioRef }) => {
+const Spectrogram = ({ height = 200, showLabels = true }) => {
     const canvasRef = useRef(null);
-    const analyserRef = useRef(null);
-    const sourceRef = useRef(null);
-    const audioContextRef = useRef(null);
+    const { dataRef, isAudioActive } = useAudio();
+    const requestRef = useRef();
 
-    useEffect(() => {
-        // Initialize Audio Context and Analyser if audioRef is provided
-        if (audioRef?.current && !audioContextRef.current) {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioContextRef.current = new AudioContext();
-            analyserRef.current = audioContextRef.current.createAnalyser();
-            analyserRef.current.fftSize = 2048;
+    // Spectrogram State
+    const speed = 2; // Pixels per frame
 
-            try {
-                sourceRef.current = audioContextRef.current.createMediaElementSource(audioRef.current);
-                sourceRef.current.connect(analyserRef.current);
-                analyserRef.current.connect(audioContextRef.current.destination);
-            } catch (e) {
-                console.warn("Could not connect audio source for spectrogram:", e);
-            }
-        }
-
-        return () => {
-            if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-                audioContextRef.current.close();
-            }
-        };
-    }, [audioRef]);
-
-    const { colorBlindMode } = useSettings();
-
-    useEffect(() => {
+    const draw = () => {
         const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d', { willReadFrequently: true, alpha: false });
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = 256;
+        if (!canvas || !dataRef.current) return;
 
-        const colormap = new Uint32Array(256);
-        for (let i = 0; i < 256; i++) {
-            const t = i / 255;
-            let r, g, b;
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const h = canvas.height;
 
-            if (colorBlindMode) {
-                // Accessible Palette (Viridis-like: Purple -> Teal -> Yellow)
-                // Simple approximation
-                if (t < 0.5) {
-                    // Purple to Teal
-                    const tt = t * 2;
-                    r = 75 + (30 - 75) * tt;
-                    g = 0 + (150 - 0) * tt;
-                    b = 130 + (130 - 130) * tt;
+        // 1. Shift existing image to the left
+        // We use drawImage to move the canvas content
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = width;
+        tempCanvas.height = h;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(canvas, 0, 0);
+
+        // Clear
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, width, h);
+
+        // Draw shifted image
+        ctx.drawImage(tempCanvas, -speed, 0);
+
+        // 2. Draw new column at the right edge
+        const spectrum = dataRef.current.spectrum; // Float32Array (0-255 or similar depending on FFT)
+        if (spectrum && spectrum.length > 0) {
+            const numBins = spectrum.length;
+            // We only care about 0-8kHz usually. 
+            // If sample rate is 44.1k, Nyquist is 22k. 
+            // 512 bins -> ~43Hz per bin. 
+            // 8000Hz / 43 = ~186 bins.
+            const maxBin = Math.min(numBins, 200);
+
+            for (let i = 0; i < maxBin; i++) {
+                const value = spectrum[i]; // Magnitude
+                // Map magnitude to color
+                // Assuming magnitude is roughly 0-100 (dB-ish) or linear amplitude
+                // Let's assume linear 0-1 for now, or check AudioEngine.
+                // AudioEngine uses simpleFFT returning magnitude.
+
+                // Normalize roughly. 
+                const intensity = Math.min(255, value * 5000); // Scale factor might need tuning
+
+                // Heatmap: 
+                // Low: Blue (0,0,255)
+                // Mid: Red (255,0,0)
+                // High: Yellow (255,255,0)
+
+                let r = 0, g = 0, b = 0;
+                if (intensity < 128) {
+                    // Blue to Red
+                    b = 255 - (intensity * 2);
+                    r = intensity * 2;
                 } else {
-                    // Teal to Yellow
-                    const tt = (t - 0.5) * 2;
-                    r = 30 + (255 - 30) * tt;
-                    g = 150 + (255 - 150) * tt;
-                    b = 130 + (0 - 130) * tt;
+                    // Red to Yellow
+                    r = 255;
+                    g = (intensity - 128) * 2;
                 }
-            } else {
-                // Standard Heatmap (Dark -> Red/Orange -> White)
-                r = Math.min(255, Math.max(0, t * 400 - 100));
-                g = Math.min(255, Math.max(0, t * 400 - 200));
-                b = Math.min(255, Math.max(0, t * 400 - 50));
-            }
 
-            colormap[i] = (255 << 24) | (Math.floor(b) << 16) | (Math.floor(g) << 8) | Math.floor(r);
+                ctx.fillStyle = `rgb(${r},${g},${b})`;
+
+                // Draw a block for this frequency bin
+                // Y-axis is frequency (low at bottom)
+                const y = h - (i / maxBin) * h;
+                const binHeight = h / maxBin;
+
+                ctx.fillRect(width - speed, y - binHeight, speed, binHeight + 1);
+            }
         }
 
-        const loop = () => {
-            let spectrum;
+        requestRef.current = requestAnimationFrame(draw);
+    };
 
-            // Priority 1: Live Data from dataRef
-            if (dataRef?.current?.spectrum) {
-                spectrum = dataRef.current.spectrum;
-            }
-            // Priority 2: Playback Data from Analyser
-            else if (analyserRef.current && audioRef?.current && !audioRef.current.paused) {
-                const bufferLength = analyserRef.current.frequencyBinCount;
-                const dataArray = new Uint8Array(bufferLength);
-                analyserRef.current.getByteFrequencyData(dataArray);
-                spectrum = dataArray;
-            }
-
-            if (!spectrum) return;
-
-            const width = canvas.width;
-            const height = canvas.height;
-            const scrollSpeed = 2;
-
-            ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
-
-            const imgData = ctx.createImageData(scrollSpeed, height);
-            const data = new Uint32Array(imgData.data.buffer);
-
-            for (let y = 0; y < height; y++) {
-                const maxIndex = spectrum.length;
-                const targetMaxFreq = 8000;
-                const sampleRate = 16000;
-                const maxTargetIndex = Math.floor(maxIndex * targetMaxFreq / (sampleRate / 2));
-
-                const mappedIndex = Math.floor(y / height * maxTargetIndex);
-
-                const val = spectrum[mappedIndex] || 0;
-
-                let intensity;
-                // Silence Check
-                if (dataRef?.current?.isSilent) {
-                    intensity = 0;
-                } else if (dataRef?.current) {
-                    intensity = Math.log10(val + 1) * 50;
-                } else {
-                    intensity = val;
-                }
-
-                intensity = Math.min(255, Math.max(0, intensity));
-                const color = colormap[Math.floor(intensity)];
-
-                for (let x = 0; x < scrollSpeed; x++) {
-                    data[(height - 1 - y) * scrollSpeed + x] = color;
-                }
-            }
-
-            ctx.putImageData(imgData, width - scrollSpeed, 0);
-        };
-
-        // Use RenderCoordinator instead of individual RAF
-        const unsubscribe = renderCoordinator.subscribe(
-            'spectrogram',
-            loop,
-            renderCoordinator.PRIORITY.MEDIUM
-        );
-
-        return () => {
-            unsubscribe();
-        };
-    }, [dataRef, audioRef]);
+    useEffect(() => {
+        if (isAudioActive) {
+            requestRef.current = requestAnimationFrame(draw);
+        }
+        return () => cancelAnimationFrame(requestRef.current);
+    }, [isAudioActive]);
 
     return (
-        <div className="h-full w-full relative overflow-hidden rounded-xl bg-black">
-            <canvas ref={canvasRef} className="w-full h-full"></canvas>
-            <div className="absolute bottom-1 right-2 text-[9px] text-white/50 font-mono">0 - 8kHz</div>
+        <div className="relative w-full bg-black rounded-xl overflow-hidden border border-white/10 shadow-inner">
+            <canvas
+                ref={canvasRef}
+                width={600}
+                height={height}
+                className="w-full h-full"
+            />
+            {showLabels && (
+                <div className="absolute left-2 top-2 text-xs text-white/50 font-mono pointer-events-none">
+                    <div>8kHz</div>
+                </div>
+            )}
+            {showLabels && (
+                <div className="absolute left-2 bottom-2 text-xs text-white/50 font-mono pointer-events-none">
+                    <div>0Hz</div>
+                </div>
+            )}
         </div>
     );
-});
+};
 
 export default Spectrogram;

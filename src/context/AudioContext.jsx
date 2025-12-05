@@ -58,48 +58,53 @@ export const AudioProvider = ({ children }) => {
         if (isFirstTime) { localStorage.setItem('hasVisited', 'true'); }
 
         console.log("[AudioContext] Initializing AudioEngine...");
-        audioEngineRef.current = new AudioEngine((data) => {
-            const currentHistory = dataRef.current.history;
-            let pitchToStore = data.pitch;
-
-            if (data.pitch > 0) {
-                dataRef.current.silenceCounter = 0;
-                dataRef.current.lastValidPitch = data.pitch;
-            } else {
-                dataRef.current.silenceCounter++;
-                if (dataRef.current.silenceCounter < 15 && dataRef.current.lastValidPitch > 0) {
-                    pitchToStore = dataRef.current.lastValidPitch;
-                } else {
-                    pitchToStore = 0;
-                }
-            }
-
-            dataRef.current = {
-                ...data,
-                history: [...currentHistory.slice(1), pitchToStore],
-                silenceCounter: dataRef.current.silenceCounter,
-                lastValidPitch: dataRef.current.lastValidPitch
-            };
-
-            // Log audio data periodically for debugging
-            const now = Date.now();
-            if (now - lastLogTimeRef.current > 2000) {
-                // Log buffer diagnostics if available
-                if (data.debug?.bufferDiag) {
-                    console.log(`[Worklet Buffer] RMS: ${data.debug.bufferDiag.rms}, Max Sample: ${data.debug.bufferDiag.maxSample}, Length: ${data.debug.bufferDiag.bufferLength}`);
-                }
+        try {
+            audioEngineRef.current = new AudioEngine((data) => {
+                const currentHistory = dataRef.current.history;
+                let pitchToStore = data.pitch;
 
                 if (data.pitch > 0) {
-                    console.log(`[AudioContext] 🎤 Audio detected - Pitch: ${data.pitch.toFixed(1)}Hz, Volume: ${(data.volume * 100).toFixed(1)}%, Resonance: ${data.resonance.toFixed(1)}Hz`);
+                    dataRef.current.silenceCounter = 0;
+                    dataRef.current.lastValidPitch = data.pitch;
                 } else {
-                    console.log(`[AudioContext] 🔇 No pitch detected - Volume: ${(data.volume * 100).toFixed(1)}% (${data.volume > 0.01 ? 'Sound detected but no pitch' : 'Silence'})`);
+                    dataRef.current.silenceCounter++;
+                    if (dataRef.current.silenceCounter < 15 && dataRef.current.lastValidPitch > 0) {
+                        pitchToStore = dataRef.current.lastValidPitch;
+                    } else {
+                        pitchToStore = 0;
+                    }
                 }
-                lastLogTimeRef.current = now;
-            }
-        });
 
-        if (settings.noiseGate) {
-            audioEngineRef.current.setNoiseGate(settings.noiseGate);
+                dataRef.current = {
+                    ...data,
+                    history: [...currentHistory.slice(1), pitchToStore],
+                    silenceCounter: dataRef.current.silenceCounter,
+                    lastValidPitch: dataRef.current.lastValidPitch
+                };
+
+                // Log audio data periodically for debugging
+                const now = Date.now();
+                if (now - lastLogTimeRef.current > 2000) {
+                    // Log buffer diagnostics if available
+                    if (data.debug?.bufferDiag) {
+                        console.log(`[Worklet Buffer] RMS: ${data.debug.bufferDiag.rms}, Max Sample: ${data.debug.bufferDiag.maxSample}, Length: ${data.debug.bufferDiag.bufferLength}`);
+                    }
+
+                    if (data.pitch > 0) {
+                        console.log(`[AudioContext] 🎤 Audio detected - Pitch: ${data.pitch.toFixed(1)}Hz, Volume: ${(data.volume * 100).toFixed(1)}%, Resonance: ${data.resonance.toFixed(1)}Hz`);
+                    } else {
+                        console.log(`[AudioContext] 🔇 No pitch detected - Volume: ${(data.volume * 100).toFixed(1)}% (${data.volume > 0.01 ? 'Sound detected but no pitch' : 'Silence'})`);
+                    }
+                    lastLogTimeRef.current = now;
+                }
+            });
+
+            if (settings.noiseGate) {
+                audioEngineRef.current.setNoiseGate(settings.noiseGate);
+            }
+        } catch (err) {
+            console.error("[AudioContext] Failed to initialize AudioEngine:", err);
+            setAudioError("Audio initialization failed. Your browser may not support required features.");
         }
 
         // iOS Audio Unlock

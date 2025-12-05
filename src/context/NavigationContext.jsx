@@ -43,7 +43,8 @@ export const NavigationProvider = ({ children }) => {
         voiceQuality: false,
         course: false,
         feedback: false,
-        commandPalette: false // New Command Palette
+        commandPalette: false, // New Command Palette
+        adaptiveSession: false
     });
 
     // Initialize Analytics

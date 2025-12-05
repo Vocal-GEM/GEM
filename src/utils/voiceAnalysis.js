@@ -6,6 +6,7 @@
 
 import { PitchDetector } from './pitch';
 import { lpcAnalyzer } from './lpcAnalysis';
+import { audioCalibrator } from './AudioCalibrator';
 
 export class VoiceAnalyzer {
     constructor(audioContext) {
@@ -138,7 +139,8 @@ export class VoiceAnalyzer {
             sum += samples[i] * samples[i];
         }
         const rms = Math.sqrt(sum / samples.length);
-        const db = 20 * Math.log10(rms + 1e-10);
+        // Use calibrated dB SPL
+        const db = audioCalibrator.getDbSpl(rms);
 
         return {
             rms: rms,

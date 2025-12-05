@@ -22,6 +22,7 @@ export const SettingsProvider = ({ children }) => {
         triggerDarkRes: true,
         notation: 'hz',
         homeNote: 190,
+        showNorms: true, // Show standardized gender norms on charts
 
         theme: 'dark', // 'dark' | 'light'
         ttsProvider: 'browser', // 'browser' | 'elevenlabs'
@@ -49,6 +50,12 @@ export const SettingsProvider = ({ children }) => {
 
         // Audio Settings
         listenMode: false, // Monitor own voice (requires headphones)
+
+        // Accessibility
+        accessibility: {
+            highContrast: false,
+            fontSize: 'normal' // 'normal' | 'large' | 'xl'
+        }
     });
 
 
@@ -68,14 +75,30 @@ export const SettingsProvider = ({ children }) => {
         loadSettings();
     }, []);
 
-    // Apply Theme
+    // Apply Theme and Accessibility
     useEffect(() => {
+        const root = document.documentElement;
+
+        // Theme
         if (settings.theme === 'light') {
-            document.documentElement.classList.add('light-mode');
+            root.classList.add('light-mode');
         } else {
-            document.documentElement.classList.remove('light-mode');
+            root.classList.remove('light-mode');
         }
-    }, [settings.theme]);
+
+        // High Contrast
+        if (settings.accessibility?.highContrast) {
+            root.classList.add('high-contrast');
+        } else {
+            root.classList.remove('high-contrast');
+        }
+
+        // Font Size
+        root.classList.remove('font-normal', 'font-large', 'font-xl');
+        if (settings.accessibility?.fontSize) {
+            root.classList.add(`font-${settings.accessibility.fontSize}`);
+        }
+    }, [settings.theme, settings.accessibility]);
 
     // Init TTS
     useEffect(() => {

@@ -65,7 +65,6 @@ export class AudioEngine {
         this.adaptiveThreshold = 0.0001;
         this.backgroundNoiseBuffer = [];
         this.silenceFrameCount = 0;
-
         // Socket.IO
         this.socket = null;
         this.latestBackendAnalysis = {
@@ -86,58 +85,55 @@ export class AudioEngine {
             bufferSize: 0,
             connectionLog: []
         };
+        this.audioContext = new AudioContext({ latencyHint: 'interactive' });
+        this.debugInfo.contextState = this.audioContext.state;
 
-        this.socketBuffer = [];
-        this.MAX_BUFFER_SIZE = 50;
+        // Unlock AudioContext
+        const buffer = this.audioContext.createBuffer(1, 1, 22050);
+        const source = this.audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(this.audioContext.destination);
+        source.start(0);
 
-        this.filterSettings = { min: 80, max: 8000 };
-        this.calibration = { min: 500, max: 2500 };
+        this.toneEngine = new ToneEngine(this.audioContext);
+        this.hapticEngine = new HapticEngine();
+
+        // Initialize Socket
+        const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        this.socket = io(BACKEND_URL, {
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            timeout: 20000
+        });
+
+        this.socket.on('connect', () => {
+            this.debugInfo.socketConnected = true;
+            this.logConnectionEvent('Connected');
+            this.flushSocketBuffer();
+        });
+
+        this.socket.on('disconnect', (reason) => {
+            this.debugInfo.socketConnected = false;
+            this.logConnectionEvent(`Disconnected: ${reason}`);
+        });
+
+        this.socket.on('analysis_update', (data) => {
+            this.latestBackendAnalysis = { ...data, timestamp: Date.now() };
+        });
+
+        // Clinical Metrics
+        this.calibrationOffset = 90;
+        this.hnrBuffer = [];
     }
 
     async start() {
         if (this.isActive) return;
+
         try {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            this.audioContext = new AudioContext({ latencyHint: 'interactive' });
-            this.debugInfo.contextState = this.audioContext.state;
-
-            // Unlock AudioContext
-            const buffer = this.audioContext.createBuffer(1, 1, 22050);
-            const source = this.audioContext.createBufferSource();
-            source.buffer = buffer;
-            source.connect(this.audioContext.destination);
-            source.start(0);
-
             if (this.audioContext.state === 'suspended') {
                 await this.audioContext.resume();
             }
-
-            this.toneEngine = new ToneEngine(this.audioContext);
-            this.hapticEngine = new HapticEngine();
-
-            // Initialize Socket
-            const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-            this.socket = io(BACKEND_URL, {
-                reconnection: true,
-                reconnectionDelay: 1000,
-                reconnectionDelayMax: 5000,
-                timeout: 20000
-            });
-
-            this.socket.on('connect', () => {
-                this.debugInfo.socketConnected = true;
-                this.logConnectionEvent('Connected');
-                this.flushSocketBuffer();
-            });
-
-            this.socket.on('disconnect', (reason) => {
-                this.debugInfo.socketConnected = false;
-                this.logConnectionEvent(`Disconnected: ${reason}`);
-            });
-
-            this.socket.on('analysis_update', (data) => {
-                this.latestBackendAnalysis = { ...data, timestamp: Date.now() };
-            });
 
             console.log("[AudioEngine] Requesting microphone access...");
             const stream = await navigator.mediaDevices.getUserMedia({
@@ -208,6 +204,7 @@ export class AudioEngine {
             alert("Mic access denied or Audio error: " + err.message);
         }
     }
+
 
     processAudioFrame() {
         if (!this.isActive) return;
@@ -334,244 +331,235 @@ export class AudioEngine {
                 const result = this.formantAnalyzer.analyze(windowed, TARGET_RATE);
                 f1 = result.f1;
                 f2 = result.f2;
-                vowel = result.vowel;
-            } else {
-                this.formantAnalyzer.reset();
-            }
 
-            // Prepare Update - Pass all calculated values
-            this.handleUpdate({
-                pitch: pitch > 0 ? pitch : -1,
-                pitchConfidence: pitchConfidence,
-                resonance: resonance,
-                resonanceConfidence: resonanceConfidence,
-                volume: rms,
-                jitter: jitter,
-                shimmer: shimmer,
-                weight: weight,
-                f1: this.smoothedF1,
-                f2: this.smoothedF2,
-                vowel: vowel,
-                spectrum: spectrum,
-                isSilent: rms < this.adaptiveThreshold
+                // Smoothing for UI
+                let smoothPitch = pitch;
+                if (pitch > 0) {
+                    this.smoothPitchBuffer.push(pitch);
+                    if (this.smoothPitchBuffer.length > 5) this.smoothPitchBuffer.shift();
+                    smoothPitch = MainDSP.median(this.smoothPitchBuffer);
+                } else {
+                    this.smoothPitchBuffer = [];
+                    smoothPitch = -1;
+                }
+
+                // Prosody
+                const prosody = this.analyzeProsody(smoothPitch);
+
+                // Resonance Score
+                let finalScore = 50;
+                let isBackendActive = false;
+                const now = Date.now();
+                const lastUpdate = this.latestBackendAnalysis.timestamp || 0;
+
+                if (this.socket && this.socket.connected && (now - lastUpdate < 2000)) {
+                    finalScore = this.latestBackendAnalysis.rbi_score || 50;
+                    isBackendActive = true;
+                } else {
+                    if (spectralCentroid > 0) {
+                        const minC = this.calibration.min;
+                        const maxC = this.calibration.max;
+                        const norm = Math.max(0, Math.min(1, (spectralCentroid - minC) / (maxC - minC)));
+                        finalScore = norm * 100;
+                    } else {
+                        finalScore = 0;
+                    }
+                }
+
+                // Calculate HNR (Harmonics-to-Noise Ratio)
+                let hnr = 0;
+                if (pitchConfidence > 0.8) {
+                    // Approximate HNR based on periodicity confidence
+                    // 0.8 -> 10dB, 0.9 -> 20dB, 0.99 -> 30dB
+                    hnr = 10 * Math.log10(pitchConfidence / (1 - pitchConfidence + 0.0001));
+                }
+                this.hnrBuffer.push(hnr);
+                if (this.hnrBuffer.length > 10) this.hnrBuffer.shift();
+                const smoothHNR = this.hnrBuffer.reduce((a, b) => a + b, 0) / this.hnrBuffer.length;
+
+                // Calculate CPP (Cepstral Peak Prominence)
+                // Simplified client-side estimation or use backend value
+                const cpp = this.latestBackendAnalysis.cpp_mean || 0;
+
+                this.onAudioUpdate({
+                    pitch: smoothPitch,
+                    pitchConfidence,
+                    clarity: pitchConfidence,
+                    resonance: spectralCentroid,
+                    resonanceConfidence,
+                    resonanceScore: finalScore,
+                    rbi: finalScore,
+                    isBackendActive,
+                    spectralCentroid: spectralCentroid,
+                    f1: f1 || 0,
+                    f2: f2 || 0,
+                    weight: weight || 50,
+                    volume: rms, // Use RMS as volume
+                    dbSPL: 20 * Math.log10(rms + 0.00001) + this.calibrationOffset,
+                    jitter: jitter,
+                    shimmer: shimmer,
+                    hnr: smoothHNR,
+                    cpp: cpp,
+                    vowel: vowel || '',
+                    prosody,
+                    spectrum: spectrum,
+                    debug: {
+                        backend: this.latestBackendAnalysis,
+                        method: 'MainThread (YIN)',
+                        pitchConfidence,
+                        resonanceConfidence
+                    }
+                });
+            }
+        }
+
+        analyzeProsody(currentPitch) {
+            if (currentPitch > 0) this.pitchBuffer.push(currentPitch); else if (this.pitchBuffer.length > 0) this.pitchBuffer.push(0);
+            if (this.pitchBuffer.length > 100) this.pitchBuffer.shift();
+            const validP = this.pitchBuffer.filter(p => p > 50 && p < 600);
+            if (validP.length < 10) return { semitoneRange: 0, slopeDirection: 'flat' };
+            let minP = Math.min(...validP); let maxP = Math.max(...validP); const stRange = MainDSP.hzToSemitones(maxP) - MainDSP.hzToSemitones(minP);
+            const contour = Math.min(1, stRange / 12);
+            const recent = validP.slice(-20); if (recent.length < 5) return { semitoneRange: stRange, slopeDirection: 'flat', contour };
+            const first = recent[0]; const last = recent[recent.length - 1]; const diff = last - first; let direction = 'flat'; if (diff > 5) direction = 'rising'; if (diff < -5) direction = 'falling';
+            return { semitoneRange: stRange, slopeDirection: direction, contour };
+        }
+
+        playFeedbackTone(freq) { if (this.toneEngine) this.toneEngine.play(freq, 0.15, 'sine'); }
+
+        triggerVibration(pattern) { if (this.hapticEngine) this.hapticEngine.trigger(pattern); }
+
+        startRecording() {
+            if (this.mediaRecorder && this.mediaRecorder.state === 'inactive') {
+                this.chunks = [];
+                this.mediaRecorder.start();
+                console.log("[AudioEngine] Recording started");
+            }
+        }
+
+    async stopRecording() {
+            return new Promise((resolve) => {
+                if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+                    this.mediaRecorder.onstop = () => {
+                        const blob = new Blob(this.chunks, { 'type': 'audio/ogg; codecs=opus' });
+                        console.log("[AudioEngine] Recording stopped, blob size:", blob.size);
+                        resolve({ blob, url: window.URL.createObjectURL(blob) });
+                    };
+                    this.mediaRecorder.stop();
+                } else {
+                    resolve(null);
+                }
+            });
+        }
+
+    async blobToAudioBuffer(blob) {
+            const arrayBuffer = await blob.arrayBuffer();
+            return await this.audioContext.decodeAudioData(arrayBuffer);
+        }
+
+        stop() {
+            if (!this.isActive) return;
+            if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+            if (this.microphone) this.microphone.disconnect();
+            if (this.audioContext) this.audioContext.close();
+            if (this.socket) {
+                this.socket.disconnect();
+                this.socket = null;
+            }
+            this.isActive = false;
+        }
+
+        setFilters(lowCutoff, highCutoff) {
+            this.filterSettings = { min: lowCutoff, max: highCutoff };
+            if (this.highpass) this.highpass.frequency.value = lowCutoff;
+            if (this.lowpass) this.lowpass.frequency.value = highCutoff;
+        }
+
+        setCalibration(min, max) {
+            this.calibration = { min, max };
+        }
+
+        setNoiseGate(threshold) {
+            // No-op for now, or update adaptiveThreshold logic
+        }
+
+        setListenMode(enabled) {
+            if (this.monitorGain) {
+                // Smooth transition to avoid clicks
+                const now = this.audioContext.currentTime;
+                const target = enabled ? 1.0 : 0.0;
+                this.monitorGain.gain.cancelScheduledValues(now);
+                this.monitorGain.gain.linearRampToValueAtTime(target, now + 0.1);
+                console.log(`[AudioEngine] Listen Mode: ${enabled ? 'ON' : 'OFF'}`);
+            }
+        }
+
+        getDebugState() {
+            return {
+                ...this.debugInfo,
+                bufferSize: this.socketBuffer.length
+            };
+        }
+
+        logConnectionEvent(msg) {
+            const time = new Date().toLocaleTimeString();
+            this.debugInfo.connectionLog.unshift(`[${time}] ${msg}`);
+            if (this.debugInfo.connectionLog.length > 10) this.debugInfo.connectionLog.pop();
+        }
+
+        sendAudioChunk(pcm) {
+            if (!this.socket) return;
+            const chunk = { pcm, sr: 16000 };
+            if (this.socket.connected) {
+                this.socket.emit('audio_chunk', chunk);
+            } else {
+                if (this.socketBuffer.length < this.MAX_BUFFER_SIZE) {
+                    this.socketBuffer.push(chunk);
+                }
+            }
+        }
+
+        flushSocketBuffer() {
+            if (!this.socket || !this.socket.connected || this.socketBuffer.length === 0) return;
+            console.log(`[AudioEngine] Flushing ${this.socketBuffer.length} buffered chunks...`);
+            while (this.socketBuffer.length > 0) {
+                const chunk = this.socketBuffer.shift();
+                this.socket.emit('audio_chunk', chunk);
+            }
+        }
+
+    async analyzeEnvironment(durationMs = 3000) {
+            if (!this.isActive) await this.start();
+            return new Promise((resolve) => {
+                const samples = [];
+                let clippingCount = 0;
+                const collector = (data) => {
+                    if (data.volume !== undefined) samples.push(data.volume);
+                    if (data.volume > 0.95) clippingCount++;
+                };
+                const originalHandler = this.onAudioUpdate;
+                this.onAudioUpdate = (data) => {
+                    collector(data);
+                    if (originalHandler) originalHandler(data);
+                };
+                setTimeout(() => {
+                    this.onAudioUpdate = originalHandler;
+                    if (samples.length === 0) {
+                        resolve({ score: 0, noiseFloor: 0, clipping: 0, message: "No audio detected" });
+                        return;
+                    }
+                    const avgVolume = samples.reduce((a, b) => a + b, 0) / samples.length;
+                    const maxVolume = Math.max(...samples);
+                    const noiseFloorDb = 20 * Math.log10(avgVolume + 0.0001);
+                    let score = 100;
+                    let message = "Environment is perfect!";
+                    if (avgVolume > 0.1) { score -= 30; message = "Background noise detected. Try to find a quieter spot."; }
+                    else if (avgVolume > 0.05) { score -= 10; message = "Slight background noise."; }
+                    if (clippingCount > 0) { score -= 50; message = "Microphone is clipping! Lower your input gain or move further away."; }
+                    else if (maxVolume > 0.9) { score -= 20; message = "Input levels are very high. Watch for clipping."; }
+                    else if (maxVolume < 0.01) { score -= 40; message = "Input level is too low. Move closer to the mic."; }
+                    resolve({ score: Math.max(0, Math.round(score)), noiseFloor: Math.round(noiseFloorDb), clipping: clippingCount, avgVolume, message });
+                }, durationMs);
             });
         }
     }
-
-    handleUpdate(data) {
-        if (!this.isActive) return;
-
-        const { pitch, pitchConfidence, resonance, resonanceConfidence, volume, jitter, shimmer, vowel, spectrum, isSilent, weight, f1, f2 } = data;
-
-        // Smoothing for UI
-        let smoothPitch = pitch;
-        if (pitch > 0) {
-            this.smoothPitchBuffer.push(pitch);
-            if (this.smoothPitchBuffer.length > 5) this.smoothPitchBuffer.shift();
-            smoothPitch = MainDSP.median(this.smoothPitchBuffer);
-        } else {
-            this.smoothPitchBuffer = [];
-            smoothPitch = -1;
-        }
-
-        // Prosody
-        const prosody = this.analyzeProsody(smoothPitch);
-
-        // Resonance Score
-        let finalScore = 50;
-        let isBackendActive = false;
-        const now = Date.now();
-        const lastUpdate = this.latestBackendAnalysis.timestamp || 0;
-
-        if (this.socket && this.socket.connected && (now - lastUpdate < 2000)) {
-            finalScore = this.latestBackendAnalysis.rbi_score || 50;
-            isBackendActive = true;
-        } else {
-            if (resonance > 0) {
-                const minC = this.calibration.min;
-                const maxC = this.calibration.max;
-                const norm = Math.max(0, Math.min(1, (resonance - minC) / (maxC - minC)));
-                finalScore = norm * 100;
-            } else {
-                finalScore = 0;
-            }
-        }
-
-        this.onAudioUpdate({
-            pitch: smoothPitch,
-            pitchConfidence,
-            clarity: pitchConfidence,
-            resonance: resonance,
-            resonanceConfidence,
-            resonanceScore: finalScore,
-            rbi: finalScore,
-            isBackendActive,
-            spectralCentroid: resonance,
-            f1: f1 || 0,
-            f2: f2 || 0,
-            weight: weight || 50,
-            volume: volume,
-            jitter: jitter,
-            shimmer: shimmer,
-            vowel: vowel || '',
-            prosody,
-            spectrum: spectrum,
-            debug: {
-                backend: this.latestBackendAnalysis,
-                method: 'MainThread (YIN)',
-                pitchConfidence,
-                resonanceConfidence
-            }
-        });
-    }
-
-    analyzeProsody(currentPitch) {
-        if (currentPitch > 0) this.pitchBuffer.push(currentPitch); else if (this.pitchBuffer.length > 0) this.pitchBuffer.push(0);
-        if (this.pitchBuffer.length > 100) this.pitchBuffer.shift();
-        const validP = this.pitchBuffer.filter(p => p > 50 && p < 600);
-        if (validP.length < 10) return { semitoneRange: 0, slopeDirection: 'flat' };
-        let minP = Math.min(...validP); let maxP = Math.max(...validP); const stRange = MainDSP.hzToSemitones(maxP) - MainDSP.hzToSemitones(minP);
-        const contour = Math.min(1, stRange / 12);
-        const recent = validP.slice(-20); if (recent.length < 5) return { semitoneRange: stRange, slopeDirection: 'flat', contour };
-        const first = recent[0]; const last = recent[recent.length - 1]; const diff = last - first; let direction = 'flat'; if (diff > 5) direction = 'rising'; if (diff < -5) direction = 'falling';
-        return { semitoneRange: stRange, slopeDirection: direction, contour };
-    }
-
-    playFeedbackTone(freq) { if (this.toneEngine) this.toneEngine.play(freq, 0.15, 'sine'); }
-
-    triggerVibration(pattern) { if (this.hapticEngine) this.hapticEngine.trigger(pattern); }
-
-    startRecording() {
-        if (this.mediaRecorder && this.mediaRecorder.state === 'inactive') {
-            this.chunks = [];
-            this.mediaRecorder.start();
-            console.log("[AudioEngine] Recording started");
-        }
-    }
-
-    async stopRecording() {
-        return new Promise((resolve) => {
-            if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-                this.mediaRecorder.onstop = () => {
-                    const blob = new Blob(this.chunks, { 'type': 'audio/ogg; codecs=opus' });
-                    console.log("[AudioEngine] Recording stopped, blob size:", blob.size);
-                    resolve({ blob, url: window.URL.createObjectURL(blob) });
-                };
-                this.mediaRecorder.stop();
-            } else {
-                resolve(null);
-            }
-        });
-    }
-
-    async blobToAudioBuffer(blob) {
-        const arrayBuffer = await blob.arrayBuffer();
-        return await this.audioContext.decodeAudioData(arrayBuffer);
-    }
-
-    stop() {
-        if (!this.isActive) return;
-        if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
-        if (this.microphone) this.microphone.disconnect();
-        if (this.audioContext) this.audioContext.close();
-        if (this.socket) {
-            this.socket.disconnect();
-            this.socket = null;
-        }
-        this.isActive = false;
-    }
-
-    setFilters(lowCutoff, highCutoff) {
-        this.filterSettings = { min: lowCutoff, max: highCutoff };
-        if (this.highpass) this.highpass.frequency.value = lowCutoff;
-        if (this.lowpass) this.lowpass.frequency.value = highCutoff;
-    }
-
-    setCalibration(min, max) {
-        this.calibration = { min, max };
-    }
-
-    setNoiseGate(threshold) {
-        // No-op for now, or update adaptiveThreshold logic
-    }
-
-    setListenMode(enabled) {
-        if (this.monitorGain) {
-            // Smooth transition to avoid clicks
-            const now = this.audioContext.currentTime;
-            const target = enabled ? 1.0 : 0.0;
-            this.monitorGain.gain.cancelScheduledValues(now);
-            this.monitorGain.gain.linearRampToValueAtTime(target, now + 0.1);
-            console.log(`[AudioEngine] Listen Mode: ${enabled ? 'ON' : 'OFF'}`);
-        }
-    }
-
-    getDebugState() {
-        return {
-            ...this.debugInfo,
-            bufferSize: this.socketBuffer.length
-        };
-    }
-
-    logConnectionEvent(msg) {
-        const time = new Date().toLocaleTimeString();
-        this.debugInfo.connectionLog.unshift(`[${time}] ${msg}`);
-        if (this.debugInfo.connectionLog.length > 10) this.debugInfo.connectionLog.pop();
-    }
-
-    sendAudioChunk(pcm) {
-        if (!this.socket) return;
-        const chunk = { pcm, sr: 16000 };
-        if (this.socket.connected) {
-            this.socket.emit('audio_chunk', chunk);
-        } else {
-            if (this.socketBuffer.length < this.MAX_BUFFER_SIZE) {
-                this.socketBuffer.push(chunk);
-            }
-        }
-    }
-
-    flushSocketBuffer() {
-        if (!this.socket || !this.socket.connected || this.socketBuffer.length === 0) return;
-        console.log(`[AudioEngine] Flushing ${this.socketBuffer.length} buffered chunks...`);
-        while (this.socketBuffer.length > 0) {
-            const chunk = this.socketBuffer.shift();
-            this.socket.emit('audio_chunk', chunk);
-        }
-    }
-
-    async analyzeEnvironment(durationMs = 3000) {
-        if (!this.isActive) await this.start();
-        return new Promise((resolve) => {
-            const samples = [];
-            let clippingCount = 0;
-            const collector = (data) => {
-                if (data.volume !== undefined) samples.push(data.volume);
-                if (data.volume > 0.95) clippingCount++;
-            };
-            const originalHandler = this.onAudioUpdate;
-            this.onAudioUpdate = (data) => {
-                collector(data);
-                if (originalHandler) originalHandler(data);
-            };
-            setTimeout(() => {
-                this.onAudioUpdate = originalHandler;
-                if (samples.length === 0) {
-                    resolve({ score: 0, noiseFloor: 0, clipping: 0, message: "No audio detected" });
-                    return;
-                }
-                const avgVolume = samples.reduce((a, b) => a + b, 0) / samples.length;
-                const maxVolume = Math.max(...samples);
-                const noiseFloorDb = 20 * Math.log10(avgVolume + 0.0001);
-                let score = 100;
-                let message = "Environment is perfect!";
-                if (avgVolume > 0.1) { score -= 30; message = "Background noise detected. Try to find a quieter spot."; }
-                else if (avgVolume > 0.05) { score -= 10; message = "Slight background noise."; }
-                if (clippingCount > 0) { score -= 50; message = "Microphone is clipping! Lower your input gain or move further away."; }
-                else if (maxVolume > 0.9) { score -= 20; message = "Input levels are very high. Watch for clipping."; }
-                else if (maxVolume < 0.01) { score -= 40; message = "Input level is too low. Move closer to the mic."; }
-                resolve({ score: Math.max(0, Math.round(score)), noiseFloor: Math.round(noiseFloorDb), clipping: clippingCount, avgVolume, message });
-            }, durationMs);
-        });
-    }
-}

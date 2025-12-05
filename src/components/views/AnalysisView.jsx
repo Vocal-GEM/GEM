@@ -8,7 +8,9 @@ import VoiceRangeProfile from '../viz/VoiceRangeProfile';
 import Spectrogram from '../viz/Spectrogram';
 import AssessmentView from '../coach/AssessmentView';
 import Toast from '../ui/Toast';
+import Toast from '../ui/Toast';
 import { CoachEngine } from '../../utils/coachEngine';
+import { getTargetNorms } from '../../data/VoiceNorms';
 
 import ClipCapture from '../ui/ClipCapture';
 
@@ -16,6 +18,9 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
     const { settings } = useSettings();
     const [localResults, setLocalResults] = useState(null);
     const analysisResults = propResults || localResults;
+
+    // Get norms based on settings
+    const norms = getTargetNorms(settings.genderTarget || 'feminine');
 
     const [activeTab, setActiveTab] = useState('transcript');
     const [vizSubTab, setVizSubTab] = useState('pitch');
@@ -281,7 +286,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                                                 : 'good'
                                     }
                                     description="How high or low your voice sounds. Higher values are more feminine, lower values are more masculine."
-                                    details={targetRange ? `Target: ${targetRange.min}-${targetRange.max} Hz` : null}
+                                    details={`Target: ${norms.pitch.min}-${norms.pitch.max} Hz`}
                                 />
 
                                 {/* Formants */}
@@ -291,7 +296,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                                     unit="Hz"
                                     status="neutral"
                                     description="The 'brightness' or 'darkness' of your voice. Higher resonance typically sounds brighter and more feminine."
-                                    details="F1: Throat size / F2: Tongue position"
+                                    details={`F1: ${norms.f1.label} / F2: ${norms.f2.label}`}
                                 />
 
                                 {/* Speech Rate */}
@@ -337,7 +342,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                                                     analysisResults.overall.jitter > 1.0 ? 'warning' : 'good'
                                         }
                                         description="Measures how steady your pitch is. Lower values mean a clearer voice."
-                                        details="Target: < 1.0%"
+                                        details={`Target: ${norms.jitter.label}`}
                                     />
 
                                     {/* HNR */}
@@ -350,7 +355,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                                                 analysisResults.overall.hnr < 15 ? 'warning' : 'good'
                                         }
                                         description="Harmonics-to-Noise Ratio. Higher values mean a clearer voice with less breathiness or hoarseness."
-                                        details="Target: > 15 dB"
+                                        details={`Target: ${norms.hnr.label}`}
                                     />
 
                                     {/* Shimmer */}
@@ -363,7 +368,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                                                 analysisResults.overall.shimmer > 3.8 ? 'warning' : 'good'
                                         }
                                         description="Measures how steady your volume is. Lower values mean a more stable voice."
-                                        details="Target: < 3.8%"
+                                        details={`Target: ${norms.shimmer.label}`}
                                     />
 
                                     {/* CPPS */}
