@@ -32,22 +32,12 @@ const CompassWizard = lazy(() => import('./components/ui/CompassWizard'));
 const CalibrationWizard = lazy(() => import('./components/ui/CalibrationWizard'));
 const HistoryView = lazy(() => import('./components/ui/HistoryView'));
 const CoachView = lazy(() => import('./components/ui/CoachView'));
-const AudioLibrary = lazy(() => import('./components/ui/AudioLibrary'));
-const ComparisonTool = lazy(() => import('./components/ui/ComparisonTool'));
-const ProgressView = lazy(() => import('./components/views/ProgressView'));
 const PracticeMode = lazy(() => import('./components/views/PracticeMode'));
 const AnalysisView = lazy(() => import('./components/views/AnalysisView'));
-const ArticulationView = lazy(() => import('./components/views/ArticulationView'));
-const VocalFoldsView = lazy(() => import('./components/views/VocalFoldsView'));
-const VoiceQualityView = lazy(() => import('./components/views/VoiceQualityView'));
-const FeminizationCourse = lazy(() => import('./components/ui/FeminizationCourse'));
 const AdaptivePracticeSession = lazy(() => import('./components/views/AdaptivePracticeSession'));
 const GuidedJourney = lazy(() => import('./components/ui/GuidedJourney'));
 
 // Lazy Loaded Components - Visualizations
-const VoiceQualityAnalysis = lazy(() => import('./components/viz/VoiceQualityAnalysis'));
-const VowelAnalysis = lazy(() => import('./components/viz/VowelAnalysis'));
-const DynamicOrb = lazy(() => import('./components/viz/DynamicOrb'));
 const ResonanceOrb = lazy(() => import('./components/viz/ResonanceOrb'));
 const LiveMetricsBar = lazy(() => import('./components/viz/LiveMetricsBar'));
 const GenderPerceptionDashboard = lazy(() => import('./components/ui/GenderPerceptionDashboard'));
