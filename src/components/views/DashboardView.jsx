@@ -2,6 +2,9 @@ import React from 'react';
 import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen } from 'lucide-react';
 import VocalHealthPanel from '../dashboard/VocalHealthPanel';
 import SmartCoachWidget from '../dashboard/SmartCoachWidget';
+import JourneyEntryCard from '../ui/JourneyEntryCard';
+import { useGuidedJourney } from '../../context/GuidedJourneyContext';
+import { useNavigation } from '../../context/NavigationContext';
 
 const StatCard = ({ label, value, subtext, icon, color }) => (
     <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
@@ -33,8 +36,40 @@ const ActionCard = ({ title, description, onClick, icon, color }) => (
 );
 
 const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
+    const {
+        hasInProgressJourney,
+        isJourneyComplete,
+        getProgressPercentage,
+        getCurrentStep,
+        resumeJourney
+    } = useGuidedJourney();
+    const { openModal } = useNavigation();
+
+    const handleStartJourney = () => {
+        openModal('guidedJourney');
+    };
+
+    const handleResumeJourney = () => {
+        resumeJourney();
+        openModal('guidedJourney');
+    };
+
+    const currentStep = getCurrentStep();
+
     return (
         <div className="w-full min-h-screen bg-black p-6 lg:p-12">
+            {/* Guided Journey Entry - Featured prominently for first-time users */}
+            <div className="mb-8">
+                <JourneyEntryCard
+                    onStart={handleStartJourney}
+                    onResume={handleResumeJourney}
+                    hasInProgress={hasInProgressJourney()}
+                    progressPercentage={getProgressPercentage()}
+                    currentStepTitle={currentStep?.title || ''}
+                    isComplete={isJourneyComplete}
+                />
+            </div>
+
             {/* Smart Coach Widget */}
             <SmartCoachWidget onStartSession={onOpenAdaptiveSession} />
 

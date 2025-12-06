@@ -514,4 +514,108 @@ export class AudioEngine {
         // Store noise gate setting for use in processing loop
         this.noiseGateThreshold = threshold || 0.01;
     }
+
+    /**
+     * Set calibration values for dark/bright resonance
+     * @param {number} dark - Dark resonance calibration value
+     * @param {number} bright - Bright resonance calibration value
+     */
+    setCalibration(dark, bright) {
+        this.calibrationDark = dark;
+        this.calibrationBright = bright;
+    }
+
+    /**
+     * Set frequency filters for pitch detection
+     * @param {number} min - Minimum frequency filter
+     * @param {number} max - Maximum frequency filter
+     */
+    setFilters(min, max) {
+        this.filterMin = min;
+        this.filterMax = max;
+    }
+
+    /**
+     * Start recording audio to a clip
+     * Uses MediaRecorder to capture audio data
+     */
+    async startRecording() {
+        if (this.isRecording) return;
+
+        // Make sure audio is active first
+        if (!this.isActive) {
+            await this.start();
+        }
+
+        try {
+            // Get a fresh stream for recording
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false
+                }
+            });
+
+            this.recordingChunks = [];
+            this.mediaRecorder = new MediaRecorder(stream, {
+                mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+                    ? 'audio/webm;codecs=opus'
+                    : 'audio/webm'
+            });
+
+            this.mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) {
+                    this.recordingChunks.push(e.data);
+                }
+            };
+
+            this.mediaRecorder.start(100); // Collect data every 100ms
+            this.isRecording = true;
+            this.recordingStartTime = Date.now();
+            console.log('[AudioEngine] Recording started');
+        } catch (error) {
+            console.error('[AudioEngine] Failed to start recording:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Stop recording and return the audio blob and analysis
+     * @returns {Promise<{blob: Blob, url: string, duration: number, analysis: Object}>}
+     */
+    async stopRecording() {
+        if (!this.mediaRecorder || !this.isRecording) {
+            return null;
+        }
+
+        return new Promise((resolve) => {
+            this.mediaRecorder.onstop = () => {
+                const blob = new Blob(this.recordingChunks, { type: 'audio/webm' });
+                const url = URL.createObjectURL(blob);
+                const duration = (Date.now() - this.recordingStartTime) / 1000;
+
+                // Stop the recording stream tracks
+                if (this.mediaRecorder.stream) {
+                    this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                }
+
+                this.isRecording = false;
+                this.recordingChunks = [];
+                console.log('[AudioEngine] Recording stopped, duration:', duration, 's');
+
+                resolve({
+                    blob,
+                    url,
+                    duration,
+                    analysis: {
+                        // Return latest analysis data
+                        ...this.latestBackendAnalysis
+                    }
+                });
+            };
+
+            this.mediaRecorder.stop();
+        });
+    }
 }

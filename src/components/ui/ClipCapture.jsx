@@ -25,7 +25,7 @@ const ClipCapture = ({ onCapture }) => {
                 onCapture(result);
             }
         } else {
-            startRecording();
+            await startRecording();
         }
     };
 

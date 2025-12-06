@@ -13,6 +13,7 @@ import { ClientProvider } from './context/ClientContext'
 import { NavigationProvider } from './context/NavigationContext'
 import { LayoutProvider } from './context/LayoutContext'
 import { ToastProvider } from './context/ToastContext'
+import { GuidedJourneyProvider } from './context/GuidedJourneyContext'
 import GlobalErrorBoundary from './components/ui/GlobalErrorBoundary'
 
 import { registerSW } from 'virtual:pwa-register'
@@ -37,9 +38,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                                     <StatsProvider>
                                         <JournalProvider>
                                             <ClientProvider>
-                                                <HashRouter>
-                                                    <App />
-                                                </HashRouter>
+                                                <GuidedJourneyProvider>
+                                                    <HashRouter>
+                                                        <App />
+                                                    </HashRouter>
+                                                </GuidedJourneyProvider>
                                             </ClientProvider>
                                         </JournalProvider>
                                     </StatsProvider>

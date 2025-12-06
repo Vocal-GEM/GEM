@@ -142,10 +142,15 @@ export const AudioProvider = ({ children }) => {
         return await audioEngineRef.current.analyzeEnvironment();
     };
 
-    const startRecording = () => {
+    const startRecording = async () => {
         if (audioEngineRef.current) {
-            audioEngineRef.current.startRecording();
-            setIsRecording(true);
+            try {
+                await audioEngineRef.current.startRecording();
+                setIsRecording(true);
+            } catch (error) {
+                console.error('[AudioContext] Failed to start recording:', error);
+                setAudioError(error.message || 'Failed to start recording');
+            }
         }
     };
 

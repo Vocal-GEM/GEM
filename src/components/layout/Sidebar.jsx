@@ -19,6 +19,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
 
     const navItems = [
         { id: 'dashboard', label: 'Dashboard', icon: <Home size={20} /> },
+        { id: 'practice', label: 'Practice', icon: <Activity size={20} /> },
         { id: 'analysis', label: 'Voice Analysis', icon: <Mic size={20} /> },
         { id: 'assessment', label: 'Voice Assessment', icon: <BookOpen size={20} /> },
         { id: 'acoustics', label: 'Acoustic Analysis', icon: <Activity size={20} /> },

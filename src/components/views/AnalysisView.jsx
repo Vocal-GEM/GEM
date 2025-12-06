@@ -42,49 +42,75 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
     const handleRecordingComplete = async (recordingResult) => {
         setIsAnalyzing(true);
         try {
-            // AudioEngine returns { blob, url }
-            const { blob, url } = recordingResult;
+            // AudioEngine returns { blob, url, duration, analysis }
+            const { blob, url, duration, analysis } = recordingResult;
 
-            const formData = new FormData();
-            formData.append('audio', blob, 'recording.wav');
+            // Try backend analysis first
+            try {
+                const formData = new FormData();
+                formData.append('audio', blob, 'recording.webm');
 
-            const response = await fetch('/api/analyze', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (!response.ok) {
-                let errorMessage = 'Analysis failed';
-                try {
-                    const errorData = await response.json();
-                    errorMessage = errorData.error || errorMessage;
-                } catch (e) {
-                    // ignore json parse error
-                }
-                throw new Error(errorMessage);
-            }
-
-            const data = await response.json();
-
-            if (data.words) {
-                const center = targetRange ? (targetRange.min + targetRange.max) / 2 : 200;
-                data.words = data.words.map(word => {
-                    let deviations = 0;
-                    if (word.metrics && word.metrics.pitch && word.metrics.pitch.mean) {
-                        deviations = Math.abs(word.metrics.pitch.mean - center) / center;
-                    }
-                    return { ...word, deviations };
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    body: formData,
                 });
+
+                if (!response.ok) {
+                    throw new Error('Backend unavailable');
+                }
+
+                const data = await response.json();
+
+                if (data.words) {
+                    const center = targetRange ? (targetRange.min + targetRange.max) / 2 : 200;
+                    data.words = data.words.map(word => {
+                        let deviations = 0;
+                        if (word.metrics && word.metrics.pitch && word.metrics.pitch.mean) {
+                            deviations = Math.abs(word.metrics.pitch.mean - center) / center;
+                        }
+                        return { ...word, deviations };
+                    });
+                }
+
+                setLocalResults(data);
+                showToast("Analysis complete!", "success");
+
+            } catch (backendError) {
+                // Backend unavailable - use client-side fallback
+                console.warn("Backend analysis unavailable, using client-side fallback:", backendError);
+
+                // Create fallback results from AudioEngine's realtime analysis
+                const fallbackResults = {
+                    transcript: "(Transcription requires backend server)",
+                    duration: duration,
+                    overall: {
+                        pitch: {
+                            mean: analysis?.pitch || 0,
+                            min: analysis?.pitch ? analysis.pitch * 0.8 : 0,
+                            max: analysis?.pitch ? analysis.pitch * 1.2 : 0
+                        },
+                        formants: {
+                            f1: analysis?.f1 || 0,
+                            f2: analysis?.f2 || 0
+                        },
+                        jitter: analysis?.jitter || 0,
+                        shimmer: analysis?.shimmer || 0,
+                        hnr: analysis?.hnr || 0,
+                        intensity: analysis?.intensity || 0
+                    },
+                    words: [],
+                    isClientSideFallback: true
+                };
+
+                setLocalResults(fallbackResults);
+                showToast("Recording saved! Full analysis requires backend server.", "info");
             }
 
-            setLocalResults(data);
-
+            // Set audio player source regardless of backend status
             if (audioRef.current) {
                 audioRef.current.src = url;
                 audioRef.current.load();
             }
-
-            showToast("Analysis complete!", "success");
 
         } catch (error) {
             console.error("Analysis error:", error);

@@ -49,6 +49,7 @@ const VocalFoldsView = lazy(() => import('./components/views/VocalFoldsView'));
 const VoiceQualityView = lazy(() => import('./components/views/VoiceQualityView'));
 const FeminizationCourse = lazy(() => import('./components/ui/FeminizationCourse'));
 const AdaptivePracticeSession = lazy(() => import('./components/views/AdaptivePracticeSession'));
+const GuidedJourney = lazy(() => import('./components/ui/GuidedJourney'));
 
 // Lazy Loaded Components - Visualizations
 const VoiceQualityAnalysis = lazy(() => import('./components/viz/VoiceQualityAnalysis'));
@@ -440,6 +441,11 @@ const App = () => {
                                     <AdaptivePracticeSession onClose={() => closeModal('adaptiveSession')} />
                                 </Suspense>
                             </div>
+                        )}
+                        {modals.guidedJourney && (
+                            <Suspense fallback={<LoadingSpinner />}>
+                                <GuidedJourney onClose={() => closeModal('guidedJourney')} />
+                            </Suspense>
                         )}
 
                         <CelebrationModal

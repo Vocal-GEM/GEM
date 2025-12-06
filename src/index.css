@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Force black background on html and body */
+html,
+body {
+  background-color: #000000;
+}
+
 :root {
   /* Glassmorphism */
   --glass-border: rgba(255, 255, 255, 0.1);

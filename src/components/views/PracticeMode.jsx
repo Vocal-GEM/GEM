@@ -230,122 +230,122 @@ const PracticeMode = ({
                         )}
                     </button>
                 </div>
+            </div>
 
-                {/* Main Content Grid */}
-                <div className="flex flex-col lg:flex-row gap-4 mb-4">
-                    {/* Left Column: Visualization */}
-                    <ResizablePanel
-                        className="flex flex-col relative flex-shrink-0 w-full lg:w-1/2"
-                        defaultHeight={500}
-                        defaultWidth={null}
-                        minWidth={300}
-                    >
-                        <div id="visualization-area" className="flex flex-col h-full relative">
-                            <div className="h-full w-full relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5 shadow-2xl">
-                                <ErrorBoundary>
-                                    <Suspense fallback={<LoadingSpinner />}>
-                                        {practiceTab === 'overview' && (
-                                            <DynamicOrb
-                                                dataRef={dataRef}
-                                                calibration={calibration}
-                                                showDebug={false}
-                                                colorBlindMode={settings.colorBlindMode}
-                                            />
-                                        )}
-                                        {practiceTab === 'pitch' && <PitchVisualizer dataRef={dataRef} targetRange={targetRange} />}
-                                        {practiceTab === 'resonance' && <ResonanceOrb dataRef={dataRef} />}
-                                        {practiceTab === 'weight' && <VoiceQualityMeter dataRef={dataRef} userMode="user" showAnalysis={false} />}
-                                        {practiceTab === 'vowel' && <VowelSpacePlot dataRef={dataRef} showAnalysis={false} />}
-                                        {practiceTab === 'spectrogram' && <Spectrogram dataRef={dataRef} />}
-                                    </Suspense>
-                                </ErrorBoundary>
-                            </div>
-                        </div>
-
-                        {/* Comparison Tool (hidden on overview/resonance to save space/redundancy) */}
-                        {
-                            practiceTab !== 'overview' && practiceTab !== 'resonance' && (
-                                <div className="mt-3">
-                                    <ComparisonTool />
-                                </div>
-                            )
-                        }
-                    </ResizablePanel>
-
-                    {/* Right Column: Dashboard & Tools */}
-                    <div id="dashboard-area" className="flex-1 flex flex-col min-h-[600px] h-full overflow-y-auto custom-scrollbar pr-2 space-y-3 min-w-[300px]">
-                        {/* Gender Perception Dashboard */}
-                        <div className="min-h-[300px]">
-                            <GenderPerceptionDashboard dataRef={dataRef} view={practiceTab === 'overview' ? 'all' : practiceTab} />
-                        </div>
-
-                        {/* Context-Specific Tools */}
-                        {
-                            practiceTab === 'pitch' && (
-                                <div className="space-y-3 animate-in slide-in-from-right-4 fade-in duration-300">
-                                    <PitchTargets audioEngine={audioEngineRef} />
-                                    <PitchPipe audioEngine={audioEngineRef} />
-                                </div>
-                            )
-                        }
-
-                        {
-                            practiceTab === 'weight' && (
-                                <div className="animate-in slide-in-from-right-4 fade-in duration-300">
-                                    <VoiceQualityAnalysis
-                                        dataRef={dataRef}
-                                        colorBlindMode={settings.colorBlindMode}
-                                        toggleAudio={toggleAudio}
-                                        isAudioActive={isAudioActive}
-                                    />
-                                </div>
-                            )
-                        }
-
-                        {
-                            practiceTab === 'vowel' && (
-                                <div className="animate-in slide-in-from-right-4 fade-in duration-300">
-                                    <VowelAnalysis dataRef={dataRef} colorBlindMode={settings.colorBlindMode} />
-                                </div>
-                            )
-                        }
-
-                        {/* Exercises */}
-                        <ToolExercises tool={practiceTab === 'overview' ? 'all' : practiceTab} audioEngine={audioEngineRef.current} />
-
-                        {/* Quick Links */}
-                        <div className="grid grid-cols-2 gap-3 pt-2">
-                            <button onClick={() => openModal('adaptiveSession')} className="col-span-2 p-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 transition-all shadow-lg shadow-blue-900/20 flex flex-row items-center justify-center gap-3 text-center group border border-white/10">
-                                <div className="p-2 rounded-full bg-white/20 text-white group-hover:scale-110 transition-transform">
-                                    <Play size={24} fill="currentColor" />
-                                </div>
-                                <div className="text-left">
-                                    <span className="block text-lg font-bold text-white">Start Daily Training</span>
-                                    <span className="block text-xs text-blue-100 opacity-80">Personalized biofeedback routine</span>
-                                </div>
-                            </button>
-
-                            <button onClick={() => openModal('assessment')} className="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors flex flex-col items-center gap-2 text-center group">
-                                <div className="p-2 rounded-full bg-blue-500/10 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                                    <Activity size={20} />
-                                </div>
-                                <span className="text-sm font-bold">Assessment</span>
-                            </button>
-                            <button onClick={() => openModal('warmup')} className="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors flex flex-col items-center gap-2 text-center group">
-                                <div className="p-2 rounded-full bg-orange-500/10 text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-colors">
-                                    <Play size={20} />
-                                </div>
-                                <span className="text-sm font-bold">Warm Up</span>
-                            </button>
-                            <button onClick={() => openModal('calibration')} className="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors flex flex-col items-center gap-2 text-center group">
-                                <div className="p-2 rounded-full bg-green-500/10 text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
-                                    <RefreshCw size={20} />
-                                </div>
-                                <span className="text-sm font-bold">Recalibrate</span>
-                            </button>
+            {/* Main Content Grid */}
+            <div className="flex flex-col lg:flex-row gap-4 w-full">
+                {/* Left Column: Visualization - Takes more space */}
+                <ResizablePanel
+                    className="flex flex-col relative flex-shrink-0 w-full lg:w-3/5"
+                    defaultHeight={550}
+                    defaultWidth={null}
+                    minWidth={400}
+                >
+                    <div id="visualization-area" className="flex flex-col h-full relative">
+                        <div className="h-full w-full relative z-20 rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5 shadow-2xl">
+                            <ErrorBoundary>
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    {practiceTab === 'overview' && (
+                                        <DynamicOrb
+                                            dataRef={dataRef}
+                                            calibration={calibration}
+                                            showDebug={false}
+                                            colorBlindMode={settings.colorBlindMode}
+                                        />
+                                    )}
+                                    {practiceTab === 'pitch' && <PitchVisualizer dataRef={dataRef} targetRange={targetRange} />}
+                                    {practiceTab === 'resonance' && <ResonanceOrb dataRef={dataRef} />}
+                                    {practiceTab === 'weight' && <VoiceQualityMeter dataRef={dataRef} userMode="user" showAnalysis={false} />}
+                                    {practiceTab === 'vowel' && <VowelSpacePlot dataRef={dataRef} showAnalysis={false} />}
+                                    {practiceTab === 'spectrogram' && <Spectrogram dataRef={dataRef} />}
+                                </Suspense>
+                            </ErrorBoundary>
                         </div>
                     </div>
+
+                    {/* Comparison Tool (hidden on overview/resonance to save space/redundancy) */}
+                    {
+                        practiceTab !== 'overview' && practiceTab !== 'resonance' && (
+                            <div className="mt-3">
+                                <ComparisonTool />
+                            </div>
+                        )
+                    }
+                </ResizablePanel>
+
+                {/* Right Column: Dashboard & Tools */}
+                <div id="dashboard-area" className="flex-1 flex flex-col min-h-[600px] h-full overflow-y-auto custom-scrollbar space-y-3 min-w-[320px] lg:w-2/5">
+                    {/* Gender Perception Dashboard */}
+                    <div className="min-h-[300px]">
+                        <GenderPerceptionDashboard dataRef={dataRef} view={practiceTab === 'overview' ? 'all' : practiceTab} />
+                    </div>
+
+                    {/* Context-Specific Tools */}
+                    {
+                        practiceTab === 'pitch' && (
+                            <div className="space-y-3 animate-in slide-in-from-right-4 fade-in duration-300">
+                                <PitchTargets audioEngine={audioEngineRef} />
+                                <PitchPipe audioEngine={audioEngineRef} />
+                            </div>
+                        )
+                    }
+
+                    {
+                        practiceTab === 'weight' && (
+                            <div className="animate-in slide-in-from-right-4 fade-in duration-300">
+                                <VoiceQualityAnalysis
+                                    dataRef={dataRef}
+                                    colorBlindMode={settings.colorBlindMode}
+                                    toggleAudio={toggleAudio}
+                                    isAudioActive={isAudioActive}
+                                />
+                            </div>
+                        )
+                    }
+
+                    {
+                        practiceTab === 'vowel' && (
+                            <div className="animate-in slide-in-from-right-4 fade-in duration-300">
+                                <VowelAnalysis dataRef={dataRef} colorBlindMode={settings.colorBlindMode} />
+                            </div>
+                        )
+                    }
+
+                    {/* Exercises */}
+                    <ToolExercises tool={practiceTab === 'overview' ? 'all' : practiceTab} audioEngine={audioEngineRef.current} />
                 </div>
+            </div>
+
+            {/* Quick Links - Full width below main content */}
+            <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <button onClick={() => openModal('adaptiveSession')} className="col-span-2 lg:col-span-2 p-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 transition-all shadow-lg shadow-blue-900/20 flex flex-row items-center justify-center gap-3 text-center group border border-white/10">
+                    <div className="p-2 rounded-full bg-white/20 text-white group-hover:scale-110 transition-transform">
+                        <Play size={24} fill="currentColor" />
+                    </div>
+                    <div className="text-left">
+                        <span className="block text-lg font-bold text-white">Start Daily Training</span>
+                        <span className="block text-xs text-blue-100 opacity-80">Personalized biofeedback routine</span>
+                    </div>
+                </button>
+
+                <button onClick={() => openModal('assessment')} className="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors flex flex-col items-center gap-2 text-center group">
+                    <div className="p-2 rounded-full bg-blue-500/10 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                        <Activity size={20} />
+                    </div>
+                    <span className="text-sm font-bold">Assessment</span>
+                </button>
+                <button onClick={() => openModal('warmup')} className="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors flex flex-col items-center gap-2 text-center group">
+                    <div className="p-2 rounded-full bg-orange-500/10 text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                        <Play size={20} />
+                    </div>
+                    <span className="text-sm font-bold">Warm Up</span>
+                </button>
+                <button onClick={() => openModal('calibration')} className="col-span-2 lg:col-span-4 p-4 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors flex flex-row items-center justify-center gap-3 text-center group">
+                    <div className="p-2 rounded-full bg-green-500/10 text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
+                        <RefreshCw size={20} />
+                    </div>
+                    <span className="text-sm font-bold">Recalibrate Voice Profile</span>
+                </button>
             </div>
         </div>
     );
