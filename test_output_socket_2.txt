@@ -1,0 +1,108 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.14 [39m[90mC:/Users/riley/Desktop/GEM[39m
+
+[90mstdout[2m | src/engines/AudioEngine.socket.test.js[2m > [22m[2mAudioEngine Socket Integration[2m > [22m[2mshould initialize socket on start
+[22m[39m[AudioEngine] Requesting microphone access...
+
+stderr | src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should initialize socket on start
+MediaRecorder init failed: ReferenceError: MediaRecorder is not defined
+    at AudioEngine.start (C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.js:156:46)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.socket.test.js:90:9
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:919:20
+
+[90mstdout[2m | src/engines/AudioEngine.socket.test.js[2m > [22m[2mAudioEngine Socket Integration[2m > [22m[2mshould initialize socket on start
+[22m[39m[AudioEngine] Microphone access granted
+[AudioEngine] Γ£à Audio chain connected: Mic -> Filters -> Analyser (Main Thread)
+
+[90mstdout[2m | src/engines/AudioEngine.socket.test.js[2m > [22m[2mAudioEngine Socket Integration[2m > [22m[2mshould handle socket connection events
+[22m[39m[AudioEngine] Requesting microphone access...
+
+[90mstdout[2m | src/engines/AudioEngine.socket.test.js[2m > [22m[2mAudioEngine Socket Integration[2m > [22m[2mshould handle socket connection events
+[22m[39m[AudioEngine] Microphone access granted
+[AudioEngine] Γ£à Audio chain connected: Mic -> Filters -> Analyser (Main Thread)
+
+stderr | src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should handle socket connection events
+MediaRecorder init failed: ReferenceError: MediaRecorder is not defined
+    at AudioEngine.start (C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.js:156:46)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.socket.test.js:96:9
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:919:20
+
+[90mstdout[2m | src/engines/AudioEngine.socket.test.js[2m > [22m[2mAudioEngine Socket Integration[2m > [22m[2mshould emit audio_chunk when connected
+[22m[39m[AudioEngine] Requesting microphone access...
+
+stderr | src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should emit audio_chunk when connected
+MediaRecorder init failed: ReferenceError: MediaRecorder is not defined
+    at AudioEngine.start (C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.js:156:46)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.socket.test.js:112:9
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:919:20
+
+[90mstdout[2m | src/engines/AudioEngine.socket.test.js[2m > [22m[2mAudioEngine Socket Integration[2m > [22m[2mshould emit audio_chunk when connected
+[22m[39m[AudioEngine] Microphone access granted
+[AudioEngine] Γ£à Audio chain connected: Mic -> Filters -> Analyser (Main Thread)
+
+[90mstdout[2m | src/engines/AudioEngine.socket.test.js[2m > [22m[2mAudioEngine Socket Integration[2m > [22m[2mshould buffer chunks when disconnected and flush on connect
+[22m[39m[AudioEngine] Requesting microphone access...
+
+[90mstdout[2m | src/engines/AudioEngine.socket.test.js[2m > [22m[2mAudioEngine Socket Integration[2m > [22m[2mshould buffer chunks when disconnected and flush on connect
+[22m[39m[AudioEngine] Microphone access granted
+[AudioEngine] Γ£à Audio chain connected: Mic -> Filters -> Analyser (Main Thread)
+
+stderr | src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should buffer chunks when disconnected and flush on connect
+MediaRecorder init failed: ReferenceError: MediaRecorder is not defined
+    at AudioEngine.start (C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.js:156:46)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.socket.test.js:125:9
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:919:20
+
+[90mstdout[2m | src/engines/AudioEngine.socket.test.js[2m > [22m[2mAudioEngine Socket Integration[2m > [22m[2mshould buffer chunks when disconnected and flush on connect
+[22m[39m[AudioEngine] Flushing 1 buffered chunks...
+
+[90mstdout[2m | src/engines/AudioEngine.socket.test.js[2m > [22m[2mAudioEngine Socket Integration[2m > [22m[2mshould update latestBackendAnalysis on analysis_update
+[22m[39m[AudioEngine] Requesting microphone access...
+
+[90mstdout[2m | src/engines/AudioEngine.socket.test.js[2m > [22m[2mAudioEngine Socket Integration[2m > [22m[2mshould update latestBackendAnalysis on analysis_update
+[22m[39m[AudioEngine] Microphone access granted
+[AudioEngine] Γ£à Audio chain connected: Mic -> Filters -> Analyser (Main Thread)
+
+stderr | src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should update latestBackendAnalysis on analysis_update
+MediaRecorder init failed: ReferenceError: MediaRecorder is not defined
+    at AudioEngine.start (C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.js:156:46)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.socket.test.js:147:9
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/@vitest/runner/dist/index.js:919:20
+
+ [31mΓ¥»[39m src/engines/AudioEngine.socket.test.js [2m([22m[2m5 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[32m 202[2mms[22m[39m
+[31m     [31m├ù[31m should initialize socket on start[39m[32m 46[2mms[22m[39m
+[31m     [31m├ù[31m should handle socket connection events[39m[32m 50[2mms[22m[39m
+[31m     [31m├ù[31m should emit audio_chunk when connected[39m[32m 35[2mms[22m[39m
+[31m     [31m├ù[31m should buffer chunks when disconnected and flush on connect[39m[32m 35[2mms[22m[39m
+[31m     [31m├ù[31m should update latestBackendAnalysis on analysis_update[39m[32m 33[2mms[22m[39m
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 5 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should initialize socket on start
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should handle socket connection events
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should emit audio_chunk when connected
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should buffer chunks when disconnected and flush on connect
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should update latestBackendAnalysis on analysis_update
+TypeError: this.audioContext.close is not a function
+ Γ¥» AudioEngine.stop src/engines/AudioEngine.js:506:50
+    504|         if (this.animationFrameId) cancelAnimationFrame(this.animationΓÇª
+    505|         if (this.microphone) this.microphone.disconnect();
+    506|         if (this.audioContext) this.audioContext.close();
+       |                                                  ^
+    507|         if (this.socket) {
+    508|             this.socket.disconnect();
+ Γ¥» src/engines/AudioEngine.socket.test.js:85:28
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/5]ΓÄ»
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[90m (5)[39m
+[2m   Start at [22m 11:32:21
+[2m   Duration [22m 3.16s[2m (transform 169ms, setup 196ms, import 249ms, tests 202ms, environment 1.48s)[22m
+

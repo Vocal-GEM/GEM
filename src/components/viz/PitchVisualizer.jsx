@@ -6,6 +6,8 @@ import { frequencyToNote, getCentsDeviation } from '../../utils/musicUtils';
 import { useAudio } from '../../context/AudioContext';
 import { useFeedback } from '../../hooks/useFeedback';
 import FeedbackControls from '../ui/FeedbackControls';
+import { NormsService } from '../../services/NormsService';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, onScore, settings }) => {
     const { voiceProfiles } = useProfile();
@@ -19,6 +21,10 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
     const [averagePitchRange, setAveragePitchRange] = useState({ lowest: null, highest: null });
     const [showUnstableHelp, setShowUnstableHelp] = useState(false);
 
+    const label = userMode === 'slp' ? 'Fundamental Frequency (F0)' : 'Pitch';
+    const { audioEngineRef } = useAudio();
+    const { settings: feedbackSettings, setSettings: setFeedbackSettings } = useFeedback(audioEngineRef, dataRef);
+
     useEffect(() => {
         balloonRef.current.src = '/assets/balloon.png';
         birdRef.current.src = '/assets/bird.png';
@@ -27,7 +33,7 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
     const handleZoomIn = () => {
         setZoomRange(prev => {
             const range = prev.max - prev.min;
-            if (range <= 100) return prev; // Max zoom limit
+            if (range <= 100) return prev;
             const center = (prev.min + prev.max) / 2;
             const newRange = range * 0.8;
             return { min: center - newRange / 2, max: center + newRange / 2 };
@@ -37,10 +43,10 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
     const handleZoomOut = () => {
         setZoomRange(prev => {
             const range = prev.max - prev.min;
-            if (range >= 1000) return prev; // Min zoom limit
+            if (range >= 1000) return prev;
             const center = (prev.min + prev.max) / 2;
             const newRange = range * 1.25;
-            return { min: Math.max(0, center - newRange / 2), max: center + newRange / 2 }; // Prevent negative freq
+            return { min: Math.max(0, center - newRange / 2), max: center + newRange / 2 };
         });
     };
 
@@ -56,53 +62,42 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
 
         if (exercise) gameRef.current = { score: 0, lastUpdate: Date.now(), lastPitch: 0 };
 
-        // Helper to get color based on frequency
         const getPitchColor = (freq, clarity = 1.0) => {
-            // 1. Confidence Check
-            // If clarity is low (e.g. < 0.8), don't give "success" colors
             if (clarity < 0.8) {
-                return colorBlindMode ? '#9333ea' : '#ef4444'; // Default to "Out of Range" / Unstable
+                return colorBlindMode ? '#9333ea' : '#ef4444';
             }
 
             const fem = voiceProfiles.find(p => p.id === 'fem');
             const masc = voiceProfiles.find(p => p.id === 'masc');
 
-            // Use genderRange if available, fallback to targetRange
             const femRange = fem?.genderRange || fem?.targetRange;
             const mascRange = masc?.genderRange || masc?.targetRange;
 
-            // Check if within target range (primary success)
             if (targetRange && freq >= targetRange.min && freq <= targetRange.max) {
-                if (colorBlindMode) return '#0d9488'; // Teal-600 (Safe)
-                return '#22c55e'; // Green-500
+                if (colorBlindMode) return '#0d9488';
+                return '#22c55e';
             }
 
-            // Check if within tolerance (near miss) - Cents based (e.g. +/- 50 cents)
-            // 50 cents is approx 3% frequency deviation (2^(50/1200) ~= 1.029)
             if (targetRange) {
-                // Calculate cents distance from nearest edge
                 const distMin = 1200 * Math.log2(freq / targetRange.min);
                 const distMax = 1200 * Math.log2(freq / targetRange.max);
 
-                // If within 50 cents of min (below) or max (above)
                 if ((distMin > -50 && distMin < 0) || (distMax > 0 && distMax < 50)) {
-                    if (colorBlindMode) return '#f59e0b'; // Amber-500 (Safe)
-                    return '#eab308'; // Yellow-500
+                    if (colorBlindMode) return '#f59e0b';
+                    return '#eab308';
                 }
             }
 
-            // Check Gender Ranges
             if (femRange && freq >= femRange.min && freq <= femRange.max) {
-                return '#e879f9'; // Fuchsia-400 (Feminine)
+                return '#e879f9';
             }
 
             if (mascRange && freq >= mascRange.min && freq <= mascRange.max) {
-                return '#60a5fa'; // Blue-400 (Masculine)
+                return '#60a5fa';
             }
 
-            // Out of range
-            if (colorBlindMode) return '#9333ea'; // Purple-600 (Safe for contrast against teal/amber)
-            return '#ef4444'; // Red-500
+            if (colorBlindMode) return '#9333ea';
+            return '#ef4444';
         };
 
         const loop = () => {
@@ -120,52 +115,60 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
             const yMax = zoomRange.max;
             const mapY = (freq) => height - ((freq - yMin) / (yMax - yMin)) * height;
 
-            // Draw Grid & Axis
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
             ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
             ctx.font = '10px sans-serif';
             ctx.textAlign = 'right';
             ctx.lineWidth = 1;
 
-            // Draw horizontal grid lines every 50Hz
             for (let f = Math.ceil(yMin / 50) * 50; f < yMax; f += 50) {
                 const y = mapY(f);
                 ctx.beginPath();
-                ctx.moveTo(30, y); // Start after axis labels
+                ctx.moveTo(30, y);
                 ctx.lineTo(width, y);
                 ctx.stroke();
                 ctx.fillText(`${f}`, 25, y + 3);
             }
 
-            // Draw Axis Line
-            ctx.beginPath();
-            ctx.moveTo(30, 0);
-            ctx.lineTo(30, height);
             ctx.stroke();
+
+            const showNorms = settings?.showNorms !== false;
+
+            if (showNorms) {
+                let genderId = null;
+                const targetCenter = (targetRange.min + targetRange.max) / 2;
+                if (targetCenter < 160) genderId = 'masculine';
+                else if (targetCenter > 190) genderId = 'feminine';
+                else genderId = 'androgynous';
+
+                const norms = NormsService.getNorms(genderId);
+
+                if (norms && norms.pitch) {
+                    const normTopY = mapY(norms.pitch.max);
+                    const normBotY = mapY(norms.pitch.min);
+                    const normH = Math.abs(normBotY - normTopY);
+
+                    if (normTopY < height && normBotY > 0) {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+                        ctx.fillRect(30, normTopY, width - 30, normH);
+
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                        ctx.font = 'italic 10px sans-serif';
+                        ctx.textAlign = 'right';
+                        ctx.fillText(norms.pitch.label, width - 10, normTopY + 12);
+                    }
+                }
+            }
 
             if (targetRange && !exercise) {
                 const topY = mapY(targetRange.max);
                 const botY = mapY(targetRange.min);
                 const h = Math.abs(botY - topY);
 
-                // Tolerance Band (lighter, wider)
-                const tolerance = (targetRange.max - targetRange.min) * 0.5;
-                const tolTopY = mapY(targetRange.max + tolerance);
-                const tolBotY = mapY(targetRange.min - tolerance);
-                const tolH = Math.abs(tolBotY - tolTopY);
-
-                if (tolTopY < height && tolBotY > 0) {
-                    ctx.fillStyle = colorBlindMode ? 'rgba(245, 158, 11, 0.05)' : 'rgba(234, 179, 8, 0.05)'; // Amber/Yellow tint
-                    ctx.fillRect(30, tolTopY, width - 30, tolH);
-                }
-
-                // Target Band (Success Zone)
                 if (topY < height && botY > 0) {
-                    // Shaded region
-                    ctx.fillStyle = colorBlindMode ? 'rgba(13, 148, 136, 0.1)' : 'rgba(34, 197, 94, 0.1)'; // Teal/Green tint
+                    ctx.fillStyle = colorBlindMode ? 'rgba(13, 148, 136, 0.1)' : 'rgba(34, 197, 94, 0.1)';
                     ctx.fillRect(30, topY, width - 30, h);
 
-                    // Border lines
                     ctx.strokeStyle = colorBlindMode ? 'rgba(13, 148, 136, 0.5)' : 'rgba(34, 197, 94, 0.5)';
                     ctx.lineWidth = 2;
                     ctx.beginPath();
@@ -175,38 +178,44 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                     ctx.lineTo(width, botY);
                     ctx.stroke();
 
-                    // Label
                     ctx.fillStyle = colorBlindMode ? '#0d9488' : '#22c55e';
                     ctx.font = 'bold 10px sans-serif';
                     ctx.textAlign = 'left';
                     ctx.fillText('TARGET ZONE', 35, topY - 5);
                 }
+            }
 
-                // Draw Home Note Anchor
-                if (settings?.homeNote && settings.homeNote > yMin && settings.homeNote < yMax) {
-                    const homeY = mapY(settings.homeNote);
-                    ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
-                    ctx.lineWidth = 2;
-                    ctx.setLineDash([10, 5]);
-                    ctx.beginPath();
-                    ctx.moveTo(30, homeY);
-                    ctx.lineTo(width, homeY);
-                    ctx.stroke();
-                    ctx.setLineDash([]);
-                    ctx.fillStyle = 'rgba(255, 215, 0, 0.9)';
-                    ctx.font = 'bold 10px sans-serif';
-                    ctx.textAlign = 'left';
-                    ctx.fillText(`Home: ${Math.round(settings.homeNote)} Hz`, 35, homeY - 5);
-                }
+            const tolerance = (targetRange.max - targetRange.min) * 0.5;
+            const tolTopY = mapY(targetRange.max + tolerance);
+            const tolBotY = mapY(targetRange.min - tolerance);
+            const tolH = Math.abs(tolBotY - tolTopY);
+
+            if (tolTopY < height && tolBotY > 0) {
+                ctx.fillStyle = colorBlindMode ? 'rgba(245, 158, 11, 0.05)' : 'rgba(234, 179, 8, 0.05)';
+                ctx.fillRect(30, tolTopY, width - 30, tolH);
+            }
+
+            if (settings?.homeNote && settings.homeNote > yMin && settings.homeNote < yMax) {
+                const homeY = mapY(settings.homeNote);
+                ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([10, 5]);
+                ctx.beginPath();
+                ctx.moveTo(30, homeY);
+                ctx.lineTo(width, homeY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = 'rgba(255, 215, 0, 0.9)';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(`Home: ${Math.round(settings.homeNote)} Hz`, 35, homeY - 5);
             }
 
             if (exercise) {
                 const now = Date.now();
-                // Draw Game Path
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.setLineDash([10, 15]); ctx.beginPath();
                 let targetFreqAtCurrent = 0;
 
-                // Draw Birds/Obstacles based on path
                 for (let i = 30; i < width; i += 5) {
                     const t = (i - 30) / (width - 30); let freq = 0;
                     if (exercise.gameId === 'glide') { const freqRange = exercise.range; const center = (targetRange.min + targetRange.max) / 2; const phase = (Date.now() / 2000) * Math.PI * 2; freq = center + (freqRange / 2) * Math.sin((t * Math.PI * 4) + phase); }
@@ -214,11 +223,10 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
 
                     const y = mapY(freq);
                     if (i === 30) ctx.moveTo(i, y); else ctx.lineTo(i, y);
-                    if (i >= width - 50 && i < width - 40) targetFreqAtCurrent = freq; // Check slightly ahead
+                    if (i >= width - 50 && i < width - 40) targetFreqAtCurrent = freq;
 
-                    // Draw birds occasionally
                     if (i % 150 === 0) {
-                        const birdY = y + (Math.sin(i + now / 100) * 20); // Bobbing bird
+                        const birdY = y + (Math.sin(i + now / 100) * 20);
                         if (birdRef.current.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
                     }
                 }
@@ -227,11 +235,9 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                 const currentPitch = dataRef.current.history[dataRef.current.history.length - 1];
                 if (currentPitch > 0) {
                     const playerY = mapY(currentPitch);
-                    // Draw Balloon
                     if (balloonRef.current.complete) {
                         ctx.drawImage(balloonRef.current, width - 60, playerY - 25, 50, 50);
                     } else {
-                        // Fallback circle
                         ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(width - 40, playerY, 15, 0, Math.PI * 2); ctx.fill();
                     }
 
@@ -251,7 +257,6 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
 
             const history = dataRef.current.history;
 
-            // 1. Draw the Line (Multi-colored)
             ctx.lineWidth = 3;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
@@ -266,7 +271,6 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                     const x2 = 30 + (i / (history.length - 1)) * (width - 30);
                     const y2 = mapY(p2);
 
-                    // Create Gradient for this segment
                     const grad = ctx.createLinearGradient(x1, y1, x2, y2);
                     grad.addColorStop(0, getPitchColor(p1));
                     grad.addColorStop(1, getPitchColor(p2));
@@ -279,7 +283,6 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                 }
             }
 
-            // 2. Draw the Dots
             history.forEach((p, i) => {
                 if (p > 0) {
                     const x = 30 + (i / (history.length - 1)) * (width - 30);
@@ -295,7 +298,6 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
             const currentP = history[history.length - 1];
             const currentClarity = dataRef.current.clarity || 0;
 
-            // Update average pitch range
             if (currentP > 0) {
                 setAveragePitchRange(prev => ({
                     lowest: prev.lowest === null ? currentP : Math.min(prev.lowest, currentP),
@@ -310,7 +312,6 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                 ctx.fillText(Math.round(currentP) + " Hz", width - 10, 30);
             }
 
-            // Stability Indicator
             if (history.length > 10 && currentP > 0) {
                 const recent = history.slice(-10).filter(p => p > 0);
                 if (recent.length > 5) {
@@ -338,29 +339,21 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
             }
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'pitch-visualizer',
-                loop,
-                renderCoordinator.PRIORITY.HIGH
-            );
-        });
+        const unsubscribe = renderCoordinator.subscribe(
+            'pitch-visualizer',
+            loop,
+            renderCoordinator.PRIORITY.HIGH
+        );
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
     }, [targetRange, exercise, zoomRange, voiceProfiles, settings, colorBlindMode]);
-
-    const label = userMode === 'slp' ? 'Fundamental Frequency (F0)' : 'Pitch';
-    const { audioEngineRef } = useAudio();
-    const { settings: feedbackSettings, setSettings: setFeedbackSettings } = useFeedback(audioEngineRef, dataRef);
 
     return (
         <div className="w-full h-full relative overflow-hidden group">
             <div className="absolute top-3 left-10 text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</div>
 
-            {/* Current Note Display */}
             {dataRef.current?.pitch > 50 && (
                 <div className="absolute top-3 left-3 bg-slate-900/90 backdrop-blur-sm border border-blue-500/50 rounded-lg px-4 py-2 shadow-lg">
                     <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Current Note</div>
@@ -378,12 +371,10 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                 </div>
             )}
 
-            {/* Feedback Controls */}
             <div className="absolute top-3 right-48 z-20">
                 <FeedbackControls settings={feedbackSettings} setSettings={setFeedbackSettings} />
             </div>
 
-            {/* Average Pitch Range Display */}
             <div className="absolute top-3 right-3 flex items-center gap-2 bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2">
                 <div className="flex flex-col items-end">
                     <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Average Pitch</div>
@@ -404,7 +395,6 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                 </button>
             </div>
 
-            {/* Zoom Controls */}
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                     onClick={handleZoomIn}
@@ -424,7 +414,6 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
 
             <canvas ref={canvasRef} className="w-full h-full"></canvas>
 
-            {/* Unstable Signal Overlay */}
             {dataRef.current?.pitch > 0 && (dataRef.current?.clarity || 0) < 0.8 && (
                 <div className="absolute top-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-30">
                     <div className="flex items-center gap-2 bg-red-500/90 text-white px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
@@ -440,7 +429,6 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                 </div>
             )}
 
-            {/* Help Modal */}
             {showUnstableHelp && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
                     <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl relative">
@@ -489,5 +477,7 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
         </div>
     );
 });
+
+PitchVisualizer.displayName = 'PitchVisualizer';
 
 export default PitchVisualizer;

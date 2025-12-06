@@ -12,6 +12,7 @@ import { JournalProvider } from './context/JournalContext'
 import { ClientProvider } from './context/ClientContext'
 import { NavigationProvider } from './context/NavigationContext'
 import { LayoutProvider } from './context/LayoutContext'
+import { ToastProvider } from './context/ToastContext'
 import GlobalErrorBoundary from './components/ui/GlobalErrorBoundary'
 
 import { registerSW } from 'virtual:pwa-register'
@@ -26,26 +27,28 @@ const updateSW = registerSW({
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <GlobalErrorBoundary>
-        <SettingsProvider>
-            <AuthProvider>
-                <ProfileProvider>
-                    <AudioProvider>
-                        <NavigationProvider>
-                            <LayoutProvider>
-                                <StatsProvider>
-                                    <JournalProvider>
-                                        <ClientProvider>
-                                            <HashRouter>
-                                                <App />
-                                            </HashRouter>
-                                        </ClientProvider>
-                                    </JournalProvider>
-                                </StatsProvider>
-                            </LayoutProvider>
-                        </NavigationProvider>
-                    </AudioProvider>
-                </ProfileProvider>
-            </AuthProvider>
-        </SettingsProvider>
+        <ToastProvider>
+            <SettingsProvider>
+                <AuthProvider>
+                    <ProfileProvider>
+                        <AudioProvider>
+                            <NavigationProvider>
+                                <LayoutProvider>
+                                    <StatsProvider>
+                                        <JournalProvider>
+                                            <ClientProvider>
+                                                <HashRouter>
+                                                    <App />
+                                                </HashRouter>
+                                            </ClientProvider>
+                                        </JournalProvider>
+                                    </StatsProvider>
+                                </LayoutProvider>
+                            </NavigationProvider>
+                        </AudioProvider>
+                    </ProfileProvider>
+                </AuthProvider>
+            </SettingsProvider>
+        </ToastProvider>
     </GlobalErrorBoundary>,
 )

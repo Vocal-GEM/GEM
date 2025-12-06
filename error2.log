@@ -1,0 +1,54 @@
+
+ RUN  v4.0.14 C:/Users/riley/Desktop/GEM
+
+ Γ¥» src/engines/AudioEngine.socket.test.js (5 tests | 5 failed) 37ms
+     ├ù should initialize socket on start 10ms
+     ├ù should handle socket connection events 17ms
+     ├ù should emit audio_chunk when connected 4ms
+     ├ù should buffer chunks when disconnected and flush on connect 3ms
+     ├ù should update latestBackendAnalysis on analysis_update 1ms
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 5 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should initialize socket on start
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should handle socket connection events
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should emit audio_chunk when connected
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should buffer chunks when disconnected and flush on connect
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should update latestBackendAnalysis on analysis_update
+TypeError: this.audioContext.suspend is not a function
+ Γ¥» AudioEngine.stop src/engines/AudioEngine.js:467:31
+    465|         }
+    466|         if (this.audioContext && this.audioContext.state !== 'closed')ΓÇª
+    467|             this.audioContext.suspend();
+       |                               ^
+    468|         }
+    469|     }
+ Γ¥» src/engines/AudioEngine.socket.test.js:98:28
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/6]ΓÄ»
+
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should buffer chunks when disconnected and flush on connect
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ Γ¥» src/engines/AudioEngine.socket.test.js:146:44
+    144|         // Should NOT emit yet
+    145|         expect(mockSocket.emit).not.toHaveBeenCalled();
+    146|         expect(engine.socketBuffer.length).toBe(1);
+       |                                            ^
+    147| 
+    148|         // Simulate connection
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/6]ΓÄ»
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed (5)
+   Start at  23:02:15
+   Duration  1.55s (transform 113ms, setup 135ms, import 110ms, tests 37ms, environment 1.03s)
+

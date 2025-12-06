@@ -18,14 +18,7 @@ const FeedbackModal = ({ isOpen, onClose, initialType = 'feedback', errorDetails
         try {
             await new Promise(resolve => setTimeout(resolve, 1500));
 
-            console.log('Feedback submitted:', {
-                type,
-                message,
-                email,
-                errorDetails,
-                timestamp: new Date().toISOString(),
-                userAgent: navigator.userAgent
-            });
+            // console.log('Feedback submitted:', { ... });
 
             setSubmitted(true);
             setTimeout(() => {

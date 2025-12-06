@@ -29,42 +29,6 @@
   --slate-700: 51 65 85;
   --slate-800: 30 41 59;
   --slate-900: 15 23 42;
-  --slate-950: 2 6 23;
-
-  --white: 255 255 255;
-  --black: 0 0 0;
-}
-
-.light-mode {
-  /* LIGHT MODE - Inverted Slate Scale */
-  --slate-50: 2 6 23;
-  /* was 950 */
-  --slate-100: 15 23 42;
-  /* was 900 */
-  --slate-200: 30 41 59;
-  /* was 800 */
-  --slate-300: 51 65 85;
-  /* was 700 */
-  --slate-400: 71 85 105;
-  /* was 600 */
-  --slate-500: 100 116 139;
-  /* was 500 */
-  --slate-600: 148 163 184;
-  /* was 400 */
-  --slate-700: 203 213 225;
-  /* was 300 */
-  --slate-800: 226 232 240;
-  /* was 200 */
-  --slate-900: 241 245 249;
-  /* was 100 */
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-}
-
-.glass-panel-gradient {
-  background: var(--gradient-subtle);
-  backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid transparent;
   background-clip: padding-box;
@@ -570,4 +534,95 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ===================================
+   MOBILE & ACCESSIBILITY IMPROVEMENTS
+   =================================== */
+
+/* Minimum Touch Targets for Mobile (44x44px) */
+@media (hover: none) and (pointer: coarse) {
+
+  button,
+  a,
+  [role="button"],
+  input[type="checkbox"],
+  input[type="radio"],
+  select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Ensure clickable areas are large enough */
+  button:not(.icon-only),
+  a:not(.icon-only) {
+    padding: 12px 16px;
+  }
+}
+
+/* Screen Reader Only Content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only:focus,
+.sr-only:active {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Focus Visible Improvements */
+*:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+
+  .glass-panel,
+  .glass-panel-gradient {
+    border: 2px solid currentColor;
+    background: rgba(0, 0, 0, 0.9);
+  }
+
+  button,
+  a {
+    border: 1px solid currentColor;
+  }
 }

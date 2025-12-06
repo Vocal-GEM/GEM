@@ -157,7 +157,7 @@ export const textToSpeechService = {
         } catch (error) {
             console.error("ElevenLabs TTS Error:", error);
             // Fallback to browser
-            console.log("Falling back to browser TTS...");
+            // Fallback to browser
             if (options.onEndLoading) options.onEndLoading();
             return this.speakWithBrowser(text, options);
         }

@@ -17,7 +17,8 @@ const STORES = {
     SYNC_QUEUE: 'sync_queue',
     SYNC_METADATA: 'sync_metadata',
     CLIENTS: 'clients',
-    SESSIONS: 'sessions'
+    SESSIONS: 'sessions',
+    ASSESSMENTS: 'assessments'
 };
 
 class IndexedDBManager {
@@ -82,6 +83,12 @@ class IndexedDBManager {
                     sessionStore.createIndex('timestamp', 'timestamp', { unique: false });
                     sessionStore.createIndex('date', 'date', { unique: false });
                 }
+
+                if (!db.objectStoreNames.contains(STORES.ASSESSMENTS)) {
+                    const assessmentStore = db.createObjectStore(STORES.ASSESSMENTS, { keyPath: 'id', autoIncrement: true });
+                    assessmentStore.createIndex('timestamp', 'timestamp', { unique: false });
+                    assessmentStore.createIndex('date', 'date', { unique: false });
+                }
             };
         });
     }
@@ -95,15 +102,12 @@ class IndexedDBManager {
     // Generic CRUD operations
     async get(storeName, key) {
         await this.ensureReady();
-        const start = performance.now();
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], 'readonly');
             const store = transaction.objectStore(storeName);
             const request = store.get(key);
 
             request.onsuccess = () => {
-                const duration = performance.now() - start;
-                if (duration > 10) console.debug(`[IndexedDB] get ${storeName} took ${duration.toFixed(2)}ms`);
                 resolve(request.result);
             };
             request.onerror = () => reject(request.error);
@@ -112,15 +116,12 @@ class IndexedDBManager {
 
     async getAll(storeName) {
         await this.ensureReady();
-        const start = performance.now();
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], 'readonly');
             const store = transaction.objectStore(storeName);
             const request = store.getAll();
 
             request.onsuccess = () => {
-                const duration = performance.now() - start;
-                if (duration > 20) console.debug(`[IndexedDB] getAll ${storeName} took ${duration.toFixed(2)}ms`);
                 resolve(request.result || []);
             };
             request.onerror = () => reject(request.error);
@@ -129,15 +130,12 @@ class IndexedDBManager {
 
     async put(storeName, value) {
         await this.ensureReady();
-        const start = performance.now();
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], 'readwrite');
             const store = transaction.objectStore(storeName);
             const request = store.put(value);
 
             request.onsuccess = () => {
-                const duration = performance.now() - start;
-                console.debug(`[IndexedDB] put ${storeName} took ${duration.toFixed(2)}ms`);
                 resolve(request.result);
             };
             request.onerror = () => reject(request.error);
@@ -146,15 +144,12 @@ class IndexedDBManager {
 
     async add(storeName, value) {
         await this.ensureReady();
-        const start = performance.now();
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], 'readwrite');
             const store = transaction.objectStore(storeName);
             const request = store.add(value);
 
             request.onsuccess = () => {
-                const duration = performance.now() - start;
-                console.debug(`[IndexedDB] add ${storeName} took ${duration.toFixed(2)}ms`);
                 resolve(request.result);
             };
             request.onerror = () => reject(request.error);
@@ -183,33 +178,6 @@ class IndexedDBManager {
             request.onsuccess = () => resolve();
             request.onerror = () => reject(request.error);
         });
-    }
-
-    // High-level API for common operations
-    async saveJournal(entry) {
-        if (!entry.timestamp) entry.timestamp = Date.now();
-        if (!entry.date) entry.date = new Date().toISOString().split('T')[0];
-        return await this.add(STORES.JOURNALS, entry);
-    }
-
-    async getJournals() {
-        const journals = await this.getAll(STORES.JOURNALS);
-        return journals.sort((a, b) => b.timestamp - a.timestamp);
-    }
-
-    async saveStats(stats) {
-        return await this.put(STORES.STATS, { id: 'current', ...stats });
-    }
-
-    async getStats() {
-        const stats = await this.get(STORES.STATS, 'current');
-        return stats || {
-            streak: 0,
-            totalSeconds: 0,
-            xp: 0,
-            lastPractice: null,
-            achievements: []
-        };
     }
 
     async saveGoals(goals) {
@@ -265,6 +233,17 @@ class IndexedDBManager {
         return sessions.sort((a, b) => b.timestamp - a.timestamp).slice(0, limit);
     }
 
+    async saveAssessment(assessment) {
+        if (!assessment.timestamp) assessment.timestamp = Date.now();
+        if (!assessment.date) assessment.date = new Date().toISOString().split('T')[0];
+        return await this.add(STORES.ASSESSMENTS, assessment);
+    }
+
+    async getAssessments(limit = 50) {
+        const assessments = await this.getAll(STORES.ASSESSMENTS);
+        return assessments.sort((a, b) => b.timestamp - a.timestamp).slice(0, limit);
+    }
+
     // Migration helper: Import from localStorage
     async migrateFromLocalStorage() {
         try {
@@ -301,7 +280,7 @@ class IndexedDBManager {
             // Mark migration as complete
             localStorage.setItem('indexeddb_migrated', 'true');
 
-            console.log('✅ Migration from localStorage to IndexedDB complete');
+            localStorage.setItem('indexeddb_migrated', 'true');
             return true;
         } catch (error) {
             console.error('❌ Migration failed:', error);
@@ -320,6 +299,121 @@ class IndexedDBManager {
             localStorage.getItem('goals');
 
         return !!hasData;
+    }
+    // Data Management
+    async exportAllData() {
+        await this.ensureReady();
+        const exportData = {
+            version: 1,
+            timestamp: new Date().toISOString(),
+            stores: {}
+        };
+
+        for (const storeName of Object.values(STORES)) {
+            try {
+                exportData.stores[storeName] = await this.getAll(storeName);
+            } catch (e) {
+                console.warn(`Failed to export store ${storeName}:`, e);
+                exportData.stores[storeName] = [];
+            }
+        }
+
+        return exportData;
+    }
+
+    async importData(jsonData) {
+        await this.ensureReady();
+        if (!jsonData || !jsonData.stores) {
+            throw new Error('Invalid backup file format');
+        }
+
+        const stores = Object.values(STORES);
+
+        // 1. Validate all data first
+        for (const storeName of stores) {
+            if (jsonData.stores[storeName] && !Array.isArray(jsonData.stores[storeName])) {
+                throw new Error(`Invalid data format for store: ${storeName}`);
+            }
+        }
+
+        let successCount = 0;
+
+        // 2. Import store by store
+        // Ideally we would use a single transaction for all, but that locks the whole DB.
+        // We will do it sequentially to be safer than parallel.
+        for (const storeName of stores) {
+            if (jsonData.stores[storeName] && Array.isArray(jsonData.stores[storeName])) {
+                try {
+                    // Clear and Import within a transaction if possible, but our wrapper is simple.
+                    // We will clear then add. If add fails, we at least tried.
+                    await this.clear(storeName);
+
+                    for (const item of jsonData.stores[storeName]) {
+                        await this.put(storeName, item);
+                    }
+                    successCount++;
+                } catch (e) {
+                    console.error(`Failed to import store ${storeName}:`, e);
+                    // Continue to next store? Or stop? 
+                    // Stopping is probably better to alert user of partial failure.
+                    throw new Error(`Import failed for ${storeName}: ${e.message}`);
+                }
+            }
+        }
+
+        return successCount;
+    }
+
+    async factoryReset() {
+        await this.ensureReady();
+        const stores = Object.values(STORES);
+        for (const storeName of stores) {
+            await this.clear(storeName);
+        }
+        localStorage.clear(); // Also clear localStorage
+        return true;
+    }
+
+    /**
+     * Get all journals
+     * @returns {Promise<Array>}
+     */
+    async getJournals() {
+        return await this.getAll(STORES.JOURNALS);
+    }
+
+    /**
+     * Save a journal entry
+     * @param {Object} entry - Journal entry data
+     * @returns {Promise<number>} - ID of saved entry
+     */
+    async saveJournal(entry) {
+        return await this.add(STORES.JOURNALS, {
+            ...entry,
+            timestamp: entry.timestamp || Date.now(),
+            date: entry.date || new Date().toISOString().split('T')[0]
+        });
+    }
+
+    /**
+     * Get all stats
+     * @returns {Promise<Array>}
+     */
+    async getStats() {
+        return await this.getAll(STORES.STATS);
+    }
+
+    /**
+     * Save stats
+     * @param {Object} stats - Stats data
+     * @returns {Promise}
+     */
+    async saveStats(stats) {
+        return await this.put(STORES.STATS, {
+            id: 'current',
+            ...stats,
+            lastUpdated: Date.now()
+        });
     }
 }
 

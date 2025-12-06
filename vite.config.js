@@ -2,10 +2,35 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 import { visualizer } from 'rollup-plugin-visualizer'
+import { execSync } from 'child_process'
+import { readFileSync } from 'fs'
+
+// Get version from package.json
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'));
+const packageVersion = packageJson.version;
+
+// Get git commit hash
+let gitHash = 'dev';
+try {
+    gitHash = execSync('git rev-parse --short HEAD').toString().trim();
+} catch (e) {
+    console.warn('Failed to get git hash, using "dev"');
+}
+
+// Combine version with git hash
+const appVersion = `${packageVersion}-${gitHash}`;
 
 // https://vitejs.dev/config/
 export default defineConfig({
+    define: {
+        __APP_VERSION__: JSON.stringify(appVersion),
+        'import.meta.env.VITE_APP_VERSION': JSON.stringify(appVersion)
+    },
     base: './',
     plugins: [
         react(),
@@ -31,6 +56,7 @@ export default defineConfig({
                 ]
             },
             workbox: {
+                maximumFileSizeToCacheInBytes: 6000000,
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,glb}'],
                 globIgnores: ['**/assets/transformers-*.js', '**/assets/pdf-*.js'],
                 runtimeCaching: [

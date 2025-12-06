@@ -1,0 +1,33 @@
+
+ RUN  v4.0.14 C:/Users/riley/Desktop/GEM
+
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Suites 1 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  src/components/ui/SkeletonLoader.test.jsx [ src/components/ui/SkeletonLoader.test.jsx ]
+Error: Transform failed with 1 error:
+C:/Users/riley/Desktop/GEM/src/components/ui/SkeletonLoader.test.jsx:39:0: ERROR: Unexpected "}"
+  Plugin: vite:esbuild
+  File: C:/Users/riley/Desktop/GEM/src/components/ui/SkeletonLoader.test.jsx:39:0
+  
+  Unexpected "}"
+  37 |      });
+  38 |  });
+  39 |  });
+     |  ^
+  40 |  
+  
+ Γ¥» failureErrorWithLog node_modules/vitest/node_modules/esbuild/lib/main.js:1467:15
+ Γ¥» node_modules/vitest/node_modules/esbuild/lib/main.js:736:50
+ Γ¥» responseCallbacks.<computed> node_modules/vitest/node_modules/esbuild/lib/main.js:603:9
+ Γ¥» handleIncomingPacket node_modules/vitest/node_modules/esbuild/lib/main.js:658:12
+ Γ¥» Socket.readFromStdout node_modules/vitest/node_modules/esbuild/lib/main.js:581:7
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/1]ΓÄ»
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  23:13:28
+   Duration  1.31s (transform 19ms, setup 148ms, import 0ms, tests 0ms, environment 894ms)
+

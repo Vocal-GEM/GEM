@@ -51,8 +51,8 @@ const SibilantGauge = ({ centroid = 0, isSibilant = false }) => {
             </div>
 
             <p className="mt-4 text-xs text-slate-400">
-                Aim for the <span className="text-green-400">Green Zone</span> for a brighter, more feminine "S" sound.
-                The <span className="text-red-400">Red Zone</span> is typical for "SH" sounds.
+                Aim for the <span className="text-green-400">Green Zone</span> for a brighter, more feminine &quot;S&quot; sound.
+                The <span className="text-red-400">Red Zone</span> is typical for &quot;SH&quot; sounds.
             </p>
         </div>
     );

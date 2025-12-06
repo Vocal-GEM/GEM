@@ -324,7 +324,7 @@ const MicrophoneCalibration = ({ audioEngine }) => {
                         <h4 className="text-sm font-bold text-white">Manual Override</h4>
                     </div>
                     <p className="text-xs text-slate-400 mb-3">
-                        Adjust sensitivity if automatic detection isn't working well
+                        Adjust sensitivity if automatic detection isn&apos;t working well
                     </p>
                     <div className="flex items-center gap-3">
                         <span className="text-xs text-slate-500">Sensitive</span>

@@ -117,6 +117,7 @@ def create_app():
     from .routes.main import main_bp
     from .routes.analysis import analysis_bp
     from .routes.tts import tts_bp
+    from .routes.settings import settings_bp
 
     csrf.exempt(auth_bp)
     csrf.exempt(data_bp)
@@ -124,6 +125,7 @@ def create_app():
     csrf.exempt(main_bp)
     csrf.exempt(analysis_bp)
     csrf.exempt(tts_bp)
+    csrf.exempt(settings_bp)
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(data_bp)
@@ -131,6 +133,7 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(analysis_bp)
     app.register_blueprint(tts_bp)
+    app.register_blueprint(settings_bp)
 
     from .routes.voice_quality import voice_quality_bp
     csrf.exempt(voice_quality_bp)

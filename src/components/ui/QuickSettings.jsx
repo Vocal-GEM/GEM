@@ -44,6 +44,30 @@ const QuickSettings = ({ isOpen, onClose }) => {
                         </div>
                     </div>
 
+                    {/* Audio */}
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Audio</label>
+                        <div className="space-y-2">
+                            <button
+                                onClick={() => updateSettings({ ...settings, listenMode: !settings.listenMode })}
+                                className={`w-full p-3 rounded-xl border text-left flex items-center justify-between transition-all ${settings.listenMode ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'}`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={`p-2 rounded-lg ${settings.listenMode ? 'bg-white/20' : 'bg-slate-700'}`}>
+                                        <Zap size={16} className={settings.listenMode ? 'text-white' : 'text-slate-400'} />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="font-medium">Listen Mode</span>
+                                        <span className="text-[10px] opacity-70">Hear yourself (Use headphones!)</span>
+                                    </div>
+                                </div>
+                                <div className={`w-10 h-5 rounded-full relative transition-colors ${settings.listenMode ? 'bg-white/30' : 'bg-slate-700'}`}>
+                                    <div className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${settings.listenMode ? 'left-6' : 'left-1'}`} />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
                     {/* Performance */}
                     <div className="space-y-3">
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Performance</label>

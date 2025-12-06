@@ -23,19 +23,16 @@ export const useSpeechRecognition = (onResult) => {
             recognition.onstart = () => {
                 setListening(true);
                 setError(null);
-                console.log('🎤 Speech recognition started (auto-mode)');
             };
 
             recognition.onend = () => {
                 setListening(false);
-                console.log('🎤 Speech recognition ended (auto-mode)');
 
                 // Auto-restart if we should still be listening
                 if (shouldBeListeningRef.current) {
                     restartTimeoutRef.current = setTimeout(() => {
                         try {
                             recognition.start();
-                            console.log('🔄 Auto-restarting recognition...');
                         } catch (e) {
                             console.error("Failed to restart recognition:", e);
                         }
@@ -45,7 +42,6 @@ export const useSpeechRecognition = (onResult) => {
 
             recognition.onresult = (event) => {
                 const transcript = event.results[event.results.length - 1][0].transcript;
-                console.log('📝 Recognized (auto-mode):', transcript);
                 onResult(transcript);
             };
 
@@ -60,7 +56,6 @@ export const useSpeechRecognition = (onResult) => {
                     setError('microphone-denied');
                 } else if (event.error === 'no-speech') {
                     // This is normal, just continue listening
-                    console.log('⏸️ No speech detected, continuing...');
                     setError(null);
                 } else if (event.error === 'aborted') {
                     // Recognition was aborted, restart if needed
@@ -99,11 +94,9 @@ export const useSpeechRecognition = (onResult) => {
             pttRecognition.maxAlternatives = 1;
 
             pttRecognition.onstart = () => {
-                console.log('🎙️ Push-to-talk recognition started');
             };
 
             pttRecognition.onend = () => {
-                console.log('🎙️ Push-to-talk recognition ended');
                 // We don't strictly need to set false here if stopPushToTalk handles it,
                 // but it's good safety in case recognition ends for other reasons.
                 setPushToTalkActive(false);
@@ -111,14 +104,12 @@ export const useSpeechRecognition = (onResult) => {
 
             pttRecognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
-                console.log('📝 Recognized (push-to-talk):', transcript);
                 onResult(transcript);
             };
 
             pttRecognition.onerror = (event) => {
                 console.error("🚨 Push-to-talk error:", event.error);
                 if (event.error === 'no-speech') {
-                    console.log('⏸️ No speech detected in push-to-talk');
                     setError(null);
                 } else {
                     setError(event.error);
@@ -135,7 +126,6 @@ export const useSpeechRecognition = (onResult) => {
             try {
                 shouldBeListeningRef.current = true;
                 recognitionRef.current.start();
-                console.log('▶️ Starting auto-listening...');
             } catch (e) {
                 if (e.name !== 'InvalidStateError') {
                     console.error("Recognition start error:", e);
@@ -153,7 +143,6 @@ export const useSpeechRecognition = (onResult) => {
         if (recognitionRef.current) {
             try {
                 recognitionRef.current.stop();
-                console.log('⏹️ Stopping auto-listening...');
             } catch (e) {
                 console.error("Recognition stop error:", e);
             }
@@ -170,7 +159,6 @@ export const useSpeechRecognition = (onResult) => {
         if (pushToTalkRecognitionRef.current) {
             try {
                 pushToTalkRecognitionRef.current.start();
-                console.log('🎙️ Push-to-talk activated - speak now!');
             } catch (e) {
                 console.error("Push-to-talk start error:", e);
                 setPushToTalkActive(false);
@@ -179,7 +167,6 @@ export const useSpeechRecognition = (onResult) => {
     }, [listening, stop]);
 
     const stopPushToTalk = useCallback(() => {
-        console.log('🎙️ Push-to-talk button released');
         // Reset button visual state immediately
         setPushToTalkActive(false);
         // The non-continuous recognition will stop automatically when speech ends

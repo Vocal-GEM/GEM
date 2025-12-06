@@ -84,7 +84,6 @@ const PracticeMode = ({
                 stability: avgStability,
                 notes: 'Practice Session'
             });
-            console.log("Session saved:", { duration, avgPitch });
         } catch (e) {
             console.error("Failed to save session:", e);
         }
@@ -315,7 +314,17 @@ const PracticeMode = ({
                         <ToolExercises tool={practiceTab === 'overview' ? 'all' : practiceTab} audioEngine={audioEngineRef.current} />
 
                         {/* Quick Links */}
-                        <div className="grid grid-cols-3 gap-3 pt-2">
+                        <div className="grid grid-cols-2 gap-3 pt-2">
+                            <button onClick={() => openModal('adaptiveSession')} className="col-span-2 p-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 transition-all shadow-lg shadow-blue-900/20 flex flex-row items-center justify-center gap-3 text-center group border border-white/10">
+                                <div className="p-2 rounded-full bg-white/20 text-white group-hover:scale-110 transition-transform">
+                                    <Play size={24} fill="currentColor" />
+                                </div>
+                                <div className="text-left">
+                                    <span className="block text-lg font-bold text-white">Start Daily Training</span>
+                                    <span className="block text-xs text-blue-100 opacity-80">Personalized biofeedback routine</span>
+                                </div>
+                            </button>
+
                             <button onClick={() => openModal('assessment')} className="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors flex flex-col items-center gap-2 text-center group">
                                 <div className="p-2 rounded-full bg-blue-500/10 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
                                     <Activity size={20} />

@@ -17,3 +17,8 @@ google-generativeai==0.3.2
 bleach==6.1.0
 pypdf==3.17.4
 Flask-Migrate==4.0.7
+faster-whisper==1.0.1
+numpy==1.26.4
+scipy==1.13.0
+praat-parselmouth==0.4.3
+soundfile==0.12.1

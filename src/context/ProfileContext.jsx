@@ -2,40 +2,25 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { indexedDB } from '../services/IndexedDBManager';
 import { useAuth } from './AuthContext';
 
-const ProfileContext = createContext();
+export const ProfileContext = createContext();
 
-export const useProfile = () => useContext(ProfileContext);
+export const useProfile = () => {
+    const context = useContext(ProfileContext);
+    if (!context) {
+        throw new Error('useProfile must be used within a ProfileProvider');
+    }
+    return context;
+};
 
 export const ProfileProvider = ({ children }) => {
+    // --- State ---
     const [voiceProfiles, setVoiceProfiles] = useState([
         {
             id: 'fem',
-            name: 'Feminine',
-            targetRange: { min: 180, max: 220 },
-            genderRange: { min: 180, max: 500 },
+            name: 'Feminization',
+            targetRange: { min: 170, max: 220 },
             calibration: { dark: 500, bright: 2500 },
-            filterSettings: { min: 150, max: 8000 },
             skillLevel: 'beginner',
-            goals: ['pitch', 'resonance']
-        },
-        {
-            id: 'masc',
-            name: 'Masculine',
-            targetRange: { min: 90, max: 140 },
-            genderRange: { min: 50, max: 145 },
-            calibration: { dark: 400, bright: 1800 },
-            filterSettings: { min: 70, max: 8000 },
-            skillLevel: 'beginner',
-            goals: ['weight', 'resonance']
-        },
-        {
-            id: 'neutral',
-            name: 'Neutral',
-            targetRange: { min: 150, max: 180 },
-            genderRange: { min: 145, max: 180 },
-            calibration: { dark: 450, bright: 2200 },
-            filterSettings: { min: 100, max: 8000 },
-            skillLevel: 'intermediate',
             goals: ['control', 'flexibility']
         }
     ]);
@@ -52,6 +37,13 @@ export const ProfileProvider = ({ children }) => {
     const [goals, setGoals] = useState([]);
     const [showCalibration, setShowCalibration] = useState(false);
 
+    // Vocal Health State
+    const [vocalHealth, setVocalHealth] = useState({
+        hydration: { current: 0, goal: 8, lastUpdated: Date.now() },
+        fatigue: { level: 1, note: '', lastUpdated: Date.now() },
+        usage: { dailyLimitMinutes: 30, todaySeconds: 0, lastUpdated: Date.now() }
+    });
+
     // Onboarding State
     const { user } = useAuth();
     const [onboardingStatus, setOnboardingStatus] = useState({
@@ -59,6 +51,8 @@ export const ProfileProvider = ({ children }) => {
         compass: false,
         calibration: false
     });
+
+    // --- Effects ---
 
     // Load Onboarding Status
     useEffect(() => {
@@ -83,7 +77,6 @@ export const ProfileProvider = ({ children }) => {
                             calibration: lsCalibration
                         };
                         await indexedDB.saveSetting(key, status);
-                        console.log(`[ProfileContext] Migrated onboarding status for ${userId}`);
                     } else {
                         status = { tutorial: false, compass: false, calibration: false };
                     }
@@ -97,15 +90,7 @@ export const ProfileProvider = ({ children }) => {
         loadOnboarding();
     }, [user]);
 
-    const updateOnboardingStatus = async (updates) => {
-        setOnboardingStatus(prev => {
-            const newStatus = { ...prev, ...updates };
-            const userId = user ? user.id : 'guest';
-            indexedDB.saveSetting(`onboarding_${userId}`, newStatus);
-            return newStatus;
-        });
-    };
-
+    // Load Profiles & Active Profile
     useEffect(() => {
         const loadProfiles = async () => {
             try {
@@ -135,6 +120,39 @@ export const ProfileProvider = ({ children }) => {
         };
         loadProfiles();
     }, []);
+
+    // Load Vocal Health from active profile
+    useEffect(() => {
+        if (activeProfile) {
+            const profile = voiceProfiles.find(p => p.id === activeProfile);
+            if (profile && profile.vocalHealth) {
+                // Check if it's a new day to reset daily counters
+                const lastDate = new Date(profile.vocalHealth.hydration.lastUpdated).getDate();
+                const today = new Date().getDate();
+
+                if (lastDate !== today) {
+                    setVocalHealth({
+                        hydration: { ...profile.vocalHealth.hydration, current: 0, lastUpdated: Date.now() },
+                        fatigue: { ...profile.vocalHealth.fatigue, lastUpdated: Date.now() },
+                        usage: { ...profile.vocalHealth.usage, todaySeconds: 0, lastUpdated: Date.now() }
+                    });
+                } else {
+                    setVocalHealth(profile.vocalHealth);
+                }
+            }
+        }
+    }, [activeProfile, voiceProfiles]);
+
+    // --- Actions ---
+
+    const updateOnboardingStatus = async (updates) => {
+        setOnboardingStatus(prev => {
+            const newStatus = { ...prev, ...updates };
+            const userId = user ? user.id : 'guest';
+            indexedDB.saveSetting(`onboarding_${userId}`, newStatus);
+            return newStatus;
+        });
+    };
 
     const updateTargetRange = (range) => {
         setTargetRange(range);
@@ -199,7 +217,53 @@ export const ProfileProvider = ({ children }) => {
         }
     };
 
-    const value = {
+    const updateVocalHealth = (updates) => {
+        setVocalHealth(prev => {
+            const newState = { ...prev, ...updates };
+            // Persist to profile
+            if (activeProfile) {
+                setVoiceProfiles(profiles => {
+                    const newProfiles = profiles.map(p => p.id === activeProfile ? { ...p, vocalHealth: newState } : p);
+                    const profile = newProfiles.find(p => p.id === activeProfile);
+                    if (profile) indexedDB.saveProfile(profile);
+                    return newProfiles;
+                });
+            }
+            return newState;
+        });
+    };
+
+    const updateHydration = (amount) => {
+        updateVocalHealth({
+            hydration: {
+                ...vocalHealth.hydration,
+                current: Math.max(0, vocalHealth.hydration.current + amount),
+                lastUpdated: Date.now()
+            }
+        });
+    };
+
+    const logFatigue = (level, note = '') => {
+        updateVocalHealth({
+            fatigue: {
+                level,
+                note,
+                lastUpdated: Date.now()
+            }
+        });
+    };
+
+    const updateUsage = (seconds) => {
+        updateVocalHealth({
+            usage: {
+                ...vocalHealth.usage,
+                todaySeconds: vocalHealth.usage.todaySeconds + seconds,
+                lastUpdated: Date.now()
+            }
+        });
+    };
+
+    const value = React.useMemo(() => ({
         voiceProfiles,
         activeProfile,
         targetRange,
@@ -217,8 +281,24 @@ export const ProfileProvider = ({ children }) => {
         onboardingStatus,
         updateOnboardingStatus,
         saveSession: indexedDB.saveSession.bind(indexedDB),
-        getSessions: indexedDB.getSessions.bind(indexedDB)
-    };
+        getSessions: indexedDB.getSessions.bind(indexedDB),
+        vocalHealth,
+        updateHydration,
+        logFatigue,
+        updateUsage
+    }), [
+        voiceProfiles,
+        activeProfile,
+        targetRange,
+        calibration,
+        calibrationMetadata,
+        filterSettings,
+        skillLevel,
+        goals,
+        showCalibration,
+        onboardingStatus,
+        vocalHealth
+    ]);
 
     return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>;
 };

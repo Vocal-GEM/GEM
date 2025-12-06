@@ -50,7 +50,7 @@ const CourseCard = ({ onOpenCourse }) => {
                         <div className="w-16 h-16 bg-yellow-500/20 text-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4">
                             <Trophy className="w-8 h-8" />
                         </div>
-                        <p className="text-slate-300 mb-4">You've completed all available lessons!</p>
+                        <p className="text-slate-300 mb-4">You&apos;ve completed all available lessons!</p>
                         <button
                             onClick={onOpenCourse}
                             className="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-xl text-white font-bold transition-all"

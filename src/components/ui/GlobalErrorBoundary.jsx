@@ -53,7 +53,7 @@ class GlobalErrorBoundary extends React.Component {
                                 <p className="text-sm font-mono text-red-300 mb-2">
                                     {this.state.error.toString()}
                                 </p>
-                                {process.env.NODE_ENV === 'development' && this.state.errorInfo && (
+                                {import.meta.env.DEV && this.state.errorInfo && (
                                     <details className="mt-2">
                                         <summary className="text-xs text-slate-500 cursor-pointer hover:text-slate-400">
                                             Stack Trace

@@ -31,9 +31,9 @@ describe('SkeletonLoader', () => {
     });
 
     it('applies custom className', () => {
-        render(<SkeletonLoader className="w-20 h-20" />);
-        const skeleton = screen.getByRole('status');
-        expect(skeleton).toHaveClass('w-20');
-        expect(skeleton).toHaveClass('h-20');
+        const { container } = render(<SkeletonLoader className="w-20 h-20" />);
+        expect(container.firstChild).toHaveClass('w-20');
+        expect(container.firstChild).toHaveClass('h-20');
     });
 });
+

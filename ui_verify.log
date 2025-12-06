@@ -1,0 +1,37 @@
+
+ RUN  v4.0.14 C:/Users/riley/Desktop/GEM
+
+ Γ¥» src/components/ui/SkeletonLoader.test.jsx (5 tests | 1 failed) 417ms
+     Γ£ô renders correctly with default props 267ms
+     Γ£ô renders the correct number of items 68ms
+     Γ£ô applies the correct class for "circle" variant 38ms
+     Γ£ô applies the correct class for "rect" variant 17ms
+     ├ù applies custom className 25ms
+ Γ£ô src/components/ui/QuickActions.test.jsx (4 tests) 797ms
+     Γ£ô should render the FAB button  343ms
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 1 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  src/components/ui/SkeletonLoader.test.jsx > SkeletonLoader > applies custom className
+Error: expect(element).toHaveClass("w-20")
+
+Expected the element to have class:
+  w-20
+Received:
+  bg-slate-800/50 animate-pulse rounded-md h-4
+ Γ¥» src/components/ui/SkeletonLoader.test.jsx:36:26
+     34|         render(<SkeletonLoader className="w-20 h-20" />);
+     35|         const skeleton = screen.getByRole('status');
+     36|         expect(skeleton).toHaveClass('w-20');
+       |                          ^
+     37|         expect(skeleton).toHaveClass('h-20');
+     38|     });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/1]ΓÄ»
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 8 passed (9)
+   Start at  23:11:32
+   Duration  3.15s (transform 210ms, setup 348ms, import 617ms, tests 1.21s, environment 2.37s)
+

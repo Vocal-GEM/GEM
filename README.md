@@ -1,5 +1,7 @@
 # Vocal GEM 💎
 
+![CI](https://github.com/RileyTheRiler/GEM/actions/workflows/ci.yml/badge.svg)
+
 A personal voice coaching application for gender-affirming voice training. Vocal GEM combines real-time biofeedback with AI-driven insights to help you achieve your voice goals.
 
 ## ✨ Features

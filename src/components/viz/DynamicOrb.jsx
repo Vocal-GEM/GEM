@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import React, { useRef, useMemo, useState, useEffect, Suspense, lazy } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -785,5 +786,7 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
     </div>
   );
 });
+
+DynamicOrb.displayName = 'DynamicOrb';
 
 export default DynamicOrb;

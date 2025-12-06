@@ -72,7 +72,7 @@ const Login = ({ onSwitchToSignup, onClose }) => {
                 </form>
 
                 <div className="mt-6 text-center text-sm text-slate-400">
-                    Don't have an account? <button onClick={onSwitchToSignup} className="text-blue-400 hover:text-blue-300 font-bold">Sign Up</button>
+                    Don&apos;t have an account? <button onClick={onSwitchToSignup} className="text-blue-400 hover:text-blue-300 font-bold">Sign Up</button>
                 </div>
             </div>
         </div>

@@ -11,6 +11,8 @@ call venv\Scripts\activate
 
 echo Installing dependencies...
 pip install -r requirements.txt
+pip install -r requirements-ml.txt
+pip install librosa
 
 echo Starting Flask server...
 set FLASK_APP=app

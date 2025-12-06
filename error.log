@@ -1,0 +1,47 @@
+
+ RUN  v4.0.14 C:/Users/riley/Desktop/GEM
+
+ Γ¥» src/engines/AudioEngine.socket.test.js (5 tests | 5 failed) 39ms
+     ├ù should initialize socket on start 8ms
+     ├ù should handle socket connection events 21ms
+     ├ù should emit audio_chunk when connected 6ms
+     ├ù should buffer chunks when disconnected and flush on connect 1ms
+     ├ù should update latestBackendAnalysis on analysis_update 1ms
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 5 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should initialize socket on start
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should handle socket connection events
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should emit audio_chunk when connected
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should buffer chunks when disconnected and flush on connect
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should update latestBackendAnalysis on analysis_update
+TypeError: this.passthroughGain.gain.setTargetAtTime is not a function
+ Γ¥» AudioEngine.stop src/engines/AudioEngine.js:454:39
+    452|         // Mute passthrough on stop
+    453|         if (this.passthroughGain) {
+    454|             this.passthroughGain.gain.setTargetAtTime(0, this.audioConΓÇª
+       |                                       ^
+    455|         }
+    456| 
+ Γ¥» src/engines/AudioEngine.socket.test.js:98:28
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/6]ΓÄ»
+
+ FAIL  src/engines/AudioEngine.socket.test.js > AudioEngine Socket Integration > should buffer chunks when disconnected and flush on connect
+TypeError: Cannot read properties of undefined (reading 'length')
+ Γ¥» src/engines/AudioEngine.socket.test.js:146:36
+    144|         // Should NOT emit yet
+    145|         expect(mockSocket.emit).not.toHaveBeenCalled();
+    146|         expect(engine.socketBuffer.length).toBe(1);
+       |                                    ^
+    147| 
+    148|         // Simulate connection
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/6]ΓÄ»
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed (5)
+   Start at  22:56:20
+   Duration  1.91s (transform 148ms, setup 233ms, import 155ms, tests 39ms, environment 1.22s)
+

@@ -1,3 +1,4 @@
+/* eslint-env node */
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useTTS } from './useTTS';
@@ -17,7 +18,7 @@ describe('useTTS', () => {
             onerror: null
         };
 
-        global.SpeechSynthesisUtterance = vi.fn(() => mockUtterance);
+        global.SpeechSynthesisUtterance = vi.fn(function () { return mockUtterance; });
 
         mockSpeechSynthesis = {
             getVoices: vi.fn().mockReturnValue([

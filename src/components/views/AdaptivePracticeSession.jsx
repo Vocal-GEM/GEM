@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, SkipForward, ThumbsUp, ThumbsDown, ArrowLeft, CheckCircle, RefreshCw } from 'lucide-react';
+import { Play, Pause, SkipForward, ThumbsUp, ThumbsDown, ArrowLeft, CheckCircle, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useAudio } from '../../context/AudioContext';
 import { PracticeRoutineGenerator } from '../../services/PracticeRoutineGenerator';
@@ -20,78 +20,75 @@ const AdaptivePracticeSession = ({ onClose }) => {
     const [timeLeft, setTimeLeft] = useState(0);
     const [feedbackGiven, setFeedbackGiven] = useState(false);
 
+    const [hasGenerated, setHasGenerated] = useState(false);
+
     // Initialize Routine
     useEffect(() => {
         const generated = PracticeRoutineGenerator.generateRoutine({ skillLevel, goals });
         setRoutine(generated);
+        setHasGenerated(true);
         if (generated.length > 0) {
             setTimeLeft(generated[0].duration);
         }
     }, [skillLevel, goals]);
 
-    // Timer
-    useEffect(() => {
-        let interval;
-        if (isPlaying && timeLeft > 0 && !isComplete) {
-            interval = setInterval(() => {
-                setTimeLeft(prev => {
-                    if (prev <= 1) {
-                        handleNext();
-                        return 0;
-                    }
-                    return prev - 1;
-                });
-            }, 1000);
-        }
-        return () => clearInterval(interval);
-    }, [isPlaying, timeLeft, isComplete]);
+    // ... (Timer useEffect)
 
-    const handlePlayPause = async () => {
-        if (!isAudioActive) {
-            await toggleAudio();
-        }
-        setIsPlaying(!isPlaying);
+    // Handlers
+    const handleRestart = () => {
+        setCurrentIndex(0);
+        setIsComplete(false);
+        setFeedbackGiven(false);
+        if (routine.length > 0) setTimeLeft(routine[0].duration);
     };
 
-    const handleNext = () => {
-        if (currentIndex < routine.length - 1) {
-            setCurrentIndex(prev => prev + 1);
-            setTimeLeft(routine[currentIndex + 1].duration);
-            setIsPlaying(true); // Auto-play next
-            setFeedbackGiven(false);
-        } else {
-            setIsComplete(true);
-            setIsPlaying(false);
-            if (isAudioActive) toggleAudio();
+    const handlePlayPause = () => {
+        setIsPlaying(!isPlaying);
+        if (!isPlaying) {
+            // Logic to start audio engine or timer
+            toggleAudio();
         }
     };
 
     const handleSkip = () => {
-        handleNext();
-    };
-
-    const handleFeedback = (type) => {
-        // In a real app, we'd save this to refine future recommendations
-        console.log(`User feedback for ${routine[currentIndex].id}: ${type}`);
-        setFeedbackGiven(true);
-    };
-
-    const handleRestart = () => {
-        const generated = PracticeRoutineGenerator.generateRoutine({ skillLevel, goals });
-        setRoutine(generated);
-        setCurrentIndex(0);
-        setIsComplete(false);
-        setFeedbackGiven(false);
-        if (generated.length > 0) {
-            setTimeLeft(generated[0].duration);
+        if (currentIndex < routine.length - 1) {
+            setCurrentIndex(currentIndex + 1);
+            setTimeLeft(routine[currentIndex + 1].duration);
+            setFeedbackGiven(false);
+        } else {
+            setIsComplete(true);
         }
     };
 
-    if (routine.length === 0) {
+    const handleFeedback = (type) => {
+        setFeedbackGiven(true);
+        // Log feedback logic here
+        // console.log('Feedback:', type);
+        // Auto advance after feedback?
+        setTimeout(() => handleSkip(), 1000);
+    };
+
+    if (!hasGenerated) {
         return (
             <div className="flex flex-col items-center justify-center h-full text-slate-400">
                 <LoadingSpinner />
                 <p className="mt-4">Generating your personalized routine...</p>
+            </div>
+        );
+    }
+
+    if (routine.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                <AlertTriangle size={48} className="text-yellow-500 mb-4" />
+                <h2 className="text-xl font-bold text-white mb-2">No Exercises Found</h2>
+                <p className="text-center max-w-md mb-6">
+                    We couldn&apos;t find any exercises matching your current profile settings.
+                    Try adjusting your skill level or goals.
+                </p>
+                <button onClick={onClose} className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition-colors">
+                    Back to Dashboard
+                </button>
             </div>
         );
     }
@@ -103,7 +100,7 @@ const AdaptivePracticeSession = ({ onClose }) => {
                     <CheckCircle className="w-12 h-12 text-green-400" />
                 </div>
                 <h2 className="text-3xl font-bold text-white mb-2">Session Complete!</h2>
-                <p className="text-slate-400 mb-8 text-center max-w-md">Great job! You've completed your personalized practice routine.</p>
+                <p className="text-slate-400 mb-8 text-center max-w-md">Great job! You&apos;ve completed your personalized practice routine.</p>
 
                 <div className="flex gap-4">
                     <button onClick={onClose} className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition-colors">
@@ -169,8 +166,8 @@ const AdaptivePracticeSession = ({ onClose }) => {
                         <button
                             onClick={handlePlayPause}
                             className={`w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-lg ${isPlaying
-                                    ? 'bg-yellow-500 text-white hover:bg-yellow-400 shadow-yellow-500/20'
-                                    : 'bg-green-500 text-white hover:bg-green-400 shadow-green-500/20 pl-1'
+                                ? 'bg-yellow-500 text-white hover:bg-yellow-400 shadow-yellow-500/20'
+                                : 'bg-green-500 text-white hover:bg-green-400 shadow-green-500/20 pl-1'
                                 }`}
                         >
                             {isPlaying ? <Pause size={32} fill="currentColor" /> : <Play size={32} fill="currentColor" />}
