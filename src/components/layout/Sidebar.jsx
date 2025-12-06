@@ -6,6 +6,9 @@ import ProfileManager from '../ui/ProfileManager';
 import Login from '../ui/Login';
 import Signup from '../ui/Signup';
 
+// Import version from package.json
+const APP_VERSION = import.meta.env.VITE_APP_VERSION || '0.1.0';
+
 const Sidebar = ({ activeView, onViewChange }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [showProfileManager, setShowProfileManager] = useState(false);
@@ -41,10 +44,17 @@ const Sidebar = ({ activeView, onViewChange }) => {
                 <div className="flex flex-col h-full">
                     {/* Header */}
                     <div className="p-6 border-b border-slate-800">
-                        <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
-                            Vocal GEM
-                        </h1>
-                        <p className="text-xs text-slate-500 mt-1">Gender Expression Modulator</p>
+                        <div className="flex items-start justify-between">
+                            <div>
+                                <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+                                    Vocal GEM
+                                </h1>
+                                <p className="text-xs text-slate-500 mt-1">Gender Expression Modulator</p>
+                            </div>
+                            <span className="text-[10px] text-slate-600 font-mono bg-slate-800 px-2 py-1 rounded" title="App Version">
+                                v{APP_VERSION}
+                            </span>
+                        </div>
                     </div>
 
                     {/* Nav Items */}
