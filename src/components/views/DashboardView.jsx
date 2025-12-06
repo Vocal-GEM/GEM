@@ -34,7 +34,7 @@ const ActionCard = ({ title, description, onClick, icon, color }) => (
 
 const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
     return (
-        <div className="w-full min-h-screen bg-slate-950 p-6 lg:p-12">
+        <div className="w-full min-h-screen bg-black p-6 lg:p-12">
             {/* Smart Coach Widget */}
             <SmartCoachWidget onStartSession={onOpenAdaptiveSession} />
 

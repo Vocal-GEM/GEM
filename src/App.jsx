@@ -234,7 +234,7 @@ const App = () => {
                     Skip to main content
                 </a>
 
-                <div className="flex min-h-screen bg-slate-950 text-white font-sans selection:bg-blue-500/30">
+                <div className="flex min-h-screen bg-black text-white font-sans selection:bg-blue-500/30">
                     <Suspense fallback={null}>
                         <Sidebar activeView={activeTab} onViewChange={setActiveTab} />
                     </Suspense>
