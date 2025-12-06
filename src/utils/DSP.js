@@ -220,4 +220,81 @@ export class DSP {
         const db = 20 * Math.log10(rms);
         return db + offset;
     }
+
+    /**
+     * Calculate Jitter (Frequency Perturbation)
+     * Measures cycle-to-cycle variation in pitch periods.
+     * @param {number[]} pitchPeriods Array of pitch periods (1/F0) in seconds
+     * @returns {number} Jitter percentage (0.0 to 100.0)
+     */
+    static calculateJitter(pitchPeriods) {
+        if (pitchPeriods.length < 2) return 0;
+
+        let sumDiff = 0;
+        let sumPeriod = 0;
+
+        for (let i = 0; i < pitchPeriods.length; i++) {
+            sumPeriod += pitchPeriods[i];
+            if (i > 0) {
+                sumDiff += Math.abs(pitchPeriods[i] - pitchPeriods[i - 1]);
+            }
+        }
+
+        const avgPeriod = sumPeriod / pitchPeriods.length;
+        if (avgPeriod === 0) return 0;
+
+        const avgDiff = sumDiff / (pitchPeriods.length - 1);
+        const jitter = avgDiff / avgPeriod;
+        return jitter * 100; // Return as percentage
+    }
+
+    /**
+     * Calculate Shimmer (Amplitude Perturbation)
+     * Measures cycle-to-cycle variation in amplitude.
+     * @param {number[]} amplitudes Array of peak amplitudes
+     * @returns {number} Shimmer percentage (0.0 to 100.0)
+     */
+    static calculateShimmer(amplitudes) {
+        if (amplitudes.length < 2) return 0;
+
+        let sumDiff = 0;
+        let sumAmp = 0;
+
+        for (let i = 0; i < amplitudes.length; i++) {
+            sumAmp += amplitudes[i];
+            if (i > 0) {
+                sumDiff += Math.abs(amplitudes[i] - amplitudes[i - 1]);
+            }
+        }
+
+        const avgAmp = sumAmp / amplitudes.length;
+        if (avgAmp === 0) return 0;
+
+        const avgDiff = sumDiff / (amplitudes.length - 1);
+        const shimmer = avgDiff / avgAmp;
+        return shimmer * 100; // Return as percentage
+    }
+
+    /**
+     * Calculate Harmonics-to-Noise Ratio (HNR)
+     * Uses autocorrelation peak to estimate signal periodicity vs noise.
+     * @param {Float32Array} autocorrelation Autocorrelation buffer
+     * @param {number} periodLag Index of the first major peak (corresponding to pitch period)
+     * @returns {number} HNR in dB
+     */
+    static calculateHNR(autocorrelation, periodLag) {
+        if (!autocorrelation || periodLag <= 0 || periodLag >= autocorrelation.length) return 0;
+
+        const totalPower = autocorrelation[0];
+        const harmonicPower = autocorrelation[periodLag];
+
+        // Safety check to prevent log of negative or zero
+        if (totalPower <= 0 || harmonicPower <= 0 || harmonicPower >= totalPower) return 50; // Cap at 50dB if perfect
+
+        const noisePower = totalPower - harmonicPower;
+        if (noisePower <= 0) return 50;
+
+        const hnr = 10 * Math.log10(harmonicPower / noisePower);
+        return hnr;
+    }
 }

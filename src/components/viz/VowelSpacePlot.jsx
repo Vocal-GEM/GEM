@@ -1,8 +1,8 @@
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
-const VowelSpacePlot = ({ f1, f2, dataRef, showAnalysis = true }) => {
+const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRecording = false }) => {
     const { colorBlindMode } = useSettings();
     const { profile } = useProfile();
 
@@ -17,155 +17,173 @@ const VowelSpacePlot = ({ f1, f2, dataRef, showAnalysis = true }) => {
     const minF2 = isMasc ? 500 : 500;
     const maxF2 = isMasc ? 2500 : 3000;
 
-    // Vowel targets (approximate) - Could also adapt these positions slightly if needed
-    const targets = [
-        { label: '/i/', f1: isMasc ? 270 : 300, f2: isMasc ? 2200 : 2500, color: colorBlindMode ? 'rgba(147, 51, 234, 0.2)' : 'rgba(236, 72, 153, 0.2)' }, // Pink/Purple
-        { label: '/a/', f1: isMasc ? 750 : 850, f2: isMasc ? 1200 : 1700, color: colorBlindMode ? 'rgba(13, 148, 136, 0.2)' : 'rgba(59, 130, 246, 0.2)' }, // Blue/Teal
-        { label: '/u/', f1: isMasc ? 270 : 300, f2: isMasc ? 700 : 800, color: colorBlindMode ? 'rgba(245, 158, 11, 0.2)' : 'rgba(16, 185, 129, 0.2)' }   // Green/Amber
-    ];
+    // Vowel targets (approximate)
+    const targets = {
+        'i': { label: '/i/', f1: isMasc ? 270 : 300, f2: isMasc ? 2200 : 2500, color: colorBlindMode ? '#9333ea' : '#ec4899' }, // Pink/Purple
+        'a': { label: '/a/', f1: isMasc ? 750 : 850, f2: isMasc ? 1200 : 1700, color: colorBlindMode ? '#0d9488' : '#3b82f6' }, // Blue/Teal
+        'u': { label: '/u/', f1: isMasc ? 270 : 300, f2: isMasc ? 700 : 800, color: colorBlindMode ? '#f59e0b' : '#10b981' }   // Green/Amber
+    };
 
     const getXPos = (val) => 100 - ((val - minF2) / (maxF2 - minF2)) * 100;
     const getYPos = (val) => ((val - minF1) / (maxF1 - minF1)) * 100;
 
-    const pointRef = React.useRef(null);
-    const labelRef = React.useRef(null);
-    const [currentVowel, setCurrentVowel] = React.useState('');
-    const [currentF1, setCurrentF1] = React.useState(0);
-    const [currentF2, setCurrentF2] = React.useState(0);
+    const pointRef = useRef(null);
+    const labelRef = useRef(null);
+    const canvasRef = useRef(null);
 
-    React.useEffect(() => {
-        if (!dataRef) return;
+    const [currentVowel, setCurrentVowel] = useState('');
+    const [hitScore, setHitScore] = useState(0);
 
-        const loop = () => {
-            if (pointRef.current && dataRef.current) {
-                const { f1: currentF1, f2: currentF2, vowel, clarity } = dataRef.current;
+    // Animation Loop
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
 
-                // Update state for vowel display
-                setCurrentVowel(vowel || '');
-                setCurrentF1(currentF1 || 0);
-                setCurrentF2(currentF2 || 0);
+        let animationId;
 
-                if (currentF1 && currentF2 && currentF1 > 0 && currentF2 > 0) {
-                    // Confidence Gating
-                    const conf = clarity !== undefined ? clarity : 1.0;
+        const render = () => {
+            // Clear Canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                    // If confidence is very low, hide or dim significantly
-                    if (conf < 0.4) {
-                        pointRef.current.style.opacity = '0.1';
-                        // Don't update position if extremely unstable to prevent jumping
-                    } else {
-                        pointRef.current.style.opacity = conf < 0.7 ? '0.5' : '1';
-                        pointRef.current.style.left = `${getXPos(currentF2)}%`;
-                        pointRef.current.style.top = `${getYPos(currentF1)}%`;
+            // Draw Target Zones
+            Object.entries(targets).forEach(([key, t]) => {
+                const isActive = targetVowel === key;
+                const opacity = isActive ? 0.6 : (targetVowel ? 0.1 : 0.3);
+
+                const x = (getXPos(t.f2) / 100) * canvas.width;
+                const y = (getYPos(t.f1) / 100) * canvas.height;
+
+                // Glowing effect for active target
+                if (isActive) {
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, 60);
+                    gradient.addColorStop(0, `${t.color}40`);
+                    gradient.addColorStop(1, `${t.color}00`);
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 60, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Pulse Ring
+                    const time = Date.now() / 500;
+                    const pulseSize = 20 + Math.sin(time) * 5;
+                    ctx.strokeStyle = t.color;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(x, y, pulseSize, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                // Core Circle
+                ctx.fillStyle = t.color;
+                ctx.globalAlpha = opacity;
+                ctx.beginPath();
+                ctx.arc(x, y, 10, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Label
+                ctx.globalAlpha = isActive ? 1 : 0.5;
+                ctx.fillStyle = '#fff';
+                ctx.font = isActive ? 'bold 16px Inter' : '12px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText(t.label, x, y + 25);
+                ctx.globalAlpha = 1;
+            });
+
+            // Update User Dot
+            if (dataRef && dataRef.current && isRecording) {
+                const { f1, f2, vowel, clarity } = dataRef.current;
+
+                if (f1 && f2 && clarity > 0.4) {
+                    const x = (getXPos(f2) / 100) * canvas.width;
+                    const y = (getYPos(f1) / 100) * canvas.height;
+
+                    // Smooth transition (lerp could be added here for smoother movement)
+                    if (pointRef.current) {
+                        pointRef.current.style.transform = `translate(${x}px, ${y}px)`;
+                        pointRef.current.style.opacity = '1';
+                    }
+
+                    // Check Hit
+                    if (targetVowel) {
+                        const t = targets[targetVowel];
+                        const tx = (getXPos(t.f2) / 100) * canvas.width;
+                        const ty = (getYPos(t.f1) / 100) * canvas.height;
+                        const distance = Math.hypot(x - tx, y - ty);
+
+                        // Hit threshold
+                        if (distance < 50) {
+                            setHitScore(prev => Math.min(100, prev + 1));
+                        }
                     }
 
                     if (labelRef.current) {
-                        labelRef.current.innerText = `${currentF1.toFixed(0)} / ${currentF2.toFixed(0)} Hz`;
+                        labelRef.current.innerText = `${f1.toFixed(0)} / ${f2.toFixed(0)} Hz`;
+                        // Move label with point
+                        labelRef.current.style.transform = `translate(${x + 15}px, ${y}px)`;
                     }
-                } else {
-                    pointRef.current.style.opacity = '0';
+
+                    setCurrentVowel(vowel);
+                } else if (pointRef.current) {
+                    pointRef.current.style.opacity = '0.1';
                 }
             }
-            requestAnimationFrame(loop);
+
+            animationId = requestAnimationFrame(render);
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'vowel-space-plot',
-                loop,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
+        // Resize handler
+        const resize = () => {
+            if (!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        };
+        window.addEventListener('resize', resize);
+        resize();
+
+        render();
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            cancelAnimationFrame(animationId);
+            window.removeEventListener('resize', resize);
         };
-    }, [dataRef, minF1, maxF1, minF2, maxF2]); // Re-run if axes change
+    }, [targetVowel, isMasc, isRecording, colorBlindMode]);
 
     return (
-        <div className="h-full bg-slate-900 rounded-xl border border-slate-800 relative overflow-hidden">
-            {/* Vowel Detection Display */}
-            {showAnalysis && (
-                <div className="absolute top-2 left-2 right-2 z-10 flex items-center justify-between">
-                    <div className="glass-panel-dark px-3 py-2 rounded-lg">
-                        <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Detected Vowel</div>
-                        <div className={`text-xl font-bold transition-all ${currentVowel ? 'text-teal-400 animate-pulse' : 'text-slate-600'
-                            }`}>
-                            {currentVowel ? `/${currentVowel}/` : '—'}
-                        </div>
-                    </div>
-                    <div className="glass-panel-dark px-3 py-2 rounded-lg text-right">
-                        <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Formants</div>
-                        <div className="text-xs font-mono text-slate-300">
-                            F1: <span className={`font-bold ${colorBlindMode ? 'text-purple-400' : 'text-pink-400'}`}>{currentF1 > 0 ? currentF1.toFixed(0) : '—'}</span> Hz
-                        </div>
-                        <div className="text-xs font-mono text-slate-300">
-                            F2: <span className={`font-bold ${colorBlindMode ? 'text-teal-400' : 'text-blue-400'}`}>{currentF2 > 0 ? currentF2.toFixed(0) : '—'}</span> Hz
-                        </div>
+        <div className="w-full h-full relative bg-slate-950 rounded-xl overflow-hidden shadow-inner">
+            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full block" />
+
+            {/* Grid Lines / Labels */}
+            <div className="absolute inset-0 pointer-events-none opacity-20">
+                <div className="absolute top-4 left-4 text-xs font-mono text-white">High F2 (Front)</div>
+                <div className="absolute top-4 right-4 text-xs font-mono text-white">Low F2 (Back)</div>
+                <div className="absolute top-1/2 left-2 -rotate-90 text-xs font-mono text-white origin-left">Low F1 (Close)</div>
+                <div className="absolute bottom-4 left-4 text-xs font-mono text-white">High F1 (Open)</div>
+            </div>
+
+            {/* User Dot (HTML Overlay for crispness/glow) */}
+            <div
+                ref={pointRef}
+                className="absolute w-6 h-6 bg-white rounded-full shadow-[0_0_20px_rgba(255,255,255,0.8)] pointer-events-none transition-opacity duration-200 -ml-3 -mt-3"
+                style={{ opacity: 0, top: 0, left: 0 }}
+            >
+                <div className="absolute inset-0 bg-white rounded-full animate-ping opacity-50"></div>
+            </div>
+
+            <div ref={labelRef} className="absolute text-[10px] font-mono text-slate-400 pointer-events-none whitespace-nowrap px-2 py-1 bg-black/50 rounded" style={{ top: 0, left: 0 }}></div>
+
+            {/* Hit Score Feedback */}
+            {targetVowel && isRecording && (
+                <div className="absolute bottom-6 right-6 flex flex-col items-center">
+                    <div className="text-xs uppercase tracking-widest text-slate-500 mb-1">Target Resonance</div>
+                    <div className="h-2 w-32 bg-slate-800 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
+                            style={{ width: `${hitScore}%` }}
+                        ></div>
                     </div>
                 </div>
             )}
-            <div className={`absolute inset-0 p-4 ${showAnalysis ? 'pt-20' : ''}`}>
-                {/* Grid & Labels */}
-                <div className="w-full h-full border-l border-b border-slate-700 relative">
-                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-slate-500">
-                        F2 (Resonance/Backness)
-                    </div>
-                    <div className="absolute -left-8 top-1/2 -translate-y-1/2 -rotate-90 text-xs text-slate-500">
-                        F1 (Openness)
-                    </div>
-
-                    {/* Target Zones */}
-                    {targets.map(t => (
-                        <div
-                            key={t.label}
-                            className="absolute rounded-full flex items-center justify-center text-xs font-bold text-white/50"
-                            style={{
-                                left: `${getXPos(t.f2)}%`,
-                                top: `${getYPos(t.f1)}%`,
-                                width: '40px',
-                                height: '40px',
-                                transform: 'translate(-50%, -50%)',
-                                backgroundColor: t.color
-                            }}
-                        >
-                            {t.label}
-                        </div>
-                    ))}
-
-                    {/* User Point (Static Props) */}
-                    {f1 && f2 && !dataRef && (
-                        <div
-                            className="absolute w-4 h-4 bg-white rounded-full shadow-[0_0_10px_white] transition-all duration-500"
-                            style={{
-                                left: `${getXPos(f2)}%`,
-                                top: `${getYPos(f1)}%`,
-                                transform: 'translate(-50%, -50%)'
-                            }}
-                        >
-                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700">
-                                {f1.toFixed(0)} / {f2.toFixed(0)} Hz
-                            </div>
-                        </div>
-                    )}
-
-                    {/* User Point (Real-time Ref) */}
-                    {dataRef && (
-                        <div
-                            ref={pointRef}
-                            className="absolute w-4 h-4 bg-white rounded-full shadow-[0_0_10px_white] transition-all duration-75 opacity-0"
-                            style={{
-                                transform: 'translate(-50%, -50%)'
-                            }}
-                        >
-                            <div ref={labelRef} className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700">
-                                0 / 0 Hz
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
         </div>
     );
 };

@@ -1,18 +1,25 @@
 import React, { useState } from 'react';
 import { Home, Mic, BookOpen, Activity, Dumbbell, BarChart2, Settings, Menu, X, ChevronRight, User } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
+import { useAuth } from '../../context/AuthContext';
 import ProfileManager from '../ui/ProfileManager';
+import Login from '../ui/Login';
+import Signup from '../ui/Signup';
 
 const Sidebar = ({ activeView, onViewChange }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [showProfileManager, setShowProfileManager] = useState(false);
+    const [showLogin, setShowLogin] = useState(false);
+    const [showSignup, setShowSignup] = useState(false);
     const { activeProfile } = useProfile();
+    const { user, logout } = useAuth();
 
     const navItems = [
         { id: 'dashboard', label: 'Dashboard', icon: <Home size={20} /> },
         { id: 'analysis', label: 'Voice Analysis', icon: <Mic size={20} /> },
         { id: 'assessment', label: 'Voice Assessment', icon: <BookOpen size={20} /> },
         { id: 'acoustics', label: 'Acoustic Analysis', icon: <Activity size={20} /> },
+        { id: 'vowels', label: 'Resonance Lab', icon: <Mic size={20} /> },
         { id: 'phonetogram', label: 'Voice Range', icon: <BarChart2 size={20} /> },
         { id: 'training', label: 'Training Gym', icon: <Dumbbell size={20} /> },
         { id: 'history', label: 'History & Progress', icon: <BarChart2 size={20} /> },
@@ -63,18 +70,32 @@ const Sidebar = ({ activeView, onViewChange }) => {
 
                     {/* User Profile */}
                     <div className="p-4 border-t border-slate-800">
-                        <button
-                            onClick={() => setShowProfileManager(true)}
-                            className="w-full flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 transition-colors border border-slate-700/50"
-                        >
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold shadow-lg">
-                                {activeProfile?.name?.[0]?.toUpperCase() || 'U'}
+                        {user ? (
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold shadow-lg">
+                                        {user.username?.[0]?.toUpperCase() || 'U'}
+                                    </div>
+                                    <div className="text-left flex-1 overflow-hidden">
+                                        <div className="text-sm font-bold text-white truncate">{user.username}</div>
+                                        <button
+                                            onClick={logout}
+                                            className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                                        >
+                                            Sign Out
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="text-left flex-1 overflow-hidden">
-                                <div className="text-sm font-bold text-white truncate">{activeProfile?.name || 'User'}</div>
-                                <div className="text-xs text-slate-400">Switch Profile</div>
-                            </div>
-                        </button>
+                        ) : (
+                            <button
+                                onClick={() => setShowLogin(true)}
+                                className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all shadow-lg shadow-blue-900/20"
+                            >
+                                <User size={18} />
+                                Sign In
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -88,6 +109,24 @@ const Sidebar = ({ activeView, onViewChange }) => {
             )}
 
             {showProfileManager && <ProfileManager onClose={() => setShowProfileManager(false)} />}
+            {showLogin && (
+                <Login
+                    onClose={() => setShowLogin(false)}
+                    onSwitchToSignup={() => {
+                        setShowLogin(false);
+                        setShowSignup(true);
+                    }}
+                />
+            )}
+            {showSignup && (
+                <Signup
+                    onClose={() => setShowSignup(false)}
+                    onSwitchToLogin={() => {
+                        setShowSignup(false);
+                        setShowLogin(true);
+                    }}
+                />
+            )}
         </>
     );
 };

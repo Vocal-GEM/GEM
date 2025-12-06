@@ -95,7 +95,7 @@ const CalibrationWizard = ({ onComplete, onClose }) => {
                             <div className="w-20 h-20 bg-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <Volume2 size={40} className="text-teal-400" />
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Let's set your levels</h3>
+                            <h3 className="text-xl font-bold text-white mb-2">Let&apos;s set your levels</h3>
                             <p className="text-slate-400 mb-6">
                                 To ensure accurate clinical measurements, we need to calibrate your microphone sensitivity.
                                 Please find a quiet room.
@@ -138,7 +138,7 @@ const CalibrationWizard = ({ onComplete, onClose }) => {
                         <div className="text-center">
                             <h3 className="text-xl font-bold text-white mb-2">Reference Tone</h3>
                             <p className="text-slate-400 mb-8">
-                                Take a deep breath and say <strong>"Ahhhhh"</strong> at a comfortable, conversational volume for 5 seconds.
+                                Take a deep breath and say <strong>&quot;Ahhhhh&quot;</strong> at a comfortable, conversational volume for 5 seconds.
                             </p>
 
                             {progress > 0 ? (

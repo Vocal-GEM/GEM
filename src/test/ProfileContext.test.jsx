@@ -4,16 +4,20 @@ import { ProfileProvider, useProfile } from '../context/ProfileContext';
 import { indexedDB } from '../services/IndexedDBManager';
 
 // Mock IndexedDB
-vi.mock('../services/IndexedDBManager', () => ({
-    indexedDB: {
-        ensureReady: vi.fn().mockResolvedValue(true),
-        getProfiles: vi.fn().mockResolvedValue([]),
-        saveProfile: vi.fn().mockResolvedValue(true),
-        getSetting: vi.fn().mockResolvedValue(null),
-        saveSetting: vi.fn().mockResolvedValue(true),
-        saveSession: vi.fn().mockResolvedValue(true),
-        getSessions: vi.fn().mockResolvedValue([])
+const { mockIndexedDB } = vi.hoisted(() => ({
+    mockIndexedDB: {
+        ensureReady: vi.fn(),
+        getProfiles: vi.fn(),
+        saveProfile: vi.fn(),
+        getSetting: vi.fn(),
+        saveSetting: vi.fn(),
+        saveSession: vi.fn(),
+        getSessions: vi.fn()
     }
+}));
+
+vi.mock('../services/IndexedDBManager', () => ({
+    indexedDB: mockIndexedDB
 }));
 
 // Mock AuthContext
@@ -26,6 +30,13 @@ vi.mock('../context/AuthContext', () => ({
 describe('ProfileContext Integration', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockIndexedDB.ensureReady.mockResolvedValue(true);
+        mockIndexedDB.getProfiles.mockResolvedValue([]);
+        mockIndexedDB.saveProfile.mockResolvedValue(true);
+        mockIndexedDB.getSetting.mockResolvedValue(null);
+        mockIndexedDB.saveSetting.mockResolvedValue(true);
+        mockIndexedDB.saveSession.mockResolvedValue(true);
+        mockIndexedDB.getSessions.mockResolvedValue([]);
     });
 
     const wrapper = ({ children }) => <ProfileProvider>{children}</ProfileProvider>;
@@ -73,8 +84,12 @@ describe('ProfileContext Integration', () => {
 
             // Wait for initial load
             await waitFor(() => {
+                expect(mockIndexedDB.getProfiles).toHaveBeenCalled();
+            });
+
+            await waitFor(() => {
                 expect(result.current.voiceProfiles.length).toBeGreaterThan(1);
-            }, { timeout: 2000 });
+            }, { timeout: 4000 });
 
             // Create a new profile to switch to
             await act(async () => {

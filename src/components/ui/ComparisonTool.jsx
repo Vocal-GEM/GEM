@@ -101,7 +101,7 @@ const ComparisonTool = () => {
                 <ArrowLeftRight className="text-blue-400" />
                 Voice Comparison
             </h3>
-            <p className="text-sm text-slate-400">Record a "Before" and "After" clip to hear your progress.</p>
+            <p className="text-sm text-slate-400">Record a &quot;Before&quot; and &quot;After&quot; clip to hear your progress.</p>
 
             {/* Target Phrase & TTS */}
             <div className="bg-slate-900/30 p-4 rounded-xl border border-white/5 space-y-3">

@@ -4,16 +4,7 @@ import { PitchDetector } from '../utils/PitchDetector';
 import { ResonanceCalculator } from '../utils/ResonanceCalculator';
 import { FormantAnalyzer } from '../utils/FormantAnalyzer';
 
-const MainDSP = {
-    hzToSemitones: (hz) => 12 * Math.log2(hz / 440) + 69,
-    median: (values) => {
-        if (values.length === 0) return 0;
-        const sorted = [...values].sort((a, b) => a - b);
-        const half = Math.floor(sorted.length / 2);
-        if (sorted.length % 2) return sorted[half];
-        return (sorted[half - 1] + sorted[half]) / 2.0;
-    }
-};
+
 
 export class HapticEngine {
     constructor() { this.lastTrigger = 0; this.canVibrate = typeof navigator !== 'undefined' && !!navigator.vibrate; }
@@ -69,6 +60,8 @@ export class AudioEngine {
         this.silenceFrameCount = 0;
         // Socket.IO
         this.socket = null;
+        this.socketBuffer = [];
+        this.MAX_BUFFER_SIZE = 50;
         this.latestBackendAnalysis = {
             rbi_score: 50,
             breathiness_score: 0,
@@ -111,6 +104,7 @@ export class AudioEngine {
 
         this.socket.on('connect', () => {
             this.debugInfo.socketConnected = true;
+            this.retryCount = 0; // Reset retry count on successful connection
             this.logConnectionEvent('Connected');
             this.flushSocketBuffer();
         });
@@ -120,6 +114,22 @@ export class AudioEngine {
             this.logConnectionEvent(`Disconnected: ${reason}`);
         });
 
+        this.socket.on('connect_error', (error) => {
+            this.debugInfo.socketConnected = false;
+            this.debugInfo.error = 'Connection failed. Retrying...';
+            this.logConnectionEvent(`Connection error: ${error.message}`);
+
+            // Exponential backoff retry (max 10 seconds)
+            const retryDelay = Math.min(1000 * Math.pow(2, this.retryCount), 10000);
+            this.retryCount = (this.retryCount || 0) + 1;
+
+            setTimeout(() => {
+                if (!this.debugInfo.socketConnected && this.socket) {
+                    this.socket.connect();
+                }
+            }, retryDelay);
+        });
+
         this.socket.on('analysis_update', (data) => {
             this.latestBackendAnalysis = { ...data, timestamp: Date.now() };
         });
@@ -127,6 +137,11 @@ export class AudioEngine {
         // Clinical Metrics
         this.calibrationOffset = 90;
         this.hnrBuffer = [];
+
+        // Listen Mode (Passthrough)
+        this.passthroughGain = this.audioContext.createGain();
+        this.passthroughGain.gain.value = 0; // Muted by default
+        this.passthroughGain.connect(this.audioContext.destination);
     }
 
     async start() {
@@ -138,7 +153,11 @@ export class AudioEngine {
             this.microphone = this.audioContext.createMediaStreamSource(stream);
             this.analyser = this.audioContext.createAnalyser();
             this.analyser.fftSize = 2048;
+            this.analyser.fftSize = 2048;
             this.microphone.connect(this.analyser);
+
+            // Connect to passthrough (already connected to destination, but gain is 0)
+            this.microphone.connect(this.passthroughGain);
 
             this.isActive = true;
             this.debugInfo.state = 'running';
@@ -244,10 +263,58 @@ export class AudioEngine {
                     const rms = DSP.calculateRMS(pcm);
                     const intensity = DSP.calculateDB(rms, this.calibrationOffset);
 
-                    // Update latest analysis with local intensity
+                    // --- Jitter / Shimmer Calculation (Main Thread from Worklet Chunks) ---
+                    // Note: Worklet chunks might be small (e.g. 128 or 4096 frames). 
+                    // YIN needs ~2048 for good low pitch detection.
+
+                    // We can reuse the buffers we defined (ensure they are initialized)
+                    if (!this.analysisPitchBuffer) this.analysisPitchBuffer = [];
+                    if (!this.analysisAmpBuffer) this.analysisAmpBuffer = [];
+
+                    // Calculate Pitch on this chunk (might be less accurate if chunk is small)
+                    // If chunk is small, we might want to circular buffer Pcm data?
+                    // Assuming chunk size is decent (set to 0.25s in config -> ~11000 samples? No, 4096 usually)
+                    const { pitch, confidence } = DSP.calculatePitchYIN(pcm, this.audioContext.sampleRate, 0.2);
+
+                    let jitter = 0;
+                    let shimmer = 0;
+                    let hnr = 0;
+
+                    let maxAmp = 0;
+                    for (let i = 0; i < pcm.length; i++) if (Math.abs(pcm[i]) > maxAmp) maxAmp = Math.abs(pcm[i]);
+
+                    if (pitch > 50 && confidence > 0.8) {
+                        const period = 1.0 / pitch;
+                        this.analysisPitchBuffer.push(period);
+                        this.analysisAmpBuffer.push(maxAmp);
+
+                        if (this.analysisPitchBuffer.length > 15) this.analysisPitchBuffer.shift();
+                        if (this.analysisAmpBuffer.length > 15) this.analysisAmpBuffer.shift();
+
+                        if (this.analysisPitchBuffer.length > 5) {
+                            jitter = DSP.calculateJitter(this.analysisPitchBuffer);
+                            shimmer = DSP.calculateShimmer(this.analysisAmpBuffer);
+                        }
+
+                        // Simple HNR proxy from confidence
+                        hnr = 10 * Math.log10(confidence / (1.001 - confidence));
+                    } else {
+                        // Decay
+                        if (Math.random() > 0.9) { // Slow decay
+                            this.analysisPitchBuffer = [];
+                            this.analysisAmpBuffer = [];
+                        }
+                    }
+
+                    // Update latest analysis with local metrics
                     this.latestBackendAnalysis = {
                         ...this.latestBackendAnalysis,
                         intensity: intensity,
+                        pitch: pitch,
+                        jitter: jitter,
+                        shimmer: shimmer,
+                        hnr: hnr,
+                        clarity: confidence,
                         timestamp: Date.now()
                     };
 
@@ -301,18 +368,79 @@ export class AudioEngine {
     startProcessing() {
         if (!this.isActive) return;
 
-        const bufferLength = this.analyser.frequencyBinCount;
+        const bufferLength = this.analyser.frequencyBinCount; // 1024 if fftSize is 2048
         const dataArray = new Float32Array(bufferLength);
+
+        // Buffers for calculating perturbation metrics over time (e.g., last 10-20 frames)
+        this.visualPitchBuffer = []; // Store 1/F0
+        this.visualAmpBuffer = [];   // Store Peak Amplitude
 
         const loop = () => {
             if (!this.isActive) return;
             this.animationFrameId = requestAnimationFrame(loop);
 
+            // If Live Analysis (Worklet) is active, it handles the metrics and updates.
+            // We exit here to avoid redundant processing and double-updates.
+            if (this.isLiveAnalysisActive) return;
+
             this.analyser.getFloatTimeDomainData(dataArray);
 
-            // Calculate Intensity
+            // 1. Basic Signal Stats
             const rms = DSP.calculateRMS(dataArray);
             const intensity = DSP.calculateDB(rms, this.calibrationOffset);
+            let maxAmp = 0;
+            for (let i = 0; i < dataArray.length; i++) {
+                if (Math.abs(dataArray[i]) > maxAmp) maxAmp = Math.abs(dataArray[i]);
+            }
+
+            // 2. Pitch Detection (YIN)
+            // Use local DSP static for synchronous calculation or this.pitchDetector if preferred.
+            // Using DSP.calculatePitchYIN for direct access.
+            const { pitch, confidence } = DSP.calculatePitchYIN(dataArray, this.audioContext.sampleRate, 0.2);
+
+            let jitter = 0;
+            let shimmer = 0;
+            let hnr = 0;
+
+            if (pitch > 50 && confidence > 0.8) {
+                const period = 1.0 / pitch;
+
+                // Update Buffers
+                this.visualPitchBuffer.push(period);
+                this.visualAmpBuffer.push(maxAmp);
+
+                // Keep last 15 frames (~250ms at 60fps) for smoothing
+                if (this.visualPitchBuffer.length > 15) this.visualPitchBuffer.shift();
+                if (this.visualAmpBuffer.length > 15) this.visualAmpBuffer.shift();
+
+                // 3. Calculate Perturbation Metrics
+                if (this.visualPitchBuffer.length > 5) {
+                    jitter = DSP.calculateJitter(this.visualPitchBuffer);
+                    shimmer = DSP.calculateShimmer(this.visualAmpBuffer);
+                }
+
+                // 4. Calculate HNR
+                // We need autocorrelation. YIN does difference, but let's do a quick autocorr for HNR at the pitch lag.
+                // Downsample for performance? 
+                // Let's rely on a simplified check: 
+                // HNR is related to YIN confidence (aperiodicity). 
+                // HNR approx = 10 * log10(confidence / (1 - confidence)) ? 
+                // Actually YIN 'confidence' = 1 - minDifference. 
+                // So if confidence is 1.0, error is 0. HNR is infinite.
+                // Let's use the explicit HNR function but only for the lag found by YIN.
+                // Optimization: Only compute autocorr at the specific lag? 
+                // No, calculateHNR needs the peak vs total power.
+                // Let's use a simpler proxy for real-time: mapped confidence.
+                // Clinical HNR usually requires full autocorr. 
+                // Let's interpret YIN confidence as a quality metric directly for now to save CPU.
+                // 0.8 confidence -> "Okay", 0.98 -> "Clean". 
+                // Map 0.8-1.0 to 0-30dB range approx.
+                hnr = 10 * Math.log10(confidence / (1.001 - confidence));
+            } else {
+                // Decay metrics if voice lost
+                this.visualPitchBuffer = [];
+                this.visualAmpBuffer = [];
+            }
 
             // Process audio data here (simplified for brevity)
             // In a real implementation, you would call pitchDetector, resonanceCalculator, etc.
@@ -320,10 +448,13 @@ export class AudioEngine {
             // For now, just call the update handler with some dummy data or processed data
             if (this.onAudioUpdate) {
                 this.onAudioUpdate({
-                    volume: Math.max(...dataArray),
-                    pitch: 0, // Placeholder
-                    clarity: 0, // Placeholder
-                    intensity: intensity
+                    volume: maxAmp,
+                    pitch: pitch || 0,
+                    clarity: confidence || 0,
+                    intensity: intensity,
+                    jitter: jitter,
+                    shimmer: shimmer,
+                    hnr: hnr
                 });
             }
         };
@@ -331,8 +462,17 @@ export class AudioEngine {
         loop();
     }
 
+    // Explicitly add HNR calculation if needed for high precision mode, 
+    // but the loop above uses a heuristic for performance.
+
     stop() {
         this.isActive = false;
+
+        // Mute passthrough on stop
+        if (this.passthroughGain) {
+            this.passthroughGain.gain.setTargetAtTime(0, this.audioContext.currentTime, 0.1);
+        }
+
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
             this.animationFrameId = null;
@@ -344,5 +484,34 @@ export class AudioEngine {
         if (this.audioContext && this.audioContext.state !== 'closed') {
             this.audioContext.suspend();
         }
+    }
+
+    /**
+     * Enable or disable audio passthrough (monitoring).
+     * @param {boolean} enabled 
+     */
+    setPassthrough(enabled) {
+        if (!this.passthroughGain) return;
+        const now = this.audioContext.currentTime;
+        // Ramp to avoid clicks
+        this.passthroughGain.gain.cancelScheduledValues(now);
+        this.passthroughGain.gain.setTargetAtTime(enabled ? 1.0 : 0, now, 0.1);
+    }
+
+    /**
+     * Enable or disable listen mode (alias for setPassthrough for backward compatibility)
+     * @param {boolean} enabled 
+     */
+    setListenMode(enabled) {
+        this.setPassthrough(enabled);
+    }
+
+    /**
+     * Set noise gate threshold
+     * @param {number} threshold - Threshold value (0-1)
+     */
+    setNoiseGate(threshold) {
+        // Store noise gate setting for use in processing loop
+        this.noiseGateThreshold = threshold || 0.01;
     }
 }

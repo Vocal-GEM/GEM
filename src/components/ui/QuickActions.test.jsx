@@ -1,10 +1,13 @@
-import { describe, it, expect, vi } from 'vitest';
+/* eslint-env jest */
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import QuickActions from './QuickActions';
 
 describe('QuickActions', () => {
-    const mockUpdateSettings = vi.fn();
-    const mockSettings = { listenMode: false };
+    const { mockSettings, mockUpdateSettings } = vi.hoisted(() => ({
+        mockSettings: { listenMode: false },
+        mockUpdateSettings: vi.fn(),
+    }));
 
     beforeEach(() => {
         vi.mock('../../context/SettingsContext', () => ({

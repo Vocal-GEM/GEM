@@ -1,3 +1,4 @@
+/* eslint-env node, jest */
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 

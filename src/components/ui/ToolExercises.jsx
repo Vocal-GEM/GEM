@@ -4,8 +4,8 @@ import PitchPipe from './PitchPipe';
 import BreathPacer from './BreathPacer';
 import WarmUpModule from './WarmUpModule';
 import TwisterCard from './TwisterCard';
-import PitchMatchingModule from '../modules/PitchMatchingModule';
-import IntonationCurveModule from '../modules/IntonationCurveModule';
+import PitchMatchingModule from './PitchMatchingModule';
+import IntonationCurveModule from './IntonationCurveModule';
 
 const ToolExercises = ({ tool, audioEngine }) => {
     const renderExercise = () => {
@@ -21,14 +21,14 @@ const ToolExercises = ({ tool, audioEngine }) => {
                 return (
                     <div className="h-full">
                         <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Recommended Exercise</h3>
-                        <PitchMatchingModule embedded={true} />
+                        <PitchMatchingModule audioEngine={audioEngine} embedded={true} />
                     </div>
                 );
             case 'contour':
                 return (
                     <div className="h-full">
                         <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Recommended Exercise</h3>
-                        <IntonationCurveModule embedded={true} />
+                        <IntonationCurveModule audioEngine={audioEngine} embedded={true} />
                     </div>
                 );
             case 'weight':

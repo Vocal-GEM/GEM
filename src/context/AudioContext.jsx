@@ -164,11 +164,13 @@ export const AudioProvider = ({ children }) => {
         isAudioActive,
         toggleAudio,
         runEnvironmentCheck,
+        setPassthrough: (enabled) => audioEngineRef.current?.setPassthrough(enabled),
         startRecording,
         stopRecording,
         isRecording,
-        audioError
-    }), [isAudioActive, isRecording, audioError]);
+        audioError,
+        audioContext: audioEngineRef.current?.audioContext
+    }), [isAudioActive, isRecording, audioError, audioEngineRef.current?.audioContext]);
 
     return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>;
 };

@@ -59,7 +59,7 @@ const TargetVoicePlayer = ({ text, label = "Target Voice" }) => {
 
                 <div className="flex-1">
                     <div className="text-white font-medium text-sm line-clamp-2 italic">
-                        "{text}"
+                        &quot;{text}&quot;
                     </div>
                 </div>
             </div>

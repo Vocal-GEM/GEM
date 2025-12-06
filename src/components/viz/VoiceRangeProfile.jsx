@@ -233,7 +233,7 @@ const VoiceRangeProfile = ({ sessions = [], targetRange }) => {
 
             {showInfo && (
                 <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-200">
-                    This chart maps your voice capabilities. The horizontal axis is Pitch (Hz), and the vertical axis is Volume (dB). The shaded area represents your "Voice Space" - the range of pitches and volumes you can comfortably produce.
+                    This chart maps your voice capabilities. The horizontal axis is Pitch (Hz), and the vertical axis is Volume (dB). The shaded area represents your &quot;Voice Space&quot; - the range of pitches and volumes you can comfortably produce.
                 </div>
             )}
 

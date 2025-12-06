@@ -1,9 +1,12 @@
+/* eslint-env node */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AudioEngine } from './AudioEngine';
 import { io } from 'socket.io-client';
 
 // Mock socket.io-client
-vi.mock('socket.io-client');
+vi.mock('socket.io-client', () => ({
+    io: vi.fn()
+}));
 
 // Mock AudioContext and browser APIs
 const mockAudioContext = {
@@ -23,7 +26,7 @@ const mockAudioContext = {
     }),
     createGain: () => ({
         connect: vi.fn(),
-        gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() }
+        gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), setTargetAtTime: vi.fn() }
     }),
     createBiquadFilter: () => ({
         connect: vi.fn(),
@@ -40,6 +43,7 @@ const mockAudioContext = {
         disconnect: vi.fn()
     }),
     resume: vi.fn().mockResolvedValue(),
+    suspend: vi.fn().mockResolvedValue(),
     close: vi.fn().mockResolvedValue(),
     destination: {},
     state: 'suspended',

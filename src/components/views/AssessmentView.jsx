@@ -14,7 +14,7 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
                     <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                    <h2 className="text-xl font-bold text-white">Coach's Assessment</h2>
+                    <h2 className="text-xl font-bold text-white">Coach&apos;s Assessment</h2>
                     <p className="text-slate-400 text-sm">Based on your latest recording</p>
                 </div>
             </div>
@@ -22,7 +22,7 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
             {/* Summary Card */}
             <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-6 mb-6 border border-slate-700/50">
                 <p className="text-lg font-medium text-slate-200 leading-relaxed">
-                    "{summary}"
+                    &quot;{summary}&quot;
                 </p>
             </div>
 

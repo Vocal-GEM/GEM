@@ -199,7 +199,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
                             <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
                                     <div className="text-xs text-blue-200">
-                                        ℹ️ ElevenLabs API key is configured on the server. If voices don't load, contact your administrator.
+                                        ℹ️ ElevenLabs API key is configured on the server. If voices don&apos;t load, contact your administrator.
                                     </div>
                                 </div>
 

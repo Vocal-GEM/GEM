@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Square, Trash2, Save, Info } from 'lucide-react';
+import Toast from '../ui/Toast';
 import { useAudio } from '../../context/AudioContext';
 import { phonetogramService } from '../../services/PhonetogramService';
 import PhonetogramChart from '../viz/PhonetogramChart';
@@ -8,6 +9,7 @@ const PhonetogramView = () => {
     const { isAudioActive, toggleAudio, dataRef } = useAudio();
     const [isRecording, setIsRecording] = useState(false);
     const [profileData, setProfileData] = useState([]);
+    const [toast, setToast] = useState(null);
     const requestRef = useRef();
 
     // Update loop
@@ -59,9 +61,25 @@ const PhonetogramView = () => {
         }
     };
 
-    const handleSave = () => {
-        // In a real app, we'd save this to IndexedDB via a service
-        alert('Profile saved! (Simulation)');
+    const handleSave = async () => {
+        if (profileData.length === 0) {
+            setToast({ message: 'No data to save recorded yet.', type: 'info' });
+            return;
+        }
+
+        try {
+            const { indexedDB, STORES } = await import('../../services/IndexedDBManager');
+            await indexedDB.add(STORES.ASSESSMENTS, {
+                type: 'phonetogram',
+                data: profileData,
+                timestamp: Date.now(),
+                source: 'phonetogram'
+            });
+            setToast({ message: 'Phonetogram profile saved to History!', type: 'success' });
+        } catch (err) {
+            console.error(err);
+            setToast({ message: 'Failed to save profile.', type: 'error' });
+        }
     };
 
     return (
@@ -108,8 +126,8 @@ const PhonetogramView = () => {
                     <button
                         onClick={handleToggleRecording}
                         className={`w-full py-6 rounded-2xl font-bold text-xl flex items-center justify-center gap-3 transition-all ${isRecording
-                                ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-900/20'
-                                : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20'
+                            ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-900/20'
+                            : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20'
                             }`}
                     >
                         {isRecording ? (
@@ -132,7 +150,7 @@ const PhonetogramView = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-slate-400">
                         <div className="flex gap-3">
                             <div className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-white shrink-0">1</div>
-                            <p>Start recording and make a soft "Ooo" sound. Glide from your lowest note to your highest note.</p>
+                            <p>Start recording and make a soft &quot;Ooo&quot; sound. Glide from your lowest note to your highest note.</p>
                         </div>
                         <div className="flex gap-3">
                             <div className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-white shrink-0">2</div>
@@ -149,6 +167,13 @@ const PhonetogramView = () => {
                     </div>
                 </div>
             </div>
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </div>
     );
 };

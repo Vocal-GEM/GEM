@@ -92,7 +92,7 @@ const AssessmentModule = ({ onClose }) => {
                     {!results ? (
                         <div className="text-center space-y-4">
                             <p className="text-slate-300 text-sm">
-                                Read the passage above out loud at a comfortable pace. We'll analyze your average pitch and range.
+                                Read the passage above out loud at a comfortable pace. We&apos;ll analyze your average pitch and range.
                             </p>
                             {!isRecording ? (
                                 <button

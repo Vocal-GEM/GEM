@@ -63,7 +63,7 @@ const AdaptivePracticeSession = ({ onClose }) => {
     const handleFeedback = (type) => {
         setFeedbackGiven(true);
         // Log feedback logic here
-        console.log('Feedback:', type);
+        // console.log('Feedback:', type);
         // Auto advance after feedback?
         setTimeout(() => handleSkip(), 1000);
     };
@@ -83,7 +83,7 @@ const AdaptivePracticeSession = ({ onClose }) => {
                 <AlertTriangle size={48} className="text-yellow-500 mb-4" />
                 <h2 className="text-xl font-bold text-white mb-2">No Exercises Found</h2>
                 <p className="text-center max-w-md mb-6">
-                    We couldn't find any exercises matching your current profile settings.
+                    We couldn&apos;t find any exercises matching your current profile settings.
                     Try adjusting your skill level or goals.
                 </p>
                 <button onClick={onClose} className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition-colors">
@@ -100,7 +100,7 @@ const AdaptivePracticeSession = ({ onClose }) => {
                     <CheckCircle className="w-12 h-12 text-green-400" />
                 </div>
                 <h2 className="text-3xl font-bold text-white mb-2">Session Complete!</h2>
-                <p className="text-slate-400 mb-8 text-center max-w-md">Great job! You've completed your personalized practice routine.</p>
+                <p className="text-slate-400 mb-8 text-center max-w-md">Great job! You&apos;ve completed your personalized practice routine.</p>
 
                 <div className="flex gap-4">
                     <button onClick={onClose} className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition-colors">

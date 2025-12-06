@@ -407,7 +407,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                                     <div>
                                         <h4 className="font-bold text-yellow-400">Resonance Mismatch Detected</h4>
                                         <p className="text-sm text-yellow-200/80">
-                                            Your pitch is high, but your resonance (formants) is relatively low. This can sometimes sound "hollow" or unnatural. Try brightening your resonance by smiling slightly or raising your tongue.
+                                            Your pitch is high, but your resonance (formants) is relatively low. This can sometimes sound &quot;hollow&quot; or unnatural. Try brightening your resonance by smiling slightly or raising your tongue.
                                         </p>
                                     </div>
                                 </div>

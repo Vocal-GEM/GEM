@@ -1,6 +1,7 @@
 /**
  * Resonance Processor v5.5 - Optimized with Adaptive Noise Gate & Frame Overlap & Streaming Support
  */
+/* global sampleRate */
 
 class DSP {
     static decimate(buffer, inputRate, targetRate) {

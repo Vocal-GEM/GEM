@@ -20,6 +20,8 @@ const SkeletonLoader = ({ className = "", variant = "text", count = 1 }) => {
             {items.map((_, i) => (
                 <div
                     key={i}
+                    role="status"
+                    aria-label="Loading..."
                     className={`bg-slate-800/50 animate-pulse ${getClasses()}`}
                     style={{
                         animationDelay: `${i * 100}ms`,

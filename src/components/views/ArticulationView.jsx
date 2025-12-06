@@ -339,7 +339,7 @@ const ArticulationView = () => {
 
                                 {/* Quick Tips */}
                                 <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-800 text-sm text-slate-400">
-                                    <p className="mb-2"><strong className="text-white">Tip:</strong> For a sharper "S":</p>
+                                    <p className="mb-2"><strong className="text-white">Tip:</strong> For a sharper &quot;S&quot;:</p>
                                     <ul className="list-disc list-inside space-y-1 ml-2">
                                         <li>Raise tongue tip to alveolar ridge</li>
                                         <li>Groove the tongue center</li>
@@ -457,7 +457,7 @@ const ArticulationView = () => {
                                     </div>
 
                                     <p className="text-lg font-serif italic text-slate-300 mb-6 leading-relaxed">
-                                        "{t.text}"
+                                        &quot;{t.text}&quot;
                                     </p>
 
                                     {activeTwister === t.id && twisterFeedback && (

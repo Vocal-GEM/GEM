@@ -787,4 +787,6 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
   );
 });
 
+DynamicOrb.displayName = 'DynamicOrb';
+
 export default DynamicOrb;

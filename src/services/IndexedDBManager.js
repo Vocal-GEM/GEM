@@ -373,6 +373,48 @@ class IndexedDBManager {
         localStorage.clear(); // Also clear localStorage
         return true;
     }
+
+    /**
+     * Get all journals
+     * @returns {Promise<Array>}
+     */
+    async getJournals() {
+        return await this.getAll(STORES.JOURNALS);
+    }
+
+    /**
+     * Save a journal entry
+     * @param {Object} entry - Journal entry data
+     * @returns {Promise<number>} - ID of saved entry
+     */
+    async saveJournal(entry) {
+        return await this.add(STORES.JOURNALS, {
+            ...entry,
+            timestamp: entry.timestamp || Date.now(),
+            date: entry.date || new Date().toISOString().split('T')[0]
+        });
+    }
+
+    /**
+     * Get all stats
+     * @returns {Promise<Array>}
+     */
+    async getStats() {
+        return await this.getAll(STORES.STATS);
+    }
+
+    /**
+     * Save stats
+     * @param {Object} stats - Stats data
+     * @returns {Promise}
+     */
+    async saveStats(stats) {
+        return await this.put(STORES.STATS, {
+            id: 'current',
+            ...stats,
+            lastUpdated: Date.now()
+        });
+    }
 }
 
 // Export singleton instance

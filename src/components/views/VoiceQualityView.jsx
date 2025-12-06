@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Upload, Play, Square, Activity, FileText, BarChart2, Info } from 'lucide-react';
+import { Mic, Upload, Play, Square, Activity, FileText, BarChart2, Info, Save, History, Calendar, Trash2 } from 'lucide-react';
+import Toast from '../ui/Toast';
+import { indexedDB, STORES } from '../../services/IndexedDBManager';
 import Spectrogram from '../viz/Spectrogram';
 import ClipCapture from '../ui/ClipCapture';
 import IntensityMeter from '../viz/IntensityMeter';
@@ -36,15 +38,41 @@ const VoiceQualityView = () => {
     const [results, setResults] = useState(null);
     const [error, setError] = useState(null);
     const [goal, setGoal] = useState('transfem_soft_slightly_breathy');
+    const [toast, setToast] = useState(null);
+
     const [includeTranscript, setIncludeTranscript] = useState(true);
+
+    // History State
+    const [history, setHistory] = useState([]);
+    const [historyLoading, setHistoryLoading] = useState(false);
 
     // Live Analysis State
     const [isLive, setIsLive] = useState(false);
     const [liveMetrics, setLiveMetrics] = useState(null);
 
     // Use Audio Engine
-    const { audioEngineRef } = useAudio();
+    const { audioEngineRef, setPassthrough } = useAudio();
     const audioEngine = audioEngineRef.current;
+
+    // Listen Mode
+    const [isListenMode, setIsListenMode] = useState(false);
+    const [showFeedbackWarning, setShowFeedbackWarning] = useState(false);
+
+    // Toggle Listen Mode
+    const toggleListenMode = () => {
+        if (!isListenMode) {
+            setShowFeedbackWarning(true);
+        } else {
+            setIsListenMode(false);
+            setPassthrough(false);
+        }
+    };
+
+    const confirmListenMode = () => {
+        setIsListenMode(true);
+        setPassthrough(true);
+        setShowFeedbackWarning(false);
+    };
 
     // --- Recorded Analysis ---
 
@@ -144,6 +172,73 @@ const VoiceQualityView = () => {
         };
     }, [isLive, audioEngine]);
 
+    // --- History Logic ---
+
+    useEffect(() => {
+        if (activeTab === 'history') {
+            loadHistory();
+        }
+    }, [activeTab]);
+
+    const loadHistory = async () => {
+        setHistoryLoading(true);
+        try {
+            const allAssessments = await indexedDB.getAll(STORES.ASSESSMENTS);
+            // Filter for voice_quality type if we have multiple types, but for now show all sorted descending
+            const sorted = allAssessments
+                .filter(a => a.type === 'voice_quality')
+                .sort((a, b) => b.timestamp - a.timestamp);
+            setHistory(sorted);
+        } catch (err) {
+            console.error("Failed to load history:", err);
+            setError("Failed to load history.");
+        } finally {
+            setHistoryLoading(false);
+        }
+    };
+
+    const handleSaveResult = async (dataToSave, source = 'file') => {
+        try {
+            const record = {
+                type: 'voice_quality',
+                timestamp: Date.now(),
+                date: new Date().toISOString(),
+                source: source,
+                // Spread metrics
+                rbi_score: dataToSave.rbi_score || 0,
+                jitter: dataToSave.jitter || 0,
+                shimmer: dataToSave.shimmer || 0,
+                metrics: {
+                    breathiness: dataToSave.breathiness_score,
+                    roughness: dataToSave.roughness_score,
+                    strain: dataToSave.strain_score
+                },
+                goal_label: dataToSave.goals?.goal_label || goal
+            };
+
+            await indexedDB.saveAssessment(record);
+            setToast({ message: "Result saved to History!", type: 'success' });
+        } catch (err) {
+            console.error(err);
+            setToast({ message: "Failed to save result: " + err.message, type: 'error' });
+        }
+    };
+
+    // Auto-calculate average for live session when stopping? 
+    // For now, let's just save the LAST frame or require user to click "Save" while running?
+    // Better: Button "Snapshot & Save"
+    const handleSnapshot = () => {
+        if (!liveMetrics) return;
+        handleSaveResult(liveMetrics, 'live');
+    };
+
+    const handleDeleteHistory = async (id) => {
+        if (confirm("Delete this record?")) {
+            await indexedDB.delete(STORES.ASSESSMENTS, id);
+            loadHistory();
+        }
+    };
+
     // --- Rendering Helpers ---
 
     const renderGoalStatus = (goals) => {
@@ -208,48 +303,112 @@ const VoiceQualityView = () => {
         );
     };
 
-    const renderLiveBars = () => {
-        if (!liveMetrics) return <div className="text-slate-400 italic">Waiting for audio...</div>;
+    const getMetricValue = (val) => val !== undefined && val !== null ? val : 0;
 
-        const { breathiness_score, strain_score, roughness_score, label } = liveMetrics;
-
-        const renderBar = (label, value, colorClass) => (
-            <div className="mb-4">
-                <div className="flex justify-between text-sm mb-1">
-                    <span>{label}</span>
-                    <span>{value}</span>
-                </div>
-                <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
-                    <div
-                        className={`h-full transition-all duration-300 ${colorClass}`}
-                        style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
-                    />
-                </div>
-            </div>
-        );
+    const renderGauges = () => {
+        if (!liveMetrics && isLive) return <div className="text-slate-400 italic text-center p-8">Initializing analysis...</div>;
 
         return (
-            <div className="mt-6 p-6 bg-slate-800/50 rounded-xl border border-white/10">
-                <div className="flex items-center justify-between mb-6">
-                    <h3 className="font-bold text-xl">Current Quality: <span className="capitalize text-teal-400">{label}</span></h3>
-                    <div className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-bold animate-pulse">LIVE</div>
+            <div className="mt-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Jitter Gauge */}
+                    <div className="p-6 bg-slate-900 rounded-2xl border border-slate-800 relative group hover:border-slate-700 transition-colors">
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-slate-400 font-bold text-sm uppercase tracking-wider">Jitter (Roughness)</h3>
+                            <Info className="w-4 h-4 text-slate-600" />
+                        </div>
+
+                        <div className="relative h-32 flex items-center justify-center">
+                            <div className="w-24 h-24 rounded-full border-4 border-slate-800 flex items-center justify-center relative">
+                                <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831" fill="none" stroke="#1e293b" strokeWidth="4" />
+                                    <path
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831"
+                                        fill="none"
+                                        stroke={liveMetrics?.jitter > 1.0 ? '#ef4444' : '#10b981'}
+                                        strokeWidth="4"
+                                        strokeDasharray={`${Math.min(100, (getMetricValue(liveMetrics?.jitter) / 2.0) * 100)}, 100`}
+                                    />
+                                </svg>
+                                <div className="text-center">
+                                    <div className="text-2xl font-bold text-white">
+                                        {isLive ? getMetricValue(liveMetrics?.jitter).toFixed(2) : '—'}%
+                                    </div>
+                                    <div className="text-[9px] text-slate-500 uppercase">Target &lt; 1.0%</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="text-xs text-center text-slate-500 mt-2">
+                            {liveMetrics?.jitter > 1.0 ? 'Rough / Unsteady' : 'Stable'}
+                        </div>
+                    </div>
+
+                    {/* Shimmer Gauge */}
+                    <div className="p-6 bg-slate-900 rounded-2xl border border-slate-800 relative group hover:border-slate-700 transition-colors">
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-slate-400 font-bold text-sm uppercase tracking-wider">Shimmer (Breathiness)</h3>
+                            <Info className="w-4 h-4 text-slate-600" />
+                        </div>
+                        <div className="relative h-32 flex items-center justify-center">
+                            <div className="w-24 h-24 rounded-full border-4 border-slate-800 flex items-center justify-center relative">
+                                <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831" fill="none" stroke="#1e293b" strokeWidth="4" />
+                                    <path
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831"
+                                        fill="none"
+                                        stroke={liveMetrics?.shimmer > 3.8 ? '#ef4444' : '#10b981'}
+                                        strokeWidth="4"
+                                        strokeDasharray={`${Math.min(100, (getMetricValue(liveMetrics?.shimmer) / 5.0) * 100)}, 100`}
+                                    />
+                                </svg>
+                                <div className="text-center">
+                                    <div className="text-2xl font-bold text-white">
+                                        {isLive ? getMetricValue(liveMetrics?.shimmer).toFixed(2) : '—'}%
+                                    </div>
+                                    <div className="text-[9px] text-slate-500 uppercase">Target &lt; 3.8%</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="text-xs text-center text-slate-500 mt-2">
+                            {liveMetrics?.shimmer > 3.8 ? 'Breathy / Hoarse' : 'Clear'}
+                        </div>
+                    </div>
+
+                    {/* HNR Gauge */}
+                    <div className="p-6 bg-slate-900 rounded-2xl border border-slate-800 relative group hover:border-slate-700 transition-colors">
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-slate-400 font-bold text-sm uppercase tracking-wider">HNR (Noise Ratio)</h3>
+                            <Info className="w-4 h-4 text-slate-600" />
+                        </div>
+                        <div className="relative h-32 flex items-center justify-center">
+                            <div className="w-24 h-24 rounded-full border-4 border-slate-800 flex items-center justify-center relative">
+                                <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831" fill="none" stroke="#1e293b" strokeWidth="4" />
+                                    <path
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831"
+                                        fill="none"
+                                        stroke={liveMetrics?.hnr < 20 ? '#eab308' : '#10b981'}
+                                        strokeWidth="4"
+                                        strokeDasharray={`${Math.min(100, (getMetricValue(liveMetrics?.hnr) / 30.0) * 100)}, 100`}
+                                    />
+                                </svg>
+                                <div className="text-center">
+                                    <div className="text-2xl font-bold text-white">
+                                        {isLive ? getMetricValue(liveMetrics?.hnr).toFixed(1) : '—'}
+                                    </div>
+                                    <div className="text-[9px] text-slate-500 uppercase">dB (Target &gt; 20)</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="text-xs text-center text-slate-500 mt-2">
+                            {liveMetrics?.hnr < 20 ? 'Noisy' : 'Clean Tone'}
+                        </div>
+                    </div>
                 </div>
 
-                {renderBar('Breathiness', breathiness_score, breathiness_score > 75 ? 'bg-pink-500' : breathiness_score > 40 ? 'bg-green-500' : 'bg-slate-500')}
-                {renderBar('Strain', strain_score, strain_score > 60 ? 'bg-red-500' : 'bg-green-500')}
-                {renderBar('Roughness', roughness_score, roughness_score > 50 ? 'bg-orange-500' : 'bg-green-500')}
-
-                <div className="mt-4">
-                    <IntensityMeter intensity={liveMetrics.intensity || -100} />
-                </div>
-
-                <div className="mt-4 p-4 bg-slate-900/50 rounded-lg text-sm text-slate-300">
-                    <Info className="w-4 h-4 inline mr-2 text-teal-400" />
-                    {label === 'breathy' && "Your voice is breathy. Ensure it's supported and not whispery."}
-                    {label === 'pressed' && "High strain detected. Try to relax your throat and use less effort."}
-                    {label === 'rough' && "Roughness detected. Try to smooth out the airflow."}
-                    {label === 'modal' && "Good, clear tone detected."}
-                    {label === 'silence' && "Listening..."}
+                <div className="mt-4 p-4 bg-slate-900/50 rounded-lg text-sm text-slate-300 flex items-center justify-center">
+                    <Info className="w-4 h-4 mr-2 text-teal-400" />
+                    <span>Sustain a steady vowel (&quot;ahhh&quot;) for accurate clinical metrics.</span>
                 </div>
             </div>
         );
@@ -257,24 +416,33 @@ const VoiceQualityView = () => {
 
     return (
         <div className="w-full max-w-4xl mx-auto p-4 animate-in fade-in duration-500">
+            {/* Header */}
             <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-purple-500">
-                    Voice Quality Analysis
-                </h2>
-                <div className="flex bg-slate-800 p-1 rounded-lg">
+                <div>
+                    <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-blue-500">
+                        Voice Quality Analysis
+                    </h1>
+                    <p className="text-slate-400 text-sm">Clinical metrics for timbre and stability</p>
+                </div>
+
+                <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-800">
                     <button
                         onClick={() => setActiveTab('recorded')}
-                        className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${activeTab === 'recorded' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-white'
-                            }`}
+                        className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${activeTab === 'recorded' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                     >
-                        Recorded
+                        File Upload
                     </button>
                     <button
                         onClick={() => setActiveTab('live')}
-                        className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${activeTab === 'live' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-white'
-                            }`}
+                        className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${activeTab === 'live' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                     >
-                        Live
+                        Live Microphone
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('history')}
+                        className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${activeTab === 'history' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                    >
+                        History
                     </button>
                 </div>
             </div>
@@ -285,155 +453,235 @@ const VoiceQualityView = () => {
                 </div>
             )}
 
-            {activeTab === 'recorded' ? (
-                <div className="space-y-6">
-                    <div className="p-6 bg-slate-800/50 rounded-xl border border-white/10">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-bold text-slate-400 mb-2">Target Goal</label>
-                                <select
-                                    value={goal}
-                                    onChange={(e) => setGoal(e.target.value)}
-                                    className="w-full p-3 bg-slate-900 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-teal-500 outline-none"
-                                >
-                                    <option value="transfem_soft_slightly_breathy">Transfeminine (Soft, Slightly Breathy)</option>
-                                    <option value="clean_smooth">Clean & Smooth</option>
-                                    <option value="light_and_bright">Light & Bright</option>
-                                </select>
+            {activeTab === 'history' ? (
+                <div className="animate-in fade-in duration-500">
+                    <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <History className="text-teal-400" /> Assessment History
+                    </h2>
 
-                                {/* Norms Info */}
-                                {(() => {
-                                    const norms = getNormsForGoal(goal);
-                                    return (
-                                        <div className="mt-3 p-3 bg-slate-900/50 rounded-lg border border-white/5 text-xs text-slate-400">
-                                            <div className="flex justify-between mb-1">
-                                                <span>Target Pitch:</span>
-                                                <span className="text-teal-400">{norms.pitch.min}-{norms.pitch.max}Hz</span>
+                    {historyLoading ? (
+                        <div className="text-center text-slate-500 py-12">Loading history...</div>
+                    ) : history.length === 0 ? (
+                        <div className="text-center text-slate-500 py-12 border-2 border-dashed border-slate-800 rounded-2xl">
+                            No saved assessments yet.
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {history.map(item => (
+                                <div key={item.id} className="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <div>
+                                        <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
+                                            <Calendar className="w-3 h-3" />
+                                            {new Date(item.timestamp).toLocaleString()}
+                                            <span className="px-2 py-0.5 bg-slate-800 rounded text-slate-500 uppercase">{item.source}</span>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <div className="font-bold text-white text-lg">
+                                                Jitter: <span className={item.jitter > 1 ? 'text-red-400' : 'text-green-400'}>{item.jitter?.toFixed(2)}%</span>
                                             </div>
-                                            <div className="flex justify-between">
-                                                <span>Resonance:</span>
-                                                <span className="text-teal-400">{norms.resonance.description}</span>
+                                            <div className="font-bold text-white text-lg">
+                                                Shimmer: <span className={item.shimmer > 3.8 ? 'text-red-400' : 'text-green-400'}>{item.shimmer?.toFixed(2)}%</span>
                                             </div>
                                         </div>
-                                    );
-                                })()}
+                                    </div>
+                                    <button
+                                        onClick={() => handleDeleteHistory(item.id)}
+                                        className="p-2 text-slate-600 hover:text-red-400 transition-colors"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            ) : activeTab === 'live' ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-center">
+                    {!isLive ? (
+                        <div className="max-w-md py-12">
+                            <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl border border-slate-800">
+                                <Mic size={32} className="text-teal-400" />
                             </div>
-                            <div>
-                                <label className="block text-sm font-bold text-slate-400 mb-2">Upload or Record</label>
-                                <div className="flex items-center gap-4">
-                                    <div className="relative flex-1">
-                                        <input
-                                            type="file"
-                                            accept="audio/*"
-                                            onChange={handleFileChange}
-                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                        />
-                                        <div className="w-full p-3 bg-slate-900 border border-white/10 rounded-lg text-slate-300 flex items-center gap-2 hover:bg-slate-900/80 transition-colors">
-                                            <Upload className="w-4 h-4" />
-                                            <span className="truncate">{file ? file.name : "Choose WAV file..."}</span>
-                                        </div>
-                                    </div>
-                                    <div className="flex-shrink-0">
-                                        <ClipCapture onCapture={(result) => {
-                                            if (result && result.blob) {
-                                                const recordedFile = new File([result.blob], "recording.ogg", { type: "audio/ogg" });
-                                                setFile(recordedFile);
-                                                setResults(null);
-                                                setError(null);
-                                            }
-                                        }} />
-                                    </div>
+                            <h2 className="text-xl font-bold text-white mb-3">Live Clinical Analysis</h2>
+                            <p className="text-slate-400 mb-8">
+                                Start the microphone to analyze Jitter, Shimmer, HNR, and Spectral Tilt in real-time.
+                                Best results with a sustained vowel (like &quot;ahhh&quot;).
+                            </p>
+                            <button
+                                onClick={startLiveAnalysis}
+                                className="px-8 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-xl font-bold transition-all shadow-lg shadow-teal-500/20 flex items-center gap-2 mx-auto"
+                            >
+                                <Play size={18} fill="currentColor" />
+                                Start Analysis
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="w-full">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                                    Live Metrics
+                                </h3>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={toggleListenMode}
+                                        className={`px-3 py-1 rounded text-xs font-bold border transition-colors flex items-center gap-1 ${isListenMode ? 'bg-teal-500/20 text-teal-300 border-teal-500/50' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'}`}
+                                    >
+                                        {isListenMode ? '🎧 Monitoring On' : '🎧 Monitor Audio'}
+                                    </button>
+                                    <button
+                                        onClick={stopLiveAnalysis}
+                                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-bold transition-colors border border-slate-700"
+                                    >
+                                        Stop
+                                    </button>
+                                    <button
+                                        onClick={handleSnapshot}
+                                        className="px-4 py-2 bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 rounded-lg text-sm font-bold transition-colors border border-teal-500/30 flex items-center gap-2"
+                                    >
+                                        <Save size={16} /> Save
+                                    </button>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="mt-4 flex items-center gap-4">
-                            <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={includeTranscript}
-                                    onChange={(e) => setIncludeTranscript(e.target.checked)}
-                                    className="rounded bg-slate-900 border-white/10 text-teal-500 focus:ring-teal-500"
-                                />
-                                Include Transcript Analysis
-                            </label>
-                        </div>
-
-                        <button
-                            onClick={handleAnalyze}
-                            disabled={!file || isAnalyzing}
-                            className="mt-6 w-full py-3 bg-gradient-to-r from-teal-500 to-purple-600 hover:from-teal-400 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-                        >
-                            {isAnalyzing ? (
-                                <><Activity className="w-5 h-5 animate-spin" /> Analyzing...</>
-                            ) : (
-                                <><BarChart2 className="w-5 h-5" /> Analyze Recording</>
+                            {showFeedbackWarning && (
+                                <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl animate-in zoom-in-95 duration-200">
+                                    <h4 className="flex items-center gap-2 text-yellow-400 font-bold mb-2">
+                                        <Info className="w-5 h-5" />
+                                        Warning: Feedback Risk
+                                    </h4>
+                                    <p className="text-sm text-yellow-200/80 mb-4">
+                                        This enables real-time audio monitoring. <strong>You MUST wear headphones</strong> to avoid loud feedback loops (screeching).
+                                    </p>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={confirmListenMode}
+                                            className="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg text-sm"
+                                        >
+                                            I&apos;m wearing headphones
+                                        </button>
+                                        <button
+                                            onClick={() => setShowFeedbackWarning(false)}
+                                            className="px-4 py-2 bg-black/20 hover:bg-black/30 text-yellow-200 font-bold rounded-lg text-sm"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
                             )}
-                        </button>
-                    </div>
 
-                    {results && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            {renderGoalStatus(results.goals)}
+                            {renderGauges()}
 
-                            <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div className="p-4 bg-slate-800/50 rounded-xl border border-white/10 text-center">
-                                    <div className="text-sm text-slate-400 uppercase">Breathiness</div>
-                                    <div className="text-2xl font-bold text-white mt-1">{results.summary.breathiness_score}</div>
-                                </div>
-                                <div className="p-4 bg-slate-800/50 rounded-xl border border-white/10 text-center">
-                                    <div className="text-sm text-slate-400 uppercase">Roughness</div>
-                                    <div className="text-2xl font-bold text-white mt-1">{results.summary.roughness_score}</div>
-                                </div>
-                                <div className="p-4 bg-slate-800/50 rounded-xl border border-white/10 text-center">
-                                    <div className="text-sm text-slate-400 uppercase">Strain</div>
-                                    <div className="text-2xl font-bold text-white mt-1">{results.summary.strain_score}</div>
-                                </div>
-                                <div className="p-4 bg-slate-800/50 rounded-xl border border-white/10 text-center">
-                                    <div className="text-sm text-slate-400 uppercase">Overall</div>
-                                    <div className="text-lg font-bold text-teal-400 mt-1">{results.summary.overall_label}</div>
-                                </div>
+                            <div className="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                                <div className="text-sm text-slate-400 mb-2 text-left">Real-time Spectrogram</div>
+                                <Spectrogram height={150} />
                             </div>
-
-                            {renderTranscript(results.transcript)}
-
-                            {/* Charts could go here using results.timeline */}
                         </div>
                     )}
                 </div>
             ) : (
-                <div className="space-y-6">
-                    <div className="p-8 bg-slate-800/50 rounded-xl border border-white/10 text-center">
-                        {!isLive ? (
-                            <button
-                                onClick={startLiveAnalysis}
-                                className="px-8 py-4 bg-red-500 hover:bg-red-400 text-white font-bold rounded-full shadow-lg shadow-red-500/20 transition-all flex items-center gap-3 mx-auto text-lg"
+                <div className="flex-1">
+                    {/* Existing Upload UI (mostly unchanged but wrapped cleaner) */}
+                    {!results && (
+                        <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-800 rounded-2xl bg-slate-900/30 p-12">
+                            <Upload size={48} className="text-slate-600 mb-4" />
+                            <h3 className="text-lg font-bold text-white mb-2">Upload Audio File</h3>
+                            <p className="text-slate-400 text-sm mb-6 max-w-sm text-center">
+                                Select a recording (WAV, MP3) to analyze voice quality markers.
+                            </p>
+                            <input
+                                type="file"
+                                accept="audio/*"
+                                onChange={handleFileChange}
+                                className="hidden"
+                                id="audio-upload"
+                            />
+                            <label
+                                htmlFor="audio-upload"
+                                className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold cursor-pointer transition-colors border border-slate-700"
                             >
-                                <Mic className="w-6 h-6" /> Start Live Analysis
-                            </button>
-                        ) : (
-                            <button
-                                onClick={stopLiveAnalysis}
-                                className="px-8 py-4 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-full transition-all flex items-center gap-3 mx-auto text-lg"
-                            >
-                                <Square className="w-6 h-6 fill-current" /> Stop Analysis
-                            </button>
-                        )}
-                        <p className="mt-4 text-slate-400 text-sm">
-                            Microphone audio will be analyzed in real-time for breathiness, strain, and roughness.
-                        </p>
-                    </div>
+                                Browse Files
+                            </label>
+                            {file && (
+                                <div className="mt-6 flex flex-col items-center gap-4">
+                                    <div className="text-teal-400 font-mono text-sm">{file.name}</div>
+                                    <button
+                                        onClick={handleAnalyze}
+                                        disabled={isAnalyzing}
+                                        className="px-8 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-xl font-bold transition-all shadow-lg shadow-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    >
+                                        {isAnalyzing ? 'Analyzing...' : 'Run Analysis'}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
-                    {isLive && (
-                        <>
-                            {renderLiveBars()}
-                            <div className="mt-6">
-                                <h3 className="font-bold text-lg mb-2 text-slate-300">Real-time Spectrogram</h3>
-                                <Spectrogram height={150} />
+                    {results && (
+                        <div className="max-w-4xl mx-auto pb-12 animate-in fade-in duration-500">
+                            <button
+                                onClick={() => setResults(null)}
+                                className="mb-6 text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-1"
+                            >
+                                ← Analyze Another File
+                            </button>
+
+                            <div className="flex justify-end mb-4">
+                                <button
+                                    onClick={() => handleSaveResult(results, 'file')}
+                                    className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-white font-bold text-sm transition-colors border border-slate-700"
+                                >
+                                    <Save size={16} /> Save to History
+                                </button>
                             </div>
-                        </>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                                <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
+                                    <div className="text-slate-500 text-xs uppercase tracking-wider mb-2">RBI Index</div>
+                                    <div className="flex items-end gap-3">
+                                        <div className="text-5xl font-bold text-white">{results.rbi_score ? results.rbi_score.toFixed(0) : '—'}</div>
+                                        <div className="text-sm text-slate-400 mb-2">/ 100</div>
+                                    </div>
+                                    <div className="mt-4 h-2 bg-slate-800 rounded-full overflow-hidden">
+                                        <div className="h-full bg-gradient-to-r from-teal-500 to-blue-500" style={{ width: `${results.rbi_score || 0}%` }}></div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
+                                    <h3 className="font-bold text-white mb-4">Quality Metrics</h3>
+                                    <div className="space-y-4">
+                                        {[
+                                            { label: 'Breathiness', val: results.breathiness_score, color: 'bg-blue-500' },
+                                            { label: 'Roughness', val: results.roughness_score, color: 'bg-orange-500' },
+                                            { label: 'Strain', val: results.strain_score, color: 'bg-red-500' }
+                                        ].map(m => (
+                                            <div key={m.label}>
+                                                <div className="flex justify-between text-xs mb-1">
+                                                    <span className="text-slate-400">{m.label}</span>
+                                                    <span className="text-white font-mono">{m.val ? m.val.toFixed(1) : 0}</span>
+                                                </div>
+                                                <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                                    <div className={`h-full ${m.color}`} style={{ width: `${(m.val || 0) * 10}%` }}></div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {renderGoalStatus(results.goals)}
+                            {renderTranscript(results.transcript)}
+                        </div>
                     )}
                 </div>
+            )}
+
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
             )}
         </div>
     );

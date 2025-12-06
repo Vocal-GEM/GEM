@@ -18,7 +18,7 @@ const CalibrationSummary = ({ results, onConfirm, onRecalibrate }) => {
                 </div>
 
                 <h2 className="text-2xl font-bold text-white">Calibration Complete</h2>
-                <p className="text-slate-400">Here's what we learned about your environment and voice.</p>
+                <p className="text-slate-400">Here&apos;s what we learned about your environment and voice.</p>
 
                 <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 bg-slate-800/50 rounded-xl border border-white/5">

@@ -1,0 +1,634 @@
+
+ RUN  v4.0.14 C:/Users/riley/Desktop/GEM
+
+ Γ¥» src/services/IndexedDBManager.test.js (2 tests | 1 failed) 10ms
+     Γ£ô should initialize the database 4ms
+     ├ù should save and retrieve a journal entry 4ms
+stderr | src/test/ProfileContext.test.jsx > ProfileContext Integration > should provide default values
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (C:/Users/riley/Desktop/GEM/src/context/ProfileContext.jsx:20:28)
+    at wrapper (C:/Users/riley/Desktop/GEM/src/test/ProfileContext.test.jsx:41:22)
+
+stderr | src/test/ProfileContext.test.jsx > ProfileContext Integration > should update hydration
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (C:/Users/riley/Desktop/GEM/src/context/ProfileContext.jsx:20:28)
+    at wrapper (C:/Users/riley/Desktop/GEM/src/test/ProfileContext.test.jsx:41:22)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (C:/Users/riley/Desktop/GEM/src/context/ProfileContext.jsx:20:28)
+    at wrapper (C:/Users/riley/Desktop/GEM/src/test/ProfileContext.test.jsx:41:22)
+
+stderr | src/test/ProfileContext.test.jsx > ProfileContext Integration > should log fatigue
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (C:/Users/riley/Desktop/GEM/src/context/ProfileContext.jsx:20:28)
+    at wrapper (C:/Users/riley/Desktop/GEM/src/test/ProfileContext.test.jsx:41:22)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (C:/Users/riley/Desktop/GEM/src/context/ProfileContext.jsx:20:28)
+    at wrapper (C:/Users/riley/Desktop/GEM/src/test/ProfileContext.test.jsx:41:22)
+
+ Γ¥» src/components/ui/TooltipOverlay.test.jsx (5 tests | 4 failed) 386ms
+     Γ£ô should not render when not active 31ms
+     ├ù should render step content when active 220ms
+     ├ù should call onNext when Next button is clicked 75ms
+     ├ù should call onSkip when Skip button is clicked 4ms
+     ├ù should show Finish button on last step 54ms
+ Γ¥» src/components/ui/CelebrationModal.test.jsx (3 tests | 1 failed) 110ms
+     Γ£ô should not render when no achievement is provided 26ms
+     ├ù should render achievement details when provided 63ms
+     Γ£ô should call onClose when close button is clicked 19ms
+ Γ£ô src/components/ui/EmptyState.test.jsx (4 tests) 530ms
+     Γ£ô renders action button when onAction and actionLabel are provided  482ms
+ Γ£ô src/components/ui/CommandPalette.test.jsx (5 tests) 276ms
+ Γ£ô src/components/ui/QuickActions.test.jsx (4 tests) 1548ms
+     Γ£ô should render the FAB button  607ms
+     Γ£ô should expand menu when clicked  307ms
+     Γ£ô should call onAction when an action is clicked  369ms
+ Γ£ô src/context/AuthContext.test.jsx (3 tests) 170ms
+ Γ£ô src/test/VocalHealthPanel.test.jsx (6 tests) 270ms
+ Γ£ô src/components/ui/SkeletonLoader.test.jsx (5 tests) 988ms
+     Γ£ô renders correctly with default props  655ms
+ Γ£ô src/components/layout/Sidebar.test.jsx (4 tests) 366ms
+ Γ¥» src/test/ProfileContext.test.jsx (4 tests | 1 failed) 5043ms
+     Γ£ô should provide default values 22ms
+     Γ£ô should update hydration 7ms
+     Γ£ô should log fatigue 4ms
+       ├ù should switch profile 5007ms
+stderr | src/components/ui/HistoryView.test.jsx > HistoryView Personalization > should render all widgets by default
+Warning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (C:/Users/riley/Desktop/GEM/src/components/ui/HistoryView.jsx:36:24)
+
+stderr | src/components/ui/HistoryView.test.jsx > HistoryView Personalization > should hide widgets based on config
+Warning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (C:/Users/riley/Desktop/GEM/src/components/ui/HistoryView.jsx:36:24)
+
+stderr | src/components/ui/HistoryView.test.jsx > HistoryView Personalization > should dispatch openDashboardConfig event
+Warning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (C:/Users/riley/Desktop/GEM/src/components/ui/HistoryView.jsx:36:24)
+
+stderr | src/components/ui/HistoryView.test.jsx > HistoryView Personalization > should dispatch openDashboardConfig event
+Warning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (C:/Users/riley/Desktop/GEM/src/components/ui/HistoryView.jsx:36:24)
+
+stderr | src/components/ui/HistoryView.test.jsx > HistoryView Personalization > should dispatch openDashboardConfig event
+Warning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (C:/Users/riley/Desktop/GEM/src/components/ui/HistoryView.jsx:36:24)
+
+ Γ£ô src/components/ui/HistoryView.test.jsx (3 tests) 273ms
+ Γ£ô src/context/LanguageContext.test.jsx (3 tests) 56ms
+stderr | src/components/views/PracticeMode.test.jsx > PracticeMode > renders without crashing
+[AudioContext] Failed to initialize AudioEngine: TypeError: this.audioContext.createBuffer is not a function
+    at new AudioEngine (C:/Users/riley/Desktop/GEM/src/engines/AudioEngine.js:87:42)
+    at C:/Users/riley/Desktop/GEM/src/context/AudioContext.jsx:61:38
+    at commitHookEffectListMount (C:\Users\riley\Desktop\GEM\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (C:\Users\riley\Desktop\GEM\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (C:\Users\riley\Desktop\GEM\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (C:\Users\riley\Desktop\GEM\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (C:\Users\riley\Desktop\GEM\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (C:\Users\riley\Desktop\GEM\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (C:\Users\riley\Desktop\GEM\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at C:\Users\riley\Desktop\GEM\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+
+stderr | src/components/views/PracticeMode.test.jsx > PracticeMode > renders without crashing
+Failed to load settings: TypeError: Cannot read properties of undefined (reading 'open')
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:32:46
+    at new Promise (<anonymous>)
+    at IndexedDBManager.init (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:31:16)
+    at new IndexedDBManager (C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:27:33)
+    at C:/Users/riley/Desktop/GEM/src/services/IndexedDBManager.js:379:26
+    at VitestModuleEvaluator._runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:190:10)
+    at file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:62
+    at Traces.$ (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27)
+    at VitestModuleEvaluator.runInlinedModule (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/dist/module-evaluator.js:98:21)
+    at VitestModuleRunner.directRequest (file:///C:/Users/riley/Desktop/GEM/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1146:80)
+
+(node:8336) PromiseRejectionHandledWarning: Promise rejection was handled asynchronously (rejection id: 2)
+(Use `node --trace-warnings ...` to show where the warning was created)
+ Γ£ô src/components/views/PracticeMode.test.jsx (1 test) 300ms
+ Γ£ô src/components/ui/TourOverlay.test.jsx (4 tests) 491ms
+ Γ£ô src/test/SmartCoachWidget.test.jsx (4 tests) 184ms
+stderr | src/components/ui/CoachView.test.jsx > CoachView Component > renders empty state when messages are cleared or initial
+Warning: An update to CoachView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CoachView (C:/Users/riley/Desktop/GEM/src/components/ui/CoachView.jsx:33:69)
+
+ Γ£ô src/components/ui/CoachView.test.jsx (1 test) 100ms
+ Γ£ô src/components/ui/Breadcrumbs.test.jsx (3 tests) 134ms
+ Γ£ô src/components/viz/ProgressCharts.test.jsx (3 tests) 109ms
+stderr | src/context/AudioContext.test.jsx > AudioContext Integration > should initialize AudioEngine on mount
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (C:/Users/riley/Desktop/GEM/src/context/ProfileContext.jsx:20:28)
+    at SettingsProvider (C:/Users/riley/Desktop/GEM/src/context/SettingsContext.jsx:19:29)
+    at wrapper (C:/Users/riley/Desktop/GEM/src/context/AudioContext.test.jsx:67:20)
+Warning: An update to SettingsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at SettingsProvider (C:/Users/riley/Desktop/GEM/src/context/SettingsContext.jsx:19:29)
+    at wrapper (C:/Users/riley/Desktop/GEM/src/context/AudioContext.test.jsx:67:20)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (C:/Users/riley/Desktop/GEM/src/context/ProfileContext.jsx:20:28)
+    at SettingsProvider (C:/Users/riley/Desktop/GEM/src/context/SettingsContext.jsx:19:29)
+    at wrapper (C:/Users/riley/Desktop/GEM/src/context/AudioContext.test.jsx:67:20)
+
+stderr | src/context/AudioContext.test.jsx > AudioContext Integration > should update dataRef when AudioEngine sends updates
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (C:/Users/riley/Desktop/GEM/src/context/ProfileContext.jsx:20:28)
+    at SettingsProvider (C:/Users/riley/Desktop/GEM/src/context/SettingsContext.jsx:19:29)
+    at wrapper (C:/Users/riley/Desktop/GEM/src/context/AudioContext.test.jsx:67:20)
+Warning: An update to SettingsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at SettingsProvider (C:/Users/riley/Desktop/GEM/src/context/SettingsContext.jsx:19:29)
+    at wrapper (C:/Users/riley/Desktop/GEM/src/context/AudioContext.test.jsx:67:20)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (C:/Users/riley/Desktop/GEM/src/context/ProfileContext.jsx:20:28)
+    at SettingsProvider (C:/Users/riley/Desktop/GEM/src/context/SettingsContext.jsx:19:29)
+    at wrapper (C:/Users/riley/Desktop/GEM/src/context/AudioContext.test.jsx:67:20)
+
+ Γ£ô src/context/AudioContext.test.jsx (3 tests) 59ms
+ Γ£ô src/hooks/useTTS.test.js (5 tests) 42ms
+ Γ£ô src/engines/AudioEngine.socket.test.js (5 tests) 42ms
+ Γ£ô src/components/ui/AudioLibrary.test.jsx (1 test) 68ms
+ Γ£ô src/components/ui/OfflineIndicator.test.jsx (3 tests) 114ms
+ Γ£ô src/context/SettingsContext.test.js (2 tests) 39ms
+ Γ£ô src/context/TourContext.test.jsx (6 tests) 72ms
+ Γ£ô src/utils/cppAnalysis.test.js (4 tests) 13ms
+ Γ£ô src/hooks/useCourseProgress.test.js (4 tests) 37ms
+ Γ£ô src/utils/PitchDetector.test.js (4 tests) 24ms
+ Γ£ô src/test/IndexedDBManager.test.js (8 tests) 28ms
+ Γ£ô src/utils/pitch.test.js (3 tests) 15ms
+stderr | src/services/SyncManager.test.js > SyncManager > Offline Behavior > should forceSyncNow returning false when offline
+Cannot sync: offline
+
+ Γ£ô src/services/SyncManager.test.js (7 tests) 12ms
+ Γ£ô src/services/AnalyticsService.test.js (5 tests) 8ms
+ Γ£ô src/test/PhonetogramService.test.js (6 tests) 8ms
+ Γ£ô src/services/BiofeedbackService.test.js (7 tests) 5ms
+ Γ£ô src/test/gavt_enhancements.test.js (7 tests) 5ms
+ Γ£ô src/utils/lpcAnalysis.test.js (3 tests) 5ms
+ Γ£ô src/utils/coachEngine.test.js (3 tests) 5ms
+ Γ£ô src/utils/DSP.test.js (7 tests) 5ms
+ Γ£ô src/test/PracticeRoutineGenerator.test.js (6 tests) 5ms
+ Γ£ô src/utils/ResonanceCalculator.test.js (3 tests) 5ms
+ Γ£ô src/utils/FormantAnalyzer.test.js (4 tests) 4ms
+ Γ£ô src/test/NormsService.test.js (5 tests) 3ms
+ Γ£ô src/test/advanced_signal_analysis.test.js (3 tests) 3ms
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 7 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  src/services/IndexedDBManager.test.js > IndexedDBManager > should save and retrieve a journal entry
+TypeError: __vite_ssr_import_2__.indexedDB.saveJournal is not a function
+ Γ¥» src/services/IndexedDBManager.test.js:18:36
+     16|     it('should save and retrieve a journal entry', async () => {
+     17|         const entry = { text: 'Test entry', mood: 'happy' };
+     18|         const id = await dbManager.saveJournal(entry);
+       |                                    ^
+     19|         expect(id).toBeDefined();
+     20| 
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/7]ΓÄ»
+
+ FAIL  src/test/ProfileContext.test.jsx > ProfileContext Integration > with multiple profiles > should switch profile
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ Γ¥» src/test/ProfileContext.test.jsx:82:9
+     80|         });
+     81| 
+     82|         it('should switch profile', async () => {
+       |         ^
+     83|             const { result } = renderHook(() => useProfile(), { wrappeΓÇª
+     84| 
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/7]ΓÄ»
+
+ FAIL  src/components/ui/CelebrationModal.test.jsx > CelebrationModal > should render achievement details when provided
+TestingLibraryElementError: Unable to find an element with the text: ≡ƒÅå. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300"
+    >
+      <div
+        class="bg-slate-900 border border-yellow-500/30 rounded-2xl p-8 max-w-sm w-full text-center relative shadow-[0_0_50px_rgba(245,158,11,0.2)] animate-in zoom-in-95 duration-300"
+      >
+        <button
+          class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-x"
+            fill="none"
+            height="20"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="20"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M18 6 6 18"
+            />
+            <path
+              d="m6 6 12 12"
+            />
+          </svg>
+        </button>
+        <div
+          class="w-20 h-20 mx-auto bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-orange-500/30 animate-bounce"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-trophy text-white"
+            fill="none"
+            height="40"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="40"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"
+            />
+            <path
+              d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"
+            />
+            <path
+              d="M18 9h1.5a1 1 0 0 0 0-5H18"
+            />
+            <path
+              d="M4 22h16"
+            />
+            <path
+              d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"
+            />
+            <path
+              d="M6 9H4.5a1 1 0 0 1 0-5H6"
+            />
+          </svg>
+        </div>
+        <h2
+          class="text-2xl font-bold text-white mb-2"
+        >
+          Achievement Unlocked!
+        </h2>
+        <h3
+          class="text-xl font-bold text-yellow-400 mb-4"
+        >
+          Test Achievement
+        </h3>
+        <p
+          class="text-slate-300 mb-6"
+        >
+          You did it!
+        </p>
+        <div
+          class="flex justify-center gap-1 mb-6"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-star text-yellow-500 fill-yellow-500 w-6 h-6 animate-pulse"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            style="animation-delay: 0ms;"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"
+            />
+          </svg>
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-star text-yellow-500 fill-yellow-500 w-6 h-6 animate-pulse"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            style="animation-delay: 200ms;"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"
+            />
+          </svg>
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-star text-yellow-500 fill-yellow-500 w-6 h-6 animate-pulse"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            style="animation-delay: 400ms;"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"
+            />
+          </svg>
+        </div>
+        <button
+          class="w-full py-3 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-400 hover:to-orange-500 text-white font-bold rounded-xl transition-all shadow-lg"
+        >
+          Awesome!
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+ Γ¥» Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ Γ¥» src/components/ui/CelebrationModal.test.jsx:26:23
+     24|         expect(screen.getByText('Test Achievement')).toBeInTheDocumentΓÇª
+     25|         expect(screen.getByText('You did it!')).toBeInTheDocument();
+     26|         expect(screen.getByText('≡ƒÅå')).toBeInTheDocument();
+       |                       ^
+     27|     });
+     28| 
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[3/7]ΓÄ»
+
+ FAIL  src/components/ui/TooltipOverlay.test.jsx > TooltipOverlay > should render step content when active
+TestingLibraryElementError: Unable to find an element with the text: Test Title. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+</body>
+ Γ¥» Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ Γ¥» src/components/ui/TooltipOverlay.test.jsx:19:23
+     17|     it('should render step content when active', () => {
+     18|         render(<TooltipOverlay isActive={true} step={mockStep} />);
+     19|         expect(screen.getByText('Test Title')).toBeInTheDocument();
+       |                       ^
+     20|         expect(screen.getByText('Test Content')).toBeInTheDocument();
+     21|     });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[4/7]ΓÄ»
+
+ FAIL  src/components/ui/TooltipOverlay.test.jsx > TooltipOverlay > should call onNext when Next button is clicked
+TestingLibraryElementError: Unable to find an element with the text: Next. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+</body>
+ Γ¥» Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ Γ¥» src/components/ui/TooltipOverlay.test.jsx:26:32
+     24|         const onNext = vi.fn();
+     25|         render(<TooltipOverlay isActive={true} step={mockStep} onNext=ΓÇª
+     26|         fireEvent.click(screen.getByText('Next'));
+       |                                ^
+     27|         expect(onNext).toHaveBeenCalled();
+     28|     });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[5/7]ΓÄ»
+
+ FAIL  src/components/ui/TooltipOverlay.test.jsx > TooltipOverlay > should call onSkip when Skip button is clicked
+TestingLibraryElementError: Unable to find an element with the text: Skip Tour. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+</body>
+ Γ¥» Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ Γ¥» src/components/ui/TooltipOverlay.test.jsx:33:32
+     31|         const onSkip = vi.fn();
+     32|         render(<TooltipOverlay isActive={true} step={mockStep} onSkip=ΓÇª
+     33|         fireEvent.click(screen.getByText('Skip Tour'));
+       |                                ^
+     34|         expect(onSkip).toHaveBeenCalled();
+     35|     });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[6/7]ΓÄ»
+
+ FAIL  src/components/ui/TooltipOverlay.test.jsx > TooltipOverlay > should show Finish button on last step
+TestingLibraryElementError: Unable to find an element with the text: Finish. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+</body>
+ Γ¥» Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ Γ¥» node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ Γ¥» src/components/ui/TooltipOverlay.test.jsx:39:23
+     37|     it('should show Finish button on last step', () => {
+     38|         render(<TooltipOverlay isActive={true} step={mockStep} isLastSΓÇª
+     39|         expect(screen.getByText('Finish')).toBeInTheDocument();
+       |                       ^
+     40|         expect(screen.queryByText('Next')).not.toBeInTheDocument();
+     41|     });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[7/7]ΓÄ»
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Unhandled Errors ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ» Unhandled Rejection ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+TypeError: Cannot read properties of undefined (reading 'open')
+ Γ¥» src/services/IndexedDBManager.js:32:46
+     30|     async init() {
+     31|         return new Promise((resolve, reject) => {
+     32|             const request = window.indexedDB.open(DB_NAME, DB_VERSION);
+       |                                              ^
+     33| 
+     34|             request.onerror = () => reject(request.error);
+ Γ¥» IndexedDBManager.init src/services/IndexedDBManager.js:31:16
+ Γ¥» new IndexedDBManager src/services/IndexedDBManager.js:27:33
+ Γ¥» src/services/IndexedDBManager.js:379:26
+ Γ¥» VitestModuleEvaluator._runInlinedModule node_modules/vitest/dist/module-evaluator.js:190:10
+ Γ¥» node_modules/vitest/dist/module-evaluator.js:98:62
+ Γ¥» Traces.$ node_modules/vitest/dist/chunks/traces.U4xDYhzZ.js:115:27
+ Γ¥» VitestModuleEvaluator.runInlinedModule node_modules/vitest/dist/module-evaluator.js:98:21
+ Γ¥» VitestModuleRunner.directRequest node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1146:80
+
+This error originated in "src/components/views/PracticeMode.test.jsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+
+ Test Files  4 failed | 40 passed (44)
+      Tests  7 failed | 174 passed (181)
+     Errors  1 error
+   Start at  23:31:01
+   Duration  23.33s (transform 7.57s, setup 10.19s, import 17.06s, tests 11.97s, environment 90.84s)
+
