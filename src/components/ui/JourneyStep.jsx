@@ -168,8 +168,8 @@ const JourneyStep = ({
                             <button
                                 onClick={() => setIsExerciseActive(!isExerciseActive)}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${isExerciseActive
-                                        ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
-                                        : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                                    ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                                    : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
                                     }`}
                             >
                                 {isExerciseActive ? <Pause size={12} /> : <Play size={12} />}
@@ -292,7 +292,7 @@ const JourneyStep = ({
                         {step.exercise.phrases.map((phrase, i) => (
                             <div key={i} className="bg-slate-800/50 rounded-xl border border-white/5 p-4">
                                 <span className="text-pink-400 font-bold mr-2">{i + 1}.</span>
-                                <span className="text-slate-200 text-lg font-serif italic">"{phrase}"</span>
+                                <span className="text-slate-200 text-lg font-serif italic">&ldquo;{phrase}&rdquo;</span>
                             </div>
                         ))}
                     </div>
@@ -360,10 +360,10 @@ const JourneyStep = ({
             {/* Step header */}
             <div className="mb-6 flex-shrink-0">
                 <span className={`inline-block px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-2 ${step.type === 'theory' ? 'bg-blue-500/20 text-blue-400' :
-                        step.type === 'interactive' ? 'bg-pink-500/20 text-pink-400' :
-                            step.type === 'exercise' ? 'bg-orange-500/20 text-orange-400' :
-                                step.type === 'checkpoint' ? 'bg-green-500/20 text-green-400' :
-                                    'bg-purple-500/20 text-purple-400'
+                    step.type === 'interactive' ? 'bg-pink-500/20 text-pink-400' :
+                        step.type === 'exercise' ? 'bg-orange-500/20 text-orange-400' :
+                            step.type === 'checkpoint' ? 'bg-green-500/20 text-green-400' :
+                                'bg-purple-500/20 text-purple-400'
                     }`}>
                     {step.type}
                 </span>

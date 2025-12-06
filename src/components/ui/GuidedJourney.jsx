@@ -115,7 +115,7 @@ const GuidedJourney = ({ onClose }) => {
                         </h1>
 
                         <p className="text-xl text-slate-300 mb-8">
-                            You've completed all 12 steps of the Voice Feminization Journey.
+                            You&apos;ve completed all 12 steps of the Voice Feminization Journey.
                             This is just the beginning of your transformation!
                         </p>
 
@@ -135,7 +135,7 @@ const GuidedJourney = ({ onClose }) => {
                         <div className="bg-slate-900/50 rounded-xl p-6 border border-white/10 mb-8 text-left">
                             <h3 className="font-bold text-white mb-3 flex items-center gap-2">
                                 <CheckCircle className="w-5 h-5 text-green-400" />
-                                What's Next?
+                                What&apos;s Next?
                             </h3>
                             <ul className="space-y-2 text-sm text-slate-300">
                                 <li>• Practice daily with the Voice Analysis tools</li>

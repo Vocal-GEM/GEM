@@ -1,5 +1,4 @@
-import { useState, useEffect, lazy, Suspense, useRef } from 'react';
-import { Settings as SettingsIcon } from 'lucide-react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useAudio } from './context/AudioContext';
 import { useSettings } from './context/SettingsContext';
 import { useAuth } from './context/AuthContext';
@@ -16,14 +15,8 @@ import UserProfile from './components/ui/UserProfile';
 import VocalHealthTips from './components/ui/VocalHealthTips';
 import AssessmentModule from './components/ui/AssessmentModule';
 import WarmUpModule from './components/ui/WarmUpModule';
-import ForwardFocusDrill from './components/ui/ForwardFocusDrill';
-import IncognitoScreen from './components/ui/IncognitoScreen';
 import LoadingSpinner from './components/ui/LoadingSpinner';
-import PitchPipe from './components/ui/PitchPipe';
-import BreathPacer from './components/ui/BreathPacer';
-import MirrorComponent from './components/ui/MirrorComponent';
 import FloatingCamera from './components/ui/FloatingCamera';
-import PitchTargets from './components/ui/PitchTargets';
 
 // Lazy Loaded Components - UI
 const Sidebar = lazy(() => import('./components/layout/Sidebar'));

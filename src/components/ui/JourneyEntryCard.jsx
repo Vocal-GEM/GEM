@@ -27,7 +27,7 @@ const JourneyEntryCard = ({
                                 COMPLETED
                             </span>
                             <h3 className="text-xl font-bold text-white">Voice Feminization Journey</h3>
-                            <p className="text-sm text-slate-400 mt-1">You've completed all 12 steps!</p>
+                            <p className="text-sm text-slate-400 mt-1">You&apos;ve completed all 12 steps!</p>
                         </div>
                         <div className="text-4xl">🎉</div>
                     </div>

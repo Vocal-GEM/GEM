@@ -117,6 +117,7 @@ const SpectrogramMesh = ({ dataRef }) => {
 
     return (
         <mesh ref={meshRef}>
+            {/* eslint-disable react/no-unknown-property */}
             <bufferGeometry>
                 <bufferAttribute
                     attach="attributes-position"
