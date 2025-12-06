@@ -1,3 +1,10 @@
+import { useState, useEffect, lazy, Suspense, useRef } from 'react';
+import { Settings as SettingsIcon } from 'lucide-react';
+import { useAudio } from './context/AudioContext';
+import { useSettings } from './context/SettingsContext';
+import { useAuth } from './context/AuthContext';
+import { useProfile } from './context/ProfileContext';
+import { useStats } from './context/StatsContext';
 import { useJournal } from './context/JournalContext';
 import { useNavigation } from './context/NavigationContext';
 import { LanguageProvider } from './context/LanguageContext';
