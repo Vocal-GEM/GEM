@@ -95,6 +95,7 @@ const TooltipOverlay = ({
                 <button
                     onClick={onSkip}
                     className="absolute top-2 right-2 text-slate-500 hover:text-white transition-colors"
+                    aria-label="Skip Tour"
                 >
                     <X size={16} />
                 </button>
