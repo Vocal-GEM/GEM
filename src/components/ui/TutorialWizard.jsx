@@ -85,7 +85,7 @@ const TutorialWizard = ({ onComplete, onSkip }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 animate-in fade-in duration-500">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black p-4 animate-in fade-in duration-500">
             <div className="glass-panel max-w-2xl w-full bg-slate-900 border border-white/10 rounded-3xl shadow-2xl relative overflow-hidden flex flex-col md:flex-row min-h-[500px]">
 
                 {/* Left Panel (Progress & Info) */}

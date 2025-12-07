@@ -50,6 +50,47 @@ def test_analyze():
         if os.path.exists(dummy_wav):
             os.remove(dummy_wav)
 
+def test_analyze_with_transcript():
+    print("\nTesting /api/voice-quality/analyze with TRANSCRIPT...")
+    # Create a dummy wav file
+    import wave
+    import struct
+    
+    dummy_wav = "test_audio_transcript.wav"
+    with wave.open(dummy_wav, "w") as f:
+        f.setnchannels(1)
+        f.setsampwidth(2)
+        f.setframerate(16000)
+        # 1 second of silence (might result in empty transcript but tests the pipeline)
+        data = struct.pack("<" + ("h"*16000), *([0]*16000))
+        f.writeframes(data)
+        
+    try:
+        with open(dummy_wav, "rb") as f:
+            files = {"audio": f}
+            data = {"goal": "transfem_soft_slightly_breathy", "include_transcript": "true"}
+            resp = requests.post(f"{BASE_URL}/api/voice-quality/analyze", files=files, data=data)
+            
+        if resp.status_code == 200:
+            print("SUCCESS: Analyze endpoint returned 200")
+            res = resp.json()
+            transcript = res.get("transcript", {})
+            print("Transcript Keys:", transcript.keys())
+            if "words" in transcript:
+                print("Transcript Words (Count):", len(transcript["words"]))
+            else:
+                print("FAILURE: No words in transcript")
+        else:
+            print(f"FAILURE: Analyze endpoint returned {resp.status_code}")
+            print(resp.text)
+            
+    except Exception as e:
+        print(f"FAILURE: Could not connect to backend: {e}")
+    finally:
+        if os.path.exists(dummy_wav):
+            os.remove(dummy_wav)
+
 if __name__ == "__main__":
     test_goals()
     test_analyze()
+    test_analyze_with_transcript()

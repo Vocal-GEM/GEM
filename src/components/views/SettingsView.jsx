@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Download, Upload, Trash2, AlertTriangle, Check, FileJson, Eye } from 'lucide-react';
+import { Download, Upload, Trash2, AlertTriangle, Check, FileJson, Eye, Globe } from 'lucide-react';
 import { indexedDB } from '../../services/IndexedDBManager';
 import { useSettings } from '../../context/SettingsContext';
+import { useTranslation } from 'react-i18next';
 
 const SettingsView = () => {
+    const { t } = useTranslation();
     const { settings, updateSettings } = useSettings();
     const [status, setStatus] = useState({ type: '', message: '' });
     const [isResetting, setIsResetting] = useState(false);
@@ -74,7 +76,7 @@ const SettingsView = () => {
     return (
         <div className="w-full min-h-screen bg-slate-950 p-6 lg:p-12">
             <div className="max-w-3xl mx-auto">
-                <h1 className="text-3xl font-bold text-white mb-8">Settings & Data</h1>
+                <h1 className="text-3xl font-bold text-white mb-8">{t('settings.title')}</h1>
 
                 {/* Status Message */}
                 {status.message && (
@@ -87,22 +89,56 @@ const SettingsView = () => {
                     </div>
                 )}
 
+                {/* Language Settings */}
+                <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden mb-8">
+                    <div className="p-6 border-b border-slate-800">
+                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                            <Globe className="text-blue-400" size={24} />
+                            {t('settings.language.title')}
+                        </h2>
+                        <p className="text-slate-400 mt-1">{t('settings.language.description')}</p>
+                    </div>
+
+                    <div className="p-6">
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={() => updateSettings({ ...settings, language: 'en' })}
+                                className={`flex-1 p-4 rounded-xl border transition-all ${settings.language === 'en'
+                                    ? 'bg-blue-500/20 border-blue-500 text-blue-400'
+                                    : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                                    }`}
+                            >
+                                <span className="font-bold">English</span>
+                            </button>
+                            <button
+                                onClick={() => updateSettings({ ...settings, language: 'es' })}
+                                className={`flex-1 p-4 rounded-xl border transition-all ${settings.language === 'es'
+                                    ? 'bg-blue-500/20 border-blue-500 text-blue-400'
+                                    : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                                    }`}
+                            >
+                                <span className="font-bold">Español</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Visualization Settings */}
                 <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden mb-8">
                     <div className="p-6 border-b border-slate-800">
                         <h2 className="text-xl font-bold text-white flex items-center gap-2">
                             <Eye className="text-blue-400" size={24} />
-                            Visualizations
+                            {t('settings.visualizations.title')}
                         </h2>
-                        <p className="text-slate-400 mt-1">Configure how data is displayed on charts and graphs.</p>
+                        <p className="text-slate-400 mt-1">{t('settings.visualizations.description')}</p>
                     </div>
 
                     <div className="p-6 space-y-6">
                         {/* Show Norms Toggle */}
                         <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700">
                             <div>
-                                <h3 className="font-bold text-white">Show Standardized Norms</h3>
-                                <p className="text-sm text-slate-400">Display gender-based target zones (Masculine/Feminine/Androgynous) on charts.</p>
+                                <h3 className="font-bold text-white">{t('settings.visualizations.showNorms.title')}</h3>
+                                <p className="text-sm text-slate-400">{t('settings.visualizations.showNorms.description')}</p>
                             </div>
                             <button
                                 onClick={() => updateSettings({ ...settings, showNorms: !settings.showNorms })}
@@ -120,17 +156,17 @@ const SettingsView = () => {
                     <div className="p-6 border-b border-slate-800">
                         <h2 className="text-xl font-bold text-white flex items-center gap-2">
                             <Eye className="text-purple-400" size={24} />
-                            Accessibility
+                            {t('settings.accessibility.title')}
                         </h2>
-                        <p className="text-slate-400 mt-1">Customize the interface for better visibility and readability.</p>
+                        <p className="text-slate-400 mt-1">{t('settings.accessibility.description')}</p>
                     </div>
 
                     <div className="p-6 space-y-6">
                         {/* High Contrast */}
                         <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700">
                             <div>
-                                <h3 className="font-bold text-white">High Contrast Mode</h3>
-                                <p className="text-sm text-slate-400">Increase contrast for better visibility.</p>
+                                <h3 className="font-bold text-white">{t('settings.accessibility.highContrast.title')}</h3>
+                                <p className="text-sm text-slate-400">{t('settings.accessibility.highContrast.description')}</p>
                             </div>
                             <button
                                 onClick={() => updateSettings({
@@ -147,8 +183,8 @@ const SettingsView = () => {
                         {/* Font Size */}
                         <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700">
                             <div>
-                                <h3 className="font-bold text-white">Font Size</h3>
-                                <p className="text-sm text-slate-400">Adjust the text size of the application.</p>
+                                <h3 className="font-bold text-white">{t('settings.accessibility.fontSize.title')}</h3>
+                                <p className="text-sm text-slate-400">{t('settings.accessibility.fontSize.description')}</p>
                             </div>
                             <div className="flex gap-2">
                                 {['normal', 'large', 'xl'].map((size) => (
@@ -177,36 +213,36 @@ const SettingsView = () => {
                     <div className="p-6 border-b border-slate-800">
                         <h2 className="text-xl font-bold text-white flex items-center gap-2">
                             <FileJson className="text-teal-400" size={24} />
-                            Data Management
+                            {t('settings.data.title')}
                         </h2>
-                        <p className="text-slate-400 mt-1">Manage your local data, create backups, or reset the application.</p>
+                        <p className="text-slate-400 mt-1">{t('settings.data.description')}</p>
                     </div>
 
                     <div className="p-6 space-y-6">
                         {/* Export */}
                         <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700">
                             <div>
-                                <h3 className="font-bold text-white">Export Backup</h3>
-                                <p className="text-sm text-slate-400">Download all your progress and settings as a JSON file.</p>
+                                <h3 className="font-bold text-white">{t('settings.data.export.title')}</h3>
+                                <p className="text-sm text-slate-400">{t('settings.data.export.description')}</p>
                             </div>
                             <button
                                 onClick={handleExport}
                                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
                             >
                                 <Download size={18} />
-                                Export
+                                {t('settings.data.export.button')}
                             </button>
                         </div>
 
                         {/* Import */}
                         <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700">
                             <div>
-                                <h3 className="font-bold text-white">Import Backup</h3>
-                                <p className="text-sm text-slate-400">Restore data from a previously exported JSON file.</p>
+                                <h3 className="font-bold text-white">{t('settings.data.import.title')}</h3>
+                                <p className="text-sm text-slate-400">{t('settings.data.import.description')}</p>
                             </div>
                             <label className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors cursor-pointer">
                                 <Upload size={18} />
-                                Import
+                                {t('settings.data.import.button')}
                                 <input
                                     type="file"
                                     accept=".json"
@@ -219,8 +255,8 @@ const SettingsView = () => {
                         {/* Factory Reset */}
                         <div className="flex items-center justify-between p-4 bg-red-500/5 rounded-xl border border-red-500/20">
                             <div>
-                                <h3 className="font-bold text-red-400">Factory Reset</h3>
-                                <p className="text-sm text-red-300/70">Permanently delete all data and reset the application.</p>
+                                <h3 className="font-bold text-red-400">{t('settings.data.reset.title')}</h3>
+                                <p className="text-sm text-red-300/70">{t('settings.data.reset.description')}</p>
                             </div>
                             <button
                                 onClick={handleReset}
@@ -230,7 +266,7 @@ const SettingsView = () => {
                                     }`}
                             >
                                 <Trash2 size={18} />
-                                {isResetting ? 'Click again to confirm' : 'Reset Data'}
+                                {isResetting ? t('settings.data.reset.confirm') : t('settings.data.reset.button')}
                             </button>
                         </div>
                     </div>

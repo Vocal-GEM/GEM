@@ -1,7 +1,8 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 import os
 import tempfile
-from ..voice_quality_analysis import analyze_file, analyze_file_with_transcript, GOAL_PRESETS
+import soundfile as sf
+from ..voice_quality_analysis import analyze_file, analyze_file_with_transcript, GOAL_PRESETS, clean_audio_signal, load_audio
 from ..asr_transcriber import transcribe_audio_with_words
 
 voice_quality_bp = Blueprint('voice_quality', __name__)
@@ -43,6 +44,43 @@ def analyze():
             os.remove(tmp_path)
 
     return jsonify(result)
+
+@voice_quality_bp.route('/api/voice-quality/clean', methods=['POST'])
+def clean_audio():
+    if 'audio' not in request.files:
+        return jsonify({'error': 'No audio file provided'}), 400
+        
+    file = request.files['audio']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+            tmp_path = tmp.name
+            file.save(tmp_path)
+            
+        # Load, Clean, Save
+        y, sr = load_audio(tmp_path)
+        y_clean = clean_audio_signal(y, sr)
+        
+        # Save back to temp
+        sf.write(tmp_path, y_clean, sr)
+        
+        return send_file(
+            tmp_path, 
+            mimetype="audio/wav", 
+            as_attachment=True, 
+            download_name="cleaned_audio.wav"
+        )
+
+    except Exception as e:
+        print(f"Cleaning error: {e}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        # send_file requires the file to exist when it returns.
+        # We perform cleanup only if exception occurred or rely on OS temp cleaning.
+        # Ideally we'd use after_request to delete.
+        pass
 
 @voice_quality_bp.route('/api/voice-quality/goals', methods=['GET'])
 def get_goals():

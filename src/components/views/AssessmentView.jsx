@@ -1,7 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle, AlertCircle, ArrowRight, Sparkles, Activity, Mic, Zap, Clock, TrendingUp } from 'lucide-react';
 
+
 const AssessmentView = ({ feedback, onClose, onPractice }) => {
+    const { t } = useTranslation();
     if (!feedback) return null;
 
     const { summary, strengths, focusArea, details, tips } = feedback;
@@ -14,8 +17,8 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
                     <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                    <h2 className="text-xl font-bold text-white">Coach&apos;s Assessment</h2>
-                    <p className="text-slate-400 text-sm">Based on your latest recording</p>
+                    <h2 className="text-xl font-bold text-white">{t('assessment.title')}</h2>
+                    <p className="text-slate-400 text-sm">{t('assessment.subtitle')}</p>
                 </div>
             </div>
 
@@ -31,7 +34,7 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
                 <div className="space-y-4">
                     <h3 className="font-bold text-green-400 flex items-center gap-2">
                         <CheckCircle className="w-5 h-5" />
-                        What Went Well
+                        {t('assessment.strengths.title')}
                     </h3>
                     {strengths.length > 0 ? (
                         <ul className="space-y-3">
@@ -43,7 +46,7 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
                             ))}
                         </ul>
                     ) : (
-                        <p className="text-slate-500 text-sm italic">Keep practicing to build your strengths!</p>
+                        <p className="text-slate-500 text-sm italic">{t('assessment.strengths.empty')}</p>
                     )}
                 </div>
 
@@ -51,9 +54,9 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
                 <div className="space-y-4">
                     <h3 className="font-bold text-amber-400 flex items-center gap-2">
                         <AlertCircle className="w-5 h-5" />
-                        Primary Focus
+                        {t('assessment.focus.title')}
                         {focusArea.priority === 'high' && (
-                            <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full">High Priority</span>
+                            <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full">{t('assessment.focus.highPriority')}</span>
                         )}
                     </h3>
                     <div className="bg-amber-500/5 rounded-xl p-4 border border-amber-500/10">
@@ -79,7 +82,7 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
                             onClick={() => onPractice(focusArea.exercise)}
                             className="w-full py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
                         >
-                            Practice {focusArea.exercise}
+                            {t('assessment.focus.practice')} {focusArea.exercise}
                             <ArrowRight className="w-4 h-4" />
                         </button>
                     </div>
@@ -91,7 +94,7 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
                 <div className="mt-6 p-4 bg-blue-500/5 rounded-xl border border-blue-500/10">
                     <h3 className="font-bold text-blue-400 flex items-center gap-2 mb-3">
                         <Zap className="w-4 h-4" />
-                        Pro Tips
+                        {t('assessment.tips.title')}
                     </h3>
                     <ul className="space-y-2">
                         {tips.map((tip, index) => (
@@ -105,28 +108,28 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
 
             {/* Detailed Metrics Breakdown */}
             <div className="mt-8 pt-6 border-t border-slate-800">
-                <h3 className="font-bold text-slate-400 mb-4 text-sm uppercase tracking-wider">Detailed Breakdown</h3>
+                <h3 className="font-bold text-slate-400 mb-4 text-sm uppercase tracking-wider">{t('assessment.breakdown.title')}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <MetricCard
-                        title="Pitch"
+                        title={t('assessment.breakdown.pitch')}
                         status={details.pitch.status}
                         score={details.pitch.score}
                         icon={Activity}
                     />
                     <MetricCard
-                        title="Resonance"
+                        title={t('assessment.breakdown.resonance')}
                         status={details.resonance.status}
                         score={details.resonance.score}
                         icon={Mic}
                     />
                     <MetricCard
-                        title="Stability"
+                        title={t('assessment.breakdown.stability')}
                         status={details.stability.status}
                         score={details.stability.score}
                         icon={Activity}
                     />
                     <MetricCard
-                        title="Voice Quality"
+                        title={t('assessment.breakdown.quality')}
                         status={details.voiceQuality.status}
                         score={details.voiceQuality.score}
                         icon={Sparkles}
@@ -139,7 +142,7 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
                     onClick={onClose}
                     className="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-medium transition-colors"
                 >
-                    Close Assessment
+                    {t('assessment.close')}
                 </button>
             </div>
         </div>

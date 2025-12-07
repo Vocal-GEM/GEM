@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Square, Trash2, Save, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Toast from '../ui/Toast';
 import { useAudio } from '../../context/AudioContext';
 import { phonetogramService } from '../../services/PhonetogramService';
 import PhonetogramChart from '../viz/PhonetogramChart';
 
 const PhonetogramView = () => {
+    const { t } = useTranslation();
     const { isAudioActive, toggleAudio, dataRef } = useAudio();
     const [isRecording, setIsRecording] = useState(false);
     const [profileData, setProfileData] = useState([]);
@@ -55,7 +57,7 @@ const PhonetogramView = () => {
     };
 
     const handleClear = () => {
-        if (confirm('Are you sure you want to clear the current profile?')) {
+        if (confirm(t('phonetogram.controls.clear') + '?')) {
             phonetogramService.clear();
             setProfileData([]);
         }
@@ -63,7 +65,7 @@ const PhonetogramView = () => {
 
     const handleSave = async () => {
         if (profileData.length === 0) {
-            setToast({ message: 'No data to save recorded yet.', type: 'info' });
+            setToast({ message: t('phonetogram.toast.noData'), type: 'info' });
             return;
         }
 
@@ -75,10 +77,10 @@ const PhonetogramView = () => {
                 timestamp: Date.now(),
                 source: 'phonetogram'
             });
-            setToast({ message: 'Phonetogram profile saved to History!', type: 'success' });
+            setToast({ message: t('phonetogram.toast.saveSuccess'), type: 'success' });
         } catch (err) {
             console.error(err);
-            setToast({ message: 'Failed to save profile.', type: 'error' });
+            setToast({ message: t('phonetogram.toast.saveFail'), type: 'error' });
         }
     };
 
@@ -86,21 +88,21 @@ const PhonetogramView = () => {
         <div className="w-full min-h-screen bg-slate-950 p-6 lg:p-12 flex flex-col">
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-2">Voice Range Profile</h1>
-                    <p className="text-slate-400">Map your vocal capabilities by exploring your pitch and volume range.</p>
+                    <h1 className="text-3xl font-bold text-white mb-2">{t('phonetogram.title')}</h1>
+                    <p className="text-slate-400">{t('phonetogram.subtitle')}</p>
                 </div>
                 <div className="flex gap-3">
                     <button
                         onClick={handleClear}
                         className="p-3 rounded-xl bg-slate-800 text-slate-400 hover:text-red-400 hover:bg-slate-700 transition-colors"
-                        title="Clear Data"
+                        title={t('phonetogram.controls.clear')}
                     >
                         <Trash2 size={20} />
                     </button>
                     <button
                         onClick={handleSave}
                         className="p-3 rounded-xl bg-slate-800 text-slate-400 hover:text-green-400 hover:bg-slate-700 transition-colors"
-                        title="Save Profile"
+                        title={t('phonetogram.controls.save')}
                     >
                         <Save size={20} />
                     </button>
@@ -115,7 +117,7 @@ const PhonetogramView = () => {
                 {isRecording && (
                     <div className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1 bg-red-500/20 text-red-400 rounded-full animate-pulse border border-red-500/50">
                         <div className="w-2 h-2 bg-red-500 rounded-full" />
-                        <span className="text-xs font-bold uppercase">Recording</span>
+                        <span className="text-xs font-bold uppercase">{t('phonetogram.recording')}</span>
                     </div>
                 )}
             </div>
@@ -132,11 +134,11 @@ const PhonetogramView = () => {
                     >
                         {isRecording ? (
                             <>
-                                <Square fill="currentColor" /> Stop Recording
+                                <Square fill="currentColor" /> {t('phonetogram.controls.stop')}
                             </>
                         ) : (
                             <>
-                                <Mic fill="currentColor" /> Start Recording
+                                <Mic fill="currentColor" /> {t('phonetogram.controls.start')}
                             </>
                         )}
                     </button>
@@ -145,24 +147,24 @@ const PhonetogramView = () => {
                 <div className="lg:col-span-2 bg-slate-900/50 rounded-2xl p-6 border border-slate-800">
                     <h3 className="text-white font-bold flex items-center gap-2 mb-4">
                         <Info size={20} className="text-blue-400" />
-                        How to use
+                        {t('phonetogram.help.title')}
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-slate-400">
                         <div className="flex gap-3">
                             <div className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-white shrink-0">1</div>
-                            <p>Start recording and make a soft &quot;Ooo&quot; sound. Glide from your lowest note to your highest note.</p>
+                            <p>{t('phonetogram.help.step1')}</p>
                         </div>
                         <div className="flex gap-3">
                             <div className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-white shrink-0">2</div>
-                            <p>Repeat the glide, but this time as loud as you comfortably can (without straining!).</p>
+                            <p>{t('phonetogram.help.step2')}</p>
                         </div>
                         <div className="flex gap-3">
                             <div className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-white shrink-0">3</div>
-                            <p>Try to fill in the middle area by singing at a comfortable volume.</p>
+                            <p>{t('phonetogram.help.step3')}</p>
                         </div>
                         <div className="flex gap-3">
                             <div className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-white shrink-0">4</div>
-                            <p>Stop recording to see your complete Voice Range Profile.</p>
+                            <p>{t('phonetogram.help.step4')}</p>
                         </div>
                     </div>
                 </div>

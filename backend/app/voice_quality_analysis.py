@@ -632,3 +632,28 @@ def compute_chunk_scores_from_frames(frame_data):
         "hnr_mean": hnr,
         "h1_h2_mean": h1_h2
     }
+
+def clean_audio_signal(y, sr):
+    """
+    Apply bandpass filter and normalization to clean the audio signal.
+    """
+    if scipy is None: return y
+    
+    # 1. Bandpass Filter (80Hz - 8000Hz)
+    # Removes low rumble and high frequency hiss/aliasing
+    nyquist = 0.5 * sr
+    low = 80 / nyquist
+    high = min(8000 / nyquist, 0.99) # Ensure high is < 1
+    
+    b, a = scipy.signal.butter(4, [low, high], btype='band')
+    y_clean = scipy.signal.filtfilt(b, a, y)
+    
+    # 2. Noise Gate-ish (Simple silence suppression)
+    # (Optional, skipping for now to avoid artifacts)
+    
+    # 3. Peak Normalization (-1 dB)
+    max_val = np.max(np.abs(y_clean))
+    if max_val > 0:
+        y_clean = y_clean / max_val * 0.89  # approx -1dB
+        
+    return y_clean

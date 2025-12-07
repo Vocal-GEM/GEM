@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { indexedDB } from '../services/IndexedDBManager';
 import { textToSpeechService } from '../services/TextToSpeechService';
+import i18n from '../i18n';
 
 const SettingsContext = createContext(null);
 
@@ -22,6 +23,7 @@ export const SettingsProvider = ({ children }) => {
         triggerDarkRes: true,
         notation: 'hz',
         homeNote: 190,
+        language: 'en', // 'en' | 'es'
         showNorms: true, // Show standardized gender norms on charts
 
         theme: 'dark', // 'dark' | 'light'
@@ -104,6 +106,13 @@ export const SettingsProvider = ({ children }) => {
     useEffect(() => {
         textToSpeechService.init(settings);
     }, [settings]);
+
+    // specific effect for language
+    useEffect(() => {
+        if (settings.language && i18n.language !== settings.language) {
+            i18n.changeLanguage(settings.language);
+        }
+    }, [settings.language]);
 
     // Sync performance mode with RenderCoordinator
     useEffect(() => {

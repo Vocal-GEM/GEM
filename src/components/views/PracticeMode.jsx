@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { X, Mic, Mic2, Volume2, VolumeX, Settings, Activity, BarChart2, BookOpen, ChevronRight, Play, Pause, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import ResizablePanel from '../ui/ResizablePanel';
 import { useNavigation } from '../../context/NavigationContext';
 import { useTour } from '../../context/TourContext';
@@ -42,6 +43,7 @@ const PracticeMode = ({
         navigate,
         openModal
     } = useNavigation();
+    const { t } = useTranslation();
 
     const {
         audioEngineRef,
@@ -167,12 +169,12 @@ const PracticeMode = ({
 
     // Tabs Configuration
     const TABS = [
-        { id: 'overview', label: 'Overview', icon: Activity },
-        { id: 'pitch', label: 'Pitch', icon: Mic2 },
-        { id: 'resonance', label: 'Resonance', icon: Volume2 },
-        { id: 'weight', label: 'Weight', icon: BarChart2 },
-        { id: 'vowel', label: 'Vowel', icon: BookOpen },
-        { id: 'spectrogram', label: 'Spectrogram', icon: Activity },
+        { id: 'overview', label: t('practiceMode.tabs.overview'), icon: Activity },
+        { id: 'pitch', label: t('practiceMode.tabs.pitch'), icon: Mic2 },
+        { id: 'resonance', label: t('practiceMode.tabs.resonance'), icon: Volume2 },
+        { id: 'weight', label: t('practiceMode.tabs.weight'), icon: BarChart2 },
+        { id: 'vowel', label: t('practiceMode.tabs.vowel'), icon: BookOpen },
+        { id: 'spectrogram', label: t('practiceMode.tabs.spectrogram'), icon: Activity },
     ];
 
     return (
@@ -224,9 +226,9 @@ const PracticeMode = ({
                         aria-pressed={isAudioActive}
                     >
                         {isAudioActive ? (
-                            <><span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" /> STOP SESSION</>
+                            <><span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" /> {t('practiceMode.session.stop')}</>
                         ) : (
-                            <><Play className="w-4 h-4" /> START SESSION</>
+                            <><Play className="w-4 h-4" /> {t('practiceMode.session.start')}</>
                         )}
                     </button>
                 </div>
@@ -323,8 +325,8 @@ const PracticeMode = ({
                         <Play size={24} fill="currentColor" />
                     </div>
                     <div className="text-left">
-                        <span className="block text-lg font-bold text-white">Start Daily Training</span>
-                        <span className="block text-xs text-blue-100 opacity-80">Personalized biofeedback routine</span>
+                        <span className="block text-lg font-bold text-white">{t('practiceMode.daily.title')}</span>
+                        <span className="block text-xs text-blue-100 opacity-80">{t('practiceMode.daily.subtitle')}</span>
                     </div>
                 </button>
 
@@ -332,19 +334,19 @@ const PracticeMode = ({
                     <div className="p-2 rounded-full bg-blue-500/10 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
                         <Activity size={20} />
                     </div>
-                    <span className="text-sm font-bold">Assessment</span>
+                    <span className="text-sm font-bold">{t('practiceMode.actions.assessment')}</span>
                 </button>
                 <button onClick={() => openModal('warmup')} className="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors flex flex-col items-center gap-2 text-center group">
                     <div className="p-2 rounded-full bg-orange-500/10 text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-colors">
                         <Play size={20} />
                     </div>
-                    <span className="text-sm font-bold">Warm Up</span>
+                    <span className="text-sm font-bold">{t('practiceMode.actions.warmup')}</span>
                 </button>
                 <button onClick={() => openModal('calibration')} className="col-span-2 lg:col-span-4 p-4 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors flex flex-row items-center justify-center gap-3 text-center group">
                     <div className="p-2 rounded-full bg-green-500/10 text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
                         <RefreshCw size={20} />
                     </div>
-                    <span className="text-sm font-bold">Recalibrate Voice Profile</span>
+                    <span className="text-sm font-bold">{t('practiceMode.actions.calibrate')}</span>
                 </button>
             </div>
         </div>

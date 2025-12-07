@@ -4,6 +4,7 @@ import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
 import { useStats } from '../../context/StatsContext';
 import { useSettings } from '../../context/SettingsContext';
+import { useTranslation } from 'react-i18next';
 
 import ResonanceOrb from '../viz/ResonanceOrb';
 import LiveMetricsBar from '../viz/LiveMetricsBar';
@@ -23,6 +24,7 @@ import { useLayout } from '../../context/LayoutContext';
 
 
 const PracticeView = () => {
+    const { t } = useTranslation();
     const { isAudioActive, toggleAudio, dataRef, audioEngineRef } = useAudio();
     const { calibration, targetRange } = useProfile();
     const { goals, stats } = useStats();
@@ -72,25 +74,25 @@ const PracticeView = () => {
                         }`}
                 >
                     {isAudioActive ? (
-                        <><span className="w-3 h-3 bg-red-500 rounded-full animate-ping"></span> STOP LISTENING</>
+                        <><span className="w-3 h-3 bg-red-500 rounded-full animate-ping"></span> {t('practice.stop')}</>
                     ) : (
-                        <><Mic className="w-6 h-6" /> START PRACTICE</>
+                        <><Mic className="w-6 h-6" /> {t('practice.start')}</>
                     )}
                 </button>
 
                 {/* Secondary Actions: Tools Drawer Toggle */}
                 <button
                     onClick={() => setShowTools(!showTools)}
-                    className="w-full py-3 bg-slate-800/50 backdrop-blur-md rounded-xl text-slate-400 text-sm font-medium border border-white/5 hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-slate-800 rounded-xl text-slate-400 text-sm font-medium border border-white/5 hover:bg-slate-700 transition-colors flex items-center justify-center gap-2"
                 >
-                    {showTools ? 'Hide Advanced Tools' : 'Show Advanced Tools'}
+                    {showTools ? t('practice.tools.hide') : t('practice.tools.show')}
                     <i data-lucide={showTools ? "chevron-down" : "chevron-up"} className="w-4 h-4"></i>
                 </button>
             </div>
 
             {/* Advanced Tools Drawer (Slide Up) */}
             {showTools && (
-                <div className="animate-in slide-in-from-bottom-10 fade-in duration-300 pt-4 pb-4 bg-slate-900/95 backdrop-blur-xl rounded-t-3xl border-t border-white/10 shadow-2xl absolute bottom-0 left-0 right-0 h-[75vh] flex flex-col z-40">
+                <div className="animate-in slide-in-from-bottom-10 fade-in duration-300 pt-4 pb-4 bg-slate-900 rounded-t-3xl border-t border-white/10 shadow-2xl absolute bottom-0 left-0 right-0 h-[75vh] flex flex-col z-40">
 
                     {/* Drawer Handle */}
                     <div className="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-4 shrink-0 cursor-pointer hover:bg-slate-600 transition-colors" onClick={() => setShowTools(false)}></div>
@@ -100,16 +102,16 @@ const PracticeView = () => {
                         {/* Tool Toggles */}
                         <div className="flex gap-2 overflow-x-auto no-scrollbar flex-1 items-center">
                             {[
-                                { id: 'pitch', label: 'Pitch', icon: Activity },
-                                { id: 'resonance', label: 'Resonance', icon: Activity },
-                                { id: 'range', label: 'Range', icon: Maximize2 },
-                                { id: 'weight', label: 'Weight', icon: Anchor },
-                                { id: 'vowel', label: 'Vowel', icon: Aperture },
-                                { id: 'spectrogram', label: 'Spectrogram', icon: Waves },
+                                { id: 'pitch', label: t('practice.tools.pitch.label'), icon: Activity },
+                                { id: 'resonance', label: t('practice.tools.resonance.label'), icon: Activity },
+                                { id: 'range', label: t('practice.tools.range.label'), icon: Maximize2 },
+                                { id: 'weight', label: t('practice.tools.weight.label'), icon: Anchor },
+                                { id: 'vowel', label: t('practice.tools.vowel.label'), icon: Aperture },
+                                { id: 'spectrogram', label: t('practice.tools.spectrogram.label'), icon: Waves },
                                 ...(userMode === 'slp' ? [
-                                    { id: 'cpp', label: 'CPP', icon: Stethoscope },
-                                    { id: 'mpt', label: 'MPT', icon: Stethoscope },
-                                    { id: 'intonation', label: 'Intonation', icon: Activity }
+                                    { id: 'cpp', label: t('practice.tools.cpp.label'), icon: Stethoscope },
+                                    { id: 'mpt', label: t('practice.tools.mpt.label'), icon: Stethoscope },
+                                    { id: 'intonation', label: t('practice.tools.intonation.label'), icon: Activity }
                                 ] : [])
                             ].map(tool => (
                                 <button
@@ -133,7 +135,7 @@ const PracticeView = () => {
                     {/* Grid Content */}
                     <div className="flex-1 overflow-y-auto px-4 custom-scrollbar">
                         <ResizableToolGrid className="min-h-full">
-                            <GridTool toolId="pitch" title="Pitch Visualizer">
+                            <GridTool toolId="pitch" title={t('practice.tools.pitch.title')}>
                                 <PitchVisualizer
                                     dataRef={dataRef}
                                     targetRange={targetRange}
@@ -144,37 +146,37 @@ const PracticeView = () => {
                                 />
                             </GridTool>
 
-                            <GridTool toolId="resonance" title="Resonance">
+                            <GridTool toolId="resonance" title={t('practice.tools.resonance.title')}>
                                 <div className="flex items-center justify-center h-full bg-slate-950">
                                     <ResonanceOrb dataRef={dataRef} calibration={calibration} size={200} />
                                 </div>
                             </GridTool>
 
-                            <GridTool toolId="weight" title="Voice Quality">
+                            <GridTool toolId="weight" title={t('practice.tools.weight.title')}>
                                 <VoiceQualityMeter dataRef={dataRef} userMode={userMode} />
                             </GridTool>
 
-                            <GridTool toolId="vowel" title="Vowel Space">
+                            <GridTool toolId="vowel" title={t('practice.tools.vowel.title')}>
                                 <VowelSpacePlot dataRef={dataRef} userMode={userMode} />
                             </GridTool>
 
-                            <GridTool toolId="range" title="Voice Range">
+                            <GridTool toolId="range" title={t('practice.tools.range.title')}>
                                 <VoiceRangeProfile dataRef={dataRef} isActive={isAudioActive} />
                             </GridTool>
 
-                            <GridTool toolId="spectrogram" title="Spectrogram">
+                            <GridTool toolId="spectrogram" title={t('practice.tools.spectrogram.title')}>
                                 <HighResSpectrogram dataRef={dataRef} />
                             </GridTool>
 
-                            <GridTool toolId="cpp" title="CPP Meter">
+                            <GridTool toolId="cpp" title={t('practice.tools.cpp.title')}>
                                 <CPPMeter dataRef={dataRef} isActive={isAudioActive} />
                             </GridTool>
 
-                            <GridTool toolId="mpt" title="MPT Tracker">
+                            <GridTool toolId="mpt" title={t('practice.tools.mpt.title')}>
                                 <MPTTracker dataRef={dataRef} isActive={isAudioActive} />
                             </GridTool>
 
-                            <GridTool toolId="intonation" title="Intonation Trainer">
+                            <GridTool toolId="intonation" title={t('practice.tools.intonation.title')}>
                                 <IntonationTrainer dataRef={dataRef} isActive={isAudioActive} />
                             </GridTool>
                         </ResizableToolGrid>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import VocalHealthPanel from '../dashboard/VocalHealthPanel';
 import SmartCoachWidget from '../dashboard/SmartCoachWidget';
 import JourneyEntryCard from '../ui/JourneyEntryCard';
@@ -36,6 +37,7 @@ const ActionCard = ({ title, description, onClick, icon, color }) => (
 );
 
 const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
+    const { t } = useTranslation();
     const {
         hasInProgressJourney,
         isJourneyComplete,
@@ -79,27 +81,27 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                 <StatCard
-                    label="Current DSI Score"
+                    label={t('dashboard.stats.dsi.label')}
                     value="1.2"
-                    subtext="+0.3"
+                    subtext={t('dashboard.stats.dsi.subtext')}
                     icon={<Activity size={24} />}
                     color="text-teal-400"
                 />
                 <StatCard
-                    label="Day Streak"
+                    label={t('dashboard.stats.streak.label')}
                     value="3"
                     icon={<Calendar size={24} />}
                     color="text-purple-400"
                 />
                 <StatCard
-                    label="Practice Time"
+                    label={t('dashboard.stats.practice.label')}
                     value="45m"
-                    subtext="Today"
+                    subtext={t('dashboard.stats.practice.subtext')}
                     icon={<Play size={24} />}
                     color="text-blue-400"
                 />
                 <StatCard
-                    label="Exercises"
+                    label={t('dashboard.stats.exercises.label')}
                     value="12"
                     icon={<Trophy size={24} />}
                     color="text-amber-400"
@@ -107,25 +109,25 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
             </div>
 
             {/* Quick Actions */}
-            <h2 className="text-xl font-bold text-white mb-6">Quick Start</h2>
+            <h2 className="text-xl font-bold text-white mb-6">{t('dashboard.quickStart')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <ActionCard
-                    title="Training Gym"
-                    description="Practice pitch, resonance, and intonation exercises."
+                    title={t('dashboard.actions.training.title')}
+                    description={t('dashboard.actions.training.description')}
                     icon={<Dumbbell size={24} />}
                     color="text-blue-400"
                     onClick={() => onViewChange('training')}
                 />
                 <ActionCard
-                    title="Voice Assessment"
-                    description="Take a full assessment to track your progress."
+                    title={t('dashboard.actions.assessment.title')}
+                    description={t('dashboard.actions.assessment.description')}
                     icon={<BookOpen size={24} />}
                     color="text-purple-400"
                     onClick={() => onViewChange('assessment')}
                 />
                 <ActionCard
-                    title="Live Analysis"
-                    description="Real-time feedback on your speaking voice."
+                    title={t('dashboard.actions.analysis.title')}
+                    description={t('dashboard.actions.analysis.description')}
                     icon={<Mic size={24} />}
                     color="text-teal-400"
                     onClick={() => onViewChange('analysis')}

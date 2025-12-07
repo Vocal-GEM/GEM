@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Volume2, Info, Trophy, Star, RefreshCw, ChevronRight, AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAudio } from '../../context/AudioContext';
 import { VoiceAnalyzer } from '../../utils/voiceAnalysis';
 import { transcriptionEngine } from '../../utils/transcriptionEngine';
@@ -49,6 +50,7 @@ const editDistance = (s1, s2) => {
 };
 
 const ArticulationView = () => {
+    const { t } = useTranslation();
     const { audioEngineRef } = useAudio();
 
     // State
@@ -296,15 +298,15 @@ const ArticulationView = () => {
                 <div className="flex flex-col md:flex-row justify-between items-end gap-4">
                     <div>
                         <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-2">
-                            Articulation Practice
+                            {t('articulation.title')}
                         </h1>
                         <p className="text-slate-400">
-                            Refine your consonant precision and vowel resonance.
+                            {t('articulation.subtitle')}
                         </p>
                     </div>
                     <div className="bg-slate-900 p-1 rounded-lg flex gap-1 w-full md:w-auto">
-                        <button onClick={() => setViewMode('practice')} className={`flex-1 md:flex-none px-6 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'practice' ? 'bg-slate-800 text-white shadow' : 'text-slate-500 hover:text-slate-300'}`}>Practice</button>
-                        <button onClick={() => setViewMode('challenge')} className={`flex-1 md:flex-none px-6 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'challenge' ? 'bg-slate-800 text-white shadow' : 'text-slate-500 hover:text-slate-300'}`}>Challenges</button>
+                        <button onClick={() => setViewMode('practice')} className={`flex-1 md:flex-none px-6 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'practice' ? 'bg-slate-800 text-white shadow' : 'text-slate-500 hover:text-slate-300'}`}>{t('articulation.modes.practice')}</button>
+                        <button onClick={() => setViewMode('challenge')} className={`flex-1 md:flex-none px-6 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'challenge' ? 'bg-slate-800 text-white shadow' : 'text-slate-500 hover:text-slate-300'}`}>{t('articulation.modes.challenges')}</button>
                     </div>
                 </div>
 
@@ -317,7 +319,7 @@ const ArticulationView = () => {
                                 <div className="flex items-center justify-between">
                                     <h2 className="font-bold text-lg flex items-center gap-2">
                                         <Info className="w-5 h-5 text-blue-400" />
-                                        Tongue Position
+                                        {t('articulation.tongue')}
                                     </h2>
                                     <span className="text-xs font-mono text-slate-500">
                                         F1: {metrics.formants.f1?.toFixed(0)} | F2: {metrics.formants.f2?.toFixed(0)}
@@ -330,7 +332,7 @@ const ArticulationView = () => {
                             <div className="space-y-4">
                                 <h2 className="font-bold text-lg flex items-center gap-2">
                                     <Volume2 className="w-5 h-5 text-green-400" />
-                                    Sibilant Quality
+                                    {t('articulation.sibilant.title')}
                                 </h2>
                                 <SibilantGauge
                                     centroid={metrics.sibilance.centroid}
@@ -339,12 +341,7 @@ const ArticulationView = () => {
 
                                 {/* Quick Tips */}
                                 <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-800 text-sm text-slate-400">
-                                    <p className="mb-2"><strong className="text-white">Tip:</strong> For a sharper &quot;S&quot;:</p>
-                                    <ul className="list-disc list-inside space-y-1 ml-2">
-                                        <li>Raise tongue tip to alveolar ridge</li>
-                                        <li>Groove the tongue center</li>
-                                        <li>Smile slightly to shorten vocal tract</li>
-                                    </ul>
+                                    <p className="mb-2"><strong className="text-white">Tip:</strong> {t('articulation.sibilant.tip')}</p>
                                 </div>
                             </div>
                         </div>
@@ -353,7 +350,7 @@ const ArticulationView = () => {
                         <div className="bg-slate-900 rounded-xl border border-slate-800 p-6 min-h-[120px]">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider">
-                                    Live Transcription (IPA)
+                                    {t('articulation.transcript')}
                                 </h3>
                                 {transcriptionStatus === 'error' && (
                                     <span className="text-red-400 text-xs font-bold flex items-center gap-1">
@@ -388,7 +385,7 @@ const ArticulationView = () => {
                                         className="px-8 py-4 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full font-bold text-lg hover:from-pink-500 hover:to-purple-500 transition-all shadow-lg shadow-pink-500/20 flex items-center gap-3"
                                     >
                                         <Mic className="w-6 h-6" />
-                                        Start Practice
+                                        {t('articulation.controls.start')}
                                     </button>
                                 ) : (
                                     <div className="flex gap-4">
@@ -397,7 +394,7 @@ const ArticulationView = () => {
                                             className="px-8 py-4 bg-slate-800 border border-red-500/50 text-red-400 rounded-full font-bold text-lg hover:bg-red-500/10 transition-all flex items-center gap-3"
                                         >
                                             <Square className="w-5 h-5" />
-                                            Stop
+                                            {t('articulation.controls.stop')}
                                         </button>
                                     </div>
                                 )}
@@ -480,7 +477,7 @@ const ArticulationView = () => {
                                             </>
                                         ) : (
                                             <>
-                                                <Mic className="w-4 h-4" /> {twisterScore !== null ? 'Try Again' : 'Start Challenge'}
+                                                <Mic className="w-4 h-4" /> {twisterScore !== null ? t('articulation.challenge.tryAgain') : t('articulation.challenge.start')}
                                             </>
                                         )}
                                     </button>

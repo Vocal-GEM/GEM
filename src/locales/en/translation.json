@@ -1,0 +1,460 @@
+{
+    "settings": {
+        "title": "Settings & Data",
+        "language": {
+            "title": "Language",
+            "description": "Select your preferred language",
+            "english": "English",
+            "spanish": "Spanish"
+        },
+        "visualizations": {
+            "title": "Visualizations",
+            "description": "Configure how data is displayed on charts and graphs.",
+            "showNorms": {
+                "title": "Show Standardized Norms",
+                "description": "Display gender-based target zones (Masculine/Feminine/Androgynous) on charts."
+            }
+        },
+        "accessibility": {
+            "title": "Accessibility",
+            "description": "Customize the interface for better visibility and readability.",
+            "highContrast": {
+                "title": "High Contrast Mode",
+                "description": "Increase contrast for better visibility."
+            },
+            "fontSize": {
+                "title": "Font Size",
+                "description": "Adjust the text size of the application."
+            }
+        },
+        "data": {
+            "title": "Data Management",
+            "description": "Manage your local data, create backups, or reset the application.",
+            "export": {
+                "title": "Export Backup",
+                "description": "Download all your progress and settings as a JSON file.",
+                "button": "Export",
+                "success": "Backup downloaded successfully!",
+                "loading": "Preparing backup...",
+                "error": "Failed to export data."
+            },
+            "import": {
+                "title": "Import Backup",
+                "description": "Restore data from a previously exported JSON file.",
+                "button": "Import",
+                "warning": "WARNING: This will overwrite your current data with the backup. Are you sure?",
+                "success": "Data restored successfully! Reloading...",
+                "loading": "Restoring data...",
+                "error": "Failed to restore data. Invalid file format."
+            },
+            "reset": {
+                "title": "Factory Reset",
+                "description": "Permanently delete all data and reset the application.",
+                "button": "Reset Data",
+                "confirm": "Click again to confirm"
+            }
+        }
+    },
+    "dashboard": {
+        "quickStart": "Quick Start",
+        "stats": {
+            "dsi": {
+                "label": "Current DSI Score",
+                "subtext": "+0.3"
+            },
+            "streak": {
+                "label": "Day Streak"
+            },
+            "practice": {
+                "label": "Practice Time",
+                "subtext": "Today"
+            },
+            "exercises": {
+                "label": "Exercises"
+            }
+        },
+        "actions": {
+            "training": {
+                "title": "Training Gym",
+                "description": "Practice pitch, resonance, and intonation exercises."
+            },
+            "assessment": {
+                "title": "Voice Assessment",
+                "description": "Take a full assessment to track your progress."
+            },
+            "analysis": {
+                "title": "Live Analysis",
+                "description": "Real-time feedback on your speaking voice."
+            }
+        }
+    },
+    "analysis": {
+        "title": "Voice Analysis",
+        "header": "Analysis Results",
+        "placeholder": {
+            "title": "Voice Analysis",
+            "description": "Record a voice sample to get detailed analysis of your pitch, resonance, and voice quality.",
+            "analyzing": "Analyzing Audio...",
+            "instruction": "Press the microphone button to start recording. Speak a few sentences for best results."
+        },
+        "tabs": {
+            "transcript": "Transcript",
+            "metrics": "Metrics",
+            "visualizations": "Visualizations",
+            "coach": "AI Coach"
+        },
+        "vizTabs": {
+            "pitch": "Pitch & Stability",
+            "resonance": "Resonance & Vowels",
+            "range": "Voice Range",
+            "spectrogram": "Spectrogram"
+        },
+        "transcript": {
+            "title": "Color-Coded Transcript",
+            "unavailable": "No transcript available",
+            "error": "Word-level analysis is unavailable. The transcription model could not be loaded. You can still view overall voice metrics in the other tabs.",
+            "legend": {
+                "title": "Color Legend:",
+                "good": "Within target (±5%)",
+                "minor": "Minor deviation (5-15%)",
+                "moderate": "Moderate deviation (15-25%)",
+                "severe": "Significant deviation (> 25%)"
+            }
+        },
+        "metrics": {
+            "summary": {
+                "title": "Analysis Summary"
+            },
+            "labels": {
+                "pitch": "Average Pitch",
+                "resonance": "Resonance (F1/F2)",
+                "rate": "Speech Rate",
+                "avgFormant": "Avg Resonance",
+                "jitter": "Pitch Stability (Jitter)",
+                "shimmer": "Amplitude Stability (Shimmer)",
+                "hnr": "Voice Quality (HNR)",
+                "cpps": "Breathiness (CPPS)",
+                "spi": "Soft Phonation (SPI)",
+                "slope": "Spectral Slope"
+            },
+            "descriptions": {
+                "pitch": "How high or low your voice sounds. Higher values are more feminine, lower values are more masculine.",
+                "resonance": "The 'brightness' or 'darkness' of your voice. Higher resonance typically sounds brighter and more feminine.",
+                "rate": "How fast you are speaking. Normal conversation is usually 3-5 syllables per second.",
+                "jitter": "Measures how steady your pitch is. Lower values mean a clearer voice.",
+                "hnr": "Harmonics-to-Noise Ratio. Higher values mean a clearer voice with less breathiness or hoarseness.",
+                "shimmer": "Measures how steady your volume is. Lower values mean a more stable voice.",
+                "avgFormant": "Average of your formant frequencies. Higher average correlates with feminine perception.",
+                "cpps": "Cepstral Peak Prominence. Higher values indicate a clearer, more resonant voice.",
+                "spi": "Soft Phonation Index. Higher values indicate a softer, breathier voice quality.",
+                "slope": "How quickly energy drops off at higher frequencies. Steeper slope (more negative) sounds softer/flutier."
+            },
+            "advanced": {
+                "show": "Show Advanced Metrics",
+                "hide": "Hide Advanced Metrics"
+            },
+            "mismatch": {
+                "title": "Resonance Mismatch Detected",
+                "description": "Your pitch is high, but your resonance (formants) is relatively low. This can sometimes sound \"hollow\" or unnatural. Try brightening your resonance by smiling slightly or raising your tongue."
+            }
+        },
+        "controls": {
+            "speed": "Speed:",
+            "loop": "Loop",
+            "clean": "Clean Audio",
+            "cleaning": "Cleaning..."
+        },
+        "toasts": {
+            "analysisComplete": "Analysis complete!",
+            "backendUnavailable": "Recording saved! Full analysis requires backend server.",
+            "cleanSuccess": "Audio cleaned successfully!",
+            "cleanFail": "Failed to clean audio. Is the backend running?",
+            "noAudio": "No audio to clean"
+        }
+    },
+    "assessment": {
+        "title": "Coach's Assessment",
+        "subtitle": "Based on your latest recording",
+        "strengths": {
+            "title": "What Went Well",
+            "empty": "Keep practicing to build your strengths!"
+        },
+        "focus": {
+            "title": "Primary Focus",
+            "highPriority": "High Priority",
+            "practice": "Practice"
+        },
+        "tips": {
+            "title": "Pro Tips"
+        },
+        "breakdown": {
+            "title": "Detailed Breakdown",
+            "pitch": "Pitch",
+            "resonance": "Resonance",
+            "stability": "Stability",
+            "quality": "Voice Quality"
+        },
+        "close": "Close Assessment"
+    },
+    "practice": {
+        "start": "START PRACTICE",
+        "stop": "STOP LISTENING",
+        "tools": {
+            "show": "Show Advanced Tools",
+            "hide": "Hide Advanced Tools",
+            "pitch": {
+                "label": "Pitch",
+                "title": "Pitch Visualizer"
+            },
+            "resonance": {
+                "label": "Resonance",
+                "title": "Resonance"
+            },
+            "range": {
+                "label": "Range",
+                "title": "Voice Range"
+            },
+            "weight": {
+                "label": "Weight",
+                "title": "Voice Quality"
+            },
+            "vowel": {
+                "label": "Vowel",
+                "title": "Vowel Space"
+            },
+            "spectrogram": {
+                "label": "Spectrogram",
+                "title": "Spectrogram"
+            },
+            "cpp": {
+                "label": "CPP",
+                "title": "CPP Meter"
+            },
+            "mpt": {
+                "label": "MPT",
+                "title": "MPT Tracker"
+            },
+            "intonation": {
+                "label": "Intonation",
+                "title": "Intonation Trainer"
+            }
+        }
+    },
+    "training": {
+        "title": "Training Gym",
+        "subtitle": "Targeted biofeedback exercises to build muscle memory.",
+        "back": "Back to Modules",
+        "modules": {
+            "pitchA3": {
+                "title": "Sustain A3",
+                "desc": "Practice holding a steady A3 note (220Hz). Good for lower range stability."
+            },
+            "pitchC4": {
+                "title": "Sustain C4",
+                "desc": "Practice holding a steady Middle C (261Hz). A central target for many voices."
+            },
+            "resonanceI": {
+                "title": "Bright /i/ Target",
+                "desc": "Practice the /i/ (heed) vowel to maximize oral resonance and brightness."
+            },
+            "intonationRising": {
+                "title": "Rising Intonation",
+                "desc": "Practice the upward pitch slide used in questions."
+            },
+            "intonationFalling": {
+                "title": "Falling Intonation",
+                "desc": "Practice the downward pitch slide used in statements."
+            },
+            "intonationHill": {
+                "title": "Hill Pattern",
+                "desc": "Practice the rise-and-fall pattern used for emphasis."
+            }
+        }
+    },
+    "practiceMode": {
+        "daily": {
+            "title": "Start Daily Training",
+            "subtitle": "Personalized biofeedback routine"
+        },
+        "tabs": {
+            "overview": "Overview",
+            "pitch": "Pitch",
+            "resonance": "Resonance",
+            "weight": "Weight",
+            "vowel": "Vowel",
+            "spectrogram": "Spectrogram"
+        },
+        "session": {
+            "start": "START SESSION",
+            "stop": "STOP SESSION"
+        },
+        "actions": {
+            "assessment": "Assessment",
+            "warmup": "Warm Up",
+            "calibrate": "Recalibrate Voice Profile"
+        }
+    },
+    "acoustic": {
+        "title": "Advanced Acoustic Analysis",
+        "subtitle": "Objective measures for spectral balance, voice quality, and glottal efficiency.",
+        "cards": {
+            "breathiness": {
+                "title": "Breathiness (GNE)",
+                "desc": "Measures glottal noise. Higher values indicate more breathy voice."
+            },
+            "roughness": {
+                "title": "Roughness",
+                "desc": "Measures irregularity in vibration. Higher values indicate hoarseness."
+            },
+            "cpp": {
+                "title": "CPP (Cepstral Peak)",
+                "desc": "Cepstral Peak Prominence. Higher values indicate better vocal quality (less dysphonia)."
+            }
+        },
+        "ltas": {
+            "title": "Long-Term Average Spectrum (LTAS)",
+            "desc": "Use LTAS to analyze the spectral tilt of your voice over time.",
+            "fem": "Feminization: Look for more energy in high frequencies (right side).",
+            "masc": "Masculinization: Look for more energy in low frequencies (left side)."
+        },
+        "spectral": {
+            "title": "Spectral Weight (H1-H2)",
+            "score": "Spectral Balance Score",
+            "dark": "Darker/Fuller",
+            "bright": "Brighter/Buzzier"
+        }
+    },
+    "articulation": {
+        "title": "Articulation Practice",
+        "subtitle": "Refine your consonant precision and vowel resonance.",
+        "modes": {
+            "practice": "Practice",
+            "challenges": "Challenges"
+        },
+        "tongue": "Tongue Position",
+        "sibilant": {
+            "title": "Sibilant Quality",
+            "tip": "For a sharper \"S\": Raise tongue tip, groove center, smile slightly."
+        },
+        "transcript": "Live Transcription (IPA)",
+        "controls": {
+            "start": "Start Practice",
+            "stop": "Stop",
+            "hold": "Hold to Verify Pronunciation"
+        },
+        "challenge": {
+            "accuracy": "ACCURACY",
+            "tryAgain": "Try Again",
+            "start": "Start Challenge"
+        }
+    },
+    "phonetogram": {
+        "title": "Voice Range Profile",
+        "subtitle": "Map your vocal capabilities by exploring your pitch and volume range.",
+        "controls": {
+            "clear": "Clear Data",
+            "save": "Save Profile",
+            "start": "Start Recording",
+            "stop": "Stop Recording"
+        },
+        "recording": "Recording",
+        "help": {
+            "title": "How to use",
+            "step1": "Start recording and make a soft \"Ooo\" sound. Glide from your lowest note to your highest note.",
+            "step2": "Repeat the glide, but this time as loud as you comfortably can (without straining!).",
+            "step3": "Try to fill in the middle area by singing at a comfortable volume.",
+            "step4": "Stop recording to see your complete Voice Range Profile."
+        },
+        "toast": {
+            "saveSuccess": "Phonetogram profile saved to History!",
+            "saveFail": "Failed to save profile.",
+            "noData": "No data to save recorded yet."
+        }
+    },
+    "vocalFolds": {
+        "title": "Vocal Folds Simulation",
+        "controls": {
+            "play": "Play Tone",
+            "stop": "Stop Tone"
+        },
+        "metrics": {
+            "pitch": "Simulated Pitch",
+            "quality": "Voice Quality",
+            "glottis": "Glottal Status",
+            "open": "Open",
+            "closed": "Closed"
+        },
+        "physics": "Physics Note",
+        "params": {
+            "title": "Parameters",
+            "elongation": {
+                "label": "Elongation (Stretch)",
+                "desc": "Simulates the Cricothyroid (CT) muscle stretching the folds. Increases pitch."
+            },
+            "mass": {
+                "label": "Mass (Thickness)",
+                "desc": "Simulates the Thyroarytenoid (TA) muscle thickening the folds. Lowers pitch, adds weight."
+            },
+            "tension": {
+                "label": "Tension (Stiffness)",
+                "desc": "Simulates the stiffness of the vocal ligament and body."
+            },
+            "adduction": {
+                "label": "Adduction (Closure)",
+                "desc": "How tightly the folds come together. Low = Breathy, High = Pressed."
+            }
+        },
+        "presets": "Presets"
+    },
+    "voiceQuality": {
+        "title": "Voice Quality Analysis",
+        "subtitle": "Clinical metrics for timbre and stability",
+        "tabs": {
+            "upload": "File Upload",
+            "live": "Live Microphone",
+            "history": "History"
+        },
+        "upload": {
+            "title": "Upload Audio File",
+            "desc": "Select a recording (WAV, MP3) to analyze voice quality markers.",
+            "browse": "Browse Files",
+            "analyzing": "Analyzing...",
+            "run": "Run Analysis"
+        },
+        "live": {
+            "title": "Live Clinical Analysis",
+            "desc": "Start the microphone to analyze Jitter, Shimmer, HNR, and Spectral Tilt in real-time.",
+            "start": "Start Analysis",
+            "metrics": "Live Metrics",
+            "monitor": "Monitor Audio",
+            "stop": "Stop",
+            "save": "Save"
+        },
+        "history": {
+            "title": "Assessment History",
+            "empty": "No saved assessments yet.",
+            "loading": "Loading history..."
+        },
+        "warning": {
+            "title": "Warning: Feedback Risk",
+            "desc": "This enables real-time audio monitoring. You MUST wear headphones to avoid loud feedback loops.",
+            "confirm": "I'm wearing headphones",
+            "cancel": "Cancel"
+        }
+    },
+    "vowelTuning": {
+        "title": "Resonance Lab",
+        "subtitle": "Fine-tune your vowel resonance targets",
+        "controls": {
+            "start": "Start Lab",
+            "stop": "Stop"
+        },
+        "target": "Target Vowel",
+        "tip": "Coaching Tip",
+        "ready": {
+            "title": "Ready to Tune?",
+            "desc": "Select a vowel and hit Start to begin.",
+            "button": "Start Microphone"
+        }
+    }
+}

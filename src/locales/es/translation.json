@@ -1,0 +1,460 @@
+{
+    "settings": {
+        "title": "Configuración y Datos",
+        "language": {
+            "title": "Idioma",
+            "description": "Selecciona tu idioma preferido",
+            "english": "Inglés",
+            "spanish": "Español"
+        },
+        "visualizations": {
+            "title": "Visualizaciones",
+            "description": "Configura cómo se muestran los datos en gráficos y tablas.",
+            "showNorms": {
+                "title": "Mostrar Normas Estandarizadas",
+                "description": "Mostrar zonas objetivo basadas en género (Masculino/Femenino/Andrógino) en los gráficos."
+            }
+        },
+        "accessibility": {
+            "title": "Accesibilidad",
+            "description": "Personaliza la interfaz para una mejor visibilidad y legibilidad.",
+            "highContrast": {
+                "title": "Modo de Alto Contraste",
+                "description": "Aumentar el contraste para mejor visibilidad."
+            },
+            "fontSize": {
+                "title": "Tamaño de Fuente",
+                "description": "Ajustar el tamaño del texto de la aplicación."
+            }
+        },
+        "data": {
+            "title": "Gestión de Datos",
+            "description": "Gestiona tus datos locales, crea copias de seguridad o restablece la aplicación.",
+            "export": {
+                "title": "Exportar Copia de Seguridad",
+                "description": "Descarga todo tu progreso y configuración como un archivo JSON.",
+                "button": "Exportar",
+                "success": "¡Copia de seguridad descargada con éxito!",
+                "loading": "Preparando copia de seguridad...",
+                "error": "Error al exportar datos."
+            },
+            "import": {
+                "title": "Importar Copia de Seguridad",
+                "description": "Restaurar datos desde un archivo JSON exportado anteriormente.",
+                "button": "Importar",
+                "warning": "ADVERTENCIA: Esto sobrescribirá tus datos actuales con la copia de seguridad. ¿Estás seguro?",
+                "success": "¡Datos restaurados con éxito! Recargando...",
+                "loading": "Restaurando datos...",
+                "error": "Error al restaurar datos. Formato de archivo inválido."
+            },
+            "reset": {
+                "title": "Restablecimiento de Fábrica",
+                "description": "Eliminar permanentemente todos los datos y restablecer la aplicación.",
+                "button": "Restablecer Datos",
+                "confirm": "Haz clic de nuevo para confirmar"
+            }
+        }
+    },
+    "dashboard": {
+        "quickStart": "Inicio Rápido",
+        "stats": {
+            "dsi": {
+                "label": "Puntuación DSI",
+                "subtext": "+0.3"
+            },
+            "streak": {
+                "label": "Racha (Días)"
+            },
+            "practice": {
+                "label": "Tiempo Práctica",
+                "subtext": "Hoy"
+            },
+            "exercises": {
+                "label": "Ejercicios"
+            }
+        },
+        "actions": {
+            "training": {
+                "title": "Gimnasio Vocal",
+                "description": "Practica ejercicios de tono, resonancia y entonación."
+            },
+            "assessment": {
+                "title": "Evaluación Vocal",
+                "description": "Realiza una evaluación completa para seguir tu progreso."
+            },
+            "analysis": {
+                "title": "Análisis en Vivo",
+                "description": "Comentarios en tiempo real sobre tu voz hablada."
+            }
+        }
+    },
+    "analysis": {
+        "title": "Análisis de Voz",
+        "header": "Resultados del Análisis",
+        "placeholder": {
+            "title": "Análisis de Voz",
+            "description": "Graba una muestra de voz para obtener un análisis detallado de tu tono, resonancia y calidad vocal.",
+            "analyzing": "Analizando Audio...",
+            "instruction": "Presiona el micrófono para empezar a grabar. Habla unas frases para mejores resultados."
+        },
+        "tabs": {
+            "transcript": "Transcripción",
+            "metrics": "Métricas",
+            "visualizations": "Visualizaciones",
+            "coach": "Entrenador IA"
+        },
+        "vizTabs": {
+            "pitch": "Tono y Estabilidad",
+            "resonance": "Resonancia y Vocales",
+            "range": "Rango Vocal",
+            "spectrogram": "Espectrograma"
+        },
+        "transcript": {
+            "title": "Transcripción Codificada por Color",
+            "unavailable": "No hay transcripción disponible",
+            "error": "El análisis a nivel de palabra no está disponible. No se pudo cargar el modelo de transcripción. Aún puedes ver las métricas generales en las otras pestañas.",
+            "legend": {
+                "title": "Leyenda de Color:",
+                "good": "Dentro del objetivo (±5%)",
+                "minor": "Desviación menor (5-15%)",
+                "moderate": "Desviación moderada (15-25%)",
+                "severe": "Desviación significativa (> 25%)"
+            }
+        },
+        "metrics": {
+            "summary": {
+                "title": "Resumen del Análisis"
+            },
+            "labels": {
+                "pitch": "Tono Promedio",
+                "resonance": "Resonancia (F1/F2)",
+                "rate": "Velocidad del Habla",
+                "avgFormant": "Resonancia Promedio",
+                "jitter": "Estabilidad de Tono (Jitter)",
+                "shimmer": "Estabilidad de Amplitud (Shimmer)",
+                "hnr": "Calidad de Voz (HNR)",
+                "cpps": "Respiración (CPPS)",
+                "spi": "Fonación Suave (SPI)",
+                "slope": "Pendiente Espectral"
+            },
+            "descriptions": {
+                "pitch": "Qué tan alto o bajo suena tu voz. Valores más altos son más femeninos, bajos más masculinos.",
+                "resonance": "El 'brillo' u 'oscuridad' de tu voz. Mayor resonancia suena más brillante y femenina.",
+                "rate": "Qué tan rápido hablas. Conversación normal es 3-5 sílabas por segundo.",
+                "jitter": "Mide qué tan estable es tu tono. Valores bajos significan una voz más clara.",
+                "hnr": "Relación Armónicos-Ruido. Valores más altos significan una voz más clara y menos velada.",
+                "shimmer": "Mide qué tan estable es tu volumen. Valores bajos significan una voz más estable.",
+                "avgFormant": "Promedio de tus frecuencias formantes. Promedio alto correlaciona con percepción femenina.",
+                "cpps": "Prominencia de Pico Cepstral. Valores más altos indican una voz más clara y resonante.",
+                "spi": "Índice de Fonación Suave. Valores más altos indican una cualidad de voz más suave o velada.",
+                "slope": "Qué tan rápido cae la energía en frecuencias altas. Pendiente más pronunciada suena más suave/aflautada."
+            },
+            "advanced": {
+                "show": "Mostrar Métricas Avanzadas",
+                "hide": "Ocultar Métricas Avanzadas"
+            },
+            "mismatch": {
+                "title": "Desajuste de Resonancia Detectado",
+                "description": "Tu tono es alto, pero tu resonancia es relativamente baja. Esto puede sonar 'hueco'. Intenta abrillantar tu resonancia sonriendo levemente o elevando la lengua."
+            }
+        },
+        "controls": {
+            "speed": "Velocidad:",
+            "loop": "Bucle",
+            "clean": "Limpiar Audio",
+            "cleaning": "Limpiando..."
+        },
+        "toasts": {
+            "analysisComplete": "¡Análisis completo!",
+            "backendUnavailable": "¡Grabación guardada! El análisis completo requiere el servidor.",
+            "cleanSuccess": "¡Audio limpiado con éxito!",
+            "cleanFail": "Error al limpiar audio. ¿Está corriendo el servidor?",
+            "noAudio": "No hay audio para limpiar"
+        }
+    },
+    "assessment": {
+        "title": "Evaluación del Entrenador",
+        "subtitle": "Basado en tu última grabación",
+        "strengths": {
+            "title": "Lo Que Salió Bien",
+            "empty": "¡Sigue practicando para aumentar tus fortalezas!"
+        },
+        "focus": {
+            "title": "Enfoque Principal",
+            "highPriority": "Alta Prioridad",
+            "practice": "Practicar"
+        },
+        "tips": {
+            "title": "Consejos Pro"
+        },
+        "breakdown": {
+            "title": "Desglose Detallado",
+            "pitch": "Tono",
+            "resonance": "Resonancia",
+            "stability": "Estabilidad",
+            "quality": "Calidad Vocal"
+        },
+        "close": "Cerrar Evaluación"
+    },
+    "practice": {
+        "start": "INICIAR PRÁCTICA",
+        "stop": "DETENER ESCUCHA",
+        "tools": {
+            "show": "Mostrar Herramientas Avanzadas",
+            "hide": "Ocultar Herramientas Avanzadas",
+            "pitch": {
+                "label": "Tono",
+                "title": "Visualizador de Tono"
+            },
+            "resonance": {
+                "label": "Resonancia",
+                "title": "Resonancia"
+            },
+            "range": {
+                "label": "Rango",
+                "title": "Rango Vocal"
+            },
+            "weight": {
+                "label": "Peso",
+                "title": "Calidad Vocal"
+            },
+            "vowel": {
+                "label": "Vocal",
+                "title": "Espacio Vocálico"
+            },
+            "spectrogram": {
+                "label": "Espectrograma",
+                "title": "Espectrograma"
+            },
+            "cpp": {
+                "label": "CPP",
+                "title": "Medidor CPP"
+            },
+            "mpt": {
+                "label": "TMF",
+                "title": "Rastreador TMF"
+            },
+            "intonation": {
+                "label": "Entonación",
+                "title": "Entrenador de Entonación"
+            }
+        }
+    },
+    "training": {
+        "title": "Gimnasio Vocal",
+        "subtitle": "Ejercicios de bioretroalimentación para memoria muscular.",
+        "back": "Volver a Módulos",
+        "modules": {
+            "pitchA3": {
+                "title": "Sostener A3",
+                "desc": "Practica sostener una nota A3 estable (220Hz). Bueno para estabilidad en rango bajo."
+            },
+            "pitchC4": {
+                "title": "Sostener C4",
+                "desc": "Practica sostener un Do Central (261Hz). Un objetivo central para muchas voces."
+            },
+            "resonanceI": {
+                "title": "Objetivo /i/ Brillante",
+                "desc": "Practica la vocal /i/ para maximizar la resonancia oral y el brillo."
+            },
+            "intonationRising": {
+                "title": "Entonación Ascendente",
+                "desc": "Practica el deslizamiento de tono hacia arriba usado en preguntas."
+            },
+            "intonationFalling": {
+                "title": "Entonación Descendente",
+                "desc": "Practica el deslizamiento de tono hacia abajo usado en afirmaciones."
+            },
+            "intonationHill": {
+                "title": "Patrón de Colina",
+                "desc": "Practica el patrón de subida y bajada usado para dar énfasis."
+            }
+        }
+    },
+    "practiceMode": {
+        "daily": {
+            "title": "Iniciar Entrenamiento Diario",
+            "subtitle": "Rutina personalizada de bioretroalimentación"
+        },
+        "tabs": {
+            "overview": "Resumen",
+            "pitch": "Tono",
+            "resonance": "Resonancia",
+            "weight": "Peso",
+            "vowel": "Vocal",
+            "spectrogram": "Espectrograma"
+        },
+        "session": {
+            "start": "INICIAR SESIÓN",
+            "stop": "DETENER SESIÓN"
+        },
+        "actions": {
+            "assessment": "Evaluación",
+            "warmup": "Calentamiento",
+            "calibrate": "Recalibrar Perfil de Voz"
+        }
+    },
+    "acoustic": {
+        "title": "Análisis Acústico Avanzado",
+        "subtitle": "Medidas objetivas para el equilibrio espectral, calidad vocal y eficiencia glotal.",
+        "cards": {
+            "breathiness": {
+                "title": "Aire (GNE)",
+                "desc": "Mide el ruido glotal. Valores altos indican voz más aireada."
+            },
+            "roughness": {
+                "title": "Aspereza",
+                "desc": "Mide la irregularidad en la vibración. Valores altos indican ronquera."
+            },
+            "cpp": {
+                "title": "Pic (Pico Cepstral)",
+                "desc": "Prominencia del Pico Cepstral. Valores altos indican mejor calidad vocal."
+            }
+        },
+        "ltas": {
+            "title": "Espectro Promedio a Largo Plazo (LTAS)",
+            "desc": "Usa LTAS para analizar la inclinación espectral de tu voz a lo largo del tiempo.",
+            "fem": "Feminización: Busca más energía en frecuencias altas (derecha).",
+            "masc": "Masculinización: Busca más energía en frecuencias bajas (izquierda)."
+        },
+        "spectral": {
+            "title": "Peso Espectral (H1-H2)",
+            "score": "Puntaje de Equilibrio Espectral",
+            "dark": "Más Oscuro/Lleno",
+            "bright": "Más Brillante/Zumbante"
+        }
+    },
+    "articulation": {
+        "title": "Práctica de Articulación",
+        "subtitle": "Refina tu precisión consonántica y resonancia vocálica.",
+        "modes": {
+            "practice": "Práctica",
+            "challenges": "Desafíos"
+        },
+        "tongue": "Posición de la Lengua",
+        "sibilant": {
+            "title": "Calidad Sibilante",
+            "tip": "Para una \"S\" más nítida: Levanta la punta de la lengua y sonríe ligeramente."
+        },
+        "transcript": "Transcripción en Vivo (IPA)",
+        "controls": {
+            "start": "Iniciar Práctica",
+            "stop": "Detener",
+            "hold": "Mantener para Verificar Pronunciación"
+        },
+        "challenge": {
+            "accuracy": "PRECISIÓN",
+            "tryAgain": "Intentar de Nuevo",
+            "start": "Iniciar Desafío"
+        }
+    },
+    "phonetogram": {
+        "title": "Perfil de Rango Vocal",
+        "subtitle": "Mapea tus capacidades vocales explorando tu rango de tono y volumen.",
+        "controls": {
+            "clear": "Borrar Datos",
+            "save": "Guardar Perfil",
+            "start": "Iniciar Grabación",
+            "stop": "Detener Grabación"
+        },
+        "recording": "Grabando",
+        "help": {
+            "title": "Cómo usar",
+            "step1": "Inicia la grabación y haz un sonido suave \"Uuu\". Deslízate desde tu nota más baja a la más alta.",
+            "step2": "Repite el deslizamiento, pero esta vez tan fuerte como puedas cómodamente (¡sin esforzarte!).",
+            "step3": "Intenta llenar el área media cantando a un volumen cómodo.",
+            "step4": "Detén la grabación para ver tu Perfil de Rango Vocal completo."
+        },
+        "toast": {
+            "saveSuccess": "¡Perfil guardado en el Historial!",
+            "saveFail": "Error al guardar perfil.",
+            "noData": "No hay datos grabados para guardar."
+        }
+    },
+    "vocalFolds": {
+        "title": "Simulación de Cuerdas Vocales",
+        "controls": {
+            "play": "Reproducir Tono",
+            "stop": "Detener Tono"
+        },
+        "metrics": {
+            "pitch": "Tono Simulado",
+            "quality": "Calidad Vocal",
+            "glottis": "Estado Glotal",
+            "open": "Abierto",
+            "closed": "Cerrado"
+        },
+        "physics": "Nota de Física",
+        "params": {
+            "title": "Parámetros",
+            "elongation": {
+                "label": "Elongación (Estiramiento)",
+                "desc": "Simula el músculo Cricotiroideo (CT). Aumenta el tono."
+            },
+            "mass": {
+                "label": "Masa (Grosor)",
+                "desc": "Simula el músculo Tiroaritenoideo (TA). Baja el tono, añade peso."
+            },
+            "tension": {
+                "label": "Tensión (Rigidez)",
+                "desc": "Simula la rigidez del ligamento vocal y el cuerpo."
+            },
+            "adduction": {
+                "label": "Aducción (Cierre)",
+                "desc": "Qué tan apretadas se juntan las cuerdas. Bajo = Aireado, Alto = Presionado."
+            }
+        },
+        "presets": "Preajustes"
+    },
+    "voiceQuality": {
+        "title": "Análisis de Calidad Vocal",
+        "subtitle": "Métricas clínicas para timbre y estabilidad",
+        "tabs": {
+            "upload": "Subir Archivo",
+            "live": "Micrófono en Vivo",
+            "history": "Historial"
+        },
+        "upload": {
+            "title": "Subir Audio",
+            "desc": "Selecciona una grabación (WAV, MP3) para analizar marcadores de calidad.",
+            "browse": "Buscar Archivos",
+            "analyzing": "Analizando...",
+            "run": "Ejecutar Análisis"
+        },
+        "live": {
+            "title": "Análisis Clínico en Vivo",
+            "desc": "Inicia el micrófono para analizar Jitter, Shimmer y HNR en tiempo real.",
+            "start": "Iniciar Análisis",
+            "metrics": "Métricas en Vivo",
+            "monitor": "Monitorear Audio",
+            "stop": "Detener",
+            "save": "Guardar"
+        },
+        "history": {
+            "title": "Historial de Evaluaciones",
+            "empty": "Aún no hay evaluaciones guardadas.",
+            "loading": "Cargando historial..."
+        },
+        "warning": {
+            "title": "Advertencia: Riesgo de Retroalimentación",
+            "desc": "Esto habilita el monitoreo en tiempo real. DEBES usar audífonos para evitar acople.",
+            "confirm": "Estoy usando audífonos",
+            "cancel": "Cancelar"
+        }
+    },
+    "vowelTuning": {
+        "title": "Laboratorio de Resonancia",
+        "subtitle": "Afina tus objetivos de resonancia vocálica",
+        "controls": {
+            "start": "Iniciar Lab",
+            "stop": "Detener"
+        },
+        "target": "Vocal Objetivo",
+        "tip": "Consejo del Entrenador",
+        "ready": {
+            "title": "¿Listo para Afinar?",
+            "desc": "Selecciona una vocal y presiona Iniciar.",
+            "button": "Iniciar Micrófono"
+        }
+    }
+}

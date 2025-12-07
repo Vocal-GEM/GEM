@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Upload, Play, Square, Activity, FileText, BarChart2, Info, Save, History, Calendar, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Toast from '../ui/Toast';
 import { indexedDB, STORES } from '../../services/IndexedDBManager';
 import Spectrogram from '../viz/Spectrogram';
@@ -32,6 +33,7 @@ ChartJS.register(
 import { useAudio } from '../../context/AudioContext';
 
 const VoiceQualityView = () => {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('recorded'); // 'recorded' or 'live'
     const [file, setFile] = useState(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -93,7 +95,7 @@ const VoiceQualityView = () => {
         const formData = new FormData();
         formData.append('audio', file);
         formData.append('goal', goal);
-        formData.append('include_transcript', includeTranscript);
+        formData.append('include_transcript', includeTranscript.toString());
 
         try {
             // Assuming backend is on same host/port or proxied. 
@@ -217,7 +219,7 @@ const VoiceQualityView = () => {
             };
 
             await indexedDB.saveAssessment(record);
-            setToast({ message: "Result saved to History!", type: 'success' });
+            setToast({ message: t('voiceQuality.live.save') + "!", type: 'success' });
         } catch (err) {
             console.error(err);
             setToast({ message: "Failed to save result: " + err.message, type: 'error' });
@@ -306,7 +308,7 @@ const VoiceQualityView = () => {
     const getMetricValue = (val) => val !== undefined && val !== null ? val : 0;
 
     const renderGauges = () => {
-        if (!liveMetrics && isLive) return <div className="text-slate-400 italic text-center p-8">Initializing analysis...</div>;
+        if (!liveMetrics && isLive) return <div className="text-slate-400 italic text-center p-8">{t('voiceQuality.history.loading')}</div>;
 
         return (
             <div className="mt-6 mb-8">
@@ -420,9 +422,9 @@ const VoiceQualityView = () => {
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-blue-500">
-                        Voice Quality Analysis
+                        {t('voiceQuality.title')}
                     </h1>
-                    <p className="text-slate-400 text-sm">Clinical metrics for timbre and stability</p>
+                    <p className="text-slate-400 text-sm">{t('voiceQuality.subtitle')}</p>
                 </div>
 
                 <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-800">
@@ -430,19 +432,19 @@ const VoiceQualityView = () => {
                         onClick={() => setActiveTab('recorded')}
                         className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${activeTab === 'recorded' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                     >
-                        File Upload
+                        {t('voiceQuality.tabs.upload')}
                     </button>
                     <button
                         onClick={() => setActiveTab('live')}
                         className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${activeTab === 'live' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                     >
-                        Live Microphone
+                        {t('voiceQuality.tabs.live')}
                     </button>
                     <button
                         onClick={() => setActiveTab('history')}
                         className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${activeTab === 'history' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                     >
-                        History
+                        {t('voiceQuality.tabs.history')}
                     </button>
                 </div>
             </div>
@@ -456,14 +458,14 @@ const VoiceQualityView = () => {
             {activeTab === 'history' ? (
                 <div className="animate-in fade-in duration-500">
                     <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                        <History className="text-teal-400" /> Assessment History
+                        <History className="text-teal-400" /> {t('voiceQuality.history.title')}
                     </h2>
 
                     {historyLoading ? (
-                        <div className="text-center text-slate-500 py-12">Loading history...</div>
+                        <div className="text-center text-slate-500 py-12">{t('voiceQuality.history.loading')}</div>
                     ) : history.length === 0 ? (
                         <div className="text-center text-slate-500 py-12 border-2 border-dashed border-slate-800 rounded-2xl">
-                            No saved assessments yet.
+                            {t('voiceQuality.history.empty')}
                         </div>
                     ) : (
                         <div className="space-y-4">
@@ -502,17 +504,16 @@ const VoiceQualityView = () => {
                             <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl border border-slate-800">
                                 <Mic size={32} className="text-teal-400" />
                             </div>
-                            <h2 className="text-xl font-bold text-white mb-3">Live Clinical Analysis</h2>
+                            <h2 className="text-xl font-bold text-white mb-3">{t('voiceQuality.live.title')}</h2>
                             <p className="text-slate-400 mb-8">
-                                Start the microphone to analyze Jitter, Shimmer, HNR, and Spectral Tilt in real-time.
-                                Best results with a sustained vowel (like &quot;ahhh&quot;).
+                                {t('voiceQuality.live.desc')}
                             </p>
                             <button
                                 onClick={startLiveAnalysis}
                                 className="px-8 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-xl font-bold transition-all shadow-lg shadow-teal-500/20 flex items-center gap-2 mx-auto"
                             >
                                 <Play size={18} fill="currentColor" />
-                                Start Analysis
+                                {t('voiceQuality.live.start')}
                             </button>
                         </div>
                     ) : (
@@ -520,26 +521,26 @@ const VoiceQualityView = () => {
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                                     <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                                    Live Metrics
+                                    {t('voiceQuality.live.metrics')}
                                 </h3>
                                 <div className="flex gap-2">
                                     <button
                                         onClick={toggleListenMode}
                                         className={`px-3 py-1 rounded text-xs font-bold border transition-colors flex items-center gap-1 ${isListenMode ? 'bg-teal-500/20 text-teal-300 border-teal-500/50' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'}`}
                                     >
-                                        {isListenMode ? '🎧 Monitoring On' : '🎧 Monitor Audio'}
+                                        {isListenMode ? '🎧 ' + t('voiceQuality.live.monitor') + ' On' : '🎧 ' + t('voiceQuality.live.monitor')}
                                     </button>
                                     <button
                                         onClick={stopLiveAnalysis}
                                         className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-bold transition-colors border border-slate-700"
                                     >
-                                        Stop
+                                        {t('voiceQuality.live.stop')}
                                     </button>
                                     <button
                                         onClick={handleSnapshot}
                                         className="px-4 py-2 bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 rounded-lg text-sm font-bold transition-colors border border-teal-500/30 flex items-center gap-2"
                                     >
-                                        <Save size={16} /> Save
+                                        <Save size={16} /> {t('voiceQuality.live.save')}
                                     </button>
                                 </div>
                             </div>
@@ -548,23 +549,23 @@ const VoiceQualityView = () => {
                                 <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl animate-in zoom-in-95 duration-200">
                                     <h4 className="flex items-center gap-2 text-yellow-400 font-bold mb-2">
                                         <Info className="w-5 h-5" />
-                                        Warning: Feedback Risk
+                                        {t('voiceQuality.warning.title')}
                                     </h4>
                                     <p className="text-sm text-yellow-200/80 mb-4">
-                                        This enables real-time audio monitoring. <strong>You MUST wear headphones</strong> to avoid loud feedback loops (screeching).
+                                        {t('voiceQuality.warning.desc')}
                                     </p>
                                     <div className="flex gap-3">
                                         <button
                                             onClick={confirmListenMode}
                                             className="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg text-sm"
                                         >
-                                            I&apos;m wearing headphones
+                                            {t('voiceQuality.warning.confirm')}
                                         </button>
                                         <button
                                             onClick={() => setShowFeedbackWarning(false)}
                                             className="px-4 py-2 bg-black/20 hover:bg-black/30 text-yellow-200 font-bold rounded-lg text-sm"
                                         >
-                                            Cancel
+                                            {t('voiceQuality.warning.cancel')}
                                         </button>
                                     </div>
                                 </div>
@@ -585,9 +586,9 @@ const VoiceQualityView = () => {
                     {!results && (
                         <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-800 rounded-2xl bg-slate-900/30 p-12">
                             <Upload size={48} className="text-slate-600 mb-4" />
-                            <h3 className="text-lg font-bold text-white mb-2">Upload Audio File</h3>
+                            <h3 className="text-lg font-bold text-white mb-2">{t('voiceQuality.upload.title')}</h3>
                             <p className="text-slate-400 text-sm mb-6 max-w-sm text-center">
-                                Select a recording (WAV, MP3) to analyze voice quality markers.
+                                {t('voiceQuality.upload.desc')}
                             </p>
                             <input
                                 type="file"
@@ -600,7 +601,7 @@ const VoiceQualityView = () => {
                                 htmlFor="audio-upload"
                                 className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold cursor-pointer transition-colors border border-slate-700"
                             >
-                                Browse Files
+                                {t('voiceQuality.upload.browse')}
                             </label>
                             {file && (
                                 <div className="mt-6 flex flex-col items-center gap-4">
@@ -610,7 +611,7 @@ const VoiceQualityView = () => {
                                         disabled={isAnalyzing}
                                         className="px-8 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-xl font-bold transition-all shadow-lg shadow-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                     >
-                                        {isAnalyzing ? 'Analyzing...' : 'Run Analysis'}
+                                        {isAnalyzing ? t('voiceQuality.upload.analyzing') : t('voiceQuality.upload.run')}
                                     </button>
                                 </div>
                             )}

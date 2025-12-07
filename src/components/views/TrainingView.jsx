@@ -2,51 +2,53 @@ import React, { useState } from 'react';
 import IntonationTrainingModule from '../training/IntonationTrainingModule';
 import PitchTrainingModule from '../training/PitchTrainingModule';
 import ResonanceTrainingModule from '../training/ResonanceTrainingModule';
+import { useTranslation } from 'react-i18next';
 import { Dumbbell, Music, Activity, ArrowLeft, Mic2, TrendingUp, TrendingDown, Waves } from 'lucide-react';
 
 const TrainingView = () => {
+    const { t } = useTranslation();
     const [activeModule, setActiveModule] = useState(null);
 
     const modules = [
         {
             id: 'pitch-a3',
-            title: 'Sustain A3',
-            description: 'Practice holding a steady A3 note (220Hz). Good for lower range stability.',
+            title: t('training.modules.pitchA3.title'),
+            description: t('training.modules.pitchA3.desc'),
             icon: <Music size={24} className="text-teal-400" />,
             component: <PitchTrainingModule targetNote="A3" targetFreq={220} tolerance={5} />
         },
         {
             id: 'pitch-c4',
-            title: 'Sustain C4',
-            description: 'Practice holding a steady Middle C (261Hz). A central target for many voices.',
+            title: t('training.modules.pitchC4.title'),
+            description: t('training.modules.pitchC4.desc'),
             icon: <Music size={24} className="text-purple-400" />,
             component: <PitchTrainingModule targetNote="C4" targetFreq={261.6} tolerance={5} />
         },
         {
             id: 'resonance-i',
-            title: 'Bright /i/ Target',
-            description: 'Practice the /i/ (heed) vowel to maximize oral resonance and brightness.',
+            title: t('training.modules.resonanceI.title'),
+            description: t('training.modules.resonanceI.desc'),
             icon: <Mic2 size={24} className="text-amber-400" />,
             component: <ResonanceTrainingModule targetVowel="i" />
         },
         {
             id: 'intonation-rising',
-            title: 'Rising Intonation',
-            description: 'Practice the upward pitch slide used in questions.',
+            title: t('training.modules.intonationRising.title'),
+            description: t('training.modules.intonationRising.desc'),
             icon: <TrendingUp size={24} className="text-teal-400" />,
             component: <IntonationTrainingModule patternType="rising" />
         },
         {
             id: 'intonation-falling',
-            title: 'Falling Intonation',
-            description: 'Practice the downward pitch slide used in statements.',
+            title: t('training.modules.intonationFalling.title'),
+            description: t('training.modules.intonationFalling.desc'),
             icon: <TrendingDown size={24} className="text-rose-400" />,
             component: <IntonationTrainingModule patternType="falling" />
         },
         {
             id: 'intonation-hill',
-            title: 'Hill Pattern',
-            description: 'Practice the rise-and-fall pattern used for emphasis.',
+            title: t('training.modules.intonationHill.title'),
+            description: t('training.modules.intonationHill.desc'),
             icon: <Waves size={24} className="text-blue-400" />,
             component: <IntonationTrainingModule patternType="hill" />
         }
@@ -61,7 +63,7 @@ const TrainingView = () => {
                         onClick={() => setActiveModule(null)}
                         className="flex items-center gap-2 text-slate-400 hover:text-white mb-4 transition-colors"
                     >
-                        <ArrowLeft size={20} /> Back to Modules
+                        <ArrowLeft size={20} /> {t('training.back')}
                     </button>
                 ) : (
                     <div className="flex items-center gap-4 mb-8">
@@ -69,8 +71,8 @@ const TrainingView = () => {
                             <Dumbbell size={32} className="text-teal-400" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold text-white">Training Gym</h1>
-                            <p className="text-slate-400">Targeted biofeedback exercises to build muscle memory.</p>
+                            <h1 className="text-3xl font-bold text-white">{t('training.title')}</h1>
+                            <p className="text-slate-400">{t('training.subtitle')}</p>
                         </div>
                     </div>
                 )}
