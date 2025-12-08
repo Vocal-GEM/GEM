@@ -191,7 +191,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                 {promptText && (
                     <div className="mt-4 p-4 bg-slate-700/50 rounded-lg border border-slate-600/50">
                         <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">Read this aloud:</p>
-                        <p className="text-white font-medium italic">"{promptText}"</p>
+                        <p className="text-white font-medium italic">&quot;{promptText}&quot;</p>
                     </div>
                 )}
             </div>

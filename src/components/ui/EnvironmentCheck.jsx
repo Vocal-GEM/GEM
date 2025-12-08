@@ -80,7 +80,7 @@ const EnvironmentCheck = ({ onClose }) => {
             {status === 'idle' && (
                 <div className="space-y-4">
                     <p className="text-slate-300">
-                        We'll listen to the background noise in your room to set the best microphone sensitivity.
+                        We&apos;ll listen to the background noise in your room to set the best microphone sensitivity.
                     </p>
                     <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
                         <ul className="space-y-2 text-sm text-slate-400">

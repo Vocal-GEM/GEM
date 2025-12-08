@@ -21,9 +21,9 @@ import FloatingCamera from './components/ui/FloatingCamera';
 // Lazy Loaded Components - UI
 const Sidebar = lazy(() => import('./components/layout/Sidebar'));
 const DashboardView = lazy(() => import('./components/views/DashboardView'));
-const TrainingView = lazy(() => import('./components/views/TrainingView'));
+
 const ClinicalAssessmentView = lazy(() => import('./components/views/ClinicalAssessmentView'));
-const AcousticAnalysisView = lazy(() => import('./components/views/AcousticAnalysisView'));
+
 const SettingsView = lazy(() => import('./components/views/SettingsView'));
 const AnalysisHub = lazy(() => import('./components/views/AnalysisHub'));
 const LearnView = lazy(() => import('./components/views/LearnView'));
@@ -34,20 +34,13 @@ const CalibrationWizard = lazy(() => import('./components/ui/CalibrationWizard')
 const HistoryView = lazy(() => import('./components/ui/HistoryView'));
 const CoachView = lazy(() => import('./components/views/CoachView'));
 const PracticeMode = lazy(() => import('./components/views/PracticeMode'));
-const AnalysisView = lazy(() => import('./components/views/AnalysisView'));
+
 const AdaptivePracticeSession = lazy(() => import('./components/views/AdaptivePracticeSession'));
 const GuidedJourney = lazy(() => import('./components/ui/GuidedJourney'));
 const PracticeCardsPanel = lazy(() => import('./components/ui/PracticeCardsPanel'));
 const ProgramView = lazy(() => import('./components/views/ProgramView'));
 
 // Lazy Loaded Components - Visualizations
-const ResonanceOrb = lazy(() => import('./components/viz/ResonanceOrb'));
-const LiveMetricsBar = lazy(() => import('./components/viz/LiveMetricsBar'));
-const GenderPerceptionDashboard = lazy(() => import('./components/ui/GenderPerceptionDashboard'));
-const PitchVisualizer = lazy(() => import('./components/viz/PitchVisualizer'));
-const PitchOrb = lazy(() => import('./components/viz/PitchOrb'));
-const VoiceQualityMeter = lazy(() => import('./components/viz/VoiceQualityMeter'));
-const VowelSpacePlot = lazy(() => import('./components/viz/VowelSpacePlot'));
 const HighResSpectrogram = lazy(() => import('./components/viz/HighResSpectrogram'));
 const Spectrogram = lazy(() => import('./components/viz/Spectrogram'));
 const ContourVisualizer = lazy(() => import('./components/viz/ContourVisualizer'));

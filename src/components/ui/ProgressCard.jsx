@@ -138,7 +138,7 @@ const ProgressCard = ({ stats, onClose }) => {
                     {/* Motivational text */}
                     <div className="text-center mt-6 relative">
                         <p className="text-white/80 text-sm italic">
-                            "Every practice session is a step towards my authentic voice."
+                            &quot;Every practice session is a step towards my authentic voice.&quot;
                         </p>
                     </div>
                 </div>

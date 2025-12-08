@@ -14,7 +14,7 @@ import { Info } from 'lucide-react';
  * based on combined pitch and resonance analysis.
  */
 const GenderPerceptionBadge = ({ dataRef, showDetails = false, size = 'normal' }) => {
-    const { colorBlindMode } = useSettings();
+    const { colorBlindMode, settings } = useSettings();
     const [prediction, setPrediction] = useState(null);
     const [showTooltip, setShowTooltip] = useState(false);
     const smoothedRef = useRef({ score: 0.5 });

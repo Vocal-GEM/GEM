@@ -292,13 +292,13 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
                                         <div className="flex justify-between items-start mb-1">
                                             <h3 className="font-bold text-white group-hover:text-blue-400 transition-colors">{clip.title}</h3>
                                             <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide ${clip.difficulty === 'Easy' ? 'bg-green-500/10 text-green-400' :
-                                                    clip.difficulty === 'Medium' ? 'bg-yellow-500/10 text-yellow-400' :
-                                                        'bg-red-500/10 text-red-400'
+                                                clip.difficulty === 'Medium' ? 'bg-yellow-500/10 text-yellow-400' :
+                                                    'bg-red-500/10 text-red-400'
                                                 }`}>
                                                 {clip.difficulty}
                                             </span>
                                         </div>
-                                        <p className="text-sm text-slate-300 italic mb-2">"{clip.text}"</p>
+                                        <p className="text-sm text-slate-300 italic mb-2">&quot;{clip.text}&quot;</p>
                                         <div className="text-xs text-slate-500 flex items-center gap-1">
                                             <Volume2 size={12} /> Click to start
                                         </div>
@@ -326,7 +326,7 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
                             </div>
 
                             <div className="bg-slate-800/80 p-6 rounded-2xl w-full max-w-sm text-center border border-white/5">
-                                <p className="text-lg text-white font-medium">"{selectedClip.text}"</p>
+                                <p className="text-lg text-white font-medium">&quot;{selectedClip.text}&quot;</p>
                             </div>
 
                             <button
@@ -390,8 +390,8 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
                                     {score}%
                                 </div>
                                 <div className={`px-4 py-1 rounded-full text-sm font-bold ${score > 80 ? 'bg-green-500/20 text-green-400' :
-                                        score > 50 ? 'bg-yellow-500/20 text-yellow-400' :
-                                            'bg-red-500/20 text-red-400'
+                                    score > 50 ? 'bg-yellow-500/20 text-yellow-400' :
+                                        'bg-red-500/20 text-red-400'
                                     }`}>
                                     {score > 80 ? 'Excellent Match!' : score > 50 ? 'Good Effort' : 'Keep Practicing'}
                                 </div>
