@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Upload, Play, Square, Activity, FileText, BarChart2, Info, Save, History, Calendar, Trash2 } from 'lucide-react';
+import { Mic, Upload, Play, Square, Activity, FileText, BarChart2, Info, Save, History, Calendar, Trash2, Pause, Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Toast from '../ui/Toast';
 import { indexedDB, STORES } from '../../services/IndexedDBManager';
 import Spectrogram from '../viz/Spectrogram';
+import FileSpectrogram from '../viz/FileSpectrogram';
 import ClipCapture from '../ui/ClipCapture';
 import IntensityMeter from '../viz/IntensityMeter';
 import { DSP } from '../../utils/DSP';
@@ -60,6 +61,14 @@ const VoiceQualityView = () => {
     const [isListenMode, setIsListenMode] = useState(false);
     const [showFeedbackWarning, setShowFeedbackWarning] = useState(false);
 
+    // Audio playback for uploaded files
+    const audioRef = useRef(null);
+    const [audioBuffer, setAudioBuffer] = useState(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [fileDuration, setFileDuration] = useState(0);
+    const [showSpectrogram, setShowSpectrogram] = useState(false);
+
     // Toggle Listen Mode
     const toggleListenMode = () => {
         if (!isListenMode) {
@@ -78,11 +87,31 @@ const VoiceQualityView = () => {
 
     // --- Recorded Analysis ---
 
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
         if (e.target.files && e.target.files[0]) {
-            setFile(e.target.files[0]);
+            const selectedFile = e.target.files[0];
+            setFile(selectedFile);
             setResults(null);
             setError(null);
+            setAudioBuffer(null);
+            setShowSpectrogram(false);
+
+            // Decode audio for spectrogram visualization
+            try {
+                const arrayBuffer = await selectedFile.arrayBuffer();
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const decoded = await audioCtx.decodeAudioData(arrayBuffer);
+                setAudioBuffer(decoded);
+                setFileDuration(decoded.duration);
+
+                // Create audio element for playback
+                const url = URL.createObjectURL(selectedFile);
+                if (audioRef.current) {
+                    audioRef.current.src = url;
+                }
+            } catch (err) {
+                console.error('Failed to decode audio:', err);
+            }
         }
     };
 
@@ -240,6 +269,41 @@ const VoiceQualityView = () => {
             loadHistory();
         }
     };
+
+    // Audio playback controls
+    const togglePlayback = () => {
+        if (!audioRef.current) return;
+        if (isPlaying) {
+            audioRef.current.pause();
+        } else {
+            audioRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
+    };
+
+    const handleSeek = (time) => {
+        if (audioRef.current) {
+            audioRef.current.currentTime = time;
+            setCurrentTime(time);
+        }
+    };
+
+    // Update current time during playback
+    useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        const updateTime = () => setCurrentTime(audio.currentTime);
+        const onEnded = () => setIsPlaying(false);
+
+        audio.addEventListener('timeupdate', updateTime);
+        audio.addEventListener('ended', onEnded);
+
+        return () => {
+            audio.removeEventListener('timeupdate', updateTime);
+            audio.removeEventListener('ended', onEnded);
+        };
+    }, []);
 
     // --- Rendering Helpers ---
 
@@ -614,6 +678,48 @@ const VoiceQualityView = () => {
                                         {isAnalyzing ? t('voiceQuality.upload.analyzing') : t('voiceQuality.upload.run')}
                                     </button>
                                 </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* File with spectrogram visualization (before or after analysis) */}
+                    {file && audioBuffer && (
+                        <div className="mt-6">
+                            {/* Hidden audio element for playback */}
+                            <audio ref={audioRef} className="hidden" />
+
+                            {/* Toggle and controls */}
+                            <div className="flex items-center justify-between mb-4">
+                                <button
+                                    onClick={() => setShowSpectrogram(!showSpectrogram)}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-colors border ${showSpectrogram
+                                            ? 'bg-teal-500/20 text-teal-400 border-teal-500/50'
+                                            : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
+                                        }`}
+                                >
+                                    <Eye size={16} />
+                                    {showSpectrogram ? 'Hide Spectrogram' : 'Show Spectrogram'}
+                                </button>
+
+                                {showSpectrogram && (
+                                    <button
+                                        onClick={togglePlayback}
+                                        className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-bold transition-colors border border-slate-700"
+                                    >
+                                        {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+                                        {isPlaying ? 'Pause' : 'Play'}
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Spectrogram visualization */}
+                            {showSpectrogram && (
+                                <FileSpectrogram
+                                    audioBuffer={audioBuffer}
+                                    currentTime={currentTime}
+                                    duration={fileDuration}
+                                    onSeek={handleSeek}
+                                />
                             )}
                         </div>
                     )}

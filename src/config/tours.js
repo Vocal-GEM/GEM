@@ -44,5 +44,53 @@ export const TOURS = {
             content: 'Visualize your progress over time with these charts.',
             placement: 'top'
         }
+    ],
+    'spectrogram': [
+        {
+            target: 'visualization-area',
+            title: 'Spectrogram Reading',
+            content: 'The brighter areas show where your voice resonance is strongest. Try to match the target patterns.',
+            placement: 'right'
+        }
+    ],
+    'daf_mode': [
+        {
+            target: 'daf-modal',
+            title: 'Delayed Auditory Feedback',
+            content: 'This tool plays your voice back with a slight delay to alter your speech processing loop.',
+            placement: 'bottom'
+        },
+        {
+            target: 'daf-info-box',
+            title: 'How it Works',
+            content: 'Read this quick guide to understand the benefits for fluency and pitch control.',
+            placement: 'bottom'
+        },
+        {
+            target: 'daf-delay-selector',
+            title: 'Adjust Delay',
+            content: 'Start with 150ms. Longer delays (200ms+) disrupt speech more, testing your focus.',
+            placement: 'top'
+        },
+        {
+            target: 'daf-start-button',
+            title: 'Start Practice',
+            content: 'Put on headphones and click here to begin.',
+            placement: 'top'
+        }
+    ],
+    'recordings_view': [
+        {
+            target: 'recordings-list',
+            title: 'Your Library',
+            content: 'All your practice sessions and baselines are saved here.',
+            placement: 'top'
+        },
+        {
+            target: 'recording-play-btn',
+            title: 'Playback',
+            content: 'Listen to your past recordings to hear your progress.',
+            placement: 'right'
+        }
     ]
 };

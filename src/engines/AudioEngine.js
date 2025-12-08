@@ -385,12 +385,66 @@ export class AudioEngine {
 
             this.analyser.getFloatTimeDomainData(dataArray);
 
+            // --- NEW: Spectral Tilt Calculation ---
+            // We need frequency data for tilt/weight analysis
+            const freqBufferLength = this.analyser.frequencyBinCount;
+            const freqData = new Float32Array(freqBufferLength);
+            this.analyser.getFloatFrequencyData(freqData);
+
+            // Approximate Spectral Tilt (db/octave proxy)
+            // Compare Energy in 0-1kHz vs 1kHz-4kHz
+            // Bin size = SampleRate / FFTSize = 44100 / 2048 ~ 21.5 Hz
+            // (Assuming Default AudioContext SampleRate, typically 44.1k or 48k. Using safe defaults)
+            const sr = this.audioContext.sampleRate;
+            const binSize = sr / (bufferLength * 2); // bufferLength is fftSize/2 e.g. 1024. Wait, fftSize is 2048. So binSize = sr/2048.
+
+            // Define bands
+            const bin1k = Math.floor(1000 / binSize);
+            const bin4k = Math.floor(4000 / binSize);
+
+            let sumLow = 0;
+            let sumHigh = 0;
+
+            // Sum Energy (not dB)
+            for (let i = 1; i < bin1k; i++) { // Skip DC
+                sumLow += Math.pow(10, freqData[i] / 10);
+            }
+            for (let i = bin1k; i < bin4k; i++) {
+                sumHigh += Math.pow(10, freqData[i] / 10);
+            }
+
+            const dbLow = 10 * Math.log10(sumLow + 1e-10);
+            const dbHigh = 10 * Math.log10(sumHigh + 1e-10);
+
+            // 1k to 4k is 2 octaves.
+            // Tilt = (High - Low) / Octaves
+            const tilt = (dbHigh - dbLow) / 2.0;
+            // --------------------------------------
+
             // 1. Basic Signal Stats
             const rms = DSP.calculateRMS(dataArray);
             const intensity = DSP.calculateDB(rms, this.calibrationOffset);
             let maxAmp = 0;
             for (let i = 0; i < dataArray.length; i++) {
                 if (Math.abs(dataArray[i]) > maxAmp) maxAmp = Math.abs(dataArray[i]);
+            }
+
+            // Noise Gate check
+            if (maxAmp < (this.noiseGateThreshold || 0.01)) {
+                if (this.onAudioUpdate) {
+                    this.onAudioUpdate({
+                        volume: 0,
+                        pitch: 0,
+                        clarity: 0,
+                        intensity: -100,
+                        jitter: 0,
+                        shimmer: 0,
+                        hnr: 0,
+                        tilt: -20, // Default steep tilt for silence
+                        isSilent: true // Flag for UI to handle silence
+                    });
+                }
+                return; // Skip further processing for this frame
             }
 
             // 2. Pitch Detection (YIN)
@@ -454,7 +508,8 @@ export class AudioEngine {
                     intensity: intensity,
                     jitter: jitter,
                     shimmer: shimmer,
-                    hnr: hnr
+                    hnr: hnr,
+                    tilt: tilt || -20
                 });
             }
         };

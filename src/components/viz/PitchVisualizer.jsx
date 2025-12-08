@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
-import { RotateCcw, HelpCircle, AlertTriangle, X } from 'lucide-react';
+import { RotateCcw, HelpCircle, AlertTriangle, X, Sparkles, BarChart2 } from 'lucide-react';
 import { frequencyToNote, getCentsDeviation } from '../../utils/musicUtils';
 import { useAudio } from '../../context/AudioContext';
 import { useFeedback } from '../../hooks/useFeedback';
 import FeedbackControls from '../ui/FeedbackControls';
 import { NormsService } from '../../services/NormsService';
 import { renderCoordinator } from '../../services/RenderCoordinator';
+import { predictGenderPerception, getPerceptionColor, AMBIGUITY_ZONE } from '../../services/GenderPerceptionPredictor';
+import GenderTimeline from './GenderTimeline';
 
 const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, onScore, settings }) => {
     const { voiceProfiles } = useProfile();
@@ -20,6 +22,8 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
     const [zoomRange, setZoomRange] = useState({ min: 50, max: 350 });
     const [averagePitchRange, setAveragePitchRange] = useState({ lowest: null, highest: null });
     const [showUnstableHelp, setShowUnstableHelp] = useState(false);
+    const [ambiguityZoneData, setAmbiguityZoneData] = useState(null);
+    const [showGenderTimeline, setShowGenderTimeline] = useState(false);
 
     const label = userMode === 'slp' ? 'Fundamental Frequency (F0)' : 'Pitch';
     const { audioEngineRef } = useAudio();
@@ -54,6 +58,53 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
         setAveragePitchRange({ lowest: null, highest: null });
     };
 
+    // Touch gesture state for pinch-to-zoom
+    const touchesRef = useRef([]);
+    const initialPinchDistRef = useRef(null);
+    const initialZoomRef = useRef(null);
+
+    const handlePointerDown = (e) => {
+        touchesRef.current.push({ id: e.pointerId, x: e.clientX, y: e.clientY });
+        if (touchesRef.current.length === 2) {
+            // Start pinch
+            const [t1, t2] = touchesRef.current;
+            initialPinchDistRef.current = Math.hypot(t2.x - t1.x, t2.y - t1.y);
+            initialZoomRef.current = { ...zoomRange };
+        }
+    };
+
+    const handlePointerMove = (e) => {
+        const idx = touchesRef.current.findIndex(t => t.id === e.pointerId);
+        if (idx !== -1) {
+            touchesRef.current[idx] = { id: e.pointerId, x: e.clientX, y: e.clientY };
+        }
+
+        if (touchesRef.current.length === 2 && initialPinchDistRef.current) {
+            const [t1, t2] = touchesRef.current;
+            const currentDist = Math.hypot(t2.x - t1.x, t2.y - t1.y);
+            const scale = initialPinchDistRef.current / currentDist; // Inverted: pinch out = zoom in
+
+            const initialRange = initialZoomRef.current.max - initialZoomRef.current.min;
+            const newRange = Math.max(50, Math.min(1000, initialRange * scale));
+            const center = (initialZoomRef.current.min + initialZoomRef.current.max) / 2;
+
+            setZoomRange({
+                min: Math.max(0, center - newRange / 2),
+                max: center + newRange / 2
+            });
+        }
+    };
+
+    const handlePointerUp = (e) => {
+        touchesRef.current = touchesRef.current.filter(t => t.id !== e.pointerId);
+        if (touchesRef.current.length < 2) {
+            initialPinchDistRef.current = null;
+            initialZoomRef.current = null;
+        }
+    };
+
+    const handlePointerCancel = handlePointerUp;
+
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -67,33 +118,49 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                 return colorBlindMode ? '#9333ea' : '#ef4444';
             }
 
+            // Check Settings Mode
+            const mode = settings?.genderFeedbackMode || 'neutral'; // Default to neutral if undefined
+
             const fem = voiceProfiles.find(p => p.id === 'fem');
             const masc = voiceProfiles.find(p => p.id === 'masc');
 
             const femRange = fem?.genderRange || fem?.targetRange;
             const mascRange = masc?.genderRange || masc?.targetRange;
 
+            // Target Zone (Always Winning Color)
             if (targetRange && freq >= targetRange.min && freq <= targetRange.max) {
                 if (colorBlindMode) return '#0d9488';
-                return '#22c55e';
+                return '#22c55e'; // Green
             }
 
+            // Near Miss Zone
             if (targetRange) {
                 const distMin = 1200 * Math.log2(freq / targetRange.min);
                 const distMax = 1200 * Math.log2(freq / targetRange.max);
 
                 if ((distMin > -50 && distMin < 0) || (distMax > 0 && distMax < 50)) {
                     if (colorBlindMode) return '#f59e0b';
-                    return '#eab308';
+                    return '#eab308'; // Yellow
                 }
             }
 
+            // If Neutral or Off, avoid gendered colors
+            if (mode === 'neutral') {
+                if (freq < 155) return '#6366f1'; // Indigo (Low)
+                if (freq > 185) return '#f59e0b'; // Amber (High)
+                return '#10b981'; // Emerald (Mid/Target-ish)
+            }
+            if (mode === 'off') {
+                return '#94a3b8'; // Slate (Neutral feedback)
+            }
+
+            // Default Gendered Colors
             if (femRange && freq >= femRange.min && freq <= femRange.max) {
-                return '#e879f9';
+                return '#e879f9'; // Pink
             }
 
             if (mascRange && freq >= mascRange.min && freq <= mascRange.max) {
-                return '#60a5fa';
+                return '#60a5fa'; // Blue
             }
 
             if (colorBlindMode) return '#9333ea';
@@ -101,6 +168,7 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
         };
 
         const loop = () => {
+            // ... (context init omitted, assumes mostly unchanged logic till drawing) ...
             if (!canvas) return;
             const rect = canvas.getBoundingClientRect();
             canvas.width = rect.width * dpr;
@@ -111,6 +179,7 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
             const height = rect.height;
             ctx.clearRect(0, 0, width, height);
 
+            // ... (grid drawing lines 114-133 omitted) ...
             const yMin = zoomRange.min;
             const yMax = zoomRange.max;
             const mapY = (freq) => height - ((freq - yMin) / (yMax - yMin)) * height;
@@ -133,8 +202,9 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
             ctx.stroke();
 
             const showNorms = settings?.showNorms !== false;
+            const mode = settings?.genderFeedbackMode || 'neutral';
 
-            if (showNorms) {
+            if (showNorms && mode !== 'off') {
                 let genderId = null;
                 const targetCenter = (targetRange.min + targetRange.max) / 2;
                 if (targetCenter < 160) genderId = 'masculine';
@@ -148,6 +218,14 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                     const normBotY = mapY(norms.pitch.min);
                     const normH = Math.abs(normBotY - normTopY);
 
+                    // Override label for neutral mode
+                    let label = norms.pitch.label;
+                    if (mode === 'neutral') {
+                        if (genderId === 'masculine') label = 'Typical Low Range';
+                        else if (genderId === 'feminine') label = 'Typical High Range';
+                        else label = 'Mid Range';
+                    }
+
                     if (normTopY < height && normBotY > 0) {
                         ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
                         ctx.fillRect(30, normTopY, width - 30, normH);
@@ -155,7 +233,7 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                         ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
                         ctx.font = 'italic 10px sans-serif';
                         ctx.textAlign = 'right';
-                        ctx.fillText(norms.pitch.label, width - 10, normTopY + 12);
+                        ctx.fillText(label, width - 10, normTopY + 12);
                     }
                 }
             }
@@ -209,6 +287,24 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                 ctx.font = 'bold 10px sans-serif';
                 ctx.textAlign = 'left';
                 ctx.fillText(`Home: ${Math.round(settings.homeNote)} Hz`, 35, homeY - 5);
+            }
+
+            // Crossover point marker at 157 Hz (gender-neutral point based on research)
+            const crossoverFreq = 157;
+            if (crossoverFreq > yMin && crossoverFreq < yMax && mode !== 'off') {
+                const crossY = mapY(crossoverFreq);
+                ctx.strokeStyle = 'rgba(168, 85, 247, 0.5)'; // Purple
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(30, crossY);
+                ctx.lineTo(width, crossY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = 'rgba(168, 85, 247, 0.7)';
+                ctx.font = 'italic 9px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText('Crossover ~157 Hz', width - 10, crossY - 3);
             }
 
             if (exercise) {
@@ -303,6 +399,21 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                     lowest: prev.lowest === null ? currentP : Math.min(prev.lowest, currentP),
                     highest: prev.highest === null ? currentP : Math.max(prev.highest, currentP)
                 }));
+
+                // Check if in ambiguity zone and update state
+                const f1 = dataRef.current.f1 || 0;
+                const rbi = dataRef.current.resonanceScore;
+                if (currentP >= AMBIGUITY_ZONE.min && currentP <= AMBIGUITY_ZONE.max) {
+                    const prediction = predictGenderPerception(currentP, f1, rbi);
+                    setAmbiguityZoneData({
+                        pitch: currentP,
+                        f1,
+                        rbi,
+                        prediction
+                    });
+                } else {
+                    setAmbiguityZoneData(null);
+                }
             }
 
             if (currentP > 0) {
@@ -412,7 +523,49 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                 </button>
             </div>
 
-            <canvas ref={canvasRef} className="w-full h-full"></canvas>
+            <canvas
+                ref={canvasRef}
+                className="w-full h-full touch-none"
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerCancel}
+            ></canvas>
+
+            {/* Gender Timeline Toggle */}
+            <button
+                onClick={() => setShowGenderTimeline(!showGenderTimeline)}
+                className={`absolute top-3 left-28 z-20 p-2 rounded-lg backdrop-blur-sm border transition-all ${showGenderTimeline
+                        ? 'bg-purple-500/30 border-purple-500/50 text-purple-300'
+                        : 'bg-slate-800/80 border-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-700'
+                    }`}
+                title="Toggle Gender Timeline"
+            >
+                <BarChart2 size={16} />
+            </button>
+
+            {/* Gender Timeline Overlay */}
+            {showGenderTimeline && (
+                <div className="absolute inset-0 z-10 bg-slate-900/95 backdrop-blur-sm rounded-xl p-4 animate-in fade-in duration-200">
+                    <div className="h-full flex flex-col">
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="text-sm font-bold text-purple-300 flex items-center gap-2">
+                                <BarChart2 size={16} />
+                                Gender Estimation Timeline
+                            </div>
+                            <button
+                                onClick={() => setShowGenderTimeline(false)}
+                                className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white"
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+                        <div className="flex-1 min-h-0">
+                            <GenderTimeline dataRef={dataRef} duration={10} />
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {dataRef.current?.pitch > 0 && (dataRef.current?.clarity || 0) < 0.8 && (
                 <div className="absolute top-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-30">
@@ -425,6 +578,47 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
                         >
                             <HelpCircle size={14} />
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Ambiguity Zone Alert */}
+            {ambiguityZoneData && settings?.genderFeedbackMode !== 'off' && (
+                <div className="absolute bottom-4 left-4 z-30 animate-in fade-in slide-in-from-left-2 duration-300">
+                    <div className="flex items-start gap-3 bg-purple-900/80 backdrop-blur-sm border border-purple-500/40 rounded-xl px-4 py-3 shadow-lg max-w-xs">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
+                            <Sparkles className="text-purple-400" size={16} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="text-[10px] font-bold text-purple-300 uppercase tracking-wider mb-1">
+                                Ambiguity Zone
+                            </div>
+                            <div className="text-xs text-purple-100 mb-2">
+                                Resonance is now the deciding factor
+                            </div>
+                            <div className="flex gap-3 text-[10px]">
+                                <div>
+                                    <span className="text-purple-400">F1:</span>
+                                    <span className="text-white font-mono ml-1">
+                                        {ambiguityZoneData.f1 > 0 ? `${Math.round(ambiguityZoneData.f1)} Hz` : '--'}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span className="text-purple-400">RBI:</span>
+                                    <span className="text-white font-mono ml-1">
+                                        {ambiguityZoneData.rbi !== undefined ? `${Math.round(ambiguityZoneData.rbi)}%` : '--'}
+                                    </span>
+                                </div>
+                            </div>
+                            {ambiguityZoneData.prediction && (
+                                <div
+                                    className="mt-2 text-xs font-bold"
+                                    style={{ color: getPerceptionColor(ambiguityZoneData.prediction.score, colorBlindMode) }}
+                                >
+                                    → {ambiguityZoneData.prediction.label}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

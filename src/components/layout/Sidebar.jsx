@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Home, Mic, BookOpen, Activity, Dumbbell, BarChart2, Settings, Menu, X, ChevronRight, User } from 'lucide-react';
+import { Home, Mic, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, User, Waves } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigation } from '../../context/NavigationContext';
 import ProfileManager from '../ui/ProfileManager';
 import Login from '../ui/Login';
 import Signup from '../ui/Signup';
@@ -16,17 +17,15 @@ const Sidebar = ({ activeView, onViewChange }) => {
     const [showSignup, setShowSignup] = useState(false);
     const { activeProfile } = useProfile();
     const { user, logout } = useAuth();
+    const { openModal } = useNavigation();
 
+    // Consolidated navigation: 6 items instead of 12
     const navItems = [
         { id: 'dashboard', label: 'Dashboard', icon: <Home size={20} /> },
         { id: 'practice', label: 'Practice', icon: <Activity size={20} /> },
-        { id: 'analysis', label: 'Voice Analysis', icon: <Mic size={20} /> },
-        { id: 'assessment', label: 'Voice Assessment', icon: <BookOpen size={20} /> },
-        { id: 'acoustics', label: 'Acoustic Analysis', icon: <Activity size={20} /> },
-        { id: 'vowels', label: 'Resonance Lab', icon: <Mic size={20} /> },
-        { id: 'phonetogram', label: 'Voice Range', icon: <BarChart2 size={20} /> },
-        { id: 'training', label: 'Training Gym', icon: <Dumbbell size={20} /> },
-        { id: 'history', label: 'History & Progress', icon: <BarChart2 size={20} /> },
+        { id: 'analysis', label: 'Analysis', icon: <Waves size={20} /> },
+        { id: 'history', label: 'History', icon: <BarChart2 size={20} /> },
+        { id: 'coach', label: 'Coach', icon: <BookOpen size={20} /> },
         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
     ];
 
@@ -64,17 +63,23 @@ const Sidebar = ({ activeView, onViewChange }) => {
                             <button
                                 key={item.id}
                                 onClick={() => {
-                                    onViewChange(item.id);
+                                    if (item.isModal) {
+                                        openModal(item.id);
+                                    } else {
+                                        onViewChange(item.id);
+                                    }
                                     setIsOpen(false);
                                 }}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeView === item.id
-                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
-                                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${item.isModal
+                                    ? 'text-violet-400 hover:bg-violet-500/10 hover:text-violet-300 border border-violet-500/20'
+                                    : activeView === item.id
+                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
+                                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                                     }`}
                             >
                                 {item.icon}
                                 <span className="font-medium">{item.label}</span>
-                                {activeView === item.id && <ChevronRight size={16} className="ml-auto opacity-50" />}
+                                {!item.isModal && activeView === item.id && <ChevronRight size={16} className="ml-auto opacity-50" />}
                             </button>
                         ))}
                     </nav>

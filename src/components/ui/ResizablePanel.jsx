@@ -10,6 +10,18 @@ const ResizablePanel = ({
     defaultWidth = "50%",
     onResize
 }) => {
+    // Detect if we're on a mobile device
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 640);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
     // We only manage height and width. 
     // Initial width might be 'auto' or controlled by flex, so we might not set it initially.
     const [dimensions, setDimensions] = useState({ width: defaultWidth, height: defaultHeight });
@@ -19,6 +31,8 @@ const ResizablePanel = ({
     const startDims = useRef({ width: 0, height: 0 });
 
     const handleMouseDown = (e) => {
+        if (isMobile) return; // Disable resizing on mobile
+
         e.preventDefault();
         e.stopPropagation();
 
@@ -45,7 +59,8 @@ const ResizablePanel = ({
         const dx = e.clientX - startPos.current.x;
         const dy = e.clientY - startPos.current.y;
 
-        const newWidth = Math.max(minWidth, startDims.current.width + dx);
+        const effectiveMinWidth = isMobile ? 0 : minWidth;
+        const newWidth = Math.max(effectiveMinWidth, startDims.current.width + dx);
         const newHeight = Math.max(minHeight, startDims.current.height + dy);
 
         setDimensions({ width: newWidth, height: newHeight });
@@ -64,6 +79,8 @@ const ResizablePanel = ({
     };
 
     const handleTouchStart = (e) => {
+        if (isMobile) return; // Disable resizing on mobile
+
         e.stopPropagation();
         const touch = e.touches[0];
         const rect = panelRef.current.getBoundingClientRect();
@@ -85,7 +102,8 @@ const ResizablePanel = ({
         const dx = touch.clientX - startPos.current.x;
         const dy = touch.clientY - startPos.current.y;
 
-        const newWidth = Math.max(minWidth, startDims.current.width + dx);
+        const effectiveMinWidth = isMobile ? 0 : minWidth;
+        const newWidth = Math.max(effectiveMinWidth, startDims.current.width + dx);
         const newHeight = Math.max(minHeight, startDims.current.height + dy);
 
         setDimensions({ width: newWidth, height: newHeight });
@@ -122,28 +140,38 @@ const ResizablePanel = ({
         };
     }, [isResizing]);
 
+    // On mobile, use full width and auto height
+    const mobileStyle = isMobile ? {
+        width: '100%',
+        minWidth: 0,
+        height: 'auto',
+        minHeight: dimensions.height
+    } : {
+        height: dimensions.height,
+        width: dimensions.width ?? undefined, // Use undefined to let CSS take over if null
+        transition: isResizing ? 'none' : 'width 0.2s, height 0.2s'
+    };
+
     return (
         <div
             ref={panelRef}
             className={`relative group ${className}`}
-            style={{
-                height: dimensions.height,
-                width: dimensions.width ?? undefined, // Use undefined to let CSS take over if null
-                transition: isResizing ? 'none' : 'width 0.2s, height 0.2s'
-            }}
+            style={mobileStyle}
         >
             {children}
 
-            {/* Resize Handle */}
-            <div
-                className={`absolute bottom-0 right-0 p-1 cursor-nwse-resize z-50 opacity-0 group-hover:opacity-100 transition-opacity ${isResizing ? 'opacity-100' : ''}`}
-                onMouseDown={handleMouseDown}
-                onTouchStart={handleTouchStart}
-            >
-                <div className="w-6 h-6 bg-slate-800/80 backdrop-blur-sm rounded-tl-lg border-t border-l border-white/20 flex items-center justify-center shadow-lg hover:bg-blue-500/80 transition-colors">
-                    <GripHorizontal size={16} className="text-white/70 transform -rotate-45" />
+            {/* Resize Handle - Hidden on mobile */}
+            {!isMobile && (
+                <div
+                    className={`absolute bottom-0 right-0 p-1 cursor-nwse-resize z-50 opacity-0 group-hover:opacity-100 transition-opacity ${isResizing ? 'opacity-100' : ''}`}
+                    onMouseDown={handleMouseDown}
+                    onTouchStart={handleTouchStart}
+                >
+                    <div className="w-6 h-6 bg-slate-800/80 backdrop-blur-sm rounded-tl-lg border-t border-l border-white/20 flex items-center justify-center shadow-lg hover:bg-blue-500/80 transition-colors">
+                        <GripHorizontal size={16} className="text-white/70 transform -rotate-45" />
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Resize Overlay to prevent iframe/interaction interference during resize */}
             {

@@ -86,6 +86,13 @@ const CommandPalette = () => {
             icon: Command,
             category: 'Exercises',
             action: () => openModal('assessment')
+        },
+        {
+            id: 'modal-practice-cards',
+            label: 'Open Practice Cards',
+            icon: Book,
+            category: 'Exercises',
+            action: () => openModal('practiceCards')
         }
     ];
 

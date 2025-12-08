@@ -20,7 +20,7 @@ export const NORMS = {
         resonance: { min: 140, max: 180, label: 'Brighter Resonance' }
     },
     [GENDER_IDENTITIES.ANDROGYNOUS]: {
-        pitch: { min: 145, max: 185, label: 'Androgynous Range (145-185Hz)' },
+        pitch: { min: 135, max: 185, label: 'Androgynous Range (135-185Hz)' },
         resonance: { min: 110, max: 150, label: 'Neutral Resonance' }
     }
 };

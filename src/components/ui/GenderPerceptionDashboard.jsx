@@ -2,14 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Activity, Target, Lightbulb } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 import { useProfile } from '../../context/ProfileContext';
+import { predictGenderPerception, getPerceptionLabel, getPerceptionColor } from '../../services/GenderPerceptionPredictor';
 
 const GenderPerceptionDashboard = ({ dataRef, view }) => {
     const { settings } = useSettings();
     const { activeProfile, targetRange } = useProfile();
-    const { colorBlindMode } = settings;
+    const { colorBlindMode, genderFeedbackMode = 'neutral' } = settings;
 
     const [metrics, setMetrics] = useState({
-        perception: 'Androgynous',
+        perception: '--',
         pitch: 0,
         resonance: 0,
         weight: 50,
@@ -17,7 +18,8 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
         f2: 0,
         jitter: 0,
         shimmer: 0,
-        tilt: 0
+        tilt: 0,
+        score: 0.5
     });
 
     useEffect(() => {
@@ -26,11 +28,14 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
 
             const { pitch, resonance, weight, f1, f2, jitter, shimmer, tilt } = dataRef.current;
 
-            // Calculate gender perception based on pitch
-            let perception = 'Androgynous';
+            let perception = '--';
+            let score = 0.5;
+
             if (pitch > 0) {
-                if (pitch < 145) perception = 'Masculine';
-                else if (pitch > 175) perception = 'Feminine';
+                // Use shared logic for consistent scoring/labeling across the app
+                const prediction = predictGenderPerception(pitch, f1);
+                perception = getPerceptionLabel(prediction.score, genderFeedbackMode);
+                score = prediction.score;
             }
 
             setMetrics({
@@ -42,7 +47,8 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
                 f2: f2 || 0,
                 jitter: jitter || 0,
                 shimmer: shimmer || 0,
-                tilt: tilt || 0
+                tilt: tilt || 0,
+                score
             });
         };
 
@@ -58,21 +64,28 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
         return () => {
             if (unsubscribe) unsubscribe();
         };
-    }, [dataRef]);
+    }, [dataRef, genderFeedbackMode]);
 
-    const getPerceptionColor = () => {
+    const getDashboardColor = () => {
+        if (metrics.perception === '--') return 'text-slate-400 bg-slate-500/10 border-slate-500/30';
+        // Reuse shared color logic but adapt for background styles
+        const hex = getPerceptionColor(metrics.score, colorBlindMode);
+
+        // We need to return tailwind classes, so this is a bit of a hybrid approach
+        // ideally we'd rewrite getPerceptionColor to return semantic names, but for now we'll match manually
+        // based on the score to keep visual consistency with the Badge
+
         if (colorBlindMode) {
-            switch (metrics.perception) {
-                case 'Masculine': return 'text-teal-400 bg-teal-500/10 border-teal-500/30';
-                case 'Feminine': return 'text-purple-400 bg-purple-500/10 border-purple-500/30';
-                default: return 'text-white bg-slate-500/10 border-slate-500/30';
-            }
+            if (metrics.score < 0.3) return 'text-teal-400 bg-teal-500/10 border-teal-500/30';
+            if (metrics.score > 0.7) return 'text-purple-400 bg-purple-500/10 border-purple-500/30';
+            return 'text-indigo-400 bg-indigo-500/10 border-indigo-500/30';
         }
-        switch (metrics.perception) {
-            case 'Masculine': return 'text-blue-400 bg-blue-500/10 border-blue-500/30';
-            case 'Feminine': return 'text-pink-400 bg-pink-500/10 border-pink-500/30';
-            default: return 'text-purple-400 bg-purple-500/10 border-purple-500/30';
-        }
+
+        if (metrics.score < 0.25) return 'text-blue-400 bg-blue-500/10 border-blue-500/30';
+        if (metrics.score > 0.75) return 'text-pink-400 bg-pink-500/10 border-pink-500/30';
+        if (metrics.score >= 0.45 && metrics.score <= 0.55) return 'text-purple-400 bg-purple-500/10 border-purple-500/30';
+
+        return 'text-indigo-400 bg-indigo-500/10 border-indigo-500/30';
     };
 
     const getResonanceLabel = () => {
@@ -166,14 +179,20 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
             {/* Header */}
             <div className="flex items-center gap-2 mb-2 shrink-0">
                 <Activity className="w-4 h-4 text-slate-400" />
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Gender Perception</h3>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                    {genderFeedbackMode === 'neutral' ? 'Range Analysis' : 'Gender Perception'}
+                </h3>
             </div>
 
-            {/* Perception Badge */}
-            <div className={`mb-2 px-4 py-3 rounded-lg border ${getPerceptionColor()} text-center shrink-0`}>
-                <div className="text-xs font-bold uppercase tracking-wider opacity-60 mb-1">Current Perception</div>
-                <div className="text-2xl font-bold">{metrics.perception}</div>
-            </div>
+            {/* Perception Badge - Hidden in 'off' mode */}
+            {genderFeedbackMode !== 'off' && (
+                <div className={`mb-2 px-4 py-3 rounded-lg border ${getDashboardColor()} text-center shrink-0`}>
+                    <div className="text-xs font-bold uppercase tracking-wider opacity-60 mb-1">
+                        {genderFeedbackMode === 'neutral' ? 'Current Range' : 'Current Perception'}
+                    </div>
+                    <div className="text-2xl font-bold">{metrics.perception}</div>
+                </div>
+            )}
 
             {/* Target & Advice Section (New) */}
             {(targetInfo || advice) && (

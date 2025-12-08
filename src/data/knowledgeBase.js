@@ -118,7 +118,7 @@ export const KNOWLEDGE_BASE = [
         id: 'masc_01',
         tags: ['masculinization', 'tips', 'summary', 'trans man'],
         question: "What are the key pillars of voice masculinization?",
-        answer: "The three main pillars are:\n\n1. **Resonance (R1):** Lengthening the vocal tract for a darker, deeper sound.\n2. **Pitch:** Lowering the average fundamental frequency (usually below 145Hz).\n3. **Weight:** Increasing vocal weight for a fuller, buzzier tone.\n\n*Monotone delivery can also help perceive masculinity.*",
+        answer: "The three main pillars are:\n\n1. **Resonance (R1):** Lengthening the vocal tract for a darker, deeper sound.\n2. **Pitch:** Lowering the average fundamental frequency (usually below 135Hz).\n3. **Weight:** Increasing vocal weight for a fuller, buzzier tone.\n\n*Monotone delivery can also help perceive masculinity.*",
         category: "Masculinization"
     },
     {

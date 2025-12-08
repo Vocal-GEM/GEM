@@ -59,8 +59,8 @@ This isn't just a tutorial – it's a personal coaching experience designed to t
 
 | Range | Typical Association |
 |-------|---------------------|
-| 85-145 Hz | Masculine range |
-| 145-175 Hz | Androgynous range |
+| 85-135 Hz | Masculine range |
+| 135-175 Hz | Androgynous range |
 | 165-255 Hz | Feminine range |
 
 ### The Truth About Pitch

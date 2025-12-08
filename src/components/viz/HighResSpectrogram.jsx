@@ -1,9 +1,39 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo, useState, useCallback } from 'react';
+import { useSettings } from '../../context/SettingsContext';
+import { generateColormap } from '../../utils/colormaps';
+import { Camera, X } from 'lucide-react';
+
+/**
+ * Convert frequency to musical note with cents
+ */
+const hzToNote = (hz) => {
+    if (hz <= 0) return '—';
+    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const midi = 12 * Math.log2(hz / 440) + 69;
+    const noteIndex = Math.round(midi) % 12;
+    const octave = Math.floor(Math.round(midi) / 12) - 1;
+    const cents = Math.round((midi - Math.round(midi)) * 100);
+    const centsStr = cents >= 0 ? `+${cents}` : `${cents}`;
+    return `${noteNames[noteIndex]}${octave} (${centsStr}¢)`;
+};
+
+const MAX_FREQ = 8000;
 
 const HighResSpectrogram = ({ dataRef }) => {
     const canvasRef = useRef(null);
     const tempCanvasRef = useRef(null);
     const lastFormantsRef = useRef({ f1: 0, f2: 0 });
+    const { settings } = useSettings();
+
+    // Tap cursor state  
+    const [cursorData, setCursorData] = useState(null);
+    const [showControls, setShowControls] = useState(false);
+
+    // Dynamic colormap based on settings
+    const colormap = useMemo(
+        () => generateColormap(settings.spectrogramColorScheme),
+        [settings.spectrogramColorScheme]
+    );
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -24,39 +54,6 @@ const HighResSpectrogram = ({ dataRef }) => {
 
         tempCanvas.width = canvas.width;
         tempCanvas.height = canvas.height;
-
-        // Generate Viridis-like Colormap (Clinical standard)
-        // Dark Blue -> Green -> Yellow
-        const colormap = new Uint32Array(256);
-        for (let i = 0; i < 256; i++) {
-            const t = i / 255;
-            // Simple approximation of Viridis
-            // R: increasing from 0.2
-            // G: increasing
-            // B: decreasing then increasing?
-            // Let's use a "Magma" or "Inferno" style: Black -> Purple -> Orange -> Yellow
-
-            let r, g, b;
-            if (t < 0.25) { // Black to Purple
-                r = t * 4 * 100;
-                g = 0;
-                b = t * 4 * 150;
-            } else if (t < 0.5) { // Purple to Red
-                r = 100 + (t - 0.25) * 4 * 155;
-                g = 0;
-                b = 150 - (t - 0.25) * 4 * 100;
-            } else if (t < 0.75) { // Red to Orange
-                r = 255;
-                g = (t - 0.5) * 4 * 128;
-                b = 50;
-            } else { // Orange to Yellow/White
-                r = 255;
-                g = 128 + (t - 0.75) * 4 * 127;
-                b = 50 + (t - 0.75) * 4 * 205;
-            }
-
-            colormap[i] = (255 << 24) | (Math.floor(b) << 16) | (Math.floor(g) << 8) | Math.floor(r);
-        }
 
         let animationId;
 
@@ -79,26 +76,14 @@ const HighResSpectrogram = ({ dataRef }) => {
             const imgData = ctx.createImageData(scrollSpeed, height);
             const data = new Uint32Array(imgData.data.buffer);
 
-            // Map spectrum to column
-            // Spectrum usually 1024 bins -> 24kHz
-            // We want 0-8kHz displayed (typical voice range harmonics)
-            // 8kHz is 1/3 of 24kHz
             const maxBin = Math.floor(spectrum.length / 3);
 
             for (let y = 0; y < height; y++) {
-                // Map y (0 at top) to frequency bin
-                // We want low freq at bottom
-                const freqRatio = (height - 1 - y) / height; // 0 at bottom, 1 at top
-
-                // Logarithmic frequency scale is better for voice
-                // But linear is easier to verify formants visually
-                // Let's stick to linear for now to match SpectrumAnalyzer
+                const freqRatio = (height - 1 - y) / height;
                 const binIndex = Math.floor(freqRatio * maxBin);
-
                 const val = spectrum[binIndex] || 0;
 
-                // Enhance contrast
-                let intensity = Math.log10(val + 1) * 60; // Boost
+                let intensity = Math.log10(val + 1) * 60;
                 intensity = Math.min(255, Math.max(0, intensity));
 
                 const color = colormap[Math.floor(intensity)];
@@ -118,30 +103,20 @@ const HighResSpectrogram = ({ dataRef }) => {
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
 
-            // Helper to draw formant line
             const drawFormant = (currFreq, lastFreq, color) => {
                 if (currFreq > 0 && lastFreq > 0) {
-                    // Map frequency to Y (0-8kHz)
-                    const currY = height * (1 - currFreq / 8000);
-                    const lastY = height * (1 - lastFreq / 8000);
-
-                    // Draw line from previous position (shifted left) to current
+                    const currY = height * (1 - currFreq / MAX_FREQ);
+                    const lastY = height * (1 - lastFreq / MAX_FREQ);
                     ctx.beginPath();
                     ctx.strokeStyle = color;
-                    // Previous point was at (width - scrollSpeed), now at (width - 2*scrollSpeed)
                     ctx.moveTo(width - scrollSpeed * 2, lastY);
                     ctx.lineTo(width - scrollSpeed, currY);
                     ctx.stroke();
                 }
             };
 
-            // Draw F1 (Red)
             drawFormant(f1, last.f1, 'rgba(255, 50, 50, 0.9)');
-
-            // Draw F2 (Red)
             drawFormant(f2, last.f2, 'rgba(255, 50, 50, 0.9)');
-
-            // Update history
             lastFormantsRef.current = { f1, f2 };
 
             animationId = requestAnimationFrame(loop);
@@ -159,11 +134,81 @@ const HighResSpectrogram = ({ dataRef }) => {
         return () => {
             if (unsubscribe) unsubscribe();
         };
+    }, [dataRef, colormap]);
+
+    /**
+     * Handle canvas click - show Hz/dB/Note at tap position
+     */
+    const handleCanvasClick = useCallback((e) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const y = e.clientY - rect.top;
+
+        // Map y to frequency
+        const canvasY = (y / rect.height) * canvas.height;
+        const freqRatio = 1 - (canvasY / canvas.height);
+        const frequency = freqRatio * MAX_FREQ;
+
+        // Get current dB from live spectrum
+        const spectrum = dataRef.current?.spectrum;
+        let dB = -100;
+        if (spectrum) {
+            const maxBin = Math.floor(spectrum.length / 3);
+            const binIndex = Math.floor(freqRatio * maxBin);
+            const val = spectrum[binIndex] || 0;
+            dB = val < 0 ? val : 20 * Math.log10(val + 0.00001);
+        }
+
+        setCursorData({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+            frequency: Math.round(frequency),
+            dB: dB.toFixed(1),
+            note: hzToNote(frequency)
+        });
     }, [dataRef]);
 
+    /**
+     * Take high-quality screenshot
+     */
+    const handleScreenshot = useCallback(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(canvas, 0, 0);
+
+        // Add labels
+        tempCtx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        tempCtx.font = '14px sans-serif';
+        tempCtx.textAlign = 'left';
+        [0, 2000, 4000, 6000, 8000].forEach(hz => {
+            const y = canvas.height * (1 - hz / MAX_FREQ);
+            tempCtx.fillText(`${hz < 1000 ? hz : hz / 1000 + 'k'} Hz`, 5, y + 4);
+        });
+
+        const link = document.createElement('a');
+        link.download = `spectrogram_hires_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
+        link.href = tempCanvas.toDataURL('image/png');
+        link.click();
+    }, []);
+
     return (
-        <div className="relative h-full w-full bg-black rounded-xl overflow-hidden border border-slate-800">
-            <canvas ref={canvasRef} className="w-full h-full" />
+        <div
+            className="relative h-full w-full bg-black rounded-xl overflow-hidden border border-slate-800"
+            onMouseEnter={() => setShowControls(true)}
+            onMouseLeave={() => setShowControls(false)}
+        >
+            <canvas
+                ref={canvasRef}
+                className="w-full h-full cursor-crosshair"
+                onClick={handleCanvasClick}
+            />
 
             {/* Overlay Labels */}
             <div className="absolute top-2 left-2 text-xs font-bold text-white/70 bg-black/50 px-2 rounded">
@@ -181,8 +226,48 @@ const HighResSpectrogram = ({ dataRef }) => {
                 <span>2k</span>
                 <span>0</span>
             </div>
+
+            {/* Tap Cursor Tooltip */}
+            {cursorData && (
+                <div
+                    className="absolute z-20 bg-slate-900/95 border border-teal-500/50 rounded-lg px-3 py-2 shadow-xl pointer-events-none animate-in fade-in zoom-in-95 duration-150"
+                    style={{
+                        left: Math.min(cursorData.x, 280) + 10,
+                        top: Math.max(10, cursorData.y - 60)
+                    }}
+                >
+                    <div className="text-teal-400 font-bold text-lg">{cursorData.frequency} Hz</div>
+                    <div className="text-slate-300 text-sm">{cursorData.dB} dB</div>
+                    <div className="text-amber-400 text-sm font-mono">{cursorData.note}</div>
+                    <button
+                        className="absolute -top-2 -right-2 w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center text-slate-500 hover:text-white pointer-events-auto"
+                        onClick={(e) => { e.stopPropagation(); setCursorData(null); }}
+                    >
+                        <X size={12} />
+                    </button>
+                </div>
+            )}
+
+            {/* Screenshot Button */}
+            {showControls && (
+                <button
+                    onClick={handleScreenshot}
+                    className="absolute top-2 right-2 p-2 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-white/70 hover:text-white transition-all z-10 animate-in fade-in duration-200"
+                    title="Save Screenshot"
+                >
+                    <Camera size={16} />
+                </button>
+            )}
+
+            {/* Tap hint */}
+            {showControls && !cursorData && (
+                <div className="absolute bottom-2 left-2 text-[10px] text-white/40 bg-black/50 px-2 py-1 rounded animate-in fade-in duration-200">
+                    Click to inspect Hz/dB
+                </div>
+            )}
         </div>
     );
 };
 
 export default HighResSpectrogram;
+

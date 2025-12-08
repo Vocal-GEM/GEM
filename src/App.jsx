@@ -25,17 +25,20 @@ const TrainingView = lazy(() => import('./components/views/TrainingView'));
 const ClinicalAssessmentView = lazy(() => import('./components/views/ClinicalAssessmentView'));
 const AcousticAnalysisView = lazy(() => import('./components/views/AcousticAnalysisView'));
 const SettingsView = lazy(() => import('./components/views/SettingsView'));
-const PhonetogramView = lazy(() => import('./components/views/PhonetogramView'));
+const AnalysisHub = lazy(() => import('./components/views/AnalysisHub'));
+const LearnView = lazy(() => import('./components/views/LearnView'));
 
 const TutorialWizard = lazy(() => import('./components/ui/TutorialWizard'));
 const CompassWizard = lazy(() => import('./components/ui/CompassWizard'));
 const CalibrationWizard = lazy(() => import('./components/ui/CalibrationWizard'));
 const HistoryView = lazy(() => import('./components/ui/HistoryView'));
-const CoachView = lazy(() => import('./components/ui/CoachView'));
+const CoachView = lazy(() => import('./components/views/CoachView'));
 const PracticeMode = lazy(() => import('./components/views/PracticeMode'));
 const AnalysisView = lazy(() => import('./components/views/AnalysisView'));
 const AdaptivePracticeSession = lazy(() => import('./components/views/AdaptivePracticeSession'));
 const GuidedJourney = lazy(() => import('./components/ui/GuidedJourney'));
+const PracticeCardsPanel = lazy(() => import('./components/ui/PracticeCardsPanel'));
+const ProgramView = lazy(() => import('./components/views/ProgramView'));
 
 // Lazy Loaded Components - Visualizations
 const ResonanceOrb = lazy(() => import('./components/viz/ResonanceOrb'));
@@ -230,7 +233,7 @@ const App = () => {
                         onDismiss={() => setDismissedError(true)}
                     />
 
-                    <main id="main-content" className="flex-1 w-full lg:ml-64 p-0">
+                    <main id="main-content" className="flex-1 w-full lg:ml-64 p-0 pb-20 lg:pb-0">
                         {activeTab === 'dashboard' && (
                             <Suspense fallback={<LoadingSpinner />}>
                                 <DashboardView
@@ -264,38 +267,16 @@ const App = () => {
                         {activeTab === 'analysis' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
-                                    <AnalysisView />
+                                    <AnalysisHub dataRef={dataRef} targetRange={targetRange} />
                                 </Suspense>
                             </div>
                         )}
 
-                        {activeTab === 'assessment' && (
-                            <Suspense fallback={<LoadingSpinner />}>
-                                <ClinicalAssessmentView />
-                            </Suspense>
-                        )}
 
-                        {activeTab === 'acoustics' && (
-                            <Suspense fallback={<LoadingSpinner />}>
-                                <AcousticAnalysisView />
-                            </Suspense>
-                        )}
 
-                        {activeTab === 'vowels' && (
+                        {activeTab === 'learn' && (
                             <Suspense fallback={<LoadingSpinner />}>
-                                <VowelTuningView />
-                            </Suspense>
-                        )}
-
-                        {activeTab === 'phonetogram' && (
-                            <Suspense fallback={<LoadingSpinner />}>
-                                <PhonetogramView />
-                            </Suspense>
-                        )}
-
-                        {activeTab === 'training' && (
-                            <Suspense fallback={<LoadingSpinner />}>
-                                <TrainingView />
+                                <LearnView />
                             </Suspense>
                         )}
 
@@ -303,6 +284,14 @@ const App = () => {
                             <Suspense fallback={<LoadingSpinner />}>
                                 <SettingsView />
                             </Suspense>
+                        )}
+
+                        {activeTab === 'program' && (
+                            <div className="p-4 lg:p-8">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    <ProgramView onNavigate={setActiveTab} />
+                                </Suspense>
+                            </div>
                         )}
 
                         {activeTab === 'history' && (
@@ -321,18 +310,29 @@ const App = () => {
                             </div>
                         )}
 
+                        {activeTab === 'assessment' && (
+                            <div className="p-4 lg:p-8">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    <ClinicalAssessmentView />
+                                </Suspense>
+                            </div>
+                        )}
+
                         {/* Modals & Overlays */}
                         <FeedbackSettings
-                            isOpen={showSettings}
-                            onClose={() => setShowSettings(false)}
+                            isOpen={showSettings || modals.settings}
+                            onClose={() => {
+                                setShowSettings(false);
+                                closeModal('settings');
+                            }}
                             settings={settings}
                             setSettings={updateSettings}
                             targetRange={targetRange}
                             onSetGoal={(type) => {
                                 let r = { min: 170, max: 220 };
                                 if (type === 'fem') r = { min: 165, max: 255 };
-                                if (type === 'masc') r = { min: 85, max: 145 };
-                                if (type === 'androg') r = { min: 145, max: 175 };
+                                if (type === 'masc') r = { min: 85, max: 135 };
+                                if (type === 'androg') r = { min: 135, max: 175 };
                                 updateTargetRange(r);
                             }}
                             onUpdateRange={(min, max) => updateTargetRange({ min, max })}
@@ -430,12 +430,22 @@ const App = () => {
                                 <GuidedJourney onClose={() => closeModal('guidedJourney')} />
                             </Suspense>
                         )}
+                        {modals.practiceCards && (
+                            <Suspense fallback={<LoadingSpinner />}>
+                                <PracticeCardsPanel onClose={() => closeModal('practiceCards')} />
+                            </Suspense>
+                        )}
 
                         <CelebrationModal
                             achievement={unlockedAchievement}
                             onClose={closeAchievement}
                         />
                     </main>
+
+                    {/* Mobile Bottom Navigation */}
+                    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
+                        <BottomNav activeTab={activeTab} onNavigate={setActiveTab} />
+                    </div>
                 </div>
             </LanguageProvider>
         </TourProvider >

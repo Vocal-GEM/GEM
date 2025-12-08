@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Book, FileText, TrendingUp, Calendar, Clock, Activity, BarChart2, Mic, Settings } from 'lucide-react';
+import { Book, FileText, TrendingUp, Calendar, Clock, Activity, BarChart2, Mic, Settings, Layers, X, Share2, Play } from 'lucide-react';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
+import ProgressCard from './ProgressCard';
+import RecordingsList from './RecordingsList';
 import { useProfile } from '../../context/ProfileContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSettings } from '../../context/SettingsContext';
 import { useTour } from '../../context/TourContext';
+import { usePracticeCards } from '../../context/PracticeCardsContext';
 import { pdfReportGenerator } from '../../utils/pdfReportGenerator';
 import {
     Chart as ChartJS,
@@ -36,9 +39,12 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
     const { t } = useLanguage();
     const { settings } = useSettings();
     const { startTour } = useTour();
+    const { cardSets } = usePracticeCards();
     const [sessions, setSessions] = useState([]);
     const [isGenerating, setIsGenerating] = useState(false);
-    const [activeTab, setActiveTab] = useState('overview'); // overview, sessions, journals
+    const [activeTab, setActiveTab] = useState('overview'); // overview, sessions, journals, recordings
+    const [cardFilter, setCardFilter] = useState(null); // Filter sessions by card set
+    const [showProgressCard, setShowProgressCard] = useState(false);
 
     useEffect(() => {
         const loadSessions = async () => {
@@ -53,6 +59,13 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
     useEffect(() => {
         startTour('history_view');
     }, []);
+
+    useEffect(() => {
+        if (activeTab === 'recordings') {
+            // Slight delay for list render
+            setTimeout(() => startTour('recordings_view'), 200);
+        }
+    }, [activeTab, startTour]);
 
     // Calculate Streak Dynamically
     const streak = useMemo(() => {
@@ -224,6 +237,15 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
                     <Activity size={16} aria-hidden="true" /> {t('history.sessions')}
                 </button>
                 <button
+                    onClick={() => setActiveTab('recordings')}
+                    className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 whitespace-nowrap transition-all ${activeTab === 'recordings' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
+                    role="tab"
+                    aria-selected={activeTab === 'recordings'}
+                    aria-controls="recordings-panel"
+                >
+                    <Mic size={16} aria-hidden="true" /> {t('history.recordings', 'Recordings')}
+                </button>
+                <button
                     onClick={() => setActiveTab('journals')}
                     className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 whitespace-nowrap transition-all ${activeTab === 'journals' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
                     role="tab"
@@ -237,7 +259,13 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
             {/* Overview Tab */}
             {activeTab === 'overview' && (
                 <div className="space-y-6" role="tabpanel" id="overview-panel">
-                    <div className="flex justify-end">
+                    <div className="flex justify-between items-center">
+                        <button
+                            onClick={() => setShowProgressCard(true)}
+                            className="px-3 py-1.5 bg-gradient-to-r from-pink-500/20 to-purple-500/20 hover:from-pink-500/30 hover:to-purple-500/30 border border-pink-500/30 text-pink-300 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all"
+                        >
+                            <Share2 size={12} /> Share Progress
+                        </button>
                         <button
                             onClick={() => window.dispatchEvent(new CustomEvent('openDashboardConfig'))}
                             className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
@@ -308,7 +336,33 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
             {/* Sessions Tab */}
             {activeTab === 'sessions' && (
                 <div className="space-y-4" role="tabpanel" id="sessions-panel">
-                    <h3 className="text-lg font-bold mb-2 px-1">{t('history.recentSessions')}</h3>
+                    <div className="flex justify-between items-center mb-2">
+                        <h3 className="text-lg font-bold px-1">{t('history.recentSessions')}</h3>
+                        {/* Card Set Filter */}
+                        <div className="flex items-center gap-2">
+                            {cardFilter && (
+                                <button
+                                    onClick={() => setCardFilter(null)}
+                                    className="flex items-center gap-1 px-2 py-1 bg-violet-500/20 text-violet-400 rounded-full text-xs font-bold hover:bg-violet-500/30 transition-colors"
+                                >
+                                    <X size={12} />
+                                    Clear
+                                </button>
+                            )}
+                            <select
+                                value={cardFilter || ''}
+                                onChange={(e) => setCardFilter(e.target.value || null)}
+                                className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-violet-500/50"
+                            >
+                                <option value="">All Sessions</option>
+                                <optgroup label="Practice Card Sets">
+                                    {cardSets.map(set => (
+                                        <option key={set.id} value={set.id}>{set.name}</option>
+                                    ))}
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
                     {sessions.length === 0 ? (
                         <EmptyState
                             icon={Activity}
@@ -337,6 +391,16 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
                             </div>
                         ))
                     )}
+                </div>
+            )}
+
+            {/* Recordings Tab */}
+            {activeTab === 'recordings' && (
+                <div role="tabpanel" id="recordings-panel">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-bold px-1">{t('history.recordings', 'Saved Recordings')}</h3>
+                    </div>
+                    <RecordingsList />
                 </div>
             )}
 
@@ -402,6 +466,19 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
                         )}
                     </div>
                 </div>
+            )}
+
+            {/* Progress Card Modal */}
+            {showProgressCard && (
+                <ProgressCard
+                    stats={{
+                        totalSeconds: stats?.totalSeconds || 0,
+                        currentStreak: streak,
+                        totalSessions: sessions.length,
+                        firstSessionDate: sessions.length > 0 ? sessions[sessions.length - 1]?.timestamp : null
+                    }}
+                    onClose={() => setShowProgressCard(false)}
+                />
             )}
         </div>
     );

@@ -1,15 +1,9 @@
 import React from 'react';
 import { HeartPulse, X } from 'lucide-react';
+import { vocalHealthTips } from '../../data/vocalHealthTips';
 
 const VocalHealthTips = ({ onClose }) => {
-    const tips = [
-        { icon: '💧', title: 'Stay Hydrated', desc: 'Drink plenty of water throughout the day. Avoid caffeine and alcohol before practice.' },
-        { icon: '🤫', title: 'Avoid Strain', desc: 'Never push through pain. If your voice hurts, stop and rest.' },
-        { icon: '😴', title: 'Rest Your Voice', desc: 'Take breaks during long practice sessions. Silence is healing.' },
-        { icon: '🚭', title: 'Avoid Irritants', desc: 'Smoking, vaping, and shouting can damage your vocal cords.' },
-        { icon: '🌡️', title: 'Warm Up First', desc: 'Always do gentle humming or sirens before intense exercises.' },
-        { icon: '🩺', title: 'See a Professional', desc: 'If you experience persistent hoarseness or pain, consult an SLP or ENT doctor.' }
-    ];
+    // Tips are now imported from data/vocalHealthTips.js
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
@@ -28,10 +22,12 @@ const VocalHealthTips = ({ onClose }) => {
                     </div>
 
                     <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-                        {tips.map((tip, i) => (
-                            <div key={i} className="bg-slate-800/50 p-4 rounded-xl border border-white/5 hover:border-emerald-500/30 transition-colors">
+                        {vocalHealthTips.map((tip, i) => (
+                            <div key={tip.id} className={`bg-slate-800/50 p-4 rounded-xl border border-${tip.color || 'emerald'}-500/20 hover:border-${tip.color || 'emerald'}-500/50 transition-colors`}>
                                 <div className="flex items-start gap-3">
-                                    <div className="text-3xl">{tip.icon}</div>
+                                    <div className={`p-2 rounded-lg bg-${tip.color || 'emerald'}-500/10`}>
+                                        {React.cloneElement(tip.icon, { size: 24 })}
+                                    </div>
                                     <div className="flex-1">
                                         <h3 className="font-bold text-white mb-1">{tip.title}</h3>
                                         <p className="text-sm text-slate-300 leading-relaxed">{tip.desc}</p>

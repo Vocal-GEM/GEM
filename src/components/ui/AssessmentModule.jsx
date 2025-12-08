@@ -4,7 +4,7 @@ import { useAudio } from '../../context/AudioContext';
 
 const RAINBOW_PASSAGE = `When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow.`;
 
-const AssessmentModule = ({ onClose }) => {
+const AssessmentModule = ({ onClose, embedded = false }) => {
     const { dataRef, isAudioActive, toggleAudio } = useAudio();
     const [isRecording, setIsRecording] = useState(false);
     const [results, setResults] = useState(null);
@@ -66,22 +66,24 @@ const AssessmentModule = ({ onClose }) => {
         }
     };
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in duration-300">
-            <div className="glass-panel max-w-2xl w-full p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden">
-                {/* Background Glow */}
-                <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -ml-20 -mt-20 animate-pulse"></div>
+    const content = (
+        <div className={`${embedded ? 'w-full h-full bg-transparent' : 'bg-slate-900 max-w-2xl w-full p-8 rounded-3xl border border-white/10 shadow-2xl'} relative overflow-hidden flex flex-col`}>
+            {/* Background Glow - Only if not embedded or different style */}
+            {!embedded && <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -ml-20 -mt-20 animate-pulse"></div>}
 
-                <div className="relative z-10">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-3xl font-bold text-white flex items-center gap-2">
-                            <ClipboardCheck className="text-blue-400" /> Baseline Assessment
-                        </h2>
+            <div className={`relative z-10 flex flex-col h-full ${embedded ? 'p-6' : ''}`}>
+                <div className="flex justify-between items-center mb-6 flex-shrink-0">
+                    <h2 className="text-3xl font-bold text-white flex items-center gap-2">
+                        <ClipboardCheck className="text-blue-400" /> Baseline Assessment
+                    </h2>
+                    {!embedded && onClose && (
                         <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
                             <X className="w-5 h-5 text-slate-400" />
                         </button>
-                    </div>
+                    )}
+                </div>
 
+                <div className="flex-1 overflow-y-auto custom-scrollbar">
                     <div className="bg-slate-800/50 p-6 rounded-2xl border border-white/5 mb-6">
                         <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">The Rainbow Passage</h3>
                         <p className="text-slate-200 leading-relaxed text-lg font-serif">
@@ -138,17 +140,29 @@ const AssessmentModule = ({ onClose }) => {
                                 >
                                     Try Again
                                 </button>
-                                <button
-                                    onClick={onClose}
-                                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-colors shadow-lg shadow-emerald-500/20"
-                                >
-                                    Done
-                                </button>
+                                {onClose && !embedded && (
+                                    <button
+                                        onClick={onClose}
+                                        className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-colors shadow-lg shadow-emerald-500/20"
+                                    >
+                                        Done
+                                    </button>
+                                )}
                             </div>
                         </div>
                     )}
                 </div>
             </div>
+        </div>
+    );
+
+    if (embedded) {
+        return content;
+    }
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in duration-300">
+            {content}
         </div>
     );
 };

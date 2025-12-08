@@ -1,171 +1,185 @@
-import React, { useState, useEffect } from 'react';
-import { Mic, CheckCircle, AlertTriangle, XCircle, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Mic, CheckCircle, AlertTriangle, Volume2, ArrowRight, Loader2 } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
+import { useSettings } from '../../context/SettingsContext';
 
-const EnvironmentCheck = ({ onComplete, onCancel }) => {
+const EnvironmentCheck = ({ onClose }) => {
     const { runEnvironmentCheck } = useAudio();
-    const [status, setStatus] = useState('idle'); // idle, checking, success, warning, error
+    const { settings, updateSettings } = useSettings();
+    const [status, setStatus] = useState('idle'); // idle, checking, success, error
     const [result, setResult] = useState(null);
-    const [progress, setProgress] = useState(0);
-
-    useEffect(() => {
-        startCheck();
-    }, []);
+    const [countdown, setCountdown] = useState(3);
 
     const startCheck = async () => {
         setStatus('checking');
-        setProgress(0);
-        setResult(null);
+        setCountdown(3);
 
-        // Simulate progress bar
-        const interval = setInterval(() => {
-            setProgress(p => Math.min(p + 5, 95));
-        }, 150);
+        // Simple countdown for UX
+        const timer = setInterval(() => {
+            setCountdown(prev => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
 
         try {
-            const data = await runEnvironmentCheck();
-            clearInterval(interval);
-            setProgress(100);
-            setResult(data);
-
-            if (data.score >= 80) {
-                setStatus('success');
-            } else if (data.score >= 50) {
-                setStatus('warning');
-            } else {
-                setStatus('error');
-            }
+            // Run the actual check (takes ~3s)
+            const analysis = await runEnvironmentCheck();
+            setResult(analysis);
+            setStatus('success');
         } catch (error) {
-            clearInterval(interval);
-            console.error("Environment check failed:", error);
+            console.error(error);
             setStatus('error');
-            setResult({ message: "Failed to access microphone or audio engine." });
+        } finally {
+            clearInterval(timer);
         }
     };
 
+    const applyOptimizations = () => {
+        if (!result) return;
+
+        // Calculate appropriate threshold based on noise floor
+        // Noise floor is in dB (e.g. -60dB).
+        // Threshold needs to be in Amplitude (0-1).
+        // 0dB = 1.0, -20dB = 0.1, -40dB = 0.01, -60dB = 0.001
+
+        // Let's be conservative: Threshold = NoiseFloor + 6dB (margin) converted to linear
+        // If noise floor is -50dB, threshold should be -44dB.
+        const margindB = 6;
+        const targetdB = (result.noiseFloor || -60) + margindB;
+        const targetThreshold = Math.pow(10, targetdB / 20);
+
+        // Ensure it's within sane bounds (0.001 to 0.1)
+        const safeThreshold = Math.min(Math.max(targetThreshold, 0.0001), 0.1);
+
+        updateSettings({
+            ...settings,
+            noiseGate: safeThreshold
+        });
+
+        if (onClose) onClose();
+    };
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-slate-900 border border-slate-700 rounded-3xl p-8 max-w-md w-full shadow-2xl relative overflow-hidden">
-
-                {/* Header */}
-                <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold text-white mb-2">Environment Check</h2>
-                    <p className="text-slate-400">Ensuring optimal audio conditions for your practice.</p>
+        <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-md mx-auto shadow-2xl">
+            <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                        <Volume2 size={24} />
+                    </div>
+                    <div>
+                        <h2 className="text-xl font-bold text-white">Environment Check</h2>
+                        <p className="text-sm text-slate-400">Optimize app for your room</p>
+                    </div>
                 </div>
-
-                {/* Content */}
-                <div className="min-h-[200px] flex flex-col items-center justify-center">
-
-                    {status === 'checking' && (
-                        <div className="w-full space-y-4">
-                            <div className="flex justify-center mb-4">
-                                <div className="relative">
-                                    <Mic className="w-12 h-12 text-blue-500 animate-pulse" />
-                                    <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-ping" />
-                                </div>
-                            </div>
-                            <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                                <div
-                                    className="bg-blue-500 h-full transition-all duration-150 ease-out"
-                                    style={{ width: `${progress}%` }}
-                                />
-                            </div>
-                            <p className="text-center text-sm text-blue-400 font-medium animate-pulse">Listening to room noise...</p>
-                        </div>
-                    )}
-
-                    {status === 'success' && (
-                        <div className="text-center space-y-4 animate-in zoom-in-95 duration-300">
-                            <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <CheckCircle className="w-10 h-10 text-green-400" />
-                            </div>
-                            <h3 className="text-xl font-bold text-green-400">Ready to Practice!</h3>
-                            <p className="text-slate-300">{result?.message}</p>
-                            <div className="grid grid-cols-2 gap-4 mt-4">
-                                <div className="bg-slate-800 p-3 rounded-xl">
-                                    <div className="text-xs text-slate-500 uppercase font-bold">Noise Floor</div>
-                                    <div className="text-lg font-mono text-white">{result?.noiseFloor} dB</div>
-                                </div>
-                                <div className="bg-slate-800 p-3 rounded-xl">
-                                    <div className="text-xs text-slate-500 uppercase font-bold">Score</div>
-                                    <div className="text-lg font-mono text-green-400">{result?.score}/100</div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {status === 'warning' && (
-                        <div className="text-center space-y-4 animate-in zoom-in-95 duration-300">
-                            <div className="w-20 h-20 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <AlertTriangle className="w-10 h-10 text-yellow-400" />
-                            </div>
-                            <h3 className="text-xl font-bold text-yellow-400">Check Audio</h3>
-                            <p className="text-slate-300">{result?.message}</p>
-                            <div className="grid grid-cols-2 gap-4 mt-4">
-                                <div className="bg-slate-800 p-3 rounded-xl">
-                                    <div className="text-xs text-slate-500 uppercase font-bold">Noise Floor</div>
-                                    <div className="text-lg font-mono text-white">{result?.noiseFloor} dB</div>
-                                </div>
-                                <div className="bg-slate-800 p-3 rounded-xl">
-                                    <div className="text-xs text-slate-500 uppercase font-bold">Score</div>
-                                    <div className="text-lg font-mono text-yellow-400">{result?.score}/100</div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {status === 'error' && (
-                        <div className="text-center space-y-4 animate-in zoom-in-95 duration-300">
-                            <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <XCircle className="w-10 h-10 text-red-400" />
-                            </div>
-                            <h3 className="text-xl font-bold text-red-400">Environment Issue</h3>
-                            <p className="text-slate-300">{result?.message || "Unknown error occurred."}</p>
-                            {result?.clipping > 0 && (
-                                <p className="text-sm text-red-300 bg-red-900/20 p-2 rounded">
-                                    ⚠️ Clipping detected ({result.clipping} samples). Lower your mic gain.
-                                </p>
-                            )}
-                        </div>
-                    )}
-
-                </div>
-
-                {/* Actions */}
-                <div className="mt-8 flex gap-3">
-                    <button
-                        onClick={onCancel}
-                        className="flex-1 py-3 rounded-xl font-bold text-slate-400 hover:bg-slate-800 transition-colors"
-                    >
-                        Cancel
-                    </button>
-
-                    {status !== 'checking' && (
-                        <>
-                            {status === 'error' ? (
-                                <button
-                                    onClick={startCheck}
-                                    className="flex-1 py-3 rounded-xl font-bold bg-slate-700 hover:bg-slate-600 text-white transition-colors flex items-center justify-center gap-2"
-                                >
-                                    <Loader2 size={18} /> Try Again
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={onComplete}
-                                    className={`flex-1 py-3 rounded-xl font-bold text-white transition-all shadow-lg flex items-center justify-center gap-2
-                                        ${status === 'warning'
-                                            ? 'bg-yellow-600 hover:bg-yellow-500 shadow-yellow-500/20'
-                                            : 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/20'
-                                        }`}
-                                >
-                                    {status === 'warning' ? 'Practice Anyway' : 'Start Practice'}
-                                </button>
-                            )}
-                        </>
-                    )}
-                </div>
-
             </div>
+
+            {status === 'idle' && (
+                <div className="space-y-4">
+                    <p className="text-slate-300">
+                        We'll listen to the background noise in your room to set the best microphone sensitivity.
+                    </p>
+                    <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                        <ul className="space-y-2 text-sm text-slate-400">
+                            <li className="flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                                Please remain silent during the check
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                                It takes about 3 seconds
+                            </li>
+                        </ul>
+                    </div>
+                    <button
+                        onClick={startCheck}
+                        className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all"
+                    >
+                        Start Check <ArrowRight size={18} />
+                    </button>
+                </div>
+            )}
+
+            {status === 'checking' && (
+                <div className="py-8 flex flex-col items-center justify-center space-y-4">
+                    <div className="relative">
+                        <Loader2 size={48} className="text-emerald-500 animate-spin" />
+                        <div className="absolute inset-0 flex items-center justify-center font-bold text-white text-xs">
+                            {countdown}
+                        </div>
+                    </div>
+                    <p className="text-slate-300 font-medium">Listening to background noise...</p>
+                </div>
+            )}
+
+            {status === 'success' && result && (
+                <div className="space-y-4">
+                    <div className="text-center mb-6">
+                        <div className={`text-3xl font-bold mb-1 ${result.score > 70 ? 'text-emerald-400' : result.score > 40 ? 'text-amber-400' : 'text-red-400'}`}>
+                            {result.score}/100
+                        </div>
+                        <p className="text-sm text-slate-400">Quality Score</p>
+                    </div>
+
+                    <div className="bg-slate-800/50 p-4 rounded-xl space-y-3 border border-slate-700">
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-slate-400">Noise Floor</span>
+                            <span className="text-slate-200 font-mono">{result.noiseFloor} dB</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-slate-400">Issues</span>
+                            <span className={result.clipping > 0 ? 'text-red-400 font-bold' : 'text-emerald-400'}>
+                                {result.clipping > 0 ? 'Clipping Detected' : 'None'}
+                            </span>
+                        </div>
+                        <div className="pt-2 border-t border-slate-700/50">
+                            <p className="text-xs text-slate-300 leading-relaxed">
+                                {result.message}
+                            </p>
+                        </div>
+                    </div>
+
+                    {result.score < 50 && (
+                        <div className="flex items-start gap-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                            <AlertTriangle size={16} className="text-amber-400 mt-0.5 shrink-0" />
+                            <p className="text-xs text-amber-200">
+                                Your environment is quite noisy. This may affect analysis accuracy. Try moving to a quieter room.
+                            </p>
+                        </div>
+                    )}
+
+                    <button
+                        onClick={applyOptimizations}
+                        className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all"
+                    >
+                        <CheckCircle size={18} /> Apply Optimization
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="w-full py-3 text-slate-400 hover:text-white text-sm font-medium"
+                    >
+                        Skip
+                    </button>
+                </div>
+            )}
+
+            {status === 'error' && (
+                <div className="text-center py-6 space-y-4">
+                    <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 mx-auto">
+                        <AlertTriangle size={24} />
+                    </div>
+                    <p className="text-slate-300">Could not access microphone or run analysis.</p>
+                    <button
+                        onClick={() => setStatus('idle')}
+                        className="px-6 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white font-bold"
+                    >
+                        Try Again
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

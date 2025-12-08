@@ -456,5 +456,108 @@
             "desc": "Selecciona una vocal y presiona Iniciar.",
             "button": "Iniciar Micrófono"
         }
+    },
+    "practiceCards": {
+        "title": "Tarjetas de Práctica",
+        "defaultSets": "Sets Predeterminados",
+        "mySets": "Mis Sets",
+        "createSet": "Crear Set Personalizado",
+        "editSet": "Editar Set de Tarjetas",
+        "deleteConfirm": "Clic de nuevo para confirmar",
+        "allLevels": "Todos los Niveles",
+        "cards": "tarjetas",
+        "practices": "prácticas",
+        "noSetsMatch": "Ningún set coincide con este filtro",
+        "noCustomSets": "Aún no hay sets personalizados",
+        "createYourOwn": "Crea tus propios sets abajo",
+        "cardOf": "Tarjeta {{current}} de {{total}}",
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "difficulty": {
+            "beginner": "Principiante",
+            "intermediate": "Intermedio",
+            "advanced": "Avanzado"
+        },
+        "focus": {
+            "pitch": "Tono",
+            "resonance": "Resonancia",
+            "intonation": "Entonación",
+            "articulation": "Articulación",
+            "general": "General"
+        },
+        "activity": {
+            "title": "Actividad de Tarjeta",
+            "subtitle": "Historial y estadísticas de práctica",
+            "totalPractices": "Prácticas",
+            "savedRecordings": "Guardadas",
+            "totalTime": "Tiempo Total",
+            "recentActivity": "Actividad Reciente",
+            "noHistory": "Sin historial de práctica aún",
+            "startPracticing": "Empieza a practicar esta tarjeta para seguir tu progreso",
+            "exploreRecordings": "Explorar {{count}} Grabación",
+            "exploreRecordings_plural": "Explorar {{count}} Grabaciones"
+        },
+        "editor": {
+            "setName": "Nombre del Set",
+            "description": "Descripción",
+            "difficultyLevel": "Nivel de Dificultad",
+            "cardText": "Ingresa el texto de la tarjeta...",
+            "focusArea": "Área de Enfoque",
+            "addCard": "Agregar Tarjeta",
+            "cancel": "Cancelar",
+            "create": "Crear Set",
+            "update": "Actualizar Set",
+            "validation": "Por favor llena el nombre del set y al menos una tarjeta"
+        }
+    },
+    "voiceAssessment": {
+        "title": "Evaluación Vocal",
+        "subtitle": "Análisis completo de las características de tu voz",
+        "tabs": {
+            "baseline": "Línea Base",
+            "selfAssess": "Autoevaluación",
+            "quickCheck": "Revisión Rápida"
+        },
+        "baseline": {
+            "title": "El Pasaje del Arcoíris",
+            "instruction": "Lee el pasaje a un ritmo cómodo. Analizaremos tu tono y rango.",
+            "start": "Iniciar Grabación",
+            "stop": "Detener Grabación"
+        },
+        "selfAssess": {
+            "instruction": "Graba tu voz, luego califica cómo crees que suena. ¡Revelaremos el análisis real!",
+            "rateTitle": "Califica Tu Voz:",
+            "reveal": "Revelar Análisis",
+            "results": "Resultados del Análisis",
+            "yourGuess": "Tu estimación",
+            "actual": "Real"
+        },
+        "quickCheck": {
+            "title": "Revisión Rápida de Voz",
+            "instruction": "Obtén feedback instantáneo de tu voz. ¡Solo habla unos segundos!",
+            "checkAgain": "Revisar de Nuevo"
+        },
+        "results": {
+            "title": "Tus Resultados",
+            "lowest": "Más Bajo",
+            "highest": "Más Alto",
+            "range": "Rango",
+            "tryAgain": "Intentar de Nuevo"
+        },
+        "history": {
+            "title": "Evaluaciones Recientes"
+        },
+        "categories": {
+            "lower": "Rango Bajo",
+            "mid": "Rango Medio",
+            "androgynous": "Andrógino",
+            "higher": "Rango Alto"
+        },
+        "sliders": {
+            "gender": "Masculino / Femenino",
+            "pitch": "Altura del Tono",
+            "resonance": "Resonancia",
+            "weight": "Peso"
+        }
     }
 }

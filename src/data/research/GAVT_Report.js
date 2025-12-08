@@ -31,7 +31,7 @@ export const GAVT_REPORT = [
         category: "Targets",
         tags: ["ambiguous", "androgynous", "range"],
         question: "What is the androgynous pitch range?",
-        answer: "The gender ambiguous range is roughly 145 Hz to 175 Hz. If your pitch is in this zone, your resonance becomes the deciding factor for how your gender is perceived."
+        answer: "The gender ambiguous range is roughly 135 Hz to 175 Hz. If your pitch is in this zone, your resonance becomes the deciding factor for how your gender is perceived."
     },
     {
         category: "Targets",

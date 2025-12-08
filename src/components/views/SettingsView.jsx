@@ -3,6 +3,7 @@ import { Download, Upload, Trash2, AlertTriangle, Check, FileJson, Eye, Globe } 
 import { indexedDB } from '../../services/IndexedDBManager';
 import { useSettings } from '../../context/SettingsContext';
 import { useTranslation } from 'react-i18next';
+import { COLORMAP_PRESETS } from '../../utils/colormaps';
 
 const SettingsView = () => {
     const { t } = useTranslation();
@@ -74,7 +75,7 @@ const SettingsView = () => {
     };
 
     return (
-        <div className="w-full min-h-screen bg-slate-950 p-6 lg:p-12">
+        <div className="w-full min-h-screen bg-slate-950 p-6 lg:p-12 text-white">
             <div className="max-w-3xl mx-auto">
                 <h1 className="text-3xl font-bold text-white mb-8">{t('settings.title')}</h1>
 
@@ -147,6 +148,30 @@ const SettingsView = () => {
                             >
                                 <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.showNorms ? 'left-7' : 'left-1'}`} />
                             </button>
+                        </div>
+
+                        {/* Spectrogram Color Scheme */}
+                        <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                            <div className="mb-3">
+                                <h3 className="font-bold text-white">{t('settings.visualizations.colorScheme.title', 'Spectrogram Colors')}</h3>
+                                <p className="text-sm text-slate-400">{t('settings.visualizations.colorScheme.description', 'Choose a color palette for spectrogram visualizations')}</p>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                {Object.entries(COLORMAP_PRESETS).map(([key, { name, icon }]) => (
+                                    <button
+                                        key={key}
+                                        onClick={() => updateSettings({ ...settings, spectrogramColorScheme: key })}
+                                        className={`flex items-center gap-2 px-4 py-3 rounded-lg border transition-all ${settings.spectrogramColorScheme === key
+                                                ? 'bg-teal-500/20 border-teal-500 text-teal-400'
+                                                : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                                            }`}
+                                        aria-label={`Set color scheme to ${name}`}
+                                    >
+                                        <span className="text-lg">{icon}</span>
+                                        <span className="font-medium">{name}</span>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>

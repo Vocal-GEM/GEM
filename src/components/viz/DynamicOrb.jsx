@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unknown-property */
 import React, { useRef, useMemo, useState, useEffect, Suspense, lazy } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Diamond, Flame, Bug, Box, Activity, Sliders, Gauge } from 'lucide-react';
 import { useGLTF, OrbitControls } from '@react-three/drei';
@@ -214,9 +214,26 @@ void main() {
 }
 `;
 
-const VisualizerMesh = ({ mode, dataRef, externalDataRef, calibration, targetRange }) => {
+const VisualizerMesh = ({ mode, setMode, dataRef, externalDataRef, calibration, targetRange }) => {
   const mesh = useRef();
   const material = useRef();
+  const { gl } = useThree();
+
+  // Handle Context Loss Gracefully
+  useEffect(() => {
+    const handleContextLost = (e) => {
+      e.preventDefault();
+      console.warn("WebGL Context Lost! Switching to Safe Mode.");
+      setMode('safe');
+    };
+
+    const canvas = gl.domElement;
+    canvas.addEventListener('webglcontextlost', handleContextLost);
+
+    return () => {
+      canvas.removeEventListener('webglcontextlost', handleContextLost);
+    };
+  }, [gl, setMode]);
 
   const uniforms = useMemo(() => ({
     u_time: { value: 0 },
@@ -655,16 +672,10 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
           frameloop={isVisible ? "always" : "never"} // Pause when hidden
           onCreated={(state) => {
             state.gl.setClearColor('#020617', 0);
-            const canvas = state.gl.domElement;
-            canvas.addEventListener('webglcontextlost', (e) => {
-              e.preventDefault();
-              console.warn("WebGL Context Lost! Switching to Safe Mode.");
-              setMode('safe');
-            });
           }}
         >
           <ambientLight intensity={0.5} />
-          <VisualizerMesh key={mode} mode={mode} dataRef={dataRef} externalDataRef={externalDataRef} calibration={calibration} targetRange={targetRange} />
+          <VisualizerMesh key={mode} mode={mode} setMode={setMode} dataRef={dataRef} externalDataRef={externalDataRef} calibration={calibration} targetRange={targetRange} />
           <OrbitControls enableZoom={false} enablePan={false} autoRotate={false} />
         </Canvas>
       )}

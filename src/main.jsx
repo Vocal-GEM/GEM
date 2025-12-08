@@ -15,6 +15,7 @@ import { NavigationProvider } from './context/NavigationContext'
 import { LayoutProvider } from './context/LayoutContext'
 import { ToastProvider } from './context/ToastContext'
 import { GuidedJourneyProvider } from './context/GuidedJourneyContext'
+import { PracticeCardsProvider } from './context/PracticeCardsContext'
 import GlobalErrorBoundary from './components/ui/GlobalErrorBoundary'
 
 import { registerSW } from 'virtual:pwa-register'
@@ -40,9 +41,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                                         <JournalProvider>
                                             <ClientProvider>
                                                 <GuidedJourneyProvider>
-                                                    <HashRouter>
-                                                        <App />
-                                                    </HashRouter>
+                                                    <PracticeCardsProvider>
+                                                        <HashRouter>
+                                                            <App />
+                                                        </HashRouter>
+                                                    </PracticeCardsProvider>
                                                 </GuidedJourneyProvider>
                                             </ClientProvider>
                                         </JournalProvider>

@@ -35,6 +35,7 @@ body {
   --slate-700: 51 65 85;
   --slate-800: 30 41 59;
   --slate-900: 15 23 42;
+  --slate-950: 2 6 23;
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid transparent;
   background-clip: padding-box;
@@ -631,4 +632,115 @@ a:focus-visible,
   a {
     border: 1px solid currentColor;
   }
+}
+
+/* ===================================
+   MOBILE-FIRST RESPONSIVE UTILITIES
+   =================================== */
+
+/* Ensure proper mobile viewport behavior */
+html {
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Small screens (phones) - max-width: 640px */
+@media (max-width: 640px) {
+
+  /* Full-width panels on mobile */
+  .mobile-full-width {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Stack flex layouts */
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+
+  /* Hide on mobile */
+  .hide-mobile {
+    display: none !important;
+  }
+
+  /* Compact spacing on mobile */
+  .mobile-compact-padding {
+    padding: 0.75rem !important;
+  }
+
+  /* Reduce gap on mobile */
+  .mobile-gap-2 {
+    gap: 0.5rem !important;
+  }
+
+  /* Full-screen modals on mobile */
+  .mobile-fullscreen-modal {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Smaller text on mobile */
+  .mobile-text-sm {
+    font-size: 0.875rem !important;
+  }
+
+  .mobile-text-xs {
+    font-size: 0.75rem !important;
+  }
+
+  /* Tighter button padding */
+  .mobile-btn-compact {
+    padding: 0.5rem 0.75rem !important;
+  }
+}
+
+/* Show only on mobile */
+@media (min-width: 641px) {
+  .show-mobile-only {
+    display: none !important;
+  }
+}
+
+/* Medium screens (tablets) - 641px to 1024px */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .tablet-two-col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile-specific safe area for bottom navigation */
+.pb-bottom-nav {
+  padding-bottom: calc(70px + env(safe-area-inset-bottom));
+}
+
+/* Ensure visualizations are responsive */
+.responsive-canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
+}
+
+/* Touch-friendly scrollable areas */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+/* Prevent text selection on interactive elements (mobile) */
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }

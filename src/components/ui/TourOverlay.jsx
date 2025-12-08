@@ -136,7 +136,7 @@ const TourOverlay = () => {
 
             {/* Tooltip */}
             <div
-                className={`absolute w-80 bg-white text-slate-900 p-5 rounded-2xl shadow-2xl pointer-events-auto transition-all duration-300 ease-in-out flex flex-col gap-3 animate-in fade-in zoom-in-95`}
+                className={`absolute w-80 bg-slate-900 text-white p-5 rounded-2xl shadow-2xl pointer-events-auto transition-all duration-300 ease-in-out flex flex-col gap-3 animate-in fade-in zoom-in-95 border border-slate-700`}
                 style={{
                     top: position.top,
                     left: position.left,
@@ -144,14 +144,14 @@ const TourOverlay = () => {
                 }}
             >
                 <div className="flex justify-between items-start">
-                    <h3 className="font-bold text-lg">{step.title}</h3>
-                    <button onClick={skipTour} className="text-slate-400 hover:text-slate-600 p-1">
+                    <h3 className="font-bold text-lg text-white">{step.title}</h3>
+                    <button onClick={skipTour} className="text-slate-400 hover:text-slate-200 p-1">
                         <X size={16} />
                     </button>
                 </div>
-                <p className="text-slate-600 text-sm leading-relaxed">{step.content}</p>
+                <p className="text-slate-300 text-sm leading-relaxed">{step.content}</p>
 
-                <div className="flex justify-between items-center mt-2 pt-3 border-t border-slate-100">
+                <div className="flex justify-between items-center mt-2 pt-3 border-t border-slate-700">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                         Step {currentStep + 1} of {tourConfig.length}
                     </span>
@@ -159,7 +159,7 @@ const TourOverlay = () => {
                         {currentStep > 0 && (
                             <button
                                 onClick={prevStep}
-                                className="px-3 py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 text-sm font-bold transition-colors"
+                                className="px-3 py-1.5 rounded-lg text-slate-300 hover:bg-slate-700 text-sm font-bold transition-colors"
                             >
                                 Back
                             </button>
@@ -176,10 +176,10 @@ const TourOverlay = () => {
 
                 {/* Arrow */}
                 <div
-                    className={`absolute w-4 h-4 bg-white transform rotate-45 ${position.placement === 'top' ? 'bottom-[-8px] left-1/2 -translate-x-1/2' :
-                        position.placement === 'bottom' ? 'top-[-8px] left-1/2 -translate-x-1/2' :
-                            position.placement === 'left' ? 'right-[-8px] top-1/2 -translate-y-1/2' :
-                                'left-[-8px] top-1/2 -translate-y-1/2'
+                    className={`absolute w-4 h-4 bg-slate-900 border-slate-700 transform rotate-45 ${position.placement === 'top' ? 'bottom-[-8px] left-1/2 -translate-x-1/2 border-b border-r' :
+                        position.placement === 'bottom' ? 'top-[-8px] left-1/2 -translate-x-1/2 border-t border-l' :
+                            position.placement === 'left' ? 'right-[-8px] top-1/2 -translate-y-1/2 border-t border-r' :
+                                'left-[-8px] top-1/2 -translate-y-1/2 border-b border-l'
                         }`}
                     style={{
                         marginLeft: position.placement === 'top' || position.placement === 'bottom' ? position.arrowOffset : 0,

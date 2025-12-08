@@ -7,8 +7,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     // Default gender ranges if not set in settings
     const defaultRanges = {
         feminine: { min: 165, max: 300 },
-        androgynous: { min: 145, max: 175 },
-        masculine: { min: 85, max: 145 }
+        androgynous: { min: 135, max: 175 },
+        masculine: { min: 85, max: 135 }
     };
 
     const genderRanges = settings.genderRanges || defaultRanges;

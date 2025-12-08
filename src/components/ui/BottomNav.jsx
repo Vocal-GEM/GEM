@@ -1,13 +1,13 @@
 import React from 'react';
-import { Mic, BarChart2, Bot, Activity, Wrench } from 'lucide-react';
+import { Home, Activity, Waves, BarChart2, Settings } from 'lucide-react';
 
 const BottomNav = ({ activeTab, onNavigate }) => {
   const navItems = [
-    { id: 'practice', label: 'Studio', icon: Mic },
-    { id: 'history', label: 'Progress', icon: BarChart2 },
-    { id: 'coach', label: 'Insights', icon: Bot },
-    { id: 'analysis', label: 'Analysis', icon: Activity },
-    { id: 'tools', label: 'Tools', icon: Wrench },
+    { id: 'dashboard', label: 'Home', icon: Home },
+    { id: 'practice', label: 'Practice', icon: Activity },
+    { id: 'analysis', label: 'Analysis', icon: Waves },
+    { id: 'history', label: 'History', icon: BarChart2 },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (

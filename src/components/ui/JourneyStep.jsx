@@ -12,6 +12,7 @@ const ResonanceOrb = lazy(() => import('../viz/ResonanceOrb'));
 const VoiceQualityMeter = lazy(() => import('../viz/VoiceQualityMeter'));
 const VowelSpacePlot = lazy(() => import('../viz/VowelSpacePlot'));
 const ContourVisualizer = lazy(() => import('../viz/ContourVisualizer'));
+const BaselineRecorder = lazy(() => import('./BaselineRecorder'));
 
 /**
  * JourneyStep - Renders individual journey steps based on their type
@@ -223,13 +224,13 @@ const JourneyStep = ({
 
                 {/* Special intro exercise (baseline recording prompt) */}
                 {step.exercise?.type === 'baseline-recording' && (
-                    <div className="bg-slate-800/50 rounded-xl border border-pink-500/20 p-6 text-center">
-                        <div className="text-4xl mb-4">🎤</div>
-                        <p className="text-slate-300 mb-2">{step.exercise.instruction}</p>
-                        <p className="text-xs text-slate-500">
-                            (Recording feature coming soon - for now, just read aloud and continue)
-                        </p>
-                    </div>
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <BaselineRecorder
+                            instruction={step.exercise.instruction}
+                            promptText={step.exercise.prompt}
+                            onRecordingComplete={() => { }}
+                        />
+                    </Suspense>
                 )}
 
                 {renderCoachTip()}

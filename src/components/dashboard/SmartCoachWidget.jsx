@@ -30,7 +30,7 @@ const SmartCoachWidget = ({ onStartSession }) => {
     }, [goals]);
 
     return (
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-600 to-indigo-600 p-8 shadow-2xl mb-8">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-600 to-indigo-600 p-8 shadow-2xl mb-8 text-white">
             {/* Background Decoration */}
             <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-teal-500/20 rounded-full blur-3xl pointer-events-none"></div>

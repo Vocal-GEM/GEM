@@ -456,5 +456,108 @@
             "desc": "Select a vowel and hit Start to begin.",
             "button": "Start Microphone"
         }
+    },
+    "practiceCards": {
+        "title": "Practice Cards",
+        "defaultSets": "Default Sets",
+        "mySets": "My Sets",
+        "createSet": "Create Custom Set",
+        "editSet": "Edit Card Set",
+        "deleteConfirm": "Click again to confirm delete",
+        "allLevels": "All Levels",
+        "cards": "cards",
+        "practices": "practices",
+        "noSetsMatch": "No sets match this filter",
+        "noCustomSets": "No custom sets yet",
+        "createYourOwn": "Create your own card sets below",
+        "cardOf": "Card {{current}} of {{total}}",
+        "previous": "Previous",
+        "next": "Next",
+        "difficulty": {
+            "beginner": "Beginner",
+            "intermediate": "Intermediate",
+            "advanced": "Advanced"
+        },
+        "focus": {
+            "pitch": "Pitch",
+            "resonance": "Resonance",
+            "intonation": "Intonation",
+            "articulation": "Articulation",
+            "general": "General"
+        },
+        "activity": {
+            "title": "Card Activity",
+            "subtitle": "Practice history & stats",
+            "totalPractices": "Practices",
+            "savedRecordings": "Saved",
+            "totalTime": "Total Time",
+            "recentActivity": "Recent Activity",
+            "noHistory": "No practice history yet",
+            "startPracticing": "Start practicing this card to track your progress",
+            "exploreRecordings": "Explore {{count}} Recording",
+            "exploreRecordings_plural": "Explore {{count}} Recordings"
+        },
+        "editor": {
+            "setName": "Set Name",
+            "description": "Description",
+            "difficultyLevel": "Difficulty Level",
+            "cardText": "Enter card text...",
+            "focusArea": "Focus Area",
+            "addCard": "Add Card",
+            "cancel": "Cancel",
+            "create": "Create Set",
+            "update": "Update Set",
+            "validation": "Please fill in the set name and at least one card"
+        }
+    },
+    "voiceAssessment": {
+        "title": "Voice Assessment",
+        "subtitle": "Comprehensive analysis of your voice characteristics",
+        "tabs": {
+            "baseline": "Baseline",
+            "selfAssess": "Self-Assessment",
+            "quickCheck": "Quick Check"
+        },
+        "baseline": {
+            "title": "The Rainbow Passage",
+            "instruction": "Read the passage above at a comfortable pace. We'll analyze your pitch and range.",
+            "start": "Start Recording",
+            "stop": "Stop Recording"
+        },
+        "selfAssess": {
+            "instruction": "Record your voice, then rate how you think it sounds. We'll reveal the actual analysis!",
+            "rateTitle": "Rate Your Voice:",
+            "reveal": "Reveal Analysis",
+            "results": "Analysis Results",
+            "yourGuess": "Your guess",
+            "actual": "Actual"
+        },
+        "quickCheck": {
+            "title": "Quick Voice Check",
+            "instruction": "Get instant feedback on your current voice. Just speak for a few seconds!",
+            "checkAgain": "Check Again"
+        },
+        "results": {
+            "title": "Your Results",
+            "lowest": "Lowest",
+            "highest": "Highest",
+            "range": "Range",
+            "tryAgain": "Try Again"
+        },
+        "history": {
+            "title": "Recent Assessments"
+        },
+        "categories": {
+            "lower": "Lower Range",
+            "mid": "Mid Range",
+            "androgynous": "Androgynous",
+            "higher": "Higher Range"
+        },
+        "sliders": {
+            "gender": "Masculine / Feminine",
+            "pitch": "Pitch Height",
+            "resonance": "Resonance",
+            "weight": "Weight"
+        }
     }
 }

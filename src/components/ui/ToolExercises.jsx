@@ -6,6 +6,7 @@ import WarmUpModule from './WarmUpModule';
 import TwisterCard from './TwisterCard';
 import PitchMatchingModule from './PitchMatchingModule';
 import IntonationCurveModule from './IntonationCurveModule';
+import ShadowingExercise from '../exercises/ShadowingExercise';
 
 const ToolExercises = ({ tool, audioEngine }) => {
     const renderExercise = () => {
@@ -29,6 +30,13 @@ const ToolExercises = ({ tool, audioEngine }) => {
                     <div className="h-full">
                         <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Recommended Exercise</h3>
                         <IntonationCurveModule audioEngine={audioEngine} embedded={true} />
+                    </div>
+                );
+            case 'shadowing':
+                return (
+                    <div className="h-full">
+                        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Shadowing Practice</h3>
+                        <ShadowingExercise embedded={true} />
                     </div>
                 );
             case 'weight':
@@ -84,3 +92,4 @@ const ToolExercises = ({ tool, audioEngine }) => {
 };
 
 export default ToolExercises;
+

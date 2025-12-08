@@ -353,7 +353,7 @@ To achieve a natural-sounding masculine voice, we focus on:
 
 1. **Speak naturally**.
 2. **Watch the graph**.
-3. **Target Range**: Aim for **85Hz to 145Hz**.
+3. **Target Range**: Aim for **85Hz to 135Hz**.
 
 **Exercise**: Hum a low note and feel the vibration in your chest.
                 `
@@ -379,7 +379,7 @@ export const ANDROGYNY_COURSE = [
 
 An androgynous voice sits in the overlap between masculine and feminine characteristics.
 
-1. **Pitch**: **145Hz to 175Hz**.
+1. **Pitch**: **135Hz to 175Hz**.
 2. **Resonance**: Balanced - not too bright, not too dark.
 3. **Weight**: Moderate.
 

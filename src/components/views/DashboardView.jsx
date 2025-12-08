@@ -8,31 +8,31 @@ import { useGuidedJourney } from '../../context/GuidedJourneyContext';
 import { useNavigation } from '../../context/NavigationContext';
 
 const StatCard = ({ label, value, subtext, icon, color }) => (
-    <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
-        <div className="flex justify-between items-start mb-4">
-            <div className={`p-3 rounded-xl ${color} bg-opacity-10`}>
-                {React.cloneElement(icon, { className: color })}
+    <div className="bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
+        <div className="flex justify-between items-start mb-2 sm:mb-4">
+            <div className={`p-2 sm:p-3 rounded-xl ${color} bg-opacity-10`}>
+                {React.cloneElement(icon, { className: `${color} w-5 h-5 sm:w-6 sm:h-6` })}
             </div>
-            {subtext && <span className="text-xs font-bold text-teal-500 bg-teal-500/10 px-2 py-1 rounded-full">{subtext}</span>}
+            {subtext && <span className="text-[10px] sm:text-xs font-bold text-teal-500 bg-teal-500/10 px-2 py-1 rounded-full">{subtext}</span>}
         </div>
-        <div className="text-3xl font-bold text-white mb-1">{value}</div>
-        <div className="text-sm text-slate-400">{label}</div>
+        <div className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: '#ffffff' }}>{value}</div>
+        <div className="text-xs sm:text-sm text-slate-400">{label}</div>
     </div>
 );
 
 const ActionCard = ({ title, description, onClick, icon, color }) => (
     <button
         onClick={onClick}
-        className="w-full bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500/50 hover:bg-slate-800 transition-all group text-left"
+        className="w-full bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-800 hover:border-teal-500/50 hover:bg-slate-800 transition-all group text-left"
     >
-        <div className="flex items-center justify-between mb-4">
-            <div className={`p-3 rounded-xl ${color} bg-opacity-10 group-hover:scale-110 transition-transform`}>
-                {React.cloneElement(icon, { className: color })}
+        <div className="flex items-center justify-between mb-2 sm:mb-4">
+            <div className={`p-2 sm:p-3 rounded-xl ${color} bg-opacity-10 group-hover:scale-110 transition-transform`}>
+                {React.cloneElement(icon, { className: `${color} w-5 h-5 sm:w-6 sm:h-6` })}
             </div>
-            <ArrowRight className="text-slate-600 group-hover:text-white transition-colors" size={20} />
+            <ArrowRight className="text-slate-600 group-hover:text-white transition-colors w-4 h-4 sm:w-5 sm:h-5" />
         </div>
-        <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-        <p className="text-sm text-slate-400">{description}</p>
+        <h3 className="text-base sm:text-lg font-bold mb-1 sm:mb-2" style={{ color: '#ffffff' }}>{title}</h3>
+        <p className="text-xs sm:text-sm text-slate-400 line-clamp-2">{description}</p>
     </button>
 );
 
@@ -59,7 +59,7 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
     const currentStep = getCurrentStep();
 
     return (
-        <div className="w-full min-h-screen bg-black p-6 lg:p-12">
+        <div className="w-full min-h-screen bg-black p-4 sm:p-6 lg:p-12 text-white">
             {/* Guided Journey Entry - Featured prominently for first-time users */}
             <div className="mb-8">
                 <JourneyEntryCard
@@ -79,7 +79,7 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
             <VocalHealthPanel />
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
                 <StatCard
                     label={t('dashboard.stats.dsi.label')}
                     value="1.2"
@@ -109,8 +109,8 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
             </div>
 
             {/* Quick Actions */}
-            <h2 className="text-xl font-bold text-white mb-6">{t('dashboard.quickStart')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <h2 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">{t('dashboard.quickStart')}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
                 <ActionCard
                     title={t('dashboard.actions.training.title')}
                     description={t('dashboard.actions.training.description')}

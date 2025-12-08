@@ -44,7 +44,8 @@ export const NavigationProvider = ({ children }) => {
         course: false,
         feedback: false,
         commandPalette: false, // New Command Palette
-        adaptiveSession: false
+        adaptiveSession: false,
+        practiceCards: false // Practice Cards feature
     });
 
     // Initialize Analytics
@@ -72,11 +73,15 @@ export const NavigationProvider = ({ children }) => {
         };
     }, []);
 
+    const [navigationParams, setNavigationParams] = useState({});
+    const [modalParams, setModalParams] = useState({});
+
     // Navigation Actions
-    const navigate = (view) => {
-        if (view !== activeView) {
+    const navigate = (view, params = {}) => {
+        if (view !== activeView || Object.keys(params).length > 0) {
+            setNavigationParams(params);
             setActiveView(view);
-            analyticsService.trackView(view);
+            analyticsService.trackView(view, params);
         }
     };
 
@@ -87,13 +92,15 @@ export const NavigationProvider = ({ children }) => {
         }
     };
 
-    const openModal = (modalName) => {
+    const openModal = (modalName, params = {}) => {
+        setModalParams(prev => ({ ...prev, [modalName]: params }));
         setModals(prev => ({ ...prev, [modalName]: true }));
-        analyticsService.trackModalOpen(modalName);
+        analyticsService.trackModalOpen(modalName, params);
     };
 
     const closeModal = (modalName) => {
         setModals(prev => ({ ...prev, [modalName]: false }));
+        // Optional: clear params on close? Keeping them might be safer for animations.
     };
 
     const closeAllModals = () => {
@@ -120,6 +127,8 @@ export const NavigationProvider = ({ children }) => {
         practiceTab,
         modals,
         history,
+        navigationParams,
+        modalParams,
         navigate,
         switchPracticeTab,
         openModal,

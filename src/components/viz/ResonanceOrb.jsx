@@ -56,16 +56,24 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
 
         const loop = () => {
             if (orbRef.current && dataRef.current) {
-                const { resonance, pitch, volume, f1, f2, debug, weight, resonanceScore, isBackendActive, resonanceConfidence, isSilent } = dataRef.current;
+                const { resonance, pitch, volume, f1, f2, debug, weight, resonanceScore, isBackendActive, resonanceConfidence, isSilent, tilt } = dataRef.current;
 
                 // Use backend RBI score (0-100) mapped to 0-1
                 let calculatedScore = (resonanceScore !== undefined ? resonanceScore : 50) / 100.0;
+
+                // Extract tilt (if available) - typically -30 (steep) to 0 (flat)
+                // Map tilt to a 0-1 brightness scale
+                // -24 (Soft) -> 0.0
+                // -6 (Bright) -> 1.0
+                const tiltVal = tilt !== undefined ? tilt : -12;
+                const tiltNorm = Math.max(0, Math.min(1, (tiltVal + 24) / 18)); // Map -24..-6 to 0..1
 
                 if (calibration) {
                     historyRef.current.push({
                         f1: f1 || 0,
                         f2: f2 || 0,
-                        score: calculatedScore
+                        score: calculatedScore,
+                        tilt: tiltVal
                     });
                     if (historyRef.current.length > 50) historyRef.current.shift();
                 }
@@ -88,6 +96,7 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                         label: labelState.current.current,
                         peakCount: debug.peakCount !== undefined ? debug.peakCount : '—',
                         smoothingMode: debug.smoothingMode || '—',
+                        tilt: tiltVal.toFixed(1),
                         history: [...historyRef.current] // Copy for render
                     });
                 }
@@ -150,12 +159,29 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                     }
                 }
 
+                // ============================================
+                // Tilt / Brightness Indicator (Outer Glow)
+                // ============================================
+                // Map tiltNorm (0=Soft, 1=Pressed) to Glow Color/Intensity
+                let glowColor;
+                if (tiltNorm > 0.8) glowColor = "rgba(255, 200, 0, 0.8)"; // Very Pressed (Gold)
+                else if (tiltNorm > 0.5) glowColor = "rgba(255, 255, 255, 0.4)"; // Balanced
+                else glowColor = "rgba(100, 255, 255, 0.3)"; // Breathy (Cyan)
+
                 // Apply visual updates to orb
                 if (orbRef.current) {
                     orbRef.current.style.backgroundColor = color;
-                    orbRef.current.style.boxShadow = `0 0 ${size * 0.35}px ${color}, 0 0 ${size * 0.7}px ${color}40`;
+
+                    // Modify shadow based on Tilt
+                    // High Tilt (Pressed) -> Harder shadow
+                    // Low Tilt (Breathy) -> Softer shadow
+                    const shadowSize = size * (0.35 + (1 - tiltNorm) * 0.2); // Breathy = Larger bloom
+                    const shadowOpacity = 0.5 + (tiltNorm * 0.5); // Pressed = More opaque
+
+                    orbRef.current.style.boxShadow = `0 0 ${shadowSize}px ${color}, 0 0 ${size * 0.2}px ${glowColor}`;
                     orbRef.current.style.opacity = isVoiceActive ? "1" : "0.3";
-                    orbRef.current.style.border = "none";
+                    orbRef.current.style.border = tiltNorm > 0.85 ? "2px solid rgba(255,200,0,0.8)" : "none"; // Warning border if too pressed
+
 
                     // Update Gauge Rotation
                     const gaugeNeedle = document.getElementById('resonance-gauge-needle');

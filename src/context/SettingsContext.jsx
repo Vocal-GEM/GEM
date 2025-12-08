@@ -38,6 +38,8 @@ export const SettingsProvider = ({ children }) => {
             spectrum: true
         },
 
+        genderFeedbackMode: 'neutral', // 'default' | 'neutral' | 'off'
+
         disable3D: false, // Safe Mode (2D Fallback)
         beginnerMode: true, // Default to true for new users
         analyticsEnabled: false, // Privacy by default
@@ -57,11 +59,28 @@ export const SettingsProvider = ({ children }) => {
         accessibility: {
             highContrast: false,
             fontSize: 'normal' // 'normal' | 'large' | 'xl'
-        }
+        },
+
+        // Visualization
+        spectrogramColorScheme: 'heatmap' // 'heatmap' | 'magma' | 'viridis' | 'grayscale'
     });
 
 
     const [showSettings, setShowSettings] = useState(false);
+
+    // Voice data collection consent (separate from main settings for privacy)
+    const [voiceDataConsent, setVoiceDataConsentState] = useState({
+        enabled: false,
+        anonymousUpload: false,
+        localStorageOnly: true,
+        includeGenderLabel: false,
+        acknowledgedAt: null
+    });
+
+    const setVoiceDataConsent = async (consent) => {
+        setVoiceDataConsentState(consent);
+        await indexedDB.saveSetting('voice_data_consent', consent);
+    };
 
     // Load Settings
     useEffect(() => {
@@ -70,6 +89,10 @@ export const SettingsProvider = ({ children }) => {
                 await indexedDB.ensureReady();
                 const savedSettings = await indexedDB.getSetting('app_settings');
                 if (savedSettings) setSettings(prev => ({ ...prev, ...savedSettings }));
+
+                // Load voice data consent separately
+                const savedConsent = await indexedDB.getSetting('voice_data_consent');
+                if (savedConsent) setVoiceDataConsentState(savedConsent);
             } catch (e) {
                 console.error("Failed to load settings:", e);
             }
@@ -154,8 +177,10 @@ export const SettingsProvider = ({ children }) => {
         settings,
         updateSettings,
         showSettings,
-        setShowSettings
-    }), [settings, showSettings]);
+        setShowSettings,
+        voiceDataConsent,
+        setVoiceDataConsent
+    }), [settings, showSettings, voiceDataConsent]);
 
     return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
 };

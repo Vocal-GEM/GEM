@@ -3,8 +3,8 @@ import React from 'react';
 const CompassWizard = ({ onComplete }) => {
     const handleSelect = (type) => {
         let range = { min: 170, max: 220 };
-        if (type === 'masc') range = { min: 85, max: 145 };
-        if (type === 'androg') range = { min: 145, max: 175 };
+        if (type === 'masc') range = { min: 85, max: 135 };
+        if (type === 'androg') range = { min: 135, max: 175 };
         if (type === 'fem') range = { min: 170, max: 220 };
         onComplete(range, { mode: type });
     };
@@ -21,13 +21,13 @@ const CompassWizard = ({ onComplete }) => {
                     <button onClick={() => handleSelect('masc')} className="group relative overflow-hidden p-6 rounded-2xl bg-slate-800 border border-slate-700 hover:border-blue-500 hover:bg-slate-700 transition-all text-left">
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         <h3 className="text-xl font-bold text-white mb-1">Masculine</h3>
-                        <p className="text-sm text-slate-400">Focus on chest resonance and lower pitch (85-145 Hz).</p>
+                        <p className="text-sm text-slate-400">Focus on chest resonance and lower pitch (85-135 Hz).</p>
                     </button>
 
                     <button onClick={() => handleSelect('androg')} className="group relative overflow-hidden p-6 rounded-2xl bg-slate-800 border border-slate-700 hover:border-purple-500 hover:bg-slate-700 transition-all text-left">
                         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         <h3 className="text-xl font-bold text-white mb-1">Androgynous</h3>
-                        <p className="text-sm text-slate-400">A balanced mix of resonance and pitch (145-175 Hz).</p>
+                        <p className="text-sm text-slate-400">A balanced mix of resonance and pitch (135-175 Hz).</p>
                     </button>
 
                     <button onClick={() => handleSelect('fem')} className="group relative overflow-hidden p-6 rounded-2xl bg-slate-800 border border-slate-700 hover:border-pink-500 hover:bg-slate-700 transition-all text-left">

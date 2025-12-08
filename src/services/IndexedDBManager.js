@@ -5,7 +5,7 @@
  */
 
 const DB_NAME = 'VocalGEM';
-const DB_VERSION = 2;
+const DB_VERSION = 4;
 
 // Store names
 const STORES = {
@@ -18,7 +18,9 @@ const STORES = {
     SYNC_METADATA: 'sync_metadata',
     CLIENTS: 'clients',
     SESSIONS: 'sessions',
-    ASSESSMENTS: 'assessments'
+    ASSESSMENTS: 'assessments',
+    RECORDINGS: 'recordings',
+    MODULE_NOTES: 'module_notes'
 };
 
 class IndexedDBManager {
@@ -29,7 +31,8 @@ class IndexedDBManager {
 
     async init() {
         return new Promise((resolve, reject) => {
-            const request = window.indexedDB.open(DB_NAME, DB_VERSION);
+            // Version 4 adds MODULE_NOTES store
+            const request = window.indexedDB.open(DB_NAME, 4);
 
             request.onerror = () => reject(request.error);
             request.onsuccess = () => {
@@ -88,6 +91,17 @@ class IndexedDBManager {
                     const assessmentStore = db.createObjectStore(STORES.ASSESSMENTS, { keyPath: 'id', autoIncrement: true });
                     assessmentStore.createIndex('timestamp', 'timestamp', { unique: false });
                     assessmentStore.createIndex('date', 'date', { unique: false });
+                }
+
+                if (!db.objectStoreNames.contains(STORES.RECORDINGS)) {
+                    const recordingStore = db.createObjectStore(STORES.RECORDINGS, { keyPath: 'id' });
+                    recordingStore.createIndex('timestamp', 'timestamp', { unique: false });
+                    recordingStore.createIndex('type', 'type', { unique: false });
+                }
+
+                if (!db.objectStoreNames.contains(STORES.MODULE_NOTES)) {
+                    // Key is moduleId (string)
+                    db.createObjectStore(STORES.MODULE_NOTES, { keyPath: 'moduleId' });
                 }
             };
         });
@@ -242,6 +256,46 @@ class IndexedDBManager {
     async getAssessments(limit = 50) {
         const assessments = await this.getAll(STORES.ASSESSMENTS);
         return assessments.sort((a, b) => b.timestamp - a.timestamp).slice(0, limit);
+    }
+
+    async saveRecording(recording) {
+        if (!recording.id) recording.id = crypto.randomUUID();
+        if (!recording.timestamp) recording.timestamp = Date.now();
+        // If blob is present, we might want to ensure it's an ArrayBuffer for compatibility
+        // But IndexedDB supports Blobs well in modern browsers. 
+        // We will store as is, but if we need serialization we can convert.
+        return await this.put(STORES.RECORDINGS, recording);
+    }
+
+    async getRecordings() {
+        const recordings = await this.getAll(STORES.RECORDINGS);
+        return recordings.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+
+    async deleteRecording(id) {
+        return await this.delete(STORES.RECORDINGS, id);
+    }
+
+    /**
+     * Save a note for a learning module
+     * @param {string} moduleId 
+     * @param {string} content 
+     */
+    async saveModuleNote(moduleId, content) {
+        return await this.put(STORES.MODULE_NOTES, {
+            moduleId,
+            content,
+            updatedAt: Date.now()
+        });
+    }
+
+    /**
+     * Get a note for a learning module
+     * @param {string} moduleId 
+     * @returns {Promise<Object>} The note object or undefined
+     */
+    async getModuleNote(moduleId) {
+        return await this.get(STORES.MODULE_NOTES, moduleId);
     }
 
     // Migration helper: Import from localStorage
