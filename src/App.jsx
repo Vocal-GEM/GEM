@@ -41,18 +41,10 @@ const PracticeCardsPanel = lazy(() => import('./components/ui/PracticeCardsPanel
 const ProgramView = lazy(() => import('./components/views/ProgramView'));
 
 // Lazy Loaded Components - Visualizations
-const HighResSpectrogram = lazy(() => import('./components/viz/HighResSpectrogram'));
 const Spectrogram = lazy(() => import('./components/viz/Spectrogram'));
-const ContourVisualizer = lazy(() => import('./components/viz/ContourVisualizer'));
-
-const SpectralTiltMeter = lazy(() => import('./components/viz/SpectralTiltMeter'));
 const ResonanceMetrics = lazy(() => import('./components/viz/ResonanceMetrics'));
-const VowelTuningView = lazy(() => import('./components/views/VowelTuningView'));
-const ToolExercises = lazy(() => import('./components/ui/ToolExercises'));
-import DebugOverlay from './components/ui/DebugOverlay';
+
 import FeedbackSettings from './components/ui/FeedbackSettings';
-import OfflineIndicator from './components/ui/OfflineIndicator';
-import ErrorBoundary from './components/ui/ErrorBoundary';
 import FeedbackModal from './components/ui/FeedbackModal';
 import CourseCard from './components/ui/CourseCard';
 import BottomNav from './components/ui/BottomNav';

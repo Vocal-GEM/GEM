@@ -46,7 +46,11 @@ const CelebrationModal = ({ achievement, onClose }) => {
                 </button>
 
                 <div className="w-20 h-20 mx-auto bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-orange-500/30 animate-bounce">
-                    <Trophy size={40} className="text-white" />
+                    {achievement.icon ? (
+                        <span className="text-4xl">{achievement.icon}</span>
+                    ) : (
+                        <Trophy size={40} className="text-white" />
+                    )}
                 </div>
 
                 <h2 className="text-2xl font-bold text-white mb-2">Achievement Unlocked!</h2>

@@ -66,3 +66,48 @@ global.ResizeObserver = class ResizeObserver {
     unobserve() { }
     disconnect() { }
 };
+// Mock IndexedDB
+const indexedDBMock = {
+    open: vi.fn().mockReturnValue({
+        result: {
+            objectStoreNames: {
+                contains: vi.fn(),
+            },
+            createObjectStore: vi.fn().mockReturnValue({
+                createIndex: vi.fn(),
+            }),
+            transaction: vi.fn().mockReturnValue({
+                objectStore: vi.fn().mockReturnValue({
+                    get: vi.fn(),
+                    getAll: vi.fn(),
+                    put: vi.fn(),
+                    add: vi.fn(),
+                    delete: vi.fn(),
+                    clear: vi.fn(),
+                }),
+            }),
+        },
+        onsuccess: null,
+        onerror: null,
+        onupgradeneeded: null,
+    }),
+};
+global.indexedDB = indexedDBMock;
+global.window.indexedDB = indexedDBMock;
+
+// Mock Lucide React
+vi.mock('lucide-react', async (importOriginal) => {
+    const actual = await importOriginal();
+    return {
+        ...actual,
+        Zap: (props) => <svg {...props} data-testid="icon-zap" />,
+        Droplets: (props) => <svg {...props} data-testid="icon-droplets" />,
+        HeartPulse: (props) => <svg {...props} data-testid="icon-heart-pulse" />,
+        Moon: (props) => <svg {...props} data-testid="icon-moon" />,
+        AlertTriangle: (props) => <svg {...props} data-testid="icon-alert-triangle" />,
+        Music: (props) => <svg {...props} data-testid="icon-music" />,
+        Stethoscope: (props) => <svg {...props} data-testid="icon-stethoscope" />,
+        Utensils: (props) => <svg {...props} data-testid="icon-utensils" />,
+        Wind: (props) => <svg {...props} data-testid="icon-wind" />,
+    };
+});

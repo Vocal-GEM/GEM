@@ -8,6 +8,7 @@ import { AudioProvider } from '../../context/AudioContext';
 import { ProfileProvider } from '../../context/ProfileContext';
 import { SettingsProvider } from '../../context/SettingsContext';
 import { TourProvider } from '../../context/TourContext';
+import { PracticeCardsProvider } from '../../context/PracticeCardsContext';
 
 // Mock dependencies
 vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
@@ -48,13 +49,15 @@ describe('PracticeMode', () => {
                     <AudioProvider>
                         <NavigationProvider>
                             <TourProvider>
-                                <PracticeMode
-                                    dataRef={mockDataRef}
-                                    calibration={{}}
-                                    targetRange={{ min: 100, max: 200 }}
-                                    goals={{}}
-                                    settings={{}}
-                                />
+                                <PracticeCardsProvider>
+                                    <PracticeMode
+                                        dataRef={mockDataRef}
+                                        calibration={{}}
+                                        targetRange={{ min: 100, max: 200 }}
+                                        goals={{}}
+                                        settings={{}}
+                                    />
+                                </PracticeCardsProvider>
                             </TourProvider>
                         </NavigationProvider>
                     </AudioProvider>
