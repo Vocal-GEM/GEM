@@ -28,6 +28,15 @@ vi.mock('../../context/SettingsContext', () => ({
     SettingsProvider: ({ children }) => <div>{children}</div>
 }));
 
+// Mock PracticeCardsContext
+const mockUsePracticeCards = vi.fn();
+vi.mock('../../context/PracticeCardsContext', () => ({
+    usePracticeCards: () => mockUsePracticeCards(),
+    PracticeCardsProvider: ({ children }) => <div>{children}</div>
+}));
+
+const MockPracticeCardsProvider = ({ children }) => <div>{children}</div>;
+
 // Mock Chart.js components
 vi.mock('react-chartjs-2', () => ({
     Line: () => <div>Line Chart</div>,
@@ -46,10 +55,13 @@ describe('HistoryView Personalization', () => {
                 }
             }
         });
+        mockUsePracticeCards.mockReturnValue({
+            // minimal mock state if needed
+        });
     });
 
     it('should render all widgets by default', () => {
-        render(<HistoryView stats={{ totalSeconds: 600 }} journals={[]} />);
+        render(<HistoryView stats={{ totalSeconds: 600 }} journals={[]} />, { wrapper: MockPracticeCardsProvider });
 
         expect(screen.getByText('history.streak')).toBeInTheDocument();
         expect(screen.getByText('history.totalPractice')).toBeInTheDocument();

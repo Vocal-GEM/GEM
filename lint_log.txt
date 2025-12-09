@@ -1,0 +1,898 @@
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\App.jsx[24m[0m
+[0m   [2m60:10[22m  [33mwarning[39m  'PracticeCardsProvider' is defined but never used                                                                  [2mno-unused-vars[22m[0m
+[0m  [2m132:11[22m  [33mwarning[39m  'showIncognito' is assigned a value but never used                                                                 [2mno-unused-vars[22m[0m
+[0m  [2m157:11[22m  [33mwarning[39m  'showVocalFolds' is assigned a value but never used                                                                [2mno-unused-vars[22m[0m
+[0m  [2m169:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'audioEngineRef'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\coach\AssessmentView.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\dashboard\SmartCoachWidget.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\dashboard\VocalHealthPanel.jsx[24m[0m
+[0m  [2m2:41[22m  [33mwarning[39m  'ChevronRight' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\exercises\ShadowingExercise.jsx[24m[0m
+[0m    [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                         [2mno-unused-vars[22m[0m
+[0m    [2m2:10[22m  [33mwarning[39m  'Play' is defined but never used                                                                                          [2mno-unused-vars[22m[0m
+[0m    [2m2:16[22m  [33mwarning[39m  'Pause' is defined but never used                                                                                         [2mno-unused-vars[22m[0m
+[0m    [2m2:56[22m  [33mwarning[39m  'CheckCircle' is defined but never used                                                                                   [2mno-unused-vars[22m[0m
+[0m   [2m55:13[22m  [33mwarning[39m  'audioEngineRef' is assigned a value but never used                                                                       [2mno-unused-vars[22m[0m
+[0m  [2m157:8[22m   [33mwarning[39m  React Hook useCallback has a missing dependency: 'speakText'. Either include it or remove the dependency array            [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m172:8[22m   [33mwarning[39m  React Hook useCallback has a missing dependency: 'handleStopRecording'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m211:11[22m  [33mwarning[39m  'handleReset' is assigned a value but never used                                                                          [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\layout\ResizableToolGrid.jsx[24m[0m
+[0m  [2m62:28[22m  [33mwarning[39m  'toolId' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\layout\Sidebar.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                   [2mno-unused-vars[22m[0m
+[0m   [2m2:16[22m  [33mwarning[39m  'Mic' is defined but never used                     [2mno-unused-vars[22m[0m
+[0m  [2m18:13[22m  [33mwarning[39m  'activeProfile' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\layout\Sidebar.test.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\modules\IntonationCurveModule.jsx[24m[0m
+[0m   [2m1:8[22m  [33mwarning[39m  'React' is defined but never used                                                                           [2mno-unused-vars[22m[0m
+[0m  [2m55:8[22m  [33mwarning[39m  React Hook useEffect has a missing dependency: 'dataRef'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\modules\PitchMatchingModule.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                           [2mno-unused-vars[22m[0m
+[0m   [2m1:38[22m  [33mwarning[39m  'useRef' is defined but never used                                                                          [2mno-unused-vars[22m[0m
+[0m  [2m49:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'dataRef'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\training\IntonationTrainingModule.jsx[24m[0m
+[0m    [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                                                                                                                                                    [2mno-unused-vars[22m[0m
+[0m    [2m3:16[22m  [33mwarning[39m  'Square' is defined but never used                                                                                                                                                                                                                   [2mno-unused-vars[22m[0m
+[0m  [2m140:8[22m   [33mwarning[39m  React Hook useEffect has missing dependencies: 'dataRef' and 'onComplete'. Either include them or remove the dependency array. If 'onComplete' changes too often, find the parent component that defines it and wrap that definition in useCallback  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\training\PitchTrainingModule.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                           [2mno-unused-vars[22m[0m
+[0m   [2m3:24[22m  [33mwarning[39m  'Trophy' is defined but never used                                                                          [2mno-unused-vars[22m[0m
+[0m   [2m9:12[22m  [33mwarning[39m  'streak' is assigned a value but never used                                                                 [2mno-unused-vars[22m[0m
+[0m  [2m92:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'dataRef'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\training\ResonanceTrainingModule.jsx[24m[0m
+[0m    [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                           [2mno-unused-vars[22m[0m
+[0m    [2m5:55[22m  [33mwarning[39m  'onComplete' is defined but never used. Allowed unused args must match /^_/u                                [2mno-unused-vars[22m[0m
+[0m  [2m131:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'dataRef'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\AnalysisReportView.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\AnalyticsDashboard.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\AssessmentModule.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\AudioLibrary.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                              [2mno-unused-vars[22m[0m
+[0m  [2m6:25[22m  [33mwarning[39m  'audioEngine' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\AudioLibrary.test.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\BaselineRecorder.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used   [2mno-unused-vars[22m[0m
+[0m  [2m4:21[22m  [33mwarning[39m  'STORES' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\BottomNav.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\Breadcrumbs.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\BreathPacer.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\CalibrationSummary.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\CalibrationWizard.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                               [2mno-unused-vars[22m[0m
+[0m   [2m8:12[22m  [33mwarning[39m  'noiseFloor' is assigned a value but never used                                                                 [2mno-unused-vars[22m[0m
+[0m   [2m9:12[22m  [33mwarning[39m  'referenceLevel' is assigned a value but never used                                                             [2mno-unused-vars[22m[0m
+[0m  [2m17:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'toggleAudio'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\CardActivityModal.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\CardSetEditor.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\CelebrationModal.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ChatMessage.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                       [2mno-unused-vars[22m[0m
+[0m  [2m12:36[22m  [33mwarning[39m  'node' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m  [2m13:36[22m  [33mwarning[39m  'node' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m  [2m14:36[22m  [33mwarning[39m  'node' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m  [2m15:35[22m  [33mwarning[39m  'node' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m  [2m16:40[22m  [33mwarning[39m  'node' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m  [2m17:35[22m  [33mwarning[39m  'node' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m  [2m18:38[22m  [33mwarning[39m  'node' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ClientSelector.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ClipAnalysisModal.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used     [2mno-unused-vars[22m[0m
+[0m  [2m2:37[22m  [33mwarning[39m  'Activity' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ClipCapture.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m  [2m2:23[22m  [33mwarning[39m  'Save' is defined but never used   [2mno-unused-vars[22m[0m
+[0m  [2m2:29[22m  [33mwarning[39m  'X' is defined but never used      [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ClipReviewModal.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used          [2mno-unused-vars[22m[0m
+[0m  [2m2:31[22m  [33mwarning[39m  'Trash2' is defined but never used         [2mno-unused-vars[22m[0m
+[0m  [2m6:13[22m  [33mwarning[39m  'user' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\CoachView.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\CoachView.test.jsx[24m[0m
+[0m   [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m  [2m48:5[22m  [31merror[39m    'beforeEach' is not defined        [2mno-undef[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\CommandPalette.jsx[24m[0m
+[0m    [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                                   [2mno-unused-vars[22m[0m
+[0m    [2m3:27[22m  [33mwarning[39m  'X' is defined but never used                                                                                                       [2mno-unused-vars[22m[0m
+[0m    [2m3:73[22m  [33mwarning[39m  'Home' is defined but never used                                                                                                    [2mno-unused-vars[22m[0m
+[0m  [2m128:8[22m   [33mwarning[39m  React Hook useEffect has missing dependencies: 'closeModal' and 'handleSelect'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ComparisonTool.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used      [2mno-unused-vars[22m[0m
+[0m  [2m1:27[22m  [33mwarning[39m  'useRef' is defined but never used     [2mno-unused-vars[22m[0m
+[0m  [2m1:35[22m  [33mwarning[39m  'useEffect' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\CompassWizard.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\CourseCard.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used        [2mno-unused-vars[22m[0m
+[0m  [2m2:22[22m  [33mwarning[39m  'CheckCircle' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\DAFMode.jsx[24m[0m
+[0m   [2m1:8[22m  [33mwarning[39m  'React' is defined but never used                                                                           [2mno-unused-vars[22m[0m
+[0m  [2m36:8[22m  [33mwarning[39m  React Hook useEffect has a missing dependency: 'stopDAF'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\DailyGoalsWidget.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\DebugOverlay.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used        [2mno-unused-vars[22m[0m
+[0m  [2m2:23[22m  [33mwarning[39m  'Mic' is defined but never used          [2mno-unused-vars[22m[0m
+[0m  [2m2:43[22m  [33mwarning[39m  'CheckCircle' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\EmptyState.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\EmptyState.test.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\EnvironmentCheck.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m  [2m2:10[22m  [33mwarning[39m  'Mic' is defined but never used    [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ErrorBoundary.jsx[24m[0m
+[0m  [2m9:37[22m  [33mwarning[39m  'error' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ErrorRecovery.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\FeedbackControls.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m  [2m2:74[22m  [33mwarning[39m  'Check' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\FeedbackModal.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\FeedbackSettings.jsx[24m[0m
+[0m   [2m9:82[22m   [33mwarning[39m  'onSetGoal' is defined but never used. Allowed unused args must match /^_/u      [2mno-unused-vars[22m[0m
+[0m   [2m9:122[22m  [33mwarning[39m  'onUpdateRange' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m  [2m10:11[22m   [33mwarning[39m  'defaultGenderRanges' is assigned a value but never used                         [2mno-unused-vars[22m[0m
+[0m  [2m15:12[22m   [33mwarning[39m  'customRanges' is assigned a value but never used                                [2mno-unused-vars[22m[0m
+[0m  [2m15:26[22m   [33mwarning[39m  'setCustomRanges' is assigned a value but never used                             [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\FeminizationCourse.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                              [2mno-unused-vars[22m[0m
+[0m   [2m2:62[22m  [33mwarning[39m  'Star' is defined but never used                                               [2mno-unused-vars[22m[0m
+[0m  [2m33:11[22m  [33mwarning[39m  'getLessonStatus' is assigned a value but never used                           [2mno-unused-vars[22m[0m
+[0m  [2m37:29[22m  [33mwarning[39m  'lessonId' is defined but never used. Allowed unused args must match /^_/u     [2mno-unused-vars[22m[0m
+[0m  [2m37:39[22m  [33mwarning[39m  'moduleIndex' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m  [2m37:52[22m  [33mwarning[39m  'lessonIndex' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\FloatingCamera.jsx[24m[0m
+[0m   [2m1:8[22m  [33mwarning[39m  'React' is defined but never used                                                                                   [2mno-unused-vars[22m[0m
+[0m  [2m65:8[22m  [33mwarning[39m  React Hook useEffect has a missing dependency: 'handleMouseMove'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ForwardFocusDrill.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\GenderPerceptionBadge.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\GenderPerceptionDashboard.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used         [2mno-unused-vars[22m[0m
+[0m  [2m72:15[22m  [33mwarning[39m  'hex' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\GlobalErrorBoundary.jsx[24m[0m
+[0m  [2m11:37[22m  [33mwarning[39m  'error' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\GuidedJourney.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                        [2mno-unused-vars[22m[0m
+[0m  [2m35:11[22m  [33mwarning[39m  'progressPercentage' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m  [2m73:11[22m  [33mwarning[39m  'handleStepClick' is assigned a value but never used     [2mno-unused-vars[22m[0m
+[0m  [2m94:11[22m  [33mwarning[39m  'canGoForward' is assigned a value but never used        [2mno-unused-vars[22m[0m
+[0m  [2m95:11[22m  [33mwarning[39m  'isFirstStep' is assigned a value but never used         [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\HelpTooltip.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                           [2mno-unused-vars[22m[0m
+[0m  [2m7:33[22m  [33mwarning[39m  'children' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\HistoryView.jsx[24m[0m
+[0m   [2m1:8[22m    [33mwarning[39m  'React' is defined but never used                                                                             [2mno-unused-vars[22m[0m
+[0m   [2m2:91[22m   [33mwarning[39m  'Layers' is defined but never used                                                                            [2mno-unused-vars[22m[0m
+[0m   [2m2:110[22m  [33mwarning[39m  'Play' is defined but never used                                                                              [2mno-unused-vars[22m[0m
+[0m  [2m61:8[22m    [33mwarning[39m  React Hook useEffect has a missing dependency: 'startTour'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\IncognitoScreen.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\InfoTooltip.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m  [2m2:22[22m  [33mwarning[39m  'Info' is defined but never used   [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\InstantPlayback.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                                                        [2mno-unused-vars[22m[0m
+[0m   [2m2:21[22m  [33mwarning[39m  'Play' is defined but never used                                                                                                                         [2mno-unused-vars[22m[0m
+[0m  [2m36:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'stopRecording'. Either include it or remove the dependency array                                         [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m45:8[22m   [33mwarning[39m  React Hook useEffect has missing dependencies: 'isRecording', 'startRecording', and 'stopRecording'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\IntonationCurveModule.jsx[24m[0m
+[0m    [2m2:8[22m   [33mwarning[39m  'React' is defined but never used                                                                        [2mno-unused-vars[22m[0m
+[0m    [2m3:16[22m  [33mwarning[39m  'Square' is defined but never used                                                                       [2mno-unused-vars[22m[0m
+[0m  [2m170:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'draw'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\JournalForm.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\JourneyEntryCard.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used       [2mno-unused-vars[22m[0m
+[0m  [2m2:10[22m  [33mwarning[39m  'ArrowRight' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\JourneyProgressBar.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\JourneyStep.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                             [2mno-unused-vars[22m[0m
+[0m   [2m3:28[22m  [33mwarning[39m  'ChevronRight' is defined but never used                                      [2mno-unused-vars[22m[0m
+[0m  [2m22:5[22m   [33mwarning[39m  'onComplete' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m  [2m23:5[22m   [33mwarning[39m  'isCompleted' is assigned a value but never used                              [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\LayoutControls.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\LessonView.jsx[24m[0m
+[0m  [2m16:8[22m   [33mwarning[39m  'ForwardFocusDrill' is defined but never used        [2mno-unused-vars[22m[0m
+[0m  [2m18:8[22m   [33mwarning[39m  'TwisterCard' is defined but never used              [2mno-unused-vars[22m[0m
+[0m  [2m27:22[22m  [33mwarning[39m  'audioEngineRef' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\LoadingSpinner.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\Login.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\MLComparisonPanel.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used           [2mno-unused-vars[22m[0m
+[0m  [2m3:76[22m  [33mwarning[39m  'classifyWithML' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\MicrophoneCalibration.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\MigrationModal.jsx[24m[0m
+[0m   [2m1:8[22m  [33mwarning[39m  'React' is defined but never used                                                                                   [2mno-unused-vars[22m[0m
+[0m  [2m11:8[22m  [33mwarning[39m  React Hook useEffect has a missing dependency: 'checkAndMigrate'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\MirrorComponent.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ModuleNotes.jsx[24m[0m
+[0m   [2m1:8[22m  [33mwarning[39m  'React' is defined but never used                                                                            [2mno-unused-vars[22m[0m
+[0m  [2m12:8[22m  [33mwarning[39m  React Hook useEffect has a missing dependency: 'loadNote'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\OfflineIndicator.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used        [2mno-unused-vars[22m[0m
+[0m  [2m3:36[22m  [33mwarning[39m  'Check' is defined but never used        [2mno-unused-vars[22m[0m
+[0m  [2m3:43[22m  [33mwarning[39m  'AlertCircle' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\OfflineIndicator.test.jsx[24m[0m
+[0m  [2m2:26[22m  [33mwarning[39m  'act' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\PitchMatchingModule.jsx[24m[0m
+[0m    [2m2:8[22m   [33mwarning[39m  'React' is defined but never used                                                                           [2mno-unused-vars[22m[0m
+[0m    [2m3:25[22m  [33mwarning[39m  'Trophy' is defined but never used                                                                          [2mno-unused-vars[22m[0m
+[0m    [2m3:41[22m  [33mwarning[39m  'RefreshCw' is defined but never used                                                                       [2mno-unused-vars[22m[0m
+[0m   [2m11:12[22m  [33mwarning[39m  'status' is assigned a value but never used                                                                 [2mno-unused-vars[22m[0m
+[0m  [2m142:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'animate'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\PitchPipe.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used              [2mno-unused-vars[22m[0m
+[0m  [2m11:11[22m  [33mwarning[39m  'playOnce' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\PitchTargets.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\PracticeCardItem.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\PracticeCardsPanel.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used              [2mno-unused-vars[22m[0m
+[0m   [2m1:27[22m  [33mwarning[39m  'useEffect' is defined but never used          [2mno-unused-vars[22m[0m
+[0m   [2m3:34[22m  [33mwarning[39m  'Play' is defined but never used               [2mno-unused-vars[22m[0m
+[0m  [2m16:9[22m   [33mwarning[39m  'cardSets' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\PracticeFilterMenu.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used   [2mno-unused-vars[22m[0m
+[0m  [2m2:23[22m  [33mwarning[39m  'Filter' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\PracticeTimer.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                       [2mno-unused-vars[22m[0m
+[0m  [2m17:11[22m  [33mwarning[39m  'audioRef' is assigned a value but never used                                                                           [2mno-unused-vars[22m[0m
+[0m  [2m45:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'playCompletionSound'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ProfileManager.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                   [2mno-unused-vars[22m[0m
+[0m  [2m2:22[22m  [33mwarning[39m  'Trash2' is defined but never used                  [2mno-unused-vars[22m[0m
+[0m  [2m6:70[22m  [33mwarning[39m  'deleteProfile' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ProgressCard.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\QuickActions.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m  [2m2:37[22m  [33mwarning[39m  'X' is defined but never used      [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\QuickSettings.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\RecordingsList.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                                                                                                                                                                [2mno-unused-vars[22m[0m
+[0m  [2m22:22[22m  [33mwarning[39m  The ref value 'audioRef.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'audioRef.current' to a variable inside the effect, and use that variable in the cleanup function  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m24:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'audioUrl'. Either include it or remove the dependency array                                                                                                                                                      [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ResizablePanel.jsx[24m[0m
+[0m    [2m1:8[22m  [33mwarning[39m  'React' is defined but never used                                                                                                                             [2mno-unused-vars[22m[0m
+[0m  [2m141:8[22m  [33mwarning[39m  React Hook useEffect has missing dependencies: 'handleMouseMove', 'handleMouseUp', and 'handleTouchMove'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\SessionNotes.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m  [2m3:16[22m  [33mwarning[39m  'Clock' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\Signup.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\SkeletonLoader.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\SkeletonLoader.test.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\TargetVoicePlayer.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\Toast.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ToneGenerator.jsx[24m[0m
+[0m    [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                      [2mno-unused-vars[22m[0m
+[0m  [2m268:47[22m  [33mwarning[39m  'idx' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\ToolExercises.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\TooltipOverlay.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used               [2mno-unused-vars[22m[0m
+[0m  [2m14:11[22m  [33mwarning[39m  'targetRef' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\TooltipOverlay.test.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\TourOverlay.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used             [2mno-unused-vars[22m[0m
+[0m  [2m1:38[22m  [33mwarning[39m  'useRef' is defined but never used            [2mno-unused-vars[22m[0m
+[0m  [2m4:27[22m  [33mwarning[39m  'ChevronLeft' is defined but never used       [2mno-unused-vars[22m[0m
+[0m  [2m7:80[22m  [33mwarning[39m  'endTour' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\TutorialWizard.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\TwisterCard.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used      [2mno-unused-vars[22m[0m
+[0m  [2m2:15[22m  [33mwarning[39m  'Play' is defined but never used       [2mno-unused-vars[22m[0m
+[0m  [2m2:21[22m  [33mwarning[39m  'RotateCcw' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\UserProfile.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used              [2mno-unused-vars[22m[0m
+[0m  [2m2:21[22m  [33mwarning[39m  'Trophy' is defined but never used             [2mno-unused-vars[22m[0m
+[0m  [2m2:29[22m  [33mwarning[39m  'Flame' is defined but never used              [2mno-unused-vars[22m[0m
+[0m  [2m2:43[22m  [33mwarning[39m  'Star' is defined but never used               [2mno-unused-vars[22m[0m
+[0m  [2m2:49[22m  [33mwarning[39m  'Lock' is defined but never used               [2mno-unused-vars[22m[0m
+[0m  [2m2:55[22m  [33mwarning[39m  'Award' is defined but never used              [2mno-unused-vars[22m[0m
+[0m  [2m8:13[22m  [33mwarning[39m  'settings' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\VocalHealthTips.jsx[24m[0m
+[0m  [2m25:52[22m  [33mwarning[39m  'i' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\VocalStatsSummary.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                        [2mno-unused-vars[22m[0m
+[0m   [2m1:17[22m  [33mwarning[39m  'useState' is defined but never used                                     [2mno-unused-vars[22m[0m
+[0m   [2m1:27[22m  [33mwarning[39m  'useEffect' is defined but never used                                    [2mno-unused-vars[22m[0m
+[0m   [2m1:38[22m  [33mwarning[39m  'useMemo' is defined but never used                                      [2mno-unused-vars[22m[0m
+[0m  [2m22:11[22m  [33mwarning[39m  'pitchRange' is assigned a value but never used                          [2mno-unused-vars[22m[0m
+[0m  [2m23:11[22m  [33mwarning[39m  'volumeRange' is assigned a value but never used                         [2mno-unused-vars[22m[0m
+[0m  [2m66:40[22m  [33mwarning[39m  'label' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\VoiceDataConsent.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\VoiceSelfAssessment.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                    [2mno-unused-vars[22m[0m
+[0m   [2m1:46[22m  [33mwarning[39m  'useCallback' is defined but never used              [2mno-unused-vars[22m[0m
+[0m   [2m2:52[22m  [33mwarning[39m  'EyeOff' is defined but never used                   [2mno-unused-vars[22m[0m
+[0m  [2m26:12[22m  [33mwarning[39m  'isAnalyzing' is assigned a value but never used     [2mno-unused-vars[22m[0m
+[0m  [2m26:25[22m  [33mwarning[39m  'setIsAnalyzing' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\WarmUpModule.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\ui\WarmupRoutine.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                  [2mno-unused-vars[22m[0m
+[0m   [2m1:46[22m  [33mwarning[39m  'useCallback' is defined but never used            [2mno-unused-vars[22m[0m
+[0m  [2m12:12[22m  [33mwarning[39m  'isPlaying' is assigned a value but never used     [2mno-unused-vars[22m[0m
+[0m  [2m12:23[22m  [33mwarning[39m  'setIsPlaying' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\AcousticAnalysisView.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\AdaptivePracticeSession.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                       [2mno-unused-vars[22m[0m
+[0m   [2m1:38[22m  [33mwarning[39m  'useRef' is defined but never used                                      [2mno-unused-vars[22m[0m
+[0m   [2m6:8[22m   [33mwarning[39m  'DynamicOrb' is defined but never used                                  [2mno-unused-vars[22m[0m
+[0m  [2m13:13[22m  [33mwarning[39m  'activeProfile' is assigned a value but never used                      [2mno-unused-vars[22m[0m
+[0m  [2m14:13[22m  [33mwarning[39m  'audioEngineRef' is assigned a value but never used                     [2mno-unused-vars[22m[0m
+[0m  [2m14:38[22m  [33mwarning[39m  'isAudioActive' is assigned a value but never used                      [2mno-unused-vars[22m[0m
+[0m  [2m63:29[22m  [33mwarning[39m  'type' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\AnalysisHub.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used      [2mno-unused-vars[22m[0m
+[0m  [2m3:53[22m  [33mwarning[39m  'ArrowLeft' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\AnalysisView.jsx[24m[0m
+[0m    [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                        [2mno-unused-vars[22m[0m
+[0m    [2m4:39[22m  [33mwarning[39m  'RotateCcw' is defined but never used                                    [2mno-unused-vars[22m[0m
+[0m    [2m4:50[22m  [33mwarning[39m  'Download' is defined but never used                                     [2mno-unused-vars[22m[0m
+[0m    [2m4:60[22m  [33mwarning[39m  'Share2' is defined but never used                                       [2mno-unused-vars[22m[0m
+[0m  [2m210:47[22m  [33mwarning[39m  'range' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\ArticulationView.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used         [2mno-unused-vars[22m[0m
+[0m   [2m2:38[22m  [33mwarning[39m  'Trophy' is defined but never used        [2mno-unused-vars[22m[0m
+[0m   [2m2:46[22m  [33mwarning[39m  'Star' is defined but never used          [2mno-unused-vars[22m[0m
+[0m   [2m2:52[22m  [33mwarning[39m  'RefreshCw' is defined but never used     [2mno-unused-vars[22m[0m
+[0m   [2m2:63[22m  [33mwarning[39m  'ChevronRight' is defined but never used  [2mno-unused-vars[22m[0m
+[0m  [2m10:8[22m   [33mwarning[39m  'TwisterCard' is defined but never used   [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\AssessmentView.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\ClinicalAssessmentView.jsx[24m[0m
+[0m     [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                          [2mno-unused-vars[22m[0m
+[0m     [2m1:46[22m  [33mwarning[39m  'useMemo' is defined but never used                                        [2mno-unused-vars[22m[0m
+[0m     [2m5:41[22m  [33mwarning[39m  'Volume2' is defined but never used                                        [2mno-unused-vars[22m[0m
+[0m    [2m43:13[22m  [33mwarning[39m  't' is assigned a value but never used                                     [2mno-unused-vars[22m[0m
+[0m  [2m1129:36[22m  [33mwarning[39m  'onReset' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\CoachView.jsx[24m[0m
+[0m  [2m2:8[22m   [33mwarning[39m  'React' is defined but never used       [2mno-unused-vars[22m[0m
+[0m  [2m4:36[22m  [33mwarning[39m  'ArrowRight' is defined but never used  [2mno-unused-vars[22m[0m
+[0m  [2m9:13[22m  [33mwarning[39m  't' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\MixingBoardView.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                              [2mno-unused-vars[22m[0m
+[0m  [2m2:10[22m  [33mwarning[39m  'Volume2' is defined but never used                                            [2mno-unused-vars[22m[0m
+[0m  [2m2:19[22m  [33mwarning[39m  'Mic' is defined but never used                                                [2mno-unused-vars[22m[0m
+[0m  [2m4:37[22m  [33mwarning[39m  'audioEngine' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m  [2m7:12[22m  [33mwarning[39m  'sliderValues' is assigned a value but never used                              [2mno-unused-vars[22m[0m
+[0m  [2m7:26[22m  [33mwarning[39m  'setSliderValues' is assigned a value but never used                           [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\PhonetogramView.jsx[24m[0m
+[0m   [2m1:8[22m  [33mwarning[39m  'React' is defined but never used                                                                          [2mno-unused-vars[22m[0m
+[0m  [2m46:8[22m  [33mwarning[39m  React Hook useEffect has a missing dependency: 'update'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\PracticeMode.jsx[24m[0m
+[0m   [2m1:8[22m    [33mwarning[39m  'React' is defined but never used                                                                             [2mno-unused-vars[22m[0m
+[0m   [2m2:16[22m   [33mwarning[39m  'Square' is defined but never used                                                                            [2mno-unused-vars[22m[0m
+[0m   [2m2:48[22m   [33mwarning[39m  'Settings' is defined but never used                                                                          [2mno-unused-vars[22m[0m
+[0m   [2m2:69[22m   [33mwarning[39m  'Calendar' is defined but never used                                                                          [2mno-unused-vars[22m[0m
+[0m   [2m2:79[22m   [33mwarning[39m  'Clock' is defined but never used                                                                             [2mno-unused-vars[22m[0m
+[0m   [2m2:86[22m   [33mwarning[39m  'Save' is defined but never used                                                                              [2mno-unused-vars[22m[0m
+[0m   [2m2:103[22m  [33mwarning[39m  'ChevronRight' is defined but never used                                                                      [2mno-unused-vars[22m[0m
+[0m   [2m2:117[22m  [33mwarning[39m  'AlertCircle' is defined but never used                                                                       [2mno-unused-vars[22m[0m
+[0m   [2m2:130[22m  [33mwarning[39m  'Check' is defined but never used                                                                             [2mno-unused-vars[22m[0m
+[0m  [2m52:5[22m    [33mwarning[39m  'goals' is defined but never used. Allowed unused args must match /^_/u                                       [2mno-unused-vars[22m[0m
+[0m  [2m54:5[22m    [33mwarning[39m  'onUpdateRange' is defined but never used. Allowed unused args must match /^_/u                               [2mno-unused-vars[22m[0m
+[0m  [2m55:5[22m    [33mwarning[39m  'onSwitchProfile' is defined but never used. Allowed unused args must match /^_/u                             [2mno-unused-vars[22m[0m
+[0m  [2m60:9[22m    [33mwarning[39m  'navigate' is assigned a value but never used                                                                 [2mno-unused-vars[22m[0m
+[0m  [2m83:8[22m    [33mwarning[39m  React Hook useEffect has a missing dependency: 'startTour'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\PracticeMode.test.jsx[24m[0m
+[0m   [2m2:8[22m   [33mwarning[39m  'React' is defined but never used                     [2mno-unused-vars[22m[0m
+[0m   [2m3:26[22m  [33mwarning[39m  'waitFor' is defined but never used                   [2mno-unused-vars[22m[0m
+[0m  [2m43:11[22m  [33mwarning[39m  'mockAudioEngine' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\PracticeView.jsx[24m[0m
+[0m  [2m28:50[22m  [33mwarning[39m  'audioEngineRef' is assigned a value but never used   [2mno-unused-vars[22m[0m
+[0m  [2m30:13[22m  [33mwarning[39m  'goals' is assigned a value but never used            [2mno-unused-vars[22m[0m
+[0m  [2m30:20[22m  [33mwarning[39m  'stats' is assigned a value but never used            [2mno-unused-vars[22m[0m
+[0m  [2m43:12[22m  [33mwarning[39m  'activeGame' is assigned a value but never used       [2mno-unused-vars[22m[0m
+[0m  [2m43:24[22m  [33mwarning[39m  'setActiveGame' is assigned a value but never used    [2mno-unused-vars[22m[0m
+[0m  [2m45:12[22m  [33mwarning[39m  'showAllTools' is assigned a value but never used     [2mno-unused-vars[22m[0m
+[0m  [2m45:26[22m  [33mwarning[39m  'setShowAllTools' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\ProgramView.jsx[24m[0m
+[0m   [2m2:8[22m   [33mwarning[39m  'React' is defined but never used                [2mno-unused-vars[22m[0m
+[0m   [2m9:38[22m  [33mwarning[39m  'currentDay' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m  [2m10:13[22m  [33mwarning[39m  'openModal' is assigned a value but never used   [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\ProgressView.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used             [2mno-unused-vars[22m[0m
+[0m   [2m2:10[22m  [33mwarning[39m  'TrendingUp' is defined but never used        [2mno-unused-vars[22m[0m
+[0m  [2m13:12[22m  [33mwarning[39m  'loading' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\SLPDashboard.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                  [2mno-unused-vars[22m[0m
+[0m  [2m13:20[22m  [33mwarning[39m  'Mic' is defined but never used                    [2mno-unused-vars[22m[0m
+[0m  [2m13:35[22m  [33mwarning[39m  'FileText' is defined but never used               [2mno-unused-vars[22m[0m
+[0m  [2m13:45[22m  [33mwarning[39m  'BarChart2' is defined but never used              [2mno-unused-vars[22m[0m
+[0m  [2m16:13[22m  [33mwarning[39m  'activeClient' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m  [2m17:13[22m  [33mwarning[39m  'showSettings' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\SettingsView.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\TrainingView.jsx[24m[0m
+[0m  [2m7:27[22m  [33mwarning[39m  'Activity' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\VocalFoldsView.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                    [2mno-unused-vars[22m[0m
+[0m  [2m15:21[22m  [33mwarning[39m  'setQuality' is assigned a value but never used      [2mno-unused-vars[22m[0m
+[0m  [2m16:25[22m  [33mwarning[39m  'setDescription' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m  [2m33:15[22m  [33mwarning[39m  'lFactor' is assigned a value but never used         [2mno-unused-vars[22m[0m
+[0m  [2m34:15[22m  [33mwarning[39m  'mFactor' is assigned a value but never used         [2mno-unused-vars[22m[0m
+[0m  [2m35:15[22m  [33mwarning[39m  'tFactor' is assigned a value but never used         [2mno-unused-vars[22m[0m
+[0m  [2m57:13[22m  [33mwarning[39m  'd' is assigned a value but never used               [2mno-unused-vars[22m[0m
+[0m  [2m60:13[22m  [33mwarning[39m  'q' is assigned a value but never used               [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\VoiceQualityView.jsx[24m[0m
+[0m    [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                    [2mno-unused-vars[22m[0m
+[0m    [2m2:29[22m  [33mwarning[39m  'Square' is defined but never used                                                                                   [2mno-unused-vars[22m[0m
+[0m    [2m2:57[22m  [33mwarning[39m  'BarChart2' is defined but never used                                                                                [2mno-unused-vars[22m[0m
+[0m    [2m8:8[22m   [33mwarning[39m  'ClipCapture' is defined but never used                                                                              [2mno-unused-vars[22m[0m
+[0m    [2m9:8[22m   [33mwarning[39m  'IntensityMeter' is defined but never used                                                                           [2mno-unused-vars[22m[0m
+[0m   [2m10:10[22m  [33mwarning[39m  'DSP' is defined but never used                                                                                      [2mno-unused-vars[22m[0m
+[0m   [2m11:10[22m  [33mwarning[39m  'getNormsForGoal' is defined but never used                                                                          [2mno-unused-vars[22m[0m
+[0m   [2m22:10[22m  [33mwarning[39m  'Line' is defined but never used                                                                                     [2mno-unused-vars[22m[0m
+[0m   [2m43:18[22m  [33mwarning[39m  'setGoal' is assigned a value but never used                                                                         [2mno-unused-vars[22m[0m
+[0m   [2m46:31[22m  [33mwarning[39m  'setIncludeTranscript' is assigned a value but never used                                                            [2mno-unused-vars[22m[0m
+[0m  [2m204:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'stopLiveAnalysis'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\views\VowelTuningView.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used      [2mno-unused-vars[22m[0m
+[0m  [2m1:27[22m  [33mwarning[39m  'useEffect' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\CPPMeter.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\ContourVisualizer.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\DynamicOrb.jsx[24m[0m
+[0m  [2m5:19[22m  [33mwarning[39m  'Flame' is defined but never used    [2mno-unused-vars[22m[0m
+[0m  [2m5:31[22m  [33mwarning[39m  'Box' is defined but never used      [2mno-unused-vars[22m[0m
+[0m  [2m6:10[22m  [33mwarning[39m  'useGLTF' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\FileSpectrogram.jsx[24m[0m
+[0m    [2m5:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                     [2mno-unused-vars[22m[0m
+[0m    [2m8:10[22m  [33mwarning[39m  'Undo2' is defined but never used                                                                                     [2mno-unused-vars[22m[0m
+[0m  [2m114:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'renderSpectrogram'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m121:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'renderSpectrogram'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m126:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'renderPlayhead'. Either include it or remove the dependency array     [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m189:8[22m   [33mwarning[39m  React Hook useCallback has a missing dependency: 'renderPlayhead'. Either include it or remove the dependency array   [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\GenderTimeline.jsx[24m[0m
+[0m    [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                    [2mno-unused-vars[22m[0m
+[0m  [2m111:33[22m  [33mwarning[39m  'i' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\HighResSpectrogram.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                 [2mno-unused-vars[22m[0m
+[0m  [2m58:13[22m  [33mwarning[39m  'animationId' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\IntensityMeter.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\IntonationTrainer.jsx[24m[0m
+[0m    [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                                      [2mno-unused-vars[22m[0m
+[0m    [2m1:46[22m  [33mwarning[39m  'useMemo' is defined but never used                                                                                                    [2mno-unused-vars[22m[0m
+[0m    [2m2:75[22m  [33mwarning[39m  'Settings' is defined but never used                                                                                                   [2mno-unused-vars[22m[0m
+[0m  [2m253:8[22m   [33mwarning[39m  React Hook useEffect has missing dependencies: 'dataRef', 'patterns', and 'score'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\LTASPlot.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                           [2mno-unused-vars[22m[0m
+[0m   [2m5:22[22m  [33mwarning[39m  'isAudioActive' is assigned a value but never used                                                          [2mno-unused-vars[22m[0m
+[0m  [2m93:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'dataRef'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\LiveMetricsBar.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\MPTTracker.jsx[24m[0m
+[0m   [2m1:8[22m  [33mwarning[39m  'React' is defined but never used                                                                             [2mno-unused-vars[22m[0m
+[0m  [2m55:8[22m  [33mwarning[39m  React Hook useEffect has a missing dependency: 'stopTimer'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\MetricCard.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\OrbLegend.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\PhonetogramChart.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\PitchOrb.jsx[24m[0m
+[0m    [2m1:8[22m  [33mwarning[39m  'React' is defined but never used                                                                                  [2mno-unused-vars[22m[0m
+[0m  [2m171:8[22m  [33mwarning[39m  React Hook useEffect has a missing dependency: 'getGenderColor'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\PitchResonanceQuadrant.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used                     [2mno-unused-vars[22m[0m
+[0m  [2m6:5[22m  [33mwarning[39m  'getPerceptionExplanation' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\PitchTrace.jsx[24m[0m
+[0m    [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                                                                  [2mno-unused-vars[22m[0m
+[0m  [2m116:17[22m  [33mwarning[39m  'isDrawing' is assigned a value but never used                                                                                                                     [2mno-unused-vars[22m[0m
+[0m  [2m184:8[22m   [33mwarning[39m  React Hook useEffect has missing dependencies: 'bounds.fMax', 'bounds.fMin', 'bounds.tMax', and 'bounds.tMin'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\PitchVisualizer.jsx[24m[0m
+[0m  [2m462:8[22m  [33mwarning[39m  React Hook useEffect has missing dependencies: 'dataRef' and 'onScore'. Either include them or remove the dependency array. If 'onScore' changes too often, find the parent component that defines it and wrap that definition in useCallback  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\ProgressCharts.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\QualityVisualizer.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used            [2mno-unused-vars[22m[0m
+[0m  [2m62:47[22m  [33mwarning[39m  'height' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\ResonanceMetrics.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\ResonanceOrb.jsx[24m[0m
+[0m    [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                     [2mno-unused-vars[22m[0m
+[0m    [2m2:16[22m  [33mwarning[39m  'WifiOff' is defined but never used                   [2mno-unused-vars[22m[0m
+[0m   [2m59:66[22m  [33mwarning[39m  'weight' is assigned a value but never used           [2mno-unused-vars[22m[0m
+[0m   [2m59:90[22m  [33mwarning[39m  'isBackendActive' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m  [2m179:27[22m  [33mwarning[39m  'shadowOpacity' is assigned a value but never used    [2mno-unused-vars[22m[0m
+[0m  [2m267:11[22m  [33mwarning[39m  'radius' is assigned a value but never used           [2mno-unused-vars[22m[0m
+[0m  [2m268:11[22m  [33mwarning[39m  'center' is assigned a value but never used           [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\SZRatio.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                              [2mno-unused-vars[22m[0m
+[0m   [2m2:10[22m  [33mwarning[39m  'Timer' is defined but never used                                                                              [2mno-unused-vars[22m[0m
+[0m  [2m10:23[22m  [33mwarning[39m  'setThreshold' is assigned a value but never used                                                              [2mno-unused-vars[22m[0m
+[0m  [2m51:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'startTimer'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\SagittalDiagram.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\SibilantGauge.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\SpectralTiltMeter.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                           [2mno-unused-vars[22m[0m
+[0m  [2m3:10[22m  [33mwarning[39m  'AlertTriangle' is defined but never used                                   [2mno-unused-vars[22m[0m
+[0m  [2m3:25[22m  [33mwarning[39m  'Activity' is defined but never used                                        [2mno-unused-vars[22m[0m
+[0m  [2m5:39[22m  [33mwarning[39m  'userMode' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m  [2m9:11[22m  [33mwarning[39m  'canvasRef' is assigned a value but never used                              [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\Spectrogram.jsx[24m[0m
+[0m    [2m1:8[22m  [33mwarning[39m  'React' is defined but never used                                                                        [2mno-unused-vars[22m[0m
+[0m  [2m105:8[22m  [33mwarning[39m  React Hook useEffect has a missing dependency: 'draw'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\Spectrogram3D.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used      [2mno-unused-vars[22m[0m
+[0m  [2m1:34[22m  [33mwarning[39m  'useEffect' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\SpectrumAnalyzer.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\StrainIndicator.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\VoiceQualityAnalysis.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\VoiceQualityMeter.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\VoiceRangeProfile.jsx[24m[0m
+[0m    [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                                                                                                                                      [2mno-unused-vars[22m[0m
+[0m    [2m2:20[22m  [33mwarning[39m  'Maximize2' is defined but never used                                                                                                                                                                                                  [2mno-unused-vars[22m[0m
+[0m    [2m2:31[22m  [33mwarning[39m  'Minimize2' is defined but never used                                                                                                                                                                                                  [2mno-unused-vars[22m[0m
+[0m   [2m50:12[22m  [33mwarning[39m  'hoverInfo' is assigned a value but never used                                                                                                                                                                                         [2mno-unused-vars[22m[0m
+[0m   [2m50:23[22m  [33mwarning[39m  'setHoverInfo' is assigned a value but never used                                                                                                                                                                                      [2mno-unused-vars[22m[0m
+[0m   [2m64:19[22m  [33mwarning[39m  'points' is assigned a value but never used                                                                                                                                                                                            [2mno-unused-vars[22m[0m
+[0m  [2m106:8[22m   [33mwarning[39m  React Hook useMemo has missing dependencies: 'config.intensityBins', 'config.maxIntensity', 'config.maxPitch', 'config.minIntensity', 'config.minPitch', and 'config.pitchBins'. Either include them or remove the dependency array    [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m212:8[22m   [33mwarning[39m  React Hook useEffect has missing dependencies: 'config.intensityBins', 'config.maxIntensity', 'config.maxPitch', 'config.minIntensity', 'config.minPitch', and 'config.pitchBins'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\VowelAnalysis.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\components\viz\VowelSpacePlot.jsx[24m[0m
+[0m    [2m3:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                                                  [2mno-unused-vars[22m[0m
+[0m    [2m5:36[22m  [33mwarning[39m  'showAnalysis' is assigned a value but never used                                                                                                  [2mno-unused-vars[22m[0m
+[0m   [2m34:12[22m  [33mwarning[39m  'currentVowel' is assigned a value but never used                                                                                                  [2mno-unused-vars[22m[0m
+[0m  [2m150:8[22m   [33mwarning[39m  React Hook useEffect has missing dependencies: 'dataRef', 'getXPos', 'getYPos', and 'targets'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\AudioContext.jsx[24m[0m
+[0m    [2m8:14[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                   [2mreact-refresh/only-export-components[22m[0m
+[0m  [2m116:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'settings.noiseGate'. Either include it or remove the dependency array                            [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m178:9[22m   [33mwarning[39m  React Hook React.useMemo has an unnecessary dependency: 'audioEngineRef.current.audioContext'. Either exclude it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\AudioContext.test.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used   [2mno-unused-vars[22m[0m
+[0m  [2m2:10[22m  [33mwarning[39m  'render' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\AuthContext.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                               [2mno-unused-vars[22m[0m
+[0m   [2m5:14[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  [2mreact-refresh/only-export-components[22m[0m
+[0m  [2m33:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'API_URL'. Either include it or remove the dependency array                      [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\AuthContext.test.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\ClientContext.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                               [2mno-unused-vars[22m[0m
+[0m  [2m6:14[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  [2mreact-refresh/only-export-components[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\GuidedJourneyContext.jsx[24m[0m
+[0m    [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                               [2mno-unused-vars[22m[0m
+[0m  [2m266:14[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  [2mreact-refresh/only-export-components[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\JournalContext.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                               [2mno-unused-vars[22m[0m
+[0m  [2m8:14[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  [2mreact-refresh/only-export-components[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\LanguageContext.jsx[24m[0m
+[0m   [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                               [2mno-unused-vars[22m[0m
+[0m   [2m6:14[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  [2mreact-refresh/only-export-components[22m[0m
+[0m  [2m10:26[22m  [33mwarning[39m  'setTranslations' is assigned a value but never used                                                                            [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\LanguageContext.test.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m  [2m3:32[22m  [33mwarning[39m  'vi' is defined but never used     [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\LayoutContext.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                               [2mno-unused-vars[22m[0m
+[0m  [2m5:14[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  [2mreact-refresh/only-export-components[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\NavigationContext.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                               [2mno-unused-vars[22m[0m
+[0m  [2m6:14[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  [2mreact-refresh/only-export-components[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\PracticeCardsContext.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                               [2mno-unused-vars[22m[0m
+[0m  [2m7:14[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  [2mreact-refresh/only-export-components[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\ProfileContext.jsx[24m[0m
+[0m    [2m5:14[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Move your React context(s) to a separate file                                                                                                                                                              [2mreact-refresh/only-export-components[22m[0m
+[0m    [2m7:14[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                          [2mreact-refresh/only-export-components[22m[0m
+[0m  [2m289:9[22m   [33mwarning[39m  React Hook React.useMemo has missing dependencies: 'logFatigue', 'switchProfile', 'updateCalibration', 'updateFilterSettings', 'updateHydration', 'updateOnboardingStatus', 'updateTargetRange', and 'updateUsage'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\SettingsContext.jsx[24m[0m
+[0m    [2m9:17[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components    [2mreact-refresh/only-export-components[22m[0m
+[0m  [2m160:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'settings.visualizationQuality'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\StatsContext.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                               [2mno-unused-vars[22m[0m
+[0m  [2m8:14[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  [2mreact-refresh/only-export-components[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\ToastContext.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                               [2mno-unused-vars[22m[0m
+[0m  [2m6:14[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  [2mreact-refresh/only-export-components[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\context\TourContext.jsx[24m[0m
+[0m  [2m1:8[22m   [33mwarning[39m  'React' is defined but never used                                                                                               [2mno-unused-vars[22m[0m
+[0m  [2m6:14[22m  [33mwarning[39m  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  [2mreact-refresh/only-export-components[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\data\vocalHealthTips.jsx[24m[0m
+[0m  [2m1:20[22m  [33mwarning[39m  'HeartPulse' is defined but never used  [2mno-unused-vars[22m[0m
+[0m  [2m2:8[22m   [33mwarning[39m  'React' is defined but never used       [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\hooks\useAchievements.js[24m[0m
+[0m  [2m26:8[22m  [33mwarning[39m  React Hook useEffect has a missing dependency: 'achievements'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\main.jsx[24m[0m
+[0m  [2m1:8[22m  [33mwarning[39m  'React' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\services\AnalysisEngine.js[24m[0m
+[0m  [2m79:13[22m  [33mwarning[39m  'lowPitchDuration' is assigned a value but never used                    [2mno-unused-vars[22m[0m
+[0m  [2m80:13[22m  [33mwarning[39m  'highPitchDuration' is assigned a value but never used                   [2mno-unused-vars[22m[0m
+[0m  [2m83:29[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\services\FeedbackService.js[24m[0m
+[0m  [2m28:54[22m  [33mwarning[39m  'personality' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\services\IndexedDBManager.js[24m[0m
+[0m  [2m8:7[22m  [33mwarning[39m  'DB_VERSION' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\services\IndexedDBManager.test.js[24m[0m
+[0m  [2m2:44[22m  [33mwarning[39m  'afterEach' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\services\RoutineBuilder.js[24m[0m
+[0m  [2m106:69[22m  [33mwarning[39m  'difficulty' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\services\SyncManager.js[24m[0m
+[0m  [2m227:38[22m  [33mwarning[39m  'serverData' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\services\practiceCardsService.test.js[24m[0m
+[0m  [2m2:55[22m  [33mwarning[39m  'vi' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\test\IndexedDBManager.test.js[24m[0m
+[0m  [2m1:44[22m  [33mwarning[39m  'vi' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\test\PracticeRoutineGenerator.test.js[24m[0m
+[0m  [2m3:10[22m  [33mwarning[39m  'EXERCISE_LIBRARY' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\test\ProfileContext.test.jsx[24m[0m
+[0m  [2m2:10[22m  [33mwarning[39m  'render' is defined but never used  [2mno-unused-vars[22m[0m
+[0m  [2m2:18[22m  [33mwarning[39m  'screen' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\utils\CoachingEngine.js[24m[0m
+[0m   [2m71:20[22m  [33mwarning[39m  'data' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m   [2m71:26[22m  [33mwarning[39m  'now' is defined but never used. Allowed unused args must match /^_/u   [2mno-unused-vars[22m[0m
+[0m   [2m90:26[22m  [33mwarning[39m  'now' is defined but never used. Allowed unused args must match /^_/u   [2mno-unused-vars[22m[0m
+[0m  [2m105:22[22m  [33mwarning[39m  'now' is defined but never used. Allowed unused args must match /^_/u   [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\utils\FormantAnalyzer.js[24m[0m
+[0m  [2m9:29[22m  [33mwarning[39m  'sampleRate' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\utils\coachEngine.js[24m[0m
+[0m  [2m304:68[22m  [33mwarning[39m  'focus' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\utils\coachEngine.test.js[24m[0m
+[0m  [2m1:32[22m  [33mwarning[39m  'vi' is defined but never used                [2mno-unused-vars[22m[0m
+[0m  [2m3:10[22m  [33mwarning[39m  'KnowledgeService' is defined but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\utils\historyService.js[24m[0m
+[0m   [2m98:32[22m  [33mwarning[39m  'event' is defined but never used. Allowed unused args must match /^_/u   [2mno-unused-vars[22m[0m
+[0m  [2m116:32[22m  [33mwarning[39m  'event' is defined but never used. Allowed unused args must match /^_/u   [2mno-unused-vars[22m[0m
+[0m  [2m150:38[22m  [33mwarning[39m  'reject' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\utils\pdfReportGenerator.js[24m[0m
+[0m  [2m55:9[22m  [33mwarning[39m  'yPos' is assigned a value but never used  [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\riley\Desktop\GEM\src\utils\voiceAnalysis.js[24m[0m
+[0m  [2m117:31[22m  [33mwarning[39m  'sampleRate' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m  [2m233:17[22m  [33mwarning[39m  'peakIndex' is assigned a value but never used                                [2mno-unused-vars[22m[0m
+[0m  [2m327:17[22m  [33mwarning[39m  'energyLow' is assigned a value but never used                                [2mno-unused-vars[22m[0m
+[0m  [2m347:29[22m  [33mwarning[39m  'sampleRate' is defined but never used. Allowed unused args must match /^_/u  [2mno-unused-vars[22m[0m
+[0m  [2m374:15[22m  [33mwarning[39m  'minDistance' is assigned a value but never used                              [2mno-unused-vars[22m[0m
+[0m[0m
+[0m[31m[1m✖ 489 problems (1 error, 488 warnings)[22m[39m[0m
+[0m[31m[1m[22m[39m[0m

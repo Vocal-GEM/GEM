@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import CoachView from './CoachView';
 
 // Mock contexts
@@ -25,6 +25,15 @@ vi.mock('../../context/LanguageContext', () => ({
     })
 }));
 
+// Mock NavigationContext
+const mockUseNavigation = vi.fn();
+vi.mock('../../context/NavigationContext', () => ({
+    useNavigation: () => mockUseNavigation(),
+    NavigationProvider: ({ children }) => <div>{children}</div>
+}));
+
+const MockNavigationProvider = ({ children }) => <div>{children}</div>;
+
 // Mock services
 vi.mock('../../utils/historyService', () => ({
     historyService: {
@@ -36,6 +45,10 @@ vi.mock('../../utils/historyService', () => ({
 Element.prototype.scrollIntoView = vi.fn();
 
 describe('CoachView Component', () => {
+    beforeEach(() => {
+        mockUseNavigation.mockReturnValue({ activeView: 'coach', navigateTo: vi.fn() });
+    });
+
     it('renders empty state when messages are cleared or initial', async () => {
         // Note: CoachView initializes with one message. 
         // We need to simulate a state where it might show empty state if designed that way,
@@ -53,7 +66,7 @@ describe('CoachView Component', () => {
         // However, if we can't easily reach empty state, maybe we should skip this test or modify the component.
         // For now, let's try to render it and see what happens.
 
-        render(<CoachView />);
+        render(<CoachView />, { wrapper: MockNavigationProvider });
 
         // If it starts with a message, it won't show empty state.
         // But wait, the previous summary said: "Integrated when the chat message history is empty (CTA: "Say Hello")."
