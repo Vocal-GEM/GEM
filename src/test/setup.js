@@ -99,7 +99,11 @@ global.window.indexedDB = indexedDBMock;
 vi.mock('lucide-react', async (importOriginal) => {
     const actual = await importOriginal();
     const { default: React } = await import('react');
-    const createIcon = (name) => (props) => React.createElement('svg', { ...props, 'data-testid': `icon-${name}` });
+    const createIcon = (name) => {
+        const IconComponent = (props) => React.createElement('svg', { ...props, 'data-testid': `icon-${name}` });
+        IconComponent.displayName = `MockIcon${name.charAt(0).toUpperCase() + name.slice(1)}`;
+        return IconComponent;
+    };
     return {
         ...actual,
         Zap: createIcon('zap'),
