@@ -130,7 +130,6 @@ const App = () => {
     const setShowProfile = (v) => v ? openModal('profile') : closeModal('profile');
 
     const showIncognito = modals.incognito;
-    const setShowIncognito = (v) => v ? openModal('incognito') : closeModal('incognito');
 
     const showCamera = modals.camera;
     const setShowCamera = (v) => v ? openModal('camera') : closeModal('camera');
@@ -156,7 +155,7 @@ const App = () => {
     const setShowWarmUp = (v) => v ? openModal('warmup') : closeModal('warmup');
 
     const showVocalFolds = modals.vocalFolds;
-    const setShowVocalFolds = (v) => v ? openModal('vocalFolds') : closeModal('vocalFolds');
+
 
     // Onboarding hooks
     const { unlockedAchievement, closeAchievement } = useAchievements();
@@ -167,7 +166,7 @@ const App = () => {
         if (audioEngineRef.current) {
             audioEngineRef.current.setListenMode(settings.listenMode);
         }
-    }, [settings.listenMode, audioEngineRef.current]);
+    }, [settings.listenMode]);
 
     // Handle QuickSettings -> Advanced Settings transition
     useEffect(() => {

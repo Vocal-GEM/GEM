@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { KnowledgeService } from '../../services/KnowledgeService';
 import { Send, Bot, User, Sparkles } from 'lucide-react';
@@ -89,9 +89,9 @@ const AICoach = () => {
                         `}>
                             <ReactMarkdown
                                 components={{
-                                    strong: ({ node, ...props }) => <span className="font-bold text-indigo-300" {...props} />,
-                                    ul: ({ node, ...props }) => <ul className="list-disc pl-4 my-2 space-y-1" {...props} />,
-                                    li: ({ node, ...props }) => <li className="text-slate-300" {...props} />
+                                    strong: ({ node: _node, ...props }) => <span className="font-bold text-indigo-300" {...props} />,
+                                    ul: ({ node: _node, ...props }) => <ul className="list-disc pl-4 my-2 space-y-1" {...props} />,
+                                    li: ({ node: _node, ...props }) => <li className="text-slate-300" {...props} />
                                 }}
                             >
                                 {msg.text}
