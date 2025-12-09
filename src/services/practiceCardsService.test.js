@@ -69,8 +69,10 @@ describe('practiceCardsService', () => {
             const sets = await practiceCardsService.getCustomCardSets();
 
             expect(sets).toHaveLength(2);
-            expect(sets[0].name).toBe('Set One');
-            expect(sets[1].name).toBe('Set Two');
+            // Sort by name to ensure consistent ordering
+            const sortedSets = sets.sort((a, b) => a.name.localeCompare(b.name));
+            expect(sortedSets[0].name).toBe('Set One');
+            expect(sortedSets[1].name).toBe('Set Two');
         });
 
         it('should update a custom card set', async () => {

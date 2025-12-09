@@ -122,9 +122,8 @@ global.indexedDB = indexedDBMock;
 global.window.indexedDB = indexedDBMock;
 
 // Mock Lucide React
-vi.mock('lucide-react', async (importOriginal) => {
-    const actual = await importOriginal();
-    const { default: React } = await import('react');
+vi.mock('lucide-react', () => {
+    const React = require('react');
 
     // Helper to create a mock icon
     const createIcon = (name) => {
@@ -138,8 +137,7 @@ vi.mock('lucide-react', async (importOriginal) => {
     };
 
     return {
-        ...actual,
-        // Explicitly mock common icons used in the app
+        // Explicitly mock all icons used in the app
         Zap: createIcon('zap'),
         Activity: createIcon('activity'),
         User: createIcon('user'),
@@ -165,6 +163,5 @@ vi.mock('lucide-react', async (importOriginal) => {
         Stethoscope: createIcon('stethoscope'),
         Utensils: createIcon('utensils'),
         Wind: createIcon('wind'),
-        // Add minimal generic fallback if feasible, but better to be explicit to avoid Proxy loops
     };
 });
