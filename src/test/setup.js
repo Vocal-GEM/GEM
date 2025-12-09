@@ -98,16 +98,18 @@ global.window.indexedDB = indexedDBMock;
 // Mock Lucide React
 vi.mock('lucide-react', async (importOriginal) => {
     const actual = await importOriginal();
+    const { default: React } = await import('react');
+    const createIcon = (name) => (props) => React.createElement('svg', { ...props, 'data-testid': `icon-${name}` });
     return {
         ...actual,
-        Zap: (props) => <svg {...props} data-testid="icon-zap" />,
-        Droplets: (props) => <svg {...props} data-testid="icon-droplets" />,
-        HeartPulse: (props) => <svg {...props} data-testid="icon-heart-pulse" />,
-        Moon: (props) => <svg {...props} data-testid="icon-moon" />,
-        AlertTriangle: (props) => <svg {...props} data-testid="icon-alert-triangle" />,
-        Music: (props) => <svg {...props} data-testid="icon-music" />,
-        Stethoscope: (props) => <svg {...props} data-testid="icon-stethoscope" />,
-        Utensils: (props) => <svg {...props} data-testid="icon-utensils" />,
-        Wind: (props) => <svg {...props} data-testid="icon-wind" />,
+        Zap: createIcon('zap'),
+        Droplets: createIcon('droplets'),
+        HeartPulse: createIcon('heart-pulse'),
+        Moon: createIcon('moon'),
+        AlertTriangle: createIcon('alert-triangle'),
+        Music: createIcon('music'),
+        Stethoscope: createIcon('stethoscope'),
+        Utensils: createIcon('utensils'),
+        Wind: createIcon('wind'),
     };
 });
