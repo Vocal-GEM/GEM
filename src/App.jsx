@@ -41,16 +41,11 @@ const PracticeCardsPanel = lazy(() => import('./components/ui/PracticeCardsPanel
 const ProgramView = lazy(() => import('./components/views/ProgramView'));
 
 // Lazy Loaded Components - Visualizations
-const Spectrogram = lazy(() => import('./components/viz/Spectrogram'));
-const ResonanceMetrics = lazy(() => import('./components/viz/ResonanceMetrics'));
+// Lazy Loaded Components - Visualizations
 
 import FeedbackSettings from './components/ui/FeedbackSettings';
 import FeedbackModal from './components/ui/FeedbackModal';
-import CourseCard from './components/ui/CourseCard';
 import BottomNav from './components/ui/BottomNav';
-import PracticeFilterMenu from './components/ui/PracticeFilterMenu';
-import TooltipOverlay from './components/ui/TooltipOverlay';
-import QuickActions from './components/ui/QuickActions';
 import CelebrationModal from './components/ui/CelebrationModal';
 import ErrorRecovery from './components/ui/ErrorRecovery';
 import { useOnboarding } from './hooks/useOnboarding';
@@ -62,20 +57,14 @@ import { TourProvider } from './context/TourContext';
 import TourOverlay from './components/ui/TourOverlay';
 
 import CommandPalette from './components/ui/CommandPalette';
-import Breadcrumbs from './components/ui/Breadcrumbs';
+import { PracticeCardsProvider } from './context/PracticeCardsContext';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
 import QuickSettings from './components/ui/QuickSettings';
 import { analyticsService } from './services/AnalyticsService';
-
-
-
-
 const App = () => {
     const {
         audioEngineRef,
         dataRef,
-        isAudioActive,
-        toggleAudio,
         audioError
     } = useAudio();
 
@@ -113,20 +102,14 @@ const App = () => {
         setShowJournalForm
     } = useJournal();
 
-    // Local state for UI only
-    // userMode removed as per request
-
     const {
         activeView: activeTab,
         navigate: setActiveTab,
-        practiceTab: practiceView,
-        switchPracticeTab: setPracticeView,
         modals,
         openModal,
         closeModal
     } = useNavigation();
 
-    const [showQuickSettings, setShowQuickSettings] = useState(false);
     const [dismissedError, setDismissedError] = useState(false);
 
     // Initialize Analytics
@@ -134,9 +117,7 @@ const App = () => {
         analyticsService.init(settings.analyticsEnabled);
     }, [settings.analyticsEnabled]);
 
-    // Derived state for backward compatibility
-    // Derived state for backward compatibility - using modals state directly where possible
-    // or ensuring no shadowing if variables are already declared above
+
 
 
     const showLogin = modals.login;
@@ -400,7 +381,8 @@ const App = () => {
 
                         <TourOverlay />
                         <CommandPalette />
-                        <QuickSettings isOpen={showQuickSettings} onClose={() => setShowQuickSettings(false)} />
+                        <CommandPalette />
+                        <QuickSettings isOpen={false} onClose={() => { }} />
                         {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
                         {modals.analytics && <AnalyticsDashboard onClose={() => closeModal('analytics')} />}
                         {modals.adaptiveSession && (
