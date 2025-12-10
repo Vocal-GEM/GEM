@@ -67,7 +67,7 @@ const InspirationBoard = ({ onComplete }) => {
                                         <h4 className="font-bold text-white text-lg">{voice.name}</h4>
                                         <span className="text-xs px-2 py-0.5 bg-slate-800 rounded-full text-slate-400 border border-slate-700">{voice.relation}</span>
                                     </div>
-                                    <p className="text-sm text-pink-300 italic mb-3">"{voice.feelings}"</p>
+                                    <p className="text-sm text-pink-300 italic mb-3">&quot;{voice.feelings}&quot;</p>
 
                                     <div className="flex flex-col sm:flex-row gap-4 text-sm">
                                         <div className="flex items-start gap-2 text-slate-400">
@@ -206,8 +206,8 @@ const InspirationBoard = ({ onComplete }) => {
                     onClick={() => onComplete?.(voices.filter(v => v.isTopPick))}
                     disabled={topPicksCount < 1}
                     className={`px-6 py-2 rounded-lg font-bold transition-all ${topPicksCount >= 1
-                            ? 'bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-900/20'
-                            : 'bg-slate-800 text-slate-600 cursor-not-allowed'
+                        ? 'bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-900/20'
+                        : 'bg-slate-800 text-slate-600 cursor-not-allowed'
                         }`}
                 >
                     Save Picks

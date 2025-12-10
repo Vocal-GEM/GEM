@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { Play, Square, Target, Info } from 'lucide-react';
 
-const ResonanceTrainingModule = ({ targetVowel = 'i', onComplete }) => {
+const ResonanceTrainingModule = ({ targetVowel = 'i', onComplete: _onComplete }) => {
     const { dataRef, isAudioActive, toggleAudio } = useAudio();
     const [isPlaying, setIsPlaying] = useState(false);
     const [score, setScore] = useState(0);
@@ -128,6 +128,7 @@ const ResonanceTrainingModule = ({ targetVowel = 'i', onComplete }) => {
         }
 
         return () => cancelAnimationFrame(animationId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isPlaying, currentTarget]);
 
     const handleStart = () => {

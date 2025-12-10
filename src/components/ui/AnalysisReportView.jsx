@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Play, Pause, AlertCircle, CheckCircle, X } from 'lucide-react';
 import { SessionAnalyzer } from '../../utils/SessionAnalyzer';
 

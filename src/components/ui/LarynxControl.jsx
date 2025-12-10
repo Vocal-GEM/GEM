@@ -73,8 +73,8 @@ const LarynxControl = ({ onComplete }) => {
                         key={ex.id}
                         onClick={() => setActiveExercise(ex.id)}
                         className={`p-3 rounded-xl border transition-all flex flex-col items-center gap-2 text-center ${activeExercise === ex.id
-                                ? 'bg-slate-800 border-pink-500 shadow-lg shadow-pink-900/20'
-                                : 'bg-slate-900 border-slate-800 hover:bg-slate-800'
+                            ? 'bg-slate-800 border-pink-500 shadow-lg shadow-pink-900/20'
+                            : 'bg-slate-900 border-slate-800 hover:bg-slate-800'
                             }`}
                     >
                         <div className={`${activeExercise === ex.id ? ex.color : 'text-slate-500'}`}>
@@ -115,7 +115,7 @@ const LarynxControl = ({ onComplete }) => {
                             )}
                             {ex.id === 'swallow' && (
                                 <div className="p-4 bg-pink-900/20 border border-pink-500/30 rounded-lg text-sm text-pink-300">
-                                    💡 <strong>Can't hold it?</strong> Don't worry, 50% of people can't. Try the Pull-ups instead!
+                                    💡 <strong>Can&apos;t hold it?</strong> Don&apos;t worry, 50% of people can&apos;t. Try the Pull-ups instead!
                                 </div>
                             )}
                         </div>
@@ -128,7 +128,7 @@ const LarynxControl = ({ onComplete }) => {
                     onClick={onComplete}
                     className="px-8 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold flex items-center gap-2 transition-colors"
                 >
-                    I've Explored These <ChevronRight size={18} />
+                    I&apos;ve Explored These <ChevronRight size={18} />
                 </button>
             </div>
         </div>

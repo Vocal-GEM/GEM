@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAudio } from '../../context/AudioContext';
-import { Play, Square, TrendingUp, TrendingDown, Activity, RefreshCw } from 'lucide-react';
+import { Play, TrendingUp, TrendingDown, Activity, RefreshCw } from 'lucide-react';
 
 const IntonationTrainingModule = ({ patternType = 'rising', onComplete }) => {
     const { dataRef, isAudioActive, toggleAudio } = useAudio();
@@ -137,6 +137,7 @@ const IntonationTrainingModule = ({ patternType = 'rising', onComplete }) => {
         if (isPlaying) draw();
 
         return () => cancelAnimationFrame(animationId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isPlaying, currentPattern]);
 
     const handleStart = () => {

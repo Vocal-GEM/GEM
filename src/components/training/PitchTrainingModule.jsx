@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAudio } from '../../context/AudioContext';
-import { Play, Square, Trophy, Target, Volume2 } from 'lucide-react';
+import { Play, Square, Target, Volume2 } from 'lucide-react';
 
 const PitchTrainingModule = ({ targetNote = 'A3', targetFreq = 220, tolerance = 5, onComplete }) => {
     const { dataRef, isAudioActive, toggleAudio, audioEngine } = useAudio();
     const [isPlaying, setIsPlaying] = useState(false);
     const [score, setScore] = useState(0);
-    const [streak, setStreak] = useState(0);
+    const [_streak, setStreak] = useState(0);
     const [feedback, setFeedback] = useState('Ready');
     const [feedbackColor, setFeedbackColor] = useState('text-slate-400');
 
@@ -89,6 +89,7 @@ const PitchTrainingModule = ({ targetNote = 'A3', targetFreq = 220, tolerance = 
         }
 
         return () => cancelAnimationFrame(animationId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isPlaying, targetFreq, tolerance]);
 
     const handleStart = () => {

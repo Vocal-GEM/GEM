@@ -53,10 +53,10 @@ const MWordChallenge = ({ onComplete }) => {
     return (
         <div className="space-y-6">
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-                <h2 className="text-2xl font-bold text-white mb-2">The "M-Word" Challenge</h2>
+                <h2 className="text-2xl font-bold text-white mb-2">The &quot;M-Word&quot; Challenge</h2>
                 <p className="text-slate-400 mb-4">
-                    The "Umm" sound is a perfect trigger because it naturally brings the sound forward.
-                    Use "Umm..." to set your resonance, then slide into the word.
+                    The &quot;Umm&quot; sound is a perfect trigger because it naturally brings the sound forward.
+                    Use &quot;Umm...&quot; to set your resonance, then slide into the word.
                 </p>
                 <div className="bg-purple-900/30 border border-purple-500/30 p-4 rounded-xl flex items-center gap-4">
                     <div className="text-2xl font-bold text-purple-400">"Umm..."</div>
@@ -114,8 +114,8 @@ const MWordChallenge = ({ onComplete }) => {
                                         <button
                                             onClick={() => handleLevelComplete(level.id)}
                                             className={`px-4 py-2 rounded-lg font-bold flex items-center gap-2 ${isCompleted
-                                                    ? 'bg-green-600/20 text-green-400'
-                                                    : 'bg-purple-600 text-white hover:bg-purple-500'
+                                                ? 'bg-green-600/20 text-green-400'
+                                                : 'bg-purple-600 text-white hover:bg-purple-500'
                                                 }`}
                                         >
                                             {isCompleted ? 'Completed' : 'Mark Complete & Unlock Next'}
