@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Battery, Clock, AlertTriangle, ChevronRight, Sparkles, Lightbulb } from 'lucide-react';
+import { Battery, Clock, AlertTriangle, Sparkles, Lightbulb } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { vocalHealthTips } from '../../data/vocalHealthTips';
 import VocalHealthTips from '../ui/VocalHealthTips'; // Assuming we'll repurpose or verify this path

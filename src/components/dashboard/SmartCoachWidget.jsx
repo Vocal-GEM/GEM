@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Play, Sparkles, Target, Calendar } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 

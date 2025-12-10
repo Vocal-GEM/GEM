@@ -58,7 +58,6 @@ import { TourProvider } from './context/TourContext';
 import TourOverlay from './components/ui/TourOverlay';
 
 import CommandPalette from './components/ui/CommandPalette';
-import { PracticeCardsProvider } from './context/PracticeCardsContext';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
 import QuickSettings from './components/ui/QuickSettings';
 import { analyticsService } from './services/AnalyticsService';
@@ -130,7 +129,7 @@ const App = () => {
     const showProfile = modals.profile;
     const setShowProfile = (v) => v ? openModal('profile') : closeModal('profile');
 
-    const showIncognito = modals.incognito;
+    const _showIncognito = modals.incognito;
 
     const showCamera = modals.camera;
     const setShowCamera = (v) => v ? openModal('camera') : closeModal('camera');
@@ -155,7 +154,7 @@ const App = () => {
     const showWarmUp = modals.warmup;
     const setShowWarmUp = (v) => v ? openModal('warmup') : closeModal('warmup');
 
-    const showVocalFolds = modals.vocalFolds;
+    const _showVocalFolds = modals.vocalFolds;
 
 
     // Onboarding hooks
@@ -167,7 +166,7 @@ const App = () => {
         if (audioEngineRef.current) {
             audioEngineRef.current.setListenMode(settings.listenMode);
         }
-    }, [settings.listenMode]);
+    }, [settings.listenMode, audioEngineRef]);
 
     // Handle QuickSettings -> Advanced Settings transition
     useEffect(() => {

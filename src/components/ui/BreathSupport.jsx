@@ -44,7 +44,7 @@ const BreathSupport = ({ onComplete }) => {
                         <p className="text-slate-300">
                             1. Put your hands on your waist (side ribs).<br />
                             2. Take a deep breath. Feel your ribs push your hands <strong>OUT</strong>.<br />
-                            3. Hiss ("Ssssss") loudly and steadily.
+                            3. Hiss (&quot;Ssssss&quot;) loudly and steadily.
                         </p>
                         <button onClick={() => setStep(1)} className="w-full py-3 bg-blue-600 rounded-xl font-bold text-white">Start Hiss</button>
                     </div>
@@ -53,7 +53,7 @@ const BreathSupport = ({ onComplete }) => {
                 {step === 1 && (
                     <div className="text-center animate-in zoom-in">
                         <div className="text-4xl font-black text-blue-400 mb-2">SSSSSS...</div>
-                        <p className="text-white mb-4">Keep your ribs EXPANDED. Don't let them collapse instantly.</p>
+                        <p className="text-white mb-4">Keep your ribs EXPANDED. Do not let them collapse instantly.</p>
                         <button onClick={() => setStep(2)} className="w-full py-3 bg-slate-700 rounded-xl font-bold text-white">Done</button>
                     </div>
                 )}
@@ -73,7 +73,7 @@ const BreathSupport = ({ onComplete }) => {
             <div className="flex gap-2 p-4 bg-indigo-900/20 border border-indigo-500/30 rounded-xl text-sm text-indigo-200">
                 <Info className="shrink-0" size={20} />
                 <span>
-                    <strong>Concept:</strong> "Flow Phonation" means finding the balance where air flows freely without the throat squeezing to stop it.
+                    <strong>Concept:</strong> &quot;Flow Phonation&quot; means finding the balance where air flows freely without the throat squeezing to stop it.
                 </span>
             </div>
         </div>

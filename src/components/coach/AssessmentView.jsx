@@ -1,4 +1,3 @@
-import React from 'react';
 import { CheckCircle, AlertCircle, Lightbulb, Target, X } from 'lucide-react';
 
 const AssessmentView = ({ feedback, onClose, onPractice }) => {

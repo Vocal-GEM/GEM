@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Play, Pause, Mic, Square, RefreshCw, Volume2, CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Mic, Square, RefreshCw, Volume2, XCircle, ArrowLeft } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 
 /**

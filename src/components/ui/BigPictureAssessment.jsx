@@ -23,7 +23,7 @@ const BigPictureAssessment = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">The Big Picture Assessment</h2>
                 <p className="text-slate-400">
-                    Now that you understand Pitch, Weight, and Resonance, let's revisit your lists from Week 1.
+                    Now that you understand Pitch, Weight, and Resonance, let&apos;s revisit your lists from Week 1.
                     Update your descriptions using this new vocabulary.
                 </p>
             </div>
@@ -35,8 +35,8 @@ const BigPictureAssessment = ({ onComplete }) => {
                         key={type.id}
                         onClick={() => setSelectedList(type.id)}
                         className={`flex flex-col items-start p-4 rounded-xl border min-w-[200px] transition-all ${selectedList === type.id
-                                ? 'bg-purple-900/30 border-purple-500 ring-1 ring-purple-500'
-                                : 'bg-slate-800 border-slate-700 hover:bg-slate-700'
+                            ? 'bg-purple-900/30 border-purple-500 ring-1 ring-purple-500'
+                            : 'bg-slate-800 border-slate-700 hover:bg-slate-700'
                             }`}
                     >
                         <span className={`font-bold ${selectedList === type.id ? 'text-purple-300' : 'text-white'}`}>
@@ -54,7 +54,7 @@ const BigPictureAssessment = ({ onComplete }) => {
                 </h3>
 
                 <div>
-                    <label className="block text-slate-400 text-sm mb-1">Item Name (e.g. "My Angry Voice" or "Beyoncé")</label>
+                    <label className="block text-slate-400 text-sm mb-1">Item Name (e.g. &quot;My Angry Voice&quot; or &quot;Beyoncé&quot;)</label>
                     <input
                         className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-purple-500 outline-none"
                         value={currentObservation.item}
