@@ -10,7 +10,7 @@ const InflectionLesson = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">Module 6: Inflection</h2>
                 <p className="text-slate-400">
-                    The "Melody" of speech. How we emphasize words gives them meaning.
+                    The &quot;Melody&quot; of speech. How we emphasize words gives them meaning.
                 </p>
             </div>
 
@@ -24,8 +24,8 @@ const InflectionLesson = ({ onComplete }) => {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex-1 py-3 px-4 rounded-lg font-bold transition-all ${activeTab === tab.id
-                                ? 'bg-indigo-600 text-white shadow-lg'
-                                : 'text-slate-400 hover:text-white'
+                            ? 'bg-indigo-600 text-white shadow-lg'
+                            : 'text-slate-400 hover:text-white'
                             }`}
                     >
                         {tab.label}
@@ -52,7 +52,7 @@ const InflectionLesson = ({ onComplete }) => {
                                     <svg viewBox="0 0 100 40" className="w-full h-full text-indigo-500">
                                         <path d="M10,30 Q30,30 40,10 Q50,30 90,30" fill="none" stroke="currentColor" strokeWidth="2" />
                                     </svg>
-                                    <span className="absolute text-xs text-white bg-slate-900 px-2 py-1 rounded top-2">"Really?"</span>
+                                    <span className="absolute text-xs text-white bg-slate-900 px-2 py-1 rounded top-2">&quot;Really?&quot;</span>
                                 </div>
                             </div>
 
@@ -99,8 +99,8 @@ const InflectionLesson = ({ onComplete }) => {
                                         key={i}
                                         onClick={() => setEmphasisWord(i)}
                                         className={`px-2 rounded transition-all transform ${emphasisWord === i
-                                                ? 'bg-indigo-600 text-white scale-110 shadow-lg -translate-y-1 font-bold italic'
-                                                : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                                            ? 'bg-indigo-600 text-white scale-110 shadow-lg -translate-y-1 font-bold italic'
+                                            : 'text-slate-300 hover:text-white hover:bg-slate-800'
                                             }`}
                                     >
                                         {word}

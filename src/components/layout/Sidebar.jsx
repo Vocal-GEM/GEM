@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Home, Mic, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, User, Waves } from 'lucide-react';
+import { useState } from 'react';
+import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, User, Waves } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
@@ -15,7 +15,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
     const [showProfileManager, setShowProfileManager] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [showSignup, setShowSignup] = useState(false);
-    const { activeProfile } = useProfile();
+    const { activeProfile: _activeProfile } = useProfile();
     const { user, logout } = useAuth();
     const { openModal } = useNavigation();
 

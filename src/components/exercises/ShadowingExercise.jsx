@@ -52,7 +52,7 @@ const TARGET_CLIPS = [
 ];
 
 const ShadowingExercise = ({ embedded = false, onClose }) => {
-    const { audioEngineRef, dataRef, isAudioActive, toggleAudio } = useAudio();
+    const { audioEngineRef: _audioEngineRef, dataRef, isAudioActive, toggleAudio } = useAudio();
 
     const [selectedClip, setSelectedClip] = useState(null); // customized to null initially to show selection
     const [isPlaying, setIsPlaying] = useState(false);
@@ -154,7 +154,8 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
             setPhase('listen');
             speakText(selectedClip.text, selectedClip.rate, selectedClip.pitch);
         }
-    }, [selectedClip, phase]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedClip]);
 
     const handleStartRecording = useCallback(async () => {
         if (!isAudioActive) {
@@ -169,7 +170,8 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
         setTimeout(() => {
             if (isRecording) handleStopRecording();
         }, 8000);
-    }, [isAudioActive, toggleAudio, isRecording]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAudioActive, toggleAudio]);
 
     const handleStopRecording = useCallback(() => {
         setIsRecording(false);
@@ -208,7 +210,7 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
         return Math.min(100, Math.round(pitchScore + rangeScore));
     };
 
-    const handleReset = () => {
+    const _handleReset = () => {
         setPhase('select');
         setUserPitchCurve([]);
         setScore(null);

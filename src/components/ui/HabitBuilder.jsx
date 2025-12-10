@@ -74,8 +74,8 @@ const HabitBuilder = ({ onComplete }) => {
                     <div className="p-6 bg-slate-950 rounded-xl border border-dashed border-slate-700 text-center animate-in zoom-in-95">
                         <div className="text-slate-500 text-sm mb-2">Your implementation intention:</div>
                         <div className="text-xl md:text-2xl font-bold text-white leading-relaxed">
-                            "After I <span className="text-indigo-400 border-b-2 border-indigo-500/50">{existingHabit}</span>,<br />
-                            I will <span className="text-pink-400 border-b-2 border-pink-500/50">{newAction}</span>!"
+                            &quot;After I <span className="text-indigo-400 border-b-2 border-indigo-500/50">{existingHabit}</span>,<br />
+                            I will <span className="text-pink-400 border-b-2 border-pink-500/50">{newAction}</span>!&quot;
                         </div>
                     </div>
                 )}

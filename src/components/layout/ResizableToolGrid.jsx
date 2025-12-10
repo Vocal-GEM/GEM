@@ -59,7 +59,7 @@ const ResizableToolGrid = ({ children, className = '' }) => {
 };
 
 // Wrapper component for individual tools
-export const GridTool = ({ toolId, title, children, showDragHandle = true }) => {
+export const GridTool = ({ toolId: _toolId, title, children, showDragHandle = true }) => {
     const { isLocked } = useLayout();
 
     return (

@@ -117,7 +117,7 @@ const CognitiveLoadGames = ({ onComplete }) => {
                     onClick={onComplete}
                     className="px-8 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200 transition-colors shadow-lg"
                 >
-                    I'm Ready for Real Life
+                    I&apos;m Ready for Real Life
                 </button>
             </div>
         </div>

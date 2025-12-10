@@ -129,8 +129,6 @@ const App = () => {
     const showProfile = modals.profile;
     const setShowProfile = (v) => v ? openModal('profile') : closeModal('profile');
 
-    const _showIncognito = modals.incognito;
-
     const showCamera = modals.camera;
     const setShowCamera = (v) => v ? openModal('camera') : closeModal('camera');
 
@@ -153,8 +151,6 @@ const App = () => {
 
     const showWarmUp = modals.warmup;
     const setShowWarmUp = (v) => v ? openModal('warmup') : closeModal('warmup');
-
-    const _showVocalFolds = modals.vocalFolds;
 
 
     // Onboarding hooks

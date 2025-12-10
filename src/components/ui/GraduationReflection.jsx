@@ -112,7 +112,7 @@ const GraduationReflection = ({ onComplete }) => {
                                 <Heart size={32} />
                             </div>
                             <h2 className="text-2xl font-bold text-white">Heart check</h2>
-                            <p className="text-slate-400">Voice is emotional. Let's honor that.</p>
+                            <p className="text-slate-400">Voice is emotional. Let&apos;s honor that.</p>
                         </div>
                         <div className="space-y-4">
                             <div>
@@ -154,11 +154,11 @@ const GraduationReflection = ({ onComplete }) => {
                                 <Map size={32} />
                             </div>
                             <h2 className="text-2xl font-bold text-white">The Road Ahead</h2>
-                            <p className="text-slate-400">You are your own coach now. What's the plan?</p>
+                            <p className="text-slate-400">You are your own coach now. What&apos;s the plan?</p>
                         </div>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-bold text-teal-300 mb-2">My "Go-To" Warmup</label>
+                                <label className="block text-sm font-bold text-teal-300 mb-2">My &quot;Go-To&quot; Warmup</label>
                                 <textarea
                                     className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-white focus:border-teal-500 outline-none"
                                     placeholder="e.g., Lip trills -> Sirens -> Reading"
