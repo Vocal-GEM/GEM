@@ -12,7 +12,60 @@ const ResonanceOrb = lazy(() => import('../viz/ResonanceOrb'));
 const VoiceQualityMeter = lazy(() => import('../viz/VoiceQualityMeter'));
 const VowelSpacePlot = lazy(() => import('../viz/VowelSpacePlot'));
 const ContourVisualizer = lazy(() => import('../viz/ContourVisualizer'));
+const SelfCareOnboarding = lazy(() => import('./SelfCareOnboarding'));
+const VoiceAudit = lazy(() => import('./VoiceAudit'));
+const SoundJournal = lazy(() => import('./SoundJournal'));
+const InspirationBoard = lazy(() => import('./InspirationBoard'));
+const TranscriptionPractice = lazy(() => import('./TranscriptionPractice'));
+const NameVisualizer = lazy(() => import('./NameVisualizer'));
+const ModuleWrapUp = lazy(() => import('./ModuleWrapUp'));
+const WarmUpRoutine = lazy(() => import('./WarmupRoutine'));
+const QuickWarmUp = lazy(() => import('./QuickWarmUp'));
+const FollowAlongWarmup = lazy(() => import('./FollowAlongWarmup'));
+const VocalAnatomyLesson = lazy(() => import('./VocalAnatomyLesson'));
+const VoiceAlterationLesson = lazy(() => import('./VoiceAlterationLesson'));
+const BigPictureAssessment = lazy(() => import('./BigPictureAssessment'));
+const Module2WrapUp = lazy(() => import('./Module2WrapUp'));
+const LarynxControl = lazy(() => import('./LarynxControl'));
+const ResonanceApplication = lazy(() => import('./ResonanceApplication'));
+const MWordChallenge = lazy(() => import('./MWordChallenge'));
+const DailyPhrases = lazy(() => import('./DailyPhrases'));
+const Module3WrapUp = lazy(() => import('./Module3WrapUp'));
+const PianoLesson = lazy(() => import('./PianoLesson'));
+const PitchExploration = lazy(() => import('./PitchExploration'));
+const PitchExercises = lazy(() => import('./PitchExercises'));
+const PitchMemorizer = lazy(() => import('./PitchMemorizer'));
+const Module4WrapUp = lazy(() => import('./Module4WrapUp'));
+const VocalWeightTheory = lazy(() => import('./VocalWeightTheory'));
+const WeightToolbox = lazy(() => import('./WeightToolbox'));
+const TwangTechnique = lazy(() => import('./TwangTechnique'));
+const Module5WrapUp = lazy(() => import('./Module5WrapUp'));
+const InflectionLesson = lazy(() => import('./InflectionLesson'));
+const InflectionExercises = lazy(() => import('./InflectionExercises'));
+const HabitBuilder = lazy(() => import('./HabitBuilder'));
+const CognitiveLoadGames = lazy(() => import('./CognitiveLoadGames'));
+const Module6WrapUp = lazy(() => import('./Module6WrapUp'));
 const BaselineRecorder = lazy(() => import('./BaselineRecorder'));
+const PracticePhilosophy = lazy(() => import('./PracticePhilosophy'));
+const BreathSupport = lazy(() => import('./BreathSupport'));
+const StudentSelfEvaluation = lazy(() => import('./StudentSelfEvaluation'));
+const VocalHygiene = lazy(() => import('./VocalHygiene'));
+const RelaxationRoutine = lazy(() => import('./RelaxationRoutine'));
+const TonalConsistency = lazy(() => import('./TonalConsistency'));
+const VowelGlides = lazy(() => import('./VowelGlides'));
+const ResonanceBreathBalance = lazy(() => import('./ResonanceBreathBalance'));
+const ReadingPractice = lazy(() => import('./ReadingPractice'));
+const TwangDojo = lazy(() => import('./TwangDojo'));
+const RegisterBlend = lazy(() => import('./RegisterBlend'));
+const ProjectionPractice = lazy(() => import('./ProjectionPractice'));
+const ProsodyTheory = lazy(() => import('./ProsodyTheory'));
+const SyllableStacker = lazy(() => import('./SyllableStacker'));
+const InflectionMap = lazy(() => import('./InflectionMap'));
+const RecoveryStrategy = lazy(() => import('./RecoveryStrategy'));
+const TexturePlay = lazy(() => import('./TexturePlay'));
+const StyleMixer = lazy(() => import('./StyleMixer'));
+const VoiceNeutrality = lazy(() => import('./VoiceNeutrality'));
+const GraduationReflection = lazy(() => import('./GraduationReflection'));
 
 /**
  * JourneyStep - Renders individual journey steps based on their type
@@ -307,6 +360,338 @@ const JourneyStep = ({
         </div>
     );
 
+    const renderCustomExercise = () => {
+        if (!step.exercise) return null;
+
+        const type = step.exercise.type;
+
+        switch (type) {
+            case 'self-care-checklist':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <SelfCareOnboarding
+                            onComplete={() => onComplete?.()}
+                            embedded={true} // specific prop to make it fit in the flow if needed
+                        />
+                    </Suspense>
+                );
+            case 'voice-audit':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <VoiceAudit onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'sound-journal':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <SoundJournal onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'name-visualizer':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <NameVisualizer onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'inspiration-board':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <InspirationBoard onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'transcription-practice':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <TranscriptionPractice onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'module-wrap-up':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <ModuleWrapUp onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'warm-up-routine':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <WarmUpRoutine onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'quick-warm-up':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <QuickWarmUp onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'follow-along-warmup':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <FollowAlongWarmup onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'vocal-anatomy':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <VocalAnatomyLesson onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'voice-alteration':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <VoiceAlterationLesson onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'big-picture':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <BigPictureAssessment onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'module-2-wrap-up':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <Module2WrapUp onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'larynx-control':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <LarynxControl onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'resonance-app':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <ResonanceApplication onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'm-words':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <MWordChallenge onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'daily-phrases':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <DailyPhrases onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'module-3-wrap-up':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <Module3WrapUp onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'piano-theory':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <PianoLesson onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'pitch-exploration':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <PitchExploration onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'target-pitch':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <PitchExercises onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'pitch-memorizer':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <PitchMemorizer onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'module-4-wrap-up':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <Module4WrapUp onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'weight-theory':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <VocalWeightTheory onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'weight-toolbox':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <WeightToolbox onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'twang-technique':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <TwangTechnique onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'module-5-wrap-up':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <Module5WrapUp onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'inflection-lesson':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <InflectionLesson onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'inflection-exercises':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <InflectionExercises onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'habit-builder':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <HabitBuilder onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'cognitive-load':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <CognitiveLoadGames onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'module-6-wrap-up':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <Module6WrapUp onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'practice-philosophy':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <PracticePhilosophy onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'breath-support':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <BreathSupport onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'student-self-eval':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <StudentSelfEvaluation onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'vocal-hygiene':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <VocalHygiene onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'relaxation-routine':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <RelaxationRoutine onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'tonal-consistency':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <TonalConsistency onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'vowel-glides':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <VowelGlides onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'resonance-breath-balance':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <ResonanceBreathBalance onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'reading-practice':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <ReadingPractice onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'twang-dojo':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <TwangDojo onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'register-blend':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <RegisterBlend onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'projection-practice':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <ProjectionPractice onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'prosody-theory':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <ProsodyTheory onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'syllable-stacker':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <SyllableStacker onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'inflection-map':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <InflectionMap onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'recovery-strategy':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <RecoveryStrategy onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'texture-play':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <TexturePlay onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'style-mixer':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <StyleMixer onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'voice-neutrality':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <VoiceNeutrality onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            case 'graduation-reflection':
+                return (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <GraduationReflection onComplete={() => onComplete?.()} />
+                    </Suspense>
+                );
+            default:
+                return null;
+        }
+    };
+
     const renderCheckpointStep = () => (
         <div className="flex flex-col h-full">
             <div className="flex-1 overflow-y-auto space-y-6 pr-2">
@@ -321,6 +706,9 @@ const JourneyStep = ({
                 <div className="prose prose-invert prose-p:text-slate-300 prose-headings:text-white prose-strong:text-pink-300 max-w-none">
                     <ReactMarkdown>{step.content}</ReactMarkdown>
                 </div>
+
+                {/* Custom Exercises (Self-Care, Voice Audit, etc) */}
+                {renderCustomExercise()}
 
                 {/* Progress recording prompt */}
                 {step.exercise?.type === 'progress-recording' && (
@@ -350,6 +738,8 @@ const JourneyStep = ({
             case 'exercise':
                 return renderExerciseStep();
             case 'checkpoint':
+            case 'self-care':
+            case 'discovery':
                 return renderCheckpointStep();
             default:
                 return renderTheoryStep();

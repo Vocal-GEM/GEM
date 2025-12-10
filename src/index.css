@@ -13,6 +13,10 @@ body {
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-bg: rgba(255, 255, 255, 0.05);
 
+  /* Core Colors */
+  --white: 255 255 255;
+  --black: 0 0 0;
+
   /* Teal-Purple Gradient System */
   --primary-teal: #14b8a6;
   --primary-cyan: #06b6d4;

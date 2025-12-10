@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense, useCallback } from 'react';
-import { Play, Square, Mic, Volume2, Activity, Settings, BarChart2, Calendar, Clock, Save, RefreshCw, ChevronRight, AlertCircle, Check, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer } from 'lucide-react';
+import { Play, Square, Mic, Volume2, Activity, Settings, BarChart2, Calendar, Clock, Save, RefreshCw, ChevronRight, AlertCircle, Check, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAudio } from '../../context/AudioContext';
@@ -17,13 +17,19 @@ import GenderPerceptionDashboard from '../ui/GenderPerceptionDashboard';
 import PracticeCardsPanel from '../ui/PracticeCardsPanel';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorBoundary from '../ui/ErrorBoundary';
-import ResizablePanel from '../ui/ResizablePanel';
-import ComparisonTool from '../ui/ComparisonTool';
-import PracticeTimer from '../ui/PracticeTimer';
+import WarmupRoutine from '../ui/WarmupRoutine';
+import VocalStatsSummary from '../ui/VocalStatsSummary';
+import VoiceSelfAssessment from '../ui/VoiceSelfAssessment'; /* Keep for now, but not used in layout */
+import CoachPanel from '../ui/CoachPanel';
+import ProgressCharts from '../viz/ProgressCharts';
+import SelfAssessmentModal from '../ui/SelfAssessmentModal';
 import InstantPlayback from '../ui/InstantPlayback';
+import PracticeTimer from '../ui/PracticeTimer';
+import ComparisonTool from '../ui/ComparisonTool';
 
 // Embeddable Views
 import TrainingView from './TrainingView';
+import ProgressiveStackingSession from './ProgressiveStackingSession';
 import AssessmentModule from '../ui/AssessmentModule';
 
 // Tools
@@ -35,12 +41,11 @@ import VoiceQualityAnalysis from '../viz/VoiceQualityAnalysis';
 import VowelAnalysis from '../viz/VowelAnalysis';
 import GenderPerceptionBadge from '../ui/GenderPerceptionBadge';
 import PitchResonanceQuadrant from '../viz/PitchResonanceQuadrant'; // New visualization
-import VocalStatsSummary from '../ui/VocalStatsSummary';
-import WarmupRoutine from '../ui/WarmupRoutine';
 import DAFMode from '../ui/DAFMode';
 import EnvironmentCheck from '../ui/EnvironmentCheck';
 import ToolExercises from '../ui/ToolExercises';
-import VoiceSelfAssessment from '../ui/VoiceSelfAssessment';
+import PracticeWellnessCheck from '../ui/PracticeWellnessCheck';
+import { SelfCareService } from '../../services/SelfCareService';
 
 import { CoachingEngine } from '../../utils/CoachingEngine';
 
@@ -66,7 +71,9 @@ const PracticeMode = ({
     const {
         audioEngineRef,
         isAudioActive,
-        toggleAudio
+        toggleAudio,
+        startAudio,
+        stopAudio
     } = useAudio();
 
     const { startTour } = useTour();
@@ -91,9 +98,14 @@ const PracticeMode = ({
     const { saveSession } = useProfile();
     const [showTimer, setShowTimer] = useState(false);
     const [timerActive, setTimerActive] = useState(false);
+    const [showSelfAssessmentModal, setShowSelfAssessmentModal] = useState(false);
+    const [selfAssessmentSessionData, setSelfAssessmentSessionData] = useState(null);
     const [showWarmup, setShowWarmup] = useState(false);
     const [showDAF, setShowDAF] = useState(false);
     const [showEnvironmentCheck, setShowEnvironmentCheck] = useState(false);
+    const [showWellnessCheck, setShowWellnessCheck] = useState(false);
+    const [showProgressiveStacking, setShowProgressiveStacking] = useState(false);
+    const [lastSessionDuration, setLastSessionDuration] = useState(0);
 
     // Tour for DAF mode - placed after showDAF is declared
     useEffect(() => {
@@ -175,6 +187,15 @@ const PracticeMode = ({
             const session = sessionRef.current;
             if (session.startTime && session.sampleCount >= 10) {
                 const duration = (Date.now() - session.startTime) / 1000;
+
+                // Show wellness check if session was longer than 5 minutes (300 seconds)
+                // or randomly with 20% probability for shorter sessions to build habit
+                if (duration > 300 || Math.random() < 0.2) {
+                    setLastSessionDuration(duration);
+                    // Slight delay so it appears nicely after summary potentially
+                    setTimeout(() => setShowWellnessCheck(true), 500);
+                }
+
                 setSessionSummary({
                     pitchMin: session.pitchMin === Infinity ? 0 : session.pitchMin,
                     pitchMax: session.pitchMax === -Infinity ? 0 : session.pitchMax,
@@ -185,10 +206,18 @@ const PracticeMode = ({
                     duration,
                     sampleCount: session.sampleCount
                 });
+
+                // Prepare data for self-assessment modal
+                setSelfAssessmentSessionData({
+                    duration,
+                    averagePitch: session.accumulatedPitch / session.sampleCount,
+                    metrics: { ...dataRef.current } // Capture current metrics at session end
+                });
+                setShowSelfAssessmentModal(true);
             }
             saveCurrentSession();
         }
-    }, [isAudioActive, saveCurrentSession]);
+    }, [isAudioActive, saveCurrentSession, dataRef]);
 
     // Accumulate Metrics
     useEffect(() => {
@@ -281,73 +310,35 @@ const PracticeMode = ({
                 </div>
             )}
 
-            {/* Header / Controls */}
-            <div className="flex flex-col justify-between items-center mb-3 gap-3">
-                <div id="practice-tabs" className="flex items-center gap-2 sm:gap-4 overflow-x-auto w-full pb-2 no-scrollbar">
+            {/* Header / Tabs - simplified */}
+            <div className="flex flex-col mb-4 gap-4">
+                <div id="practice-tabs" className="flex items-center justify-center gap-1 p-1 bg-slate-900/50 rounded-full border border-white/5 w-fit mx-auto">
                     {TABS.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => switchPracticeTab(tab.id)}
-                            className={`px-3 py-2 sm:px-4 rounded-full text-sm font-bold flex items-center gap-1 sm:gap-2 transition-all whitespace-nowrap ${practiceTab === tab.id
-                                ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white shadow-lg shadow-teal-500/20'
-                                : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700/50'
+                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${practiceTab === tab.id
+                                ? 'bg-slate-700 text-white shadow-sm'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'
                                 }`}
-                            aria-label={`Switch to ${tab.label} view`}
-                            aria-current={practiceTab === tab.id ? 'page' : undefined}
+                            aria-label={`Switch to ${tab.label}`}
                         >
-                            <tab.icon size={14} aria-hidden="true" />
                             <span className="hidden sm:inline">{tab.label}</span>
+                            <span className="sm:hidden"><tab.icon size={16} /></span>
                         </button>
                     ))}
                 </div>
-
-                <div className="flex items-center gap-2 w-full justify-end">
-                    {/* Timer Toggle */}
-                    {timerActive ? (
-                        <PracticeTimer compact onClose={() => setTimerActive(false)} />
-                    ) : (
-                        <button
-                            onClick={() => setShowTimer(true)}
-                            className="p-2.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-all border border-slate-700"
-                            title="Practice Timer"
-                        >
-                            <Timer size={18} />
-                        </button>
-                    )}
-
-                    {/* Instant Playback */}
-                    <InstantPlayback />
-
-                    <button
-                        id="mic-button"
-                        onClick={toggleAudio}
-                        className={`px-6 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all shadow-lg ${isAudioActive
-                            ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30'
-                            : 'bg-gradient-to-r from-teal-500 to-violet-500 hover:from-teal-400 hover:to-violet-400 text-white hover:shadow-xl hover:shadow-teal-500/30 animate-glow-pulse'
-                            }`}
-                        aria-label={isAudioActive ? "Stop Session" : "Start Session"}
-                        aria-pressed={isAudioActive}
-                    >
-                        {isAudioActive ? (
-                            <><span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" /> {t('practiceMode.session.stop')}</>
-                        ) : (
-                            <><Play className="w-4 h-4" /> {t('practiceMode.session.start')}</>
-                        )}
-                    </button>
-                </div>
             </div>
 
-            {/* Main Content Grid */}
-            <div className="flex flex-col lg:flex-row gap-4 w-full">
-                {/* Left Column: Visualization - Takes more space */}
-                <ResizablePanel
-                    className="flex flex-col relative flex-shrink-0 w-full lg:w-3/5"
-                    defaultHeight={400}
-                    defaultWidth={null}
-                    minWidth={280}
-                >
-                    <div id="visualization-area" className="flex flex-col h-full relative min-h-[300px] sm:min-h-[400px]">
-                        <div className="h-full w-full relative z-20 rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900/30 border border-white/5 shadow-2xl">
+            {/* Main Content Grid - Rebalanced */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
+
+                {/* Center Stage: Visualization (Spans 8 cols) */}
+                <div className="lg:col-span-8 flex flex-col gap-6">
+                    <div className="relative w-full aspect-video lg:aspect-auto lg:h-[500px] bg-black rounded-3xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col relative group">
+
+                        {/* Visualization Layer */}
+                        <div className="flex-1 relative z-10">
                             <ErrorBoundary>
                                 <Suspense fallback={<LoadingSpinner />}>
                                     {practiceTab === 'overview' && (
@@ -364,10 +355,6 @@ const PracticeMode = ({
                                         <div className="w-full h-full flex flex-col items-center justify-center gap-4 p-4">
                                             <GenderPerceptionBadge dataRef={dataRef} showDetails={true} />
                                             <PitchResonanceQuadrant dataRef={dataRef} size={Math.min(400, window.innerWidth - 80)} />
-                                            <p className="text-xs text-slate-500 text-center max-w-sm">
-                                                This quadrant shows how pitch (Y) and resonance (X) combine to influence gender perception.
-                                                The purple zone marks the ambiguity range where resonance becomes the deciding factor.
-                                            </p>
                                         </div>
                                     )}
                                     {practiceTab === 'weight' && <VoiceQualityMeter dataRef={dataRef} userMode="user" showAnalysis={false} />}
@@ -378,115 +365,133 @@ const PracticeMode = ({
                                 </Suspense>
                             </ErrorBoundary>
                         </div>
+
+                        {/* Top Right Tools Overlay */}
+                        <div className="absolute top-4 right-4 z-50 flex gap-2">
+                            <InstantPlayback />
+                            {timerActive ? (
+                                <PracticeTimer compact onClose={() => setTimerActive(false)} />
+                            ) : (
+                                <button
+                                    onClick={() => setShowTimer(true)}
+                                    className="p-2.5 rounded-full bg-black/50 hover:bg-slate-800 text-slate-400 hover:text-white transition-all backdrop-blur-sm border border-white/10"
+                                    title="Practice Timer"
+                                >
+                                    <Timer size={18} />
+                                </button>
+                            )}
+                        </div>
                     </div>
 
-                    {/* Comparison Tool (hidden on overview/resonance to save space/redundancy) */}
-                    {
-                        practiceTab !== 'overview' && practiceTab !== 'resonance' && (
-                            <div className="mt-3">
-                                <ComparisonTool />
-                            </div>
-                        )
-                    }
-                </ResizablePanel>
-
-                {/* Right Column: Dashboard & Tools */}
-                <div id="dashboard-area" className="flex-1 flex flex-col min-h-[400px] lg:min-h-[600px] h-full overflow-y-auto custom-scrollbar space-y-3 min-w-0 lg:min-w-[320px] lg:w-2/5">
-                    {/* Gender Perception Dashboard */}
-                    <div className="min-h-[250px] sm:min-h-[300px]">
-                        <GenderPerceptionDashboard dataRef={dataRef} view={practiceTab === 'overview' ? 'all' : practiceTab} />
+                    {/* Primary Control - Centralized */}
+                    <div className="flex justify-center -mt-2">
+                        <button
+                            id="mic-button"
+                            onClick={toggleAudio}
+                            className={`px-8 py-4 rounded-full text-lg font-bold flex items-center gap-3 transition-all shadow-xl hover:scale-105 active:scale-95 ${isAudioActive
+                                ? 'bg-red-500/10 text-red-500 border border-red-500/50 hover:bg-red-500/20'
+                                : 'bg-gradient-to-r from-teal-500 to-violet-600 text-white hover:shadow-teal-500/40 ring-4 ring-slate-900 border border-white/20'
+                                }`}
+                        >
+                            {isAudioActive ? (
+                                <><Square size={20} fill="currentColor" /> {t('practiceMode.session.stop', 'Stop Microphone')}</>
+                            ) : (
+                                <><Mic size={24} /> {t('practiceMode.session.start', 'Enable Microphone')}</>
+                            )}
+                        </button>
                     </div>
 
+                    {/* Quick Access Tools (Horizontal Strip) */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900/30 p-4 rounded-2xl border border-white/5">
+                        <button onClick={() => openModal('warmup')} className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
+                            <Play size={20} className="text-orange-400" />
+                            <span className="text-xs font-bold">Warm-Up</span>
+                        </button>
+                        <button onClick={() => setShowDAF(true)} className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
+                            <Mic size={20} className="text-purple-400" />
+                            <span className="text-xs font-bold">DAF Loop</span>
+                        </button>
+                        <button onClick={() => setShowProgressiveStacking(true)} className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
+                            <Sparkles size={20} className="text-pink-400" />
+                            <span className="text-xs font-bold">Stacking</span>
+                        </button>
+                        <button onClick={() => openModal('calibration')} className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
+                            <RefreshCw size={20} className="text-green-400" />
+                            <span className="text-xs font-bold">Recalibrate</span>
+                        </button>
+                    </div>
 
-                    {/* Voice Self-Assessment Tool (Overview tab) */}
-                    {practiceTab === 'overview' && (
-                        <>
-                            <div className="animate-in slide-in-from-right-4 fade-in duration-300">
-                                <VoiceSelfAssessment />
-                            </div>
-                            <div className="h-[500px] w-full animate-in slide-in-from-right-4 fade-in duration-300 delay-100 mt-4 rounded-xl overflow-hidden border border-white/5 bg-slate-900/50">
-                                <PracticeCardsPanel embedded={true} />
-                            </div>
-                        </>
+                    {/* Comparison Tool (if needed) */}
+                    {practiceTab !== 'overview' && practiceTab !== 'resonance' && (
+                        <div className="mt-2">
+                            <ComparisonTool />
+                        </div>
+                    )}
+                </div>
+
+                {/* Right Column: Dashboard & Metrics (Spans 4 cols) */}
+                <div className="lg:col-span-4 flex flex-col gap-4 h-full">
+                    {/* Coach Panel - Actionable Feedback */}
+                    <div className="flex-1">
+                        <CoachPanel
+                            dataRef={dataRef}
+                            onNavigate={(tab) => switchPracticeTab(tab)}
+                        />
+                    </div>
+
+                    {/* Context-Specific Tools - Only show if specifically needed */}
+                    {practiceTab === 'pitch' && (
+                        <div className="space-y-3 animate-in slide-in-from-right-4 fade-in duration-300">
+                            <PitchTargets audioEngine={audioEngineRef} />
+                            <ToneGenerator compact />
+                            <PitchPipe audioEngine={audioEngineRef} />
+                        </div>
                     )}
 
-                    {/* Context-Specific Tools */}
-                    {
-                        practiceTab === 'pitch' && (
-                            <div className="space-y-3 animate-in slide-in-from-right-4 fade-in duration-300">
-                                <PitchTargets audioEngine={audioEngineRef} />
-                                <ToneGenerator compact />
-                                <PitchPipe audioEngine={audioEngineRef} />
-                            </div>
-                        )
-                    }
+                    {practiceTab === 'weight' && (
+                        <div className="space-y-3 animate-in slide-in-from-right-4 fade-in duration-300">
+                            <StrainIndicator tilt={dataRef.current?.tilt} isSilent={dataRef.current?.isSilent} />
+                            <VoiceQualityAnalysis
+                                dataRef={dataRef}
+                                colorBlindMode={settings.colorBlindMode}
+                                toggleAudio={toggleAudio}
+                                isAudioActive={isAudioActive}
+                            />
+                        </div>
+                    )}
 
-                    {
-                        practiceTab === 'weight' && (
-                            <div className="space-y-3 animate-in slide-in-from-right-4 fade-in duration-300">
-                                <StrainIndicator tilt={dataRef.current?.tilt} isSilent={dataRef.current?.isSilent} />
-                                <VoiceQualityAnalysis
-                                    dataRef={dataRef}
-                                    colorBlindMode={settings.colorBlindMode}
-                                    toggleAudio={toggleAudio}
-                                    isAudioActive={isAudioActive}
-                                />
-                            </div>
-                        )
-                    }
-
-                    {
-                        practiceTab === 'vowel' && (
-                            <div className="animate-in slide-in-from-right-4 fade-in duration-300">
-                                <VowelAnalysis dataRef={dataRef} colorBlindMode={settings.colorBlindMode} />
-                            </div>
-                        )
-                    }
+                    {practiceTab === 'vowel' && (
+                        <div className="animate-in slide-in-from-right-4 fade-in duration-300">
+                            <VowelAnalysis dataRef={dataRef} colorBlindMode={settings.colorBlindMode} />
+                        </div>
+                    )}
 
                     {/* Exercises */}
-                    <ToolExercises tool={practiceTab === 'overview' ? 'all' : practiceTab} audioEngine={audioEngineRef.current} />
+                    <div className="flex-1 overflow-y-auto custom-scrollbar min-h-[300px]">
+                        <ToolExercises tool={practiceTab === 'overview' ? 'all' : practiceTab} audioEngine={audioEngineRef.current} />
+                    </div>
                 </div>
             </div>
 
-            {/* Quick Links - Full width below main content */}
-            <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <button onClick={() => openModal('adaptiveSession')} className="col-span-2 lg:col-span-2 p-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 transition-all shadow-lg shadow-blue-900/20 flex flex-row items-center justify-center gap-3 text-center group border border-white/10">
-                    <div className="p-2 rounded-full bg-white/20 text-white group-hover:scale-110 transition-transform">
-                        <Play size={24} fill="currentColor" />
-                    </div>
-                    <div className="text-left">
-                        <span className="block text-lg font-bold text-white">{t('practiceMode.daily.title')}</span>
-                        <span className="block text-xs text-blue-50 font-medium">{t('practiceMode.daily.subtitle')}</span>
-                    </div>
-                </button>
+            {/* Bottom Row: History & Practice Cards */}
+            <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {practiceTab === 'overview' && (
+                    <>
+                        {/* Progress History */}
+                        <div className="bg-slate-900/50 rounded-2xl border border-slate-800 p-6 h-[500px]">
+                            <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+                                <Activity size={18} className="text-pink-500" />
+                                Your Progress
+                            </h3>
+                            <ProgressCharts />
+                        </div>
 
-
-                <button onClick={() => openModal('warmup')} className="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors flex flex-col items-center gap-2 text-center group">
-                    <div className="p-2 rounded-full bg-orange-500/10 text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-colors">
-                        <Play size={20} />
-                    </div>
-                    <span className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">{t('practiceMode.actions.warmup')}</span>
-                </button>
-                <button onClick={() => openModal('calibration')} className="col-span-2 lg:col-span-4 p-4 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors flex flex-row items-center justify-center gap-3 text-center group">
-                    <div className="p-2 rounded-full bg-green-500/10 text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
-                        <RefreshCw size={20} />
-                    </div>
-                    <span className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">{t('practiceMode.actions.calibrate')}</span>
-                </button>
-
-                <button onClick={() => setShowDAF(true)} className="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors flex flex-col items-center gap-2 text-center group">
-                    <div className="p-2 rounded-full bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-colors">
-                        <Mic size={20} />
-                    </div>
-                    <span className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">DAF Loop</span>
-                </button>
-
-                <button onClick={() => setShowEnvironmentCheck(true)} className="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors flex flex-col items-center gap-2 text-center group">
-                    <div className="p-2 rounded-full bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                        <Volume2 size={20} />
-                    </div>
-                    <span className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">Noise Check</span>
-                </button>
+                        {/* Practice Cards */}
+                        <div className="bg-slate-900/50 rounded-2xl border border-slate-800 h-[500px] overflow-hidden">
+                            <PracticeCardsPanel embedded={true} />
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Timer Modal */}
@@ -522,6 +527,14 @@ const PracticeMode = ({
                 </div>
             )}
 
+            {/* Post-Session Assessment Modal */}
+            {showSelfAssessmentModal && (
+                <SelfAssessmentModal
+                    sessionData={selfAssessmentSessionData}
+                    onClose={() => setShowSelfAssessmentModal(false)}
+                />
+            )}
+
             {/* DAF Modal */}
             {showDAF && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
@@ -541,6 +554,28 @@ const PracticeMode = ({
             {showEnvironmentCheck && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
                     <EnvironmentCheck onClose={() => setShowEnvironmentCheck(false)} />
+                </div>
+            )}
+
+            {/* Wellness Check Modal */}
+            {showWellnessCheck && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+                    <PracticeWellnessCheck
+                        onComplete={() => setShowWellnessCheck(false)}
+                        onDismiss={() => setShowWellnessCheck(false)}
+                        sessionDuration={lastSessionDuration}
+                    />
+                </div>
+            )}
+
+            {/* Progressive Stacking Modal */}
+            {showProgressiveStacking && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="relative w-full max-w-lg h-[85vh] bg-slate-900 rounded-2xl border border-slate-700 shadow-2xl overflow-hidden">
+                        <div className="h-full overflow-y-auto p-6">
+                            <ProgressiveStackingSession onClose={() => setShowProgressiveStacking(false)} />
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

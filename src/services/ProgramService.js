@@ -1,5 +1,7 @@
 
 // ProgramService - Manages structured curricula and programs
+import { SINGING_COURSE } from '../data/SingingCourse';
+
 const FEMINIZATION_COURSE = {
     id: 'fem-4-week',
     title: '4-Week Feminization Course',
@@ -104,7 +106,7 @@ class ProgramService {
     }
 
     getPrograms() {
-        return [FEMINIZATION_COURSE];
+        return [FEMINIZATION_COURSE, SINGING_COURSE];
     }
 
     getProgramById(id) {

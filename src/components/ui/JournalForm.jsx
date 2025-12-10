@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Lightbulb, RefreshCw } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { useJournal } from '../../context/JournalContext';
+import { getRandomPrompt } from '../../data/selfCareJournalPrompts';
 
 const JournalForm = ({ onSubmit, onCancel }) => {
     const { audioEngineRef } = useAudio();
@@ -16,7 +17,13 @@ const JournalForm = ({ onSubmit, onCancel }) => {
     const [audioBlobUrl, setAudioBlobUrl] = useState(null);
     const [recordingTime, setRecordingTime] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [currentPrompt, setCurrentPrompt] = useState(null);
     const timerRef = useRef(null);
+
+    const handleNewPrompt = () => {
+        const prompt = getRandomPrompt();
+        setCurrentPrompt(prompt);
+    };
 
     useEffect(() => {
         if (journalEntryData) {
@@ -139,6 +146,39 @@ const JournalForm = ({ onSubmit, onCancel }) => {
             {/* Notes */}
             <div>
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">How did it feel?</label>
+                
+                {/* Optional Writing Prompt */}
+                <div className="mb-3">
+                    {currentPrompt ? (
+                        <div className="bg-pink-500/10 border border-pink-500/20 rounded-xl p-3">
+                            <div className="flex items-start gap-2">
+                                <span className="text-lg">{currentPrompt.icon}</span>
+                                <div className="flex-1">
+                                    <p className="text-sm text-pink-300 italic">{currentPrompt.prompt}</p>
+                                    <span className="text-xs text-slate-500">{currentPrompt.category}</span>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handleNewPrompt}
+                                    className="text-slate-400 hover:text-pink-400 transition-colors"
+                                    title="Get another prompt"
+                                >
+                                    <RefreshCw size={14} />
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={handleNewPrompt}
+                            className="flex items-center gap-2 text-sm text-slate-400 hover:text-pink-400 transition-colors"
+                        >
+                            <Lightbulb size={14} />
+                            Need a writing prompt?
+                        </button>
+                    )}
+                </div>
+
                 <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}

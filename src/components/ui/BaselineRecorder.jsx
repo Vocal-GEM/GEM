@@ -2,13 +2,15 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Mic, Square, Play, Pause, RotateCcw, Check, Loader2 } from 'lucide-react';
 import { useGuidedJourney } from '../../context/GuidedJourneyContext';
 import { indexedDB, STORES } from '../../services/IndexedDBManager';
+import { VoiceCalibrationService } from '../../services/VoiceCalibrationService';
 
 /**
  * BaselineRecorder - Records baseline voice samples for the guided journey
  * Saves recordings to IndexedDB with a special baseline tag
+ * Now also extracts and saves voice metrics (pitch, formants, SPL)
  */
 const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
-    const { saveBaselineRecording, baselineRecording } = useGuidedJourney();
+    const { saveBaselineRecording, saveVoiceBaseline, baselineRecording } = useGuidedJourney();
 
     const [state, setState] = useState('idle'); // idle, recording, processing, done
     const [recordingTime, setRecordingTime] = useState(0);
@@ -107,6 +109,22 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
 
                 // Save to IndexedDB with baseline tag
                 try {
+                    // Extract voice metrics from the recording
+                    let voiceMetrics = null;
+                    try {
+                        voiceMetrics = await VoiceCalibrationService.analyzeBaseline(audioBlob);
+                        console.log('[BaselineRecorder] Voice metrics extracted:', voiceMetrics);
+
+                        // Save to VoiceCalibrationService's localStorage (for standalone access)
+                        VoiceCalibrationService.saveBaseline(voiceMetrics);
+
+                        // Also save to journey context
+                        saveVoiceBaseline(voiceMetrics);
+                    } catch (metricsError) {
+                        console.warn('[BaselineRecorder] Failed to extract voice metrics:', metricsError);
+                        // Continue without metrics - recording is still saved
+                    }
+
                     // Create recording object
                     const recordingData = {
                         id: 'baseline_' + Date.now(),
@@ -116,14 +134,20 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                         url: url, // Note: URL is ephemeral, but useful for current session
                         timestamp: new Date().toISOString(),
                         duration: recordingTime,
-                        mimeType: mimeType
+                        mimeType: mimeType,
+                        voiceMetrics: voiceMetrics // Include extracted metrics
                     };
 
                     // Use the new saveRecording method
                     await indexedDB.saveRecording(recordingData);
 
                     // Save reference in guided journey context (keep this for backward compatibility or context flow)
-                    saveBaselineRecording({ url, timestamp: recordingData.timestamp, duration: recordingData.duration });
+                    saveBaselineRecording({
+                        url,
+                        timestamp: recordingData.timestamp,
+                        duration: recordingData.duration,
+                        hasMetrics: !!voiceMetrics
+                    });
 
                     setState('done');
                     onRecordingComplete?.();

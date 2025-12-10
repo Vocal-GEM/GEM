@@ -222,33 +222,34 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
                 {/* Primary Metrics Grid */}
                 <div className="grid grid-cols-2 gap-2 text-xs mb-2">
                     {/* Pitch */}
+                    {/* Pitch */}
                     <div className={`bg-slate-800/50 rounded-lg p-3 border ${view === 'pitch' ? 'border-teal-500/50 shadow-[0_0_10px_rgba(20,184,166,0.1)]' : 'border-slate-700/30'}`}>
-                        <div className="text-slate-500 uppercase tracking-wider mb-1 text-[10px]">Pitch (F0)</div>
+                        <div className="text-slate-400 uppercase tracking-wider mb-1 text-[10px]">Pitch (F0)</div>
                         <div className="text-lg font-bold text-white font-mono">{Math.round(metrics.pitch)} Hz</div>
                     </div>
 
                     {/* Resonance */}
                     <div className={`bg-slate-800/50 rounded-lg p-3 border ${view === 'resonance' ? 'border-teal-500/50 shadow-[0_0_10px_rgba(20,184,166,0.1)]' : 'border-slate-700/30'}`}>
-                        <div className="text-slate-500 uppercase tracking-wider mb-1 text-[10px]">Resonance</div>
+                        <div className="text-slate-400 uppercase tracking-wider mb-1 text-[10px]">Resonance</div>
                         <div className="text-lg font-bold text-cyan-400 font-mono">{Math.round(metrics.resonance)} Hz</div>
                         <div className="text-[9px] text-slate-500 mt-0.5">{getResonanceLabel()}</div>
                     </div>
 
                     {/* F1 */}
                     <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/30">
-                        <div className="text-slate-500 uppercase tracking-wider mb-1 text-[10px]">F1 (Openness)</div>
+                        <div className="text-slate-400 uppercase tracking-wider mb-1 text-[10px]">F1 (Openness)</div>
                         <div className="text-lg font-bold text-green-400 font-mono">{Math.round(metrics.f1)} Hz</div>
                     </div>
 
                     {/* F2 */}
                     <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/30">
-                        <div className="text-slate-500 uppercase tracking-wider mb-1 text-[10px]">F2 (Brightness)</div>
+                        <div className="text-slate-400 uppercase tracking-wider mb-1 text-[10px]">F2 (Brightness)</div>
                         <div className="text-lg font-bold text-green-400 font-mono">{Math.round(metrics.f2)} Hz</div>
                     </div>
 
                     {/* Weight */}
                     <div className={`bg-slate-800/50 rounded-lg p-3 border ${view === 'weight' ? 'border-teal-500/50 shadow-[0_0_10px_rgba(20,184,166,0.1)]' : 'border-slate-700/30'} col-span-2`}>
-                        <div className="text-slate-500 uppercase tracking-wider mb-1 text-[10px]">Weight</div>
+                        <div className="text-slate-400 uppercase tracking-wider mb-1 text-[10px]">Weight</div>
                         <div className="flex items-center gap-2">
                             <div className="text-lg font-bold text-yellow-400 font-mono">{Math.round(metrics.weight)}</div>
                             <div className="text-[9px] text-slate-500">{getWeightLabel()}</div>
@@ -258,23 +259,23 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
 
                 {/* Quality Metrics */}
                 <div className="border-t border-slate-700/30 pt-2 mb-2">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Voice Quality</div>
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Voice Quality</div>
                     <div className="grid grid-cols-3 gap-2 text-xs">
                         {/* Jitter */}
                         <div className="bg-slate-800/30 rounded p-2 border border-slate-700/20">
-                            <div className="text-slate-500 text-[9px] mb-0.5">Jitter</div>
+                            <div className="text-slate-400 text-[9px] mb-0.5">Jitter</div>
                             <div className="text-sm font-mono text-orange-400">{(metrics.jitter * 100).toFixed(2)}%</div>
                         </div>
 
                         {/* Shimmer */}
                         <div className="bg-slate-800/30 rounded p-2 border border-slate-700/20">
-                            <div className="text-slate-500 text-[9px] mb-0.5">Shimmer</div>
+                            <div className="text-slate-400 text-[9px] mb-0.5">Shimmer</div>
                             <div className="text-sm font-mono text-orange-400">{(metrics.shimmer * 100).toFixed(2)}%</div>
                         </div>
 
                         {/* Spectral Tilt */}
                         <div className={`bg-slate-800/30 rounded p-2 border ${view === 'tilt' ? 'border-teal-500/50' : 'border-slate-700/20'}`}>
-                            <div className="text-slate-500 text-[9px] mb-0.5">Tilt</div>
+                            <div className="text-slate-400 text-[9px] mb-0.5">Tilt</div>
                             <div className="text-sm font-mono text-purple-400">{metrics.tilt.toFixed(1)} dB</div>
                         </div>
                     </div>

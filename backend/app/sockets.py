@@ -1,6 +1,14 @@
 from flask import request
 from flask_socketio import emit
-from .voice_quality_analysis import compute_frame_features, compute_chunk_scores_from_frames, compute_raw_rbi_features, pre_emphasis
+from .voice_quality_analysis import (
+    compute_frame_features, 
+    compute_chunk_scores_from_frames, 
+    compute_raw_rbi_features, 
+    pre_emphasis,
+    classify_laryngeal_mechanism,
+    analyze_consonant_burst,
+    analyze_phrase_ending
+)
 from .extensions import socketio
 
 try:
@@ -116,6 +124,18 @@ def handle_audio_chunk(data):
     # 2. Live RBI with global stats
     f0_list = frame_data["f0"]
     
+    # NEW: Register & Articulatory Analysis
+    f0_mean = float(np.nanmean(f0_list)) if f0_list else 0.0
+    spectral_slope = frame_data.get("spectral_slope", -6.0)
+    jitter = frame_data.get("jitter", 0.0)
+    hnr = frame_data.get("hnr", 20.0)
+    
+    register = classify_laryngeal_mechanism(f0_mean, spectral_slope, jitter, hnr)
+    
+    # Analyze raw audio for articulation
+    touch = analyze_consonant_burst(window, TARGET_SR)
+    ending = analyze_phrase_ending(window, TARGET_SR)
+    
     # Pre-emphasis for RBI
     y_pre = pre_emphasis(window)
     hop_len = int(0.01 * TARGET_SR)
@@ -193,5 +213,19 @@ def handle_audio_chunk(data):
         "hnr_mean": scores["hnr_mean"],
         "h1_h2_mean": scores["h1_h2_mean"],
         "rbi_score": avg_rbi,
-        "window_sec": len(window) / TARGET_SR
+        "window_sec": len(window) / TARGET_SR,
+        # NEW: Ventricular engagement detection
+        "ventricular_detected": scores["ventricular_detected"],
+        "ventricular_severity": scores["ventricular_severity"],
+        "ventricular_feedback": scores["ventricular_feedback"],
+        # NEW: Open Quotient estimation
+        "oq_percent": scores["oq_percent"],
+        "oq_zone": scores["oq_zone"],
+        "oq_feedback": scores["oq_feedback"],
+        # NEW: Register & Articulation
+        "register": register,
+        "touch": touch,
+        "ending": ending,
+        "spectral_slope": spectral_slope
     })
+

@@ -25,6 +25,7 @@ export const useProgram = () => {
         activeProgram,
         progress,
         currentDay,
+        programs: programService.getPrograms(),
         enroll: (id) => programService.enroll(id),
         completeTask: (id) => programService.completeTask(id),
         isTaskComplete: (id) => programService.isTaskComplete(id),

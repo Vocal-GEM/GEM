@@ -303,7 +303,7 @@ const VoiceSelfAssessment = ({ onClose }) => {
                 {recordingState === 'idle' && (
                     <button
                         onClick={startRecording}
-                        className="w-full py-4 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-pink-500/20 transition-all"
+                        className="w-full py-4 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 !text-white font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-pink-500/20 transition-all"
                     >
                         <Mic className="w-5 h-5" />
                         Start Recording
@@ -386,7 +386,7 @@ const VoiceSelfAssessment = ({ onClose }) => {
             {recordingState === 'recorded' && !showAnalysis && (
                 <button
                     onClick={() => setShowAnalysis(true)}
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 !text-white font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
                 >
                     <Eye className="w-5 h-5" />
                     Reveal Analysis

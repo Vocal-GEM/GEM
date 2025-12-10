@@ -160,7 +160,7 @@ const ProgramView = ({ onNavigate }) => {
                         <div className="p-6 border-t border-white/5 bg-slate-900/50 flex justify-end">
                             <button
                                 onClick={nextDay}
-                                className="px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-2"
+                                className="px-6 py-3 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-2"
                             >
                                 Complete Day <ChevronRight size={16} />
                             </button>

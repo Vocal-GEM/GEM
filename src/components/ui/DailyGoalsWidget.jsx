@@ -36,7 +36,7 @@ const DailyGoalsWidget = ({ goals, compact = false }) => {
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                     <Target className={allComplete ? "text-emerald-400" : "text-blue-400"} /> Daily Goals
                 </h3>
-                {allComplete && <span className="text-[10px] bg-emerald-500 text-black font-bold px-2 py-1 rounded-full">COMPLETE!</span>}
+                {allComplete && <span className="text-[10px] bg-emerald-500 text-white font-bold px-2 py-1 rounded-full">COMPLETE!</span>}
             </div>
             <div className="space-y-3">
                 {goals.map(g => {

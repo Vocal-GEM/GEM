@@ -385,6 +385,7 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
     resonance: { label: '—', color: 'text-slate-500' },
     weight: { label: '—', color: 'text-slate-500' }
   });
+  const [pitchDisplay, setPitchDisplay] = useState(null);
 
   const containerRef = useRef(null);
   const isVisible = useIntersectionObserver(containerRef);
@@ -535,6 +536,7 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
         }
 
         setGenderPerception({ label, color });
+        setPitchDisplay(pitch > 0 ? Math.round(pitch) : null);
 
         // Set individual metric classifications
         const getClassification = (score) => {
@@ -560,9 +562,19 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
         {genderPerception.label !== '—' ? `Voice detected: ${genderPerception.label}. Pitch: ${metricClassifications.pitch.label}, Resonance: ${metricClassifications.resonance.label}.` : 'Listening...'}
       </div>
 
-      <div className="absolute top-2 text-xs font-bold text-slate-500 uppercase tracking-widest z-10">
+      <div className="absolute top-2 text-xs font-bold text-slate-300 uppercase tracking-widest z-10 w-full text-center">
         Dynamic Orb - Pitch, Resonance, Weight, & Volume
       </div>
+
+      {/* Live Hz Overlay */}
+      {pitchDisplay && (
+        <div className="absolute top-[20%] left-0 right-0 text-center pointer-events-none z-0 animate-in fade-in duration-300">
+          <div className="text-5xl font-black text-white/10 tracking-tighter select-none">
+            {pitchDisplay} Hz
+          </div>
+        </div>
+      )}
+
       <OrbLegend mode={mode} />
 
       {/* Controls */}
@@ -708,9 +720,8 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
             <div className="text-white text-right text-[10px] font-bold">{debugInfo.tScore}</div>
           </div>
 
-          {/* Resonance Gradient Slider */}
           <div className="pt-3 border-t border-white/10">
-            <div className="flex justify-between text-[10px] text-slate-500 mb-1 uppercase tracking-wider">
+            <div className="flex justify-between text-[10px] text-slate-300 mb-1 uppercase tracking-wider">
               <span>Dark</span>
               <span>Balanced</span>
               <span>Bright</span>
@@ -735,19 +746,19 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
         <div className="absolute bottom-12 left-0 right-0 px-4 pointer-events-none">
           <div className="flex justify-center gap-4 text-xs">
             <div className="text-center">
-              <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Pitch</div>
+              <div className="text-[9px] uppercase tracking-wider text-slate-400 mb-0.5">Pitch</div>
               <div className={`font-bold ${metricClassifications.pitch.color} transition-colors duration-300`}>
                 {metricClassifications.pitch.label}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Resonance</div>
+              <div className="text-[9px] uppercase tracking-wider text-slate-400 mb-0.5">Resonance</div>
               <div className={`font-bold ${metricClassifications.resonance.color} transition-colors duration-300`}>
                 {metricClassifications.resonance.label}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-[9px] uppercase tracking-wider text-slate-500 mb-0.5">Weight</div>
+              <div className="text-[9px] uppercase tracking-wider text-slate-400 mb-0.5">Weight</div>
               <div className={`font-bold ${metricClassifications.weight.color} transition-colors duration-300`}>
                 {metricClassifications.weight.label}
               </div>
@@ -759,7 +770,7 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
       {/* Gender Perception Label - ONLY FOR ORB MODES */}
       {mode !== 'mixer' && mode !== 'gauges' && (
         <div className="absolute bottom-2 left-0 right-0 text-center pointer-events-none">
-          <div className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Gender Perception</div>
+          <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">Gender Perception</div>
           <div className={`text-lg font-bold ${genderPerception.color} transition-colors duration-300`}>
             {genderPerception.label}
           </div>
@@ -776,12 +787,12 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
           <div className="absolute top-1/2 left-4 -translate-y-1/2 flex flex-col items-center gap-1 opacity-50">
             <div className="text-[9px] uppercase tracking-widest text-blue-400 font-bold rotate-[-90deg]">Dark</div>
             <div className="h-16 w-1 bg-gradient-to-b from-blue-900 to-blue-500 rounded-full"></div>
-            <div className="text-[8px] text-slate-500">0.0 - 0.35</div>
+            <div className="text-[8px] text-slate-400">0.0 - 0.35</div>
           </div>
 
           {/* Balanced Zone (Center/Bottom) */}
           <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-50">
-            <div className="text-[8px] text-slate-500">0.35 - 0.65</div>
+            <div className="text-[8px] text-slate-400">0.35 - 0.65</div>
             <div className="w-24 h-1 bg-gradient-to-r from-blue-500 via-green-400 to-pink-500 rounded-full"></div>
             <div className="text-[9px] uppercase tracking-widest text-green-400 font-bold mt-1">Balanced</div>
           </div>
@@ -790,7 +801,7 @@ const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEng
           <div className="absolute top-1/2 right-4 -translate-y-1/2 flex flex-col items-center gap-1 opacity-50">
             <div className="text-[9px] uppercase tracking-widest text-pink-400 font-bold rotate-[90deg]">Bright</div>
             <div className="h-16 w-1 bg-gradient-to-t from-pink-900 to-pink-500 rounded-full"></div>
-            <div className="text-[8px] text-slate-500">0.65 - 1.0</div>
+            <div className="text-[8px] text-slate-400">0.65 - 1.0</div>
           </div>
         </div>
       )}

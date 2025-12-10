@@ -114,7 +114,6 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                 };
 
                 setLocalResults(fallbackResults);
-                setLocalResults(fallbackResults);
                 showToast(t('analysis.toasts.backendUnavailable'), "info");
             }
 
@@ -143,7 +142,8 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
             const formData = new FormData();
             formData.append('audio', currentBlobRef.current, 'audio.wav');
 
-            const response = await fetch('http://localhost:5000/api/voice-quality/clean', {
+            const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const response = await fetch(`${BACKEND_URL}/api/voice-quality/clean`, {
                 method: 'POST',
                 body: formData,
             });

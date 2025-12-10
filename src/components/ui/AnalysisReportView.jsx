@@ -208,7 +208,7 @@ const AnalysisReportView = ({ report, audioBlob, onClose }) => {
             <div className="mt-4 flex justify-center">
                 <button
                     onClick={togglePlay}
-                    className="flex items-center gap-2 px-8 py-3 bg-teal-500 hover:bg-teal-400 text-black font-bold rounded-full transition-all hover:scale-105"
+                    className="flex items-center gap-2 px-8 py-3 bg-teal-500 hover:bg-teal-400 text-white font-bold rounded-full transition-all hover:scale-105"
                 >
                     {isPlaying ? <Pause size={20} /> : <Play size={20} />}
                     {isPlaying ? 'Pause Replay' : 'Replay Full Recording'}

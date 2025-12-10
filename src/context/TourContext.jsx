@@ -17,7 +17,7 @@ export const TourProvider = ({ children }) => {
         }
     }, []);
 
-    const startTour = (tourId, force = false) => {
+    const startTour = React.useCallback((tourId, force = false) => {
         if (!TOURS[tourId]) {
             console.warn(`Tour ${tourId} not found`);
             return;
@@ -27,9 +27,9 @@ export const TourProvider = ({ children }) => {
         }
         setActiveTour(tourId);
         setCurrentStep(0);
-    };
+    }, [completedTours]);
 
-    const endTour = (completed = true) => {
+    const endTour = React.useCallback((completed = true) => {
         if (completed && activeTour) {
             const newCompleted = [...new Set([...completedTours, activeTour])];
             setCompletedTours(newCompleted);
@@ -37,9 +37,9 @@ export const TourProvider = ({ children }) => {
         }
         setActiveTour(null);
         setCurrentStep(0);
-    };
+    }, [activeTour, completedTours]);
 
-    const nextStep = () => {
+    const nextStep = React.useCallback(() => {
         if (!activeTour) return;
         const tourConfig = TOURS[activeTour];
         if (currentStep < tourConfig.length - 1) {
@@ -47,30 +47,32 @@ export const TourProvider = ({ children }) => {
         } else {
             endTour(true);
         }
-    };
+    }, [activeTour, currentStep, endTour]);
 
-    const prevStep = () => {
+    const prevStep = React.useCallback(() => {
         if (currentStep > 0) {
             setCurrentStep(prev => prev - 1);
         }
-    };
+    }, [currentStep]);
 
-    const skipTour = () => {
+    const skipTour = React.useCallback(() => {
         endTour(true); // Mark as completed so it doesn't auto-show again
-    };
+    }, [endTour]);
+
+    const value = React.useMemo(() => ({
+        activeTour,
+        currentStep,
+        completedTours,
+        startTour,
+        endTour,
+        nextStep,
+        prevStep,
+        skipTour,
+        tourConfig: activeTour ? TOURS[activeTour] : null
+    }), [activeTour, currentStep, completedTours, startTour, endTour, nextStep, prevStep, skipTour]);
 
     return (
-        <TourContext.Provider value={{
-            activeTour,
-            currentStep,
-            completedTours,
-            startTour,
-            endTour,
-            nextStep,
-            prevStep,
-            skipTour,
-            tourConfig: activeTour ? TOURS[activeTour] : null
-        }}>
+        <TourContext.Provider value={value}>
             {children}
         </TourContext.Provider>
     );

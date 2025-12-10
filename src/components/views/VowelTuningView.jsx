@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAudio } from '../../context/AudioContext';
 import VowelSpacePlot from '../viz/VowelSpacePlot';
+import BrightnessMeter from '../viz/BrightnessMeter';
 import { Info, Play, Mic, Target } from 'lucide-react';
 
 const VowelTuningView = () => {
@@ -56,6 +57,14 @@ const VowelTuningView = () => {
 
                 {/* Left Panel: Controls */}
                 <div className="lg:col-span-1 flex flex-col gap-4">
+                    {/* Brightness Meter - Real-time F2 feedback */}
+                    {isRecording && (
+                        <BrightnessMeter
+                            dataRef={audioEngineRef.current?.analysisData || { current: {} }}
+                            showTip={true}
+                        />
+                    )}
+
                     <div className="bg-slate-800/50 rounded-2xl p-4 border border-slate-700/50 flex-1">
                         <h3 className="text-white font-bold mb-4 flex items-center gap-2">
                             <Info className="w-4 h-4 text-blue-400" /> {t('vowelTuning.target')}

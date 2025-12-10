@@ -154,25 +154,39 @@ const CoachView = () => {
                                 </div>
                             </div>
                             <div className="p-6">
-                                <div className="text-xs font-bold text-pink-400 uppercase tracking-widest mb-2">Featured</div>
+                                <div className="text-xs font-bold text-pink-400 uppercase tracking-widest mb-2">Voice Feminization</div>
                                 <h3 className="text-xl font-bold mb-2">4-Week Feminization Course</h3>
                                 <p className="text-slate-400 text-sm mb-6 max-w-sm">
                                     A comprehensive journey from finding resonance to mastering vocal weight and intonation.
                                 </p>
                                 <button
                                     onClick={() => handleEnroll('fem-4-week')}
-                                    className="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2"
+                                    className="w-full py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2"
                                 >
                                     Start Program
                                 </button>
                             </div>
                         </div>
 
-                        {/* Coming Soon */}
-                        <div className="bg-slate-900/50 border border-white/5 rounded-2xl h-full flex items-center justify-center p-8 text-center opacity-50">
-                            <div>
-                                <h3 className="text-lg font-bold text-slate-400 mb-1">More Coming Soon</h3>
-                                <p className="text-xs text-slate-500">Masculinization & Androgyny Programs</p>
+                        {/* Singing Course Card */}
+                        <div className="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all group">
+                            <div className="h-32 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 group-hover:from-blue-500/30 group-hover:to-cyan-500/30 transition-all relative">
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <Sparkles size={48} className="text-white/20 group-hover:text-white/40 transition-all" />
+                                </div>
+                            </div>
+                            <div className="p-6">
+                                <div className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2">Voice Training</div>
+                                <h3 className="text-xl font-bold mb-2">Gender Affirming Singing</h3>
+                                <p className="text-slate-400 text-sm mb-6 max-w-sm">
+                                    Find a singing voice in alignment with who you are. Breath, resonance, and agility.
+                                </p>
+                                <button
+                                    onClick={() => handleEnroll('singing-1')}
+                                    className="w-full py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    Start Program
+                                </button>
                             </div>
                         </div>
                     </div>

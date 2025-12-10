@@ -208,7 +208,7 @@ const GuidedJourney = ({ onClose }) => {
     return (
         <div className="fixed inset-0 z-[100] bg-black flex flex-col animate-in fade-in duration-300">
             {/* Header */}
-            <header className="flex-shrink-0 p-4 border-b border-white/10 bg-slate-900/50 backdrop-blur-md">
+            <header className="flex-shrink-0 p-4 border-b border-white/10 bg-slate-950/90 backdrop-blur-xl">
                 <div className="max-w-5xl mx-auto flex items-center gap-4">
                     {/* Exit button */}
                     <button
@@ -254,7 +254,7 @@ const GuidedJourney = ({ onClose }) => {
             </main>
 
             {/* Footer navigation */}
-            <footer className="flex-shrink-0 p-4 border-t border-white/10 bg-slate-900/50 backdrop-blur-md">
+            <footer className="flex-shrink-0 p-4 border-t border-white/10 bg-slate-950/90 backdrop-blur-xl">
                 <div className="max-w-4xl mx-auto flex items-center justify-between">
                     {/* Back button */}
                     <button

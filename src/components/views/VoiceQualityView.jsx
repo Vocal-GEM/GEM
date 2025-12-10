@@ -7,6 +7,7 @@ import Spectrogram from '../viz/Spectrogram';
 import FileSpectrogram from '../viz/FileSpectrogram';
 import ClipCapture from '../ui/ClipCapture';
 import IntensityMeter from '../viz/IntensityMeter';
+import RegisterGauge from '../viz/RegisterGauge';
 import { DSP } from '../../utils/DSP';
 import { getNormsForGoal } from '../../data/norms';
 import {
@@ -56,6 +57,12 @@ const VoiceQualityView = () => {
     // Use Audio Engine
     const { audioEngineRef, setPassthrough } = useAudio();
     const audioEngine = audioEngineRef.current;
+
+    // Metrics Ref for 60fps components
+    const metricsRef = useRef(null);
+    useEffect(() => {
+        metricsRef.current = liveMetrics;
+    }, [liveMetrics]);
 
     // Listen Mode
     const [isListenMode, setIsListenMode] = useState(false);
@@ -130,7 +137,8 @@ const VoiceQualityView = () => {
             // Assuming backend is on same host/port or proxied. 
             // If dev, might need localhost:5000. 
             // Using relative path assuming proxy or same origin.
-            const response = await fetch('http://localhost:5000/api/voice-quality/analyze', {
+            const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const response = await fetch(`${BACKEND_URL}/api/voice-quality/analyze`, {
                 method: 'POST',
                 body: formData,
             });
@@ -476,6 +484,11 @@ const VoiceQualityView = () => {
                     <Info className="w-4 h-4 mr-2 text-teal-400" />
                     <span>Sustain a steady vowel (&quot;ahhh&quot;) for accurate clinical metrics.</span>
                 </div>
+
+                {/* NEW: Laryngeal Register Gauge */}
+                <div className="mt-6">
+                    <RegisterGauge dataRef={metricsRef} />
+                </div>
             </div>
         );
     };
@@ -621,7 +634,7 @@ const VoiceQualityView = () => {
                                     <div className="flex gap-3">
                                         <button
                                             onClick={confirmListenMode}
-                                            className="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg text-sm"
+                                            className="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-white font-bold rounded-lg text-sm"
                                         >
                                             {t('voiceQuality.warning.confirm')}
                                         </button>
@@ -693,8 +706,8 @@ const VoiceQualityView = () => {
                                 <button
                                     onClick={() => setShowSpectrogram(!showSpectrogram)}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-colors border ${showSpectrogram
-                                            ? 'bg-teal-500/20 text-teal-400 border-teal-500/50'
-                                            : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
+                                        ? 'bg-teal-500/20 text-teal-400 border-teal-500/50'
+                                        : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
                                         }`}
                                 >
                                     <Eye size={16} />

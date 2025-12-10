@@ -57,7 +57,7 @@ const CalibrationSummary = ({ results, onConfirm, onRecalibrate }) => {
                     </button>
                     <button
                         onClick={onConfirm}
-                        className="flex-[2] py-3 bg-green-500 text-black font-bold rounded-xl hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20"
+                        className="flex-[2] py-3 bg-green-500 text-white font-bold rounded-xl hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20"
                     >
                         Save & Continue
                     </button>

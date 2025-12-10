@@ -37,25 +37,25 @@ const SmartCoachWidget = ({ onStartSession }) => {
 
             <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div>
-                    <div className="flex items-center gap-2 text-indigo-200 mb-2 font-medium">
+                    <div className="flex items-center gap-2 !text-indigo-200 mb-2 font-medium">
                         <Sparkles size={18} className="text-yellow-300" />
                         <span>Smart Coach</span>
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                    <h2 className="text-3xl md:text-4xl font-bold !text-white mb-2">
                         {greeting}, {activeProfile?.name || 'Riley'}
                     </h2>
-                    <p className="text-indigo-100 text-lg max-w-xl">
-                        Ready to level up? Your daily focus is <strong className="text-white">{dailyFocus}</strong>.
+                    <p className="!text-indigo-100 text-lg max-w-xl">
+                        Ready to level up? Your daily focus is <strong className="!text-white">{dailyFocus}</strong>.
                     </p>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
                     <button
                         onClick={onStartSession}
-                        className="flex items-center justify-center gap-3 px-8 py-4 bg-white text-indigo-600 rounded-2xl font-bold text-lg hover:bg-indigo-50 transition-all shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 group"
+                        className="flex items-center justify-center gap-3 px-8 py-4 bg-white !text-indigo-600 rounded-2xl font-bold text-lg hover:bg-indigo-50 transition-all shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 group"
                     >
                         <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
-                            <Play size={16} className="ml-1 text-indigo-600" fill="currentColor" />
+                            <Play size={16} className="ml-1 !text-indigo-600" fill="currentColor" />
                         </div>
                         Start Guided Session
                     </button>
@@ -66,20 +66,20 @@ const SmartCoachWidget = ({ onStartSession }) => {
             <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap gap-6 md:gap-12">
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-white/10">
-                        <Target size={20} className="text-indigo-200" />
+                        <Target size={20} className="!text-indigo-200" />
                     </div>
                     <div>
-                        <div className="text-xs text-indigo-200 uppercase font-bold tracking-wider">Goal</div>
-                        <div className="text-white font-bold">15 mins</div>
+                        <div className="text-xs !text-indigo-200 uppercase font-bold tracking-wider">Goal</div>
+                        <div className="!text-white font-bold">15 mins</div>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-white/10">
-                        <Calendar size={20} className="text-indigo-200" />
+                        <Calendar size={20} className="!text-indigo-200" />
                     </div>
                     <div>
-                        <div className="text-xs text-indigo-200 uppercase font-bold tracking-wider">Streak</div>
-                        <div className="text-white font-bold">3 Days</div>
+                        <div className="text-xs !text-indigo-200 uppercase font-bold tracking-wider">Streak</div>
+                        <div className="!text-white font-bold">3 Days</div>
                     </div>
                 </div>
             </div>

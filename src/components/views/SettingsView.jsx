@@ -1,15 +1,44 @@
 import React, { useState } from 'react';
-import { Download, Upload, Trash2, AlertTriangle, Check, FileJson, Eye, Globe } from 'lucide-react';
+import { Download, Upload, Trash2, AlertTriangle, Check, FileJson, Eye, Globe, TrendingUp, Heart, Edit3 } from 'lucide-react';
 import { indexedDB } from '../../services/IndexedDBManager';
 import { useSettings } from '../../context/SettingsContext';
 import { useTranslation } from 'react-i18next';
 import { COLORMAP_PRESETS } from '../../utils/colormaps';
+import VoiceCalibrationWizard from '../ui/VoiceCalibrationWizard';
+import { VoiceCalibrationService } from '../../services/VoiceCalibrationService';
+import { SelfCareService, SELF_CARE_PROMPTS } from '../../services/SelfCareService';
+import SelfCareOnboarding from '../ui/SelfCareOnboarding';
 
 const SettingsView = () => {
     const { t } = useTranslation();
     const { settings, updateSettings } = useSettings();
     const [status, setStatus] = useState({ type: '', message: '' });
     const [isResetting, setIsResetting] = useState(false);
+    const [showCalibrationWizard, setShowCalibrationWizard] = useState(false);
+    const [baselineData, setBaselineData] = useState(() => VoiceCalibrationService.getBaseline());
+    const [showSelfCareWizard, setShowSelfCareWizard] = useState(false);
+    const [selfCarePlan, setSelfCarePlan] = useState(() => SelfCareService.getSelfCarePlan());
+
+    const handleClearBaseline = () => {
+        VoiceCalibrationService.clearBaseline();
+        setBaselineData(null);
+        setStatus({ type: 'success', message: 'Voice baseline cleared.' });
+        setTimeout(() => setStatus({ type: '', message: '' }), 3000);
+    };
+
+    const handleCalibrationComplete = (metrics) => {
+        setBaselineData(metrics);
+        setShowCalibrationWizard(false);
+        setStatus({ type: 'success', message: 'Voice baseline saved!' });
+        setTimeout(() => setStatus({ type: '', message: '' }), 3000);
+    };
+
+    const handleSelfCareComplete = (plan) => {
+        setSelfCarePlan(plan);
+        setShowSelfCareWizard(false);
+        setStatus({ type: 'success', message: 'Self-care plan updated!' });
+        setTimeout(() => setStatus({ type: '', message: '' }), 3000);
+    };
 
     const handleExport = async () => {
         try {
@@ -90,6 +119,180 @@ const SettingsView = () => {
                     </div>
                 )}
 
+                {/* Voice Calibration Wizard Modal */}
+                {showCalibrationWizard && (
+                    <VoiceCalibrationWizard
+                        onComplete={handleCalibrationComplete}
+                        onClose={() => setShowCalibrationWizard(false)}
+                    />
+                )}
+
+                {/* Self-Care Wizard Modal */}
+                {showSelfCareWizard && (
+                    <SelfCareOnboarding
+                        onComplete={handleSelfCareComplete}
+                        onSkip={() => setShowSelfCareWizard(false)}
+                    />
+                )}
+
+                {/* Self-Care Plan Settings */}
+                <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden mb-8">
+                    <div className="p-6 border-b border-slate-800">
+                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                            <Heart className="text-pink-400" size={24} />
+                            Self-Care Plan
+                        </h2>
+                        <p className="text-slate-400 mt-1">Manage your personal wellness strategies for the voice journey.</p>
+                    </div>
+
+                    <div className="p-6">
+                        {selfCarePlan && SelfCareService.hasCompletedPlan() ? (
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                                <div>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Check className="text-green-400" size={16} />
+                                        <h3 className="font-bold text-white">Plan Active</h3>
+                                    </div>
+                                    <p className="text-sm text-slate-400">Your self-care strategies are set and ready.</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => {
+                                            SelfCareService.clearSelfCarePlan();
+                                            setSelfCarePlan(null);
+                                            setStatus({ type: 'success', message: 'Plan cleared.' });
+                                            setTimeout(() => setStatus({ type: '', message: '' }), 3000);
+                                        }}
+                                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-red-400 border border-slate-700 hover:border-red-500/50 rounded-lg transition-colors flex items-center gap-2"
+                                    >
+                                        <Trash2 size={16} /> Clear
+                                    </button>
+                                    <button
+                                        onClick={() => setShowSelfCareWizard(true)}
+                                        className="px-4 py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-lg transition-colors flex items-center gap-2"
+                                    >
+                                        <Edit3 size={16} /> Edit Plan
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-pink-900/10 rounded-xl border border-pink-500/20">
+                                <div>
+                                    <h3 className="font-bold text-pink-100">No Plan Set</h3>
+                                    <p className="text-sm text-pink-300/80">Create a plan to support your emotional well-being.</p>
+                                </div>
+                                <button
+                                    onClick={() => setShowSelfCareWizard(true)}
+                                    className="px-4 py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-lg transition-colors flex items-center gap-2"
+                                >
+                                    <Heart size={16} /> Create Plan
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Voice Baseline Settings */}
+                <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden mb-8">
+                    <div className="p-6 border-b border-slate-800">
+                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                            <TrendingUp className="text-purple-400" size={24} />
+                            Voice Baseline
+                        </h2>
+                        <p className="text-slate-400 mt-1">Capture your voice baseline for personalized progress tracking.</p>
+                    </div>
+
+                    <div className="p-6 space-y-6">
+                        {baselineData ? (
+                            <>
+                                {/* Baseline Summary */}
+                                <div className="p-4 bg-purple-500/10 rounded-xl border border-purple-500/20">
+                                    <div className="grid grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <div className="text-xs text-slate-500 uppercase tracking-wider">Average Pitch</div>
+                                            <div className="text-xl font-bold text-purple-400">
+                                                {Math.round(baselineData.pitch?.mean || 0)} Hz
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="text-xs text-slate-500 uppercase tracking-wider">Pitch Range</div>
+                                            <div className="text-lg font-medium text-slate-300">
+                                                {Math.round(baselineData.pitch?.min || 0)} - {Math.round(baselineData.pitch?.max || 0)} Hz
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="text-xs text-slate-500 uppercase tracking-wider">F1 (Formant 1)</div>
+                                            <div className="text-lg font-medium text-pink-400">
+                                                {Math.round(baselineData.formants?.f1?.mean || 0)} Hz
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="text-xs text-slate-500 uppercase tracking-wider">F2 (Formant 2)</div>
+                                            <div className="text-lg font-medium text-pink-400">
+                                                {Math.round(baselineData.formants?.f2?.mean || 0)} Hz
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="text-xs text-slate-500">
+                                        Recorded: {baselineData.analyzedAt
+                                            ? new Date(baselineData.analyzedAt).toLocaleString()
+                                            : 'Unknown'}
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex gap-4">
+                                    <button
+                                        onClick={() => setShowCalibrationWizard(true)}
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-colors"
+                                    >
+                                        <TrendingUp size={18} />
+                                        Recalibrate
+                                    </button>
+                                    <button
+                                        onClick={handleClearBaseline}
+                                        className="flex items-center gap-2 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-xl transition-colors"
+                                    >
+                                        <Trash2 size={18} />
+                                        Clear
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="text-center py-6">
+                                <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <TrendingUp size={32} className="text-purple-400" />
+                                </div>
+                                <h3 className="text-lg font-bold text-white mb-2">No Baseline Set</h3>
+                                <p className="text-slate-400 text-sm mb-4">
+                                    Record a sample of your voice to enable personalized progress tracking and comparison overlays.
+                                </p>
+                                <button
+                                    onClick={() => setShowCalibrationWizard(true)}
+                                    className="px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-colors"
+                                >
+                                    Calibrate My Voice
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Show Baseline Comparison Toggle */}
+                        <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                            <div>
+                                <h3 className="font-bold text-white">Show Baseline Comparison</h3>
+                                <p className="text-sm text-slate-400">Display baseline overlays on pitch and formant visualizations.</p>
+                            </div>
+                            <button
+                                onClick={() => updateSettings({ ...settings, showBaselineComparison: !settings.showBaselineComparison })}
+                                className={`w-14 h-8 rounded-full transition-colors relative ${settings.showBaselineComparison ? 'bg-purple-500' : 'bg-slate-700'}`}
+                                aria-label="Toggle Baseline Comparison"
+                            >
+                                <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.showBaselineComparison ? 'left-7' : 'left-1'}`} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Language Settings */}
                 <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden mb-8">
                     <div className="p-6 border-b border-slate-800">
@@ -162,8 +365,8 @@ const SettingsView = () => {
                                         key={key}
                                         onClick={() => updateSettings({ ...settings, spectrogramColorScheme: key })}
                                         className={`flex items-center gap-2 px-4 py-3 rounded-lg border transition-all ${settings.spectrogramColorScheme === key
-                                                ? 'bg-teal-500/20 border-teal-500 text-teal-400'
-                                                : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                                            ? 'bg-teal-500/20 border-teal-500 text-teal-400'
+                                            : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
                                             }`}
                                         aria-label={`Set color scheme to ${name}`}
                                     >

@@ -23,6 +23,7 @@ const getInitialState = () => {
         completedSteps: [],
         stepProgress: {}, // { stepId: { completedAt, timeSpent, metrics } }
         baselineRecording: null,
+        voiceBaseline: null, // { pitch: {...}, formants: {...}, spl: {...}, analyzedAt }
         progressRecording: null,
         startedAt: null,
         completedAt: null
@@ -70,6 +71,7 @@ export const GuidedJourneyProvider = ({ children }) => {
             completedSteps: [],
             stepProgress: {},
             baselineRecording: null,
+            voiceBaseline: null,
             progressRecording: null,
             startedAt: new Date().toISOString(),
             completedAt: null
@@ -191,6 +193,17 @@ export const GuidedJourneyProvider = ({ children }) => {
         }));
     }, []);
 
+    // Save voice baseline metrics (pitch, formants, SPL)
+    const saveVoiceBaseline = useCallback((metrics) => {
+        setState(prev => ({
+            ...prev,
+            voiceBaseline: {
+                ...metrics,
+                savedAt: new Date().toISOString()
+            }
+        }));
+    }, []);
+
     // Exit the journey (pauses, keeps progress)
     const exitJourney = useCallback(() => {
         setIsJourneyActive(false);
@@ -204,6 +217,7 @@ export const GuidedJourneyProvider = ({ children }) => {
             completedSteps: [],
             stepProgress: {},
             baselineRecording: null,
+            voiceBaseline: null,
             progressRecording: null,
             startedAt: null,
             completedAt: null
@@ -231,6 +245,7 @@ export const GuidedJourneyProvider = ({ children }) => {
         completedSteps: state.completedSteps,
         stepProgress: state.stepProgress,
         baselineRecording: state.baselineRecording,
+        voiceBaseline: state.voiceBaseline,
         progressRecording: state.progressRecording,
         isJourneyActive,
         isJourneyComplete: state.completedAt !== null,
@@ -251,6 +266,7 @@ export const GuidedJourneyProvider = ({ children }) => {
         goToStep,
         completeStep,
         saveBaselineRecording,
+        saveVoiceBaseline,
         saveProgressRecording,
         exitJourney,
         resetJourney

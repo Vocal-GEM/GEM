@@ -1,323 +1,162 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, Pause, RotateCcw, Check, ChevronRight, Wind, Music, Volume2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Activity, Wind, Music, Sparkles, ChevronDown, ChevronUp, CheckCircle } from 'lucide-react';
+import BreathVisualizer from './BreathVisualizer';
 
-/**
- * WarmupRoutine - Guided vocal warmup exercises before practice
- * Includes breathing, humming, and pitch siren exercises
- */
-const WarmupRoutine = ({ onComplete, onSkip }) => {
-    const [currentExercise, setCurrentExercise] = useState(0);
-    const [exerciseState, setExerciseState] = useState('ready'); // ready, active, complete
-    const [timer, setTimer] = useState(0);
-    const [isPlaying, setIsPlaying] = useState(false);
+const SECTIONS = [
+    {
+        id: 'physical',
+        title: 'Physical Stretches',
+        icon: <Activity size={24} />,
+        items: [
+            'Arms (Cross-body, Triceps)',
+            'Shoulder Rolls (Back, Forward, Hike & Drop)',
+            'Legs (Quads, Hamstrings, Side Lunge)',
+            'Extremities (Wrists, Ankles)',
+            'Spinal Decompression (Rag Doll)',
+            'Neck (Side stretches, Semi-circles)'
+        ]
+    },
+    {
+        id: 'massage',
+        title: 'Jaw, Neck & Larynx',
+        icon: <Sparkles size={24} />,
+        items: [
+            'Shoulder Massage (Dig in!)',
+            'Mama Cat Neck Grabs',
+            'Jaw Release (Hinge Joint)',
+            'Sternocleidomastoid (Neck Ropes)',
+            'Laryngeal Massage (Gentro side-to-side)',
+            'Yawning Stretch',
+            'Tongue Root Relaxer (Thumb press under chin)',
+            'Raisins & Grapes (Face Scrunch/Open)'
+        ]
+    },
+    {
+        id: 'breathing',
+        title: 'Breathing & Posture',
+        icon: <Wind size={24} />,
+        component: true
+    },
+    {
+        id: 'voice',
+        title: 'Voice Activation',
+        icon: <Music size={24} />,
+        items: [
+            'Glisses on "Ah" (Sighing)',
+            'Glisses on "No" (Fish lips)',
+            'Pitch Circles (Small to big)',
+            'Lip Trills (or Zzz/Vvv)',
+            'Straw/Kazoo Phonation'
+        ]
+    }
+];
 
-    const timerRef = useRef(null);
-    const audioContextRef = useRef(null);
-    const oscillatorRef = useRef(null);
+const WarmUpRoutine = ({ onComplete }) => {
+    const [checkedItems, setCheckedItems] = useState({});
+    const [openSection, setOpenSection] = useState('physical');
 
-    const exercises = [
-        {
-            id: 'breathing',
-            name: 'Diaphragmatic Breathing',
-            icon: Wind,
-            duration: 30,
-            description: 'Deep belly breathing to relax vocal cords',
-            instruction: 'Breathe in for 4 counts, hold for 4, exhale for 6. Repeat.',
-            color: 'from-blue-500 to-cyan-500',
-            phases: [
-                { action: 'Inhale', duration: 4 },
-                { action: 'Hold', duration: 4 },
-                { action: 'Exhale', duration: 6 }
-            ]
-        },
-        {
-            id: 'humming',
-            name: 'Gentle Humming',
-            icon: Music,
-            duration: 30,
-            description: 'Warm up vocal folds with gentle vibration',
-            instruction: 'Hum gently on "mmm", feeling vibration in your lips and nose.',
-            color: 'from-purple-500 to-pink-500',
-            targetHz: 180
-        },
-        {
-            id: 'siren',
-            name: 'Pitch Sirens',
-            icon: Volume2,
-            duration: 30,
-            description: 'Slide through your range to stretch vocal folds',
-            instruction: 'Glide from low to high on "ooo", then back down. Like a siren.',
-            color: 'from-pink-500 to-rose-500',
-            lowHz: 120,
-            highHz: 300
-        },
-        {
-            id: 'lip-trill',
-            name: 'Lip Trills',
-            icon: Wind,
-            duration: 20,
-            description: 'Relax lips and connect breath to voice',
-            instruction: 'Blow air through loosely closed lips to make a "brrr" sound.',
-            color: 'from-emerald-500 to-teal-500'
-        }
-    ];
-
-    const currentEx = exercises[currentExercise];
-    const totalDuration = exercises.reduce((sum, ex) => sum + ex.duration, 0);
-    const completedDuration = exercises.slice(0, currentExercise).reduce((sum, ex) => sum + ex.duration, 0) + timer;
-    const overallProgress = (completedDuration / totalDuration) * 100;
-
-    // Cleanup
-    useEffect(() => {
-        return () => {
-            if (timerRef.current) clearInterval(timerRef.current);
-            stopTone();
-        };
-    }, []);
-
-    // Timer logic
-    useEffect(() => {
-        if (exerciseState === 'active') {
-            timerRef.current = setInterval(() => {
-                setTimer(prev => {
-                    if (prev >= currentEx.duration) {
-                        setExerciseState('complete');
-                        clearInterval(timerRef.current);
-                        stopTone();
-                        return prev;
-                    }
-                    return prev + 1;
-                });
-            }, 1000);
-        }
-        return () => {
-            if (timerRef.current) clearInterval(timerRef.current);
-        };
-    }, [exerciseState, currentEx]);
-
-    const getAudioContext = () => {
-        if (!audioContextRef.current) {
-            audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        return audioContextRef.current;
+    const toggleCheck = (item) => {
+        setCheckedItems(prev => ({ ...prev, [item]: !prev[item] }));
     };
 
-    const playTone = (hz) => {
-        stopTone();
-        const ctx = getAudioContext();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(hz, ctx.currentTime);
-        gain.gain.setValueAtTime(0.15, ctx.currentTime);
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        oscillatorRef.current = { osc, gain };
+    const toggleSection = (id) => {
+        setOpenSection(openSection === id ? null : id);
     };
 
-    const stopTone = () => {
-        if (oscillatorRef.current) {
-            oscillatorRef.current.gain.gain.setValueAtTime(0, audioContextRef.current?.currentTime || 0);
-            setTimeout(() => {
-                oscillatorRef.current?.osc.stop();
-                oscillatorRef.current = null;
-            }, 50);
-        }
-    };
-
-    const startExercise = () => {
-        setExerciseState('active');
-        setTimer(0);
-
-        // Play reference tone for humming exercise
-        if (currentEx.id === 'humming' && currentEx.targetHz) {
-            playTone(currentEx.targetHz);
-        }
-    };
-
-    const nextExercise = () => {
-        stopTone();
-        if (currentExercise < exercises.length - 1) {
-            setCurrentExercise(prev => prev + 1);
-            setExerciseState('ready');
-            setTimer(0);
-        } else {
-            // All exercises complete
-            onComplete?.();
-        }
-    };
-
-    const resetRoutine = () => {
-        stopTone();
-        setCurrentExercise(0);
-        setExerciseState('ready');
-        setTimer(0);
-    };
-
-    const formatTime = (s) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
-
-    // Get current breathing phase
-    const getBreathingPhase = () => {
-        if (currentEx.id !== 'breathing' || !currentEx.phases) return null;
-        const cycleDuration = currentEx.phases.reduce((sum, p) => sum + p.duration, 0);
-        const cyclePosition = timer % cycleDuration;
-
-        let elapsed = 0;
-        for (const phase of currentEx.phases) {
-            if (cyclePosition < elapsed + phase.duration) {
-                return {
-                    action: phase.action,
-                    remaining: phase.duration - (cyclePosition - elapsed)
-                };
-            }
-            elapsed += phase.duration;
-        }
-        return currentEx.phases[0];
-    };
-
-    const breathingPhase = getBreathingPhase();
+    const progress = (Object.values(checkedItems).filter(Boolean).length / 20) * 100; // Approx denominator
 
     return (
-        <div className="bg-slate-900 rounded-2xl border border-slate-700 p-6 max-w-md w-full">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h2 className="text-xl font-bold text-white">Vocal Warmup</h2>
-                    <p className="text-sm text-slate-400">
-                        {Math.ceil(totalDuration / 60)} min routine • {exercises.length} exercises
-                    </p>
+        <div className="max-w-2xl w-full max-h-[80vh] overflow-y-auto bg-slate-900 rounded-2xl border border-slate-700 p-6 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between bg-slate-800 rounded-xl p-4 border border-slate-700">
+                <div className="text-white font-bold">Warm-Up Progress</div>
+                <div className="w-1/3 bg-slate-700 rounded-full h-2">
+                    <div
+                        className="bg-green-500 h-2 rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(progress, 100)}%` }}
+                    />
                 </div>
-                {onSkip && (
+            </div>
+
+            {SECTIONS.map((section) => (
+                <div key={section.id} className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden transition-all">
                     <button
-                        onClick={onSkip}
-                        className="text-sm text-slate-400 hover:text-white transition-colors"
+                        onClick={() => toggleSection(section.id)}
+                        className={`w-full flex items-center justify-between p-6 ${openSection === section.id ? 'bg-slate-700' : 'hover:bg-slate-700'}`}
                     >
-                        Skip
+                        <div className="flex items-center gap-4">
+                            <div className={`p-2 rounded-lg ${openSection === section.id ? 'bg-pink-500 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                                {section.icon}
+                            </div>
+                            <h3 className={`text-xl font-bold ${openSection === section.id ? 'text-white' : 'text-slate-300'}`}>
+                                {section.title}
+                            </h3>
+                        </div>
+                        {openSection === section.id ? <ChevronUp className="text-slate-400" /> : <ChevronDown className="text-slate-400" />}
                     </button>
-                )}
-            </div>
 
-            {/* Overall Progress */}
-            <div className="mb-6">
-                <div className="flex justify-between text-xs text-slate-400 mb-1">
-                    <span>Overall Progress</span>
-                    <span>{Math.round(overallProgress)}%</span>
-                </div>
-                <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                    <div
-                        className="h-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-500"
-                        style={{ width: `${overallProgress}%` }}
-                    />
-                </div>
-            </div>
-
-            {/* Exercise Steps */}
-            <div className="flex gap-2 mb-6">
-                {exercises.map((ex, i) => (
-                    <div
-                        key={ex.id}
-                        className={`flex-1 h-2 rounded-full transition-all ${i < currentExercise ? 'bg-green-500' :
-                                i === currentExercise ? `bg-gradient-to-r ${ex.color}` :
-                                    'bg-slate-700'
-                            }`}
-                    />
-                ))}
-            </div>
-
-            {/* Current Exercise Card */}
-            <div className={`p-6 rounded-xl bg-gradient-to-br ${currentEx.color} bg-opacity-20 border border-white/10 mb-4`}>
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="p-3 rounded-full bg-white/20">
-                        <currentEx.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-bold text-white">{currentEx.name}</h3>
-                        <p className="text-sm text-white/70">{currentEx.description}</p>
-                    </div>
-                </div>
-
-                {/* Timer Display */}
-                <div className="text-center mb-4">
-                    <div className="text-4xl font-mono font-bold text-white mb-1">
-                        {formatTime(currentEx.duration - timer)}
-                    </div>
-                    {exerciseState === 'active' && breathingPhase && (
-                        <div className={`text-2xl font-bold animate-pulse ${breathingPhase.action === 'Inhale' ? 'text-cyan-300' :
-                                breathingPhase.action === 'Hold' ? 'text-yellow-300' :
-                                    'text-pink-300'
-                            }`}>
-                            {breathingPhase.action}
+                    {openSection === section.id && (
+                        <div className="p-6 border-t border-slate-700/50 space-y-6 animate-in slide-in-from-top-2">
+                            {section.component ? (
+                                <div className="space-y-8">
+                                    <p className="text-slate-400 italic mb-4">
+                                        "Breathe into your butt (beach ball). Send the air low."
+                                    </p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <BreathVisualizer type="conscious" />
+                                        <BreathVisualizer type="square" />
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <BreathVisualizer type="snake" />
+                                        <BreathVisualizer type="doggy" />
+                                    </div>
+                                    <div className="mt-4 p-4 bg-slate-800 rounded-lg">
+                                        <label className="flex items-center gap-3 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={!!checkedItems['breathing-done']}
+                                                onChange={() => toggleCheck('breathing-done')}
+                                                className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-pink-500 focus:ring-pink-500"
+                                            />
+                                            <span className="text-white">I have completed my breathing exercises</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {section.items.map((item, idx) => (
+                                        <label key={idx} className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-800/50 cursor-pointer group transition-colors">
+                                            <div className={`mt-0.5 w-5 h-5 rounded border flex items-center justify-center transition-colors ${checkedItems[item] ? 'bg-green-500 border-green-500' : 'border-slate-600 group-hover:border-slate-500'
+                                                }`}>
+                                                {checkedItems[item] && <CheckCircle size={14} className="text-white" />}
+                                            </div>
+                                            <input
+                                                type="checkbox"
+                                                className="hidden"
+                                                checked={!!checkedItems[item]}
+                                                onChange={() => toggleCheck(item)}
+                                            />
+                                            <span className={`${checkedItems[item] ? 'text-green-400 line-through decoration-green-500/50' : 'text-slate-200'} transition-colors`}>
+                                                {item}
+                                            </span>
+                                        </label>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
+            ))}
 
-                {/* Instruction */}
-                <div className="bg-black/20 rounded-lg p-3 text-center">
-                    <p className="text-sm text-white/90">{currentEx.instruction}</p>
-                </div>
-
-                {/* Timer Bar */}
-                {exerciseState === 'active' && (
-                    <div className="mt-4 h-2 bg-black/30 rounded-full overflow-hidden">
-                        <div
-                            className="h-full bg-white/50 transition-all duration-1000"
-                            style={{ width: `${(timer / currentEx.duration) * 100}%` }}
-                        />
-                    </div>
-                )}
-            </div>
-
-            {/* Controls */}
-            <div className="flex justify-center gap-4">
-                {exerciseState === 'ready' && (
-                    <button
-                        onClick={startExercise}
-                        className="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-pink-500/20 transition-all"
-                    >
-                        <Play className="w-5 h-5" fill="currentColor" />
-                        Start Exercise
-                    </button>
-                )}
-
-                {exerciseState === 'active' && (
-                    <button
-                        onClick={() => { setExerciseState('complete'); stopTone(); }}
-                        className="flex-1 py-3 rounded-xl bg-slate-700 text-white font-bold flex items-center justify-center gap-2 hover:bg-slate-600 transition-all"
-                    >
-                        <Pause className="w-5 h-5" />
-                        End Early
-                    </button>
-                )}
-
-                {exerciseState === 'complete' && (
-                    <button
-                        onClick={nextExercise}
-                        className="flex-1 py-3 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-green-500/20 transition-all"
-                    >
-                        {currentExercise < exercises.length - 1 ? (
-                            <>Next Exercise <ChevronRight className="w-5 h-5" /></>
-                        ) : (
-                            <><Check className="w-5 h-5" /> Complete Warmup</>
-                        )}
-                    </button>
-                )}
-            </div>
-
-            {/* Reset */}
-            {(exerciseState !== 'ready' || currentExercise > 0) && (
+            <div className="pt-8 flex justify-center">
                 <button
-                    onClick={resetRoutine}
-                    className="w-full mt-3 py-2 text-sm text-slate-400 hover:text-white transition-colors flex items-center justify-center gap-1"
+                    onClick={onComplete}
+                    className="px-12 py-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-pink-900/20 transform hover:scale-105 transition-all text-lg flex items-center gap-2"
                 >
-                    <RotateCcw className="w-4 h-4" />
-                    Start Over
+                    <CheckCircle /> Complete Warm-Up
                 </button>
-            )}
+            </div>
         </div>
     );
 };
 
-export default WarmupRoutine;
+export default WarmUpRoutine;

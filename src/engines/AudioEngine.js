@@ -452,6 +452,19 @@ export class AudioEngine {
             // Using DSP.calculatePitchYIN for direct access.
             const { pitch, confidence } = DSP.calculatePitchYIN(dataArray, this.audioContext.sampleRate, 0.2);
 
+            // --- QUAD-CORE ANALYSIS METRICS ---
+            let f3Noise = -100;
+            let harmonicRatio = 0;
+
+            if (pitch > 50) {
+                // Module A: Texture (F3 Noise 2.3k-3.5k)
+                f3Noise = DSP.calculateSpectralBalance(freqData, 2300, 3500, this.audioContext.sampleRate);
+
+                // Module D: Mix/Registration (Harmonic Ratio)
+                harmonicRatio = DSP.calculateHarmonicRatio(freqData, pitch, this.audioContext.sampleRate);
+            }
+            // ----------------------------------
+
             let jitter = 0;
             let shimmer = 0;
             let hnr = 0;
@@ -509,7 +522,9 @@ export class AudioEngine {
                     jitter: jitter,
                     shimmer: shimmer,
                     hnr: hnr,
-                    tilt: tilt || -20
+                    tilt: tilt || -20,
+                    f3Noise: f3Noise,
+                    harmonicRatio: harmonicRatio
                 });
             }
         };

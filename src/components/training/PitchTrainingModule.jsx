@@ -161,7 +161,7 @@ const PitchTrainingModule = ({ targetNote = 'A3', targetFreq = 220, tolerance = 
                 {!isPlaying ? (
                     <button
                         onClick={handleStart}
-                        className="flex-[2] py-3 bg-teal-500 hover:bg-teal-400 text-black font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
+                        className="flex-[2] py-3 bg-teal-500 hover:bg-teal-400 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
                     >
                         <Play size={20} /> Start Practice
                     </button>

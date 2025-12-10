@@ -102,7 +102,7 @@ const CalibrationWizard = ({ onComplete, onClose }) => {
                             </p>
                             <button
                                 onClick={() => setStep(1)}
-                                className="px-6 py-3 bg-teal-500 hover:bg-teal-400 text-black font-bold rounded-xl transition-colors flex items-center gap-2 mx-auto"
+                                className="px-6 py-3 bg-teal-500 hover:bg-teal-400 text-white font-bold rounded-xl transition-colors flex items-center gap-2 mx-auto"
                             >
                                 Start Calibration <ArrowRight size={18} />
                             </button>
@@ -126,7 +126,7 @@ const CalibrationWizard = ({ onComplete, onClose }) => {
                             ) : (
                                 <button
                                     onClick={handleStep1}
-                                    className="px-6 py-3 bg-teal-500 hover:bg-teal-400 text-black font-bold rounded-xl transition-colors"
+                                    className="px-6 py-3 bg-teal-500 hover:bg-teal-400 text-white font-bold rounded-xl transition-colors"
                                 >
                                     Start Silence Check
                                 </button>
@@ -179,7 +179,7 @@ const CalibrationWizard = ({ onComplete, onClose }) => {
                                 </button>
                                 <button
                                     onClick={handleFinish}
-                                    className="px-6 py-3 bg-green-500 hover:bg-green-400 text-black font-bold rounded-xl transition-colors"
+                                    className="px-6 py-3 bg-green-500 hover:bg-green-400 text-white font-bold rounded-xl transition-colors"
                                 >
                                     Done
                                 </button>

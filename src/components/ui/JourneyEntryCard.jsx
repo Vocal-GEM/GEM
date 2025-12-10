@@ -26,15 +26,15 @@ const JourneyEntryCard = ({
                                 <Sparkles size={12} />
                                 COMPLETED
                             </span>
-                            <h3 className="text-xl font-bold text-white">Voice Feminization Journey</h3>
-                            <p className="text-sm text-slate-400 mt-1">You&apos;ve completed all 12 steps!</p>
+                            <h3 className="text-xl font-bold !text-white">Voice Feminization Journey</h3>
+                            <p className="text-sm !text-slate-200 mt-1">You&apos;ve completed all 12 steps!</p>
                         </div>
                         <div className="text-4xl">🎉</div>
                     </div>
 
                     <button
                         onClick={onStart}
-                        className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-300 text-sm font-medium transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl !text-slate-200 text-sm font-medium transition-colors"
                     >
                         <RotateCcw size={16} />
                         Start Over
@@ -58,9 +58,9 @@ const JourneyEntryCard = ({
                                 <Clock size={12} />
                                 IN PROGRESS
                             </span>
-                            <h3 className="text-xl font-bold text-white">Voice Feminization Journey</h3>
-                            <p className="text-sm text-slate-400 mt-1">
-                                Continue: <span className="text-pink-300">{currentStepTitle}</span>
+                            <h3 className="text-xl font-bold !text-white">Voice Feminization Journey</h3>
+                            <p className="text-sm !text-slate-200 mt-1">
+                                Continue: <span className="!text-pink-300">{currentStepTitle}</span>
                             </p>
                         </div>
                         <div className="text-4xl">🌸</div>
@@ -68,7 +68,7 @@ const JourneyEntryCard = ({
 
                     {/* Progress bar */}
                     <div className="mb-4">
-                        <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+                        <div className="flex items-center justify-between text-xs !text-slate-200 mb-1">
                             <span>Progress</span>
                             <span className="font-bold text-pink-400">{progressPercentage}%</span>
                         </div>
@@ -82,7 +82,7 @@ const JourneyEntryCard = ({
 
                     <button
                         onClick={onResume}
-                        className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 rounded-xl text-white font-bold shadow-lg shadow-pink-500/20 transition-all transform active:scale-95"
+                        className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 rounded-xl !text-white font-bold shadow-lg shadow-pink-500/20 transition-all transform active:scale-95"
                     >
                         <Play size={18} fill="currentColor" />
                         Continue Journey
@@ -102,11 +102,11 @@ const JourneyEntryCard = ({
             <div className="relative z-10">
                 <div className="flex items-start justify-between mb-4">
                     <div>
-                        <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold text-white mb-3 border border-white/20">
+                        <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold !text-white mb-3 border border-white/20">
                             ✨ GUIDED EXPERIENCE
                         </span>
-                        <h3 className="text-2xl font-bold text-white mb-2">Voice Feminization Journey</h3>
-                        <p className="text-pink-100 max-w-md text-sm leading-relaxed">
+                        <h3 className="text-2xl font-bold !text-white mb-2">Voice Feminization Journey</h3>
+                        <p className="!text-pink-100 max-w-md text-sm leading-relaxed">
                             New to voice training? Start here! This guided journey will teach you
                             step-by-step, one concept at a time – no overwhelm.
                         </p>

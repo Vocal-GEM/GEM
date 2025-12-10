@@ -108,7 +108,7 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
             <div className="flex gap-2">
                 <button
                     onClick={() => setIsRecording(!isRecording)}
-                    className={`px-4 py-2 rounded-lg font-bold transition-colors ${isRecording ? 'bg-rose-500 text-white' : 'bg-teal-500 text-black'}`}
+                    className={`px-4 py-2 rounded-lg font-bold transition-colors ${isRecording ? 'bg-rose-500 text-white' : 'bg-teal-500 text-white'}`}
                 >
                     {isRecording ? 'Stop Integration' : 'Start Integration'}
                 </button>

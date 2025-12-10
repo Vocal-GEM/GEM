@@ -297,4 +297,78 @@ export class DSP {
         const hnr = 10 * Math.log10(harmonicPower / noisePower);
         return hnr;
     }
+
+    /**
+     * Calculate Harmonic to Fundamental Ratio
+     * Used for Registration detection (M1 vs M2)
+     * M1 (Chest) = Harmonic Dominance
+     * M2 (Falsetto) = Fundamental Dominance
+     * @param {Float32Array} freqData - FFT magnitude data in dB
+     * @param {number} pitch - Fundamental frequency (Hz)
+     * @param {number} sampleRate - Audio sample rate
+     * @returns {number} Ratio of Harmonic Energy to Fundamental Energy
+     */
+    static calculateHarmonicRatio(freqData, pitch, sampleRate) {
+        if (!pitch || pitch < 50) return 0;
+
+        const fftSize = freqData.length * 2;
+        const binSize = sampleRate / fftSize;
+
+        // Helper to get linear energy from dB at a frequency
+        const getEnergyAtFreq = (f) => {
+            const bin = Math.round(f / binSize);
+            if (bin < 0 || bin >= freqData.length) return 0;
+            // Handle surrounding bins for spectral leakage
+            let energy = 0;
+            for (let i = -1; i <= 1; i++) {
+                if (bin + i >= 0 && bin + i < freqData.length) {
+                    energy += Math.pow(10, freqData[bin + i] / 10);
+                }
+            }
+            return energy;
+        };
+
+        const f0Energy = getEnergyAtFreq(pitch);
+        let harmonicEnergy = 0;
+
+        // Sum first 5 harmonics (or up to Nyquist)
+        for (let h = 2; h <= 6; h++) {
+            const hFreq = pitch * h;
+            if (hFreq > sampleRate / 2) break;
+            harmonicEnergy += getEnergyAtFreq(hFreq);
+        }
+
+        if (f0Energy === 0) return 0;
+        return harmonicEnergy / f0Energy;
+    }
+
+    /**
+     * Calculate Energy in a specific Frequency Band
+     * Used for F3 Noise detection (Breathiness)
+     * @param {Float32Array} freqData - FFT magnitude data in dB
+     * @param {number} startFreq - Start frequency (Hz)
+     * @param {number} endFreq - End frequency (Hz)
+     * @param {number} sampleRate - Audio sample rate
+     * @returns {number} Average energy in dB
+     */
+    static calculateSpectralBalance(freqData, startFreq, endFreq, sampleRate) {
+        const fftSize = freqData.length * 2;
+        const binSize = sampleRate / fftSize;
+
+        const startBin = Math.floor(startFreq / binSize);
+        const endBin = Math.min(Math.ceil(endFreq / binSize), freqData.length - 1);
+
+        if (startBin >= endBin) return -100;
+
+        let totalEnergy = 0;
+        let count = 0;
+
+        for (let i = startBin; i <= endBin; i++) {
+            totalEnergy += Math.pow(10, freqData[i] / 10);
+            count++;
+        }
+
+        if (count === 0 || totalEnergy === 0) return -100;
+        return 10 * Math.log10(totalEnergy / count);
+    }
 }

@@ -33,6 +33,7 @@ const CompassWizard = lazy(() => import('./components/ui/CompassWizard'));
 const CalibrationWizard = lazy(() => import('./components/ui/CalibrationWizard'));
 const HistoryView = lazy(() => import('./components/ui/HistoryView'));
 const CoachView = lazy(() => import('./components/views/CoachView'));
+const GlossaryView = lazy(() => import('./components/views/GlossaryView'));
 const PracticeMode = lazy(() => import('./components/views/PracticeMode'));
 
 const AdaptivePracticeSession = lazy(() => import('./components/views/AdaptivePracticeSession'));
@@ -271,6 +272,14 @@ const App = () => {
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <CoachView />
+                                </Suspense>
+                            </div>
+                        )}
+
+                        {activeTab === 'glossary' && (
+                            <div className="p-4 lg:p-8">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    <GlossaryView />
                                 </Suspense>
                             </div>
                         )}

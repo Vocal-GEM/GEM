@@ -1,0 +1,126 @@
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 3326 modules transformed.
+node_modules/onnxruntime-web/dist/ort-web.min.js (6:62546): Use of eval in "node_modules/onnxruntime-web/dist/ort-web.min.js" is strongly discouraged as it poses security risks and may cause issues with minification.
+rendering chunks...
+[plugin:vite:reporter] [plugin vite:reporter] 
+(!) C:/Users/riley/Desktop/GEM/src/services/SyncManager.js is dynamically imported by C:/Users/riley/Desktop/GEM/src/context/SettingsContext.jsx but also statically imported by C:/Users/riley/Desktop/GEM/src/components/ui/FeedbackSettings.jsx, C:/Users/riley/Desktop/GEM/src/context/JournalContext.jsx, C:/Users/riley/Desktop/GEM/src/context/StatsContext.jsx, dynamic import will not move module into another chunk.
+
+computing gzip size...
+[2mdist/[22m[32mmanifest.webmanifest                          [39m[1m[2m  0.35 kB[22m[1m[22m
+[2mdist/[22m[32mindex.html                                    [39m[1m[2m  2.25 kB[22m[1m[22m[2m Γöé gzip:   0.85 kB[22m
+[2mdist/[22m[35massets/index-5d8bA0pA.css                     [39m[1m[2m145.03 kB[22m[1m[22m[2m Γöé gzip:  20.04 kB[22m
+[2mdist/[22m[36massets/colormaps-mieosXoV.js                  [39m[1m[2m  1.50 kB[22m[1m[22m[2m Γöé gzip:   0.69 kB[22m
+[2mdist/[22m[36massets/RenderCoordinator-gQBUuF49.js          [39m[1m[2m  1.86 kB[22m[1m[22m[2m Γöé gzip:   0.85 kB[22m
+[2mdist/[22m[36massets/GenderPerceptionPredictor-VqGNGTaI.js  [39m[1m[2m  1.98 kB[22m[1m[22m[2m Γöé gzip:   0.94 kB[22m
+[2mdist/[22m[36massets/RelaxationRoutine-vI_1-xwv.js          [39m[1m[2m  2.01 kB[22m[1m[22m[2m Γöé gzip:   0.95 kB[22m
+[2mdist/[22m[36massets/QuickWarmUp--8rMOMkI.js                [39m[1m[2m  2.10 kB[22m[1m[22m[2m Γöé gzip:   0.96 kB[22m
+[2mdist/[22m[36massets/StyleMixer-DVMFvFTP.js                 [39m[1m[2m  2.25 kB[22m[1m[22m[2m Γöé gzip:   1.05 kB[22m
+[2mdist/[22m[36massets/TexturePlay-DjL9MU70.js                [39m[1m[2m  2.38 kB[22m[1m[22m[2m Γöé gzip:   1.08 kB[22m
+[2mdist/[22m[36massets/CompassWizard-DL9Arlvs.js              [39m[1m[2m  2.47 kB[22m[1m[22m[2m Γöé gzip:   0.80 kB[22m
+[2mdist/[22m[36massets/InflectionMap-V3nDAymR.js              [39m[1m[2m  2.58 kB[22m[1m[22m[2m Γöé gzip:   0.91 kB[22m
+[2mdist/[22m[36massets/VowelGlides-Dl8o44Xt.js                [39m[1m[2m  2.65 kB[22m[1m[22m[2m Γöé gzip:   1.21 kB[22m
+[2mdist/[22m[36massets/SyllableStacker-Bbk1LeDV.js            [39m[1m[2m  2.66 kB[22m[1m[22m[2m Γöé gzip:   1.08 kB[22m
+[2mdist/[22m[36massets/RegisterBlend-B7gda5BV.js              [39m[1m[2m  2.73 kB[22m[1m[22m[2m Γöé gzip:   1.07 kB[22m
+[2mdist/[22m[36massets/ReadingPractice-3bmH2U__.js            [39m[1m[2m  2.86 kB[22m[1m[22m[2m Γöé gzip:   1.32 kB[22m
+[2mdist/[22m[36massets/DailyPhrases-CETVeCEe.js               [39m[1m[2m  2.88 kB[22m[1m[22m[2m Γöé gzip:   1.21 kB[22m
+[2mdist/[22m[36massets/ProjectionPractice-Cf2iTxbe.js         [39m[1m[2m  2.89 kB[22m[1m[22m[2m Γöé gzip:   1.04 kB[22m
+[2mdist/[22m[36massets/StudentSelfEvaluation-C7fQvUeS.js      [39m[1m[2m  2.91 kB[22m[1m[22m[2m Γöé gzip:   1.32 kB[22m
+[2mdist/[22m[36massets/TwangTechnique-BYrrm2oI.js             [39m[1m[2m  3.21 kB[22m[1m[22m[2m Γöé gzip:   1.24 kB[22m
+[2mdist/[22m[36massets/Module3WrapUp-CVanFlLK.js              [39m[1m[2m  3.21 kB[22m[1m[22m[2m Γöé gzip:   1.30 kB[22m
+[2mdist/[22m[36massets/Module5WrapUp-Wq7KExMI.js              [39m[1m[2m  3.24 kB[22m[1m[22m[2m Γöé gzip:   1.36 kB[22m
+[2mdist/[22m[36massets/NameVisualizer-CQ08wUOz.js             [39m[1m[2m  3.24 kB[22m[1m[22m[2m Γöé gzip:   1.37 kB[22m
+[2mdist/[22m[36massets/Module4WrapUp-QSje2lE9.js              [39m[1m[2m  3.25 kB[22m[1m[22m[2m Γöé gzip:   1.35 kB[22m
+[2mdist/[22m[36massets/PracticePhilosophy-CmvZcr0U.js         [39m[1m[2m  3.26 kB[22m[1m[22m[2m Γöé gzip:   1.00 kB[22m
+[2mdist/[22m[36massets/CognitiveLoadGames-ChVVYYus.js         [39m[1m[2m  3.28 kB[22m[1m[22m[2m Γöé gzip:   1.44 kB[22m
+[2mdist/[22m[36massets/ResonanceBreathBalance-_Zw_VgbV.js     [39m[1m[2m  3.47 kB[22m[1m[22m[2m Γöé gzip:   1.40 kB[22m
+[2mdist/[22m[36massets/VocalHygiene-D9mDeyLv.js               [39m[1m[2m  3.49 kB[22m[1m[22m[2m Γöé gzip:   1.35 kB[22m
+[2mdist/[22m[36massets/VoiceNeutrality-CMzIClgV.js            [39m[1m[2m  3.52 kB[22m[1m[22m[2m Γöé gzip:   1.32 kB[22m
+[2mdist/[22m[36massets/RecoveryStrategy-C-axEOr1.js           [39m[1m[2m  3.54 kB[22m[1m[22m[2m Γöé gzip:   1.19 kB[22m
+[2mdist/[22m[36massets/Module2WrapUp-CEqZguOx.js              [39m[1m[2m  3.54 kB[22m[1m[22m[2m Γöé gzip:   1.42 kB[22m
+[2mdist/[22m[36massets/BreathSupport-BNSwuOuH.js              [39m[1m[2m  3.54 kB[22m[1m[22m[2m Γöé gzip:   1.25 kB[22m
+[2mdist/[22m[36massets/SelfCareService-En7qTJBq.js            [39m[1m[2m  3.59 kB[22m[1m[22m[2m Γöé gzip:   1.63 kB[22m
+[2mdist/[22m[36massets/VoiceCalibrationService-CZkfHVLP.js    [39m[1m[2m  3.65 kB[22m[1m[22m[2m Γöé gzip:   1.50 kB[22m
+[2mdist/[22m[36massets/useTranslation-OH1Il4NV.js             [39m[1m[2m  3.82 kB[22m[1m[22m[2m Γöé gzip:   1.82 kB[22m
+[2mdist/[22m[36massets/InflectionExercises-y-dK6md7.js        [39m[1m[2m  3.84 kB[22m[1m[22m[2m Γöé gzip:   1.63 kB[22m
+[2mdist/[22m[36massets/BigPictureAssessment-BtnuwQij.js       [39m[1m[2m  3.86 kB[22m[1m[22m[2m Γöé gzip:   1.47 kB[22m
+[2mdist/[22m[36massets/VowelSpacePlot-B3nSQYnw.js             [39m[1m[2m  3.96 kB[22m[1m[22m[2m Γöé gzip:   1.81 kB[22m
+[2mdist/[22m[36massets/MWordChallenge-CvBKjcy8.js             [39m[1m[2m  4.01 kB[22m[1m[22m[2m Γöé gzip:   1.62 kB[22m
+[2mdist/[22m[36massets/LarynxControl-CAAUfusS.js              [39m[1m[2m  4.09 kB[22m[1m[22m[2m Γöé gzip:   1.71 kB[22m
+[2mdist/[22m[36massets/ProsodyTheory-C0LVz8-6.js              [39m[1m[2m  4.17 kB[22m[1m[22m[2m Γöé gzip:   1.57 kB[22m
+[2mdist/[22m[36massets/PitchMemorizer-DJj0RNBp.js             [39m[1m[2m  4.21 kB[22m[1m[22m[2m Γöé gzip:   1.53 kB[22m
+[2mdist/[22m[36massets/TwangDojo-mI9-8qjk.js                  [39m[1m[2m  4.25 kB[22m[1m[22m[2m Γöé gzip:   1.57 kB[22m
+[2mdist/[22m[36massets/GlossaryView-COEQLU8Q.js               [39m[1m[2m  4.41 kB[22m[1m[22m[2m Γöé gzip:   1.96 kB[22m
+[2mdist/[22m[36massets/Spectrogram-DOrQ1L4E.js                [39m[1m[2m  4.43 kB[22m[1m[22m[2m Γöé gzip:   2.18 kB[22m
+[2mdist/[22m[36massets/HabitBuilder-Cbp83jQy.js               [39m[1m[2m  4.43 kB[22m[1m[22m[2m Γöé gzip:   1.42 kB[22m
+[2mdist/[22m[36massets/PitchExercises-CtjkpvBo.js             [39m[1m[2m  4.62 kB[22m[1m[22m[2m Γöé gzip:   1.53 kB[22m
+[2mdist/[22m[36massets/CalibrationWizard-3JbkpUfG.js          [39m[1m[2m  4.62 kB[22m[1m[22m[2m Γöé gzip:   1.58 kB[22m
+[2mdist/[22m[36massets/ContourVisualizer-DLX_6AsM.js          [39m[1m[2m  4.64 kB[22m[1m[22m[2m Γöé gzip:   1.80 kB[22m
+[2mdist/[22m[36massets/FollowAlongWarmup-DOdywPTR.js          [39m[1m[2m  4.73 kB[22m[1m[22m[2m Γöé gzip:   1.81 kB[22m
+[2mdist/[22m[36massets/FeedbackControls-CpUPMAhI.js           [39m[1m[2m  4.91 kB[22m[1m[22m[2m Γöé gzip:   1.52 kB[22m
+[2mdist/[22m[36massets/InflectionLesson-BXMXWK2y.js           [39m[1m[2m  4.91 kB[22m[1m[22m[2m Γöé gzip:   1.68 kB[22m
+[2mdist/[22m[36massets/ProgramView-KD6TbbxL.js                [39m[1m[2m  5.21 kB[22m[1m[22m[2m Γöé gzip:   1.83 kB[22m
+[2mdist/[22m[36massets/ModuleWrapUp-C--eKwOw.js               [39m[1m[2m  5.44 kB[22m[1m[22m[2m Γöé gzip:   1.99 kB[22m
+[2mdist/[22m[36massets/ResonanceApplication-RvNsQvnu.js       [39m[1m[2m  5.71 kB[22m[1m[22m[2m Γöé gzip:   1.81 kB[22m
+[2mdist/[22m[36massets/workbox-window.prod.es5-vqzQaGvo.js    [39m[1m[2m  5.72 kB[22m[1m[22m[2m Γöé gzip:   2.35 kB[22m
+[2mdist/[22m[36massets/SelfCareOnboarding-9dRIlIvQ.js         [39m[1m[2m  5.74 kB[22m[1m[22m[2m Γöé gzip:   2.01 kB[22m
+[2mdist/[22m[36massets/TranscriptionPractice-BqgDYeQD.js      [39m[1m[2m  5.92 kB[22m[1m[22m[2m Γöé gzip:   2.17 kB[22m
+[2mdist/[22m[36massets/VoiceAudit-BHAC66oO.js                 [39m[1m[2m  5.96 kB[22m[1m[22m[2m Γöé gzip:   2.19 kB[22m
+[2mdist/[22m[36massets/TonalConsistency-DqrcWAZj.js           [39m[1m[2m  6.45 kB[22m[1m[22m[2m Γöé gzip:   1.98 kB[22m
+[2mdist/[22m[36massets/Sidebar-DwxP1vlL.js                    [39m[1m[2m  6.50 kB[22m[1m[22m[2m Γöé gzip:   2.16 kB[22m
+[2mdist/[22m[36massets/BaselineRecorder-BRZUFpPg.js           [39m[1m[2m  6.55 kB[22m[1m[22m[2m Γöé gzip:   2.36 kB[22m
+[2mdist/[22m[36massets/SoundJournal-DJ6XlAes.js               [39m[1m[2m  6.60 kB[22m[1m[22m[2m Γöé gzip:   2.14 kB[22m
+[2mdist/[22m[36massets/GraduationReflection-IYVf43p-.js       [39m[1m[2m  6.60 kB[22m[1m[22m[2m Γöé gzip:   1.87 kB[22m
+[2mdist/[22m[36massets/PitchExploration-DpVPpXQi.js           [39m[1m[2m  6.65 kB[22m[1m[22m[2m Γöé gzip:   1.96 kB[22m
+[2mdist/[22m[36massets/MixingBoardView-Dmi9k-bd.js            [39m[1m[2m  6.73 kB[22m[1m[22m[2m Γöé gzip:   2.39 kB[22m
+[2mdist/[22m[36massets/InspirationBoard-CUCPpc2F.js           [39m[1m[2m  6.95 kB[22m[1m[22m[2m Γöé gzip:   1.98 kB[22m
+[2mdist/[22m[36massets/WarmupRoutine-5ZGv-szh.js              [39m[1m[2m  7.24 kB[22m[1m[22m[2m Γöé gzip:   2.66 kB[22m
+[2mdist/[22m[36massets/TutorialWizard-CeXDlvnQ.js             [39m[1m[2m  7.27 kB[22m[1m[22m[2m Γöé gzip:   2.05 kB[22m
+[2mdist/[22m[36massets/VoiceQualityMeter-D5PApG1I.js          [39m[1m[2m  7.31 kB[22m[1m[22m[2m Γöé gzip:   2.27 kB[22m
+[2mdist/[22m[36massets/VocalAnatomyLesson-C9Riz-55.js         [39m[1m[2m  7.37 kB[22m[1m[22m[2m Γöé gzip:   2.24 kB[22m
+[2mdist/[22m[36massets/VocalWeightTheory-DkVdc8_g.js          [39m[1m[2m  8.35 kB[22m[1m[22m[2m Γöé gzip:   2.51 kB[22m
+[2mdist/[22m[36massets/PianoLesson-CYkjJchH.js                [39m[1m[2m  8.76 kB[22m[1m[22m[2m Γöé gzip:   2.80 kB[22m
+[2mdist/[22m[36massets/VoiceAlterationLesson-DLU_tjWG.js      [39m[1m[2m  8.84 kB[22m[1m[22m[2m Γöé gzip:   2.49 kB[22m
+[2mdist/[22m[36massets/ResonanceOrb-CdFSsCwR.js               [39m[1m[2m  9.52 kB[22m[1m[22m[2m Γöé gzip:   3.44 kB[22m
+[2mdist/[22m[36massets/useProgram-DswLY-vg.js                 [39m[1m[2m  9.62 kB[22m[1m[22m[2m Γöé gzip:   3.26 kB[22m
+[2mdist/[22m[36massets/CoachView-CUoz-HYS.js                  [39m[1m[2m 10.46 kB[22m[1m[22m[2m Γöé gzip:   2.72 kB[22m
+[2mdist/[22m[36massets/LearnView-CVok0yu9.js                  [39m[1m[2m 10.90 kB[22m[1m[22m[2m Γöé gzip:   3.63 kB[22m
+[2mdist/[22m[36massets/PitchInfoView-DMdqQTYh.js              [39m[1m[2m 10.97 kB[22m[1m[22m[2m Γöé gzip:   3.55 kB[22m
+[2mdist/[22m[36massets/VoiceQualityInfoView-Da3Mqyk5.js       [39m[1m[2m 11.68 kB[22m[1m[22m[2m Γöé gzip:   3.35 kB[22m
+[2mdist/[22m[36massets/VocalAnatomyInfoView-DpczOXrr.js       [39m[1m[2m 11.98 kB[22m[1m[22m[2m Γöé gzip:   3.43 kB[22m
+[2mdist/[22m[36massets/WeightToolbox-CwxY93ik.js              [39m[1m[2m 12.04 kB[22m[1m[22m[2m Γöé gzip:   3.24 kB[22m
+[2mdist/[22m[36massets/ResonanceInfoView-DGSHFiZR.js          [39m[1m[2m 12.16 kB[22m[1m[22m[2m Γöé gzip:   3.66 kB[22m
+[2mdist/[22m[36massets/IntonationInfoView-BvVSJPS_.js         [39m[1m[2m 12.28 kB[22m[1m[22m[2m Γöé gzip:   3.34 kB[22m
+[2mdist/[22m[36massets/ArticulationInfoView-CB8cRqDG.js       [39m[1m[2m 12.34 kB[22m[1m[22m[2m Γöé gzip:   3.47 kB[22m
+[2mdist/[22m[36massets/GenderPerceptionInfoView-CsoLU8xl.js   [39m[1m[2m 12.65 kB[22m[1m[22m[2m Γöé gzip:   3.92 kB[22m
+[2mdist/[22m[36massets/Module6WrapUp-D7bp-cWe.js              [39m[1m[2m 13.49 kB[22m[1m[22m[2m Γöé gzip:   4.58 kB[22m
+[2mdist/[22m[36massets/DashboardView-Xr05q6la.js              [39m[1m[2m 14.94 kB[22m[1m[22m[2m Γöé gzip:   4.03 kB[22m
+[2mdist/[22m[36massets/FormantsInfoView-BHkyMMle.js           [39m[1m[2m 15.49 kB[22m[1m[22m[2m Γöé gzip:   4.55 kB[22m
+[2mdist/[22m[36massets/AdaptivePracticeSession-DfJRKcK-.js    [39m[1m[2m 18.53 kB[22m[1m[22m[2m Γöé gzip:   5.74 kB[22m
+[2mdist/[22m[36massets/PitchVisualizer-D2CKwbLH.js            [39m[1m[2m 20.76 kB[22m[1m[22m[2m Γöé gzip:   6.95 kB[22m
+[2mdist/[22m[36massets/purify.es-B6FQ9oRL.js                  [39m[1m[2m 22.57 kB[22m[1m[22m[2m Γöé gzip:   8.74 kB[22m
+[2mdist/[22m[36massets/PracticeCardsPanel-BWhJrbne.js         [39m[1m[2m 23.48 kB[22m[1m[22m[2m Γöé gzip:   5.35 kB[22m
+[2mdist/[22m[36massets/SettingsView-B5JpECGq.js               [39m[1m[2m 24.39 kB[22m[1m[22m[2m Γöé gzip:   5.53 kB[22m
+[2mdist/[22m[36massets/DynamicOrb-Daz3A-J-.js                 [39m[1m[2m 24.55 kB[22m[1m[22m[2m Γöé gzip:   7.50 kB[22m
+[2mdist/[22m[36massets/ClinicalAssessmentView-B_pChG6l.js     [39m[1m[2m 30.11 kB[22m[1m[22m[2m Γöé gzip:   8.59 kB[22m
+[2mdist/[22m[36massets/react-vendor-BpUoXUuh.js               [39m[1m[2m 30.92 kB[22m[1m[22m[2m Γöé gzip:  11.56 kB[22m
+[2mdist/[22m[36massets/ui-icons-BklVTxBM.js                   [39m[1m[2m 65.13 kB[22m[1m[22m[2m Γöé gzip:  13.41 kB[22m
+[2mdist/[22m[36massets/AnalysisHub-B6CFr7TB.js                [39m[1m[2m 99.94 kB[22m[1m[22m[2m Γöé gzip:  29.90 kB[22m
+[2mdist/[22m[36massets/index.es-DrrP6UPm.js                   [39m[1m[2m150.51 kB[22m[1m[22m[2m Γöé gzip:  51.45 kB[22m
+[2mdist/[22m[36massets/GuidedJourney-DMYD4RP6.js              [39m[1m[2m151.28 kB[22m[1m[22m[2m Γöé gzip:  44.22 kB[22m
+[2mdist/[22m[36massets/PracticeMode-DgcTRmu4.js               [39m[1m[2m156.96 kB[22m[1m[22m[2m Γöé gzip:  43.81 kB[22m
+[2mdist/[22m[36massets/index-DseoD62o.js                      [39m[1m[2m175.27 kB[22m[1m[22m[2m Γöé gzip:  61.37 kB[22m
+[2mdist/[22m[36massets/HistoryView-BXXR9xki.js                [39m[1m[2m232.04 kB[22m[1m[22m[2m Γöé gzip:  57.14 kB[22m
+[2mdist/[22m[36massets/three-fiber-BGNbWPHK.js                [39m[1m[2m295.54 kB[22m[1m[22m[2m Γöé gzip:  94.87 kB[22m
+[2mdist/[22m[36massets/index-DQMrWxux.js                      [39m[1m[2m371.21 kB[22m[1m[22m[2m Γöé gzip: 110.54 kB[22m
+[2mdist/[22m[36massets/pdf-C-oxeb1N.js                        [39m[1m[2m418.73 kB[22m[1m[22m[2m Γöé gzip: 136.84 kB[22m
+[2mdist/[22m[36massets/three-core-Tdb0rhRP.js                 [39m[1m[2m718.63 kB[22m[1m[22m[2m Γöé gzip: 188.70 kB[22m
+[2mdist/[22m[36massets/transformers-Co65vAdt.js               [39m[1m[2m825.36 kB[22m[1m[22m[2m Γöé gzip: 200.26 kB[22m
+[32mΓ£ô built in 25.95s[39m
+
+PWA v1.2.0
+mode      generateSW
+precache  122 entries (10957.93 KiB)
+files generated
+  dist/sw.js
+  dist/workbox-1d305bb8.js

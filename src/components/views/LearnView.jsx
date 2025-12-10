@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     BookOpen,
     Music2,
@@ -10,7 +10,9 @@ import {
     Users,
     ArrowLeft,
     Clock,
-    ChevronRight
+    ChevronRight,
+    Brain,
+    Sparkles
 } from 'lucide-react';
 
 // Lazy load individual modules
@@ -26,6 +28,8 @@ const VocalAnatomyInfoView = lazy(() => import('./learn/VocalAnatomyInfoView'));
 const GenderPerceptionInfoView = lazy(() => import('./learn/GenderPerceptionInfoView'));
 
 import ModuleNotes from '../ui/ModuleNotes';
+import QuizView from '../ui/QuizView';
+import { quizService } from '../../services/QuizService';
 
 
 /**
@@ -36,6 +40,14 @@ import ModuleNotes from '../ui/ModuleNotes';
  */
 const LearnView = () => {
     const [activeModule, setActiveModule] = useState(null);
+    const [showQuiz, setShowQuiz] = useState(false);
+    const [quizProgress, setQuizProgress] = useState(null);
+
+    // Load quiz progress on mount
+    useEffect(() => {
+        const summary = quizService.getProgressSummary();
+        setQuizProgress(summary);
+    }, [showQuiz]);
 
     const modules = [
         {
@@ -181,6 +193,11 @@ const LearnView = () => {
         </div>
     );
 
+    // Render quiz view if active
+    if (showQuiz) {
+        return <QuizView onBack={() => setShowQuiz(false)} />;
+    }
+
     // Render active module if selected
     if (activeModule) {
         const module = modules.find(m => m.id === activeModule);
@@ -237,6 +254,47 @@ const LearnView = () => {
                     will help you practice more effectively and achieve your voice goals.
                 </p>
             </div>
+
+            {/* Quiz Yourself Card */}
+            <button
+                onClick={() => setShowQuiz(true)}
+                className="w-full mb-6 group relative p-6 rounded-2xl bg-gradient-to-r from-purple-900/40 via-pink-900/30 to-purple-900/40 border border-purple-500/30 hover:border-purple-500/60 transition-all duration-300 hover:scale-[1.01] overflow-hidden"
+            >
+                {/* Animated background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                <div className="relative z-10 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/30 to-pink-500/30 border border-purple-500/30">
+                            <Brain className="w-8 h-8 text-purple-400" />
+                        </div>
+                        <div className="text-left">
+                            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                                Quiz Yourself
+                                <Sparkles className="w-5 h-5 text-pink-400" />
+                            </h3>
+                            <p className="text-slate-400 text-sm">
+                                Test your knowledge with spaced repetition
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Progress Badge */}
+                    {quizProgress && (
+                        <div className="hidden sm:flex items-center gap-4">
+                            <div className="text-right">
+                                <div className="text-2xl font-bold text-white">
+                                    {quizProgress.totalMastered}
+                                </div>
+                                <div className="text-xs text-slate-500">
+                                    of {quizProgress.totalQuestions} mastered
+                                </div>
+                            </div>
+                            <ChevronRight className="w-6 h-6 text-purple-400 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                    )}
+                </div>
+            </button>
 
             {/* Module Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">

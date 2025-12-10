@@ -7,6 +7,7 @@ import { transcriptionEngine } from '../../utils/transcriptionEngine';
 import { convertToIPA, isSibilantWord } from '../../utils/ipaConverter';
 import SagittalDiagram from '../viz/SagittalDiagram';
 import SibilantGauge from '../viz/SibilantGauge';
+import TouchDetector from '../viz/TouchDetector';
 import TwisterCard from '../ui/TwisterCard';
 
 // --- Levenshtein Distance for Scoring ---
@@ -338,6 +339,14 @@ const ArticulationView = () => {
                                     centroid={metrics.sibilance.centroid}
                                     isSibilant={metrics.sibilance.isSibilant}
                                 />
+
+                                {/* Touch Detector - Consonant pressure */}
+                                {isRecording && (
+                                    <TouchDetector
+                                        dataRef={audioEngineRef.current?.analysisData || { current: {} }}
+                                        showFeedback={true}
+                                    />
+                                )}
 
                                 {/* Quick Tips */}
                                 <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-800 text-sm text-slate-400">
