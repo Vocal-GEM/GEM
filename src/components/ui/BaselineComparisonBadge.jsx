@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 /**
@@ -120,7 +120,7 @@ export const BaselineRangeIndicator = ({
             </div>
             <div className="relative h-2 bg-slate-700 rounded-full overflow-visible">
                 {/* Baseline range */}
-                <div 
+                <div
                     className="absolute h-full bg-purple-500/30 rounded-full"
                     style={{
                         left: `${((baselineMin - paddedMin) / paddedRange) * 100}%`,
@@ -128,17 +128,16 @@ export const BaselineRangeIndicator = ({
                     }}
                 />
                 {/* Baseline mean marker */}
-                <div 
+                <div
                     className="absolute w-0.5 h-3 bg-purple-400 -top-0.5 rounded-full"
                     style={{
                         left: `${((baselineMean - paddedMin) / paddedRange) * 100}%`
                     }}
                 />
                 {/* Current value marker */}
-                <div 
-                    className={`absolute w-2 h-2 rounded-full top-0 -translate-x-1 ${
-                        isInRange ? 'bg-emerald-400' : 'bg-amber-400'
-                    }`}
+                <div
+                    className={`absolute w-2 h-2 rounded-full top-0 -translate-x-1 ${isInRange ? 'bg-emerald-400' : 'bg-amber-400'
+                        }`}
                     style={{
                         left: `${position}%`
                     }}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Book, Edit3, Save, RefreshCw } from 'lucide-react';
 
 const LIST_TYPES = [

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Activity, RefreshCw } from 'lucide-react';
 import { analyticsService } from '../../services/AnalyticsService';
 

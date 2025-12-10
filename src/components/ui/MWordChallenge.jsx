@@ -59,7 +59,7 @@ const MWordChallenge = ({ onComplete }) => {
                     Use &quot;Umm...&quot; to set your resonance, then slide into the word.
                 </p>
                 <div className="bg-purple-900/30 border border-purple-500/30 p-4 rounded-xl flex items-center gap-4">
-                    <div className="text-2xl font-bold text-purple-400">"Umm..."</div>
+                    <div className="text-2xl font-bold text-purple-400">&quot;Umm...&quot;</div>
                     <div className="flex-1 h-1 bg-purple-700/50 rounded-full relative">
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-r from-purple-500 to-transparent opacity-50"></div>
                     </div>

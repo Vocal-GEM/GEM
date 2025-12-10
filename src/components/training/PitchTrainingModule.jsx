@@ -6,7 +6,7 @@ const PitchTrainingModule = ({ targetNote = 'A3', targetFreq = 220, tolerance = 
     const { dataRef, isAudioActive, toggleAudio, audioEngine } = useAudio();
     const [isPlaying, setIsPlaying] = useState(false);
     const [score, setScore] = useState(0);
-    const [_streak, setStreak] = useState(0);
+    const [, setStreak] = useState(0);
     const [feedback, setFeedback] = useState('Ready');
     const [feedbackColor, setFeedbackColor] = useState('text-slate-400');
 

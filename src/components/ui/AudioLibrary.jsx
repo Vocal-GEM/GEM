@@ -1,9 +1,9 @@
-import React from 'react';
+
 import { BookOpen, Music, Volume2 } from 'lucide-react';
 import EmptyState from './EmptyState';
 import { useLanguage } from '../../context/LanguageContext';
 
-const AudioLibrary = ({ audioEngine }) => {
+const AudioLibrary = ({ audioEngine: _audioEngine }) => {
     const languageContext = useLanguage();
     const t = languageContext?.t || ((k) => k);
 

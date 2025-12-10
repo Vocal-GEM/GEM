@@ -13,7 +13,7 @@ const Module3WrapUp = ({ onComplete }) => {
     const resources = [
         { id: 'meow', title: 'Meow-Yuh', desc: 'Use "Meow" to find bright resonance easily.' },
         { id: 'dog', title: 'Big Dog Little Dog', desc: 'Panting like a small dog creates brightness (no phonation).' },
-        { id: 'nasal', title: 'The Nasality Test', desc: 'Pinch your nose! If sound changes, it\'s nasal.' }
+        { id: 'nasal', title: 'The Nasality Test', desc: 'Pinch your nose! If sound changes, it&apos;s nasal.' }
     ];
 
     const toggleResource = (id) => {
@@ -44,7 +44,7 @@ const Module3WrapUp = ({ onComplete }) => {
                 <div className="space-y-4">
                     {prompts.map((prompt, i) => (
                         <div key={i} className="p-4 bg-slate-800 rounded-xl border-l-4 border-pink-500">
-                            <p className="text-slate-300 italic">"{prompt}"</p>
+                            <p className="text-slate-300 italic">&quot;{prompt}&quot;</p>
                         </div>
                     ))}
                 </div>

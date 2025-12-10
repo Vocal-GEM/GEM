@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Mic, Square, Play, Pause, RotateCcw, Check, Loader2 } from 'lucide-react';
 import { useGuidedJourney } from '../../context/GuidedJourneyContext';
-import { indexedDB, STORES } from '../../services/IndexedDBManager';
+import { indexedDB } from '../../services/IndexedDBManager';
 import { VoiceCalibrationService } from '../../services/VoiceCalibrationService';
 
 /**

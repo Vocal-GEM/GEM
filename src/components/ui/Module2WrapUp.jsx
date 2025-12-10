@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Book, CheckCircle, Trophy, Moon, Sun, Scan } from 'lucide-react';
 
 const Module2WrapUp = ({ onComplete }) => {
@@ -33,7 +34,7 @@ const Module2WrapUp = ({ onComplete }) => {
                 </div>
                 <h2 className="text-3xl font-bold text-white">Week 2 Complete!</h2>
                 <p className="text-slate-400 max-w-lg mx-auto">
-                    You've mastered the Warm Up, explored Vocal Anatomy, and learned the Big Picture of voice alteration.
+                    You&apos;ve mastered the Warm Up, explored Vocal Anatomy, and learned the Big Picture of voice alteration.
                     You are now a Voice Practitioner.
                 </p>
             </div>
@@ -47,7 +48,7 @@ const Module2WrapUp = ({ onComplete }) => {
                 <div className="space-y-4">
                     {prompts.map((prompt, i) => (
                         <div key={i} className="p-4 bg-slate-800 rounded-xl border-l-4 border-pink-500">
-                            <p className="text-slate-300 italic">"{prompt}"</p>
+                            <p className="text-slate-300 italic">&quot;{prompt}&quot;</p>
                         </div>
                     ))}
                 </div>

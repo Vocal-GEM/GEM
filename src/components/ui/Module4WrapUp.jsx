@@ -32,7 +32,7 @@ const Module4WrapUp = ({ onComplete }) => {
                 </div>
                 <h2 className="text-3xl font-bold text-white">Module 4 Complete!</h2>
                 <p className="text-slate-400 max-w-lg mx-auto">
-                    You've demystified Pitch. Remember: It's not about how high you can go,
+                    You&apos;ve demystified Pitch. Remember: It&apos;s not about how high you can go,
                     but about consistency and comfort in your chosen range.
                 </p>
             </div>
@@ -64,8 +64,8 @@ const Module4WrapUp = ({ onComplete }) => {
                             key={item.id}
                             onClick={() => toggleTask(item.id)}
                             className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left ${checkedTasks[item.id]
-                                    ? 'bg-indigo-900/20 border-indigo-500/50'
-                                    : 'bg-slate-800 border-slate-700 hover:bg-slate-750'
+                                ? 'bg-indigo-900/20 border-indigo-500/50'
+                                : 'bg-slate-800 border-slate-700 hover:bg-slate-750'
                                 }`}
                         >
                             <span className={`font-bold ${checkedTasks[item.id] ? 'text-indigo-300' : 'text-slate-300'}`}>
