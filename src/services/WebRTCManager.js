@@ -21,16 +21,26 @@ export class WebRTCManager {
         });
 
         this.socket.on('offer', async (offer) => {
-            if (!this.peerConnection) this.setupPeerConnection();
-            await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-            const answer = await this.peerConnection.createAnswer();
-            await this.peerConnection.setLocalDescription(answer);
-            this.socket.emit('answer', answer);
+            try {
+                if (!this.peerConnection) this.setupPeerConnection();
+                // Modern API: pass offer object directly (RTCSessionDescription constructor is deprecated)
+                await this.peerConnection.setRemoteDescription(offer);
+                const answer = await this.peerConnection.createAnswer();
+                await this.peerConnection.setLocalDescription(answer);
+                this.socket.emit('answer', answer);
+            } catch (error) {
+                console.error('[WebRTC] Error handling offer:', error);
+            }
         });
 
         this.socket.on('candidate', async (candidate) => {
-            if (this.peerConnection) {
-                await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+            try {
+                if (this.peerConnection && candidate) {
+                    // Modern API: pass candidate object directly (RTCIceCandidate constructor is deprecated)
+                    await this.peerConnection.addIceCandidate(candidate);
+                }
+            } catch (error) {
+                console.error('[WebRTC] Error adding ICE candidate:', error);
             }
         });
     }
@@ -59,7 +69,13 @@ export class WebRTCManager {
         this.peerConnection.ondatachannel = (event) => {
             const receiveChannel = event.channel;
             receiveChannel.onmessage = (e) => {
-                if (this.onMessage) this.onMessage(JSON.parse(e.data));
+                if (this.onMessage) {
+                    try {
+                        this.onMessage(JSON.parse(e.data));
+                    } catch (parseError) {
+                        console.error('[WebRTC] Error parsing message:', parseError);
+                    }
+                }
             };
         };
     }
@@ -81,8 +97,20 @@ export class WebRTCManager {
     }
 
     stop() {
-        if (this.peerConnection) this.peerConnection.close();
-        if (this.socket) this.socket.disconnect();
+        // Remove socket event listeners to prevent memory leaks
+        if (this.socket) {
+            this.socket.off('connect');
+            this.socket.off('offer');
+            this.socket.off('candidate');
+            this.socket.disconnect();
+            this.socket = null;
+        }
+
+        if (this.peerConnection) {
+            this.peerConnection.close();
+            this.peerConnection = null;
+        }
+
         this.isConnected = false;
     }
 }

@@ -153,7 +153,6 @@ export class AudioEngine {
             this.microphone = this.audioContext.createMediaStreamSource(stream);
             this.analyser = this.audioContext.createAnalyser();
             this.analyser.fftSize = 2048;
-            this.analyser.fftSize = 2048;
             this.microphone.connect(this.analyser);
 
             // Connect to passthrough (already connected to destination, but gain is 0)
@@ -538,6 +537,11 @@ export class AudioEngine {
     stop() {
         this.isActive = false;
 
+        // Stop live analysis if active
+        if (this.isLiveAnalysisActive) {
+            this.stopLiveAnalysis();
+        }
+
         // Mute passthrough on stop
         if (this.passthroughGain) {
             this.passthroughGain.gain.setTargetAtTime(0, this.audioContext.currentTime, 0.1);
@@ -547,13 +551,62 @@ export class AudioEngine {
             cancelAnimationFrame(this.animationFrameId);
             this.animationFrameId = null;
         }
+
+        // Disconnect analyser node (memory leak fix)
+        if (this.analyser) {
+            this.analyser.disconnect();
+            this.analyser = null;
+        }
+
         if (this.microphone) {
             this.microphone.disconnect();
             this.microphone = null;
         }
+
         if (this.audioContext && this.audioContext.state !== 'closed') {
             this.audioContext.suspend();
         }
+    }
+
+    /**
+     * Fully destroy the AudioEngine and release all resources
+     * Call this when the component unmounts
+     */
+    destroy() {
+        this.stop();
+
+        // Disconnect passthrough gain (memory leak fix)
+        if (this.passthroughGain) {
+            this.passthroughGain.disconnect();
+            this.passthroughGain = null;
+        }
+
+        // Remove socket event listeners (memory leak fix)
+        if (this.socket) {
+            this.socket.off('connect');
+            this.socket.off('disconnect');
+            this.socket.off('connect_error');
+            this.socket.off('analysis_update');
+            this.socket.disconnect();
+            this.socket = null;
+        }
+
+        // Close audio context
+        if (this.audioContext && this.audioContext.state !== 'closed') {
+            this.audioContext.close().catch(() => {
+                // Ignore errors when closing
+            });
+        }
+
+        // Clear buffers
+        this.socketBuffer = [];
+        this.pitchBuffer = [];
+        this.smoothPitchBuffer = [];
+        this.jitterBuffer = [];
+        this.weightBuffer = [];
+        this.shimmerBuffer = [];
+        this.backgroundNoiseBuffer = [];
+        this.hnrBuffer = [];
     }
 
     /**

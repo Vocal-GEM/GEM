@@ -6,6 +6,7 @@ Uses librosa for analysis and faster-whisper for transcription (no compilation n
 
 from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
+from ..extensions import limiter
 import os
 import tempfile
 try:
@@ -258,6 +259,7 @@ def transcribe_with_timing(audio_path):
 
 
 @analysis_bp.route('/api/analyze', methods=['POST'])
+@limiter.limit("10 per minute")  # Rate limit expensive analysis operations
 def analyze_audio():
     """
     Analyze uploaded audio file and return comprehensive voice metrics.
@@ -330,11 +332,12 @@ def analyze_audio():
         return jsonify(response), 200
         
     except Exception as e:
+        # Log the full error for debugging but don't expose to client
         print(f"Analysis error: {e}")
         import traceback
         traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
-        
+        return jsonify({'error': 'Audio analysis failed. Please try again with a valid audio file.'}), 500
+
     finally:
         # Clean up temp file
         if os.path.exists(temp_path):

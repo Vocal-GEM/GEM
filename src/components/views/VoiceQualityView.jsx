@@ -70,6 +70,7 @@ const VoiceQualityView = () => {
 
     // Audio playback for uploaded files
     const audioRef = useRef(null);
+    const audioUrlRef = useRef(null); // Track URL for cleanup
     const [audioBuffer, setAudioBuffer] = useState(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
@@ -103,6 +104,12 @@ const VoiceQualityView = () => {
             setAudioBuffer(null);
             setShowSpectrogram(false);
 
+            // Revoke previous URL to prevent memory leak
+            if (audioUrlRef.current) {
+                URL.revokeObjectURL(audioUrlRef.current);
+                audioUrlRef.current = null;
+            }
+
             // Decode audio for spectrogram visualization
             try {
                 const arrayBuffer = await selectedFile.arrayBuffer();
@@ -113,6 +120,7 @@ const VoiceQualityView = () => {
 
                 // Create audio element for playback
                 const url = URL.createObjectURL(selectedFile);
+                audioUrlRef.current = url; // Track for cleanup
                 if (audioRef.current) {
                     audioRef.current.src = url;
                 }
@@ -310,6 +318,15 @@ const VoiceQualityView = () => {
         return () => {
             audio.removeEventListener('timeupdate', updateTime);
             audio.removeEventListener('ended', onEnded);
+        };
+    }, []);
+
+    // Cleanup audio URL on unmount to prevent memory leak
+    useEffect(() => {
+        return () => {
+            if (audioUrlRef.current) {
+                URL.revokeObjectURL(audioUrlRef.current);
+            }
         };
     }, []);
 

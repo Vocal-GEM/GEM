@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { indexedDB } from '../services/IndexedDBManager';
 import { textToSpeechService } from '../services/TextToSpeechService';
 import i18n from '../i18n';
@@ -15,6 +15,9 @@ export function useSettings() {
 }
 
 export const SettingsProvider = ({ children }) => {
+    // Ref to store sync timeout ID (prevents window object pollution)
+    const syncTimeoutRef = useRef(null);
+
     const [settings, setSettings] = useState({
         vibration: true,
         tone: false,
@@ -156,6 +159,8 @@ export const SettingsProvider = ({ children }) => {
                     visualizationQuality: newQuality
                 }));
             }
+        }).catch(err => {
+            console.warn('Failed to load RenderCoordinator:', err);
         });
     }, [settings.performanceMode]);
 
@@ -164,14 +169,25 @@ export const SettingsProvider = ({ children }) => {
         setSettings(newSettings);
         indexedDB.saveSetting('app_settings', newSettings);
 
-        // Debounced sync to server
-        if (window.syncTimeout) clearTimeout(window.syncTimeout);
-        window.syncTimeout = setTimeout(() => {
+        // Debounced sync to server (using ref instead of window to prevent memory leak)
+        if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+        syncTimeoutRef.current = setTimeout(() => {
             import('../services/SyncManager').then(({ syncManager }) => {
                 syncManager.push('SETTINGS_UPDATE', newSettings);
+            }).catch(err => {
+                console.warn('Failed to sync settings:', err);
             });
         }, 2000);
     };
+
+    // Cleanup sync timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (syncTimeoutRef.current) {
+                clearTimeout(syncTimeoutRef.current);
+            }
+        };
+    }, []);
 
     const value = React.useMemo(() => ({
         settings,

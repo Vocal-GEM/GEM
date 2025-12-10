@@ -12,6 +12,8 @@ export const textToSpeechService = {
 
     // State
     audioCache: new Map(),
+    audioCacheOrder: [], // Track insertion order for LRU eviction
+    MAX_CACHE_SIZE: 20, // Maximum cached audio items
     currentAudio: null,
     isSpeaking: false,
 
@@ -41,12 +43,25 @@ export const textToSpeechService = {
     // Stop speaking
     stop() {
         if (this.currentAudio) {
+            // Remove event listeners to prevent memory leaks
+            this.currentAudio.onplay = null;
+            this.currentAudio.onended = null;
+            this.currentAudio.onerror = null;
             this.currentAudio.pause();
             this.currentAudio.currentTime = 0;
             this.currentAudio = null;
         }
         window.speechSynthesis.cancel();
         this.isSpeaking = false;
+    },
+
+    // Clear the audio cache and revoke all URLs
+    clearCache() {
+        for (const url of this.audioCache.values()) {
+            URL.revokeObjectURL(url);
+        }
+        this.audioCache.clear();
+        this.audioCacheOrder = [];
     },
 
     // Browser TTS Implementation
@@ -97,6 +112,12 @@ export const textToSpeechService = {
             // Check cache first
             if (this.audioCache.has(cacheKey)) {
                 audioUrl = this.audioCache.get(cacheKey);
+                // Move to end of order (most recently used)
+                const idx = this.audioCacheOrder.indexOf(cacheKey);
+                if (idx > -1) {
+                    this.audioCacheOrder.splice(idx, 1);
+                    this.audioCacheOrder.push(cacheKey);
+                }
             } else {
                 // Fetch from backend proxy
                 if (options.onStartLoading) options.onStartLoading();
@@ -121,7 +142,19 @@ export const textToSpeechService = {
 
                 const blob = await response.blob();
                 audioUrl = URL.createObjectURL(blob);
+
+                // Cache eviction - remove oldest entry if at capacity
+                if (this.audioCache.size >= this.MAX_CACHE_SIZE && this.audioCacheOrder.length > 0) {
+                    const oldestKey = this.audioCacheOrder.shift();
+                    const oldUrl = this.audioCache.get(oldestKey);
+                    if (oldUrl) {
+                        URL.revokeObjectURL(oldUrl); // Free memory
+                    }
+                    this.audioCache.delete(oldestKey);
+                }
+
                 this.audioCache.set(cacheKey, audioUrl);
+                this.audioCacheOrder.push(cacheKey);
 
                 if (options.onEndLoading) options.onEndLoading();
             }

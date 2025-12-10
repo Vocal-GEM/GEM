@@ -19,8 +19,13 @@ def create_app():
     app = Flask(__name__, static_folder=static_folder, static_url_path='')
 
     # Configuration
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-prod')
-    app.config['WTF_CSRF_ENABLED'] = False # Disable CSRF for API-only backend
+    secret_key = os.environ.get('SECRET_KEY')
+    if not secret_key:
+        if os.environ.get('FLASK_ENV') == 'production':
+            raise ValueError("SECRET_KEY environment variable must be set in production!")
+        secret_key = 'dev-secret-key-for-local-development-only'
+    app.config['SECRET_KEY'] = secret_key
+    app.config['WTF_CSRF_ENABLED'] = False  # CSRF exempt for API - tokens validated via session cookies
     
     # Database - support both PostgreSQL (production) and SQLite (development)
     database_url = os.environ.get('DATABASE_URL')
@@ -139,7 +144,8 @@ def create_app():
     csrf.exempt(voice_quality_bp)
     app.register_blueprint(voice_quality_bp)
 
-    socketio.init_app(app)
+    # Configure SocketIO with same CORS origins as HTTP (security fix)
+    socketio.init_app(app, cors_allowed_origins=allowed_origins)
     
     # Import socket handlers to register them
     from . import sockets

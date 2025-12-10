@@ -24,7 +24,7 @@ def signup():
         return jsonify({"error": pass_error}), 400
 
     if User.query.filter_by(username=username).first():
-        return jsonify({"error": "Username already exists"}), 400
+        return jsonify({"error": "Username is not available. Please choose a different one."}), 400
 
     new_user = User(username=username, password_hash=generate_password_hash(password))
     db.session.add(new_user)

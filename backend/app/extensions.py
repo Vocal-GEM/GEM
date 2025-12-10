@@ -10,5 +10,5 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 limiter = Limiter(key_func=get_remote_address)
 csrf = CSRFProtect()
-socketio = SocketIO(cors_allowed_origins="*", async_mode='threading') # Allow all for now, restrict in prod
+socketio = SocketIO(async_mode='threading')  # CORS configured in create_app
 migrate = Migrate()

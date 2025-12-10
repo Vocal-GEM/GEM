@@ -1,15 +1,17 @@
 from flask import request
 from flask_socketio import emit
+from flask_login import current_user
 from .voice_quality_analysis import (
-    compute_frame_features, 
-    compute_chunk_scores_from_frames, 
-    compute_raw_rbi_features, 
+    compute_frame_features,
+    compute_chunk_scores_from_frames,
+    compute_raw_rbi_features,
     pre_emphasis,
     classify_laryngeal_mechanism,
     analyze_consonant_burst,
     analyze_phrase_ending
 )
 from .extensions import socketio
+import time
 
 try:
     import numpy as np
@@ -24,6 +26,11 @@ except ImportError:
 CLIENT_BUFFERS = {}
 CLIENT_STATS = {}
 CLIENT_LAST_RBI = {}
+
+# Rate limiting for WebSocket connections (prevents DoS)
+CLIENT_RATE_LIMITS = {}
+MAX_CHUNKS_PER_SECOND = 50  # Reasonable limit for audio streaming
+MAX_CONNECTIONS_PER_IP = 5
 
 TARGET_SR = 16000
 MAX_BUFFER_SEC = 3.0
@@ -52,21 +59,47 @@ def _append_to_buffer(sid, pcm, sr):
 
     CLIENT_BUFFERS[sid] = buf
 
+def _check_rate_limit(sid):
+    """Check if client is within rate limits. Returns True if allowed."""
+    now = time.time()
+    if sid not in CLIENT_RATE_LIMITS:
+        CLIENT_RATE_LIMITS[sid] = {"count": 0, "window_start": now}
+        return True
+
+    rate_info = CLIENT_RATE_LIMITS[sid]
+    # Reset window if more than 1 second has passed
+    if now - rate_info["window_start"] >= 1.0:
+        rate_info["count"] = 0
+        rate_info["window_start"] = now
+
+    if rate_info["count"] >= MAX_CHUNKS_PER_SECOND:
+        return False
+
+    rate_info["count"] += 1
+    return True
+
+
 @socketio.on("connect")
 def handle_connect():
-    CLIENT_BUFFERS[request.sid] = np.zeros(0, dtype=np.float32)
-    CLIENT_STATS[request.sid] = {
+    sid = request.sid
+    # Initialize client buffers
+    CLIENT_BUFFERS[sid] = np.zeros(0, dtype=np.float32)
+    CLIENT_STATS[sid] = {
         "ratio_min": None, "ratio_max": None,
         "centroid_min": None, "centroid_max": None,
         "tilt_min": None, "tilt_max": None
     }
-    CLIENT_LAST_RBI[request.sid] = 50.0
+    CLIENT_LAST_RBI[sid] = 50.0
+    CLIENT_RATE_LIMITS[sid] = {"count": 0, "window_start": time.time()}
+
 
 @socketio.on("disconnect")
 def handle_disconnect():
-    CLIENT_BUFFERS.pop(request.sid, None)
-    CLIENT_STATS.pop(request.sid, None)
-    CLIENT_LAST_RBI.pop(request.sid, None)
+    sid = request.sid
+    CLIENT_BUFFERS.pop(sid, None)
+    CLIENT_STATS.pop(sid, None)
+    CLIENT_LAST_RBI.pop(sid, None)
+    CLIENT_RATE_LIMITS.pop(sid, None)
 
 @socketio.on("audio_chunk")
 def handle_audio_chunk(data):
@@ -76,6 +109,11 @@ def handle_audio_chunk(data):
       - 'sr': original sample rate (number)
     """
     sid = request.sid
+
+    # Rate limiting to prevent DoS
+    if not _check_rate_limit(sid):
+        emit("analysis_error", {"error": "Rate limit exceeded. Please slow down."})
+        return
 
     if not _deps_available:
         emit("analysis_error", {"error": "Server missing analysis dependencies."})
