@@ -7,8 +7,8 @@ const InflectionMap = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">Inflection Mapping</h2>
                 <p className="text-slate-400">
-                    If you don't plan your melody, you'll default to monotone.
-                    We use visual markers to "Map" the text.
+                    If you don&apos;t plan your melody, you&apos;ll default to monotone.
+                    We use visual markers to &quot;Map&quot; the text.
                 </p>
             </div>
 
@@ -41,7 +41,7 @@ const InflectionMap = ({ onComplete }) => {
 
                 <div className="text-center mt-8 text-slate-400 text-sm">
                     Read the text above, following the arrows and bold markers.
-                    <br />Exaggerate it. Make it sound "Too Much".
+                    <br />Exaggerate it. Make it sound &quot;Too Much&quot;.
                 </div>
             </div>
 

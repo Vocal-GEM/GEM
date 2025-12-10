@@ -52,7 +52,7 @@ const TARGET_CLIPS = [
 ];
 
 const ShadowingExercise = ({ embedded = false, onClose }) => {
-    const { audioEngineRef: _audioEngineRef, dataRef, isAudioActive, toggleAudio } = useAudio();
+    const { dataRef, isAudioActive, toggleAudio } = useAudio();
 
     const [selectedClip, setSelectedClip] = useState(null); // customized to null initially to show selection
     const [isPlaying, setIsPlaying] = useState(false);
@@ -208,15 +208,6 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
         const rangeScore = Math.max(0, 50 - (rangeDiff));
 
         return Math.min(100, Math.round(pitchScore + rangeScore));
-    };
-
-    const _handleReset = () => {
-        setPhase('select');
-        setUserPitchCurve([]);
-        setScore(null);
-        setIsRecording(false);
-        setIsPlaying(false);
-        setSelectedClip(null);
     };
 
     const handleTryAgain = () => {

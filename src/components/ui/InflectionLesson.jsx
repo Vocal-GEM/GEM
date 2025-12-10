@@ -73,7 +73,7 @@ const InflectionLesson = ({ onComplete }) => {
                                         <div className="w-4 h-12 bg-yellow-500"></div>
                                         <div className="w-4 h-4 bg-slate-600"></div>
                                     </div>
-                                    <span className="absolute text-xs text-white bg-slate-900 px-2 py-1 rounded top-2">"HEY!"</span>
+                                    <span className="absolute text-xs text-white bg-slate-900 px-2 py-1 rounded top-2">&quot;HEY!&quot;</span>
                                 </div>
                             </div>
                         </div>
@@ -81,8 +81,8 @@ const InflectionLesson = ({ onComplete }) => {
                         <div className="p-4 bg-slate-900 rounded-xl flex gap-3 text-sm text-slate-400 italic">
                             <AlertCircle size={16} className="shrink-0 mt-1" />
                             <div>
-                                "Feminizing is less about how HIGH you speak, and more about how LOW you DON'T speak.
-                                Avoid letting the pitch drop into the basement at the end of sentences."
+                                &quot;Feminizing is less about how HIGH you speak, and more about how LOW you DON&apos;T speak.
+                                Avoid letting the pitch drop into the basement at the end of sentences.&quot;
                             </div>
                         </div>
                     </div>

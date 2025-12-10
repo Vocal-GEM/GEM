@@ -15,7 +15,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
     const [showProfileManager, setShowProfileManager] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [showSignup, setShowSignup] = useState(false);
-    const { activeProfile: _activeProfile } = useProfile();
+    useProfile(); // Context initialization
     const { user, logout } = useAuth();
     const { openModal } = useNavigation();
 

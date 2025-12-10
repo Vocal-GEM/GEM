@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { BiofeedbackService } from '../../services/BiofeedbackService';
 import { Check, ArrowUp, ArrowDown } from 'lucide-react';
@@ -46,6 +46,7 @@ const PitchMatchingModule = ({ embedded = false }) => {
         }, 100);
 
         return () => clearInterval(interval);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAudioActive, targetNote]);
 
     return (

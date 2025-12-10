@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { Play, Square, TrendingUp, TrendingDown, Activity, RefreshCw } from 'lucide-react';
 

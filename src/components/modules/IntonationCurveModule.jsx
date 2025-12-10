@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { INTONATION_PATTERNS } from '../../data/IntonationPatterns';
 import { BiofeedbackService } from '../../services/BiofeedbackService';
@@ -52,6 +52,7 @@ const IntonationCurveModule = ({ embedded = false }) => {
         }, 30);
 
         return () => clearInterval(interval);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isRecording, userTrace, pattern]);
 
     // Draw Canvas
