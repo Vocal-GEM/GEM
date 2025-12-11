@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { CheckCircle, AlertTriangle, RefreshCw } from 'lucide-react';
 
 const CalibrationSummary = ({ results, onConfirm, onRecalibrate }) => {

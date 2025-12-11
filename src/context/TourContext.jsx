@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { TOURS } from '../config/tours';
 
 const TourContext = createContext();
@@ -17,7 +17,7 @@ export const TourProvider = ({ children }) => {
         }
     }, []);
 
-    const startTour = React.useCallback((tourId, force = false) => {
+    const startTour = useCallback((tourId, force = false) => {
         if (!TOURS[tourId]) {
             console.warn(`Tour ${tourId} not found`);
             return;
@@ -29,7 +29,7 @@ export const TourProvider = ({ children }) => {
         setCurrentStep(0);
     }, [completedTours]);
 
-    const endTour = React.useCallback((completed = true) => {
+    const endTour = useCallback((completed = true) => {
         if (completed && activeTour) {
             const newCompleted = [...new Set([...completedTours, activeTour])];
             setCompletedTours(newCompleted);
@@ -39,7 +39,7 @@ export const TourProvider = ({ children }) => {
         setCurrentStep(0);
     }, [activeTour, completedTours]);
 
-    const nextStep = React.useCallback(() => {
+    const nextStep = useCallback(() => {
         if (!activeTour) return;
         const tourConfig = TOURS[activeTour];
         if (currentStep < tourConfig.length - 1) {
@@ -49,17 +49,17 @@ export const TourProvider = ({ children }) => {
         }
     }, [activeTour, currentStep, endTour]);
 
-    const prevStep = React.useCallback(() => {
+    const prevStep = useCallback(() => {
         if (currentStep > 0) {
             setCurrentStep(prev => prev - 1);
         }
     }, [currentStep]);
 
-    const skipTour = React.useCallback(() => {
+    const skipTour = useCallback(() => {
         endTour(true); // Mark as completed so it doesn't auto-show again
     }, [endTour]);
 
-    const value = React.useMemo(() => ({
+    const value = useMemo(() => ({
         activeTour,
         currentStep,
         completedTours,

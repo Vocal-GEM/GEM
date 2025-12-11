@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Activity, Mic, Clock, ExternalLink, Calendar } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePracticeCards } from '../../context/PracticeCardsContext';

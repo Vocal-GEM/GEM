@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { DEFAULT_CARD_SETS, getAllCardSets, findCardById } from '../data/PracticeCardsData';
 import { practiceCardsService } from '../services/practiceCardsService';
 

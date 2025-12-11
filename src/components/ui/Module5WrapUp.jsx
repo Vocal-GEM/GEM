@@ -6,7 +6,7 @@ const Module5WrapUp = ({ onComplete }) => {
 
     const prompts = [
         "What am I most proud of having achieved these past five weeks? (Celebrate the small wins!)",
-        "What are some limiting beliefs I still hold about myself? (e.g. 'I can't do this')",
+        "What are some limiting beliefs I still hold about myself? (e.g. &apos;I can&apos;t do this&apos;)",
         "How can I decouple my voice success from the way I am perceived by others? (Focus on what YOU control)"
     ];
 
@@ -32,7 +32,7 @@ const Module5WrapUp = ({ onComplete }) => {
                 </div>
                 <h2 className="text-3xl font-bold text-white">Module 5 Complete!</h2>
                 <p className="text-indigo-200 max-w-lg mx-auto">
-                    You've tackled the "Big Three": Pitch, Resonance, and Weight.
+                    You&apos;ve tackled the &quot;Big Three&quot;: Pitch, Resonance, and Weight.
                     You now have the full toolkit to sculpt your voice.
                 </p>
             </div>
@@ -46,7 +46,7 @@ const Module5WrapUp = ({ onComplete }) => {
                 <div className="space-y-4">
                     {prompts.map((prompt, i) => (
                         <div key={i} className="p-4 bg-slate-800 rounded-xl border-l-4 border-pink-500">
-                            <p className="text-slate-300 italic">"{prompt}"</p>
+                            <p className="text-slate-300 italic">&quot;{prompt}&quot;</p>
                         </div>
                     ))}
                 </div>
@@ -64,8 +64,8 @@ const Module5WrapUp = ({ onComplete }) => {
                             key={item.id}
                             onClick={() => toggleTask(item.id)}
                             className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left ${checkedTasks[item.id]
-                                    ? 'bg-indigo-900/20 border-indigo-500/50'
-                                    : 'bg-slate-800 border-slate-700 hover:bg-slate-750'
+                                ? 'bg-indigo-900/20 border-indigo-500/50'
+                                : 'bg-slate-800 border-slate-700 hover:bg-slate-750'
                                 }`}
                         >
                             <span className={`font-bold ${checkedTasks[item.id] ? 'text-indigo-300' : 'text-slate-300'}`}>

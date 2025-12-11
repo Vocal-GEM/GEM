@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 const SkeletonLoader = ({ className = "", variant = "text", count = 1 }) => {
     const items = Array.from({ length: count });

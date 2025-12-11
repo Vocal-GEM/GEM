@@ -2,7 +2,7 @@
  * FileSpectrogram - Static spectrogram visualization for uploaded audio files
  * Renders a complete spectrogram from an AudioBuffer with playback cursor synchronization
  */
-import React, { useEffect, useRef, useMemo, useCallback } from 'react';
+import { useEffect, useRef, useMemo, useCallback } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { generateColormap } from '../../utils/colormaps';
 import { Undo2 } from 'lucide-react';

@@ -30,7 +30,7 @@ const PitchExploration = ({ onComplete }) => {
                         <h3 className="text-xl font-bold text-white mb-4">Exercise 1: The Glissando (The Slide)</h3>
                         <ol className="space-y-4 text-slate-300 list-decimal list-inside">
                             <li className="p-2 rounded hover:bg-slate-750">
-                                <strong>Warm up first!</strong> Don't do this cold.
+                                <strong>Warm up first!</strong> Don&apos;t do this cold.
                             </li>
                             <li className="p-2 rounded hover:bg-slate-750">
                                 Start on a low comfortable note (around C3).
@@ -39,7 +39,7 @@ const PitchExploration = ({ onComplete }) => {
                                 Slowly slide up (Glissando) like a siren.
                             </li>
                             <li className="p-2 rounded hover:bg-slate-750">
-                                <strong>Listen for the "Flip"</strong>: A gear-shift moment where you switch from Chest Voice to Head Voice.
+                                <strong>Listen for the &quot;Flip&quot;</strong>: A gear-shift moment where you switch from Chest Voice to Head Voice.
                             </li>
                         </ol>
 
@@ -51,8 +51,8 @@ const PitchExploration = ({ onComplete }) => {
                                         key={opt}
                                         onClick={() => setFlipNote(opt)}
                                         className={`px-3 py-2 rounded-lg text-sm transition-colors ${flipNote === opt
-                                                ? 'bg-pink-600 text-white'
-                                                : 'bg-slate-800 border border-slate-600 text-slate-300 hover:bg-slate-700'
+                                            ? 'bg-pink-600 text-white'
+                                            : 'bg-slate-800 border border-slate-600 text-slate-300 hover:bg-slate-700'
                                             }`}
                                     >
                                         {opt}
@@ -72,14 +72,14 @@ const PitchExploration = ({ onComplete }) => {
             {step === 2 && (
                 <div className="space-y-6 animate-in slide-in-from-right-4">
                     <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                        <h3 className="text-xl font-bold text-white mb-4">Exercise 2: "I Like Pie"</h3>
+                        <h3 className="text-xl font-bold text-white mb-4">Exercise 2: &quot;I Like Pie&quot;</h3>
                         <p className="text-slate-300 mb-4">
                             This determines your average *speaking* pitch.
                         </p>
                         <div className="bg-slate-900 p-6 rounded-xl text-center space-y-4">
-                            <div className="text-2xl font-serif text-slate-200 italic">"I like pie. I like pie. I like..."</div>
+                            <div className="text-2xl font-serif text-slate-200 italic">&quot;I like pie. I like pie. I like...&quot;</div>
                             <div className="text-4xl font-black text-white tracking-widest uppercase">PUH</div>
-                            <p className="text-slate-400 text-sm">Hold the "Puh" sound and check the tuner.</p>
+                            <p className="text-slate-400 text-sm">Hold the &quot;Puh&quot; sound and check the tuner.</p>
                         </div>
 
                         <div className="mt-6 p-4 bg-slate-900 rounded-xl">

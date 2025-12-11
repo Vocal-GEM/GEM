@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Home, Activity, Waves, BarChart2, Settings } from 'lucide-react';
 
 const BottomNav = ({ activeTab, onNavigate }) => {

@@ -50,8 +50,8 @@ const PitchMemorizer = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">Memorize Your Starting Pitch</h2>
                 <p className="text-slate-400">
-                    A feminine voice relies on <strong>how low you don't go</strong>.
-                    Memorize your bottom "safety" note so you can land on it consistently.
+                    A feminine voice relies on <strong>how low you don&apos;t go</strong>.
+                    Memorize your bottom &quot;safety&quot; note so you can land on it consistently.
                 </p>
             </div>
 
@@ -70,8 +70,8 @@ const PitchMemorizer = ({ onComplete }) => {
                                     key={note.name}
                                     onClick={() => setSelectedNote(note)}
                                     className={`py-2 rounded-lg text-sm font-bold ${selectedNote.name === note.name
-                                            ? 'bg-pink-600 text-white'
-                                            : 'bg-slate-900 text-slate-400 hover:bg-slate-700'
+                                        ? 'bg-pink-600 text-white'
+                                        : 'bg-slate-900 text-slate-400 hover:bg-slate-700'
                                         }`}
                                 >
                                     {note.name}
@@ -85,8 +85,8 @@ const PitchMemorizer = ({ onComplete }) => {
                             onClick={playTone}
                             disabled={isPlaying}
                             className={`w-32 h-32 rounded-full border-4 flex flex-col items-center justify-center gap-2 transition-all ${isPlaying
-                                    ? 'border-pink-500 bg-pink-900/20 shadow-[0_0_40px_rgba(236,72,153,0.3)] scale-95'
-                                    : 'border-slate-600 bg-slate-800 hover:border-pink-500 hover:scale-105'
+                                ? 'border-pink-500 bg-pink-900/20 shadow-[0_0_40px_rgba(236,72,153,0.3)] scale-95'
+                                : 'border-slate-600 bg-slate-800 hover:border-pink-500 hover:scale-105'
                                 }`}
                         >
                             <Volume2 size={32} className={isPlaying ? 'text-pink-400 animate-pulse' : 'text-slate-400'} />
@@ -102,7 +102,7 @@ const PitchMemorizer = ({ onComplete }) => {
                         <div>
                             <h4 className="font-bold text-white">Starting Pitch Song</h4>
                             <p className="text-sm text-slate-400">
-                                Write a silly song that starts on this note. "This is my starting pitch..."
+                                Write a silly song that starts on this note. &quot;This is my starting pitch...&quot;
                             </p>
                         </div>
                     </div>
@@ -122,7 +122,7 @@ const PitchMemorizer = ({ onComplete }) => {
                         <div>
                             <h4 className="font-bold text-white">Drone / Tuning Fork</h4>
                             <p className="text-sm text-slate-400">
-                                Search YouTube for "{selectedNote.name} Drone" and play it in the background while you work.
+                                Search YouTube for &quot;{selectedNote.name} Drone&quot; and play it in the background while you work.
                             </p>
                         </div>
                     </div>

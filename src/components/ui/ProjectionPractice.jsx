@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Mic, Megaphone, ShieldCheck } from 'lucide-react';
 
 const ProjectionPractice = ({ onComplete }) => {
@@ -7,7 +7,7 @@ const ProjectionPractice = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">Safe Projection</h2>
                 <p className="text-slate-400">
-                    "Yelling" usually drops us into a masculine chest voice.
+                    &quot;Yelling&quot; usually drops us into a masculine chest voice.
                     We need to learn to project using <strong>Resonance</strong> and <strong>Twang</strong> instead of Grunt.
                 </p>
             </div>
@@ -18,10 +18,10 @@ const ProjectionPractice = ({ onComplete }) => {
                     <h3 className="font-bold text-red-400 mb-2">The Wrong Way (Grunt)</h3>
                     <p className="text-sm text-slate-300 mb-4">
                         Pushing from the throat. Thickens vocal folds. Lowers the larynx.
-                        <br />Result: "MAN YELLING".
+                        <br />Result: &quot;MAN YELLING&quot;.
                     </p>
                     <div className="bg-slate-900 p-3 rounded-lg text-center text-xs text-red-300 font-mono">
-                        "HEY YOU!" (Deep/Barky)
+                        &quot;HEY YOU!&quot; (Deep/Barky)
                     </div>
                 </div>
 
@@ -30,10 +30,10 @@ const ProjectionPractice = ({ onComplete }) => {
                     <h3 className="font-bold text-green-400 mb-2">The Right Way (Call)</h3>
                     <p className="text-sm text-slate-300 mb-4">
                         Using the diaphragm (Air) + High Larynx + Twang (Laser).
-                        <br />Result: "Piercing Call".
+                        <br />Result: &quot;Piercing Call&quot;.
                     </p>
                     <div className="bg-slate-900 p-3 rounded-lg text-center text-xs text-green-300 font-mono">
-                        "HEY YOU!" (Bright/Sharp)
+                        &quot;HEY YOU!&quot; (Bright/Sharp)
                     </div>
                 </div>
             </div>
@@ -41,12 +41,12 @@ const ProjectionPractice = ({ onComplete }) => {
             <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
                 <div className="flex items-center gap-3 mb-4">
                     <Megaphone className="text-indigo-400" />
-                    <h3 className="font-bold text-white">The "Hey You!" Test</h3>
+                    <h3 className="font-bold text-white">The &quot;Hey You!&quot; Test</h3>
                 </div>
 
                 <p className="text-slate-300 text-sm mb-4">
                     Imagine your dog is running into traffic. You need to call them back.
-                    <strong>Don't drop your pitch.</strong> Use the "Witch Cackle" muscles to call out.
+                    <strong>Don&apos;t drop your pitch.</strong> Use the &quot;Witch Cackle&quot; muscles to call out.
                 </p>
 
                 <div className="flex gap-2">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Sliders } from 'lucide-react';
 
 const StyleMixer = ({ onComplete }) => {
@@ -19,7 +19,7 @@ const StyleMixer = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">The Mixing Board</h2>
                 <p className="text-slate-400">
-                    Who are you today? Design your "Preset".
+                    Who are you today? Design your &quot;Preset&quot;.
                     You are the Audio Engineer of your own voice.
                 </p>
             </div>

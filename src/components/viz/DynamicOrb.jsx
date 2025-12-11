@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unknown-property */
-import React, { useRef, useMemo, useState, useEffect, Suspense, lazy } from 'react';
+import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Diamond, Flame, Bug, Box, Activity, Sliders, Gauge } from 'lucide-react';
@@ -373,7 +373,7 @@ const useIntersectionObserver = (ref) => {
   return isVisible;
 };
 
-const DynamicOrb = React.memo(({ dataRef, calibration, externalDataRef, audioEngine, targetRange }) => {
+const DynamicOrb = memo(({ dataRef, calibration, externalDataRef, audioEngine, targetRange }) => {
   const { settings } = useSettings();
   const beginnerMode = settings?.beginnerMode;
   const [mode, setMode] = useState('gem');

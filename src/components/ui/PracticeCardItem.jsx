@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Play, Activity, Mic } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { FOCUS_AREAS } from '../../data/PracticeCardsData';

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Lock, Unlock, RotateCcw, LayoutGrid } from 'lucide-react';
 import { useLayout } from '../../context/LayoutContext';
 
@@ -11,8 +11,8 @@ const LayoutControls = () => {
             <button
                 onClick={toggleLock}
                 className={`p-2 rounded-lg transition-all ${isLocked
-                        ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
-                        : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700'
+                    ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                    : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700'
                     }`}
                 title={isLocked ? 'Unlock Layout' : 'Lock Layout'}
             >

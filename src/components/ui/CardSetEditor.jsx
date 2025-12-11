@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { X, Plus, Trash2, GripVertical, Save } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DIFFICULTY_LEVELS, FOCUS_AREAS } from '../../data/PracticeCardsData';

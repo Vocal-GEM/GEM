@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Image, Upload, Type, Music, ArrowRight, Save } from 'lucide-react';
 
 const NameVisualizer = ({ onComplete }) => {
@@ -39,7 +39,7 @@ const NameVisualizer = ({ onComplete }) => {
                     </label>
 
                     <p className="text-xs text-slate-500">
-                        Don't have art right now? <button onClick={() => setStep('reflect')} className="text-pink-400 underline">Skip to reflection</button>
+                        Don&apos;t have art right now? <button onClick={() => setStep('reflect')} className="text-pink-400 underline">Skip to reflection</button>
                     </p>
                 </div>
             ) : (

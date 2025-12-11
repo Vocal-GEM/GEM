@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { indexedDB } from '../services/IndexedDBManager';
 import { textToSpeechService } from '../services/TextToSpeechService';
 import i18n from '../i18n';
@@ -173,7 +173,7 @@ export const SettingsProvider = ({ children }) => {
         }, 2000);
     };
 
-    const value = React.useMemo(() => ({
+    const value = useMemo(() => ({
         settings,
         updateSettings,
         showSettings,

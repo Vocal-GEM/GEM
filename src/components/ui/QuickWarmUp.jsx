@@ -1,4 +1,3 @@
-import React from 'react';
 import { Clock, Zap } from 'lucide-react';
 
 const QUICK_ITEMS = [
@@ -17,9 +16,9 @@ const QuickWarmUp = ({ onComplete }) => {
                 <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-orange-500/30">
                     <Zap className="text-white" size={32} />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">The "I'm In A Rush" Routine</h3>
+                <h3 className="text-2xl font-bold text-white mb-2">The &quot;I&apos;m In A Rush&quot; Routine</h3>
                 <p className="text-slate-300 max-w-lg mx-auto">
-                    No time? No problem. Just do these 6 things to get your "vote" in for being a voice practitioner today.
+                    No time? No problem. Just do these 6 things to get your &quot;vote&quot; in for being a voice practitioner today.
                 </p>
             </div>
 

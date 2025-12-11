@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Volume2, CheckCircle, ArrowRight, RefreshCw, X, Loader2, TrendingUp } from 'lucide-react';
 import { VoiceCalibrationService } from '../../services/VoiceCalibrationService';
 
@@ -165,7 +165,7 @@ const VoiceCalibrationWizard = ({ onComplete, onClose }) => {
 
                             {/* Reading passage */}
                             <div className="bg-slate-800 border border-slate-600 rounded-xl p-4 mb-6 text-left">
-                                <p className="text-white italic leading-relaxed">"{READING_PASSAGE}"</p>
+                                <p className="text-white italic leading-relaxed">&quot;{READING_PASSAGE}&quot;</p>
                             </div>
 
                             {error && (

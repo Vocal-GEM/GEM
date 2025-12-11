@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Share2, Download, X, Flame, Clock, TrendingUp, Calendar, Sparkles } from 'lucide-react';
 import html2canvas from 'html2canvas';
 

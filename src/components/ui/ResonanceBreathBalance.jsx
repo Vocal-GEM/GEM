@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Wind, Zap, MoveHorizontal, Volume2 } from 'lucide-react';
 
 const ResonanceBreathBalance = ({ onComplete }) => {
@@ -42,7 +42,7 @@ const ResonanceBreathBalance = ({ onComplete }) => {
                     We tend to tense up when we brighten our resonance.
                     The cure is <strong>Open Quotient (Breath)</strong>.
                     <br /><br />
-                    We need to find the balance between the "Nee" (Bright/Tight) and the "Hee" (Breathy/Loose).
+                    We need to find the balance between the &quot;Nee&quot; (Bright/Tight) and the &quot;Hee&quot; (Breathy/Loose).
                 </p>
             </div>
 
@@ -86,8 +86,8 @@ const ResonanceBreathBalance = ({ onComplete }) => {
                 <div>
                     <h4 className="font-bold text-indigo-100">Exercise: The Slide</h4>
                     <p className="text-sm text-indigo-300 mt-1">
-                        Start at "NEE" (Tight). Slowly relax into "MEE" (Balanced).
-                        If you go too far, you'll hit "HEE" (Breathy).
+                        Start at &quot;NEE&quot; (Tight). Slowly relax into &quot;MEE&quot; (Balanced).
+                        If you go too far, you&apos;ll hit &quot;HEE&quot; (Breathy).
                         <br />
                         <strong>Goal:</strong> Keep the Brightness of Nee, but with the Ease of Hee.
                     </p>

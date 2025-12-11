@@ -1,4 +1,4 @@
-import React from 'react';
+// React removed
 import { Info } from 'lucide-react';
 
 const MetricCard = ({ label, value, unit, status = 'neutral', description, details }) => {

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, useMemo } from 'react';
 import { AudioEngine } from '../engines/AudioEngine';
 import { useSettings } from './SettingsContext';
 import { useProfile } from './ProfileContext';
@@ -163,7 +163,7 @@ export const AudioProvider = ({ children }) => {
         return null;
     };
 
-    const value = React.useMemo(() => ({
+    const value = useMemo(() => ({
         audioEngineRef,
         dataRef,
         isAudioActive,

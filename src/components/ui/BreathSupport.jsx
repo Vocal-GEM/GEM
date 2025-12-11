@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Wind, Activity, Zap, Info } from 'lucide-react';
 
 const BreathSupport = ({ onComplete }) => {

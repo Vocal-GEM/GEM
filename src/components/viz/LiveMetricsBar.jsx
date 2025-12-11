@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const LiveMetricsBar = ({ dataRef }) => {
     const [metrics, setMetrics] = useState({ f0: 0, f1: 0, f2: 0, w: 0 });

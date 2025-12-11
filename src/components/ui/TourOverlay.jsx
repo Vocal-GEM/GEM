@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTour } from '../../context/TourContext';
 import { X, ChevronRight, ChevronLeft } from 'lucide-react';

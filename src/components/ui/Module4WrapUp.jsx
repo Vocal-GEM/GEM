@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Book, CheckCircle, Sparkles, AlertCircle } from 'lucide-react';
 
 const Module4WrapUp = ({ onComplete }) => {
@@ -46,7 +46,7 @@ const Module4WrapUp = ({ onComplete }) => {
                 <div className="space-y-4">
                     {prompts.map((prompt, i) => (
                         <div key={i} className="p-4 bg-slate-800 rounded-xl border-l-4 border-pink-500">
-                            <p className="text-slate-300 italic">"{prompt}"</p>
+                            <p className="text-slate-300 italic">&quot;{prompt}&quot;</p>
                         </div>
                     ))}
                 </div>

@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { AlertTriangle, Anchor, RefreshCw, Languages } from 'lucide-react';
 
 const RecoveryStrategy = ({ onComplete }) => {
@@ -7,8 +6,8 @@ const RecoveryStrategy = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">Recovery & Code Switching</h2>
                 <p className="text-slate-400">
-                    Your voice will "break" or "dip" back into old habits. This is normal.
-                    The skill isn't "Never Failing", it's "Fast Recovery".
+                    &quot;Your voice will &quot;break&quot; or &quot;dip&quot; back into old habits. This is normal.
+                    The skill isn&apos;t &quot;Never Failing&quot;, it&apos;s &quot;Fast Recovery&quot;.
                 </p>
             </div>
 
@@ -16,7 +15,7 @@ const RecoveryStrategy = ({ onComplete }) => {
                 <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
                     <h3 className="font-bold text-white mb-4 flex items-center gap-2">
                         <AlertTriangle className="text-yellow-500" />
-                        The "Pitch Dip"
+                        The &quot;Pitch Dip&quot;
                     </h3>
                     <p className="text-slate-300 text-sm mb-4">
                         <strong>What it is:</strong> Unconsciously dropping pitch/resonance at the end of sentences or when tired.
@@ -24,9 +23,9 @@ const RecoveryStrategy = ({ onComplete }) => {
                     <div className="bg-slate-900 p-4 rounded-xl space-y-2 text-sm">
                         <div className="font-bold text-white">Quick Fixes:</div>
                         <ul className="list-disc list-inside text-slate-400">
-                            <li>The "Mini-Cough" (Resets the Larynx)</li>
-                            <li>The "Swallow" (Resets the throat)</li>
-                            <li>The "H" Breath (Resets airflow)</li>
+                            <li>The &quot;Mini-Cough&quot; (Resets the Larynx)</li>
+                            <li>The &quot;Swallow&quot; (Resets the throat)</li>
+                            <li>The &quot;H&quot; Breath (Resets airflow)</li>
                         </ul>
                     </div>
                 </div>
@@ -40,7 +39,7 @@ const RecoveryStrategy = ({ onComplete }) => {
                         <strong>Translanguaging:</strong> It is OK (and safe!) to have different voices for different people.
                     </p>
                     <div className="bg-slate-900 p-4 rounded-xl space-y-2 text-sm">
-                        <div className="font-bold text-white">Common "Modes":</div>
+                        <div className="font-bold text-white">Common &quot;Modes&quot;:</div>
                         <ul className="list-disc list-inside text-slate-400">
                             <li><strong>Work Voice:</strong> Lower pitch, authoritative.</li>
                             <li><strong>Customer Service:</strong> Higher pitch, polite.</li>
@@ -58,7 +57,7 @@ const RecoveryStrategy = ({ onComplete }) => {
                             The Anchor Word Strategy
                         </h3>
                         <p className="text-slate-300 text-sm mt-1">
-                            When you get lost, don't panic. Use your Anchor.
+                            When you get lost, don&apos;t panic. Use your Anchor.
                         </p>
                     </div>
                 </div>

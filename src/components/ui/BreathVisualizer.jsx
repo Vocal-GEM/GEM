@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Play, Pause, RefreshCw } from 'lucide-react';
 
 const PATTERNS = {

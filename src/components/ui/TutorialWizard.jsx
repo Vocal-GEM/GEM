@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useProfile } from '../../context/ProfileContext';
 import { Play, CheckCircle, ArrowRight, X } from 'lucide-react';
 

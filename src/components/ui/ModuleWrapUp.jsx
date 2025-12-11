@@ -60,8 +60,8 @@ const ModuleWrapUp = ({ onComplete }) => {
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-pink-500" />
                 <h3 className="text-3xl font-bold text-white mb-4">Week 1 Complete! 🎉</h3>
                 <p className="text-slate-300 max-w-2xl mx-auto">
-                    You've taken the first concrete steps towards your authentic voice.
-                    Be proud of yourself. It's time to reflect and set intentions for the path ahead.
+                    You&apos;ve taken the first concrete steps towards your authentic voice.
+                    Be proud of yourself. It&apos;s time to reflect and set intentions for the path ahead.
                 </p>
             </div>
 
@@ -126,7 +126,7 @@ const ModuleWrapUp = ({ onComplete }) => {
                         <Shield size={18} className="text-blue-400" /> Need Support?
                     </h5>
                     <p className="text-sm text-slate-400 mb-4">
-                        You are not alone. Connect with the community or get help if you're stuck.
+                        You are not alone. Connect with the community or get help if you&apos;re stuck.
                     </p>
                     <div className="flex gap-3">
                         <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm text-white flex items-center gap-2">
@@ -139,10 +139,10 @@ const ModuleWrapUp = ({ onComplete }) => {
                 </div>
                 <div className="flex-1 border-l border-slate-700 pl-6 hidden md:block">
                     <h5 className="font-bold text-white flex items-center gap-2 mb-2">
-                        <Heart size={18} className="text-pink-400" /> You've Got This
+                        <Heart size={18} className="text-pink-400" /> You&apos;ve Got This
                     </h5>
                     <p className="text-sm text-slate-400 italic">
-                        "I have never met somebody that couldn't improve. You are not the exception."
+                        &quot;I have never met somebody that couldn&apos;t improve. You are not the exception.&quot;
                     </p>
                 </div>
             </div>
@@ -152,8 +152,8 @@ const ModuleWrapUp = ({ onComplete }) => {
                 <button
                     onClick={handleComplete}
                     className={`px-12 py-4 rounded-xl font-bold text-lg shadow-xl hover:scale-105 transition-all flex items-center gap-3 ${showConfetti
-                            ? 'bg-green-500 text-white scale-110'
-                            : 'bg-gradient-to-r from-pink-600 to-purple-600 text-white'
+                        ? 'bg-green-500 text-white scale-110'
+                        : 'bg-gradient-to-r from-pink-600 to-purple-600 text-white'
                         }`}
                 >
                     {showConfetti ? '🎉 Awesome Work! 🎉' : 'Complete Week 1'}

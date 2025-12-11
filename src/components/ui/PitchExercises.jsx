@@ -9,7 +9,7 @@ const PitchExercises = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">Target Pitch Exercises</h2>
                 <p className="text-slate-400">
-                    Once you've chosen a comfortable starting note (e.g., D3, E3, F3), practice these drills to solidify your range.
+                    Once you&apos;ve chosen a comfortable starting note (e.g., D3, E3, F3), practice these drills to solidify your range.
                 </p>
             </div>
 
@@ -19,8 +19,8 @@ const PitchExercises = ({ onComplete }) => {
                         key={tab}
                         onClick={() => setActiveTab(tab)}
                         className={`flex-1 py-3 px-4 rounded-lg font-bold flex items-center justify-center gap-2 transition-all ${activeTab === tab
-                                ? 'bg-pink-600 text-white shadow-lg'
-                                : 'text-slate-400 hover:text-white'
+                            ? 'bg-pink-600 text-white shadow-lg'
+                            : 'text-slate-400 hover:text-white'
                             }`}
                     >
                         {tab === 'sing5' && "1. Sing Up to 5"}
@@ -35,7 +35,7 @@ const PitchExercises = ({ onComplete }) => {
                     <div className="space-y-6">
                         <h3 className="text-xl font-bold text-white">Sing Up to 5</h3>
                         <p className="text-slate-300">
-                            Find 5 notes that are comfortable at the bottom, and don't flip at the top.
+                            Find 5 notes that are comfortable at the bottom, and don&apos;t flip at the top.
                         </p>
 
                         <div className="flex items-end justify-center gap-2 h-40 bg-slate-900 rounded-xl p-8">
@@ -75,7 +75,7 @@ const PitchExercises = ({ onComplete }) => {
 
                         <div className="p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg text-sm text-yellow-200 flex gap-3">
                             <Repeat className="shrink-0" />
-                            Ensure "10" lands in the same place as "1". Don't fall into the basement!
+                            Ensure &quot;10&quot; lands in the same place as &quot;1&quot;. Don&apos;t fall into the basement!
                         </div>
                     </div>
                 )}
@@ -89,13 +89,13 @@ const PitchExercises = ({ onComplete }) => {
 
                         <ol className="list-decimal list-inside space-y-4 text-slate-300">
                             <li className="p-3 bg-slate-900 rounded-lg">
-                                <span className="text-white font-bold">"Sing..."</span> (Hold the NG sound). Air comes out nose.
+                                <span className="text-white font-bold">&quot;Sing...&quot;</span> (Hold the NG sound). Air comes out nose.
                             </li>
                             <li className="p-3 bg-slate-900 rounded-lg">
                                 <span className="text-white font-bold">Slide Up</span> (Glissando up a 5th on NG).
                             </li>
                             <li className="p-3 bg-slate-900 rounded-lg">
-                                <span className="text-white font-bold">Open to "Ah"</span> (Keep the position).
+                                <span className="text-white font-bold">Open to &quot;Ah&quot;</span> (Keep the position).
                             </li>
                             <li className="p-3 bg-slate-900 rounded-lg">
                                 <span className="text-white font-bold">Slide Down</span> (Return to start).
@@ -110,7 +110,7 @@ const PitchExercises = ({ onComplete }) => {
                     onClick={onComplete}
                     className="px-8 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200 transition-colors shadow-lg"
                 >
-                    I've Practiced These
+                    I&apos;ve Practiced These
                 </button>
             </div>
         </div>

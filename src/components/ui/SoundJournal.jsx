@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Volume2, Wind, Zap, Music, Plus, Edit3, Trash2, Save, Smile, CloudLightning, Coffee, Radio } from 'lucide-react';
 
 const INSPIRATION_PROMPTS = [
@@ -54,8 +54,8 @@ const SoundJournal = ({ onComplete }) => {
                     <div>
                         <h3 className="text-xl font-bold text-white mb-2">Sound Journal</h3>
                         <p className="text-slate-400 text-sm">
-                            Explore the bounds of your voice by making "weird" sounds.
-                            Don't worry about being feminine right now—just be curious about what your voice <em>can</em> do.
+                            Explore the bounds of your voice by making &quot;weird&quot; sounds.
+                            Don&apos;t worry about being feminine right now—just be curious about what your voice <em>can</em> do.
                         </p>
                     </div>
                 </div>

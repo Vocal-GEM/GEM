@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Heart, ChevronRight, ChevronLeft, Check, Sparkles } from 'lucide-react';
 import { SelfCareService, SELF_CARE_PROMPTS, SELF_CARE_RESOURCES } from '../../services/SelfCareService';
 
@@ -89,18 +89,18 @@ const SelfCareOnboarding = ({ onComplete, onSkip }) => {
                             <div className="text-slate-300 space-y-4 text-left max-w-lg mx-auto">
                                 <p>
                                     Voice feminization work can be <strong>emotionally challenging</strong>.
-                                    When we work on our voice, we're confronting dysphoria around core elements of our being.
+                                    When we work on our voice, we&apos;re confronting dysphoria around core elements of our being.
                                 </p>
                                 <p>
                                     Unlike learning to sing, where failing to hit a note is just frustrating—failing at
                                     voice feminization can feel like it threatens <em>who we are</em>.
                                 </p>
                                 <p className="text-pink-300 font-medium">
-                                    That's why we start with self-care. Not as an afterthought, but as the foundation.
+                                    That&apos;s why we start with self-care. Not as an afterthought, but as the foundation.
                                 </p>
                                 <p>
                                     The next few questions will help you create a personal self-care plan—so when
-                                    challenges come up (not <em>if</em>, but <em>when</em>), you're prepared.
+                                    challenges come up (not <em>if</em>, but <em>when</em>), you&apos;re prepared.
                                 </p>
                             </div>
                         </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { Mic, Volume2, CheckCircle, ArrowRight, RefreshCw } from 'lucide-react';
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ChevronDown, ChevronRight, Lock, CheckCircle, Unlock } from 'lucide-react';
 
 const LEVELS = [

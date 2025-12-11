@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Activity, Type, Music, MoveHorizontal, AlignCenter } from 'lucide-react';
 
 const ProsodyTheory = ({ onComplete }) => {
@@ -17,9 +17,9 @@ const ProsodyTheory = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">The 5 Keys of Prosody</h2>
                 <p className="text-slate-400">
-                    "Prosody" is the melody and rhythm of speech. <br />
-                    Without it, you sound "Monotone" (which reads as Masculine).
-                    With it, you sound "Alive" (which reads as Feminine).
+                    &quot;Prosody&quot; is the melody and rhythm of speech. <br />
+                    Without it, you sound &quot;Monotone&quot; (which reads as Masculine).
+                    With it, you sound &quot;Alive&quot; (which reads as Feminine).
                 </p>
             </div>
 
@@ -29,8 +29,8 @@ const ProsodyTheory = ({ onComplete }) => {
                         key={k.id}
                         onClick={() => setActiveKey(k.id)}
                         className={`p-4 rounded-xl font-bold flex flex-col items-center gap-2 min-w-[120px] transition-all border ${activeKey === k.id
-                                ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg'
-                                : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
+                            ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg'
+                            : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
                             }`}
                     >
                         <k.icon size={24} />
@@ -43,14 +43,14 @@ const ProsodyTheory = ({ onComplete }) => {
                 {activeKey === 'bounce' && (
                     <div className="space-y-4">
                         <h3 className="text-2xl font-black text-indigo-400">Bounciness</h3>
-                        <p className="text-xl text-white">"Don't walk. Dance."</p>
+                        <p className="text-xl text-white">&quot;Don&apos;t walk. Dance.&quot;</p>
                         <p className="text-slate-300">
                             Masculine speech tends to hit a note and stay there. Feminine speech is rarely static.
-                            It's always moving up or down, even on a single syllable.
+                            It&apos;s always moving up or down, even on a single syllable.
                         </p>
                         <div className="p-4 bg-slate-900 rounded-xl">
                             <div className="text-center font-mono text-lg">
-                                "Hello" &rarr; "He-↗llo-↘"
+                                &quot;Hello&quot; &rarr; &quot;He-↗llo-↘&quot;
                             </div>
                         </div>
                     </div>
@@ -58,38 +58,38 @@ const ProsodyTheory = ({ onComplete }) => {
                 {activeKey === 'tempo' && (
                     <div className="space-y-4">
                         <h3 className="text-2xl font-black text-pink-400">Tempo Variation</h3>
-                        <p className="text-xl text-white">"Fast for facts. Slow for feelings."</p>
+                        <p className="text-xl text-white">&quot;Fast for facts. Slow for feelings.&quot;</p>
                         <p className="text-slate-300">
-                            Don't speak at one speed. Speed up through unimportant words ("and then i went to the"),
-                            and SLOW DOWN on the Gold Nugggets ("STORE").
+                            Don&apos;t speak at one speed. Speed up through unimportant words (&quot;and then i went to the&quot;),
+                            and SLOW DOWN on the Gold Nugggets (&quot;STORE&quot;).
                         </p>
                     </div>
                 )}
                 {activeKey === 'elongation' && (
                     <div className="space-y-4">
                         <h3 className="text-2xl font-black text-yellow-400">Vowel Elongation</h3>
-                        <p className="text-xl text-white">"Luxuriate in the Vowels."</p>
+                        <p className="text-xl text-white">&quot;Luxuriate in the Vowels.&quot;</p>
                         <p className="text-slate-300">
                             Short clipped vowels sound militant. Long vowels sound warm and engaging.
                             <br />
-                            Don't say "Gud". Say "Goooood".
+                            Don&apos;t say &quot;Gud&quot;. Say &quot;Goooood&quot;.
                         </p>
                     </div>
                 )}
                 {activeKey === 'diction' && (
                     <div className="space-y-4">
                         <h3 className="text-2xl font-black text-green-400">Diction & Articulation</h3>
-                        <p className="text-xl text-white">"Crisp Consonants."</p>
+                        <p className="text-xl text-white">&quot;Crisp Consonants.&quot;</p>
                         <p className="text-slate-300">
-                            Feminine speech is often more precise. Pronounce your T's and K's.
-                            Don't "mumble". Use your lips and teeth.
+                            Feminine speech is often more precise. Pronounce your T&apos;s and K&apos;s.
+                            Don&apos;t &quot;mumble&quot;. Use your lips and teeth.
                         </p>
                     </div>
                 )}
                 {activeKey === 'separation' && (
                     <div className="space-y-4">
                         <h3 className="text-2xl font-black text-blue-400">Syllable Separation</h3>
-                        <p className="text-xl text-white">"Every. Syllable. Counts."</p>
+                        <p className="text-xl text-white">&quot;Every. Syllable. Counts.&quot;</p>
                         <p className="text-slate-300">
                             When we slur words together, we lose pitch control.
                             Treat every syllable as a separate note on a piano.

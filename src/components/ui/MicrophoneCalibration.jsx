@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Mic, Volume2, VolumeX, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 
 const MicrophoneCalibration = ({ audioEngine }) => {

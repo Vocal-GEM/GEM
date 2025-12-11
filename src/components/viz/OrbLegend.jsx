@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Info, X } from 'lucide-react';
 
 const OrbLegend = ({ mode = 'gem' }) => {

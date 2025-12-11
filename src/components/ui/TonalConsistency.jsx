@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Layers, Move, Music, AlertCircle, Play, Mic } from 'lucide-react';
 
 const TonalConsistency = ({ onComplete }) => {
@@ -9,8 +9,8 @@ const TonalConsistency = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">Tonal Consistency</h2>
                 <p className="text-slate-400">
-                    Masculine speech "chews" vowels (moving the jaw/tongue excessively).
-                    Feminine speech maintains a consistent "Bright" container (R1) while the tongue dances inside.
+                    Masculine speech &quot;chews&quot; vowels (moving the jaw/tongue excessively).
+                    Feminine speech maintains a consistent &quot;Bright&quot; container (R1) while the tongue dances inside.
                 </p>
             </div>
 
@@ -67,7 +67,7 @@ const TheoryTab = () => (
                 <div>
                     <h4 className="font-bold text-white">The Throat (Pharynx)</h4>
                     <p className="text-sm text-slate-400">
-                        This is the "Big Knob". Squeeze the throat (like swallowing) to make it smaller = Brighter sound.
+                        This is the &quot;Big Knob&quot;. Squeeze the throat (like swallowing) to make it smaller = Brighter sound.
                     </p>
                 </div>
             </div>
@@ -77,7 +77,7 @@ const TheoryTab = () => (
                 <div>
                     <h4 className="font-bold text-white">The Mouth (Oral Cavity)</h4>
                     <p className="text-sm text-slate-400">
-                        Controlled by tongue height. High Tongue ("EE") = Smaller space = Brighter sound.
+                        Controlled by tongue height. High Tongue (&quot;EE&quot;) = Smaller space = Brighter sound.
                     </p>
                 </div>
             </div>
@@ -97,9 +97,9 @@ const TheoryTab = () => (
 
 const AnchorTab = () => (
     <div className="space-y-6 animate-in fade-in">
-        <h3 className="text-xl font-bold text-white">The "EE" Anchor</h3>
+        <h3 className="text-xl font-bold text-white">The &quot;EE&quot; Anchor</h3>
         <p className="text-slate-300">
-            Most feminine vowels are modified towards "EE". Why? Because "EE" forces the tongue high (Small R2).
+            Most feminine vowels are modified towards &quot;EE&quot;. Why? Because &quot;EE&quot; forces the tongue high (Small R2).
         </p>
 
         <div className="grid grid-cols-2 gap-4">
@@ -107,21 +107,21 @@ const AnchorTab = () => (
                 <div className="text-4xl mb-4">😁</div>
                 <h4 className="font-bold text-white">The Goal</h4>
                 <p className="text-sm text-slate-400">
-                    Keep the back of the tongue HIGH and WIDE (touching upper molars) like you are saying "EE", even when saying "Ah".
+                    Keep the back of the tongue HIGH and WIDE (touching upper molars) like you are saying &quot;EE&quot;, even when saying &quot;Ah&quot;.
                 </p>
             </div>
             <div className="bg-slate-900 p-6 rounded-xl text-center border border-red-500/30">
                 <div className="text-4xl mb-4">😮</div>
                 <h4 className="font-bold text-white">The Habit</h4>
                 <p className="text-sm text-slate-400">
-                    Dropping the jaw and tongue floor for every vowel. This creates "Muddy" or "Dark" spots in your speech.
+                    Dropping the jaw and tongue floor for every vowel. This creates &quot;Muddy&quot; or &quot;Dark&quot; spots in your speech.
                 </p>
             </div>
         </div>
 
         <div className="p-4 bg-indigo-900/20 text-indigo-200 rounded-xl text-sm border border-indigo-500/20">
-            <strong>Try it:</strong> Say "EE". Feel the sides of your tongue touching your top teeth. <br />
-            Now say "Ah" <em>without letting the tongue lose contact with the teeth</em>.
+            <strong>Try it:</strong> Say &quot;EE&quot;. Feel the sides of your tongue touching your top teeth. <br />
+            Now say &quot;Ah&quot; <em>without letting the tongue lose contact with the teeth</em>.
         </div>
     </div>
 );
@@ -136,7 +136,7 @@ const NasalityTab = () => (
         <div className="bg-slate-900 p-6 rounded-xl border border-slate-700 space-y-4">
             <h4 className="font-bold text-white border-b border-slate-700 pb-2">The Nose Pinch Test</h4>
             <ol className="list-decimal list-inside text-slate-300 space-y-2">
-                <li>Say a vowel: <strong>"Ahhhhh"</strong></li>
+                <li>Say a vowel: <strong>&quot;Ahhhhh&quot;</strong></li>
                 <li>While sustaining it, <strong>pinch your nose</strong>.</li>
                 <li>
                     Did the sound change?

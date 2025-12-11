@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { indexedDB } from '../services/IndexedDBManager';
 import { useAuth } from './AuthContext';
 
@@ -263,7 +263,7 @@ export const ProfileProvider = ({ children }) => {
         });
     };
 
-    const value = React.useMemo(() => ({
+    const value = useMemo(() => ({
         voiceProfiles,
         activeProfile,
         targetRange,

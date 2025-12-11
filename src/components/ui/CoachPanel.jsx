@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Activity, Wind, AlertTriangle, Play, ChevronRight, Mic } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import RegisterGauge from '../viz/RegisterGauge';
@@ -117,8 +117,8 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
         <div className="h-full flex flex-col gap-4">
             {/* 1. The Coach's Insight (Action Card) */}
             <div className={`p-4 rounded-2xl border transition-all duration-500 ${advice
-                    ? `bg-${advice.color}-500/10 border-${advice.color}-500/30 shadow-[0_0_15px_rgba(0,0,0,0.3)]`
-                    : 'bg-slate-900/50 border-slate-800'
+                ? `bg-${advice.color}-500/10 border-${advice.color}-500/30 shadow-[0_0_15px_rgba(0,0,0,0.3)]`
+                : 'bg-slate-900/50 border-slate-800'
                 }`}>
                 <div className="flex items-start gap-4">
                     <div className={`p-3 rounded-xl bg-${advice?.color || 'slate'}-500/20 text-${advice?.color || 'slate'}-400`}>

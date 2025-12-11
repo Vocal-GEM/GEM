@@ -1,4 +1,4 @@
-import { Trophy, CheckCircle2, XCircle, ArrowRight, RotateCcw, Sparkles, Star, Lock } from 'lucide-react';
+import { XCircle, ArrowRight, RotateCcw, Sparkles, Star } from 'lucide-react';
 
 /**
  * QuizResults - End of quiz session results display
@@ -65,9 +65,9 @@ const QuizResults = ({
                     <div className="mt-4 h-3 bg-slate-700 rounded-full overflow-hidden">
                         <div
                             className={`h-full transition-all duration-1000 ${isPerfect ? 'bg-gradient-to-r from-yellow-400 to-amber-500' :
-                                    isGreat ? 'bg-gradient-to-r from-emerald-400 to-teal-500' :
-                                        isGood ? 'bg-gradient-to-r from-blue-400 to-cyan-500' :
-                                            'bg-gradient-to-r from-purple-400 to-pink-500'
+                                isGreat ? 'bg-gradient-to-r from-emerald-400 to-teal-500' :
+                                    isGood ? 'bg-gradient-to-r from-blue-400 to-cyan-500' :
+                                        'bg-gradient-to-r from-purple-400 to-pink-500'
                                 }`}
                             style={{ width: `${percentage}%` }}
                         />
@@ -105,7 +105,7 @@ const QuizResults = ({
                         </div>
                         <p className="text-white font-medium">{newModuleName}</p>
                         <p className="text-sm text-slate-400 mt-1">
-                            You've mastered all questions in the previous module!
+                            You&apos;ve mastered all questions in the previous module!
                         </p>
                     </div>
                 )}

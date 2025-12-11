@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Book, CheckCircle, Award, Heart, Rocket } from 'lucide-react';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use'; // Assuming a hook or use simple styles
@@ -42,7 +42,7 @@ const Module6WrapUp = ({ onComplete }) => {
                     <span>Awareness</span> • <span>Mechanics</span> • <span>Resonance</span> • <span>Pitch</span> • <span>Weight</span> • <span>Inflection</span>
                 </div>
                 <p className="text-slate-300 max-w-xl mx-auto px-4 mt-6">
-                    You have done the work. You have the tools. The journey doesn't end here, it's just becoming YOURS.
+                    You have done the work. You have the tools. The journey doesn&apos;t end here, it&apos;s just becoming YOURS.
                 </p>
                 <div className="flex justify-center text-red-400 mt-4 animate-pulse">
                     <Heart fill="currentColor" size={32} />
@@ -58,7 +58,7 @@ const Module6WrapUp = ({ onComplete }) => {
                 <div className="space-y-4">
                     {prompts.map((prompt, i) => (
                         <div key={i} className="p-4 bg-slate-800 rounded-xl border-l-4 border-pink-500">
-                            <p className="text-slate-300 italic">"{prompt}"</p>
+                            <p className="text-slate-300 italic">&quot;{prompt}&quot;</p>
                         </div>
                     ))}
                 </div>
@@ -76,8 +76,8 @@ const Module6WrapUp = ({ onComplete }) => {
                             key={item.id}
                             onClick={() => toggleTask(item.id)}
                             className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left ${checkedTasks[item.id]
-                                    ? 'bg-indigo-900/20 border-indigo-500/50'
-                                    : 'bg-slate-800 border-slate-700 hover:bg-slate-750'
+                                ? 'bg-indigo-900/20 border-indigo-500/50'
+                                : 'bg-slate-800 border-slate-700 hover:bg-slate-750'
                                 }`}
                         >
                             <span className={`font-bold ${checkedTasks[item.id] ? 'text-indigo-300' : 'text-slate-300'}`}>

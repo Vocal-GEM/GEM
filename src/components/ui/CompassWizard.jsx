@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 const CompassWizard = ({ onComplete }) => {
     const handleSelect = (type) => {

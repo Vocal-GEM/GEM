@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Music, Volume2, Info, CheckCircle, HelpCircle } from 'lucide-react';
 
 // Frequencies for Octave 3 (and C4)
@@ -141,7 +141,7 @@ const BasicsTab = () => (
             <li>• <strong>Finding F:</strong> Look for the group of <em>three black keys</em>. F is to the immediate left.</li>
         </ul>
         <div className="p-4 bg-indigo-900/20 border border-indigo-500/30 rounded-lg text-sm text-indigo-300">
-            🎹 Try finding <strong>C3</strong> on the keyboard below. It's the first white key shown.
+            🎹 Try finding <strong>C3</strong> on the keyboard below. It&apos;s the first white key shown.
         </div>
     </div>
 );
@@ -175,7 +175,7 @@ const OctavesTab = () => (
             An octave is a set of 8 white notes (C to C). Each octave is numbered.
         </p>
         <ul className="space-y-3 text-slate-300">
-            <li>• <strong>C4 (Middle C)</strong>: The center of the piano. Often the "flip" point for AMAB voices.</li>
+            <li>• <strong>C4 (Middle C)</strong>: The center of the piano. Often the &quot;flip&quot; point for AMAB voices.</li>
             <li>• <strong>C3</strong>: One octave lower. Usually a comfortable speaking range foundation.</li>
             <li>• <strong>A4</strong>: 440 Hz.</li>
             <li>• <strong>A3</strong>: 220 Hz (Half the frequency).</li>

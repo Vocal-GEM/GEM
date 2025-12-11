@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Zap, Volume2, MoveVertical } from 'lucide-react';
 
 const TwangDojo = ({ onComplete }) => {
@@ -9,8 +9,8 @@ const TwangDojo = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">The Twang Dojo</h2>
                 <p className="text-slate-400">
-                    Twang is "The Laser Effect". It adds piercing brightness without adding weight.
-                    It turns a quiet "Breath" voice into a "Power" voice.
+                    Twang is &quot;The Laser Effect&quot;. It adds piercing brightness without adding weight.
+                    It turns a quiet &quot;Breath&quot; voice into a &quot;Power&quot; voice.
                 </p>
             </div>
 
@@ -58,7 +58,7 @@ const ConceptTab = () => (
     <div className="space-y-6">
         <h3 className="text-xl font-bold text-white">The Epilaryngeal Funnel</h3>
         <p className="text-slate-300">
-            Twang narrows the "funnel" just above the vocal cords.
+            Twang narrows the &quot;funnel&quot; just above the vocal cords.
             It boosts the volume by 15-20 decibels <em>without</em> needing more air or muscle effort.
         </p>
 
@@ -66,7 +66,7 @@ const ConceptTab = () => (
             <Zap className="shrink-0 text-yellow-500" />
             <div className="text-sm">
                 <strong className="text-white block mb-1">Key Insight:</strong>
-                Feminine voices often use Twang to get "Loudness" instead of "Heavy Weight" (Shouting).
+                Feminine voices often use Twang to get &quot;Loudness&quot; instead of &quot;Heavy Weight&quot; (Shouting).
             </div>
         </div>
 
@@ -85,15 +85,15 @@ const BabyTab = () => (
 
         <div className="bg-slate-900 p-6 rounded-xl text-center space-y-4">
             <div className="text-5xl">👶</div>
-            <h4 className="text-2xl font-black text-white">"Wah! Wah!"</h4>
+            <h4 className="text-2xl font-black text-white">&quot;Wah! Wah!&quot;</h4>
             <p className="text-slate-400">
                 Imitate a bratty annoying baby. <br />
-                Feel the sound squeeze right behind your nose? That's it.
+                Feel the sound squeeze right behind your nose? That&apos;s it.
             </p>
         </div>
 
         <div className="p-4 bg-indigo-900/20 text-indigo-200 rounded-xl text-sm border border-indigo-500/20">
-            <strong>Exercise:</strong> Make the "Wah" sound, then slowly morph it into a normal "Ah". Keep the ring!
+            <strong>Exercise:</strong> Make the &quot;Wah&quot; sound, then slowly morph it into a normal &quot;Ah&quot;. Keep the ring!
         </div>
     </div>
 );
@@ -107,10 +107,10 @@ const WitchTab = () => (
 
         <div className="bg-slate-900 p-6 rounded-xl text-center space-y-4">
             <div className="text-5xl">🧙‍♀️</div>
-            <h4 className="text-2xl font-black text-white">"Hee Hee Hee!"</h4>
+            <h4 className="text-2xl font-black text-white">&quot;Hee Hee Hee!&quot;</h4>
             <p className="text-slate-400">
                 Make a wicked witch laugh. <br />
-                Notice how your tongue goes high and wide? That's high resonance + twang.
+                Notice how your tongue goes high and wide? That&apos;s high resonance + twang.
             </p>
         </div>
 

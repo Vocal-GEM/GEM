@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Target, Activity, Wind, Zap, Mic, Waves, Smile, ArrowRight } from 'lucide-react';
 
 const StudentSelfEvaluation = ({ onComplete }) => {

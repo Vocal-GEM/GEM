@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Mic, Square, Save, X, BarChart2 } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { usePracticeCards } from '../../context/PracticeCardsContext';

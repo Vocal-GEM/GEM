@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Sparkles, Play, Pause, RotateCcw } from 'lucide-react';
+import { useState } from 'react';
+import { Sparkles } from 'lucide-react';
 
 const RelaxationRoutine = ({ onComplete }) => {
     const [step, setStep] = useState(0);

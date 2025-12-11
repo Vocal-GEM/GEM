@@ -1,5 +1,4 @@
-import React from 'react';
-import { X, ExternalLink, Heart } from 'lucide-react';
+import { X, Heart } from 'lucide-react';
 import { SelfCareService } from '../../services/SelfCareService';
 
 /**
@@ -45,7 +44,7 @@ const SelfCareReminder = ({ context = 'fatigued', onDismiss, onViewPlan }) => {
                         <p className="text-sm text-slate-400 mb-2">{reminder?.message}</p>
                         {reminder?.userAnswer && (
                             <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700">
-                                <p className="text-sm text-white italic">"{reminder.userAnswer}"</p>
+                                <p className="text-sm text-white italic">&quot;{reminder.userAnswer}&quot;</p>
                             </div>
                         )}
                     </div>

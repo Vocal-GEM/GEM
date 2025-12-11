@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Play, Mic, MoveVertical, Wind, Music, AlertCircle } from 'lucide-react';
 
 const WeightToolbox = ({ onComplete }) => {

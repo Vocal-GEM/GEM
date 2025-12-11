@@ -23,7 +23,7 @@ const PracticePhilosophy = ({ onComplete }) => {
                     </div>
                     <ul className="space-y-3 text-slate-300 text-sm">
                         <li className="flex gap-2"><Target size={16} className="shrink-0 mt-1" /> Focus is 100% on the mechanic.</li>
-                        <li className="flex gap-2"><Target size={16} className="shrink-0 mt-1" /> "Does this feel right?"</li>
+                        <li className="flex gap-2"><Target size={16} className="shrink-0 mt-1" /> &quot;Does this feel right?&quot;</li>
                         <li className="flex gap-2"><Target size={16} className="shrink-0 mt-1" /> Fatigue happens quickly.</li>
                         <li className="flex gap-2"><Target size={16} className="shrink-0 mt-1" /> <strong>Goal:</strong> Build the skill.</li>
                     </ul>
@@ -37,7 +37,7 @@ const PracticePhilosophy = ({ onComplete }) => {
                     </div>
                     <ul className="space-y-3 text-slate-300 text-sm">
                         <li className="flex gap-2"><Brain size={16} className="shrink-0 mt-1" /> Focus is on life/content.</li>
-                        <li className="flex gap-2"><Brain size={16} className="shrink-0 mt-1" /> "Am I holding it?"</li>
+                        <li className="flex gap-2"><Brain size={16} className="shrink-0 mt-1" /> &quot;Am I holding it?&quot;</li>
                         <li className="flex gap-2"><Brain size={16} className="shrink-0 mt-1" /> Can do it all day.</li>
                         <li className="flex gap-2"><Brain size={16} className="shrink-0 mt-1" /> <strong>Goal:</strong> Build the habit.</li>
                     </ul>
@@ -47,10 +47,10 @@ const PracticePhilosophy = ({ onComplete }) => {
             <div className="bg-indigo-900/20 p-6 rounded-xl border border-indigo-500/30 text-center">
                 <h3 className="text-xl font-bold text-white mb-2">The Rule</h3>
                 <p className="text-indigo-200 italic text-lg">
-                    "Active practice builds the car. Passive practice drives it."
+                    &quot;Active practice builds the car. Passive practice drives it.&quot;
                 </p>
                 <p className="text-slate-400 text-sm mt-4">
-                    Don't try to "drive" (speak full time) until you've "built the car" (learned the mechanics).
+                    Don&apos;t try to &quot;drive&quot; (speak full time) until you&apos;ve &quot;built the car&quot; (learned the mechanics).
                 </p>
             </div>
 

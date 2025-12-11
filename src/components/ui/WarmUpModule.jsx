@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { WARMUP_IMAGES } from '../../data/WarmupImages';
 import ResizablePanel from './ResizablePanel';
 

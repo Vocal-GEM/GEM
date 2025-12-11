@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Sliders, Volume1, Volume2 } from 'lucide-react';
 
 const RegisterBlend = ({ onComplete }) => {
@@ -7,7 +7,7 @@ const RegisterBlend = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">Register Blending</h2>
                 <p className="text-slate-400">
-                    Avoiding the "Break" or "Yodel". The goal is a seamless slide from Chest to Head.
+                    Avoiding the &quot;Break&quot; or &quot;Yodel&quot;. The goal is a seamless slide from Chest to Head.
                 </p>
             </div>
 
@@ -19,7 +19,7 @@ const RegisterBlend = ({ onComplete }) => {
                         Messa di Voce (The Swell)
                     </h3>
                     <p className="text-slate-300 text-sm">
-                        This Italian term means "Placing the voice". It's the master exercise for control.
+                        This Italian term means &quot;Placing the voice&quot;. It&apos;s the master exercise for control.
                     </p>
                 </div>
 
@@ -63,7 +63,7 @@ const RegisterBlend = ({ onComplete }) => {
                     onClick={onComplete}
                     className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 shadow-lg transition-all"
                 >
-                    I've Tried The Swell
+                    I&apos;ve Tried The Swell
                 </button>
             </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useClient } from '../../context/ClientContext';
 import { Save, Clock, FileText } from 'lucide-react';
 

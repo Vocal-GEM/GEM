@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAudio } from '../../context/AudioContext';
 
 const LTASPlot = ({ width = 600, height = 300 }) => {

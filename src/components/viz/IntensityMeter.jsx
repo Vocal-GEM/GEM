@@ -1,9 +1,9 @@
-import React from 'react';
+// React removed
 
 const IntensityMeter = ({ intensity, min = -60, max = 0 }) => {
     // Clamp intensity between min and max
     const clampedIntensity = Math.max(min, Math.min(max, intensity));
-    
+
     // Calculate percentage (0 to 100)
     const percentage = ((clampedIntensity - min) / (max - min)) * 100;
 
@@ -29,9 +29,9 @@ const IntensityMeter = ({ intensity, min = -60, max = 0 }) => {
                 <div className="absolute left-[25%] top-0 bottom-0 w-px bg-white/5"></div>
                 <div className="absolute left-[50%] top-0 bottom-0 w-px bg-white/5"></div>
                 <div className="absolute left-[75%] top-0 bottom-0 w-px bg-white/5"></div>
-                
+
                 {/* Meter Bar */}
-                <div 
+                <div
                     className={`h-full transition-all duration-100 ease-out ${colorClass}`}
                     style={{ width: `${percentage}%` }}
                 />
