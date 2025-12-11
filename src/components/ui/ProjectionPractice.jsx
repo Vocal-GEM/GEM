@@ -1,4 +1,4 @@
-import { Volume2, Megaphone } from 'lucide-react';
+import { Megaphone } from 'lucide-react';
 
 const ProjectionPractice = ({ onComplete }) => {
     return (

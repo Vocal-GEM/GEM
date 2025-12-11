@@ -19,9 +19,9 @@ const RecordingsList = () => {
         // Cleanup audio URL on unmount
         return () => {
             if (audioUrl) URL.revokeObjectURL(audioUrl);
-            audioRef.current.pause();
+            if (audioRef.current) audioRef.current.pause();
         };
-    }, []);
+    }, [audioUrl]);
 
     const loadRecordings = async () => {
         try {

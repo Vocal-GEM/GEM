@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useEffect } from 'react';
 import { Sliders, Volume1, Volume2 } from 'lucide-react';
 
 const RegisterBlend = ({ onComplete }) => {

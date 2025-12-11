@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Brain, Trophy, Zap, BookOpen, ChevronRight, Lock, CheckCircle2 } from 'lucide-react';
 import QuizCard from './QuizCard';
 import QuizResults from './QuizResults';
-import { quizService, MODULE_ORDER, MODULE_NAMES } from '../../services/QuizService';
+import { quizService } from '../../services/QuizService';
 
 /**
  * QuizView - Main quiz interface with spaced repetition

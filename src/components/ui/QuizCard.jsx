@@ -7,7 +7,6 @@ import { CheckCircle2, XCircle, HelpCircle, Lightbulb } from 'lucide-react';
 const QuizCard = ({
     question,
     onAnswer,
-    showResult = false,
     selectedAnswer = null,
     disabled = false
 }) => {

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { RotateCcw, Square, Volume2 } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 
@@ -7,7 +7,7 @@ import { useAudio } from '../../context/AudioContext';
  * Helps users hear their actual voice, bypassing "inner ear" distortion
  */
 const InstantPlayback = ({ bufferDuration = 5 }) => {
-    const { isAudioActive, audioEngineRef } = useAudio();
+    const { audioEngineRef } = useAudio();
 
     const [isRecording, setIsRecording] = useState(false);
     const [hasRecording, setHasRecording] = useState(false);
@@ -21,10 +21,6 @@ const InstantPlayback = ({ bufferDuration = 5 }) => {
     const audioUrlRef = useRef(null);
     const recordingIntervalRef = useRef(null);
     const startTimeRef = useRef(null);
-
-    // Cleanup on unmount
-    // Definitions moved up
-    // useEffects moved down
 
     const stopRecording = useCallback(() => {
         if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
@@ -138,7 +134,7 @@ const InstantPlayback = ({ bufferDuration = 5 }) => {
         } catch (err) {
             console.error('Failed to start instant playback recording:', err);
         }
-    }, [bufferDuration, audioEngineRef]);
+    }, [bufferDuration, audioEngineRef, stopRecording]);
 
 
 
@@ -168,6 +164,14 @@ const InstantPlayback = ({ bufferDuration = 5 }) => {
 
     // Calculate buffer fill percentage
     const bufferFill = Math.min((recordingDuration / bufferDuration) * 100, 100);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (recordingIntervalRef.current) clearTimeout(recordingIntervalRef.current);
+            if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
+        };
+    }, []);
 
     return (
         <div className="flex items-center gap-2">

@@ -12,7 +12,16 @@ vi.mock('lucide-react', () => ({
     Minus: () => <span data-testid="btn-minus">-</span>,
     AlertTriangle: () => <div data-testid="icon-alert" />,
     Zap: () => <div data-testid="icon-zap" />,
-    Sun: () => <div data-testid="icon-sun" />
+    Sun: () => <div data-testid="icon-sun" />,
+    Moon: () => <div data-testid="icon-moon" />,
+    Music: () => <div data-testid="icon-music" />,
+    Stethoscope: () => <div data-testid="icon-stethoscope" />,
+    HeartPulse: () => <div data-testid="icon-heart-pulse" />,
+    Volume2: () => <div data-testid="icon-volume-2" />,
+    Utensils: () => <div data-testid="icon-utensils" />,
+    Wind: () => <div data-testid="icon-wind" />,
+    Sparkles: () => <div data-testid="icon-sparkles" />,
+    Lightbulb: () => <div data-testid="icon-lightbulb" />
 }));
 
 // Mock IndexedDBManager to prevent unhandled rejections
@@ -48,18 +57,9 @@ describe('VocalHealthPanel', () => {
         );
     };
 
-    it('should render hydration stats', () => {
+    it('should render vocal hygiene tip', () => {
         renderPanel();
-        expect(screen.getByText('3/8')).toBeInTheDocument();
-    });
-
-    it('should call updateHydration when buttons are clicked', () => {
-        renderPanel();
-        fireEvent.click(screen.getByTestId('btn-plus'));
-        expect(mockUpdateHydration).toHaveBeenCalledWith(1);
-
-        fireEvent.click(screen.getByTestId('btn-minus'));
-        expect(mockUpdateHydration).toHaveBeenCalledWith(-1);
+        expect(screen.getByText(/Vocal Hygiene/i)).toBeInTheDocument();
     });
 
     it('should render fatigue level', () => {

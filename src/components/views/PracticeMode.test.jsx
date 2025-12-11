@@ -68,6 +68,6 @@ describe('PracticeMode', () => {
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
         // Check for visualization area
-        expect(screen.getByTestId('resizable-panel')).toBeInTheDocument();
+        expect(screen.getByTestId('dynamic-orb')).toBeInTheDocument();
     });
 });
