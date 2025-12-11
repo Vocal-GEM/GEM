@@ -33,7 +33,7 @@ const InstantPlayback = ({ bufferDuration = 5 }) => {
                 clearInterval(recordingIntervalRef.current);
             }
         };
-    }, []);
+    }, [stopRecording]);
 
     // Auto-start recording when audio becomes active
     useEffect(() => {
@@ -42,9 +42,9 @@ const InstantPlayback = ({ bufferDuration = 5 }) => {
         } else if (!isAudioActive && isRecording) {
             stopRecording();
         }
-    }, [isAudioActive]);
+    }, [isAudioActive, isRecording, startRecording, stopRecording]);
 
-    const startRecording = async () => {
+    const startRecording = useCallback(async () => {
         try {
             // Get or create audio stream
             let stream;
@@ -110,7 +110,7 @@ const InstantPlayback = ({ bufferDuration = 5 }) => {
         } catch (err) {
             console.error('Failed to start instant playback recording:', err);
         }
-    };
+    }, [bufferDuration, isAudioActive]);
 
     const stopRecording = useCallback(() => {
         if (recordingIntervalRef.current) {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Activity, Target, Lightbulb } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 import { useProfile } from '../../context/ProfileContext';
-import { predictGenderPerception, getPerceptionLabel, getPerceptionColor } from '../../services/GenderPerceptionPredictor';
+import { predictGenderPerception, getPerceptionLabel } from '../../services/GenderPerceptionPredictor';
 
 const GenderPerceptionDashboard = ({ dataRef, view }) => {
     const { settings } = useSettings();

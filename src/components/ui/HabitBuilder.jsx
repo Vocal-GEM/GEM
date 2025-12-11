@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Repeat, Plus, Star, Calendar, Smartphone, Layout } from 'lucide-react';
+import { Repeat, Star, Calendar, Smartphone, Layout } from 'lucide-react';
 
 const HabitBuilder = ({ onComplete }) => {
     const [existingHabit, setExistingHabit] = useState('');

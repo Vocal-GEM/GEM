@@ -1,5 +1,5 @@
 
-import { ArrowRight, Play, RotateCcw, Clock, Sparkles } from 'lucide-react';
+import { Play, RotateCcw, Clock, Sparkles } from 'lucide-react';
 
 /**
  * JourneyEntryCard - Entry point card for the guided journey on the dashboard

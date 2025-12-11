@@ -58,7 +58,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
 
     useEffect(() => {
         startTour('history_view');
-    }, []);
+    }, [startTour]);
 
     useEffect(() => {
         if (activeTab === 'recordings') {

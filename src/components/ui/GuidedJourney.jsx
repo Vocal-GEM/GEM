@@ -16,7 +16,7 @@ const GuidedJourney = ({ onClose }) => {
         isJourneyComplete,
         getCurrentStep,
         getJourneyData,
-        getProgressPercentage,
+
         startJourney,
         advanceStep,
         goToPreviousStep,
@@ -68,12 +68,7 @@ const GuidedJourney = ({ onClose }) => {
         setTimeout(() => setIsTransitioning(false), 300);
     }, [goToPreviousStep]);
 
-    // Handle step navigation from progress bar
-    const handleStepClick = useCallback((stepId) => {
-        setIsTransitioning(true);
-        goToStep(stepId);
-        setTimeout(() => setIsTransitioning(false), 300);
-    }, [goToStep]);
+
 
     // Handle exit
     const handleExit = useCallback(() => {

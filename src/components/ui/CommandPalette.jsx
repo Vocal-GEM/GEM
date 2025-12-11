@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, Command, ArrowRight, Mic, Activity, Book, Settings, LayoutGrid } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
@@ -102,6 +102,11 @@ const CommandPalette = () => {
         action.category.toLowerCase().includes(query.toLowerCase())
     );
 
+    const handleSelect = useCallback((action) => {
+        action.action();
+        closeModal('commandPalette');
+    }, [closeModal]);
+
     // Handle Keyboard Navigation
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -125,18 +130,7 @@ const CommandPalette = () => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, filteredActions, selectedIndex, closeModal]); // handleSelect is defined inside component but uses no external closure deps that change, so it's tricky.
-    // Actually, handleSelect is defined below. Let's move handleSelect up or wrap it in useCallback.
-    // Wait, handleSelect is defined *after*.
-    // Let's wrap handleSelect in useCallback and move it before useEffect, or just disable the line if it causes circular deps.
-    // Simpler: handleSelect depends on nothing but closeModal which is stable from context.
-    // But `filteredActions` changes.
-    // Let's just add closeModal for now as the tool suggested.
-
-    const handleSelect = (action) => {
-        action.action();
-        closeModal('commandPalette');
-    };
+    }, [isOpen, filteredActions, selectedIndex, closeModal, handleSelect]);
 
     if (!isOpen) return null;
 

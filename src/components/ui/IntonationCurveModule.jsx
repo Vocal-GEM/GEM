@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, Activity, HelpCircle, RefreshCw } from 'lucide-react';
 import { INTONATION_PATTERNS } from '../../data/IntonationPatterns';
 import { BiofeedbackService } from '../../services/BiofeedbackService';
@@ -106,8 +106,9 @@ const IntonationCurveModule = ({ audioEngine }) => {
         requestRef.current = requestAnimationFrame(animateLoop);
     };
 
-    const draw = (progress, currentTrace) => {
+    const draw = useCallback((progress, currentTrace) => {
         const canvas = canvasRef.current;
+        if (!canvas) return; // Guard clause
         const ctx = canvas.getContext('2d');
         const width = canvas.width;
         const height = canvas.height;
@@ -160,14 +161,14 @@ const IntonationCurveModule = ({ audioEngine }) => {
         ctx.moveTo(playheadX, 0);
         ctx.lineTo(playheadX, height);
         ctx.stroke();
-    };
+    }, [selectedPattern]);
 
     // Initial draw
     useEffect(() => {
         if (canvasRef.current) {
             draw(0, []);
         }
-    }, [selectedPattern]);
+    }, [draw, selectedPattern]);
 
     return (
         <div className="space-y-6">
