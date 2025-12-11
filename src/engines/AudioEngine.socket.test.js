@@ -16,7 +16,8 @@ const mockAudioContext = {
         connect: vi.fn(),
         disconnect: vi.fn(),
         getFloatTimeDomainData: vi.fn(),
-        getByteFrequencyData: vi.fn()
+        getByteFrequencyData: vi.fn(),
+        getFloatFrequencyData: vi.fn()
     }),
     createOscillator: () => ({
         connect: vi.fn(),
