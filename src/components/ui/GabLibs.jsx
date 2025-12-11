@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Mic, Play, BookOpen, Volume2, ChevronLeft } from 'lucide-react';
 import { GAB_LIBS_STORIES } from '../../data/trainingData';
 
-const GabLibs = ({ onClose }) => {
+const GabLibs = () => {
     const [activeStory, setActiveStory] = useState(null);
     const [recordings, setRecordings] = useState({}); // { [keyword]: blobUrl }
     const [isRecording, setIsRecording] = useState(null); // keyword being recorded

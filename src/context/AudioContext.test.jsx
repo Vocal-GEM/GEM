@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, act, renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AudioProvider, useAudio } from './AudioContext';
 import { SettingsProvider } from './SettingsContext';

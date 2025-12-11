@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Mic, Square, Volume2, Info, Trophy, Star, RefreshCw, ChevronRight, AlertTriangle } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Mic, Square, Volume2, Info, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAudio } from '../../context/AudioContext';
 import { VoiceAnalyzer } from '../../utils/voiceAnalysis';
@@ -8,7 +8,6 @@ import { convertToIPA, isSibilantWord } from '../../utils/ipaConverter';
 import SagittalDiagram from '../viz/SagittalDiagram';
 import SibilantGauge from '../viz/SibilantGauge';
 import TouchDetector from '../viz/TouchDetector';
-import TwisterCard from '../ui/TwisterCard';
 
 // --- Levenshtein Distance for Scoring ---
 const calculateSimilarity = (s1, s2) => {

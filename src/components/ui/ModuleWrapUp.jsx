@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { PenTool, CheckSquare, MessageCircle, Heart, Star, Send, Shield } from 'lucide-react';
+import { useState } from 'react';
+import { PenTool, CheckSquare, MessageCircle, Heart, Send, Shield } from 'lucide-react';
 
 const JOURNAL_PROMPTS = [
     {
@@ -44,7 +44,7 @@ const ModuleWrapUp = ({ onComplete }) => {
         setHomework(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
-    const allHomeworkDone = HOMEWORK_ITEMS.every(item => homework[item.id]);
+
 
     const handleComplete = () => {
         setShowConfetti(true);

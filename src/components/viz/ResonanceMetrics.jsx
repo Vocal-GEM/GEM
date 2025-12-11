@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Info } from 'lucide-react';
 
 const ResonanceMetrics = ({ dataRef }) => {

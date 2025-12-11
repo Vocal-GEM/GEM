@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Wind, Activity, Speaker, Mic, BookOpen, Download, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { Wind, Activity, Speaker, BookOpen, Download, ChevronRight } from 'lucide-react';
 
 const VocalAnatomyLesson = ({ onComplete }) => {
     const [activeTab, setActiveTab] = useState('instrument'); // 'instrument' or 'larynx'
@@ -100,7 +100,7 @@ const LarynxView = () => (
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h3 className="text-2xl font-bold text-white mb-2">Inside the Larynx</h3>
                 <p className="text-slate-400 mb-4">
-                    The "Voice Box" sits on top of the trachea. It's made of cartilage, not bone.
+                    The &quot;Voice Box&quot; sits on top of the trachea. It&apos;s made of cartilage, not bone.
                 </p>
                 <div className="space-y-3">
                     <DetailRow label="Thyroid Cartilage" desc="The large V-shape housing (Adam's Apple / Thyroid Notch)." />

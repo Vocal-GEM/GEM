@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Headphones, Volume2, VolumeX, Play, Square, Settings } from 'lucide-react';
 
 /**
@@ -33,7 +33,7 @@ const DAFMode = ({ onClose }) => {
         return () => {
             stopDAF();
         };
-    }, []);
+    }, [stopDAF]);
 
     // Update delay in real-time
     useEffect(() => {

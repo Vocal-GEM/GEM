@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Book, FileText, TrendingUp, Calendar, Clock, Activity, BarChart2, Mic, Settings, Layers, X, Share2, Play } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Book, FileText, TrendingUp, Calendar, Clock, Activity, BarChart2, Mic, Settings, X, Share2 } from 'lucide-react';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
 import ProgressCard from './ProgressCard';

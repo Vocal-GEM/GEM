@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { AlertTriangle, RefreshCw, MicOff } from 'lucide-react';
 
 const ErrorRecovery = ({ error, onRetry, onDismiss }) => {

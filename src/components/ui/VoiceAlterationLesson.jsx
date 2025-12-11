@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Music, Anchor, Sun, MessageCircle, Info, Mic } from 'lucide-react';
+import { useState } from 'react';
+import { Music, Anchor, Sun, MessageCircle, Info } from 'lucide-react';
 
 const VoiceAlterationLesson = ({ onComplete }) => {
     const [activeTab, setActiveTab] = useState('pitch');
@@ -77,7 +77,7 @@ const PitchSection = () => (
             </div>
 
             <div className="text-sm text-slate-400 italic">
-                "It's extremely possible to find a note in the overlap that is sufficiently feminine."
+                &quot;It&apos;s extremely possible to find a note in the overlap that is sufficiently feminine.&quot;
             </div>
         </div>
 
@@ -86,7 +86,7 @@ const PitchSection = () => (
             <div>
                 <h5 className="font-bold text-blue-300">Myth Buster</h5>
                 <p className="text-blue-200 text-sm">
-                    We don't need "Minnie Mouse" falsetto.Feminine voices aren't cartoons. We aim for a natural range, not the stratosphere.
+                    We don&apos;t need &quot;Minnie Mouse&quot; falsetto.Feminine voices aren&apos;t cartoons. We aim for a natural range, not the stratosphere.
                 </p>
             </div>
         </div>
@@ -107,14 +107,14 @@ const WeightSection = () => (
                 <div className="w-full h-8 bg-amber-600 rounded-full shadow-lg"></div>
                 <div>
                     <div className="font-bold text-white text-lg">Thick (Heavy)</div>
-                    <div className="text-slate-400 text-sm">More buzzing, louder, "masculine" tendency.</div>
+                    <div className="text-slate-400 text-sm">More buzzing, louder, &quot;masculine&quot; tendency.</div>
                 </div>
             </div>
             <div className="bg-slate-800 p-6 rounded-xl flex flex-col items-center justify-center text-center gap-4 border border-slate-700">
                 <div className="w-full h-2 bg-amber-400 rounded-full shadow-lg mt-3 mb-3"></div>
                 <div>
                     <div className="font-bold text-white text-lg">Thin (Light)</div>
-                    <div className="text-slate-400 text-sm">Less buzzing, softer, "feminine" tendency.</div>
+                    <div className="text-slate-400 text-sm">Less buzzing, softer, &quot;feminine&quot; tendency.</div>
                 </div>
             </div>
         </div>
@@ -123,7 +123,7 @@ const WeightSection = () => (
             <h4 className="font-bold text-white mb-2">The Goal: Lightness without Breathiness</h4>
             <p className="text-slate-400 text-sm">
                 Testosterone thickens vocal folds. We use SOVT exercises (Straws!) to find the lightest *complete* closure.
-                Avoid breathiness—it's sultry but inefficient.
+                Avoid breathiness—it&apos;s sultry but inefficient.
             </p>
         </div>
     </div>
@@ -162,7 +162,7 @@ const ResonanceSection = () => (
             <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
                 <h4 className="font-bold text-white mb-2">R2: Mouth (Oral Geometry)</h4>
                 <p className="text-slate-400 text-sm mb-4">
-                    You are already an expert at this! It's how we make vowels (Ee vs Ah).
+                    You are already an expert at this! It&apos;s how we make vowels (Ee vs Ah).
                 </p>
                 <div className="flex gap-2">
                     <span className="px-3 py-1 bg-slate-700 rounded text-white font-mono">Ee</span>
@@ -185,7 +185,7 @@ const InflectionSection = () => (
             <MessageCircle className="text-purple-500" /> Inflection (Putting it Together)
         </h3>
         <p className="text-slate-300 text-lg">
-            Also called Prosody or Contour. It's Pitch, Weight, and Resonance in action.
+            Also called Prosody or Contour. It&apos;s Pitch, Weight, and Resonance in action.
         </p>
 
         <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
@@ -196,7 +196,7 @@ const InflectionSection = () => (
                 <li><strong className="text-pink-400">Japanese:</strong> Extremely gendered.</li>
             </ul>
             <p className="mt-4 text-slate-400 italic text-sm">
-                "Listen to the people in your life and determine if there's a pattern you want to copy."
+                &quot;Listen to the people in your life and determine if there&apos;s a pattern you want to copy.&quot;
             </p>
         </div>
     </div>

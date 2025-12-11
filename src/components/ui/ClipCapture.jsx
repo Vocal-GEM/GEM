@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mic, Square, Save, X, BarChart2 } from 'lucide-react';
+import { Mic, Square, BarChart2 } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { usePracticeCards } from '../../context/PracticeCardsContext';
 import ClipAnalysisModal from './ClipAnalysisModal';

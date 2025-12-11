@@ -148,7 +148,7 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                             <Info className="w-3 h-3 mt-0.5 shrink-0" />
                             <p>
                                 Chest vibration naturally fades above 300Hz ({f0.toFixed(0)}Hz).
-                                Don't push to "feel" it here.
+                                Don&apos;t push to &quot;feel&quot; it here.
                             </p>
                         </div>
                     )}

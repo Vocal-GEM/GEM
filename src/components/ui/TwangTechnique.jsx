@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Megaphone, Zap, Radio, Volume2 } from 'lucide-react';
 
 const TwangTechnique = ({ onComplete }) => {
@@ -20,8 +20,8 @@ const TwangTechnique = ({ onComplete }) => {
                             <Megaphone className="text-red-400" /> The Problem
                         </h3>
                         <p className="text-slate-300">
-                            You cannot shout with "Thin" vocal folds. They are too delicate.
-                            If you try to shout normally, your body instinctively thickens the folds, and you sound masculine ("HEY!").
+                            You cannot shout with &quot;Thin&quot; vocal folds. They are too delicate.
+                            If you try to shout normally, your body instinctively thickens the folds, and you sound masculine (&quot;HEY!&quot;).
                         </p>
                     </div>
 
@@ -43,7 +43,7 @@ const TwangTechnique = ({ onComplete }) => {
                             <Zap className="text-green-400" /> The Solution: Twang
                         </h3>
                         <p className="text-slate-300">
-                            Instead of thickening the "True Folds", we squeeze the "Aryepiglottic Sphincter" (The rim of the larynx).
+                            Instead of thickening the &quot;True Folds&quot;, we squeeze the &quot;Aryepiglottic Sphincter&quot; (The rim of the larynx).
                             This creates a piercing, bright, loud sound that cuts through noise but keeps the pitch high.
                         </p>
                     </div>

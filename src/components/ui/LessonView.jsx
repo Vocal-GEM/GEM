@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, CheckCircle, ChevronRight, PlayCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -13,9 +13,7 @@ import QualityVisualizer from '../viz/QualityVisualizer';
 import HighResSpectrogram from '../viz/HighResSpectrogram';
 import VocalFoldsView from '../views/VocalFoldsView';
 import ComparisonTool from './ComparisonTool';
-import ForwardFocusDrill from './ForwardFocusDrill';
 import BreathPacer from './BreathPacer';
-import TwisterCard from './TwisterCard';
 import TargetVoicePlayer from './TargetVoicePlayer';
 import IntonationTrainer from '../viz/IntonationTrainer';
 
@@ -27,10 +25,10 @@ const LessonView = ({ lesson, onComplete, onNext, onPrevious, hasNext, hasPrevio
     const { dataRef, audioEngineRef } = useAudio();
     const { targetRange, calibration, activeProfile } = useProfile();
     const { settings } = useSettings();
-    const [isLowConfidence, setIsLowConfidence] = React.useState(false);
+    const [isLowConfidence, setIsLowConfidence] = useState(false);
 
     // Monitor confidence
-    React.useEffect(() => {
+    useEffect(() => {
         if (lesson.type !== 'interactive') return;
 
         const checkConfidence = () => {

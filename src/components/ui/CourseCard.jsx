@@ -1,5 +1,5 @@
-import React from 'react';
-import { PlayCircle, CheckCircle, Trophy } from 'lucide-react';
+
+import { PlayCircle, Trophy } from 'lucide-react';
 import { useProgram } from '../../hooks/useProgram';
 
 const CourseCard = ({ onOpenCourse }) => {

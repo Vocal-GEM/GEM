@@ -4,14 +4,14 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
+// Determine API URL:
+// 1. Use VITE_API_URL if set
+// 2. Fallback to Render URL for easier local dev without running local backend
+const API_URL = import.meta.env.VITE_API_URL || 'https://vocalgem.onrender.com';
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null); // { id, username }
     const [isAuthLoading, setIsAuthLoading] = useState(true);
-
-    // Determine API URL:
-    // 1. Use VITE_API_URL if set
-    // 2. Fallback to Render URL for easier local dev without running local backend
-    const API_URL = import.meta.env.VITE_API_URL || 'https://vocalgem.onrender.com';
 
     useEffect(() => {
         const initAuth = async () => {

@@ -1,5 +1,5 @@
-import React, { useMemo, useRef, useEffect, useState } from 'react';
-import { Activity, Maximize2, Minimize2, Info } from 'lucide-react';
+import { useMemo, useRef, useEffect, useState } from 'react';
+import { Activity, Info } from 'lucide-react';
 
 // --- Geometry Helpers ---
 

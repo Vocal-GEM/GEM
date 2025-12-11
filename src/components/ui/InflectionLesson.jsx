@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { TrendingUp, Volume2, Music, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { TrendingUp, Volume2, AlertCircle } from 'lucide-react';
 
 const InflectionLesson = ({ onComplete }) => {
     const [activeTab, setActiveTab] = useState('concept');

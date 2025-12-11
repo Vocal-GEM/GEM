@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Play, Square, Volume2 } from 'lucide-react';
 import { textToSpeechService } from '../../services/TextToSpeechService';
 

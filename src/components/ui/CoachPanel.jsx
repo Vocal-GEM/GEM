@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Activity, Wind, AlertTriangle, Play, ChevronRight, Mic } from 'lucide-react';
+import { Activity, AlertTriangle, ChevronRight, Mic } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import RegisterGauge from '../viz/RegisterGauge';
 
@@ -14,6 +14,8 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
     });
 
     const [advice, setAdvice] = useState(null);
+
+    const { pitch, weight, resonance } = metrics;
 
     // Subscribe to Data Stream
     useEffect(() => {
@@ -36,7 +38,6 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
 
     // Derived Advice Logic
     useEffect(() => {
-        const { pitch, weight, resonance } = metrics;
 
         // Priority 1: Strain / Pressed Phonation
         // If weight > 65 or Register says 'Strain'
@@ -111,7 +112,7 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
             setAdvice(null); // Silent
         }
 
-    }, [metrics.pitch, metrics.weight, metrics.resonance, targetRange, activeProfile]);
+    }, [pitch, weight, resonance, targetRange, activeProfile]);
 
     return (
         <div className="h-full flex flex-col gap-4">

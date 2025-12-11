@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Activity, Mic, BarChart2, BookOpen, Waves, ArrowLeft, FlaskConical } from 'lucide-react';
+import { Activity, Mic, BarChart2, BookOpen, Waves, FlaskConical } from 'lucide-react';
 
 // Import existing analysis views
 import AnalysisView from './AnalysisView';

@@ -55,11 +55,10 @@ const HighResSpectrogram = ({ dataRef }) => {
         tempCanvas.width = canvas.width;
         tempCanvas.height = canvas.height;
 
-        let animationId;
+
 
         const loop = () => {
             if (!dataRef.current || !dataRef.current.spectrum) {
-                animationId = requestAnimationFrame(loop);
                 return;
             }
 
@@ -119,7 +118,7 @@ const HighResSpectrogram = ({ dataRef }) => {
             drawFormant(f2, last.f2, 'rgba(255, 50, 50, 0.9)');
             lastFormantsRef.current = { f1, f2 };
 
-            animationId = requestAnimationFrame(loop);
+
         };
 
         let unsubscribe;

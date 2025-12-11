@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, ArrowRight, X, Home, RotateCcw, CheckCircle } from 'lucide-react';
 import { useGuidedJourney } from '../../context/GuidedJourneyContext';
 import JourneyStep from './JourneyStep';
@@ -32,7 +32,6 @@ const GuidedJourney = ({ onClose }) => {
 
     const journeyData = getJourneyData(currentJourneyId || 'fem-journey');
     const currentStep = getCurrentStep();
-    const progressPercentage = getProgressPercentage();
 
     // Start journey if not already started
     useEffect(() => {
@@ -91,8 +90,6 @@ const GuidedJourney = ({ onClose }) => {
 
     // Determine navigation state
     const canGoBack = currentStepIndex > 0;
-    const canGoForward = currentStep && !currentStep.final;
-    const isFirstStep = currentStepIndex === 0;
     const isLastStep = currentStep?.final === true;
 
     // Completion screen

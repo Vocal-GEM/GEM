@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo, Children } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import { useLayout } from '../../context/LayoutContext';
 import 'react-grid-layout/css/styles.css';
@@ -11,7 +11,7 @@ const ResizableToolGrid = ({ children, className = '' }) => {
 
     // Map children to grid items
     const gridItems = useMemo(() => {
-        return React.Children.map(children, (child) => {
+        return Children.map(children, (child) => {
             if (!child || !child.props.toolId) return null;
 
             const toolId = child.props.toolId;

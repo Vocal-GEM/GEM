@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Send, Sparkles, Zap } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';

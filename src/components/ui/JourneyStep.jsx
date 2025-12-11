@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Lightbulb, Clock, ChevronRight, CheckCircle, Play, Pause, RotateCcw } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';

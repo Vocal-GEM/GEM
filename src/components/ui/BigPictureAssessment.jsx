@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Book, Edit3, Save, RefreshCw } from 'lucide-react';
+import { Edit3, Save } from 'lucide-react';
 
 const LIST_TYPES = [
     { id: 'audit', label: 'Voice Audit List', desc: 'Your recorded "Normal", "Angry", "Sleepy" voices.' },

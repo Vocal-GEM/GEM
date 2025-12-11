@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { lpcAnalyzer } from '../../utils/lpcAnalysis';
 import { Camera, X } from 'lucide-react';
 

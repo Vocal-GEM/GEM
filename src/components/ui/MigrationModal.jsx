@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { indexedDB } from '../../services/IndexedDBManager';
 import { Database, CheckCircle, AlertCircle, Loader } from 'lucide-react';
 

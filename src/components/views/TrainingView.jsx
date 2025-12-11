@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import IntonationTrainingModule from '../training/IntonationTrainingModule';
 import PitchTrainingModule from '../training/PitchTrainingModule';
-import ResonanceTrainingModule from '../training/ResonanceTrainingModule';
+
 import ShadowingExercise from '../exercises/ShadowingExercise';
 import GabLibs from '../ui/GabLibs';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell, Music, Activity, ArrowLeft, Mic2, TrendingUp, TrendingDown, MessageSquare, BookOpen, Wind, Coffee, Orbit, Zap } from 'lucide-react';
+import { Dumbbell, Music, Activity, ArrowLeft, TrendingUp, TrendingDown, MessageSquare, BookOpen, Wind, Coffee, Orbit, Zap } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
 import { TRAINING_CATEGORIES } from '../../data/trainingData';
 
@@ -102,7 +102,7 @@ const TrainingView = () => {
     };
 
     // Deep Linking
-    React.useEffect(() => {
+    useEffect(() => {
         if (navigationParams?.module) {
             const tech = techModules.find(m => m.id === navigationParams.module);
             if (tech) setActiveModule(tech);

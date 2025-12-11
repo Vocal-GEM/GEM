@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
     ArrowLeft, Play, Pause, RotateCcw, CheckCircle, Trophy,
-    Music, Sun, Wind, Volume2, AlertTriangle, Lock, Unlock
+    Music, Sun, Wind, Volume2, AlertTriangle, Lock
 } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
@@ -312,8 +312,8 @@ const ProgressiveStackingSession = ({ onClose }) => {
                         <div
                             key={f.timestamp}
                             className={`text-sm px-3 py-2 rounded-lg animate-in slide-in-from-right duration-300 ${f.type === 'warning'
-                                    ? 'bg-amber-500/20 text-amber-300'
-                                    : 'bg-blue-500/20 text-blue-300'
+                                ? 'bg-amber-500/20 text-amber-300'
+                                : 'bg-blue-500/20 text-blue-300'
                                 }`}
                         >
                             {f.message}

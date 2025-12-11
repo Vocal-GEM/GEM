@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSettings } from '../../context/SettingsContext';
-import { AlertTriangle, Activity, Info, TrendingDown } from 'lucide-react';
+import { Info, TrendingDown } from 'lucide-react';
 
 const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -6 } }) => {
     const { colorBlindMode } = useSettings();

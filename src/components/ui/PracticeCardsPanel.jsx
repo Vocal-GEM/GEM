@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
-    BookOpen, Plus, ChevronLeft, Play, Activity,
+    BookOpen, Plus, ChevronLeft, Activity,
     Star, Trash2, Edit3, Check, X, Layers
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

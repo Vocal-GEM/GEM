@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { useTranslation } from 'react-i18next';
-import { Sparkles, Info, Play, Pause, RotateCcw, Download, Share2, ChevronLeft, FileText, Activity, BarChart2, Bot, ChevronDown, ChevronUp, Repeat, Gauge, Wand2 } from 'lucide-react';
+import { Sparkles, Info, Play, Pause, ChevronLeft, FileText, Activity, BarChart2, Bot, ChevronDown, ChevronUp, Repeat, Gauge, Wand2 } from 'lucide-react';
 import MetricCard from '../viz/MetricCard';
 import PitchTrace from '../viz/PitchTrace';
 import VowelSpacePlot from '../viz/VowelSpacePlot';
@@ -207,7 +207,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
         return 'text-green-400';
     };
 
-    const generateAnalysisSummary = (results, range) => {
+    const generateAnalysisSummary = (results) => {
         if (!results || !results.overall) return "No analysis data available.";
         const pitch = results.overall.pitch?.mean;
         if (!pitch) return "Insufficient data.";

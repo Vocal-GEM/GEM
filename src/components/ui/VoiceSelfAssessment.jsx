@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Mic, Square, Play, Pause, RotateCcw, Eye, EyeOff, Check } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Mic, Square, Play, Pause, RotateCcw, Eye, Check } from 'lucide-react';
 
 /**
  * VoiceSelfAssessment - Record, self-rate, then reveal actual analysis

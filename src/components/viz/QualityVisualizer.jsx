@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Sparkles, Waves, Wind, Activity } from 'lucide-react';
 
 const QualityVisualizer = ({ dataRef }) => {

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Trash2, Lightbulb, RefreshCw } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { useJournal } from '../../context/JournalContext';
@@ -146,7 +146,7 @@ const JournalForm = ({ onSubmit, onCancel }) => {
             {/* Notes */}
             <div>
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">How did it feel?</label>
-                
+
                 {/* Optional Writing Prompt */}
                 <div className="mb-3">
                     {currentPrompt ? (

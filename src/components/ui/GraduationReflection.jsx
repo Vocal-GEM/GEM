@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Book, Heart, Map, CheckCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -6,7 +6,7 @@ const GraduationReflection = ({ onComplete }) => {
     const [step, setStep] = useState(0);
     const [glossary, setGlossary] = useState({});
     const [reflection, setReflection] = useState({});
-    const [showConfetti, setShowConfetti] = useState(false);
+
 
     // 1. Readiness
     const readinessChecks = [
@@ -25,7 +25,6 @@ const GraduationReflection = ({ onComplete }) => {
     ];
 
     const handleSubmit = () => {
-        setShowConfetti(true);
         confetti({
             particleCount: 150,
             spread: 70,

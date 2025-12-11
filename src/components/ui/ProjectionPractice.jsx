@@ -51,7 +51,7 @@ const ProjectionPractice = ({ onComplete }) => {
 
                 <div className="flex gap-2">
                     <div className="flex-1 bg-slate-900 p-4 rounded-xl text-center text-white font-bold">
-                        1. Prep "Witch" feeling
+                        1. Prep &quot;Witch&quot; feeling
                     </div>
                     <div className="flex-1 bg-slate-900 p-4 rounded-xl text-center text-white font-bold">
                         2. Deep Breath

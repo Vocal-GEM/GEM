@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Filter } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 const PracticeFilterMenu = ({ activeView, onViewChange, beginnerMode = false }) => {
     const [showMore, setShowMore] = useState(false);
@@ -42,8 +42,8 @@ const PracticeFilterMenu = ({ activeView, onViewChange, beginnerMode = false }) 
                     key={view.id}
                     onClick={() => onViewChange(view.id)}
                     className={`px-4 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap min-w-[80px] flex-shrink-0 ${activeView === view.id
-                            ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white shadow-md shadow-teal-500/20'
-                            : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/70 hover:text-white border border-slate-700/50'
+                        ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white shadow-md shadow-teal-500/20'
+                        : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/70 hover:text-white border border-slate-700/50'
                         }`}
                 >
                     {view.label}
@@ -56,8 +56,8 @@ const PracticeFilterMenu = ({ activeView, onViewChange, beginnerMode = false }) 
                     <button
                         onClick={() => setShowMore(!showMore)}
                         className={`px-4 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${activeIsSecondary || showMore
-                                ? 'bg-slate-700 text-white border border-slate-600'
-                                : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/70 hover:text-white border border-slate-700/50'
+                            ? 'bg-slate-700 text-white border border-slate-600'
+                            : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/70 hover:text-white border border-slate-700/50'
                             }`}
                     >
                         {activeIsSecondary ? secondaryFilters.find(f => f.id === activeView)?.label : 'More'}
@@ -75,8 +75,8 @@ const PracticeFilterMenu = ({ activeView, onViewChange, beginnerMode = false }) 
                                             setShowMore(false);
                                         }}
                                         className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeView === view.id
-                                                ? 'bg-teal-500/10 text-teal-400'
-                                                : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                                            ? 'bg-teal-500/10 text-teal-400'
+                                            : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                                             }`}
                                     >
                                         {view.label}

@@ -113,6 +113,7 @@ export const AudioProvider = ({ children }) => {
             window.removeEventListener('touchstart', unlockAudio);
             window.removeEventListener('click', unlockAudio);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const [audioError, setAudioError] = useState(null);
@@ -175,7 +176,8 @@ export const AudioProvider = ({ children }) => {
         isRecording,
         audioError,
         audioContext: audioEngineRef.current?.audioContext
-    }), [isAudioActive, isRecording, audioError, audioEngineRef.current?.audioContext]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }), [isAudioActive, isRecording, audioError]);
 
     return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>;
 };

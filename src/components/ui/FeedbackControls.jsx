@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Settings, Vibrate, Volume2, ArrowUp, ArrowDown, ArrowUpDown, X, Check } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Settings, Vibrate, Volume2, ArrowUp, ArrowDown, ArrowUpDown, X } from 'lucide-react';
 
 const FeedbackControls = ({ settings, setSettings }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -21,8 +21,8 @@ const FeedbackControls = ({ settings, setSettings }) => {
             <button
                 onClick={() => setIsOpen(true)}
                 className={`p-2 rounded-lg transition-colors ${settings.haptic || settings.tone
-                        ? 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30'
-                        : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-white'
+                    ? 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30'
+                    : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-white'
                     }`}
                 title="Feedback Settings"
             >

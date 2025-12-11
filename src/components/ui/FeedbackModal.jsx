@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { X, Send, Bug, MessageSquare, Loader2 } from 'lucide-react';
 
 const FeedbackModal = ({ isOpen, onClose, initialType = 'feedback', errorDetails = null }) => {

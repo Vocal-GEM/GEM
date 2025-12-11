@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Book, CheckCircle, Award, Heart, Rocket } from 'lucide-react';
 import Confetti from 'react-confetti';
-import { useWindowSize } from 'react-use'; // Assuming a hook or use simple styles
+
 
 const Module6WrapUp = ({ onComplete }) => {
     const [checkedTasks, setCheckedTasks] = useState({});

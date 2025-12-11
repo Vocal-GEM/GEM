@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { Mic, Square, Play, Plus, Trash2, Save, FileText, Smile, Meh, Frown } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Mic, Square, Play, Plus, Trash2, Save, FileText } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 
 const DEFAULT_MODES = [
@@ -68,7 +68,7 @@ const VoiceAudit = ({ onComplete }) => {
                     <div>
                         <h3 className="text-xl font-bold text-white mb-2">Voice Audit</h3>
                         <p className="text-slate-400 text-sm">
-                            Record the sentence <strong>"Hi, how are you?"</strong> (or any sentence) in as many different ways as you can.
+                            Record the sentence <strong>&quot;Hi, how are you?&quot;</strong> (or any sentence) in as many different ways as you can.
                             Notice how your voice naturally shifts based on context.
                         </p>
                     </div>
@@ -88,10 +88,10 @@ const VoiceAudit = ({ onComplete }) => {
                                     <button
                                         onClick={() => toggleRecording(mode.id)}
                                         className={`w-full py-2 rounded-lg flex items-center justify-center gap-2 font-bold transition-all ${activeRecordingId === mode.id
-                                                ? 'bg-red-500 text-white animate-pulse'
-                                                : mode.recordingUrl
-                                                    ? 'bg-green-600/20 text-green-400 hover:bg-green-600/30'
-                                                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                                            ? 'bg-red-500 text-white animate-pulse'
+                                            : mode.recordingUrl
+                                                ? 'bg-green-600/20 text-green-400 hover:bg-green-600/30'
+                                                : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                                             }`}
                                     >
                                         {activeRecordingId === mode.id ? (
@@ -170,8 +170,8 @@ const VoiceAudit = ({ onComplete }) => {
                     onClick={() => onComplete?.(modes)}
                     disabled={completedCount < 1}
                     className={`px-6 py-2 rounded-lg font-bold transition-all ${completedCount > 0
-                            ? 'bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-900/20'
-                            : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                        ? 'bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-900/20'
+                        : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                         }`}
                 >
                     Save & Continue

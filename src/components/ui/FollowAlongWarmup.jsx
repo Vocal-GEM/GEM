@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Play, Pause, SkipForward, ChevronRight, Activity, Smile, Music } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronRight, Activity, Smile, Music } from 'lucide-react';
 
 const WARMUP_STEPS = [
     // PART 1: BODY
@@ -144,7 +144,6 @@ const WARMUP_STEPS = [
 
 const FollowAlongWarmup = ({ onComplete }) => {
     const [stepIndex, setStepIndex] = useState(0);
-    const [isPlaying, setIsPlaying] = useState(false);
     // In a real app, this would sync with the audio player. Here we just step through manually or auto-advance if we had audio.
 
     const currentStep = WARMUP_STEPS[stepIndex];

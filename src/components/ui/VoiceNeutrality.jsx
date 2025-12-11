@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Scale, MessageCircle, Heart, Shield } from 'lucide-react';
 
 const VoiceNeutrality = ({ onComplete }) => {
@@ -25,7 +25,7 @@ const VoiceNeutrality = ({ onComplete }) => {
                 <p className="text-slate-400">
                     Self-love is hard. Self-hatred is easy.
                     **Neutrality** is the bridge.
-                    We stop judging "Good vs Bad" and start observing "What Happened".
+                    We stop judging &quot;Good vs Bad&quot; and start observing &quot;What Happened&quot;.
                 </p>
             </div>
 
@@ -54,18 +54,18 @@ const VoiceNeutrality = ({ onComplete }) => {
                             <span>Judge Less, Describe More</span>
                         </div>
                         <p className="text-slate-300">
-                            Instead of saying "I messed up", describe <em>specifically</em> what happened mechanically.
+                            Instead of saying &quot;I messed up&quot;, describe <em>specifically</em> what happened mechanically.
                         </p>
                         <div className="space-y-3">
                             {examples.map((ex, i) => (
                                 <div key={i} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-900 rounded-xl">
                                     <div className="text-red-400 flex flex-col">
                                         <span className="text-xs uppercase font-bold text-red-500/50">Subjective (Judgement)</span>
-                                        "{ex.bad}"
+                                        &quot;{ex.bad}&quot;
                                     </div>
                                     <div className="text-green-400 flex flex-col">
                                         <span className="text-xs uppercase font-bold text-green-500/50">Neutral (Observation)</span>
-                                        "{ex.good}"
+                                        &quot;{ex.good}&quot;
                                     </div>
                                 </div>
                             ))}
@@ -80,7 +80,7 @@ const VoiceNeutrality = ({ onComplete }) => {
                             <span>Permission to Change</span>
                         </div>
                         <p className="text-slate-300">
-                            You don't have to love your voice yet. But you must respect it.
+                            You don&apos;t have to love your voice yet. But you must respect it.
                         </p>
                         <ul className="space-y-3">
                             {affirmations.map((aff, i) => (

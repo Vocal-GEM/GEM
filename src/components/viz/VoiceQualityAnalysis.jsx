@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
@@ -31,8 +31,8 @@ const QuadCoreCard = ({ icon: Icon, title, score, label, value, color, unit }) =
             ) : (
                 // State Indicator
                 <div className={`h-full w-full rounded-full ${score === 'Flow' ? 'bg-emerald-500' :
-                        score === 'Pressed' ? 'bg-red-500' :
-                            'bg-blue-400'
+                    score === 'Pressed' ? 'bg-red-500' :
+                        'bg-blue-400'
                     }`} />
             )}
         </div>

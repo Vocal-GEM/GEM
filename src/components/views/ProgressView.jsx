@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { TrendingUp, Calendar, Clock } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Calendar, Clock } from 'lucide-react';
 import ProgressCharts from '../viz/ProgressCharts';
 import VoiceRangeProfile from '../viz/VoiceRangeProfile';
 import EmptyState from '../ui/EmptyState';
@@ -10,7 +10,7 @@ const ProgressView = () => {
     const { getProgressPercentage, completedLessons } = useCourseProgress();
     const progress = getProgressPercentage();
     const [sessions, setSessions] = useState([]);
-    const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
         const loadSessions = async () => {
@@ -19,8 +19,6 @@ const ProgressView = () => {
                 setSessions(allSessions);
             } catch (error) {
                 console.error("Failed to load sessions:", error);
-            } finally {
-                setLoading(false);
             }
         };
         loadSessions();

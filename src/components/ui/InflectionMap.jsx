@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
 const InflectionMap = ({ onComplete }) => {
     return (

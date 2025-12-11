@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Gamepad2, Timer, RefreshCw, ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { Gamepad2, ExternalLink } from 'lucide-react';
 
 const CognitiveLoadGames = ({ onComplete }) => {
     const [letter, setLetter] = useState('?');

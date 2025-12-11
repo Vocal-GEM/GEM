@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Mic, CheckCircle, AlertTriangle, Volume2, ArrowRight, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { CheckCircle, AlertTriangle, Volume2, ArrowRight, Loader2 } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
 

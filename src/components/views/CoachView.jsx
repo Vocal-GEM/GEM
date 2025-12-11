@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
+
 import { BookOpen, Trophy, Target, ArrowRight, Play, Star, Heart, Edit3, Music, Book } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
 import { useProgram } from '../../hooks/useProgram';
@@ -9,7 +9,7 @@ import SelfCareOnboarding from '../ui/SelfCareOnboarding';
 import SoundJournal from '../ui/SoundJournal';
 
 const CoachView = () => {
-    const { t } = useTranslation();
+
     const { navigate } = useNavigation();
     const { activeProgram, enroll, progress, programs } = useProgram();
     const [selfCarePlan, setSelfCarePlan] = useState(() => SelfCareService.getSelfCarePlan());
@@ -166,7 +166,7 @@ const CoachView = () => {
                             <div>
                                 <div className="text-xs font-bold text-pink-400 uppercase tracking-wider mb-1">Your Foundation</div>
                                 <p className="text-slate-400 text-sm max-w-lg">
-                                    You've set up your self-care plan. These answers will remind you how to take care of yourself during challenging practice sessions.
+                                    You&apos;ve set up your self-care plan. These answers will remind you how to take care of yourself during challenging practice sessions.
                                 </p>
                             </div>
                             <button

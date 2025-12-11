@@ -157,7 +157,7 @@ export const SettingsProvider = ({ children }) => {
                 }));
             }
         });
-    }, [settings.performanceMode]);
+    }, [settings.performanceMode, settings.visualizationQuality]);
 
 
     const updateSettings = (newSettings) => {

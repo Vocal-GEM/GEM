@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { User, Star, ThumbsUp, ThumbsDown, Plus, Trash2, Heart, Save, Mic2 } from 'lucide-react';
+import { useState } from 'react';
+import { User, Star, ThumbsUp, ThumbsDown, Plus, Trash2 } from 'lucide-react';
 
 const InspirationBoard = ({ onComplete }) => {
     const [voices, setVoices] = useState([]);

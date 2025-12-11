@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Mic, Activity, Anchor, Aperture, Maximize2, Waves, Stethoscope } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
-import { useStats } from '../../context/StatsContext';
+
 import { useSettings } from '../../context/SettingsContext';
 import { useTranslation } from 'react-i18next';
 
@@ -25,9 +25,9 @@ import { useLayout } from '../../context/LayoutContext';
 
 const PracticeView = () => {
     const { t } = useTranslation();
-    const { isAudioActive, toggleAudio, dataRef, audioEngineRef } = useAudio();
+    const { isAudioActive, toggleAudio, dataRef } = useAudio();
     const { calibration, targetRange } = useProfile();
-    const { goals, stats } = useStats();
+
     const { settings } = useSettings();
     // userMode is local state in App.jsx, but passed down? No, it was in GemContext.
     // I need to decide where userMode lives. It seems to be a UI toggle.
@@ -40,9 +40,9 @@ const PracticeView = () => {
 
     const { toggleTool, activeTools } = useLayout();
 
-    const [activeGame, setActiveGame] = useState('pitch'); // Reusing this for tab state: 'pitch' | 'resonance' | 'range' | 'spectrogram' | 'clinical'
+
     const [showTools, setShowTools] = useState(false);
-    const [showAllTools, setShowAllTools] = useState(false); // For temporarily revealing all tools in beginner mode
+
 
     // Hero Principle: Orb takes up most space
     // Mobile Ergonomics: Controls at bottom

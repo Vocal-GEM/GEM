@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ArrowUp, ArrowDown, Repeat, Music } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowUp, Repeat } from 'lucide-react';
 
 const PitchExercises = ({ onComplete }) => {
     const [activeTab, setActiveTab] = useState('sing5');

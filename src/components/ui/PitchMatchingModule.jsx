@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Play, Volume2, Trophy, Target, RefreshCw } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Play, Volume2, Target } from 'lucide-react';
 import { BiofeedbackService } from '../../services/BiofeedbackService';
 
 const PitchMatchingModule = ({ audioEngine }) => {

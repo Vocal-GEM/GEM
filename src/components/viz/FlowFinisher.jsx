@@ -121,7 +121,7 @@ const FlowFinisher = ({ dataRef, showFeedback = true }) => {
             {/* Tooltip */}
             {showTooltip && (
                 <div className="absolute z-50 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg text-xs text-slate-300 max-w-xs shadow-xl">
-                    Analyzes how you end phrases. Keeping mouth open creates resonant "alive" endings.
+                    Analyzes how you end phrases. Keeping mouth open creates resonant &quot;alive&quot; endings.
                     Closing too early = abrupt, cave-like cutoff.
                 </div>
             )}

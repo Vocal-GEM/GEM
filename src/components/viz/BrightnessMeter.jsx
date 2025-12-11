@@ -101,8 +101,8 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
             {/* Tooltip */}
             {showTooltip && (
                 <div className="absolute z-50 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg text-xs text-slate-300 max-w-xs shadow-xl">
-                    Measures how "bright" or "forward" your vowel resonance is based on F2 frequency.
-                    The /i/ vowel (as in "feet") has the highest F2 and is your brightness target.
+                    Measures how &quot;bright&quot; or &quot;forward&quot; your vowel resonance is based on F2 frequency.
+                    The /i/ vowel (as in &quot;feet&quot;) has the highest F2 and is your brightness target.
                 </div>
             )}
 
@@ -131,8 +131,8 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
                     Dark
                 </span>
                 <span className={`font-bold ${brightness.zone === 'dark' ? 'text-red-400' :
-                        brightness.zone === 'bright' ? 'text-emerald-400' :
-                            'text-yellow-400'
+                    brightness.zone === 'bright' ? 'text-emerald-400' :
+                        'text-yellow-400'
                     }`}>
                     {getZoneLabel()}
                 </span>
@@ -161,12 +161,12 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
             {/* Tip */}
             {showTip && (
                 <div className={`flex items-start gap-2 p-3 rounded-xl ${brightness.zone === 'dark' ? 'bg-red-500/10 border border-red-500/20' :
-                        brightness.zone === 'bright' ? 'bg-emerald-500/10 border border-emerald-500/20' :
-                            'bg-yellow-500/10 border border-yellow-500/20'
+                    brightness.zone === 'bright' ? 'bg-emerald-500/10 border border-emerald-500/20' :
+                        'bg-yellow-500/10 border border-yellow-500/20'
                     }`}>
                     <Smile className={`w-4 h-4 shrink-0 mt-0.5 ${brightness.zone === 'dark' ? 'text-red-400' :
-                            brightness.zone === 'bright' ? 'text-emerald-400' :
-                                'text-yellow-400'
+                        brightness.zone === 'bright' ? 'text-emerald-400' :
+                            'text-yellow-400'
                         }`} />
                     <p className="text-xs text-slate-300">{getTip()}</p>
                 </div>

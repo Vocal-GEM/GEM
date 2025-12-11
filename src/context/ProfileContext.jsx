@@ -263,7 +263,7 @@ export const ProfileProvider = ({ children }) => {
         });
     };
 
-    const value = useMemo(() => ({
+    const value = {
         voiceProfiles,
         activeProfile,
         targetRange,
@@ -286,19 +286,7 @@ export const ProfileProvider = ({ children }) => {
         updateHydration,
         logFatigue,
         updateUsage
-    }), [
-        voiceProfiles,
-        activeProfile,
-        targetRange,
-        calibration,
-        calibrationMetadata,
-        filterSettings,
-        skillLevel,
-        goals,
-        showCalibration,
-        onboardingStatus,
-        vocalHealth
-    ]);
+    };
 
     return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>;
 };

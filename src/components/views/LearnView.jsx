@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import {
     BookOpen,
     Music2,
@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 // Lazy load individual modules
-import { lazy, Suspense } from 'react';
+
 
 const PitchInfoView = lazy(() => import('./learn/PitchInfoView'));
 const FormantsInfoView = lazy(() => import('./learn/FormantsInfoView'));

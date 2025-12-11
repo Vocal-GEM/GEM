@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { useAudio } from '../../context/AudioContext';
 import LTASPlot from '../viz/LTASPlot';
 import { useTranslation } from 'react-i18next';

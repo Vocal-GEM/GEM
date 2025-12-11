@@ -1,5 +1,5 @@
-import React from 'react';
-import { Mic, Play, RotateCcw } from 'lucide-react';
+
+import { Mic } from 'lucide-react';
 
 const TwisterCard = ({ twister, onRecord, isRecording, score, feedback }) => {
     return (

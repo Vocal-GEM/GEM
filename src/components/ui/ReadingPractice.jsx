@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BookOpen, CheckCircle, RefreshCcw } from 'lucide-react';
+import { useState } from 'react';
+
 
 const ReadingPractice = ({ onComplete }) => {
     const [step, setStep] = useState(0);

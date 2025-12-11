@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Music } from 'lucide-react';
 
 const PitchTargets = ({ audioEngine }) => {

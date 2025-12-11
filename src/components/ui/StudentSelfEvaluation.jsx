@@ -37,7 +37,7 @@ const StudentSelfEvaluation = ({ onComplete }) => {
                 <h2 className="text-2xl font-bold text-white mb-2">Self-Assessment</h2>
                 <p className="text-slate-400">
                     Rate your current understanding of these concepts (0 = None, 10 = Expert).
-                    <br />It's okay to be at 0! That's why you're here.
+                    <br />It&apos;s okay to be at 0! That&apos;s why you&apos;re here.
                 </p>
             </div>
 

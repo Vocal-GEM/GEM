@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Book, CheckCircle, Award, Target } from 'lucide-react';
 
 const Module5WrapUp = ({ onComplete }) => {

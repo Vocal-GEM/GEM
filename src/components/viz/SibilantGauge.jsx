@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 const SibilantGauge = ({ centroid = 0, isSibilant = false }) => {
     // Target zones

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Layers } from 'lucide-react';
 
 const SyllableStacker = ({ onComplete }) => {
@@ -9,7 +9,7 @@ const SyllableStacker = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">Syllable Separation</h2>
                 <p className="text-slate-400">
-                    To break the habit of "Mumbling/Slurring", we first go to the extreme: **Robot Mode**.
+                    To break the habit of &quot;Mumbling/Slurring&quot;, we first go to the extreme: **Robot Mode**.
                     Then we add **Elasticity** back in.
                 </p>
             </div>
@@ -18,8 +18,8 @@ const SyllableStacker = ({ onComplete }) => {
                 <button
                     onClick={() => setMode('robot')}
                     className={`px-6 py-3 rounded-xl font-bold transition-all ${mode === 'robot'
-                            ? 'bg-blue-600 text-white shadow-lg scale-105'
-                            : 'bg-slate-800 text-slate-400'
+                        ? 'bg-blue-600 text-white shadow-lg scale-105'
+                        : 'bg-slate-800 text-slate-400'
                         }`}
                 >
                     🤖 Robot Mode
@@ -27,8 +27,8 @@ const SyllableStacker = ({ onComplete }) => {
                 <button
                     onClick={() => setMode('elastic')}
                     className={`px-6 py-3 rounded-xl font-bold transition-all ${mode === 'elastic'
-                            ? 'bg-pink-600 text-white shadow-lg scale-105'
-                            : 'bg-slate-800 text-slate-400'
+                        ? 'bg-pink-600 text-white shadow-lg scale-105'
+                        : 'bg-slate-800 text-slate-400'
                         }`}
                 >
                     🧶 Elastic Mode
@@ -44,7 +44,7 @@ const SyllableStacker = ({ onComplete }) => {
                         <p className="text-slate-300 max-w-md mx-auto mb-8">
                             Read this sentence. **Completely detach** every syllable. Even the tiny words.
                             <br /><br />
-                            "The. Sun. Light. Strikes. Rain. Drops. In. The. Air."
+                            &quot;The. Sun. Light. Strikes. Rain. Drops. In. The. Air.&quot;
                         </p>
                         <div className="text-xs text-blue-500 font-bold uppercase tracking-widest">
                             Goal: Zero Connection. Pure Diction.
@@ -57,9 +57,9 @@ const SyllableStacker = ({ onComplete }) => {
                         </h3>
                         <p className="text-slate-300 max-w-md mx-auto mb-8">
                             Now, keep the separation, but **stretch** the vowel of each syllable.
-                            Don't blend them! Just make each brick softer.
+                            Don&apos;t blend them! Just make each brick softer.
                             <br /><br />
-                            "Theeee Suuuun Liiiight Striiiiikes Raaaain Droooops."
+                            &quot;Theeee Suuuun Liiiight Striiiiikes Raaaain Droooops.&quot;
                         </p>
                         <div className="text-xs text-pink-500 font-bold uppercase tracking-widest">
                             Goal: Defined Edges, Soft Centers.

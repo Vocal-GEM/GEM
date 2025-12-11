@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAudio } from '../../context/AudioContext';
 
 const LTASPlot = ({ width = 600, height = 300 }) => {
-    const { dataRef, isAudioActive } = useAudio();
+    const { dataRef } = useAudio();
     const canvasRef = useRef(null);
     const [isRecording, setIsRecording] = useState(false);
     const accumulatorRef = useRef(new Float32Array(1024).fill(0)); // Assuming 1024 bins from AudioEngine

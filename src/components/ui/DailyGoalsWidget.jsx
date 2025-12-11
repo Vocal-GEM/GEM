@@ -1,4 +1,3 @@
-import React from 'react';
 import { Check, Target } from 'lucide-react';
 
 const DailyGoalsWidget = ({ goals, compact = false }) => {

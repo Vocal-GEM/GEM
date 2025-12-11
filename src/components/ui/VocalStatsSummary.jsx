@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { TrendingUp, TrendingDown, Minus, X, BarChart3, Volume2, Music, Target } from 'lucide-react';
 
 /**

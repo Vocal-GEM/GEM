@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Activity, Wind, Music, Sparkles, ChevronDown, ChevronUp, CheckCircle } from 'lucide-react';
 import BreathVisualizer from './BreathVisualizer';
 

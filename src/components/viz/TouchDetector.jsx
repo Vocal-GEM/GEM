@@ -104,7 +104,7 @@ const TouchDetector = ({ dataRef, showFeedback = true }) => {
             {/* Tooltip */}
             {showTooltip && (
                 <div className="absolute z-50 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg text-xs text-slate-300 max-w-xs shadow-xl">
-                    Detects how hard you're pressing consonants like B, D, G, M, N.
+                    Detects how hard you&apos;re pressing consonants like B, D, G, M, N.
                     Light touch = bright, forward sound. Hard press = dark, masculine sound.
                 </div>
             )}
@@ -131,8 +131,8 @@ const TouchDetector = ({ dataRef, showFeedback = true }) => {
                         <div
                             key={i}
                             className={`flex-1 rounded-t transition-all ${energy > 70 ? 'bg-red-500' :
-                                    energy > 40 ? 'bg-yellow-500' :
-                                        'bg-emerald-500'
+                                energy > 40 ? 'bg-yellow-500' :
+                                    'bg-emerald-500'
                                 }`}
                             style={{ height: `${Math.min(100, energy)}%` }}
                         />

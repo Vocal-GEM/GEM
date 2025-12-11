@@ -2,8 +2,8 @@
 import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Diamond, Flame, Bug, Box, Activity, Sliders, Gauge } from 'lucide-react';
-import { useGLTF, OrbitControls } from '@react-three/drei';
+import { Diamond, Bug, Activity, Sliders, Gauge } from 'lucide-react';
+import { OrbitControls } from '@react-three/drei';
 import { useSettings } from '../../context/SettingsContext';
 import OrbLegend from './OrbLegend';
 

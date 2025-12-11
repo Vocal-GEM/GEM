@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useClient } from '../../context/ClientContext';
 import { useSettings } from '../../context/SettingsContext';
 import ClientSelector from '../ui/ClientSelector';
@@ -10,7 +10,7 @@ import MPTTracker from '../viz/MPTTracker';
 import VoiceRangeProfile from '../viz/VoiceRangeProfile';
 import SZRatio from '../viz/SZRatio';
 import IntonationTrainer from '../viz/IntonationTrainer';
-import { Activity, Mic, Settings, FileText, BarChart2, Grid } from 'lucide-react';
+import { Activity, Settings, Grid } from 'lucide-react';
 
 const SLPDashboard = ({ dataRef, audioEngine }) => {
     const { activeClient } = useClient();

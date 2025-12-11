@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
-import { TrendingUp, RefreshCw, ChevronRight, ChevronLeft, Play, History, Settings, Volume2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { TrendingUp, RefreshCw, ChevronRight, ChevronLeft, Play, History, Volume2 } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 
 // Simple DTW-like scoring (Euclidean distance between resampled curves)

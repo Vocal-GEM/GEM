@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Activity, Target, Lightbulb } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 import { useProfile } from '../../context/ProfileContext';
@@ -69,7 +69,7 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
     const getDashboardColor = () => {
         if (metrics.perception === '--') return 'text-slate-400 bg-slate-500/10 border-slate-500/30';
         // Reuse shared color logic but adapt for background styles
-        const hex = getPerceptionColor(metrics.score, colorBlindMode);
+        // const hex = getPerceptionColor(metrics.score, colorBlindMode);
 
         // We need to return tailwind classes, so this is a bit of a hybrid approach
         // ideally we'd rewrite getPerceptionColor to return semantic names, but for now we'll match manually

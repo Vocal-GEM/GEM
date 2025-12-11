@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { RotateCcw, Play, Square, Volume2 } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { RotateCcw, Square, Volume2 } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 
 /**
@@ -197,8 +197,8 @@ const InstantPlayback = ({ bufferDuration = 5 }) => {
                 onClick={isPlaying ? stopPlayback : playRecording}
                 disabled={!hasRecording && !isRecording}
                 className={`p-2 rounded-lg transition-all ${hasRecording || isRecording
-                        ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:shadow-lg hover:shadow-pink-500/20'
-                        : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                    ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:shadow-lg hover:shadow-pink-500/20'
+                    : 'bg-slate-700 text-slate-500 cursor-not-allowed'
                     }`}
                 title={isPlaying ? 'Stop playback' : 'Play last recording'}
             >

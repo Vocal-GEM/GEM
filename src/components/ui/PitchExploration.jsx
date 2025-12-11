@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Mic, ArrowRight, ExternalLink, Activity, Info } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, ExternalLink, Activity, Info } from 'lucide-react';
 
 const PitchExploration = ({ onComplete }) => {
     const [step, setStep] = useState(1);

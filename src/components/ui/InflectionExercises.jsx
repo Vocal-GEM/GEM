@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ArrowUpRight, ArrowDownRight, RefreshCw, CheckCircle } from 'lucide-react';
 
 const InflectionExercises = ({ onComplete }) => {

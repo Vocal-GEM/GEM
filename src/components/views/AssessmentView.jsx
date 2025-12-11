@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { useTranslation } from 'react-i18next';
 import { CheckCircle, AlertCircle, ArrowRight, Sparkles, Activity, Mic, Zap, Clock, TrendingUp } from 'lucide-react';
 

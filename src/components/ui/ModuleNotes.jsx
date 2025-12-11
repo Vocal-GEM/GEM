@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Save, Loader2, StickyNote, Check } from 'lucide-react';
 import { indexedDB } from '../../services/IndexedDBManager';
 

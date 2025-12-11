@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, PlayCircle, CheckCircle, Lock, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, BookOpen, PlayCircle, CheckCircle, Lock } from 'lucide-react';
 import { COURSE_DATA } from '../../data/courseData';
 import LessonView from './LessonView';
 import FeedbackModal from './FeedbackModal';
@@ -30,11 +30,9 @@ const FeminizationCourse = ({ onClose }) => {
         }
     };
 
-    const getLessonStatus = (lessonId) => {
-        return completedLessons.includes(lessonId) ? 'completed' : 'locked'; // Simplified logic
-    };
 
-    const isLessonLocked = (lessonId, moduleIndex, lessonIndex) => {
+
+    const isLessonLocked = (_lessonId, _moduleIndex, _lessonIndex) => {
         return false; // All lessons unlocked
     };
 

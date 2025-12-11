@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Play, Pause, RotateCcw, Mic, Square, Headphones, Ear, MessageSquare, Repeat, Clock, CheckCircle } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Upload, Play, Pause, Mic, Square, Headphones, Ear, MessageSquare, Repeat, Clock, CheckCircle } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 
 const STEPS = [
@@ -98,7 +98,7 @@ const TranscriptionPractice = ({ onComplete }) => {
                     <h3 className="text-xl font-bold text-white mb-2">Upload Reference Clip</h3>
                     <p className="text-slate-400 mb-6 max-w-md mx-auto">
                         Upload a short (5-10s) clip of a voice you want to imitate.
-                        We'll loop this for your practice.
+                        We&apos;ll loop this for your practice.
                     </p>
                     <label className="px-6 py-3 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-xl cursor-pointer transition-all inline-block">
                         Choose Audio File
@@ -149,7 +149,7 @@ const TranscriptionPractice = ({ onComplete }) => {
                                 {STEPS[currentStep].title}
                             </h3>
 
-                            <p className="text-lg text-slate-300 mb-8 font-serif italic">"{STEPS[currentStep].instruction}"</p>
+                            <p className="text-lg text-slate-300 mb-8 font-serif italic">&quot;{STEPS[currentStep].instruction}&quot;</p>
 
                             {/* Step Specific Tools */}
                             {STEPS[currentStep].id === 'active' && (

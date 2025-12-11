@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { ArrowRight, Play, RotateCcw, Clock, Sparkles } from 'lucide-react';
 
 /**

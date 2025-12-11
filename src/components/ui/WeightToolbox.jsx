@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Play, Mic, MoveVertical, Wind, Music, AlertCircle } from 'lucide-react';
+import { Mic, MoveVertical, Wind, Music, AlertCircle } from 'lucide-react';
 
 const WeightToolbox = ({ onComplete }) => {
     const [activeTool, setActiveTool] = useState('imitation');
@@ -21,7 +21,7 @@ const WeightToolbox = ({ onComplete }) => {
             <div className="w-full md:w-64 space-y-2 shrink-0">
                 <div className="p-4 bg-slate-900 rounded-xl border border-slate-800 mb-4">
                     <h2 className="font-bold text-white mb-1">The Toolbox</h2>
-                    <p className="text-xs text-slate-400">8 ways to find "Thin".Experiment to find what works for YOU.</p>
+                    <p className="text-xs text-slate-400">8 ways to find &quot;Thin&quot;.Experiment to find what works for YOU.</p>
                 </div>
                 {tools.map(tool => (
                     <button
@@ -56,7 +56,7 @@ const WeightToolbox = ({ onComplete }) => {
                         onClick={onComplete}
                         className="text-slate-400 hover:text-white text-sm font-bold flex items-center gap-2"
                     >
-                        I've explored these tools <span className="text-xl">→</span>
+                        I&apos;ve explored these tools <span className="text-xl">→</span>
                     </button>
                 </div>
             </div>
@@ -78,7 +78,7 @@ const FlowPhonationTool = () => (
             <div className="text-xl font-bold text-white mb-2">The Candle Blow</div>
             <p className="text-sm text-slate-400">
                 Imagine blowing out a candle gently. <br />
-                Add a sound to it: <strong>"Hoooo"</strong>.
+                Add a sound to it: <strong>&quot;Hoooo&quot;</strong>.
             </p>
         </div>
 
@@ -100,7 +100,7 @@ const ImitationTool = () => (
                 <div className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center text-2xl">⭐</div>
                 <div>
                     <h4 className="font-bold text-white">Patrick Star</h4>
-                    <p className="text-sm text-pink-200">"I'm Patrick." (Duh...)</p>
+                    <p className="text-sm text-pink-200">&quot;I&apos;m Patrick.&quot; (Duh...)</p>
                     <div className="text-xs text-slate-400 mt-1">
                         Low Pitch + <span className="text-white font-bold">THIN</span> Weight
                     </div>
@@ -111,7 +111,7 @@ const ImitationTool = () => (
                 <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-2xl">🧽</div>
                 <div>
                     <h4 className="font-bold text-white">SpongeBob</h4>
-                    <p className="text-sm text-yellow-200">"I'm Ready!" (Annoying laugh)</p>
+                    <p className="text-sm text-yellow-200">&quot;I&apos;m Ready!&quot; (Annoying laugh)</p>
                     <div className="text-xs text-slate-400 mt-1">
                         High Pitch + <span className="text-white font-bold">THICK</span> Weight + Twang
                     </div>
@@ -133,8 +133,8 @@ const TriggersTool = () => (
                 <h4 className="font-bold text-white mb-2">Thick/Heavy Triggers</h4>
                 <ul className="text-sm text-slate-400 space-y-2 list-disc list-inside">
                     <li>Coughing</li>
-                    <li>Shouting ("Hey!")</li>
-                    <li>Grunt ("Ugh")</li>
+                    <li>Shouting (&quot;Hey!&quot;)</li>
+                    <li>Grunt (&quot;Ugh&quot;)</li>
                 </ul>
             </div>
             <div className="bg-slate-900 p-4 rounded-xl border-l-4 border-pink-500">
@@ -148,7 +148,7 @@ const TriggersTool = () => (
         </div>
 
         <div className="mt-4 p-4 bg-indigo-900/20 rounded-xl text-sm text-indigo-200">
-            <strong>Exercise:</strong> Yawn ("Haaaa"), notice the lightness, then try to say "One" ("Haaa-wun").
+            <strong>Exercise:</strong> Yawn (&quot;Haaaa&quot;), notice the lightness, then try to say &quot;One&quot; (&quot;Haaa-wun&quot;).
         </div>
     </div>
 );
@@ -198,7 +198,7 @@ const SOVTTool = () => (
     <div className="space-y-6 animate-in slide-in-from-right-4">
         <h3 className="text-2xl font-bold text-white">Semi-Occluded Vocal Tract (SOVT)</h3>
         <p className="text-slate-300">
-            Blocking the mouth creates "Back Pressure" which helps folds close gently (Bernoulli Effect).
+            Blocking the mouth creates &quot;Back Pressure&quot; which helps folds close gently (Bernoulli Effect).
         </p>
 
         <div className="grid grid-cols-2 gap-4">
@@ -215,7 +215,7 @@ const SOVTTool = () => (
                 <li>Hum/Sing into the straw (or closed nostril).</li>
                 <li>Notice how easy/light it feels.</li>
                 <li>Remove the straw and keep singing immediately.</li>
-                <li>Try to keep that same "Easy" feeling.</li>
+                <li>Try to keep that same &quot;Easy&quot; feeling.</li>
             </ol>
         </div>
     </div>
@@ -225,7 +225,7 @@ const IngressionTool = () => (
     <div className="space-y-6 animate-in slide-in-from-right-4">
         <h3 className="text-2xl font-bold text-white">Ingression</h3>
         <p className="text-slate-300">
-            Making sound while breathing IN. It's weird, but it forces thinness.
+            Making sound while breathing IN. It&apos;s weird, but it forces thinness.
         </p>
 
         <div className="bg-slate-900 p-6 rounded-xl border border-slate-700 text-center">
@@ -267,8 +267,8 @@ const SlidesTool = () => (
         </div>
 
         <p className="text-sm text-center text-slate-400">
-            Start with a "Hey" (Chest) and slide up to a "Woo" (Head). <br />
-            Then try to bring that "Woo" feeling back down.
+            Start with a &quot;Hey&quot; (Chest) and slide up to a &quot;Woo&quot; (Head). <br />
+            Then try to bring that &quot;Woo&quot; feeling back down.
         </p>
     </div>
 );
@@ -291,8 +291,8 @@ const PopTestTool = () => (
         </div>
 
         <p className="text-sm text-center text-slate-400 bg-slate-900 p-4 rounded-xl">
-            Sounds like: "Ah (Heavy) - Ah (Light) - Ah (Heavy)".<br />
-            You should hear a "Pop" or "Flip" between them. If you don't hear a difference, you aren't moving enough.
+            Sounds like: &quot;Ah (Heavy) - Ah (Light) - Ah (Heavy)&quot;.<br />
+            You should hear a &quot;Pop&quot; or &quot;Flip&quot; between them. If you don&apos;t hear a difference, you aren&apos;t moving enough.
         </p>
     </div>
 );

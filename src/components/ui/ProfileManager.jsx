@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { User, Plus, Trash2, Check, X } from 'lucide-react';
+import { useState } from 'react';
+import { User, Plus, Check, X } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 
 const ProfileManager = ({ onClose }) => {

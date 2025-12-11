@@ -1,4 +1,4 @@
-import React from 'react';
+import { cloneElement } from 'react';
 import { HeartPulse, X } from 'lucide-react';
 import { vocalHealthTips } from '../../data/vocalHealthTips';
 
@@ -26,7 +26,7 @@ const VocalHealthTips = ({ onClose }) => {
                             <div key={tip.id} className={`bg-slate-800/50 p-4 rounded-xl border border-${tip.color || 'emerald'}-500/20 hover:border-${tip.color || 'emerald'}-500/50 transition-colors`}>
                                 <div className="flex items-start gap-3">
                                     <div className={`p-2 rounded-lg bg-${tip.color || 'emerald'}-500/10`}>
-                                        {React.cloneElement(tip.icon, { size: 24 })}
+                                        {cloneElement(tip.icon, { size: 24 })}
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="font-bold text-white mb-1">{tip.title}</h3>

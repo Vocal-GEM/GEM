@@ -108,7 +108,7 @@ const GenderTimeline = ({ dataRef, duration = 10 }) => {
             const windows = historyRef.current.filter(h => h.isWindow);
             const windowWidth = (width - padding.left - padding.right) / duration;
 
-            windows.forEach((w, i) => {
+            windows.forEach((w) => {
                 const age = (now - w.time) / 1000;
                 const x = padding.left + (duration - age) * windowWidth - windowWidth;
 

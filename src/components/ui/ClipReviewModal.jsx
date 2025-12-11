@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Upload, Trash2, Check, Share2, Download } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { Play, Pause, Upload, Check, Share2, Download } from 'lucide-react';
+
 
 const ClipReviewModal = ({ clip, onClose }) => {
-    const { user } = useAuth();
+    // const { user } = useAuth(); // unused
     const [isPlaying, setIsPlaying] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [shareUrl, setShareUrl] = useState(null);

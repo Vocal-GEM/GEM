@@ -239,7 +239,7 @@ const VoiceCalibrationWizard = ({ onComplete, onClose }) => {
                             </div>
 
                             <p className="text-slate-400 text-sm mb-6">
-                                Your voice baseline has been saved. You'll now see personalized comparisons in your analysis tools.
+                                Your voice baseline has been saved. You&apos;ll now see personalized comparisons in your analysis tools.
                             </p>
 
                             <div className="flex gap-4 justify-center">

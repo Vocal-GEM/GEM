@@ -5,8 +5,7 @@ import { Mic, Volume2, CheckCircle, ArrowRight, RefreshCw } from 'lucide-react';
 const CalibrationWizard = ({ onComplete, onClose }) => {
     const { dataRef, audioEngineRef, isAudioActive, toggleAudio } = useAudio();
     const [step, setStep] = useState(0); // 0: Intro, 1: Silence, 2: Reference, 3: Done
-    const [noiseFloor, setNoiseFloor] = useState(0);
-    const [referenceLevel, setReferenceLevel] = useState(0);
+
     const [progress, setProgress] = useState(0);
     const [offset, setOffset] = useState(90);
 
@@ -14,7 +13,7 @@ const CalibrationWizard = ({ onComplete, onClose }) => {
 
     useEffect(() => {
         if (!isAudioActive) toggleAudio();
-    }, [isAudioActive]);
+    }, [isAudioActive, toggleAudio]);
 
     const startSampling = (duration, onFinish) => {
         samplesRef.current = [];
@@ -41,10 +40,10 @@ const CalibrationWizard = ({ onComplete, onClose }) => {
 
     const handleStep1 = () => {
         // Measure Silence (3s)
-        startSampling(3000, (avgRMS) => {
+        startSampling(3000, (_avgRMS) => {
             // avgRMS is raw 0-1.
             // We don't set offset yet, just store it.
-            setNoiseFloor(avgRMS);
+            // setNoiseFloor(avgRMS); // unused
             setStep(2);
         });
     };
@@ -52,7 +51,7 @@ const CalibrationWizard = ({ onComplete, onClose }) => {
     const handleStep2 = () => {
         // Measure Reference Tone (5s) - User says "Ahhh" comfortably
         startSampling(5000, (avgRMS) => {
-            setReferenceLevel(avgRMS);
+            // setReferenceLevel(avgRMS); // unused
 
             // Calculate Offset
             // Assume "Comfortable Sustained Vowel" is ~65 dB SPL at 30cm.

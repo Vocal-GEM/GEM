@@ -38,7 +38,7 @@ const SoundJournal = ({ onComplete }) => {
         setIsAdding(false);
     };
 
-    const usePrompt = (item) => {
+    const applyPrompt = (item) => {
         setSoundName(item.split(' ')[1] || item); // Simple split to remove emoji
         setIsAdding(true);
     };
@@ -68,7 +68,7 @@ const SoundJournal = ({ onComplete }) => {
                             {INSPIRATION_PROMPTS.flatMap(cat => cat.items).map((item, i) => (
                                 <button
                                     key={i}
-                                    onClick={() => usePrompt(item)}
+                                    onClick={() => applyPrompt(item)}
                                     className="px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 hover:border-purple-500/50 text-slate-300 text-xs transition-all hover:scale-105"
                                 >
                                     {item}

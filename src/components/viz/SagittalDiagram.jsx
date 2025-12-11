@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 const SagittalDiagram = ({ target = 'neutral' }) => {
     // Simplified SVG paths for vocal tract parts

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Heart, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { SelfCareService } from '../../services/SelfCareService';
 
@@ -36,12 +36,12 @@ const PracticeWellnessCheck = ({ onComplete, onDismiss, sessionDuration }) => {
                         key={n}
                         onClick={() => setValue(n)}
                         className={`flex-1 h-10 rounded-lg transition-all ${n <= value
-                                ? n <= 2
-                                    ? 'bg-emerald-500'
-                                    : n === 3
-                                        ? 'bg-amber-500'
-                                        : 'bg-rose-500'
-                                : 'bg-slate-700'
+                            ? n <= 2
+                                ? 'bg-emerald-500'
+                                : n === 3
+                                    ? 'bg-amber-500'
+                                    : 'bg-rose-500'
+                            : 'bg-slate-700'
                             } ${n === value ? 'ring-2 ring-white/50' : ''}`}
                         aria-label={`${label}: ${n}`}
                     />
@@ -127,7 +127,7 @@ const PracticeWellnessCheck = ({ onComplete, onDismiss, sessionDuration }) => {
                 <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 mb-4">
                     <p className="text-amber-300 text-sm">
                         💛 Your scores indicate you might need a break. Remember: consistent short sessions
-                        beat occasional long ones. It's okay to stop here.
+                        beat occasional long ones. It&apos;s okay to stop here.
                     </p>
                 </div>
             )}

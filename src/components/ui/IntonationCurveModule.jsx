@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Play, Square, Activity, HelpCircle, RefreshCw } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Play, Activity, HelpCircle, RefreshCw } from 'lucide-react';
 import { INTONATION_PATTERNS } from '../../data/IntonationPatterns';
 import { BiofeedbackService } from '../../services/BiofeedbackService';
 

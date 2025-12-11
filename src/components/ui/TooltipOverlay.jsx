@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { X, ChevronRight, ChevronLeft } from 'lucide-react';
 
 const TooltipOverlay = ({

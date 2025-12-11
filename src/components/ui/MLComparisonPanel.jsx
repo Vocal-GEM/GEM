@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Brain, Cpu, RefreshCw, CheckCircle, AlertTriangle, Info } from 'lucide-react';
-import { initializeModel, isModelReady, getModelStatus, comparePredictons, classifyWithML } from '../../services/MLGenderClassifier';
+import { initializeModel, isModelReady, getModelStatus, comparePredictons } from '../../services/MLGenderClassifier';
 import { getPerceptionColor } from '../../services/GenderPerceptionPredictor';
 import { useSettings } from '../../context/SettingsContext';
 

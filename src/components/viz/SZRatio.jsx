@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Timer, Play, Square, RotateCcw, Divide } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Play, Square, RotateCcw, Divide } from 'lucide-react';
 
 const SZRatio = ({ dataRef, isActive }) => {
     const [mode, setMode] = useState('s'); // 's' or 'z'

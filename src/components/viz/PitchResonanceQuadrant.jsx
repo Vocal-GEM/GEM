@@ -3,7 +3,6 @@ import { useSettings } from '../../context/SettingsContext';
 import {
     predictGenderPerception,
     getPerceptionColor,
-    getPerceptionExplanation,
     AMBIGUITY_ZONE
 } from '../../services/GenderPerceptionPredictor';
 import { renderCoordinator } from '../../services/RenderCoordinator';

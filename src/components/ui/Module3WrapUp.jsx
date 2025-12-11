@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Book, CheckCircle, Trophy, Sparkles, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Book, CheckCircle, Sparkles } from 'lucide-react';
 
 const Module3WrapUp = ({ onComplete }) => {
     const [checkedResources, setCheckedResources] = useState({});

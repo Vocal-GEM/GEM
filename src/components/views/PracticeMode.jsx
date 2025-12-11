@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, Suspense, useCallback } from 'react';
-import { Play, Square, Mic, Volume2, Activity, Settings, BarChart2, Calendar, Clock, Save, RefreshCw, ChevronRight, AlertCircle, Check, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer, Sparkles } from 'lucide-react';
+import { useState, useEffect, useRef, Suspense, useCallback } from 'react';
+import { Play, Square, Mic, Volume2, Activity, BarChart2, RefreshCw, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAudio } from '../../context/AudioContext';
@@ -13,13 +13,12 @@ import ResonanceOrb from '../viz/ResonanceOrb';
 import VoiceQualityMeter from '../viz/VoiceQualityMeter';
 import VowelSpacePlot from '../viz/VowelSpacePlot';
 import Spectrogram from '../viz/Spectrogram';
-import GenderPerceptionDashboard from '../ui/GenderPerceptionDashboard';
 import PracticeCardsPanel from '../ui/PracticeCardsPanel';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorBoundary from '../ui/ErrorBoundary';
 import WarmupRoutine from '../ui/WarmupRoutine';
 import VocalStatsSummary from '../ui/VocalStatsSummary';
-import VoiceSelfAssessment from '../ui/VoiceSelfAssessment'; /* Keep for now, but not used in layout */
+
 import CoachPanel from '../ui/CoachPanel';
 import ProgressCharts from '../viz/ProgressCharts';
 import SelfAssessmentModal from '../ui/SelfAssessmentModal';
@@ -45,7 +44,7 @@ import DAFMode from '../ui/DAFMode';
 import EnvironmentCheck from '../ui/EnvironmentCheck';
 import ToolExercises from '../ui/ToolExercises';
 import PracticeWellnessCheck from '../ui/PracticeWellnessCheck';
-import { SelfCareService } from '../../services/SelfCareService';
+
 
 import { CoachingEngine } from '../../utils/CoachingEngine';
 
@@ -54,15 +53,11 @@ const PracticeMode = ({
     dataRef,
     calibration,
     targetRange,
-    goals,
-    settings,
-    onUpdateRange,
-    onSwitchProfile
+    settings
 }) => {
     const {
         practiceTab,
         switchPracticeTab,
-        navigate,
         openModal,
         navigationParams
     } = useNavigation();
@@ -71,9 +66,7 @@ const PracticeMode = ({
     const {
         audioEngineRef,
         isAudioActive,
-        toggleAudio,
-        startAudio,
-        stopAudio
+        toggleAudio
     } = useAudio();
 
     const { startTour } = useTour();
@@ -87,7 +80,7 @@ const PracticeMode = ({
 
     useEffect(() => {
         startTour('practice_mode');
-    }, []);
+    }, [startTour]);
 
     useEffect(() => {
         if (practiceTab === 'spectrogram') {

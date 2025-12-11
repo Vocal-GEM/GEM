@@ -8,7 +8,7 @@ class GlobalErrorBoundary extends React.Component {
         this.state = { hasError: false, error: null, errorInfo: null, showFeedback: false };
     }
 
-    static getDerivedStateFromError(error) {
+    static getDerivedStateFromError(_) {
         return { hasError: true };
     }
 

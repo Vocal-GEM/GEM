@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { X, Mic2, Vibrate, Volume2, Eye, Target, Activity, Wifi, WifiOff, RefreshCw, Trash2, HelpCircle, Download, HeartPulse, ClipboardCheck, Flame, Book, Upload, FileText, Database, Brain } from 'lucide-react';
 import { textToSpeechService } from '../../services/TextToSpeechService';
 import { syncManager, STORES } from '../../services/SyncManager';
@@ -6,27 +6,17 @@ import MicrophoneCalibration from './MicrophoneCalibration';
 import InfoTooltip from './InfoTooltip';
 import VoiceDataConsent from './VoiceDataConsent';
 
-const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange, onSetGoal, onOpenTutorial, calibration, onUpdateRange, onUpdateCalibration, filterSettings, onUpdateFilters, onExportData, audioEngine, user }) => {
-    const defaultGenderRanges = {
-        masc: { min: 85, max: 135 },
-        androg: { min: 135, max: 175 },
-        fem: { min: 165, max: 255 },
-    };
-    const [customRanges, setCustomRanges] = React.useState({
-        masc: { min: targetRange.min, max: targetRange.max },
-        androg: { min: targetRange.min, max: targetRange.max },
-        fem: { min: targetRange.min, max: targetRange.max },
-    });
-    const [availableVoices, setAvailableVoices] = React.useState([]);
-    const [isLoadingVoices, setIsLoadingVoices] = React.useState(false);
-    const [isUploading, setIsUploading] = React.useState(false);
-    const [uploadStatus, setUploadStatus] = React.useState(null); // { type: 'success' | 'error', message: '' }
-    const [knowledgeBaseData, setKnowledgeBaseData] = React.useState(null);
-    const [showDirectory, setShowDirectory] = React.useState(false);
-    const [isLoadingDirectory, setIsLoadingDirectory] = React.useState(false);
-    const [showVoiceDataConsent, setShowVoiceDataConsent] = React.useState(false);
+const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutorial, calibration, onUpdateCalibration, filterSettings, onUpdateFilters, onExportData, audioEngine, user }) => {
+    const [availableVoices, setAvailableVoices] = useState([]);
+    const [isLoadingVoices, setIsLoadingVoices] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadStatus, setUploadStatus] = useState(null); // { type: 'success' | 'error', message: '' }
+    const [knowledgeBaseData, setKnowledgeBaseData] = useState(null);
+    const [showDirectory, setShowDirectory] = useState(false);
+    const [isLoadingDirectory, setIsLoadingDirectory] = useState(false);
+    const [showVoiceDataConsent, setShowVoiceDataConsent] = useState(false);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (settings.ttsProvider === 'elevenlabs') {
             setIsLoadingVoices(true);
             textToSpeechService.getElevenLabsVoices()
@@ -37,7 +27,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, targetRange,
         }
     }, [settings.ttsProvider]);
 
-    const [error, setError] = React.useState(null);
+    const [error, setError] = useState(null);
 
     const fetchKnowledgeBase = async () => {
         setIsLoadingDirectory(true);

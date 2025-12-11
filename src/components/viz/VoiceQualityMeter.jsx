@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { useAudio } from '../../context/AudioContext';
 import { useFeedback } from '../../hooks/useFeedback';

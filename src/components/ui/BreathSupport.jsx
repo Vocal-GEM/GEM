@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Wind, Activity, Zap, Info } from 'lucide-react';
+import { Wind, Zap, Info } from 'lucide-react';
 
 const BreathSupport = ({ onComplete }) => {
     const [step, setStep] = useState(0);

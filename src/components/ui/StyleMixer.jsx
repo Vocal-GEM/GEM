@@ -56,7 +56,7 @@ const StyleMixer = ({ onComplete }) => {
             <div className="bg-indigo-900/20 p-6 rounded-xl border border-indigo-500/30 text-center">
                 <h4 className="font-bold text-indigo-300 mb-2">Current Preset Analysis</h4>
                 <p className="text-white text-lg font-serif">
-                    "{settings.pitch > 70 ? 'Bubblier' : 'More Grounded'} &bull; {settings.resonance > 70 ? 'Sparkly' : 'Warmer'} &bull; {settings.inflection > 70 ? 'Very Expressive' : 'Chill'}"
+                    &quot;{settings.pitch > 70 ? 'Bubblier' : 'More Grounded'} &bull; {settings.resonance > 70 ? 'Sparkly' : 'Warmer'} &bull; {settings.inflection > 70 ? 'Very Expressive' : 'Chill'}&quot;
                 </p>
             </div>
 

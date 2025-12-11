@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Brain, Zap, Repeat, Trophy, Target } from 'lucide-react';
+import { useState } from 'react';
+import { Brain, Zap, Repeat, Target } from 'lucide-react';
 
 const PracticePhilosophy = ({ onComplete }) => {
     const [activeTab, setActiveTab] = useState('concept');

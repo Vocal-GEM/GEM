@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Book, CheckCircle, Trophy, Moon, Sun, Scan } from 'lucide-react';
 
 const Module2WrapUp = ({ onComplete }) => {
-    const [journalOpen, setJournalOpen] = useState(false);
+
     const [checkedHomework, setCheckedHomework] = useState({});
 
     const prompts = [
@@ -22,7 +22,7 @@ const Module2WrapUp = ({ onComplete }) => {
         setCheckedHomework(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
-    const allChecked = homework.every(h => checkedHomework[h.id]);
+
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">

@@ -1,16 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Volume2, Mic, Gauge, Sliders } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Gauge, Sliders } from 'lucide-react';
 
-const MixingBoardView = ({ dataRef, audioEngine, calibration, compact = false, viewMode: propViewMode }) => {
+const MixingBoardView = ({ dataRef, calibration, compact = false, viewMode: propViewMode }) => {
     const [internalViewMode, setInternalViewMode] = useState('sliders'); // 'sliders' or 'gauges'
     const viewMode = propViewMode || internalViewMode;
-    const [sliderValues, setSliderValues] = useState({
-        pitch: 200,
-        resonance: 0.5, // Now a score 0-1
-        weight: 50,
-        contour: 0.5,
-        volume: 50
-    });
+    // Removed unused sliderValues state
 
     // Refs for DOM elements to update directly
     const fillRefs = useRef({});

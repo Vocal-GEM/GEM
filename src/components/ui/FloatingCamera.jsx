@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Maximize2, Minus, Plus, X } from 'lucide-react';
 
 const FloatingCamera = ({ onClose }) => {
@@ -37,18 +37,18 @@ const FloatingCamera = ({ onClose }) => {
         });
     };
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = useCallback((e) => {
         if (isDragging) {
             setPosition({
                 x: e.clientX - dragOffset.x,
                 y: e.clientY - dragOffset.y
             });
         }
-    };
+    }, [isDragging, dragOffset]);
 
-    const handleMouseUp = () => {
+    const handleMouseUp = useCallback(() => {
         setIsDragging(false);
-    };
+    }, []);
 
     useEffect(() => {
         if (isDragging) {
@@ -62,7 +62,7 @@ const FloatingCamera = ({ onClose }) => {
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('mouseup', handleMouseUp);
         };
-    }, [isDragging]);
+    }, [isDragging, handleMouseMove, handleMouseUp]);
 
     const handleZoom = (delta) => {
         setZoom(prev => Math.max(1, Math.min(4, prev + delta)));

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, LogOut, Trophy, Flame, Clock, Star, Lock, Award } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, LogOut, Clock } from 'lucide-react';
 
 import { indexedDB } from '../../services/IndexedDBManager';
 import { useSettings } from '../../context/SettingsContext';

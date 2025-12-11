@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useProgram } from '../../hooks/useProgram';
 import { CheckCircle, Circle, Lock, PlayCircle, BookOpen, Clock, ChevronRight } from 'lucide-react';
 
@@ -7,7 +7,6 @@ import { useNavigation } from '../../context/NavigationContext';
 
 const ProgramView = ({ onNavigate }) => {
     const { activeProgram, progress, currentDay, completeTask, isTaskComplete, nextDay } = useProgram();
-    const { openModal } = useNavigation();
     const [selectedWeekId, setSelectedWeekId] = useState(activeProgram?.weeks[Math.min(progress.currentWeek, activeProgram.weeks.length - 1)].id);
 
     if (!activeProgram) {

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { ArrowLeftRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import TargetVoicePlayer from './TargetVoicePlayer';

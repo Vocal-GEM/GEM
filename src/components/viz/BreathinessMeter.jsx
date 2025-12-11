@@ -25,12 +25,7 @@ const ZONES = [
     { id: 3, label: 'Severe', color: 'red', range: [75, 100], feedback: 'Excessive ⚠', icon: 'warning' }
 ];
 
-// OQ Zone colors for display
-const OQ_COLORS = {
-    low: { bg: 'bg-amber-500/30', text: 'text-amber-400', border: 'border-amber-500/30' },
-    balanced: { bg: 'bg-emerald-500/30', text: 'text-emerald-400', border: 'border-emerald-500/30' },
-    high: { bg: 'bg-cyan-500/30', text: 'text-cyan-400', border: 'border-cyan-500/30' }
-};
+
 
 const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const { colorBlindMode } = useSettings();

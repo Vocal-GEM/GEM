@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Play, Mic, RefreshCw, Layers, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+import { Mic, RefreshCw } from 'lucide-react';
 
 const VowelGlides = ({ onComplete }) => {
     const [step, setStep] = useState(0);
@@ -33,7 +33,7 @@ const VowelGlides = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">Exercise: Vowel Glides</h2>
                 <p className="text-slate-400">
-                    Practice moving from the "Anchor" vowel (EE) to other vowels without losing the brightness.
+                    Practice moving from the &quot;Anchor&quot; vowel (EE) to other vowels without losing the brightness.
                 </p>
             </div>
 
@@ -82,7 +82,7 @@ const VowelGlides = ({ onComplete }) => {
             <div className="p-4 bg-indigo-900/20 text-indigo-200 rounded-xl text-sm border border-indigo-500/20 flex gap-2">
                 <RefreshCw size={20} className="shrink-0" />
                 <span>
-                    <strong>Strategy:</strong> If you lose the brightness, stop. Go back to "EE". Re-anchor. Try again.
+                    <strong>Strategy:</strong> If you lose the brightness, stop. Go back to &quot;EE&quot;. Re-anchor. Try again.
                 </span>
             </div>
         </div>

@@ -1,0 +1,357 @@
+
+C:\Users\riley\Desktop\GEM\src\components\ui\CommandPalette.jsx
+    3:27  warning  'X' is defined but never used                                                                                                       no-unused-vars
+  128:8   warning  React Hook useEffect has missing dependencies: 'closeModal' and 'handleSelect'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\ui\DAFMode.jsx
+  36:8  warning  React Hook useEffect has a missing dependency: 'stopDAF'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\ui\FeedbackControls.jsx
+  1:8   warning  'React' is defined but never used  no-unused-vars
+  2:74  warning  'Check' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\FeedbackModal.jsx
+  1:8  warning  'React' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\FeedbackSettings.jsx
+   9:82   warning  'onSetGoal' is defined but never used. Allowed unused args must match /^_/u      no-unused-vars
+   9:122  warning  'onUpdateRange' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  10:11   warning  'defaultGenderRanges' is assigned a value but never used                         no-unused-vars
+  15:12   warning  'customRanges' is assigned a value but never used                                no-unused-vars
+  15:26   warning  'setCustomRanges' is assigned a value but never used                             no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\FeminizationCourse.jsx
+  33:11  warning  'getLessonStatus' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\GabLibs.jsx
+  5:20  warning  'onClose' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\GenderPerceptionBadge.jsx
+  1:8  warning  'React' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\GenderPerceptionDashboard.jsx
+   1:8   warning  'React' is defined but never used         no-unused-vars
+  72:15  warning  'hex' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\GraduationReflection.jsx
+  1:8   warning  'React' is defined but never used                  no-unused-vars
+  9:12  warning  'showConfetti' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\GuidedJourney.jsx
+  19:9   warning  'getProgressPercentage' is assigned a value but never used  no-unused-vars
+  72:11  warning  'handleStepClick' is assigned a value but never used        no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\HabitBuilder.jsx
+  2:18  warning  'Plus' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\HistoryView.jsx
+  61:8  warning  React Hook useEffect has a missing dependency: 'startTour'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\ui\InstantPlayback.jsx
+  36:8  warning  React Hook useEffect has a missing dependency: 'stopRecording'. Either include it or remove the dependency array                                         react-hooks/exhaustive-deps
+  45:8  warning  React Hook useEffect has missing dependencies: 'isRecording', 'startRecording', and 'stopRecording'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\ui\IntonationCurveModule.jsx
+  170:8  warning  React Hook useEffect has a missing dependency: 'draw'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\ui\JournalForm.jsx
+  1:8  warning  'React' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\JourneyEntryCard.jsx
+  2:10  warning  'ArrowRight' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\JourneyStep.jsx
+   3:28  warning  'ChevronRight' is defined but never used          no-unused-vars
+  76:5   warning  'isCompleted' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\LessonView.jsx
+  16:8  error  Parsing error: Identifier 'ComparisonTool' has already been declared
+
+C:\Users\riley\Desktop\GEM\src\components\ui\MigrationModal.jsx
+  11:8  warning  React Hook useEffect has a missing dependency: 'checkAndMigrate'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\ui\Module6WrapUp.jsx
+  2:29  warning  'Award' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\ModuleNotes.jsx
+  12:8  warning  React Hook useEffect has a missing dependency: 'loadNote'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\ui\NameVisualizer.jsx
+  2:25  warning  'Type' is defined but never used        no-unused-vars
+  2:38  warning  'ArrowRight' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\OfflineIndicator.test.jsx
+  2:26  warning  'act' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\PianoLesson.jsx
+    2:17  warning  'Volume2' is defined but never used                                       no-unused-vars
+    2:26  warning  'Info' is defined but never used                                          no-unused-vars
+  197:20  warning  'onPlay' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\PitchMatchingModule.jsx
+   11:12  warning  'status' is assigned a value but never used                                                                 no-unused-vars
+  142:8   warning  React Hook useEffect has a missing dependency: 'animate'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\ui\PitchPipe.jsx
+  11:11  warning  'playOnce' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\PracticeCardsPanel.jsx
+  16:9  warning  'cardSets' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\PracticePhilosophy.jsx
+  5:12  warning  'activeTab' is assigned a value but never used     no-unused-vars
+  5:23  warning  'setActiveTab' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\PracticeTimer.jsx
+  45:8  warning  React Hook useEffect has a missing dependency: 'playCompletionSound'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\ui\ProfileManager.jsx
+  6:70  warning  'deleteProfile' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\ProjectionPractice.jsx
+  1:10  warning  'useState' is defined but never used     no-unused-vars
+  2:10  warning  'Mic' is defined but never used          no-unused-vars
+  2:26  warning  'ShieldCheck' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\QuizCard.jsx
+  10:5  warning  'showResult' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\QuizView.jsx
+  5:23  warning  'MODULE_ORDER' is defined but never used  no-unused-vars
+  5:37  warning  'MODULE_NAMES' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\RecordingsList.jsx
+  22:22  warning  The ref value 'audioRef.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'audioRef.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+  24:8   warning  React Hook useEffect has a missing dependency: 'audioUrl'. Either include it or remove the dependency array                                                                                                                                                      react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\ui\RegisterBlend.jsx
+  1:10  warning  'useState' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\ResizablePanel.jsx
+  141:8  warning  React Hook useEffect has missing dependencies: 'handleMouseMove', 'handleMouseUp', and 'handleTouchMove'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\ui\SelfAssessmentModal.jsx
+  7:13  warning  't' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\SessionNotes.jsx
+  3:16  warning  'Clock' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\SkeletonLoader.test.jsx
+  1:8  warning  'React' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\SoundJournal.jsx
+  2:10  warning  'Volume2' is defined but never used         no-unused-vars
+  2:19  warning  'Wind' is defined but never used            no-unused-vars
+  2:25  warning  'Zap' is defined but never used             no-unused-vars
+  2:43  warning  'Edit3' is defined but never used           no-unused-vars
+  2:64  warning  'Smile' is defined but never used           no-unused-vars
+  2:71  warning  'CloudLightning' is defined but never used  no-unused-vars
+  2:87  warning  'Coffee' is defined but never used          no-unused-vars
+  2:95  warning  'Radio' is defined but never used           no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\StyleMixer.jsx
+  2:10  warning  'Sliders' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\SyllableStacker.jsx
+  1:8   warning  'React' is defined but never used   no-unused-vars
+  2:10  warning  'Layers' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\TonalConsistency.jsx
+  2:24  warning  'Music' is defined but never used  no-unused-vars
+  2:44  warning  'Play' is defined but never used   no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\ToneGenerator.jsx
+  268:47  warning  'idx' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\TooltipOverlay.jsx
+  14:11  warning  'targetRef' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\TourOverlay.jsx
+  1:31  warning  'useRef' is defined but never used            no-unused-vars
+  4:27  warning  'ChevronLeft' is defined but never used       no-unused-vars
+  7:80  warning  'endTour' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\UserProfile.jsx
+  8:13  warning  'settings' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\VocalHealthTips.jsx
+  25:52  warning  'i' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\VocalStatsSummary.jsx
+   1:10  warning  'useState' is defined but never used                                     no-unused-vars
+   1:20  warning  'useEffect' is defined but never used                                    no-unused-vars
+   1:31  warning  'useMemo' is defined but never used                                      no-unused-vars
+  22:11  warning  'pitchRange' is assigned a value but never used                          no-unused-vars
+  23:11  warning  'volumeRange' is assigned a value but never used                         no-unused-vars
+  66:40  warning  'label' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\VoiceAudit.jsx
+  1:20  warning  'useRef' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\ui\VoiceSelfAssessment.jsx
+   1:39  warning  'useCallback' is defined but never used              no-unused-vars
+  26:12  warning  'isAnalyzing' is assigned a value but never used     no-unused-vars
+  26:25  warning  'setIsAnalyzing' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\views\AcousticAnalysisView.jsx
+  1:8  warning  'React' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\views\AdaptivePracticeSession.jsx
+   1:8   warning  'React' is defined but never used                                       no-unused-vars
+   1:38  warning  'useRef' is defined but never used                                      no-unused-vars
+   6:8   warning  'DynamicOrb' is defined but never used                                  no-unused-vars
+  13:13  warning  'activeProfile' is assigned a value but never used                      no-unused-vars
+  14:13  warning  'audioEngineRef' is assigned a value but never used                     no-unused-vars
+  14:38  warning  'isAudioActive' is assigned a value but never used                      no-unused-vars
+  63:29  warning  'type' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\views\AnalysisHub.jsx
+  1:8   warning  'React' is defined but never used      no-unused-vars
+  3:53  warning  'ArrowLeft' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\views\AnalysisView.jsx
+    1:8   warning  'React' is defined but never used                                        no-unused-vars
+    4:39  warning  'RotateCcw' is defined but never used                                    no-unused-vars
+    4:50  warning  'Download' is defined but never used                                     no-unused-vars
+    4:60  warning  'Share2' is defined but never used                                       no-unused-vars
+  210:47  warning  'range' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\views\ArticulationView.jsx
+   1:8   warning  'React' is defined but never used         no-unused-vars
+   2:38  warning  'Trophy' is defined but never used        no-unused-vars
+   2:46  warning  'Star' is defined but never used          no-unused-vars
+   2:52  warning  'RefreshCw' is defined but never used     no-unused-vars
+   2:63  warning  'ChevronRight' is defined but never used  no-unused-vars
+  11:8   warning  'TwisterCard' is defined but never used   no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\views\AssessmentView.jsx
+  1:8  warning  'React' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\views\ClinicalAssessmentView.jsx
+    43:13  warning  't' is assigned a value but never used                                     no-unused-vars
+  1129:36  warning  'onReset' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\views\MixingBoardView.jsx
+  4:37  warning  'audioEngine' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  7:12  warning  'sliderValues' is assigned a value but never used                              no-unused-vars
+  7:26  warning  'setSliderValues' is assigned a value but never used                           no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\views\PhonetogramView.jsx
+  46:8  warning  React Hook useEffect has a missing dependency: 'update'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\views\PracticeMode.jsx
+  16:8  warning  'GenderPerceptionDashboard' is defined but never used                                                         no-unused-vars
+  57:5  warning  'goals' is defined but never used. Allowed unused args must match /^_/u                                       no-unused-vars
+  59:5  warning  'onUpdateRange' is defined but never used. Allowed unused args must match /^_/u                               no-unused-vars
+  60:5  warning  'onSwitchProfile' is defined but never used. Allowed unused args must match /^_/u                             no-unused-vars
+  65:9  warning  'navigate' is assigned a value but never used                                                                 no-unused-vars
+  75:9  warning  'startAudio' is assigned a value but never used                                                               no-unused-vars
+  76:9  warning  'stopAudio' is assigned a value but never used                                                                no-unused-vars
+  90:8  warning  React Hook useEffect has a missing dependency: 'startTour'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\views\PracticeMode.test.jsx
+   2:8   warning  'React' is defined but never used                     no-unused-vars
+   3:26  warning  'waitFor' is defined but never used                   no-unused-vars
+  43:11  warning  'mockAudioEngine' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\views\ProgramView.jsx
+  6:10  warning  'useNavigation' is defined but never used        no-unused-vars
+  9:38  warning  'currentDay' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\views\ProgressiveStackingSession.jsx
+   19:44  warning  'target' is defined but never used. Allowed unused args must match /^_/u                                    no-unused-vars
+  106:13  warning  'calibration' is assigned a value but never used                                                            no-unused-vars
+  133:37  warning  'index' is defined but never used. Allowed unused args must match /^_/u                                     no-unused-vars
+  172:8   warning  React Hook useEffect has a missing dependency: 'dataRef'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  311:49  warning  'i' is defined but never used. Allowed unused args must match /^_/u                                         no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\views\SLPDashboard.jsx
+  16:13  warning  'activeClient' is assigned a value but never used  no-unused-vars
+  17:13  warning  'showSettings' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\views\TrainingView.jsx
+  111:8  warning  React Hook useEffect has a missing dependency: 'techModules'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\views\VocalFoldsView.jsx
+  15:21  warning  'setQuality' is assigned a value but never used      no-unused-vars
+  16:25  warning  'setDescription' is assigned a value but never used  no-unused-vars
+  33:15  warning  'lFactor' is assigned a value but never used         no-unused-vars
+  34:15  warning  'mFactor' is assigned a value but never used         no-unused-vars
+  35:15  warning  'tFactor' is assigned a value but never used         no-unused-vars
+  57:13  warning  'd' is assigned a value but never used               no-unused-vars
+  60:13  warning  'q' is assigned a value but never used               no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\views\VoiceQualityView.jsx
+   19:18  warning  'setGoal' is assigned a value but never used                                                                         no-unused-vars
+   22:31  warning  'setIncludeTranscript' is assigned a value but never used                                                            no-unused-vars
+  187:8   warning  React Hook useEffect has a missing dependency: 'stopLiveAnalysis'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\viz\FileSpectrogram.jsx
+  114:8  warning  React Hook useEffect has a missing dependency: 'renderSpectrogram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  121:8  warning  React Hook useEffect has a missing dependency: 'renderSpectrogram'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  126:8  warning  React Hook useEffect has a missing dependency: 'renderPlayhead'. Either include it or remove the dependency array     react-hooks/exhaustive-deps
+  189:8  warning  React Hook useCallback has a missing dependency: 'renderPlayhead'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\viz\IntonationTrainer.jsx
+  253:8  warning  React Hook useEffect has missing dependencies: 'dataRef', 'patterns', and 'score'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\viz\LTASPlot.jsx
+  93:8  warning  React Hook useEffect has a missing dependency: 'dataRef'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\viz\MPTTracker.jsx
+  55:8  warning  React Hook useEffect has a missing dependency: 'stopTimer'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\viz\PitchOrb.jsx
+  171:8  warning  React Hook useEffect has a missing dependency: 'getGenderColor'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\viz\PitchTrace.jsx
+  116:17  warning  'isDrawing' is assigned a value but never used                                                                                                                     no-unused-vars
+  184:8   warning  React Hook useEffect has missing dependencies: 'bounds.fMax', 'bounds.fMin', 'bounds.tMax', and 'bounds.tMin'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\viz\PitchVisualizer.jsx
+  462:8  warning  React Hook useEffect has missing dependencies: 'dataRef' and 'onScore'. Either include them or remove the dependency array. If 'onScore' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\viz\QualityVisualizer.jsx
+  62:47  warning  'height' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\viz\RegisterGauge.jsx
+  70:11  warning  'showChestWarning' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\viz\ResonanceOrb.jsx
+   59:66  warning  'weight' is assigned a value but never used           no-unused-vars
+   59:90  warning  'isBackendActive' is assigned a value but never used  no-unused-vars
+  179:27  warning  'shadowOpacity' is assigned a value but never used    no-unused-vars
+  267:11  warning  'radius' is assigned a value but never used           no-unused-vars
+  268:11  warning  'center' is assigned a value but never used           no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\viz\SZRatio.jsx
+  10:23  warning  'setThreshold' is assigned a value but never used                                                              no-unused-vars
+  51:8   warning  React Hook useEffect has a missing dependency: 'startTimer'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\viz\SpectralTiltMeter.jsx
+  5:39  warning  'userMode' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  9:11  warning  'canvasRef' is assigned a value but never used                              no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\viz\Spectrogram.jsx
+  105:8  warning  React Hook useEffect has a missing dependency: 'draw'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\viz\Spectrogram3D.jsx
+  1:27  warning  'useEffect' is defined but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\viz\VoiceQualityAnalysis.jsx
+  76:13  warning  'targetRange' is assigned a value but never used  no-unused-vars
+
+C:\Users\riley\Desktop\GEM\src\components\viz\VoiceRangeProfile.jsx
+   50:12  warning  'hoverInfo' is assigned a value but never used                                                                                                                                                                                         no-unused-vars
+   50:23  warning  'setHoverInfo' is assigned a value but never used                                                                                                                                                                                      no-unused-vars
+   64:19  warning  'points' is assigned a value but never used                                                                                                                                                                                            no-unused-vars
+  106:8   warning  React Hook useMemo has missing dependencies: 'config.intensityBins', 'config.maxIntensity', 'config.maxPitch', 'config.minIntensity', 'config.minPitch', and 'config.pitchBins'. Either include them or remove the dependency array    react-hooks/exhaustive-deps
+  212:8   warning  React Hook useEffect has missing dependencies: 'config.intensityBins', 'config.maxIntensity', 'config.maxPitch', 'config.minIntensity', 'config.minPitch', and 'config.pitchBins'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\riley\Desktop\GEM\src\components\viz\VowelSpacePlot.jsx
+    5:36  warning  'showAnalysis' is assigned a value but never used                                                                                                  no-unused-vars
+   34:12  warning  'currentVowel' is assigned a value but never used                                                                                                  no-unused-vars
+  150:8   warning  React Hook useEffect has missing dependencies: 'dataRef', 'getXPos', 'getYPos', and 'targets'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+Γ£û 182 problems (1 error, 181 warnings)
+

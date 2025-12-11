@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Search, ArrowLeft, Book } from 'lucide-react';
 import { GLOSSARY_TERMS } from '../../data/glossaryData';
 import { useNavigation } from '../../context/NavigationContext';
@@ -52,7 +52,7 @@ const GlossaryView = () => {
                 ) : (
                     <div className="text-center py-12 text-slate-500">
                         <Book size={48} className="mx-auto mb-4 opacity-50" />
-                        <p>No terms found for "{search}"</p>
+                        <p>No terms found for &quot;{search}&quot;</p>
                     </div>
                 )}
             </div>

@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Repeat, Plus, Star, Calendar, Smartphone, Layout } from 'lucide-react';
 
 const HabitBuilder = ({ onComplete }) => {
     const [existingHabit, setExistingHabit] = useState('');
     const [newAction, setNewAction] = useState('practice voice for 1 min');
-    const [showStatement, setShowStatement] = useState(false);
 
     const strategies = [
         { icon: Star, title: "Gamify", desc: "Use apps like Habitica to get 'gold' for practicing." },

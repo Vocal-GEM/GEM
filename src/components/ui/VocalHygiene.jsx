@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Droplets, Battery, Moon, AlertTriangle, Salad, CheckCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Droplets, Moon, AlertTriangle, Salad, CheckCircle } from 'lucide-react';
 
 const VocalHygiene = ({ onComplete }) => {
     const [checks, setChecks] = useState({});
@@ -22,8 +22,8 @@ const VocalHygiene = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">Vocal Hygiene: The Green Light</h2>
                 <p className="text-slate-400">
-                    You need a "Green Light" from your body before practicing.
-                    If it hurts, stop. If you're hoarse, rest.
+                    You need a &quot;Green Light&quot; from your body before practicing.
+                    If it hurts, stop. If you&apos;re hoarse, rest.
                 </p>
             </div>
 
@@ -70,7 +70,7 @@ const VocalHygiene = ({ onComplete }) => {
                 <ul className="space-y-3 text-slate-300 text-sm">
                     <li className="flex gap-2">
                         <span className="text-red-500 font-bold">1.</span>
-                        <span><strong>Rigidity:</strong> If your larynx feels "stuck" or you can't move while making sound.</span>
+                        <span><strong>Rigidity:</strong> If your larynx feels &quot;stuck&quot; or you can&apos;t move while making sound.</span>
                     </li>
                     <li className="flex gap-2">
                         <span className="text-red-500 font-bold">2.</span>

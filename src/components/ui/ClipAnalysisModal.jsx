@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { X, Play, Pause, BarChart2, Activity, Info, Brain } from 'lucide-react';
+import { X, Play, Pause, BarChart2, Info, Brain } from 'lucide-react';
 import { analyzeClip, formatAnalysisForDisplay } from '../../services/ClipAnalysisService';
 import { getPerceptionColor } from '../../services/GenderPerceptionPredictor';
 import { useSettings } from '../../context/SettingsContext';

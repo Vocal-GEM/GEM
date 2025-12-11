@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Feather, Anchor, Info, Wind, Zap, Layers } from 'lucide-react';
 
 const VocalWeightTheory = ({ onComplete }) => {
@@ -9,7 +9,7 @@ const VocalWeightTheory = ({ onComplete }) => {
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
                 <h2 className="text-2xl font-bold text-white mb-2">Module 5: Vocal Weight</h2>
                 <p className="text-slate-400">
-                    Also known as "Mass" or "Fold Thickness". This is the difference between a heavy "Buzz" and a light "Float".
+                    Also known as &quot;Mass&quot; or &quot;Fold Thickness&quot;. This is the difference between a heavy &quot;Buzz&quot; and a light &quot;Float&quot;.
                 </p>
             </div>
 
@@ -91,7 +91,7 @@ const OpenQuotientTab = () => (
         </div>
 
         <div className="p-4 bg-indigo-900/20 text-indigo-200 rounded-xl text-sm border border-indigo-500/20">
-            <strong>Goal:</strong> Feminine voices often lean towards a <em>slightly</em> higher OQ (softer) to avoid the "buzz" of heavy weight.
+            <strong>Goal:</strong> Feminine voices often lean towards a <em>slightly</em> higher OQ (softer) to avoid the &quot;buzz&quot; of heavy weight.
         </div>
     </div>
 );
@@ -100,7 +100,7 @@ const ConceptTab = () => (
     <div className="space-y-6">
         <h3 className="text-xl font-bold text-white">Heaviness vs. Lightness</h3>
         <p className="text-slate-300">
-            It's not just about Pitch. You can have a high pitch that is "Heavy" (Belting) or a low pitch that is "Light" (Sultry).
+            It&apos;s not just about Pitch. You can have a high pitch that is &quot;Heavy&quot; (Belting) or a low pitch that is &quot;Light&quot; (Sultry).
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -132,8 +132,8 @@ const ConceptTab = () => (
         <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/50 flex gap-3 text-sm text-slate-400 italic">
             <Info size={16} className="shrink-0 mt-1" />
             <div>
-                "Testosterone deepens the voice by physically thickening the vocal folds.
-                Feminizing involves learning to use just the thin edges, even if the folds are thick."
+                &quot;Testosterone deepens the voice by physically thickening the vocal folds.
+                Feminizing involves learning to use just the thin edges, even if the folds are thick.&quot;
             </div>
         </div>
     </div>
@@ -153,7 +153,7 @@ const SpectrumTab = () => {
 
     return (
         <div className="space-y-8">
-            <h3 className="text-xl font-bold text-white">The 3 B's of Phonation</h3>
+            <h3 className="text-xl font-bold text-white">The 3 B&apos;s of Phonation</h3>
             <p className="text-slate-300">
                 Adduction (Closing) vs Abduction (Opening). Finding the Goldilocks zone.
             </p>
@@ -209,7 +209,7 @@ const AnatomyTab = () => (
             <div className="flex items-start gap-4 p-4 bg-slate-900 rounded-xl border-l-4 border-pink-500">
                 <div className="font-bold text-white w-32 shrink-0">False Folds</div>
                 <div className="text-slate-400 text-sm">
-                    (Vestibular Folds) Just above the true folds. Used for straining or "GRRR" sounds.
+                    (Vestibular Folds) Just above the true folds. Used for straining or &quot;GRRR&quot; sounds.
                     <br /><span className="text-xs text-slate-500 block mt-1">Goal: Keep these OPEN (Retracted).</span>
                 </div>
             </div>
@@ -217,7 +217,7 @@ const AnatomyTab = () => (
             <div className="flex items-start gap-4 p-4 bg-slate-900 rounded-xl border-l-4 border-yellow-500">
                 <div className="font-bold text-white w-32 shrink-0">Sphincter</div>
                 <div className="text-slate-400 text-sm">
-                    (Aryepiglottic Sphincter) The top rim. Creates "Twang".
+                    (Aryepiglottic Sphincter) The top rim. Creates &quot;Twang&quot;.
                     <br /><span className="text-xs text-slate-500 block mt-1">Goal: Use this for LOUDNESS (Feminine Shout).</span>
                 </div>
             </div>

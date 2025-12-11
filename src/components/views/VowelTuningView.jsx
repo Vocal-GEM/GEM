@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAudio } from '../../context/AudioContext';
 import VowelSpacePlot from '../viz/VowelSpacePlot';

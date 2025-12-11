@@ -1,4 +1,4 @@
-import React from 'react';
+import { cloneElement } from 'react';
 import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import VocalHealthPanel from '../dashboard/VocalHealthPanel';
@@ -11,7 +11,7 @@ const StatCard = ({ label, value, subtext, icon, color }) => (
     <div className="bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
         <div className="flex justify-between items-start mb-2 sm:mb-4">
             <div className={`p-2 sm:p-3 rounded-xl ${color} bg-opacity-10`}>
-                {React.cloneElement(icon, { className: `${color} w-5 h-5 sm:w-6 sm:h-6` })}
+                {cloneElement(icon, { className: `${color} w-5 h-5 sm:w-6 sm:h-6` })}
             </div>
             {subtext && <span className="text-[10px] sm:text-xs font-bold text-teal-500 bg-teal-500/10 px-2 py-1 rounded-full">{subtext}</span>}
         </div>
@@ -27,7 +27,7 @@ const ActionCard = ({ title, description, onClick, icon, color }) => (
     >
         <div className="flex items-center justify-between mb-2 sm:mb-4">
             <div className={`p-2 sm:p-3 rounded-xl ${color} bg-opacity-10 group-hover:scale-110 transition-transform`}>
-                {React.cloneElement(icon, { className: `${color} w-5 h-5 sm:w-6 sm:h-6` })}
+                {cloneElement(icon, { className: `${color} w-5 h-5 sm:w-6 sm:h-6` })}
             </div>
             <ArrowRight className="text-slate-600 group-hover:text-white transition-colors w-4 h-4 sm:w-5 sm:h-5" />
         </div>

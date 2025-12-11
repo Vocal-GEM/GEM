@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { X, Moon, Sun, Zap, Eye, EyeOff } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 

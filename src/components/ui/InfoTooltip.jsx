@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { HelpCircle, Info } from 'lucide-react';
+import { useState } from 'react';
+import { HelpCircle } from 'lucide-react';
 
 const InfoTooltip = ({ content, icon: Icon = HelpCircle, size = 16, className = "" }) => {
     const [isVisible, setIsVisible] = useState(false);

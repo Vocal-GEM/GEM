@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Timer, Play, Pause, RotateCcw, Plus, X, Bell } from 'lucide-react';
 
 const PRESETS = [
@@ -14,7 +14,7 @@ const PracticeTimer = ({ onComplete, onClose, compact = false }) => {
     const [isRunning, setIsRunning] = useState(false);
     const [isComplete, setIsComplete] = useState(false);
     const intervalRef = useRef(null);
-    const audioRef = useRef(null);
+
 
     // Create audio context for completion chime
     useEffect(() => {
@@ -206,8 +206,8 @@ const PracticeTimer = ({ onComplete, onClose, compact = false }) => {
                         onClick={() => selectPreset(preset.seconds)}
                         disabled={isRunning}
                         className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${duration === preset.seconds
-                                ? 'bg-teal-500 text-white'
-                                : 'bg-slate-700 text-slate-300 hover:bg-slate-600 disabled:opacity-50'
+                            ? 'bg-teal-500 text-white'
+                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600 disabled:opacity-50'
                             }`}
                     >
                         {preset.label}
@@ -228,8 +228,8 @@ const PracticeTimer = ({ onComplete, onClose, compact = false }) => {
                 <button
                     onClick={toggleTimer}
                     className={`px-6 py-3 rounded-xl font-bold text-white transition-all flex items-center gap-2 ${isRunning
-                            ? 'bg-amber-500 hover:bg-amber-400'
-                            : 'bg-gradient-to-r from-teal-500 to-purple-500 hover:from-teal-400 hover:to-purple-400'
+                        ? 'bg-amber-500 hover:bg-amber-400'
+                        : 'bg-gradient-to-r from-teal-500 to-purple-500 hover:from-teal-400 hover:to-purple-400'
                         }`}
                 >
                     {isRunning ? (

@@ -1,4 +1,4 @@
-// React removed
+
 
 const IntensityMeter = ({ intensity, min = -60, max = 0 }) => {
     // Clamp intensity between min and max

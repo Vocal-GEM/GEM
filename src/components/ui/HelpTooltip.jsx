@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 /**
  * Help Tooltip Component
  * Provides contextual help for UI elements
  */
-const HelpTooltip = ({ content, children, position = 'top' }) => {
+const HelpTooltip = ({ content, position = 'top' }) => {
     const [show, setShow] = useState(false);
 
     const positionStyles = {

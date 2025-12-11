@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Activity, Mic, AlertTriangle, CheckCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Activity, AlertTriangle } from 'lucide-react';
 
 const DebugOverlay = ({ audioEngine, dataRef }) => {
     const [isOpen, setIsOpen] = useState(false);

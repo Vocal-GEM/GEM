@@ -5,7 +5,7 @@
 import { useEffect, useRef, useMemo, useCallback } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { generateColormap } from '../../utils/colormaps';
-import { Undo2 } from 'lucide-react';
+
 
 const FileSpectrogram = ({
     audioBuffer,

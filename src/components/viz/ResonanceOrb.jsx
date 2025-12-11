@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Info, WifiOff } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Info } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useAudio } from '../../context/AudioContext';
 import { useFeedback } from '../../hooks/useFeedback';

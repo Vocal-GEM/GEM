@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, cloneElement } from 'react';
 import { Battery, Clock, AlertTriangle, Sparkles, Lightbulb } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { vocalHealthTips } from '../../data/vocalHealthTips';
@@ -45,7 +45,7 @@ const VocalHealthPanel = () => {
 
                             <div className="flex items-start gap-3 mb-2">
                                 <div className={`p-2 rounded-lg bg-${currentTip.color}-500/10 mt-1`}>
-                                    {React.cloneElement(currentTip.icon, { size: 20 })}
+                                    {cloneElement(currentTip.icon, { size: 20 })}
                                 </div>
                                 <div>
                                     <h4 className={`font-bold text-sm mb-1 text-${currentTip.color}-400`}>

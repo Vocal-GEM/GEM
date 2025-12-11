@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { syncManager } from '../../services/SyncManager';
-import { Wifi, WifiOff, RefreshCw, Check, AlertCircle } from 'lucide-react';
+import { Wifi, WifiOff, RefreshCw } from 'lucide-react';
 
 const OfflineIndicator = () => {
     const [status, setStatus] = useState(syncManager.getStatus());

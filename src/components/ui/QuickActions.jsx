@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, Mic, Book, Bot, Zap, X, Volume2, VolumeX } from 'lucide-react';
+import { useState } from 'react';
+import { Plus, Mic, Book, Bot, Zap, Volume2, VolumeX } from 'lucide-react';
 
 import { useSettings } from '../../context/SettingsContext';
 

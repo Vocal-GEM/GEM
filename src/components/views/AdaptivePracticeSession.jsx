@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Play, Pause, SkipForward, ThumbsUp, ThumbsDown, ArrowLeft, CheckCircle, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useAudio } from '../../context/AudioContext';
 import { PracticeRoutineGenerator } from '../../services/PracticeRoutineGenerator';
-import DynamicOrb from '../viz/DynamicOrb';
 import PitchVisualizer from '../viz/PitchVisualizer';
 import ResonanceOrb from '../viz/ResonanceOrb';
 import VoiceQualityMeter from '../viz/VoiceQualityMeter';
 import LoadingSpinner from '../ui/LoadingSpinner';
 
 const AdaptivePracticeSession = ({ onClose }) => {
-    const { activeProfile, skillLevel, goals, calibration } = useProfile();
-    const { audioEngineRef, dataRef, isAudioActive, toggleAudio } = useAudio();
+    const { skillLevel, goals, calibration } = useProfile();
+    const { dataRef, toggleAudio } = useAudio();
 
     const [routine, setRoutine] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -60,7 +59,7 @@ const AdaptivePracticeSession = ({ onClose }) => {
         }
     };
 
-    const handleFeedback = (type) => {
+    const handleFeedback = (_type) => {
         setFeedbackGiven(true);
         // Log feedback logic here
         // console.log('Feedback:', type);

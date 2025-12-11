@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Save, X, ThumbsUp, ThumbsDown, Meh } from 'lucide-react';
+import { useState } from 'react';
+import { Save, ThumbsUp, ThumbsDown, Meh } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { historyService } from '../../utils/historyService';
 
@@ -49,8 +49,8 @@ const SelfAssessmentModal = ({ onClose, sessionData }) => {
                                     key={level}
                                     onClick={() => setEffort(level)}
                                     className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all border ${effort === level
-                                            ? 'bg-blue-600 border-blue-500 text-white shadow-lg scale-105'
-                                            : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700'
+                                        ? 'bg-blue-600 border-blue-500 text-white shadow-lg scale-105'
+                                        : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700'
                                         }`}
                                 >
                                     {level}

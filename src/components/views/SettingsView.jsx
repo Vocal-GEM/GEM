@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Download, Upload, Trash2, AlertTriangle, Check, FileJson, Eye, Globe, TrendingUp, Heart, Edit3 } from 'lucide-react';
 import { indexedDB } from '../../services/IndexedDBManager';
 import { useSettings } from '../../context/SettingsContext';
@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { COLORMAP_PRESETS } from '../../utils/colormaps';
 import VoiceCalibrationWizard from '../ui/VoiceCalibrationWizard';
 import { VoiceCalibrationService } from '../../services/VoiceCalibrationService';
-import { SelfCareService, SELF_CARE_PROMPTS } from '../../services/SelfCareService';
+import { SelfCareService } from '../../services/SelfCareService';
 import SelfCareOnboarding from '../ui/SelfCareOnboarding';
 
 const SettingsView = () => {

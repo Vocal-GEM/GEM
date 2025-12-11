@@ -1,5 +1,5 @@
 /* eslint-env jest */
-import React from 'react';
+
 import { render, screen, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
 import PracticeMode from './PracticeMode';

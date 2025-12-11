@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
 import { RotateCcw, HelpCircle, AlertTriangle, X, Sparkles, BarChart2 } from 'lucide-react';
@@ -11,7 +11,7 @@ import { renderCoordinator } from '../../services/RenderCoordinator';
 import { predictGenderPerception, getPerceptionColor, AMBIGUITY_ZONE } from '../../services/GenderPerceptionPredictor';
 import GenderTimeline from './GenderTimeline';
 
-const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, onScore, settings }) => {
+const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScore, settings }) => {
     const { voiceProfiles } = useProfile();
     const { colorBlindMode } = useSettings();
     const canvasRef = useRef(null);
@@ -536,8 +536,8 @@ const PitchVisualizer = React.memo(({ dataRef, targetRange, userMode, exercise, 
             <button
                 onClick={() => setShowGenderTimeline(!showGenderTimeline)}
                 className={`absolute top-3 left-28 z-20 p-2 rounded-lg backdrop-blur-sm border transition-all ${showGenderTimeline
-                        ? 'bg-purple-500/30 border-purple-500/50 text-purple-300'
-                        : 'bg-slate-800/80 border-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-700'
+                    ? 'bg-purple-500/30 border-purple-500/50 text-purple-300'
+                    : 'bg-slate-800/80 border-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-700'
                     }`}
                 title="Toggle Gender Timeline"
             >

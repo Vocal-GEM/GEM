@@ -1,36 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Upload, Play, Square, Activity, FileText, BarChart2, Info, Save, History, Calendar, Trash2, Pause, Eye } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Mic, Upload, Play, Activity, FileText, Info, Save, History, Calendar, Trash2, Pause, Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Toast from '../ui/Toast';
 import { indexedDB, STORES } from '../../services/IndexedDBManager';
 import Spectrogram from '../viz/Spectrogram';
 import FileSpectrogram from '../viz/FileSpectrogram';
-import ClipCapture from '../ui/ClipCapture';
-import IntensityMeter from '../viz/IntensityMeter';
 import RegisterGauge from '../viz/RegisterGauge';
-import { DSP } from '../../utils/DSP';
-import { getNormsForGoal } from '../../data/norms';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-);
 
 import { useAudio } from '../../context/AudioContext';
 
