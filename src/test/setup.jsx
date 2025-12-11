@@ -230,5 +230,6 @@ vi.mock('lucide-react', () => {
         X: createIcon('x'),
         XCircle: createIcon('x-circle'),
         Zap: createIcon('zap'),
+        Sun: createIcon('sun'),
     };
 });

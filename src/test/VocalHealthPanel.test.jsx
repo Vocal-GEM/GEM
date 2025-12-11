@@ -10,7 +10,9 @@ vi.mock('lucide-react', () => ({
     Clock: () => <div data-testid="icon-clock" />,
     Plus: () => <span data-testid="btn-plus">+</span>,
     Minus: () => <span data-testid="btn-minus">-</span>,
-    AlertTriangle: () => <div data-testid="icon-alert" />
+    AlertTriangle: () => <div data-testid="icon-alert" />,
+    Zap: () => <div data-testid="icon-zap" />,
+    Sun: () => <div data-testid="icon-sun" />
 }));
 
 // Mock IndexedDBManager to prevent unhandled rejections

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Music, Volume2, Info, CheckCircle, HelpCircle } from 'lucide-react';
+import { Music, CheckCircle, HelpCircle } from 'lucide-react';
 
 // Frequencies for Octave 3 (and C4)
 const NOTES = {
@@ -194,7 +194,7 @@ const OctavesTab = () => (
     </div>
 );
 
-const QuizTab = ({ onPlay, lastPlayed }) => {
+const QuizTab = ({ lastPlayed }) => {
     const [target, setTarget] = useState('C3');
     const [status, setStatus] = useState('waiting'); // waiting, correct, wrong
 

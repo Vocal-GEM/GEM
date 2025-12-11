@@ -13,7 +13,6 @@ import ResizablePanel from './ResizablePanel';
 
 const PracticeCardsPanel = ({ onClose, embedded = false }) => {
     const {
-        cardSets,
         customCardSets,
         defaultCardSets,
         activeCardSet,

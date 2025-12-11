@@ -22,7 +22,7 @@ import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
 
 const LessonView = ({ lesson, onComplete, onNext, onPrevious, hasNext, hasPrevious }) => {
-    const { dataRef, audioEngineRef } = useAudio();
+    const { dataRef } = useAudio();
     const { targetRange, calibration, activeProfile } = useProfile();
     const { settings } = useSettings();
     const [isLowConfidence, setIsLowConfidence] = useState(false);

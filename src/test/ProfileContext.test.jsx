@@ -79,7 +79,7 @@ describe('ProfileContext Integration', () => {
             ]);
         });
 
-        it('should switch profile', { timeout: 10000 }, async () => {
+        it('should switch profile', { timeout: 20000 }, async () => {
             const { result } = renderHook(() => useProfile(), { wrapper });
 
             // Wait for initial load

@@ -7,14 +7,8 @@ const PitchPipe = ({ audioEngine }) => {
 
     const intervalRef = useRef(null);
 
-    // Play a short burst (click)
-    const playOnce = () => {
-        if (audioEngine.current) {
-            audioEngine.current.playFeedbackTone(freq); // Default is short
-            setIsPlaying(true);
-            setTimeout(() => setIsPlaying(false), 500);
-        }
-    };
+    // Play a short burst (click) - Unused
+    // const playOnce = () => { ... }
 
     // Start continuous play (hold)
     const startPlaying = () => {

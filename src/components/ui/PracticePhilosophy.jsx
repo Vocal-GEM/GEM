@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Brain, Zap, Repeat, Target } from 'lucide-react';
 
 const PracticePhilosophy = ({ onComplete }) => {
-    const [activeTab, setActiveTab] = useState('concept');
+    // const [activeTab, setActiveTab] = useState('concept');
 
     return (
         <div className="space-y-6">

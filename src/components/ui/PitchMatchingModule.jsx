@@ -8,7 +8,7 @@ const PitchMatchingModule = ({ audioEngine }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [score, setScore] = useState(0);
     const [streak, setStreak] = useState(0);
-    const [status, setStatus] = useState('idle'); // idle, listening, success
+    // const [status, setStatus] = useState('idle'); // idle, listening, success
     const [feedback, setFeedback] = useState({ text: 'Ready', color: 'text-slate-400' });
 
     // Notes for selection
@@ -49,13 +49,13 @@ const PitchMatchingModule = ({ audioEngine }) => {
     const togglePractice = () => {
         if (isPlaying) {
             setIsPlaying(false);
-            setStatus('idle');
+            // setStatus('idle');
             setFeedback({ text: 'Stopped', color: 'text-slate-400' });
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
         } else {
             setIsPlaying(true);
             playTargetTone(); // Play cue
-            setStatus('listening');
+            // setStatus('listening');
             setScore(0);
             animate();
         }
@@ -139,7 +139,7 @@ const PitchMatchingModule = ({ audioEngine }) => {
         if (isPlaying && !requestRef.current) {
             animate();
         }
-    }, [isPlaying, targetNote]);
+    }, [isPlaying, targetNote, animate]);
 
     return (
         <div className="space-y-6">
