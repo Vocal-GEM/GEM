@@ -92,14 +92,13 @@ describe('ProfileContext Integration', () => {
             }, { timeout: 4000 });
 
             // Create a new profile to switch to
-            await act(async () => {
-                await result.current.switchProfile('p2');
+            // Create a new profile to switch to
+            act(() => {
+                result.current.switchProfile('p2');
             });
 
             // Check if saveSetting was called
-            await waitFor(() => {
-                expect(indexedDB.saveSetting).toHaveBeenCalledWith('active_profile', 'p2');
-            });
+            expect(mockIndexedDB.saveSetting).toHaveBeenCalledWith('active_profile', 'p2');
         }, 30000);
     });
 });
