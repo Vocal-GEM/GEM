@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { historyService } from '../../utils/historyService';
 
 const SelfAssessmentModal = ({ onClose, sessionData }) => {
-    const { t } = useTranslation();
+
+    // const { t } = useTranslation(); // t is unused, removing line
     const [effort, setEffort] = useState(null); // 1 (Easy) to 5 (Hard)
     const [satisfaction, setSatisfaction] = useState(null); // 1 (Bad) to 3 (Good)
     const [notes, setNotes] = useState('');

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Volume2, Wind, Zap, Music, Plus, Edit3, Trash2, Save, Smile, CloudLightning, Coffee, Radio } from 'lucide-react';
+import { Music, Plus, Trash2, Save } from 'lucide-react';
 
 const INSPIRATION_PROMPTS = [
     { label: 'Nature', items: ['🐶 Dog Bark', '🐱 Cat Meow', '🌬️ Wind in Trees', '🦗 Cicada', '🌊 Waterfall'] },

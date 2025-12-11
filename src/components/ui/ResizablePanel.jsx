@@ -119,6 +119,7 @@ const ResizablePanel = ({
     };
 
     // Cleanup
+
     useEffect(() => {
         if (isResizing) {
             // Touch events need to be added/removed dynamically or they might interfere
@@ -138,6 +139,12 @@ const ResizablePanel = ({
             document.body.style.userSelect = '';
             document.body.style.overflow = '';
         };
+        // Add dependencies - but handleMouseMove etc change on every render unless wrapped.
+        // If we add them, the effect re-runs on every render, adding/removing listeners constantly.
+        // It's better to useCallback them OR disable the rule.
+        // Since we cannot refactor everything to useCallback easily without potential staleness issues (startPos ref is fine, but setDimensions uses state),
+        // we will suppress the warning for this specific hook as it manages global listeners.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isResizing]);
 
     // On mobile, use full width and auto height

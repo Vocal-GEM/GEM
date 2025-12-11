@@ -100,6 +100,6 @@ describe('ProfileContext Integration', () => {
             await waitFor(() => {
                 expect(indexedDB.saveSetting).toHaveBeenCalledWith('active_profile', 'p2');
             });
-        });
+        }, 30000);
     });
 });

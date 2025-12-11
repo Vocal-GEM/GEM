@@ -15,11 +15,12 @@ const RecordingsList = () => {
 
     useEffect(() => {
         loadRecordings();
+        const audio = audioRef.current;
 
         // Cleanup audio URL on unmount
         return () => {
             if (audioUrl) URL.revokeObjectURL(audioUrl);
-            if (audioRef.current) audioRef.current.pause();
+            if (audio) audio.pause();
         };
     }, [audioUrl]);
 

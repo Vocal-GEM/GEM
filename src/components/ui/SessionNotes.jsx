@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useClient } from '../../context/ClientContext';
-import { Save, Clock, FileText } from 'lucide-react';
+import { Save, FileText } from 'lucide-react';
 
 const SessionNotes = () => {
     const { activeClient, updateClient } = useClient();
