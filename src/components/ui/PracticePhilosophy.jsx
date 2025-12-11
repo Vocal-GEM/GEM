@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Brain, Zap, Repeat, Target } from 'lucide-react';
 
 const PracticePhilosophy = ({ onComplete }) => {

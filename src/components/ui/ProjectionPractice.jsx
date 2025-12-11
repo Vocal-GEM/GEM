@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Mic, Megaphone, ShieldCheck } from 'lucide-react';
+import { Volume2, Megaphone } from 'lucide-react';
 
 const ProjectionPractice = ({ onComplete }) => {
     return (

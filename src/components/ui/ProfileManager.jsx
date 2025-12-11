@@ -3,7 +3,7 @@ import { User, Plus, Check, X } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 
 const ProfileManager = ({ onClose }) => {
-    const { profiles, activeProfileId, createProfile, switchProfile, deleteProfile } = useProfile();
+    const { profiles, createProfile, switchProfile, activeProfileId } = useProfile();
     const [isCreating, setIsCreating] = useState(false);
     const [newProfileName, setNewProfileName] = useState('');
 
@@ -34,18 +34,18 @@ const ProfileManager = ({ onClose }) => {
                         <div
                             key={profile.id}
                             onClick={() => switchProfile(profile.id)}
-                            className={`flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all ${activeProfileId === profile.id
+                            className={`flex items - center justify - between p - 4 rounded - xl cursor - pointer transition - all ${activeProfileId === profile.id
                                 ? 'bg-blue-600/20 border-blue-500/50 border'
                                 : 'bg-slate-800/50 border-transparent border hover:bg-slate-800'
-                                }`}
+                                } `}
                         >
                             <div className="flex items-center gap-3">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold ${activeProfileId === profile.id ? 'bg-blue-500 text-white' : 'bg-slate-700 text-slate-300'
-                                    }`}>
+                                <div className={`w - 10 h - 10 rounded - full flex items - center justify - center text - lg font - bold ${activeProfileId === profile.id ? 'bg-blue-500 text-white' : 'bg-slate-700 text-slate-300'
+                                    } `}>
                                     {profile.name[0].toUpperCase()}
                                 </div>
                                 <div>
-                                    <div className={`font-bold ${activeProfileId === profile.id ? 'text-white' : 'text-slate-300'}`}>
+                                    <div className={`font - bold ${activeProfileId === profile.id ? 'text-white' : 'text-slate-300'} `}>
                                         {profile.name}
                                     </div>
                                     <div className="text-xs text-slate-500">

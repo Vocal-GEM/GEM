@@ -42,7 +42,7 @@ const PracticeTimer = ({ onComplete, onClose, compact = false }) => {
         return () => {
             if (intervalRef.current) clearInterval(intervalRef.current);
         };
-    }, [isRunning, remaining, duration, onComplete]);
+    }, [isRunning, remaining, duration, onComplete, playCompletionSound]);
 
     // Pause timer when tab is hidden
     useEffect(() => {

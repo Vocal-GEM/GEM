@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, Volume2, Target } from 'lucide-react';
 import { BiofeedbackService } from '../../services/BiofeedbackService';
 
@@ -61,7 +61,7 @@ const PitchMatchingModule = ({ audioEngine }) => {
         }
     };
 
-    const animate = () => {
+    const animate = useCallback(() => {
         if (!audioEngine || !canvasRef.current) return;
 
         const data = audioEngine.getAnalysisData(); // Should return { pitch, volume, ... }
@@ -126,7 +126,7 @@ const PitchMatchingModule = ({ audioEngine }) => {
         if (isPlaying) {
             requestRef.current = requestAnimationFrame(animate);
         }
-    };
+    }, [audioEngine, targetNote, isPlaying]);
 
     useEffect(() => {
         return () => {

@@ -12,7 +12,7 @@ import { quizService, MODULE_ORDER, MODULE_NAMES } from '../../services/QuizServ
  * - Spaced repetition for missed questions
  * - Progress tracking and celebration
  */
-const QuizView = ({ onBack }) => {
+const QuizView = ({ onComplete }) => {
     const [mode, setMode] = useState('welcome'); // 'welcome', 'quiz', 'results'
     const [questions, setQuestions] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -96,7 +96,7 @@ const QuizView = ({ onBack }) => {
                 {/* Header */}
                 <div className="sticky top-0 z-10 bg-slate-950/90 backdrop-blur-lg border-b border-slate-800/50 px-4 lg:px-8 py-4">
                     <button
-                        onClick={onBack}
+                        onClick={onComplete}
                         className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group"
                     >
                         <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
@@ -208,20 +208,20 @@ const QuizView = ({ onBack }) => {
                                     <div
                                         key={module.moduleId}
                                         className={`flex items-center gap-4 p-3 rounded-xl transition-colors ${module.isCurrent
-                                                ? 'bg-purple-500/10 border border-purple-500/30'
-                                                : module.isUnlocked
-                                                    ? 'bg-slate-800/50'
-                                                    : 'bg-slate-800/20 opacity-50'
+                                            ? 'bg-purple-500/10 border border-purple-500/30'
+                                            : module.isUnlocked
+                                                ? 'bg-slate-800/50'
+                                                : 'bg-slate-800/20 opacity-50'
                                             }`}
                                     >
                                         {/* Module Number */}
                                         <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm ${module.isComplete
-                                                ? 'bg-emerald-500 text-white'
-                                                : module.isCurrent
-                                                    ? 'bg-purple-500 text-white'
-                                                    : module.isUnlocked
-                                                        ? 'bg-slate-700 text-slate-300'
-                                                        : 'bg-slate-800 text-slate-500'
+                                            ? 'bg-emerald-500 text-white'
+                                            : module.isCurrent
+                                                ? 'bg-purple-500 text-white'
+                                                : module.isUnlocked
+                                                    ? 'bg-slate-700 text-slate-300'
+                                                    : 'bg-slate-800 text-slate-500'
                                             }`}>
                                             {module.isComplete ? (
                                                 <CheckCircle2 className="w-4 h-4" />
@@ -250,8 +250,8 @@ const QuizView = ({ onBack }) => {
                                             <div className="w-20 h-1.5 bg-slate-700 rounded-full overflow-hidden">
                                                 <div
                                                     className={`h-full transition-all ${module.isComplete
-                                                            ? 'bg-emerald-500'
-                                                            : 'bg-purple-500'
+                                                        ? 'bg-emerald-500'
+                                                        : 'bg-purple-500'
                                                         }`}
                                                     style={{ width: `${module.percentComplete}%` }}
                                                 />
@@ -326,7 +326,7 @@ const QuizView = ({ onBack }) => {
                         </div>
                     )}
                 </div>
-            </div>
+            </div >
         );
     }
 
@@ -353,7 +353,7 @@ const QuizView = ({ onBack }) => {
                         moduleInfo={progressSummary}
                         onContinue={startQuiz}
                         onReviewMissed={reviewMissed}
-                        onBackToLearn={onBack}
+                        onBackToLearn={onComplete}
                     />
                 </div>
             </div>

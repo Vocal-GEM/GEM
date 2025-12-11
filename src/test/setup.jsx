@@ -208,6 +208,7 @@ vi.mock('lucide-react', () => {
         Square: createIcon('square'),
         Star: createIcon('star'),
         Stethoscope: createIcon('stethoscope'),
+        Sun: createIcon('sun'),
         Target: createIcon('target'),
         ThumbsDown: createIcon('thumbs-down'),
         ThumbsUp: createIcon('thumbs-up'),
@@ -230,6 +231,5 @@ vi.mock('lucide-react', () => {
         X: createIcon('x'),
         XCircle: createIcon('x-circle'),
         Zap: createIcon('zap'),
-        Sun: createIcon('sun'),
     };
 });
