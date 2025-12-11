@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Book, CheckCircle, Award, Heart, Rocket } from 'lucide-react';
+import { Book, CheckCircle, Heart, Rocket } from 'lucide-react';
 import Confetti from 'react-confetti';
 
 

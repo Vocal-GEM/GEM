@@ -20,7 +20,6 @@ const GuidedJourney = ({ onClose }) => {
         startJourney,
         advanceStep,
         goToPreviousStep,
-        goToStep,
         completeStep,
         exitJourney,
         resetJourney

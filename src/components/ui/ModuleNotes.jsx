@@ -8,26 +8,26 @@ const ModuleNotes = ({ moduleId, moduleTitle }) => {
     const [lastSaved, setLastSaved] = useState(null);
 
     useEffect(() => {
+        const loadNote = async () => {
+            try {
+                setStatus('loading');
+                const data = await indexedDB.getModuleNote(moduleId);
+                if (data) {
+                    setNote(data.content || '');
+                    setLastSaved(data.updatedAt);
+                } else {
+                    setNote('');
+                    setLastSaved(null);
+                }
+                setStatus('idle');
+            } catch (error) {
+                console.error("Failed to load note:", error);
+                setStatus('error');
+            }
+        };
+
         loadNote();
     }, [moduleId]);
-
-    const loadNote = async () => {
-        try {
-            setStatus('loading');
-            const data = await indexedDB.getModuleNote(moduleId);
-            if (data) {
-                setNote(data.content || '');
-                setLastSaved(data.updatedAt);
-            } else {
-                setNote('');
-                setLastSaved(null);
-            }
-            setStatus('idle');
-        } catch (error) {
-            console.error("Failed to load note:", error);
-            setStatus('error');
-        }
-    };
 
     const handleSave = async () => {
         if (!moduleId) return;

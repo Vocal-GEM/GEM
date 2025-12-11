@@ -110,7 +110,7 @@ const InstantPlayback = ({ bufferDuration = 5 }) => {
         } catch (err) {
             console.error('Failed to start instant playback recording:', err);
         }
-    }, [bufferDuration, isAudioActive]);
+    }, [bufferDuration, audioEngineRef]);
 
     const stopRecording = useCallback(() => {
         if (recordingIntervalRef.current) {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Image, Upload, Type, Music, ArrowRight, Save } from 'lucide-react';
+import { Image, Upload, Music, Save } from 'lucide-react';
 
 const NameVisualizer = ({ onComplete }) => {
     const [imageSrc, setImageSrc] = useState(null);

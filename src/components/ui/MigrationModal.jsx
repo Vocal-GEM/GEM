@@ -7,49 +7,49 @@ const MigrationModal = ({ onComplete }) => {
     const [message, setMessage] = useState('Checking for data...');
 
     useEffect(() => {
-        checkAndMigrate();
-    }, []);
-
-    const checkAndMigrate = async () => {
-        // Safety timeout to ensure modal doesn't stick forever
-        const timeoutId = setTimeout(() => {
-            console.warn('Migration check timed out, forcing completion');
-            setStatus('complete');
-            setMessage('Taking too long? Skipping check.');
-            setTimeout(onComplete, 1000);
-        }, 5000); // 5 seconds max
-
-        try {
-            const needsMigration = await indexedDB.needsMigration();
-            clearTimeout(timeoutId);
-
-            if (!needsMigration) {
+        const checkAndMigrate = async () => {
+            // Safety timeout to ensure modal doesn't stick forever
+            const timeoutId = setTimeout(() => {
+                console.warn('Migration check timed out, forcing completion');
                 setStatus('complete');
-                setMessage('No migration needed');
+                setMessage('Taking too long? Skipping check.');
                 setTimeout(onComplete, 1000);
-                return;
-            }
+            }, 5000); // 5 seconds max
 
-            setStatus('migrating');
-            setMessage('Migrating your data to improved storage...');
+            try {
+                const needsMigration = await indexedDB.needsMigration();
+                clearTimeout(timeoutId);
 
-            const success = await indexedDB.migrateFromLocalStorage();
+                if (!needsMigration) {
+                    setStatus('complete');
+                    setMessage('No migration needed');
+                    setTimeout(onComplete, 1000);
+                    return;
+                }
 
-            if (success) {
-                setStatus('complete');
-                setMessage('Migration complete! Your data is now stored more efficiently.');
-                setTimeout(onComplete, 2000);
-            } else {
+                setStatus('migrating');
+                setMessage('Migrating your data to improved storage...');
+
+                const success = await indexedDB.migrateFromLocalStorage();
+
+                if (success) {
+                    setStatus('complete');
+                    setMessage('Migration complete! Your data is now stored more efficiently.');
+                    setTimeout(onComplete, 2000);
+                } else {
+                    setStatus('error');
+                    setMessage('Migration failed. Your data is safe in the old storage.');
+                }
+            } catch (error) {
+                clearTimeout(timeoutId);
+                console.error('Migration error:', error);
                 setStatus('error');
-                setMessage('Migration failed. Your data is safe in the old storage.');
+                setMessage('An error occurred during migration.');
             }
-        } catch (error) {
-            clearTimeout(timeoutId);
-            console.error('Migration error:', error);
-            setStatus('error');
-            setMessage('An error occurred during migration.');
-        }
-    };
+        };
+
+        checkAndMigrate();
+    }, [onComplete]);
 
     if (status === 'complete' && message === 'No migration needed') {
         return null; // Don't show modal if no migration needed

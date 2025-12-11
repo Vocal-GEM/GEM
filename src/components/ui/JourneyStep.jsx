@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Lightbulb, Clock, ChevronRight, CheckCircle, Play, Pause, RotateCcw } from 'lucide-react';
+import { Lightbulb, Clock, CheckCircle, Play, Pause, RotateCcw } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
@@ -72,8 +72,7 @@ const GraduationReflection = lazy(() => import('./GraduationReflection'));
  */
 const JourneyStep = ({
     step,
-    onComplete,
-    isCompleted = false
+    onComplete
 }) => {
     const { dataRef, isAudioActive, toggleAudio } = useAudio();
     const { calibration, targetRange } = useProfile();

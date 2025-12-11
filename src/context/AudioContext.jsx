@@ -176,7 +176,6 @@ export const AudioProvider = ({ children }) => {
         isRecording,
         audioError,
         audioContext: audioEngineRef.current?.audioContext
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }), [isAudioActive, isRecording, audioError]);
 
     return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>;
