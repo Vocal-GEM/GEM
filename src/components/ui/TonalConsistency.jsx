@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Layers, Move, Music, AlertCircle, Play, Mic } from 'lucide-react';
+import { Layers, Move, AlertCircle, Mic } from 'lucide-react';
 
 const TonalConsistency = ({ onComplete }) => {
     const [activeTab, setActiveTab] = useState('theory'); // theory, anchors, nasality

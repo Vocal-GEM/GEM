@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Save, ThumbsUp, ThumbsDown, Meh } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { historyService } from '../../utils/historyService';
 
 const SelfAssessmentModal = ({ onClose, sessionData }) => {

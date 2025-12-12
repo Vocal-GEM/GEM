@@ -69,14 +69,14 @@ class PracticeCardsService {
             const store = transaction.objectStore(CUSTOM_SETS_STORE);
 
             const setData = {
-                id: `custom-${Date.now()}`,
+                id: `custom-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
                 isDefault: false,
                 ...cardSet,
                 // Ensure cards have IDs
                 cards: (cardSet.cards || []).map((card, index) => ({
-                    id: card.id || `card-${Date.now()}-${index}`,
+                    id: card.id || `card-${Date.now()}-${index}-${Math.floor(Math.random() * 1000)}`,
                     text: card.text,
                     focus: card.focus || 'general'
                 }))

@@ -265,7 +265,7 @@ const ToneGenerator = ({ onNotePlay, compact = false }) => {
             <div className="relative h-24 overflow-x-auto overflow-y-hidden rounded-lg">
                 {/* White keys */}
                 <div className="flex h-full min-w-max">
-                    {whiteKeys.map((noteData, idx) => {
+                    {whiteKeys.map((noteData, _idx) => {
                         const gender = getGenderIndicator(noteData.freq);
                         return (
                             <button

@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTour } from '../../context/TourContext';
-import { X, ChevronRight, ChevronLeft } from 'lucide-react';
+import { X, ChevronRight } from 'lucide-react';
 
 const TourOverlay = () => {
-    const { activeTour, currentStep, tourConfig, nextStep, prevStep, skipTour, endTour } = useTour();
+    const { activeTour, currentStep, tourConfig, nextStep, prevStep, skipTour } = useTour();
     const [position, setPosition] = useState(null);
     const [targetRect, setTargetRect] = useState(null);
 

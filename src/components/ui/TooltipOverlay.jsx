@@ -11,7 +11,6 @@ const TooltipOverlay = ({
     isActive
 }) => {
     const [position, setPosition] = useState(null);
-    const targetRef = useRef(null);
 
     useEffect(() => {
         if (!isActive || !step) return;

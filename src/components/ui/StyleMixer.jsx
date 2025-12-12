@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Sliders } from 'lucide-react';
 
 const StyleMixer = ({ onComplete }) => {
     const [settings, setSettings] = useState({

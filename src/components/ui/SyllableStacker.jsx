@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Layers } from 'lucide-react';
 
 const SyllableStacker = ({ onComplete }) => {
     const [mode, setMode] = useState('robot'); // 'robot' or 'elastic'
