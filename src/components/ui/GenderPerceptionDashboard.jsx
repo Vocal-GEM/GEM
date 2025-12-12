@@ -134,7 +134,9 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
         if (view === 'pitch') {
             if (pitch === 0) return "Speak to see your pitch.";
             if (pitch < targetRange.min) return "Pitch is too low. Try sliding up.";
-            if (pitch > targetRange.max) return "Pitch is too high. Relax down.";
+            // Only masculine goal has a pitch ceiling - feminine voices can go as high as they want
+            if (isMasc && pitch > targetRange.max) return "Pitch is too high for masculine voice. Relax down.";
+            if (isFem && pitch > targetRange.max) return "Great height! You're above your minimum target.";
             return "Perfect pitch! Hold it steady.";
         }
 

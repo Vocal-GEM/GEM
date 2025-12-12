@@ -68,11 +68,13 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
                 });
                 return;
             }
-            if (pitch > targetRange.max + 10) {
+            // Only show "pitch too high" warning for masculine goal (they need lower pitch)
+            // Feminine voices can go as high as they want - there is no ceiling
+            if (activeProfile === 'masc' && pitch > targetRange.max + 10) {
                 setAdvice({
                     type: 'info',
                     title: 'Pitch Above Target',
-                    description: `You are above your target ceiling of ${targetRange.max}Hz. Relax down.`,
+                    description: `You are above your target ceiling of ${targetRange.max}Hz for masculine voice. Try relaxing down.`,
                     action: 'Open Pitch Trainer',
                     targetTab: 'pitch',
                     icon: Activity,
