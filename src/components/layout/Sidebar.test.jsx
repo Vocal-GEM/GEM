@@ -45,6 +45,12 @@ vi.mock('../../context/NavigationContext', () => ({
     NavigationProvider: ({ children }) => <div>{children}</div>
 }));
 
+// Mock SearchService
+vi.mock('../../services/SearchService', () => ({
+    search: vi.fn(() => []),
+    groupResultsByType: vi.fn(() => []),
+}));
+
 const MockNavigationProvider = ({ children }) => <div>{children}</div>;
 
 describe('Sidebar Auth Integration', () => {
