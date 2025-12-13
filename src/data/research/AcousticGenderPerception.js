@@ -177,6 +177,59 @@ export const ACOUSTIC_GENDER_RESEARCH = {
             finding: "Children receiving visual-acoustic biofeedback improved at 2.4x the rate of traditional motor-based treatment (NYU/Syracuse, 2025)",
             caveat: "Persistent visual feedback may suppress feedforward control development. Fade feedback as proficiency increases."
         }
+    },
+    // Discourse & Pragmatics
+    discourse: {
+        title: "Discourse & Pragmatics",
+        description: "Gender markers extend beyond phonetics into conversational structure and speech acts.",
+        features: [
+            {
+                feature: "Turn-Taking & Floor Holding",
+                feminine: "Tendency toward cooperative overlap (chiming in to support). usage of minimal responses ('mm-hmm', 'yeah') to show engagement.",
+                masculine: "Competitive overlap (interruption to take floor). Longer monologues."
+            },
+            {
+                feature: "Speech Acts",
+                feminine: "More frequent use of hedging ('I think', 'maybe', 'sort of') and politeness strategies. Indirect requests ('It's cold in here' vs 'Close the window').",
+                masculine: "Direct requests. Declarative statements."
+            },
+            {
+                feature: "Pragmatic Markers",
+                feminine: "Higher usage of 'you know', 'catchphrases', and tag questions ('...isn't it?') to invite consensus.",
+                masculine: "Higher usage of 'I mean' and non-standard grammar in some contexts."
+            }
+        ],
+        implication: "Phonetic drills miss these targets. Training must include conversational role-play."
+    },
+
+    // Compensatory Strategy
+    compensatory: {
+        title: "Soft vs. Hard Constraints",
+        coreConcept: "Voice training is the process of maximizing 'Soft Constraints' (learned behaviors) to compensate for 'Hard Constraints' (anatomy).",
+        hardConstraints: "Anatomical limits that are difficult to change without surgery (e.g., Vocal Fold Mass/Length, Skull size).",
+        softConstraints: {
+            definition: "Learned sociophonetic behaviors that remain malleable.",
+            examples: [
+                "Vowel Space Area (hyper-articulation expands this)",
+                "Sibilant Frequencies (tounge position for /s/)",
+                "Intonation Patterns",
+                "Voice Onset Time"
+            ]
+        },
+        implication: "Even if anatomy limits your pitch (Hard Constraint), maximizing resonance and articulation (Soft Constraints) can successfully signal gender."
+    },
+
+    // Psychology of Voice
+    psychology: {
+        title: "Psychology & Self-Perception",
+        keyFinding: "Quality of Life correlates with SELF-perception more than LISTENER perception.",
+        source: "Davies et al. (2024)",
+        details: [
+            "Transgender individuals often judge their own voices more harshly than listeners do.",
+            "Listeners use different acoustic cues based on the speaker's perceived gender (circular logic).",
+            "Anxiety and depression are prevalent (87.5% in one cohort), directly affecting vocal motor control (laryngeal tension).",
+        ],
+        clinicalGoal: "Shift focus from 'passing' (external validation) to 'authenticity' (internal congruence). Training self-efficacy is as important as training pitch."
     }
 };
 
@@ -216,6 +269,27 @@ export const RESEARCH_KB_ENTRIES = [
         tags: ['research', 'practice', 'motor learning'],
         question: "What's the most effective practice structure?",
         answer: "Motor learning research recommends:\\n\\n1. **Random practice** (mixing exercises) > Blocked practice for retention\\n2. **Minimum 50 repetitions** per target\\n3. **Distributed practice** (15-30 min daily) > Long single sessions\\n4. **Fade biofeedback** as proficiency increases\\n5. **Hierarchical progression**: Sounds → Words → Phrases → Sentences → Conversation\\n\\n*Visual biofeedback improves learning 2.4x faster, but should be faded over time.*"
+    },
+    {
+        id: 'research_pragmatics',
+        category: 'Research',
+        tags: ['research', 'pragmatics', 'conversation', 'social'],
+        question: "Does gender affect HOW I speak, not just how I sound?",
+        answer: "Yes, 'Pragmatics' refers to social language use. Feminine communication styles often include:\\n\\n- **Cooperative Overlap**: Chiming in to show support.\\n- **Hedging**: Using 'I think', 'maybe', 'sort of' to soften statements.\\n- **Tag Questions**: Adding '...isn't it?' or '...right?' to invite agreement.\\n- **Indirectness**: phrasing requests gently.\\n\\n*Training these conversational habits can enhance gender perception even without pitch changes.*"
+    },
+    {
+        id: 'research_constraints',
+        category: 'Research',
+        tags: ['research', 'anatomy', 'strategy', 'compensation'],
+        question: "What if my anatomy limits how high I can go?",
+        answer: "Research distinguishes between **Hard Constraints** (anatomy like vocal fold length) and **Soft Constraints** (learned behaviors like articulation). \\n\\n**Key Strategy:** If you hit a physical limit with pitch (Hard Constraint), you can compensate by maximizing **Soft Constraints**:\\n\\n- Expanding your Vowel Space (clearer speech)\\n- Sharpening your /s/ sounds\\n- Using more dynamic intonation\\n\\n*You can signal gender effectively through learned behavior even with anatomical limits.*"
+    },
+    {
+        id: 'research_psychology',
+        category: 'Research',
+        tags: ['research', 'psychology', 'confidence', 'authenticity'],
+        question: "Why do I hate my voice even when people say it sounds good?",
+        answer: "Research shows that **Quality of Life correlates more with SELF-perception than listener perception**. Transgender individuals often judge their own voices more harshly than strangers do. \\n\\nAlso, anxiety can cause physical laryngeal tension, making the voice harder to control. The goal of training is finding a voice that feels **authentic to YOU**, not just one that 'passes' to others."
     }
 ];
 

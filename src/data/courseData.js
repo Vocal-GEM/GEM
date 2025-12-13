@@ -32,6 +32,7 @@ Our goal is not just to raise your pitch, but to brighten your resonance and lig
                 type: 'interactive',
                 toolId: 'pitch-visualizer',
                 duration: '10 min',
+                citations: ['paper_leung_2018', 'paper_carew_2007'],
                 description: 'Visualize your pitch in real-time and find your target range.',
                 content: `
 # Finding Your Pitch
@@ -51,6 +52,7 @@ Let's start by simply observing your current speaking pitch.
                 type: 'interactive',
                 toolId: 'resonance-orb',
                 duration: '15 min',
+                citations: ['paper_hillenbrand_2009'],
                 description: 'Learn to brighten your voice by changing the shape of your throat.',
                 content: `
 # Brightening Your Resonance
@@ -114,6 +116,7 @@ Use the meter below to monitor your vocal weight.
                 type: 'practice',
                 toolId: 'weight-visualizer',
                 duration: '15 min',
+                citations: ['paper_sodersten_2009', 'paper_titze_2006'],
                 description: 'Exercises to find a lighter, thinner vocal fold configuration.',
                 content: `
 # Thin Fold Exercises
@@ -147,6 +150,7 @@ Try speaking immediately after the flow exercise to carry over that thin, light 
                 type: 'interactive',
                 toolId: 'vowel-plot',
                 duration: '15 min',
+                citations: ['paper_gelfer_2013', 'paper_hillenbrand_2009'],
                 description: 'Visualize your vowel space and brighten your vowels.',
                 content: `
 # Brightening Vowels

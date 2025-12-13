@@ -7,6 +7,7 @@
  * - Knowledge Base (knowledgeBase.js)
  * - Course Modules (courseData.js)
  * - Practice Cards (PracticeCardsData.js)
+ * - Research Library (ResearchLibrary.js)
  * - Navigation views
  */
 
@@ -15,6 +16,7 @@ import { GLOSSARY_TERMS } from '../data/glossaryData';
 import { KNOWLEDGE_BASE } from '../data/knowledgeBase';
 import { FEMINIZATION_COURSE } from '../data/courseData';
 import { DEFAULT_CARD_SETS } from '../data/PracticeCardsData';
+import { RESEARCH_LIBRARY } from '../data/research/ResearchLibrary';
 
 // Navigation items for quick access
 const NAVIGATION_ITEMS = [
@@ -162,6 +164,20 @@ const buildSearchIndex = () => {
         });
     });
 
+    // Research Papers
+    RESEARCH_LIBRARY.forEach(paper => {
+        items.push({
+            id: `research-${paper.id}`,
+            type: 'research-paper',
+            title: paper.title,
+            subtitle: `${paper.authors} (${paper.year})`,
+            description: paper.summary,
+            tags: paper.tags || [],
+            icon: 'file-text',
+            action: { type: 'navigate', view: 'research', paperId: paper.id }
+        });
+    });
+
     return items;
 };
 
@@ -251,7 +267,8 @@ export const getTypeLabel = (type) => {
         'knowledge': 'Knowledge Base',
         'course': 'Course',
         'lesson': 'Lesson',
-        'practice-cards': 'Practice Cards'
+        'practice-cards': 'Practice Cards',
+        'research-paper': 'Research Paper'
     };
     return labels[type] || type;
 };
@@ -274,7 +291,7 @@ export const groupResultsByType = (results) => {
     });
 
     // Return in a consistent order
-    const order = ['navigation', 'exercise', 'glossary', 'knowledge', 'course', 'lesson', 'practice-cards'];
+    const order = ['navigation', 'exercise', 'glossary', 'knowledge', 'course', 'lesson', 'practice-cards', 'research-paper'];
     return order
         .filter(type => groups[type])
         .map(type => groups[type]);

@@ -8,7 +8,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Gently blow air through your lips to make them vibrate. Slide your pitch up and down comfortably.',
         goals: ['warmup', 'breath'],
-        visualization: 'pitch'
+        visualization: 'pitch',
+        citations: ['paper_titze_2006', 'paper_nyu_2025']
     },
     {
         id: 'warmup-humming',
@@ -18,7 +19,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Hum an "M" sound. Focus on feeling the vibration in your lips and nose, not your throat.',
         goals: ['warmup', 'resonance'],
-        visualization: 'resonance'
+        visualization: 'resonance',
+        citations: ['paper_nyu_2025']
     },
 
     // --- WARM-UP MASSAGES ---
@@ -98,6 +100,7 @@ export const EXERCISE_LIBRARY = [
     {
         id: 'pitch-sirens',
         title: 'Pitch Sirens',
+        citations: ['paper_leung_2018', 'paper_carew_2007', 'paper_nyu_2025'],
         category: 'pitch',
         difficulty: 'beginner',
         duration: 60,
@@ -113,7 +116,8 @@ export const EXERCISE_LIBRARY = [
         duration: 90,
         instructions: 'Sing a 5-note scale up and down (Do-Re-Mi-Fa-So-Fa-Mi-Re-Do). Move the starting pitch up by a semitone each time.',
         goals: ['pitch', 'control'],
-        visualization: 'pitch'
+        visualization: 'pitch',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'pitch-hold',
@@ -123,7 +127,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Pick a comfortable note in your target range and hold it steady for 5-10 seconds.',
         goals: ['pitch', 'stability'],
-        visualization: 'pitch'
+        visualization: 'pitch',
+        citations: ['paper_nyu_2025']
     },
 
     // --- RESONANCE ---
@@ -135,7 +140,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Sing "Mmm-Ahhh". Try to keep the bright, buzzy feeling of the "M" as you open to the "Ah".',
         goals: ['resonance', 'brightness'],
-        visualization: 'resonance'
+        visualization: 'resonance',
+        citations: ['paper_hillenbrand_2009', 'paper_leung_2018', 'paper_nyu_2025']
     },
     {
         id: 'res-ng-glide',
@@ -145,7 +151,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Sing the "ng" sound (as in "sing"). Glide up and down while maintaining the nasal resonance.',
         goals: ['resonance', 'control'],
-        visualization: 'resonance'
+        visualization: 'resonance',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'res-whisper-siren',
@@ -155,7 +162,8 @@ export const EXERCISE_LIBRARY = [
         duration: 45,
         instructions: 'Whisper a siren up and down. This helps raise the larynx naturally without strain.',
         goals: ['resonance', 'brightness'],
-        visualization: 'resonance'
+        visualization: 'resonance',
+        citations: ['paper_nyu_2025']
     },
 
     // --- WEIGHT / QUALITY ---
@@ -167,7 +175,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Say "Hhh-aaa". Start with a breathy "H" to ensure a gentle start to the vowel. Avoid clicking or hard attacks.',
         goals: ['weight', 'onset'],
-        visualization: 'weight'
+        visualization: 'weight',
+        citations: ['paper_sodersten_2009', 'paper_nyu_2025']
     },
     {
         id: 'weight-creak-fry',
@@ -177,7 +186,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Start with a loose vocal fry and slowly slide up into a clear tone. Keep the weight light.',
         goals: ['weight', 'relaxation'],
-        visualization: 'weight'
+        visualization: 'weight',
+        citations: ['paper_nyu_2025']
     },
     // --- THIN VOCAL FOLD MASS EXERCISES ---
     // These exercises help find a lighter, thinner vocal fold configuration
@@ -189,7 +199,8 @@ export const EXERCISE_LIBRARY = [
         duration: 45,
         instructions: 'Take a relaxed breath and release it on a light, airy sigh - like a contented "ahh" after a long day. Let air escape freely without pressing or holding. This encourages thin, relaxed vocal folds.',
         goals: ['weight', 'relaxation', 'thin-folds'],
-        visualization: 'weight'
+        visualization: 'weight',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'weight-high-low-glide',
@@ -199,7 +210,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Start at a comfortable high pitch and glide smoothly down to your lowest note. Keep the sound light and effortless as you descend. The high starting point encourages thinner vocal fold mass.',
         goals: ['weight', 'range', 'thin-folds'],
-        visualization: 'pitch'
+        visualization: 'pitch',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'weight-thin-flow',
@@ -221,7 +233,8 @@ export const EXERCISE_LIBRARY = [
         duration: 120,
         instructions: 'Stand tall, take your breath. As you sing your exercise, slowly squat until the phrase ends. Return to standing to breathe again.',
         goals: ['breath', 'support', 'singing'],
-        visualization: 'pitch'
+        visualization: 'pitch',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'singing-yawn-breath',
@@ -231,7 +244,8 @@ export const EXERCISE_LIBRARY = [
         duration: 90,
         instructions: 'Take in a yawn to lift the soft palate and lower the larynx. Then release on a gentle descending siren on any vowel.',
         goals: ['breath', 'relaxation', 'singing'],
-        visualization: 'pitch'
+        visualization: 'pitch',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'singing-farinelli',
@@ -241,7 +255,8 @@ export const EXERCISE_LIBRARY = [
         duration: 120,
         instructions: 'Inhale for 4 counts, suspend breath for 4 counts, exhale for 4 counts. Gradually increase the duration as you improve.',
         goals: ['breath', 'capacity', 'singing'],
-        visualization: 'weight'
+        visualization: 'weight',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'singing-pant',
@@ -251,7 +266,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Pant like a dog with your tongue out. Place one hand on your chest and one on your belly. Notice where the movement is.',
         goals: ['breath', 'awareness', 'singing'],
-        visualization: 'weight'
+        visualization: 'weight',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'singing-lip-trills',
@@ -261,7 +277,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Relax your lips and allow them to vibrate freely. If you struggle, try a rolled R or straw phonation instead.',
         goals: ['warmup', 'relaxation', 'singing'],
-        visualization: 'pitch'
+        visualization: 'pitch',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'singing-puffy-cheeks',
@@ -271,7 +288,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Gently inflate your cheeks and form a small /w/ opening. Blow air gently through, maintaining air in front of the teeth.',
         goals: ['resonance', 'relaxation', 'singing'],
-        visualization: 'resonance'
+        visualization: 'resonance',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'singing-boat-motor',
@@ -281,7 +299,8 @@ export const EXERCISE_LIBRARY = [
         duration: 90,
         instructions: 'Sing a scale on "buh" with puffy cheeks. You may feel like a boat motor. This frees the voice from pressing.',
         goals: ['resonance', 'freedom', 'singing'],
-        visualization: 'resonance'
+        visualization: 'resonance',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'singing-wee-triad',
@@ -291,7 +310,8 @@ export const EXERCISE_LIBRARY = [
         duration: 90,
         instructions: 'Sing "Wee" on a descending 5-3-1 pattern. Use a really closed "w" sound, almost like "oo", to travel between notes.',
         goals: ['pitch', 'head-voice', 'singing'],
-        visualization: 'pitch'
+        visualization: 'pitch',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'singing-bubble-blows',
@@ -301,7 +321,8 @@ export const EXERCISE_LIBRARY = [
         duration: 90,
         instructions: 'Blow bubbles into a straw submerged in water while singing a simple scale (1-2-3-4-3-2-1).',
         goals: ['breath', 'support', 'singing'],
-        visualization: 'weight'
+        visualization: 'weight',
+        citations: ['paper_nyu_2025']
     },
 
     // --- FLOW PHONATION / SOVT ---
@@ -314,7 +335,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Hold an "oo" (as in "who") sound with light, easy airflow. Feel the vibration in your lips, not tension in your throat. This is your Flow calibration vowel.',
         goals: ['flow', 'efficiency'],
-        visualization: 'flow'
+        visualization: 'flow',
+        citations: ['paper_titze_2006', 'paper_sodersten_2009', 'paper_nyu_2025']
     },
     {
         id: 'flow-u-glides',
@@ -324,7 +346,8 @@ export const EXERCISE_LIBRARY = [
         duration: 90,
         instructions: 'Glide up and down your range on "oo". Maintain the easy Flow feeling throughout. If you feel strain, return to the basic sustained /u/.',
         goals: ['flow', 'pitch'],
-        visualization: 'flow'
+        visualization: 'flow',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'flow-straw-phonation',
@@ -334,7 +357,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Hum through a straw (or into a cup of water). This creates back pressure that helps your vocal folds find efficient "touch" closure.',
         goals: ['flow', 'sovt'],
-        visualization: 'flow'
+        visualization: 'flow',
+        citations: ['paper_titze_2006', 'paper_nyu_2025']
     },
 
     // --- ACCENT METHOD ---
@@ -347,7 +371,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Breathe using your stomach muscles. Feel them expand like a balloon as you inhale, and contract as you exhale. Keep shoulders and throat relaxed.',
         goals: ['breath', 'relaxation'],
-        visualization: 'weight'
+        visualization: 'weight',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'accent-voiceless-series',
@@ -357,7 +382,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Practice voiceless sounds rhythmically: blow (like blowing out candles), "sss", "fff", "shh". Power from diaphragm, no throat tension.',
         goals: ['flow', 'breath'],
-        visualization: 'weight'
+        visualization: 'weight',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'accent-voiced-series',
@@ -367,7 +393,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Practice voiced sounds rhythmically: "vvv", "zzz", voiced "th", "zh". Keep throat relaxed, power from stomach muscles.',
         goals: ['flow', 'breath'],
-        visualization: 'flow'
+        visualization: 'flow',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'accent-mixed-sounds',
@@ -377,7 +404,8 @@ export const EXERCISE_LIBRARY = [
         duration: 90,
         instructions: 'Alternate between voiceless and voiced: "fff-vvv", "sss-zzz", "shh-zh". Ensure open throat and smooth transitions.',
         goals: ['flow', 'coordination'],
-        visualization: 'flow'
+        visualization: 'flow',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'accent-pulses',
@@ -387,7 +415,8 @@ export const EXERCISE_LIBRARY = [
         duration: 90,
         instructions: 'On a sustained sound, create small pulses by squeezing your stomach muscles (like pressing a car accelerator). Practice on "sss" then "zzz".',
         goals: ['flow', 'control'],
-        visualization: 'weight'
+        visualization: 'weight',
+        citations: ['paper_nyu_2025']
     },
 
     // --- LAX VOX SERIES ---
@@ -400,7 +429,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Blow steady bubbles into a cup of water through a straw or tube. Keep facial muscles relaxed and maintain a consistent airflow. This balances pressure above and below your vocal cords.',
         goals: ['flow', 'relaxation', 'sovt'],
-        visualization: 'weight'
+        visualization: 'weight',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'laxvox-voiced',
@@ -410,7 +440,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'While blowing bubbles, add a continuous "ooo" sound. Your cheeks should flutter slightly. Keep throat and shoulders relaxed - let the diaphragm do the work.',
         goals: ['flow', 'phonation', 'sovt'],
-        visualization: 'flow'
+        visualization: 'flow',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'laxvox-sustained',
@@ -420,7 +451,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Extend your "ooo" sound through the tube as long as comfortable. Maintain steady bubbles and don\'t run out of breath. Build capacity gradually.',
         goals: ['flow', 'breath', 'sovt'],
-        visualization: 'flow'
+        visualization: 'flow',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'laxvox-glides',
@@ -430,7 +462,8 @@ export const EXERCISE_LIBRARY = [
         duration: 90,
         instructions: 'Glide up and down in pitch through the tube. Always start with bubbles first. Ensure cheeks flutter and throat/shoulders stay relaxed throughout the range.',
         goals: ['flow', 'pitch', 'sovt'],
-        visualization: 'pitch'
+        visualization: 'pitch',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'laxvox-melody',
@@ -440,7 +473,8 @@ export const EXERCISE_LIBRARY = [
         duration: 90,
         instructions: 'Sing a simple tune through the straw while bubbling. Start with bubbles, then add the melody. Keep the easy, open feeling in your throat.',
         goals: ['flow', 'singing', 'sovt'],
-        visualization: 'pitch'
+        visualization: 'pitch',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'laxvox-transition',
@@ -450,7 +484,8 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'While sustaining sound, gradually lift the tube out of the water. Maintain the same easy airflow and effort. Feel how the voice stays relaxed.',
         goals: ['flow', 'carryover', 'sovt'],
-        visualization: 'flow'
+        visualization: 'flow',
+        citations: ['paper_nyu_2025']
     },
     {
         id: 'laxvox-to-hum',
@@ -460,6 +495,7 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Remove the tube from your mouth while continuing the sound into a hum, then open to "mmm-ahhh". Carry the released, open feeling into your natural voice.',
         goals: ['flow', 'carryover', 'resonance'],
-        visualization: 'resonance'
+        visualization: 'resonance',
+        citations: ['paper_nyu_2025']
     }
 ];

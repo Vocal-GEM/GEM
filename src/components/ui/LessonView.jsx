@@ -20,6 +20,7 @@ import IntonationTrainer from '../viz/IntonationTrainer';
 import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
+import ResearchCitation from '../ui/ResearchCitation';
 
 const LessonView = ({ lesson, onComplete, onNext, onPrevious, hasNext, hasPrevious }) => {
     const { dataRef } = useAudio();
@@ -185,6 +186,11 @@ const LessonView = ({ lesson, onComplete, onNext, onPrevious, hasNext, hasPrevio
 
                         {renderTool()}
                     </div>
+                )}
+
+                {/* Research Citations */}
+                {lesson.citations && lesson.citations.length > 0 && (
+                    <ResearchCitation citationIds={lesson.citations} />
                 )}
             </div>
 
