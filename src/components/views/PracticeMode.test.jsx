@@ -1,7 +1,7 @@
 /* eslint-env jest */
 
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import { useEffect } from 'react';
+
 import { vi, describe, it, expect } from 'vitest';
 import PracticeMode from './PracticeMode';
 import { NavigationProvider } from '../../context/NavigationContext';
@@ -44,17 +44,7 @@ describe('PracticeMode', () => {
     const mockAudioEngine = { current: {} };
 
     it('renders without crashing', async () => {
-        // Define a dummy update function for the useEffect mock
-        const update = vi.fn();
 
-        // This useEffect call is placed here to simulate a component's lifecycle
-        // It will not actually run in the test environment as it's not within a component.
-        // If the intent was to mock a component that uses useEffect, that component should be mocked.
-        // However, following the instruction to insert it directly:
-        useEffect(() => {
-            const interval = setInterval(update, 50);
-            return () => clearInterval(interval);
-        }, [update]);
         render(
             <SettingsProvider>
                 <ProfileProvider>
