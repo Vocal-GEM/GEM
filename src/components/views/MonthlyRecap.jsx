@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar, TrendingUp, Flame, Clock, Trophy, BarChart2 } from 'lucide-react';
 import { getActivitySummary, getReports } from '../../services/SessionReportService';
 import { getStreakData } from '../../services/StreakService';
@@ -152,13 +152,13 @@ const MonthlyRecap = () => {
                             <>
                                 <div className="text-4xl mb-2">🏆</div>
                                 <h3 className="text-xl font-bold text-white mb-1">Outstanding!</h3>
-                                <p className="text-slate-400">You're in the top tier of dedicated practitioners!</p>
+                                <p className="text-slate-400">You&apos;re in the top tier of dedicated practitioners!</p>
                             </>
                         ) : recap.uniqueDays >= 10 ? (
                             <>
                                 <div className="text-4xl mb-2">⭐</div>
                                 <h3 className="text-xl font-bold text-white mb-1">Great Progress!</h3>
-                                <p className="text-slate-400">You're building solid habits. Keep it up!</p>
+                                <p className="text-slate-400">You&apos;re building solid habits. Keep it up!</p>
                             </>
                         ) : recap.uniqueDays >= 5 ? (
                             <>
@@ -170,7 +170,7 @@ const MonthlyRecap = () => {
                             <>
                                 <div className="text-4xl mb-2">💪</div>
                                 <h3 className="text-xl font-bold text-white mb-1">Room to Grow</h3>
-                                <p className="text-slate-400">Every journey starts somewhere. This month, let's aim higher!</p>
+                                <p className="text-slate-400">Every journey starts somewhere. This month, let&apos;s aim higher!</p>
                             </>
                         )}
                     </div>

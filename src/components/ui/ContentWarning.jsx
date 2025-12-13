@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AlertTriangle, X, Info } from 'lucide-react';
 
 /**
@@ -42,7 +42,7 @@ const ContentWarning = ({
                     <div className="flex items-start gap-2 text-sm text-amber-200/80">
                         <Info size={16} className="flex-shrink-0 mt-0.5" />
                         <p>
-                            This app is a tool for exploration. Remember: there is no "wrong" voice.
+                            This app is a tool for exploration. Remember: there is no &quot;wrong&quot; voice.
                             Your comfort and wellbeing come first.
                         </p>
                     </div>

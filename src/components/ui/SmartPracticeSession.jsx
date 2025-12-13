@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Sparkles, Clock, ChevronRight, Play, CheckCircle, ArrowLeft, Dumbbell } from 'lucide-react';
 import { generateSmartSession, getSessionOptions } from '../../services/SmartPracticeService';
 import { addXP } from '../../services/DailyChallengeService';
@@ -61,7 +61,7 @@ const SmartPracticeSession = ({ onClose }) => {
                             How much time do you have?
                         </h1>
                         <p className="text-slate-400 text-center mb-8">
-                            We'll create a personalized session based on your progress
+                            We&apos;ll create a personalized session based on your progress
                         </p>
 
                         <div className="space-y-4">
@@ -97,10 +97,10 @@ const SmartPracticeSession = ({ onClose }) => {
                                 <div
                                     key={idx}
                                     className={`flex-1 h-1 rounded-full transition-colors ${completedSteps.includes(idx)
-                                            ? 'bg-emerald-500'
-                                            : idx === currentStepIndex
-                                                ? 'bg-amber-500'
-                                                : 'bg-slate-700'
+                                        ? 'bg-emerald-500'
+                                        : idx === currentStepIndex
+                                            ? 'bg-amber-500'
+                                            : 'bg-slate-700'
                                         }`}
                                 />
                             ))}
@@ -109,8 +109,8 @@ const SmartPracticeSession = ({ onClose }) => {
                         {/* Current Step */}
                         <div className="flex-1">
                             <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold mb-4 ${currentStep.type === 'warmup' ? 'bg-blue-500/20 text-blue-400' :
-                                    currentStep.type === 'cooldown' ? 'bg-purple-500/20 text-purple-400' :
-                                        'bg-amber-500/20 text-amber-400'
+                                currentStep.type === 'cooldown' ? 'bg-purple-500/20 text-purple-400' :
+                                    'bg-amber-500/20 text-amber-400'
                                 }`}>
                                 <Dumbbell size={14} />
                                 {currentStep.type === 'warmup' ? 'Warm Up' :

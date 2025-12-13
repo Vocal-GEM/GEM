@@ -1,8 +1,38 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 
 const AudioWaveform = ({ audioUrl, isPlaying = false, currentTime = 0, duration = 0 }) => {
     const canvasRef = useRef(null);
     const waveformDataRef = useRef(null);
+
+    // Draw waveform
+    const drawWaveform = useCallback(() => {
+        const canvas = canvasRef.current;
+        if (!canvas || !waveformDataRef.current) return;
+
+        const ctx = canvas.getContext('2d');
+        const data = waveformDataRef.current;
+        const width = canvas.width;
+        const height = canvas.height;
+        const barWidth = width / data.length;
+        const progressPercent = duration > 0 ? currentTime / duration : 0;
+
+        ctx.clearRect(0, 0, width, height);
+
+        data.forEach((value, index) => {
+            const x = index * barWidth;
+            const barHeight = value * height * 0.8;
+            const y = (height - barHeight) / 2;
+
+            // Color based on playback progress
+            const isPlayed = (index / data.length) < progressPercent;
+
+            ctx.fillStyle = isPlayed
+                ? '#14b8a6' // Teal for played
+                : 'rgba(148, 163, 184, 0.5)'; // Slate for unplayed
+
+            ctx.fillRect(x, y, barWidth - 1, barHeight);
+        });
+    }, [currentTime, duration]);
 
     // Generate waveform data from audio
     useEffect(() => {
@@ -40,37 +70,8 @@ const AudioWaveform = ({ audioUrl, isPlaying = false, currentTime = 0, duration 
         };
 
         generateWaveform();
-    }, [audioUrl]);
+    }, [audioUrl, drawWaveform]);
 
-    // Draw waveform
-    const drawWaveform = () => {
-        const canvas = canvasRef.current;
-        if (!canvas || !waveformDataRef.current) return;
-
-        const ctx = canvas.getContext('2d');
-        const data = waveformDataRef.current;
-        const width = canvas.width;
-        const height = canvas.height;
-        const barWidth = width / data.length;
-        const progressPercent = duration > 0 ? currentTime / duration : 0;
-
-        ctx.clearRect(0, 0, width, height);
-
-        data.forEach((value, index) => {
-            const x = index * barWidth;
-            const barHeight = value * height * 0.8;
-            const y = (height - barHeight) / 2;
-
-            // Color based on playback progress
-            const isPlayed = (index / data.length) < progressPercent;
-
-            ctx.fillStyle = isPlayed
-                ? '#14b8a6' // Teal for played
-                : 'rgba(148, 163, 184, 0.5)'; // Slate for unplayed
-
-            ctx.fillRect(x, y, barWidth - 1, barHeight);
-        });
-    };
 
     // Redraw on playback update
     useEffect(() => {

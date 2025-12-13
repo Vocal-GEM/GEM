@@ -1,4 +1,3 @@
-import React from 'react';
 import { Trophy, Lock } from 'lucide-react';
 import { getAllAchievements } from '../../services/AchievementsService';
 

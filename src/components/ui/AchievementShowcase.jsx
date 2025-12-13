@@ -1,31 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Trophy, Star, Lock, Sparkles } from 'lucide-react';
-
-// Achievement definitions
-const ACHIEVEMENTS = [
-    { id: 'first-session', title: 'First Steps', description: 'Complete your first practice session', icon: '🎤', xp: 50 },
-    { id: 'streak-3', title: 'On a Roll', description: 'Maintain a 3-day streak', icon: '🔥', xp: 100 },
-    { id: 'streak-7', title: 'Week Warrior', description: 'Maintain a 7-day streak', icon: '⚡', xp: 200 },
-    { id: 'streak-30', title: 'Monthly Master', description: 'Maintain a 30-day streak', icon: '🏆', xp: 500 },
-    { id: 'sessions-10', title: 'Dedicated', description: 'Complete 10 practice sessions', icon: '⭐', xp: 150 },
-    { id: 'sessions-50', title: 'Committed', description: 'Complete 50 practice sessions', icon: '💎', xp: 300 },
-    { id: 'level-5', title: 'Rising Star', description: 'Reach level 5', icon: '🌟', xp: 200 },
-    { id: 'level-10', title: 'Voice Pro', description: 'Reach level 10', icon: '👑', xp: 400 },
-    { id: 'journal-5', title: 'Documenter', description: 'Record 5 voice journal entries', icon: '📝', xp: 100 },
-    { id: 'explore-all', title: 'Explorer', description: 'Try all exercise categories', icon: '🧭', xp: 150 }
-];
-
-/**
- * Get user's unlocked achievements
- */
-const getUnlockedAchievements = () => {
-    try {
-        const stored = localStorage.getItem('gem_achievements');
-        return stored ? JSON.parse(stored) : [];
-    } catch {
-        return [];
-    }
-};
+import { useState, useEffect } from 'react';
+import { Trophy, Star, Lock } from 'lucide-react';
+import { ACHIEVEMENTS, getUnlockedAchievements } from '../../utils/achievementData';
 
 const AchievementShowcase = ({ compact = false }) => {
     const [unlocked, setUnlocked] = useState([]);
@@ -62,8 +37,8 @@ const AchievementShowcase = ({ compact = false }) => {
                             <div
                                 key={achievement.id}
                                 className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${isUnlocked
-                                        ? 'bg-amber-500/20'
-                                        : 'bg-slate-800 grayscale opacity-50'
+                                    ? 'bg-amber-500/20'
+                                    : 'bg-slate-800 grayscale opacity-50'
                                     }`}
                                 title={achievement.title}
                             >
@@ -111,8 +86,8 @@ const AchievementShowcase = ({ compact = false }) => {
                             key={achievement.id}
                             onClick={() => setSelectedAchievement(achievement)}
                             className={`p-4 rounded-xl text-left transition-all ${isUnlocked
-                                    ? 'bg-gradient-to-br from-amber-500/20 to-yellow-500/20 border border-amber-500/30 hover:border-amber-400'
-                                    : 'bg-slate-900 border border-slate-800 opacity-60'
+                                ? 'bg-gradient-to-br from-amber-500/20 to-yellow-500/20 border border-amber-500/30 hover:border-amber-400'
+                                : 'bg-slate-900 border border-slate-800 opacity-60'
                                 }`}
                         >
                             <div className="text-3xl mb-2">
@@ -153,5 +128,5 @@ const AchievementShowcase = ({ compact = false }) => {
     );
 };
 
-export { ACHIEVEMENTS, getUnlockedAchievements };
 export default AchievementShowcase;
+

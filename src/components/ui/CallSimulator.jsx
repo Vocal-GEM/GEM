@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Phone, PhoneOff, Play, Pause, RotateCcw, CheckCircle, Star } from 'lucide-react';
 
 // Simulated phone scenarios
@@ -160,8 +160,8 @@ const CallSimulator = ({ onClose }) => {
                             {isCallActive ? (
                                 <div className="space-y-4">
                                     <div className={`p-4 rounded-xl ${isUserTurn
-                                            ? 'bg-blue-500/20 border border-blue-500/30'
-                                            : 'bg-slate-800'
+                                        ? 'bg-blue-500/20 border border-blue-500/30'
+                                        : 'bg-slate-800'
                                         }`}>
                                         <div className="text-xs text-slate-400 mb-2 uppercase">
                                             {isUserTurn ? 'Your turn - say:' : currentPrompt?.speaker}
@@ -199,10 +199,10 @@ const CallSimulator = ({ onClose }) => {
                                     <div
                                         key={idx}
                                         className={`flex-1 h-1 rounded-full ${completedPrompts.includes(idx)
-                                                ? 'bg-emerald-500'
-                                                : idx === currentPromptIndex
-                                                    ? 'bg-blue-500'
-                                                    : 'bg-slate-700'
+                                            ? 'bg-emerald-500'
+                                            : idx === currentPromptIndex
+                                                ? 'bg-blue-500'
+                                                : 'bg-slate-700'
                                             }`}
                                     />
                                 ))}

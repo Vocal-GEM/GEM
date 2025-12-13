@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Eye, Type, Zap, Volume2, Minus, Plus, RotateCcw } from 'lucide-react';
 import {
     getAccessibilitySettings,

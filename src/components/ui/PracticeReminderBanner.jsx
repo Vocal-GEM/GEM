@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { AlertCircle, X, Play } from 'lucide-react';
 import { checkStreakStatus } from '../../services/StreakService';
 import { useNavigation } from '../../context/NavigationContext';
@@ -51,10 +51,10 @@ const PracticeReminderBanner = () => {
 
                     <div className="flex-1">
                         <h3 className="font-bold text-white mb-1">
-                            Don't break your {streakData.currentStreak}-day streak! 🔥
+                            Don&apos;t break your {streakData.currentStreak}-day streak! 🔥
                         </h3>
                         <p className="text-white/80 text-sm mb-3">
-                            You haven't practiced today. A quick session will keep your momentum going.
+                            You haven&apos;t practiced today. A quick session will keep your momentum going.
                         </p>
 
                         <div className="flex gap-2">

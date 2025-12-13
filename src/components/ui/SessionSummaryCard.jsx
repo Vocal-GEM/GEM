@@ -1,4 +1,3 @@
-import React from 'react';
 import { Clock, CheckCircle, Activity, Calendar } from 'lucide-react';
 import { getActivitySummary } from '../../services/SessionReportService';
 
@@ -22,7 +21,7 @@ const SessionSummaryCard = () => {
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
             <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                 <Activity className="text-blue-400" size={20} />
-                This Week's Activity
+                This Week&apos;s Activity
             </h3>
 
             {/* Stats Row */}
