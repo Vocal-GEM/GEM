@@ -83,12 +83,7 @@ export class AudioEngine {
         this.audioContext = new AudioContext({ latencyHint: 'interactive' });
         this.debugInfo.contextState = this.audioContext.state;
 
-        // Unlock AudioContext
-        const buffer = this.audioContext.createBuffer(1, 1, 22050);
-        const source = this.audioContext.createBufferSource();
-        source.buffer = buffer;
-        source.connect(this.audioContext.destination);
-        source.start(0);
+        // Unlock AudioContext logic moved to start()
 
         this.toneEngine = new ToneEngine(this.audioContext);
         this.hapticEngine = new HapticEngine();
@@ -149,6 +144,13 @@ export class AudioEngine {
 
         try {
             await this.audioContext.resume();
+
+            // Unlock AudioContext with silent buffer
+            const buffer = this.audioContext.createBuffer(1, 1, 22050);
+            const source = this.audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(this.audioContext.destination);
+            source.start(0);
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             this.microphone = this.audioContext.createMediaStreamSource(stream);
             this.analyser = this.audioContext.createAnalyser();
