@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Mic, Square, Play, Pause, RotateCcw, Check, Loader2 } from 'lucide-react';
+import { Mic, Square, Play, Pause, RotateCcw, Check, Loader2, HelpCircle } from 'lucide-react';
 import { useGuidedJourney } from '../../context/GuidedJourneyContext';
 import { indexedDB } from '../../services/IndexedDBManager';
 import { VoiceCalibrationService } from '../../services/VoiceCalibrationService';
+import MicQualityTips from './MicQualityTips';
 
 /**
  * BaselineRecorder - Records baseline voice samples for the guided journey
@@ -17,6 +18,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
     const [audioUrl, setAudioUrl] = useState(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [error, setError] = useState(null);
+    const [showMicTips, setShowMicTips] = useState(false);
 
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
@@ -207,7 +209,16 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
     return (
         <div className="bg-slate-800/50 rounded-xl border border-pink-500/20 p-6">
             {/* Header */}
-            <div className="text-center mb-6">
+            <div className="text-center mb-6 relative">
+                {/* Mic Quality Tips Button */}
+                <button
+                    onClick={() => setShowMicTips(true)}
+                    className="absolute top-0 right-0 p-1.5 text-slate-400 hover:text-pink-400 hover:bg-slate-700/50 rounded-lg transition-colors"
+                    title="Recording Tips"
+                >
+                    <HelpCircle size={18} />
+                </button>
+
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center">
                     <Mic className="w-8 h-8 text-pink-400" />
                 </div>
@@ -315,6 +326,11 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                 <p className="text-center text-xs text-slate-500 mt-4">
                     Tap the button above to start recording
                 </p>
+            )}
+
+            {/* Mic Quality Tips Modal */}
+            {showMicTips && (
+                <MicQualityTips onClose={() => setShowMicTips(false)} />
             )}
         </div>
     );

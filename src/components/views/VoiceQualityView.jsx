@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { Mic, Upload, Play, Activity, FileText, Info, Save, History, Calendar, Trash2, Pause, Eye } from 'lucide-react';
+import { Mic, Upload, Play, Activity, FileText, Info, Save, History, Calendar, Trash2, Pause, Eye, HelpCircle, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Toast from '../ui/Toast';
 import { indexedDB, STORES } from '../../services/IndexedDBManager';
 import Spectrogram from '../viz/Spectrogram';
 import FileSpectrogram from '../viz/FileSpectrogram';
 import RegisterGauge from '../viz/RegisterGauge';
+import MicQualityTips from '../ui/MicQualityTips';
+import { AudioEnhancer } from '../../utils/AudioEnhancer';
 
 import { useAudio } from '../../context/AudioContext';
 
@@ -20,6 +22,13 @@ const VoiceQualityView = () => {
     const [toast, setToast] = useState(null);
 
     const [includeTranscript, setIncludeTranscript] = useState(true);
+
+    // Mic Tips Modal State
+    const [showMicTips, setShowMicTips] = useState(false);
+
+    // Audio Enhancement State
+    const [enhanceAudio, setEnhanceAudio] = useState(true);
+    const [isEnhancing, setIsEnhancing] = useState(false);
 
     // History State
     const [history, setHistory] = useState([]);
@@ -103,12 +112,29 @@ const VoiceQualityView = () => {
         setIsAnalyzing(true);
         setError(null);
 
-        const formData = new FormData();
-        formData.append('audio', file);
-        formData.append('goal', goal);
-        formData.append('include_transcript', includeTranscript.toString());
-
         try {
+            let audioToUpload = file;
+
+            // Apply audio enhancement if enabled
+            if (enhanceAudio && audioBuffer) {
+                setIsEnhancing(true);
+                try {
+                    const enhancedBuffer = await AudioEnhancer.enhance(audioBuffer);
+                    audioToUpload = await AudioEnhancer.bufferToBlob(enhancedBuffer);
+                    // Preserve original filename
+                    audioToUpload = new File([audioToUpload], file.name, { type: 'audio/wav' });
+                } catch (enhanceErr) {
+                    console.warn('Audio enhancement failed, using original:', enhanceErr);
+                    // Fall back to original file
+                }
+                setIsEnhancing(false);
+            }
+
+            const formData = new FormData();
+            formData.append('audio', audioToUpload);
+            formData.append('goal', goal);
+            formData.append('include_transcript', includeTranscript.toString());
+
             // Assuming backend is on same host/port or proxied. 
             // If dev, might need localhost:5000. 
             // Using relative path assuming proxy or same origin.
@@ -130,6 +156,7 @@ const VoiceQualityView = () => {
             setError(err.message);
         } finally {
             setIsAnalyzing(false);
+            setIsEnhancing(false);
         }
     };
 
@@ -552,7 +579,16 @@ const VoiceQualityView = () => {
             ) : activeTab === 'live' ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-center">
                     {!isLive ? (
-                        <div className="max-w-md py-12">
+                        <div className="max-w-md py-12 relative">
+                            {/* Mic Quality Tips Button */}
+                            <button
+                                onClick={() => setShowMicTips(true)}
+                                className="absolute top-4 right-0 p-2 text-slate-400 hover:text-teal-400 hover:bg-slate-800 rounded-lg transition-colors"
+                                title="Recording Tips"
+                            >
+                                <HelpCircle size={20} />
+                            </button>
+
                             <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl border border-slate-800">
                                 <Mic size={32} className="text-teal-400" />
                             </div>
@@ -636,7 +672,16 @@ const VoiceQualityView = () => {
                 <div className="flex-1">
                     {/* Existing Upload UI (mostly unchanged but wrapped cleaner) */}
                     {!results && (
-                        <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-800 rounded-2xl bg-slate-900/30 p-12">
+                        <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-800 rounded-2xl bg-slate-900/30 p-12 relative">
+                            {/* Mic Quality Tips Button */}
+                            <button
+                                onClick={() => setShowMicTips(true)}
+                                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-teal-400 hover:bg-slate-800 rounded-lg transition-colors"
+                                title="Recording Tips"
+                            >
+                                <HelpCircle size={20} />
+                            </button>
+
                             <Upload size={48} className="text-slate-600 mb-4" />
                             <h3 className="text-lg font-bold text-white mb-2">{t('voiceQuality.upload.title')}</h3>
                             <p className="text-slate-400 text-sm mb-6 max-w-sm text-center">
@@ -658,12 +703,35 @@ const VoiceQualityView = () => {
                             {file && (
                                 <div className="mt-6 flex flex-col items-center gap-4">
                                     <div className="text-teal-400 font-mono text-sm">{file.name}</div>
+
+                                    {/* Audio Enhancement Toggle */}
+                                    <label className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700 cursor-pointer hover:border-slate-600 transition-colors group">
+                                        <input
+                                            type="checkbox"
+                                            checked={enhanceAudio}
+                                            onChange={(e) => setEnhanceAudio(e.target.checked)}
+                                            className="sr-only"
+                                        />
+                                        <div className={`w-10 h-5 rounded-full relative transition-colors ${enhanceAudio ? 'bg-teal-500' : 'bg-slate-600'
+                                            }`}>
+                                            <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${enhanceAudio ? 'translate-x-5' : 'translate-x-0'
+                                                }`} />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Sparkles size={16} className={enhanceAudio ? 'text-teal-400' : 'text-slate-500'} />
+                                            <span className="text-sm font-medium text-slate-300">Enhance Audio Quality</span>
+                                        </div>
+                                    </label>
+                                    <p className="text-xs text-slate-500 max-w-xs text-center">
+                                        Applies noise reduction and normalization for clearer analysis
+                                    </p>
+
                                     <button
                                         onClick={handleAnalyze}
-                                        disabled={isAnalyzing}
+                                        disabled={isAnalyzing || isEnhancing}
                                         className="px-8 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-xl font-bold transition-all shadow-lg shadow-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                     >
-                                        {isAnalyzing ? t('voiceQuality.upload.analyzing') : t('voiceQuality.upload.run')}
+                                        {isEnhancing ? 'Enhancing...' : isAnalyzing ? t('voiceQuality.upload.analyzing') : t('voiceQuality.upload.run')}
                                     </button>
                                 </div>
                             )}
@@ -777,6 +845,11 @@ const VoiceQualityView = () => {
                     type={toast.type}
                     onClose={() => setToast(null)}
                 />
+            )}
+
+            {/* Mic Quality Tips Modal */}
+            {showMicTips && (
+                <MicQualityTips onClose={() => setShowMicTips(false)} />
             )}
         </div>
     );
