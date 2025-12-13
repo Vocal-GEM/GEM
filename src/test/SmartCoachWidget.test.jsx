@@ -23,6 +23,11 @@ vi.mock('../services/IndexedDBManager', () => ({
     }
 }));
 
+// Mock AuthContext
+vi.mock('../context/AuthContext', () => ({
+    useAuth: () => ({ user: { username: 'Riley' } })
+}));
+
 describe('SmartCoachWidget', () => {
     const mockOnOpenAdaptiveSession = vi.fn();
 
@@ -41,10 +46,14 @@ describe('SmartCoachWidget', () => {
         );
     };
 
-    it('should render the greeting and profile name', () => {
-        renderWidget();
-        // Greeting depends on time, but name should be there
+    it('should render the user name and ignore profile name', () => {
+        // Set profile name to 'Feminization' to simulate the bug scenario
+        renderWidget({ voiceProfiles: [{ id: 'p1', name: 'Feminization' }] });
+
+        // Should show 'Riley' (from Auth mock)
         expect(screen.getByText(/Riley/)).toBeInTheDocument();
+        // Should NOT show 'Feminization'
+        expect(screen.queryByText(/Feminization/)).not.toBeInTheDocument();
     });
 
     it('should display a daily focus based on goals', () => {

@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
 import { Play, Sparkles, Target, Calendar } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
+import { useAuth } from '../../context/AuthContext';
 
 const SmartCoachWidget = ({ onStartSession }) => {
     const { activeProfile: activeProfileId, voiceProfiles, goals } = useProfile();
+    const { user } = useAuth();
     const activeProfile = voiceProfiles?.find(p => p.id === activeProfileId);
 
-    // Determine greeting based on time of day
     // Determine greeting based on time of day
     const hour = new Date().getHours();
     let greeting = 'Good Evening';
@@ -42,7 +43,7 @@ const SmartCoachWidget = ({ onStartSession }) => {
                         <span>Smart Coach</span>
                     </div>
                     <h2 className="text-3xl md:text-4xl font-bold !text-white mb-2">
-                        {greeting}, {activeProfile?.name || 'Riley'}
+                        {greeting}, {user?.username || 'Riley'}
                     </h2>
                     <p className="!text-indigo-100 text-lg max-w-xl">
                         Ready to level up? Your daily focus is <strong className="!text-white">{dailyFocus}</strong>.
