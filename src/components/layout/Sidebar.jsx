@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, User, Waves, Search, FileText, HelpCircle, Layers, BookMarked } from 'lucide-react';
+import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, User, Waves, Search, FileText, HelpCircle, Layers, BookMarked, Camera } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
@@ -47,6 +47,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
         { id: 'analysis', label: 'Analysis', icon: <Waves size={20} /> },
         { id: 'history', label: 'History', icon: <BarChart2 size={20} /> },
         { id: 'coach', label: 'Coach', icon: <BookOpen size={20} /> },
+        { id: 'camera', label: 'Mirror', icon: <Camera size={20} />, isModal: true },
         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
     ];
 
@@ -225,8 +226,8 @@ const Sidebar = ({ activeView, onViewChange }) => {
                                                     onClick={() => handleSelectResult(result)}
                                                     onMouseEnter={() => setSelectedIndex(resultIndex)}
                                                     className={`w-full px-3 py-2 flex items-center gap-3 text-left transition-colors ${isSelected
-                                                            ? 'bg-blue-600 text-white'
-                                                            : 'text-slate-300 hover:bg-slate-700/50'
+                                                        ? 'bg-blue-600 text-white'
+                                                        : 'text-slate-300 hover:bg-slate-700/50'
                                                         }`}
                                                 >
                                                     <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-white/20' : 'bg-slate-700/50'}`}>

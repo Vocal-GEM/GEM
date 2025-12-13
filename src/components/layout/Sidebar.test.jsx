@@ -57,7 +57,11 @@ describe('Sidebar Auth Integration', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockUseProfile.mockReturnValue({ activeProfile: { name: 'LocalUser' } });
-        mockUseNavigation.mockReturnValue({ activeView: 'dashboard', navigateTo: vi.fn() });
+        mockUseNavigation.mockReturnValue({
+            activeView: 'dashboard',
+            navigateTo: vi.fn(),
+            openModal: vi.fn()
+        });
     });
 
     it('shows Sign In button when not logged in', () => {
@@ -87,5 +91,21 @@ describe('Sidebar Auth Integration', () => {
 
         fireEvent.click(getByText('Sign Out'));
         expect(mockLogout).toHaveBeenCalled();
+    });
+
+    it('opens Camera modal when Mirror button is clicked', () => {
+        mockUseAuth.mockReturnValue({ user: { username: 'TestUser' } });
+        const openModalSpy = vi.fn();
+        mockUseNavigation.mockReturnValue({
+            activeView: 'dashboard',
+            openModal: openModalSpy
+        });
+
+        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+
+        const mirrorBtn = getByText('Mirror');
+        fireEvent.click(mirrorBtn);
+
+        expect(openModalSpy).toHaveBeenCalledWith('camera');
     });
 });
