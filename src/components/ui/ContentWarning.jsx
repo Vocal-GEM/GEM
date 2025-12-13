@@ -57,7 +57,7 @@ const ContentWarning = ({
                         className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-blue-500"
                     />
                     <label htmlFor="dontShow" className="text-sm text-slate-400">
-                        Don't show this again
+                        Don&apos;t show this again
                     </label>
                 </div>
 

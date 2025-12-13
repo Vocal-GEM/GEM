@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Shield, Download, Upload, Trash2, HardDrive, AlertTriangle, Check } from 'lucide-react';
-import { exportAllData, importBackup, getDataSummary, clearAllData, STORAGE_KEYS } from '../../services/DataBackupService';
+import { exportAllData, importBackup, getDataSummary, clearAllData } from '../../services/DataBackupService';
 
 const PrivacyDashboard = () => {
     const [dataSummary, setDataSummary] = useState(null);
@@ -73,8 +73,8 @@ const PrivacyDashboard = () => {
             {/* Status Message */}
             {importStatus && (
                 <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 animate-in slide-in-from-top ${importStatus.type === 'success'
-                        ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
-                        : 'bg-red-500/20 border border-red-500/30 text-red-400'
+                    ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
+                    : 'bg-red-500/20 border border-red-500/30 text-red-400'
                     }`}>
                     <Check size={18} />
                     {importStatus.message}

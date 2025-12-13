@@ -1,3 +1,5 @@
+import { getXPData } from './DailyChallengeService';
+
 /**
  * CommunityService - Handles community features and sharing
  */
@@ -115,7 +117,7 @@ export const getWeeklyChallenges = () => {
  * Get leaderboard (simulated)
  */
 export const getLeaderboard = () => {
-    const { getXPData } = require('./DailyChallengeService');
+    // const { getXPData } = require('./DailyChallengeService'); // Removed: require is not defined in ESM
     const userData = getXPData();
     const profile = getPublicProfile();
 

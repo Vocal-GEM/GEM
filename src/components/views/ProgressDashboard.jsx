@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { TrendingUp, Calendar, Target, Clock, Flame, Award } from 'lucide-react';
 import { getActivitySummary, getReports } from '../../services/SessionReportService';
 import { getStreakData } from '../../services/StreakService';
-import { getPitchTrend, getRecentRecordings } from '../../services/VoiceJournalService';
+import { getPitchTrend } from '../../services/VoiceJournalService';
 
 const ProgressDashboard = () => {
     const [activityData, setActivityData] = useState(null);
@@ -11,11 +11,7 @@ const ProgressDashboard = () => {
     const [calendarData, setCalendarData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        loadData();
-    }, []);
-
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         try {
             const activity = getActivitySummary();
             const streak = getStreakData();
@@ -34,7 +30,11 @@ const ProgressDashboard = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
 
     const buildCalendarData = (reports) => {
         const days = [];

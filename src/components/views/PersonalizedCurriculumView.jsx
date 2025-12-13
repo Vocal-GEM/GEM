@@ -77,10 +77,10 @@ const PersonalizedCurriculumView = () => {
                             key={idx}
                             onClick={() => setSelectedDay(idx)}
                             className={`px-4 py-3 rounded-xl font-medium text-sm whitespace-nowrap transition-all ${selectedDay === idx
-                                    ? 'bg-blue-600 text-white'
-                                    : isToday
-                                        ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
-                                        : 'bg-slate-800 text-slate-400 hover:text-white'
+                                ? 'bg-blue-600 text-white'
+                                : isToday
+                                    ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
+                                    : 'bg-slate-800 text-slate-400 hover:text-white'
                                 }`}
                         >
                             {day.day.slice(0, 3)}
@@ -137,7 +137,7 @@ const PersonalizedCurriculumView = () => {
                         className="w-full mt-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold rounded-xl flex items-center justify-center gap-2"
                     >
                         <Zap size={20} />
-                        Start Today's Practice
+                        Start Today&apos;s Practice
                     </button>
                 </div>
             )}
@@ -150,8 +150,8 @@ const PersonalizedCurriculumView = () => {
                         <div
                             key={idx}
                             className={`p-3 rounded-lg text-center transition-all cursor-pointer ${selectedDay === idx
-                                    ? 'bg-blue-600'
-                                    : 'bg-slate-800 hover:bg-slate-700'
+                                ? 'bg-blue-600'
+                                : 'bg-slate-800 hover:bg-slate-700'
                                 }`}
                             onClick={() => setSelectedDay(idx)}
                         >

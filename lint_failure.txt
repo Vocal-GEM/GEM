@@ -19,8 +19,7 @@ C:\Users\riley\Desktop\GEM\src\components\ui\Confetti.jsx
   109:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
 
 C:\Users\riley\Desktop\GEM\src\components\ui\ContentWarning.jsx
-   2:25  warning  'X' is defined but never used                                    no-unused-vars
-  60:28  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  2:25  warning  'X' is defined but never used  no-unused-vars
 
 C:\Users\riley\Desktop\GEM\src\components\ui\CustomCardEditor.jsx
    1:8  warning  'React' is defined but never used                                                                                   no-unused-vars
@@ -149,8 +148,7 @@ C:\Users\riley\Desktop\GEM\src\components\views\MonthlyRecap.jsx
   183:41  warning  'color' is defined but never used. Allowed unused args must match /^_/u                                           no-unused-vars
 
 C:\Users\riley\Desktop\GEM\src\components\views\PersonalizedCurriculumView.jsx
-    1:8   warning  'React' is defined but never used                                no-unused-vars
-  140:36  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  1:8  warning  'React' is defined but never used  no-unused-vars
 
 C:\Users\riley\Desktop\GEM\src\components\views\PhonetogramView.jsx
   46:8  warning  React Hook useEffect has a missing dependency: 'update'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
@@ -158,8 +156,7 @@ C:\Users\riley\Desktop\GEM\src\components\views\PhonetogramView.jsx
 C:\Users\riley\Desktop\GEM\src\components\views\PracticeMode.test.jsx
    3:26  warning  'fireEvent' is defined but never used                 no-unused-vars
    3:37  warning  'act' is defined but never used                       no-unused-vars
-  43:11  warning  'mockAudioEngine' is assigned a value but never used  no-unused-vars
-  53:9   error    'useEffect' is not defined                            no-undef
+  44:11  warning  'mockAudioEngine' is assigned a value but never used  no-unused-vars
 
 C:\Users\riley\Desktop\GEM\src\components\views\ProgramView.jsx
   7:38  warning  'currentDay' is assigned a value but never used  no-unused-vars
@@ -168,22 +165,14 @@ C:\Users\riley\Desktop\GEM\src\components\views\ProgressiveStackingSession.jsx
   311:49  warning  'i' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
 
 C:\Users\riley\Desktop\GEM\src\components\views\ResearchView.jsx
-   99:65   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
-   99:77   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
-  101:64   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
-  101:84   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
   119:68   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
   119:77   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
   119:128  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
   119:135  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
-  169:70   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
-  169:82   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
-  171:102  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
   202:69   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
   202:85   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
   232:65   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
   232:76   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
-  257:140  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
 
 C:\Users\riley\Desktop\GEM\src\components\views\SLPDashboard.jsx
   16:13  warning  'activeClient' is assigned a value but never used  no-unused-vars
@@ -350,9 +339,6 @@ C:\Users\riley\Desktop\GEM\src\services\AnalysisEngine.js
   80:13  warning  'highPitchDuration' is assigned a value but never used                   no-unused-vars
   83:29  warning  'index' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
 
-C:\Users\riley\Desktop\GEM\src\services\CommunityService.js
-  118:27  error  'require' is not defined  no-undef
-
 C:\Users\riley\Desktop\GEM\src\services\FeedbackService.js
   28:54  warning  'personality' is assigned a value but never used  no-unused-vars
 
@@ -435,5 +421,5 @@ C:\Users\riley\Desktop\GEM\src\utils\voiceAnalysis.js
   347:29  warning  'sampleRate' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
   374:15  warning  'minDistance' is assigned a value but never used                              no-unused-vars
 
-Γ£û 220 problems (20 errors, 200 warnings)
+Γ£û 208 problems (8 errors, 200 warnings)
 

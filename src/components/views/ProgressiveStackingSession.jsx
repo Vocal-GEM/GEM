@@ -16,7 +16,7 @@ const LAYER_ICONS = {
 /**
  * Mini visualization component for each layer
  */
-const LayerMeter = ({ layer, state, value, target, isCurrent }) => {
+const LayerMeter = ({ layer, state, value, isCurrent }) => {
     const IconComponent = LAYER_ICONS[layer.icon] || Music;
 
     const getStatusColor = () => {
@@ -103,7 +103,7 @@ const LayerMeter = ({ layer, state, value, target, isCurrent }) => {
  */
 const ProgressiveStackingSession = ({ onClose }) => {
     const { dataRef, isAudioActive, toggleAudio } = useAudio();
-    const { calibration, targetRange } = useProfile();
+    const { targetRange } = useProfile();
 
     const [isPlaying, setIsPlaying] = useState(false);
     const [sessionState, setSessionState] = useState(null);
@@ -130,7 +130,7 @@ const ProgressiveStackingSession = ({ onClose }) => {
                     timestamp: Date.now()
                 }]);
             },
-            onLayerAdvance: (layer, index) => {
+            onLayerAdvance: (layer, _index) => {
                 setFeedback(prev => [...prev.slice(-2), {
                     type: 'info',
                     message: `New layer: ${layer.name}`,
@@ -169,7 +169,7 @@ const ProgressiveStackingSession = ({ onClose }) => {
                 cancelAnimationFrame(animationRef.current);
             }
         };
-    }, [isPlaying, targetRange]);
+    }, [isPlaying, targetRange, dataRef]);
 
     const handleStart = useCallback(() => {
         if (!isAudioActive) toggleAudio();

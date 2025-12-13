@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
-    BookOpen, Mic2, Activity, Brain, Heart,
+    BookOpen, Activity, Brain, Heart,
     ChevronDown, ChevronUp, ExternalLink, Sparkles,
-    Target, Volume2, Waves, LineChart, Wind, Eye
+    Target, Waves, LineChart, Wind, Eye
 } from 'lucide-react';
 
 const ResearchSection = ({ title, icon, children, defaultOpen = false }) => {
@@ -83,7 +83,7 @@ const ResearchView = () => {
                 >
                     <p className="mb-4">
                         <strong>The Science:</strong> Fundamental frequency (F0) is the rate at which vocal folds vibrate, measured in Hertz (Hz).
-                        While pitch is the primary gender marker, research shows that "pitch overlap" exists between genders.
+                        While pitch is the primary gender marker, research shows that &quot;pitch overlap&quot; exists between genders.
                     </p>
                     <ul className="list-disc list-inside mb-4 space-y-1 text-slate-400">
                         <li>Feminine range: Typically 180-250 Hz (Hancock et al., 2014)</li>
@@ -96,9 +96,9 @@ const ResearchView = () => {
                             <Eye size={16} /> See it in the App
                         </h4>
                         <p className="text-sm text-slate-300">
-                            <strong>Practice Mode:</strong> The "Pitch Tuner" uses an autocorrelation algorithm to detect your F0 in real-time.
+                            <strong>Practice Mode:</strong> The &quot;Pitch Tuner&quot; uses an autocorrelation algorithm to detect your F0 in real-time.
                             <br />
-                            <strong>Analysis Hub:</strong> The "Voice Range Profile" maps your sustained pitch range.
+                            <strong>Analysis Hub:</strong> The &quot;Voice Range Profile&quot; maps your sustained pitch range.
                         </p>
                     </div>
 
@@ -116,7 +116,7 @@ const ResearchView = () => {
                 >
                     <p className="mb-4">
                         <strong>The Science:</strong> Resonance is determined by the size and shape of the vocal tract.
-                        Smaller tracts amplify higher frequencies ("brighter"), while larger tracts amplify lower frequencies ("darker").
+                        Smaller tracts amplify higher frequencies (&quot;brighter&quot;), while larger tracts amplify lower frequencies (&quot;darker&quot;).
                         Science tracks this via <strong>Formants (F1, F2, F3)</strong>.
                     </p>
                     <ul className="list-disc list-inside mb-4 space-y-1 text-slate-400">
@@ -149,9 +149,9 @@ const ResearchView = () => {
                     icon={<Wind className="text-teal-400" size={20} />}
                 >
                     <p className="mb-4">
-                        <strong>The Science:</strong> Voice quality refers to "how" the voice sounds independent of pitch.
+                        <strong>The Science:</strong> Voice quality refers to &quot;how&quot; the voice sounds independent of pitch.
                         Research suggests that a <em>slightly</em> breathier quality can enhance perceived femininity,
-                        while "pressed" or "strained" phonation is often perceived as more masculine.
+                        while &quot;pressed&quot; or &quot;strained&quot; phonation is often perceived as more masculine.
                     </p>
                     <p className="mb-4">
                         We measure this using:
@@ -166,9 +166,9 @@ const ResearchView = () => {
                             <Eye size={16} /> See it in the App
                         </h4>
                         <p className="text-sm text-slate-300">
-                            <strong>Voice Quality View:</strong> The "Breathiness" gauge uses HNR/CPP calculations.
+                            <strong>Voice Quality View:</strong> The &quot;Breathiness&quot; gauge uses HNR/CPP calculations.
                             <br />
-                            <strong>Acoustic Analysis:</strong> Tracks CPP history to ensure you aren't developing pathological breathiness (too high noise).
+                            <strong>Acoustic Analysis:</strong> Tracks CPP history to ensure you aren&apos;t developing pathological breathiness (too high noise).
                         </p>
                     </div>
 
@@ -185,7 +185,7 @@ const ResearchView = () => {
                     icon={<LineChart className="text-orange-400" size={20} />}
                 >
                     <p className="mb-4">
-                        <strong>The Science:</strong> "Weight" describes the perceived thickness of the voice, physically related to the
+                        <strong>The Science:</strong> &quot;Weight&quot; describes the perceived thickness of the voice, physically related to the
                         <strong>Closed Quotient (CQ)</strong> (how long vocal folds stay closed).
                     </p>
                     <ul className="list-disc list-inside mb-4 space-y-1 text-slate-400">
@@ -199,7 +199,7 @@ const ResearchView = () => {
                             <Eye size={16} /> See it in the App
                         </h4>
                         <p className="text-sm text-slate-300">
-                            <strong>Acoustic Analysis:</strong> The "Spectral Weight" meter measures the slope of the power spectrum (LTAS).
+                            <strong>Acoustic Analysis:</strong> The &quot;Spectral Weight&quot; meter measures the slope of the power spectrum (LTAS).
                             <br />
                             <strong>Voice Fingerprint:</strong> Visualizes the balance between low and high energy harmonics.
                         </p>
@@ -219,7 +219,7 @@ const ResearchView = () => {
                 >
                     <p className="mb-4">
                         <strong>The Science:</strong> Generally, feminine speech uses more dynamic pitch variance (semitone range)
-                        and specific patterns like "upspeak" (rising terminals), whereas masculine speech is often more monotonic.
+                        and specific patterns like &quot;upspeak&quot; (rising terminals), whereas masculine speech is often more monotonic.
                     </p>
 
                     <div className="p-4 bg-slate-950 rounded-xl border border-pink-500/20 mb-4">
@@ -229,7 +229,7 @@ const ResearchView = () => {
                         <p className="text-sm text-slate-300">
                             <strong>Call Simulator:</strong> Analyzes your pitch variance during conversation tasks.
                             <br />
-                            <strong>Practice Mode:</strong> The "Intonation" line tracks your pitch contour over time.
+                            <strong>Practice Mode:</strong> The &quot;Intonation&quot; line tracks your pitch contour over time.
                         </p>
                     </div>
                     <Citation
@@ -254,7 +254,7 @@ const ResearchView = () => {
                             <Eye size={16} /> See it in the App
                         </h4>
                         <p className="text-sm text-slate-300">
-                            <strong>Warm-Up Module:</strong> Includes "Straw Phonation" and "Lip Trills" based on Titze's protocols.
+                            <strong>Warm-Up Module:</strong> Includes &quot;Straw Phonation&quot; and &quot;Lip Trills&quot; based on Titze&apos;s protocols.
                             <br />
                             <strong>Vocal Health Tips:</strong> Provides hydration and rest reminders based on hygiene literature.
                         </p>
@@ -282,7 +282,7 @@ const ResearchView = () => {
                             <Eye size={16} /> See it in the App
                         </h4>
                         <p className="text-sm text-slate-300">
-                            <strong>Daily Tips:</strong> Focus on mental wellbeing and "trans joy" alongside technical practice.
+                            <strong>Daily Tips:</strong> Focus on mental wellbeing and &quot;trans joy&quot; alongside technical practice.
                             <br />
                             <strong>Content Warnings:</strong> Allow you to opt-out of sensitive topics to protect mental health.
                         </p>
