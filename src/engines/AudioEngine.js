@@ -422,24 +422,6 @@ export class AudioEngine {
             // Tilt = (High - Low) / Octaves
             const tilt = (dbHigh - dbLow) / 2.0;
 
-            // --- VOCAL WEIGHT CALCULATION ---
-            // Map spectral tilt to vocal weight (0-100 scale)
-            // Tilt typically ranges from -20 (very heavy/pressed) to +10 (very light/airy)
-            // We invert and scale: negative tilt = high weight, positive tilt = low weight
-            // Center around tilt of -5 dB/octave as "neutral" (weight = 50)
-            // Weight = 50 - (tilt * 5)  clamped to 0-100
-            // So tilt of -10 -> weight = 50 - (-10 * 5) = 100 (heavy)
-            // tilt of 0 -> weight = 50 - (0 * 5) = 50 (neutral)
-            // tilt of +10 -> weight = 50 - (10 * 5) = 0 (light)
-            let rawWeight = 50 - (tilt * 5);
-            rawWeight = Math.max(0, Math.min(100, rawWeight));
-
-            // Smooth the weight value
-            this.smoothedWeight = this.smoothedWeight || 50;
-            this.smoothedWeight = this.smoothedWeight * 0.85 + rawWeight * 0.15;
-            const weight = this.smoothedWeight;
-            // ---------------------------------
-
             // 1. Basic Signal Stats
             const rms = DSP.calculateRMS(dataArray);
             const intensity = DSP.calculateDB(rms, this.calibrationOffset);
@@ -461,6 +443,8 @@ export class AudioEngine {
                         hnr: 0,
                         tilt: -20, // Default steep tilt for silence
                         weight: this.smoothedWeight || 50, // Preserve last weight value
+                        h1h2: this.smoothedH1H2 || 0, // Preserve last H1-H2 value
+                        weightLabel: 'Unknown', // No voice detected
                         isSilent: true // Flag for UI to handle silence
                     });
                 }
@@ -484,6 +468,24 @@ export class AudioEngine {
                 harmonicRatio = DSP.calculateHarmonicRatio(freqData, pitch, this.audioContext.sampleRate);
             }
             // ----------------------------------
+
+            // --- IMPROVED VOCAL WEIGHT CALCULATION ---
+            // Research-based multi-factor approach using H1-H2, spectral centroid, and tilt
+            // Based on Garellek & Keating (2010) and related phonetics research
+            const weightAnalysis = DSP.calculateVocalWeight(freqData, pitch, this.audioContext.sampleRate);
+
+            // Apply lighter smoothing for better responsiveness (was 0.85/0.15, now 0.70/0.30)
+            this.smoothedWeight = this.smoothedWeight || 50;
+            this.smoothedWeight = this.smoothedWeight * 0.70 + weightAnalysis.weight * 0.30;
+
+            // Also smooth H1-H2 for UI display
+            this.smoothedH1H2 = this.smoothedH1H2 || 0;
+            this.smoothedH1H2 = this.smoothedH1H2 * 0.70 + weightAnalysis.h1h2 * 0.30;
+
+            const weight = this.smoothedWeight;
+            const h1h2 = this.smoothedH1H2;
+            const weightLabel = weightAnalysis.label;
+            // ---------------------------------
 
             let jitter = 0;
             let shimmer = 0;
@@ -544,6 +546,8 @@ export class AudioEngine {
                     hnr: hnr,
                     tilt: tilt || -20,
                     weight: weight,
+                    h1h2: h1h2, // H1-H2 measure for vocal weight
+                    weightLabel: weightLabel, // Descriptive label (e.g., "Light", "Heavy")
                     f3Noise: f3Noise,
                     harmonicRatio: harmonicRatio
                 });
