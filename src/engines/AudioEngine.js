@@ -419,7 +419,24 @@ export class AudioEngine {
             // 1k to 4k is 2 octaves.
             // Tilt = (High - Low) / Octaves
             const tilt = (dbHigh - dbLow) / 2.0;
-            // --------------------------------------
+
+            // --- VOCAL WEIGHT CALCULATION ---
+            // Map spectral tilt to vocal weight (0-100 scale)
+            // Tilt typically ranges from -20 (very heavy/pressed) to +10 (very light/airy)
+            // We invert and scale: negative tilt = high weight, positive tilt = low weight
+            // Center around tilt of -5 dB/octave as "neutral" (weight = 50)
+            // Weight = 50 - (tilt * 5)  clamped to 0-100
+            // So tilt of -10 -> weight = 50 - (-10 * 5) = 100 (heavy)
+            // tilt of 0 -> weight = 50 - (0 * 5) = 50 (neutral)
+            // tilt of +10 -> weight = 50 - (10 * 5) = 0 (light)
+            let rawWeight = 50 - (tilt * 5);
+            rawWeight = Math.max(0, Math.min(100, rawWeight));
+
+            // Smooth the weight value
+            this.smoothedWeight = this.smoothedWeight || 50;
+            this.smoothedWeight = this.smoothedWeight * 0.85 + rawWeight * 0.15;
+            const weight = this.smoothedWeight;
+            // ---------------------------------
 
             // 1. Basic Signal Stats
             const rms = DSP.calculateRMS(dataArray);
@@ -441,6 +458,7 @@ export class AudioEngine {
                         shimmer: 0,
                         hnr: 0,
                         tilt: -20, // Default steep tilt for silence
+                        weight: this.smoothedWeight || 50, // Preserve last weight value
                         isSilent: true // Flag for UI to handle silence
                     });
                 }
@@ -523,6 +541,7 @@ export class AudioEngine {
                     shimmer: shimmer,
                     hnr: hnr,
                     tilt: tilt || -20,
+                    weight: weight,
                     f3Noise: f3Noise,
                     harmonicRatio: harmonicRatio
                 });
