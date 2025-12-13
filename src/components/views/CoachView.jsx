@@ -1,12 +1,14 @@
 
 import { useState } from 'react';
 
-import { BookOpen, Trophy, Target, ArrowRight, Play, Star, Heart, Edit3, Music, Book } from 'lucide-react';
+import { BookOpen, Trophy, Target, ArrowRight, Play, Star, Heart, Edit3, Music, Book, X } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
 import { useProgram } from '../../hooks/useProgram';
 import { SelfCareService, SELF_CARE_PROMPTS } from '../../services/SelfCareService';
 import SelfCareOnboarding from '../ui/SelfCareOnboarding';
 import SoundJournal from '../ui/SoundJournal';
+import AchievementsPanel from '../ui/AchievementsPanel';
+import CustomCardEditor from '../ui/CustomCardEditor';
 
 const CoachView = () => {
 
@@ -15,6 +17,8 @@ const CoachView = () => {
     const [selfCarePlan, setSelfCarePlan] = useState(() => SelfCareService.getSelfCarePlan());
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showSoundJournal, setShowSoundJournal] = useState(false);
+    const [showAchievements, setShowAchievements] = useState(false);
+    const [showCustomCards, setShowCustomCards] = useState(false);
 
     const handleOnboardingComplete = (plan) => {
         setSelfCarePlan(plan);
@@ -40,6 +44,23 @@ const CoachView = () => {
                         <SoundJournal onComplete={() => setShowSoundJournal(false)} />
                     </div>
                 </div>
+            )}
+
+            {showAchievements && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+                    <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900 rounded-2xl p-6 border border-slate-700">
+                        <div className="flex justify-end mb-4">
+                            <button onClick={() => setShowAchievements(false)} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <AchievementsPanel />
+                    </div>
+                </div>
+            )}
+
+            {showCustomCards && (
+                <CustomCardEditor onClose={() => setShowCustomCards(false)} />
             )}
 
             {/* Header */}
@@ -137,7 +158,7 @@ const CoachView = () => {
                     <p className="text-sm text-slate-400">Practice specific skills with targeted exercises.</p>
                 </div>
 
-                <div className="bg-slate-800/50 hover:bg-slate-800 border border-white/5 hover:border-amber-500/30 rounded-2xl p-6 cursor-pointer transition-all group">
+                <div onClick={() => setShowAchievements(true)} className="bg-slate-800/50 hover:bg-slate-800 border border-white/5 hover:border-amber-500/30 rounded-2xl p-6 cursor-pointer transition-all group">
                     <div className="p-3 bg-amber-500/20 rounded-xl w-fit mb-4 group-hover:scale-110 transition-transform">
                         <Star className="text-amber-400" />
                     </div>
@@ -151,6 +172,14 @@ const CoachView = () => {
                     </div>
                     <h3 className="font-bold text-white text-lg mb-1">Glossary</h3>
                     <p className="text-sm text-slate-400">Definitions for all course terms.</p>
+                </div>
+
+                <div onClick={() => setShowCustomCards(true)} className="bg-slate-800/50 hover:bg-slate-800 border border-white/5 hover:border-pink-500/30 rounded-2xl p-6 cursor-pointer transition-all group">
+                    <div className="p-3 bg-pink-500/20 rounded-xl w-fit mb-4 group-hover:scale-110 transition-transform">
+                        <Edit3 className="text-pink-400" />
+                    </div>
+                    <h3 className="font-bold text-white text-lg mb-1">My Practice Cards</h3>
+                    <p className="text-sm text-slate-400">Create custom sentences to practice.</p>
                 </div>
             </div>
 

@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { FEMINIZATION_JOURNEY } from '../data/guidedJourneyData';
+import { recordPractice } from '../services/StreakService';
+import { generateJourneyReport } from '../services/SessionReportService';
 
 const GuidedJourneyContext = createContext(null);
 
@@ -156,6 +158,9 @@ export const GuidedJourneyProvider = ({ children }) => {
 
     // Mark a step as completed with optional metrics
     const completeStep = useCallback((stepId, metrics = {}) => {
+        // Record practice for streak tracking
+        recordPractice();
+
         setState(prev => ({
             ...prev,
             completedSteps: prev.completedSteps.includes(stepId)
@@ -204,10 +209,23 @@ export const GuidedJourneyProvider = ({ children }) => {
         }));
     }, []);
 
-    // Exit the journey (pauses, keeps progress)
+    // Exit the journey (pauses, keeps progress, logs report)
     const exitJourney = useCallback(() => {
+        // Generate session report if user practiced
+        if (state.completedSteps.length > 0 && state.startedAt) {
+            const startTime = new Date(state.startedAt);
+            const now = new Date();
+            const durationMinutes = Math.round((now - startTime) / 60000);
+
+            generateJourneyReport({
+                stepsCompleted: state.completedSteps.length,
+                moduleName: 'Green Light Protocol',
+                durationMinutes: Math.min(durationMinutes, 120), // Cap at 2 hours
+                exercises: state.completedSteps.slice(-5) // Last 5 steps
+            });
+        }
         setIsJourneyActive(false);
-    }, []);
+    }, [state.completedSteps, state.startedAt]);
 
     // Reset the journey completely
     const resetJourney = useCallback(() => {

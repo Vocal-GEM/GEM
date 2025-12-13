@@ -34,6 +34,10 @@ const CalibrationWizard = lazy(() => import('./components/ui/CalibrationWizard')
 const HistoryView = lazy(() => import('./components/ui/HistoryView'));
 const CoachView = lazy(() => import('./components/views/CoachView'));
 const GlossaryView = lazy(() => import('./components/views/GlossaryView'));
+const VoiceJournalView = lazy(() => import('./components/views/VoiceJournalView'));
+const ProgressDashboard = lazy(() => import('./components/views/ProgressDashboard'));
+const CommunityHub = lazy(() => import('./components/views/CommunityHub'));
+const ResearchView = lazy(() => import('./components/views/ResearchView'));
 const PracticeMode = lazy(() => import('./components/views/PracticeMode'));
 
 const AdaptivePracticeSession = lazy(() => import('./components/views/AdaptivePracticeSession'));
@@ -275,6 +279,38 @@ const App = () => {
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <GlossaryView />
+                                </Suspense>
+                            </div>
+                        )}
+
+                        {activeTab === 'journal' && (
+                            <div className="p-4 lg:p-8">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    <VoiceJournalView />
+                                </Suspense>
+                            </div>
+                        )}
+
+                        {activeTab === 'progress' && (
+                            <div className="p-4 lg:p-8">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    <ProgressDashboard />
+                                </Suspense>
+                            </div>
+                        )}
+
+                        {activeTab === 'community' && (
+                            <div className="p-4 lg:p-8">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    <CommunityHub />
+                                </Suspense>
+                            </div>
+                        )}
+
+                        {activeTab === 'research' && (
+                            <div className="p-4 lg:p-8">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    <ResearchView />
                                 </Suspense>
                             </div>
                         )}

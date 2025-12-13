@@ -9,11 +9,13 @@ export const TRAINING_CATEGORIES = [
             {
                 id: 'bug-blow',
                 title: 'Bug Blow',
+                difficulty: 'beginner',
                 content: "Blow as though there is a bug on the computer screen (5-10x)."
             },
             {
                 id: 'diaphragm-pulse',
                 title: 'Conversational Diaphragm Pulse',
+                difficulty: 'intermediate',
                 content: `
 1. Create a "beat/pulse" with the diaphragm.
 2. Continue that "beat/pulse" under speech.
@@ -23,6 +25,7 @@ export const TRAINING_CATEGORIES = [
             {
                 id: 'order-ops',
                 title: 'Order of Operations',
+                difficulty: 'intermediate',
                 content: `
 1. Create a "beat/pulse" with the diaphragm.
 2. Continue the pulse by gently phonating "huh" on a comfortable pitch.
@@ -33,16 +36,19 @@ export const TRAINING_CATEGORIES = [
             {
                 id: 'paper-blow',
                 title: 'Paper Blows',
+                difficulty: 'beginner',
                 content: "Hold toilet paper against the wall by blowing on it (3-4 inches away). Record how many seconds it stays up."
             },
             {
                 id: 'pursed-lip',
                 title: 'Pursed Lip Breathing',
+                difficulty: 'beginner',
                 content: 'Inhale through nose like "smelling a rose". Exhale through pursed lips like "blowing out a candle". (10x)'
             },
             {
                 id: 'rainbow-breath',
                 title: 'Rainbow Passage (Breath Focus)',
+                difficulty: 'advanced',
                 content: `Breathe after every line (//):
 
 When the sunlight strikes raindrops in the air, // 
@@ -71,6 +77,7 @@ for the pot of gold at the end of the rainbow. //`
             {
                 id: 'straw-phonation',
                 title: 'Straw Phonation',
+                difficulty: 'beginner',
                 content: `
 1. Use a standard straw. Voice pitch glides from low to high into the straw (1 min).
 2. Perform accent glides (varying pitch/volume).
@@ -81,6 +88,7 @@ for the pot of gold at the end of the rainbow. //`
             {
                 id: 'cup-bubbles',
                 title: 'Cup Bubbles',
+                difficulty: 'beginner',
                 content: `
 1. Straw 1cm into water.
 2. Blow steady bubbles without voice (5x).
@@ -92,6 +100,7 @@ for the pot of gold at the end of the rainbow. //`
             {
                 id: 'lip-trills',
                 title: 'Lip Trills',
+                difficulty: 'beginner',
                 content: `
 1. Hold a comfortable lip trill (1 min).
 2. Glide Low -> High.
@@ -102,11 +111,13 @@ for the pot of gold at the end of the rainbow. //`
             {
                 id: 'blowfish',
                 title: 'Blowfish',
+                difficulty: 'intermediate',
                 content: "Puff out cheeks and hum without letting them deflate. Glide pitch while maintaining the puff."
             },
             {
                 id: 'wall-e',
                 title: 'Wall-E',
+                difficulty: 'advanced',
                 content: "Begin whistling, then start to phonate while continuing the whistle. Try pitch slides."
             }
         ]
@@ -120,6 +131,7 @@ for the pot of gold at the end of the rainbow. //`
             {
                 id: 'jettison',
                 title: 'Jettison the Airlocks (False Fold Release)',
+                difficulty: 'intermediate',
                 content: `
 1. Put fingers in ears and breathe through mouth.
 2. Focus on the sound of the breath in the throat.
@@ -129,16 +141,19 @@ for the pot of gold at the end of the rainbow. //`
             {
                 id: 'massage-neck',
                 title: 'Neck Massage',
+                difficulty: 'beginner',
                 content: "Massage down the muscles on both sides of the neck until you feel a reduction in tension."
             },
             {
                 id: 'massage-hyoid',
                 title: 'Hyoid Release',
+                difficulty: 'intermediate',
                 content: "Gently massage the 'U' shaped bone under the chin. Move it side to side. There should be no clicking or resistance."
             },
             {
                 id: 'massage-cheeks',
                 title: 'Cheek/Jaw Massage',
+                difficulty: 'beginner',
                 content: "Use knuckles to massage under cheekbones, starting near ears and moving down to mouth."
             }
         ]
@@ -152,31 +167,37 @@ for the pot of gold at the end of the rainbow. //`
             {
                 id: 'aye-aye',
                 title: 'Aye-Aye & Yo-Yo',
+                difficulty: 'beginner',
                 content: "Say 'Aye Aye Aye' and 'Yo Yo Yo' with jaw relaxed (no lip movement). Do with and without sound (30s each)."
             },
             {
                 id: 'tongue-pull',
                 title: 'Tongue Pulling',
+                difficulty: 'intermediate',
                 content: "Use a washcloth to hold the tip of tongue. Pull straight out (not down). Perform vowel glides. **Stretches the root.**"
             },
             {
                 id: 'hyoglossus',
                 title: 'Hyoglossus Release',
+                difficulty: 'intermediate',
                 content: "Place a pencil under the tongue. Perform vowel glides. Don't let the tongue pull back or down."
             },
             {
                 id: 'pb-scrape',
                 title: 'Peanut Butter Scrape',
+                difficulty: 'beginner',
                 content: "Use tip of tongue to scrape 'peanut butter' off roof of mouth (Middle -> Front Teeth). 10x."
             },
             {
                 id: 'big-dog',
                 title: 'Big Dog / Little Dog',
+                difficulty: 'intermediate',
                 content: "Pant like a big dog (Low Larynx). Pant like a tiny chihuahua (High Larynx/Twang). **Stop if squeezing.**"
             },
             {
                 id: 'nee-rainbow',
                 title: 'Nasal Resonance: Rainbow Passage',
+                difficulty: 'advanced',
                 content: `Use the "NEE" sound to find forward resonance before each phrase:
 
 NEE - when the sunlight strikes
@@ -187,6 +208,7 @@ NEE - and form a rainbow`
             {
                 id: 'tonal-matrix',
                 title: 'Tonal Consistency Matrix',
+                difficulty: 'advanced',
                 content: `Combine "NEE" with vowels to maintain forward placement.
 
 **Group 1 (Front):**

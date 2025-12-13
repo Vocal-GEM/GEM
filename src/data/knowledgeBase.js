@@ -1,7 +1,9 @@
 import { GAVT_REPORT } from './research/GAVT_Report.js';
+import { RESEARCH_KB_ENTRIES } from './research/AcousticGenderPerception.js';
 
 export const KNOWLEDGE_BASE = [
     ...GAVT_REPORT,
+    ...RESEARCH_KB_ENTRIES,
     {
         id: 'res_01',
         tags: ['resonance', 'bright', 'R1', 'size'],
@@ -127,5 +129,12 @@ export const KNOWLEDGE_BASE = [
         question: "Why does my throat hurt?",
         answer: "Throat pain usually indicates **strain** or **tension**.\n\n- **False Vocal Folds:** You might be squeezing your throat. Retract the false folds (laugh gently or inhale on a 'k').\n- **Larynx Height:** You might be forcing your larynx too high or low without relaxation.\n\n*Stop immediately if it hurts. Rest and hydrate.*",
         category: "Health"
+    },
+    {
+        id: 'nonspeech_01',
+        tags: ['non-speech', 'laugh', 'cough', 'sneeze', 'feminization', 'resonance'],
+        question: "How can I feminize non-speech sounds (laughing, coughing)?",
+        answer: "Non-speech sounds like laughing, coughing, and sneezing can reveal your habitual voice settings. To feminize them:\n\n**Make the resonance chamber smaller using an \"E\" shape:**\n\n1. **Spread your lips slightly** (like saying 'ee').\n2. **Keep your tongue high and forward.**\n3. **Maintain your raised larynx position.**\n\n*Practice: Try laughing on a high 'hee hee hee' rather than a low 'hah hah'. The 'ee' vowel naturally creates a smaller, brighter resonance.*",
+        category: "Feminization"
     }
 ];

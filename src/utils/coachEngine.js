@@ -23,7 +23,11 @@ const EXERCISE_MAP = {
     'Resonance River': { route: '/games', component: 'ResonanceRiverGame', difficulty: 'intermediate', duration: 5 },
     'Intonation Exercise': { route: '/tools', component: 'IntonationExercise', difficulty: 'advanced', duration: 10 },
     'Forward Focus': { route: '/tools', component: 'ForwardFocusDrill', difficulty: 'intermediate', duration: 5 },
-    'Warm Up': { route: '/tools', component: 'WarmUpModule', difficulty: 'beginner', duration: 5 }
+    'Warm Up': { route: '/tools', component: 'WarmUpModule', difficulty: 'beginner', duration: 5 },
+    // Thin Fold Mass Exercises
+    'Airy Sigh': { route: '/practice', component: 'ExerciseView', exerciseId: 'weight-airy-sigh', difficulty: 'beginner', duration: 2 },
+    'High-to-Low Glide': { route: '/practice', component: 'ExerciseView', exerciseId: 'weight-high-low-glide', difficulty: 'beginner', duration: 2 },
+    'Thin Fold Flow': { route: '/practice', component: 'ExerciseView', exerciseId: 'weight-thin-flow', difficulty: 'intermediate', duration: 3 }
 };
 
 // --- Helper Evaluation Functions ---

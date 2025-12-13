@@ -22,9 +22,13 @@ const NAVIGATION_ITEMS = [
     { id: 'nav-practice', title: 'Practice Mode', subtitle: 'Start voice training exercises', view: 'practice' },
     { id: 'nav-analysis', title: 'Analysis Hub', subtitle: 'Analyze your voice in detail', view: 'analysis' },
     { id: 'nav-history', title: 'History', subtitle: 'View past sessions and journals', view: 'history' },
+    { id: 'nav-journal', title: 'Voice Journal', subtitle: 'Record and track voice clips over time', view: 'journal' },
+    { id: 'nav-progress', title: 'Progress Dashboard', subtitle: 'View trends and analytics', view: 'progress' },
+    { id: 'nav-community', title: 'Community', subtitle: 'Leaderboard and weekly challenges', view: 'community' },
     { id: 'nav-coach', title: 'Coach', subtitle: 'AI-guided voice coaching', view: 'coach' },
     { id: 'nav-settings', title: 'Settings', subtitle: 'Configure app preferences', view: 'settings' },
     { id: 'nav-glossary', title: 'Glossary', subtitle: 'Voice training terminology', view: 'glossary' },
+    { id: 'nav-research', title: 'Research', subtitle: 'The science behind the app', view: 'research' },
     { id: 'nav-assessment', title: 'Clinical Assessment', subtitle: 'Comprehensive voice evaluation', view: 'assessment' },
 ];
 

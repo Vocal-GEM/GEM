@@ -5,11 +5,26 @@ import PitchTrainingModule from '../training/PitchTrainingModule';
 import ShadowingExercise from '../exercises/ShadowingExercise';
 import GabLibs from '../ui/GabLibs';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell, Music, Activity, ArrowLeft, TrendingUp, TrendingDown, MessageSquare, BookOpen, Wind, Coffee, Orbit, Zap } from 'lucide-react';
+import { Dumbbell, Music, Activity, ArrowLeft, TrendingUp, TrendingDown, MessageSquare, BookOpen, Wind, Coffee, Orbit, Zap, Volume2, VolumeX } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
 import { TRAINING_CATEGORIES } from '../../data/trainingData';
+import { useTTS } from '../../hooks/useTTS';
 
 const ExerciseList = ({ category, onBack }) => {
+    const { speak, speaking, cancel, supported } = useTTS();
+
+    const handleSpeak = (text) => {
+        if (speaking) {
+            cancel();
+        } else {
+            // Extract readable text, limit to 400 chars for performance
+            const cleanText = text.replace(/\*\*.*?\*\*/g, '').replace(/\|.*?\|/g, '').substring(0, 400);
+            speak(cleanText, { gender: 'fem', rate: 0.9 });
+        }
+    };
+
+    const isPerformanceCategory = category.id === 'performance';
+
     return (
         <div className="h-full flex flex-col">
             <div className="flex items-center gap-2 mb-6">
@@ -23,17 +38,44 @@ const ExerciseList = ({ category, onBack }) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-12">
-                {category.exercises.map(ex => (
-                    <div key={ex.id} className="bg-slate-900 border border-slate-800 p-6 rounded-xl hover:border-slate-700 transition-colors">
-                        <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full bg-${category.color}-500`} />
-                            {ex.title}
-                        </h3>
-                        <div className="text-slate-300 whitespace-pre-line text-sm leading-relaxed">
-                            {ex.content}
+                {category.exercises.map(ex => {
+                    const difficultyColors = {
+                        beginner: 'bg-emerald-500/20 text-emerald-400',
+                        intermediate: 'bg-amber-500/20 text-amber-400',
+                        advanced: 'bg-red-500/20 text-red-400'
+                    };
+                    const difficultyLabel = ex.difficulty?.charAt(0).toUpperCase() + ex.difficulty?.slice(1) || '';
+
+                    return (
+                        <div key={ex.id} className="bg-slate-900 border border-slate-800 p-6 rounded-xl hover:border-slate-700 transition-colors">
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                        <div className={`w-2 h-2 rounded-full bg-${category.color}-500`} />
+                                        {ex.title}
+                                    </h3>
+                                    {ex.difficulty && (
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${difficultyColors[ex.difficulty]}`}>
+                                            {difficultyLabel}
+                                        </span>
+                                    )}
+                                </div>
+                                {isPerformanceCategory && supported && (
+                                    <button
+                                        onClick={() => handleSpeak(ex.content)}
+                                        className={`p-2 rounded-lg transition-colors ${speaking ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
+                                        title={speaking ? 'Stop' : 'Hear Example'}
+                                    >
+                                        {speaking ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                                    </button>
+                                )}
+                            </div>
+                            <div className="text-slate-300 whitespace-pre-line text-sm leading-relaxed">
+                                {ex.content}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );

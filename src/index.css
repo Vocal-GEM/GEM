@@ -166,6 +166,46 @@ body {
   animation: glow-pulse 2s ease-in-out infinite;
 }
 
+/* Celebration Glow Animations */
+@keyframes pulse-glow-celebration {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes edge-glow {
+  0% {
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-pulse-glow-celebration {
+  animation: pulse-glow-celebration 2s ease-out forwards;
+}
+
+.animate-edge-glow {
+  animation: edge-glow 2s ease-out forwards;
+}
+
 /* Safe Area */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
@@ -747,4 +787,117 @@ body {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
+}
+
+/* ===================================
+   CUSTOM ACCESSIBILITY CLASS MODES
+   (Applied via AccessibilityService)
+   =================================== */
+
+/* High Contrast Mode (JS-controlled) */
+.high-contrast {
+  --slate-900: 0 0 0;
+  --slate-800: 10 10 10;
+  --glass-bg: rgba(0, 0, 0, 0.95);
+  --glass-border: rgba(255, 255, 255, 0.5);
+}
+
+.high-contrast button,
+.high-contrast a,
+.high-contrast [role="button"] {
+  border: 2px solid currentColor !important;
+}
+
+.high-contrast .text-slate-400,
+.high-contrast .text-slate-500 {
+  color: rgb(200, 200, 200) !important;
+}
+
+/* Large Text Mode (JS-controlled) */
+.large-text {
+  font-size: 110%;
+}
+
+.large-text h1 {
+  font-size: 2.5rem;
+}
+
+.large-text h2 {
+  font-size: 2rem;
+}
+
+.large-text h3 {
+  font-size: 1.5rem;
+}
+
+.large-text p,
+.large-text span {
+  line-height: 1.6;
+}
+
+/* Reduced Motion (JS-controlled) */
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Font Scale Variable Support */
+:root {
+  --accessibility-font-scale: 1;
+}
+
+body {
+  font-size: calc(1rem * var(--accessibility-font-scale));
+}
+
+/* ===================================
+   LIGHT MODE THEME
+   (Applied via ThemeService)
+   =================================== */
+
+.light-mode {
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --slate-50: 15 23 42;
+  --slate-100: 30 41 59;
+  --slate-200: 51 65 85;
+  --slate-300: 71 85 105;
+  --slate-400: 100 116 139;
+  --slate-500: 148 163 184;
+  --slate-600: 203 213 225;
+  --slate-700: 226 232 240;
+  --slate-800: 241 245 249;
+  --slate-900: 248 250 252;
+  --slate-950: 255 255 255;
+}
+
+.light-mode,
+.light-mode body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.light-mode .bg-slate-900 {
+  background-color: #ffffff !important;
+}
+
+.light-mode .bg-slate-800 {
+  background-color: #f1f5f9 !important;
+}
+
+.light-mode .border-slate-800,
+.light-mode .border-slate-700 {
+  border-color: #e2e8f0 !important;
+}
+
+.light-mode .text-white {
+  color: #0f172a !important;
+}
+
+.light-mode .text-slate-400 {
+  color: #64748b !important;
 }

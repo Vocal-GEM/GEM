@@ -107,6 +107,32 @@ Use the meter below to monitor your vocal weight.
 3.  Try counting again, keeping the sound as soft as that "Haaaa".
 4.  **Goal**: Keep the indicator in the "Neutral" or "Light" zone. Avoid the "Pressed/Heavy" red zone.
                 `
+            },
+            {
+                id: 'lesson-2-3',
+                title: 'Finding Thin Vocal Fold Mass',
+                type: 'practice',
+                toolId: 'weight-visualizer',
+                duration: '15 min',
+                description: 'Exercises to find a lighter, thinner vocal fold configuration.',
+                content: `
+# Thin Fold Exercises
+
+These three exercises help you find a lighter vocal fold configuration - essential for a natural feminine voice.
+
+## 1. Light Airy Sigh
+Take a relaxed breath and release it on a **light, airy sigh** - like a contented "ahh" after a long day. Let air escape freely without pressing or holding.
+
+## 2. High-to-Low Glissando
+Start at a **comfortable high pitch** and glide smoothly down to your lowest note. Keep the sound light and effortless as you descend. Starting high encourages thinner folds.
+
+## 3. Thin Fold Flow Phonation
+Sustain a gentle **"oo"** or **"ee"** vowel with maximum airflow and minimum effort. Imagine your vocal folds are thin ribbons barely touching. If you feel pressing, add more breath.
+
+**Practice Order**: Sigh → Glissando → Flow → Speak
+
+Try speaking immediately after the flow exercise to carry over that thin, light feeling.
+                `
             }
         ]
     },

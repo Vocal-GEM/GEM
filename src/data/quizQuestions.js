@@ -1156,6 +1156,20 @@ export const quizQuestions = [
         ],
         correctIndex: 1,
         explanation: 'While acoustic measures are useful tools, the best measure of success is how you feel about your voice and whether it represents you authentically.'
+    },
+    {
+        id: 'technique-nee-rainbow',
+        moduleId: 'resonance',
+        moduleName: 'Resonance & Brightness',
+        question: 'Why do we begin each phrase of the Rainbow Passage with a NEE?',
+        options: [
+            'The larynx will likely lower when breathing in between each phrase',
+            'To find nasality',
+            'To set the tongue in the correct position',
+            'All of the above'
+        ],
+        correctIndex: 3,
+        explanation: 'Starting each phrase with NEE serves multiple purposes: it resets the larynx height after the breath (which tends to lower it), engages nasal resonance, and positions the tongue forward for optimal bright resonance.'
     }
 ];
 

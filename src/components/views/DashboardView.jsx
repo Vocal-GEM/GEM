@@ -1,11 +1,16 @@
-import { cloneElement } from 'react';
-import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen } from 'lucide-react';
+import { cloneElement, useState, useEffect } from 'react';
+import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen, Flame, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import VocalHealthPanel from '../dashboard/VocalHealthPanel';
 import SmartCoachWidget from '../dashboard/SmartCoachWidget';
 import JourneyEntryCard from '../ui/JourneyEntryCard';
+import SessionSummaryCard from '../ui/SessionSummaryCard';
+import RecommendedExercises from '../ui/RecommendedExercises';
+import DailyChallengeCard from '../ui/DailyChallengeCard';
+import SmartPracticeSession from '../ui/SmartPracticeSession';
 import { useGuidedJourney } from '../../context/GuidedJourneyContext';
 import { useNavigation } from '../../context/NavigationContext';
+import { checkStreakStatus, getStreakMessage } from '../../services/StreakService';
 
 const StatCard = ({ label, value, subtext, icon, color }) => (
     <div className="bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
@@ -47,6 +52,15 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
     } = useGuidedJourney();
     const { openModal } = useNavigation();
 
+    // Streak tracking
+    const [streakData, setStreakData] = useState({ currentStreak: 0, needsPracticeToday: true });
+    const [showSmartPractice, setShowSmartPractice] = useState(false);
+
+    useEffect(() => {
+        const status = checkStreakStatus();
+        setStreakData(status);
+    }, []);
+
     const handleStartJourney = () => {
         openModal('guidedJourney');
     };
@@ -75,8 +89,45 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
             {/* Smart Coach Widget */}
             <SmartCoachWidget onStartSession={onOpenAdaptiveSession} />
 
+            {/* Smart Practice Button */}
+            <button
+                onClick={() => setShowSmartPractice(true)}
+                className="w-full mb-8 p-6 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 rounded-2xl text-left transition-all group"
+            >
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-white/20 rounded-xl">
+                            <Sparkles className="text-white" size={24} />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold text-white">Smart Practice</h3>
+                            <p className="text-white/80 text-sm">Personalized session based on your weak areas</p>
+                        </div>
+                    </div>
+                    <ArrowRight className="text-white group-hover:translate-x-1 transition-transform" size={24} />
+                </div>
+            </button>
+
+            {/* Smart Practice Modal */}
+            {showSmartPractice && (
+                <SmartPracticeSession onClose={() => setShowSmartPractice(false)} />
+            )}
+
             {/* Vocal Health Panel */}
             <VocalHealthPanel />
+
+            {/* Session Summary */}
+            <div className="mb-8">
+                <SessionSummaryCard />
+            </div>
+
+            {/* Recommended Exercises */}
+            <RecommendedExercises onViewCategory={(cat) => onViewChange('training', { category: cat })} />
+
+            {/* Daily Challenges */}
+            <div className="mb-8">
+                <DailyChallengeCard />
+            </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
@@ -89,9 +140,10 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                 />
                 <StatCard
                     label={t('dashboard.stats.streak.label')}
-                    value="3"
-                    icon={<Calendar size={24} />}
-                    color="text-purple-400"
+                    value={streakData.currentStreak}
+                    subtext={streakData.needsPracticeToday ? "Practice today!" : "✓ Done"}
+                    icon={<Flame size={24} />}
+                    color="text-orange-400"
                 />
                 <StatCard
                     label={t('dashboard.stats.practice.label')}

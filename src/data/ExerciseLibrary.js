@@ -74,6 +74,16 @@ export const EXERCISE_LIBRARY = [
         visualization: null
     },
     {
+        id: 'warmup-tongue-pulls',
+        title: 'Tongue Pulls',
+        category: 'warmup',
+        difficulty: 'beginner',
+        duration: 30,
+        instructions: 'Gently grasp the tip of your tongue with a clean cloth or tissue. Pull it forward gently and hold for 5 seconds, then release. Repeat 5-10 times. This releases tension in the tongue root, which connects to the larynx.',
+        goals: ['warmup', 'relaxation'],
+        visualization: null
+    },
+    {
         id: 'breath-hiss',
         title: 'Sustained Hiss',
         category: 'breath',
@@ -168,6 +178,38 @@ export const EXERCISE_LIBRARY = [
         instructions: 'Start with a loose vocal fry and slowly slide up into a clear tone. Keep the weight light.',
         goals: ['weight', 'relaxation'],
         visualization: 'weight'
+    },
+    // --- THIN VOCAL FOLD MASS EXERCISES ---
+    // These exercises help find a lighter, thinner vocal fold configuration
+    {
+        id: 'weight-airy-sigh',
+        title: 'Light Airy Sigh',
+        category: 'weight',
+        difficulty: 'beginner',
+        duration: 45,
+        instructions: 'Take a relaxed breath and release it on a light, airy sigh - like a contented "ahh" after a long day. Let air escape freely without pressing or holding. This encourages thin, relaxed vocal folds.',
+        goals: ['weight', 'relaxation', 'thin-folds'],
+        visualization: 'weight'
+    },
+    {
+        id: 'weight-high-low-glide',
+        title: 'High-to-Low Glissando',
+        category: 'weight',
+        difficulty: 'beginner',
+        duration: 60,
+        instructions: 'Start at a comfortable high pitch and glide smoothly down to your lowest note. Keep the sound light and effortless as you descend. The high starting point encourages thinner vocal fold mass.',
+        goals: ['weight', 'range', 'thin-folds'],
+        visualization: 'pitch'
+    },
+    {
+        id: 'weight-thin-flow',
+        title: 'Thin Fold Flow Phonation',
+        category: 'weight',
+        difficulty: 'intermediate',
+        duration: 60,
+        instructions: 'Sustain a gentle "oo" or "ee" vowel with maximum airflow and minimum vocal effort. Imagine your vocal folds are thin ribbons barely touching. If you feel pressing or tightness, add more breath.',
+        goals: ['weight', 'flow', 'thin-folds'],
+        visualization: 'flow'
     },
 
     // --- SINGING ---
