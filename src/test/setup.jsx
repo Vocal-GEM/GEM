@@ -31,7 +31,13 @@ class AudioContextMock {
     createGain() {
         return {
             connect: vi.fn(),
-            gain: { value: 1 },
+            gain: {
+                value: 1,
+                setTargetAtTime: vi.fn(),
+                setValueAtTime: vi.fn(),
+                linearRampToValueAtTime: vi.fn(),
+                exponentialRampToValueAtTime: vi.fn()
+            },
         };
     }
     createBuffer(channels, length, sampleRate) {
