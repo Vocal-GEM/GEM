@@ -114,11 +114,12 @@ export const sortExercises = (exercises, sortBy = 'name') => {
         case 'duration':
             return sorted.sort((a, b) => a.duration - b.duration);
 
-        case 'difficulty':
+        case 'difficulty': {
             const difficultyOrder = { beginner: 0, intermediate: 1, advanced: 2 };
             return sorted.sort((a, b) =>
                 difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty]
             );
+        }
 
         case 'category':
             return sorted.sort((a, b) => a.category.localeCompare(b.category));

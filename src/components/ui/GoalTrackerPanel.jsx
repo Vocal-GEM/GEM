@@ -8,7 +8,7 @@
 import { useState, useEffect } from 'react';
 import {
     Target, Plus, CheckCircle, Trash2, RefreshCw,
-    ChevronRight, Trophy, Calendar, Clock, Flame
+    ChevronRight, Trophy
 } from 'lucide-react';
 import GoalTrackingService from '../../services/GoalTrackingService';
 

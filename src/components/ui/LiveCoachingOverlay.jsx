@@ -5,7 +5,7 @@
  * Non-intrusive toast-style messages that appear and fade naturally.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
     MessageCircle, TrendingUp, Volume2, Sparkles,
     AlertTriangle, ThumbsUp, X, Settings
@@ -63,7 +63,7 @@ const LiveCoachingOverlay = ({ enabled = true, position = 'bottom-right' }) => {
         }, 2000); // Check every 2 seconds
 
         return () => clearInterval(checkInterval);
-    }, [enabled, isAudioActive, targetRange, isMinimized, settings]);
+    }, [enabled, isAudioActive, targetRange, isMinimized, settings, dataRef]);
 
     // Process feedback queue
     useEffect(() => {
@@ -136,8 +136,8 @@ const LiveCoachingOverlay = ({ enabled = true, position = 'bottom-right' }) => {
             {!isMinimized && currentFeedback && (
                 <div
                     className={`fixed ${positionClasses[position]} z-40 max-w-sm transform transition-all duration-300 ${isVisible
-                            ? 'translate-y-0 opacity-100'
-                            : 'translate-y-4 opacity-0'
+                        ? 'translate-y-0 opacity-100'
+                        : 'translate-y-4 opacity-0'
                         }`}
                 >
                     <div className={`p-4 rounded-2xl border backdrop-blur-md shadow-xl ${getColors(currentFeedback.severity)}`}>
