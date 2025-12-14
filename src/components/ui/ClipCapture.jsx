@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mic, Square, BarChart2 } from 'lucide-react';
+import { Mic, Square, BarChart2, X } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { usePracticeCards } from '../../context/PracticeCardsContext';
 import ClipAnalysisModal from './ClipAnalysisModal';
@@ -27,6 +27,17 @@ const ClipCapture = ({ onCapture, showAnalysis = true }) => {
         }
         return () => clearInterval(interval);
     }, [isRecording]);
+
+    const handleCancel = async () => {
+        if (isRecording) {
+            // Stop recording but verify we don't process the result
+            await stopRecording();
+            setDuration(0);
+
+            // Note: We deliberately do NOT call onCapture or setLastRecording here
+            // This effectively discards the recording
+        }
+    };
 
     const handleToggle = async () => {
         if (isRecording) {
@@ -90,6 +101,17 @@ const ClipCapture = ({ onCapture, showAnalysis = true }) => {
     return (
         <>
             <div className="flex items-center gap-2">
+                {/* Cancel Button (only when recording) */}
+                {isRecording && (
+                    <button
+                        onClick={handleCancel}
+                        className="p-1.5 rounded-full bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-500/30 transition-all animate-in fade-in slide-in-from-right-4 duration-300"
+                        title="Cancel Recording"
+                    >
+                        <X size={14} />
+                    </button>
+                )}
+
                 <button
                     onClick={handleToggle}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${isRecording

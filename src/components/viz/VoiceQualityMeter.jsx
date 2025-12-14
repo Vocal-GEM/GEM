@@ -28,8 +28,11 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
                     return;
                 }
 
-                // Map Weight: 0 (Airy) -> 0%, 100 (Pressed) -> 100%
-                let target = weight || 0;
+                // Map Weight: DSP returns 100 (Light) -> 0 (Heavy). 
+                // UI expects: Left (0%) = Light, Right (100%) = Heavy.
+                // So we need to invert the DSP value: 100 - weight.
+                let rawWeight = weight || 50; // Default to balanced if missing
+                let target = 100 - rawWeight;
                 target = Math.max(0, Math.min(100, target));
 
                 // Smoother interpolation (0.05 instead of 0.1)
@@ -55,8 +58,8 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
                     }
                 }
 
-                // Update value display
-                valueRef.current.innerText = Math.round(weight || 0);
+                // Update value display (Show "Heaviness", not "Lightness")
+                valueRef.current.innerText = Math.round(target);
 
                 // Update metrics display
                 if (dataRef.current.debug) {
