@@ -11,7 +11,7 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
     const { settings: feedbackSettings, setSettings: setFeedbackSettings } = useFeedback(audioEngineRef, dataRef);
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
-    const metricsRef = useRef({ h1: null, h2: null, diff: null });
+    const metricsRef = useRef({ h1: null, h2: null, diff: null, centroid: null });
 
     useEffect(() => {
         const loop = () => {
@@ -62,11 +62,13 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
                 valueRef.current.innerText = Math.round(target);
 
                 // Update metrics display
+                // Update metrics display
                 if (dataRef.current.debug) {
-                    const { h1db, h2db, diffDb } = dataRef.current.debug;
-                    if (metricsRef.current.h1) metricsRef.current.h1.innerText = h1db ? h1db.toFixed(1) : '-';
-                    if (metricsRef.current.h2) metricsRef.current.h2.innerText = h2db ? h2db.toFixed(1) : '-';
-                    if (metricsRef.current.diff) metricsRef.current.diff.innerText = diffDb ? diffDb.toFixed(1) : '-';
+                    const { h1, h2, centroid } = dataRef.current.debug;
+                    if (metricsRef.current.h1) metricsRef.current.h1.innerText = h1 ? h1.toFixed(1) : '-';
+                    if (metricsRef.current.h2) metricsRef.current.h2.innerText = h2 ? h2.toFixed(1) : '-';
+                    if (metricsRef.current.diff) metricsRef.current.diff.innerText = (h1 && h2) ? (h1 - h2).toFixed(1) : '-';
+                    if (metricsRef.current.centroid) metricsRef.current.centroid.innerText = centroid || '-';
                 }
             }
             requestAnimationFrame(loop);
@@ -142,7 +144,7 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
                     <div className="flex items-center justify-center gap-2 mb-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                         <Activity size={12} /> Real-Time Analysis
                     </div>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-4 gap-2">
                         <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-white/5">
                             <div className="text-[10px] text-slate-500 mb-1">H1 (Fund.)</div>
                             <div ref={el => metricsRef.current.h1 = el} className={`text-lg font-mono font-bold ${colorBlindMode ? 'text-teal-300' : 'text-blue-300'}`}>-</div>
@@ -157,6 +159,11 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
                             <div className={`text-[10px] mb-1 font-bold ${colorBlindMode ? 'text-purple-500' : 'text-emerald-500'}`}>Diff</div>
                             <div ref={el => metricsRef.current.diff = el} className="text-lg font-mono text-white font-bold">-</div>
                             <div className="text-[9px] text-slate-600">dB</div>
+                        </div>
+                        <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-white/5">
+                            <div className="text-[10px] text-slate-500 mb-1">Centroid</div>
+                            <div ref={el => metricsRef.current.centroid = el} className="text-lg font-mono text-slate-300">-</div>
+                            <div className="text-[9px] text-slate-600">Hz</div>
                         </div>
                     </div>
                     <div className="mt-3 flex items-start gap-2 text-[10px] text-slate-500 leading-tight bg-slate-800/30 p-2 rounded-lg">

@@ -500,18 +500,33 @@ export class DSP {
      */
     static calculateVocalWeight(freqData, pitch, sampleRate) {
         if (!pitch || pitch < 50) {
-            return { weight: 50, h1h2: 0, centroid: 0, label: 'Unknown' };
+            return { weight: 50, h1h2: 0, centroid: 0, label: 'Unknown', h1: 0, h2: 0 };
         }
 
-        // Calculate H1-H2 (primary measure)
-        const h1h2 = this.calculateH1H2(freqData, pitch, sampleRate);
-
-        // Calculate spectral centroid (supporting measure)
-        const centroid = this.calculateSpectralCentroid(freqData, sampleRate);
-
-        // Calculate spectral tilt (0-4kHz comparison)
         const fftSize = freqData.length * 2;
         const binSize = sampleRate / fftSize;
+
+        // Helper to get amplitude in dB
+        const getAmplitudeAtFreq = (f) => {
+            const bin = Math.round(f / binSize);
+            if (bin < 0 || bin >= freqData.length) return -100;
+            let maxDb = -100;
+            for (let i = -1; i <= 1; i++) {
+                if (bin + i >= 0 && bin + i < freqData.length) {
+                    maxDb = Math.max(maxDb, freqData[bin + i]);
+                }
+            }
+            return maxDb;
+        };
+
+        const h1 = getAmplitudeAtFreq(pitch);
+        const h2 = getAmplitudeAtFreq(pitch * 2);
+        const h1h2 = h1 - h2;
+
+        // Calculate spectral centroid
+        const centroid = this.calculateSpectralCentroid(freqData, sampleRate);
+
+        // Calculate spectral tilt (0-4kHz)
         const bin1k = Math.floor(1000 / binSize);
         const bin4k = Math.floor(4000 / binSize);
 
@@ -527,34 +542,52 @@ export class DSP {
         const dbHigh = 10 * Math.log10(sumHigh + 1e-10);
         const spectralTilt = (dbHigh - dbLow) / 2.0;
 
-        // Weight calculation based on H1-H2 (primary factor, 70% weight)
-        // Research: Breathy ~9.5dB, Modal ~2dB, Pressed ~0dB
-        // Map to 0-100 scale: 0 = Heavy/Pressed, 100 = Light/Breathy
-        let h1h2Weight = 0;
-        if (h1h2 <= 0) {
-            h1h2Weight = 0; // Very pressed/heavy
-        } else if (h1h2 >= 10) {
-            h1h2Weight = 100; // Very breathy/light
-        } else {
-            // Linear mapping: 0dB -> 0, 10dB -> 100
-            h1h2Weight = h1h2 * 10;
-        }
+        // --- WEIGHT CALCULATION ---
 
-        // Centroid contribution (20% weight)
-        // Typical range: 300-1500 Hz for voice
-        // Higher centroid = lighter
+        // 1. H1-H2 (Primary Factor)
+        // 0 = Heavy, 100 = Light
+        let h1h2Weight = 0;
+        if (h1h2 <= 0) h1h2Weight = 0;
+        else if (h1h2 >= 10) h1h2Weight = 100;
+        else h1h2Weight = h1h2 * 10;
+
+        // "Tinny Mic" Detection: If H2 is significantly stronger than H1 (e.g. >15dB),
+        // it's likely the fundamental is filtered out by the mic.
+        const isTinnyMic = (h2 - h1) > 15;
+
+        // 2. Centroid (Secondary Factor)
+        // Higher Centroid = Brighter/Heavier = Closer to 0
+        // Lower Centroid = Darker/Lighter = Closer to 100
+        // Range 300Hz (Light) to 2000Hz (Heavy)
         let centroidWeight = 50;
         if (centroid > 0) {
-            centroidWeight = Math.min(100, Math.max(0, (centroid - 300) / 12));
+            // Map 300Hz -> 100% Light, 2000Hz -> 0% Light
+            // Normalized: 0 at 2000, 1 at 300
+            const norm = Math.max(0, Math.min(1, (2000 - centroid) / 1700));
+            centroidWeight = norm * 100;
         }
 
-        // Spectral tilt contribution (10% weight)
-        // Negative tilt = heavy, positive = light
-        let tiltWeight = 50 - (spectralTilt * 3);
-        tiltWeight = Math.min(100, Math.max(0, tiltWeight));
+        // 3. Spectral Tilt (Tertiary)
+        // Steep negative tilt (-20dB/oct) = Light (100)
+        // Flat tilt (0dB/oct) = Heavy (0)
+        // Map -20 -> 100, 0 -> 0
+        let tiltWeight = 50;
+        // Clamp tilt between -20 and 0
+        const clampedTilt = Math.max(-20, Math.min(0, spectralTilt));
+        // -20 -> 100, 0 -> 0 => scale by -5
+        tiltWeight = clampedTilt * -5;
 
-        // Combine factors
-        const weight = (h1h2Weight * 0.70) + (centroidWeight * 0.20) + (tiltWeight * 0.10);
+        // Combine Factors
+        let weight = 0;
+
+        if (isTinnyMic) {
+            // If mic is tinny, H1-H2 is unreliable (will incorrectly read as Heavy).
+            // Rely on Centroid and Tilt.
+            weight = (centroidWeight * 0.50) + (tiltWeight * 0.50);
+        } else {
+            // Standard weighting
+            weight = (h1h2Weight * 0.60) + (centroidWeight * 0.30) + (tiltWeight * 0.10);
+        }
 
         // Determine label
         let label = 'Balanced';
@@ -569,7 +602,9 @@ export class DSP {
             h1h2: parseFloat(h1h2.toFixed(2)),
             centroid: Math.round(centroid),
             spectralTilt: parseFloat(spectralTilt.toFixed(2)),
-            label
+            label,
+            h1: parseFloat(h1.toFixed(1)),
+            h2: parseFloat(h2.toFixed(1))
         };
     }
 }

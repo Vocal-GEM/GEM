@@ -64,4 +64,65 @@ describe('DSP Utility - Voice Quality Metrics', () => {
             expect(result).toBe(50);
         });
     });
+
+    // 4. Vocal Weight Tests
+    describe('calculateVocalWeight', () => {
+        const sampleRate = 44100;
+        const fftSize = 2048;
+        const binSize = sampleRate / fftSize; // ~21.5 Hz
+
+        // Helper to create synthetic frequency data
+        const createSpectrum = (harmonics) => {
+            const data = new Float32Array(fftSize / 2).fill(-100); // Noise floor
+            harmonics.forEach(({ freq, db }) => {
+                const bin = Math.round(freq / binSize);
+                if (bin < data.length) data[bin] = db;
+            });
+            return data;
+        };
+
+        it('should detect Light voice (H1 > H2)', () => {
+            const pitch = 200;
+            const data = createSpectrum([
+                { freq: 200, db: -10 },
+                { freq: 400, db: -20 }, // H1-H2 = +10 -> Light
+                { freq: 600, db: -30 }
+            ]);
+
+            const result = DSP.calculateVocalWeight(data, pitch, sampleRate);
+            expect(result.weight).toBeGreaterThan(60);
+            expect(result.label).toMatch(/Light/);
+        });
+
+        it('should detect Heavy voice (H1 < H2)', () => {
+            const pitch = 200;
+            const data = createSpectrum([
+                { freq: 200, db: -20 },
+                { freq: 400, db: -10 }, // H1-H2 = -10 -> Heavy
+                { freq: 600, db: -15 }
+            ]);
+
+            const result = DSP.calculateVocalWeight(data, pitch, sampleRate);
+            expect(result.weight).toBeLessThan(40);
+            expect(result.label).toMatch(/Heavy|Pressed/);
+        });
+
+        it('should handle Tinny Mic (H1 missing)', () => {
+            const pitch = 200;
+            // H1 missing (noise floor), H2 strong
+            const data = createSpectrum([
+                { freq: 200, db: -80 },
+                { freq: 400, db: -10 },
+                { freq: 600, db: -20 },
+                { freq: 800, db: -25 }
+            ]);
+
+            // H1-H2 = -70. Normally Heavy(0).
+            // But slope is steep (-15dB/oct).
+            // Fallback should yield result > 20.
+
+            const result = DSP.calculateVocalWeight(data, pitch, sampleRate);
+            expect(result.weight).toBeGreaterThan(20);
+        });
+    });
 });

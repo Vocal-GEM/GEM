@@ -556,10 +556,15 @@ export class AudioEngine {
                     hnr: hnr,
                     tilt: tilt || -20,
                     weight: weight,
-                    h1h2: h1h2, // H1-H2 measure for vocal weight
-                    weightLabel: weightLabel, // Descriptive label (e.g., "Light", "Heavy")
+                    h1h2: h1h2,
+                    weightLabel: weightLabel,
                     f3Noise: f3Noise,
-                    harmonicRatio: harmonicRatio
+                    harmonicRatio: harmonicRatio,
+                    debug: {
+                        h1: weightAnalysis.h1,
+                        h2: weightAnalysis.h2,
+                        centroid: weightAnalysis.centroid
+                    }
                 };
 
                 // Store metrics if recording
