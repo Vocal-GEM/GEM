@@ -206,6 +206,23 @@ body {
   animation: edge-glow 2s ease-out forwards;
 }
 
+/* Float-up animation for celebration particles */
+@keyframes float-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-100px) scale(0.5);
+  }
+}
+
+.animate-float-up {
+  animation: float-up 1.5s ease-out forwards;
+}
+
 /* Safe Area */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);

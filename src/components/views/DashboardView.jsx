@@ -1,5 +1,5 @@
 import { cloneElement, useState, useEffect } from 'react';
-import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen, Flame, Sparkles } from 'lucide-react';
+import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen, Flame, Sparkles, Timer } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import VocalHealthPanel from '../dashboard/VocalHealthPanel';
 import SmartCoachWidget from '../dashboard/SmartCoachWidget';
@@ -8,6 +8,8 @@ import SessionSummaryCard from '../ui/SessionSummaryCard';
 import RecommendedExercises from '../ui/RecommendedExercises';
 import DailyChallengeCard from '../ui/DailyChallengeCard';
 import SmartPracticeSession from '../ui/SmartPracticeSession';
+import QuickWarmupSession from '../ui/QuickWarmupSession';
+import QuickVoiceCheck from '../ui/QuickVoiceCheck';
 import { useGuidedJourney } from '../../context/GuidedJourneyContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { checkStreakStatus, getStreakMessage } from '../../services/StreakService';
@@ -55,6 +57,8 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
     // Streak tracking
     const [streakData, setStreakData] = useState({ currentStreak: 0, needsPracticeToday: true });
     const [showSmartPractice, setShowSmartPractice] = useState(false);
+    const [showQuickWarmup, setShowQuickWarmup] = useState(false);
+    const [showVoiceCheck, setShowVoiceCheck] = useState(false);
 
     useEffect(() => {
         const status = checkStreakStatus();
@@ -89,24 +93,75 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
             {/* Smart Coach Widget */}
             <SmartCoachWidget onStartSession={onOpenAdaptiveSession} />
 
-            {/* Smart Practice Button */}
-            <button
-                onClick={() => setShowSmartPractice(true)}
-                className="w-full mb-8 p-6 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 rounded-2xl text-left transition-all group"
-            >
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-white/20 rounded-xl">
-                            <Sparkles className="text-white" size={24} />
+            {/* Quick Action Buttons */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                {/* 5-Min Warmup Button */}
+                <button
+                    onClick={() => setShowQuickWarmup(true)}
+                    className="p-6 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 rounded-2xl text-left transition-all group"
+                >
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 bg-white/20 rounded-xl">
+                                <Timer className="text-white" size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-white">5-Min Warmup</h3>
+                                <p className="text-white/80 text-sm">Quick routine to wake up your voice</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="text-xl font-bold text-white">Smart Practice</h3>
-                            <p className="text-white/80 text-sm">Personalized session based on your weak areas</p>
-                        </div>
+                        <ArrowRight className="text-white group-hover:translate-x-1 transition-transform" size={24} />
                     </div>
-                    <ArrowRight className="text-white group-hover:translate-x-1 transition-transform" size={24} />
-                </div>
-            </button>
+                </button>
+
+                {/* Smart Practice Button */}
+                <button
+                    onClick={() => setShowSmartPractice(true)}
+                    className="p-6 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 rounded-2xl text-left transition-all group"
+                >
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 bg-white/20 rounded-xl">
+                                <Sparkles className="text-white" size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-white">Smart Practice</h3>
+                                <p className="text-white/80 text-sm">Personalized session based on your weak areas</p>
+                            </div>
+                        </div>
+                        <ArrowRight className="text-white group-hover:translate-x-1 transition-transform" size={24} />
+                    </div>
+                </button>
+
+                {/* Quick Voice Check Button */}
+                <button
+                    onClick={() => setShowVoiceCheck(true)}
+                    className="p-6 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 rounded-2xl text-left transition-all group"
+                >
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 bg-white/20 rounded-xl">
+                                <Mic className="text-white" size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-white">Voice Check</h3>
+                                <p className="text-white/80 text-sm">How am I doing?</p>
+                            </div>
+                        </div>
+                        <ArrowRight className="text-white group-hover:translate-x-1 transition-transform" size={24} />
+                    </div>
+                </button>
+            </div>
+
+            {/* Quick Warmup Modal */}
+            {showQuickWarmup && (
+                <QuickWarmupSession onClose={() => setShowQuickWarmup(false)} />
+            )}
+
+            {/* Quick Voice Check Modal */}
+            {showVoiceCheck && (
+                <QuickVoiceCheck onClose={() => setShowVoiceCheck(false)} />
+            )}
 
             {/* Smart Practice Modal */}
             {showSmartPractice && (

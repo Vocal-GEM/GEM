@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Square, Play, Pause, Trash2, Calendar, Clock, Music, Plus, X, Tag } from 'lucide-react';
+import { Mic, Square, Play, Pause, Trash2, Calendar, Clock, Music, Plus, X, Tag, FileText } from 'lucide-react';
 import { getRecordings, saveRecording, deleteRecording, updateRecording } from '../../services/VoiceJournalService';
 import { recordPractice } from '../../services/StreakService';
+import { JOURNAL_TEMPLATES, getTemplateById, formatTemplateAsEntry } from '../../data/journalTemplates';
 
 const VoiceJournalView = () => {
     const [recordings, setRecordings] = useState([]);
@@ -9,6 +10,7 @@ const VoiceJournalView = () => {
     const [playingId, setPlayingId] = useState(null);
     const [showRecordModal, setShowRecordModal] = useState(false);
     const [notes, setNotes] = useState('');
+    const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [currentBlob, setCurrentBlob] = useState(null);
     const [recordingTime, setRecordingTime] = useState(0);
 
@@ -166,8 +168,8 @@ const VoiceJournalView = () => {
                                 <button
                                     onClick={() => handlePlay(recording)}
                                     className={`p-4 rounded-full transition-colors ${playingId === recording.id
-                                            ? 'bg-pink-500 text-white'
-                                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
+                                        ? 'bg-pink-500 text-white'
+                                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
                                         }`}
                                 >
                                     {playingId === recording.id ? <Pause size={24} /> : <Play size={24} />}
@@ -225,8 +227,8 @@ const VoiceJournalView = () => {
                                     <button
                                         onClick={isRecording ? stopRecording : startRecording}
                                         className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto transition-all ${isRecording
-                                                ? 'bg-red-500 animate-pulse'
-                                                : 'bg-pink-500 hover:bg-pink-400'
+                                            ? 'bg-red-500 animate-pulse'
+                                            : 'bg-pink-500 hover:bg-pink-400'
                                             }`}
                                     >
                                         {isRecording ? <Square size={32} className="text-white" /> : <Mic size={32} className="text-white" />}
@@ -238,12 +240,39 @@ const VoiceJournalView = () => {
                             ) : (
                                 <>
                                     <div className="text-emerald-400 text-lg mb-4">✓ Recording saved ({formatTime(recordingTime)})</div>
+
+                                    {/* Template Selector */}
+                                    <div className="mb-4">
+                                        <label className="flex items-center gap-2 text-sm text-slate-400 mb-2">
+                                            <FileText size={14} />
+                                            Use a template (optional)
+                                        </label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {JOURNAL_TEMPLATES.slice(0, 4).map(template => (
+                                                <button
+                                                    key={template.id}
+                                                    onClick={() => {
+                                                        setSelectedTemplate(template.id);
+                                                        setNotes(formatTemplateAsEntry(template));
+                                                    }}
+                                                    className={`px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 transition-all ${selectedTemplate === template.id
+                                                            ? 'bg-purple-500 text-white'
+                                                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                                                        }`}
+                                                >
+                                                    <span>{template.icon}</span>
+                                                    {template.name}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
                                     <textarea
                                         value={notes}
                                         onChange={(e) => setNotes(e.target.value)}
                                         placeholder="Add notes about this recording..."
                                         className="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 resize-none"
-                                        rows={3}
+                                        rows={5}
                                     />
                                 </>
                             )}

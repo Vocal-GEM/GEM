@@ -24,6 +24,7 @@ import ProgressCharts from '../viz/ProgressCharts';
 import SelfAssessmentModal from '../ui/SelfAssessmentModal';
 import InstantPlayback from '../ui/InstantPlayback';
 import PracticeTimer from '../ui/PracticeTimer';
+import PracticeSessionTimer from '../ui/PracticeSessionTimer';
 import ComparisonTool from '../ui/ComparisonTool';
 
 // Embeddable Views
@@ -360,7 +361,14 @@ const PracticeMode = ({
                         </div>
 
                         {/* Top Right Tools Overlay */}
-                        <div className="absolute top-4 right-4 z-50 flex gap-2">
+                        <div className="absolute top-4 right-4 z-50 flex gap-2 items-center">
+                            {/* Session Timer with Wellness Reminders */}
+                            {isAudioActive && (
+                                <PracticeSessionTimer
+                                    isActive={isAudioActive}
+                                    onPause={toggleAudio}
+                                />
+                            )}
                             <InstantPlayback />
                             {timerActive ? (
                                 <PracticeTimer compact onClose={() => setTimerActive(false)} />
