@@ -5,6 +5,7 @@
 import { getActivitySummary, getReports } from './SessionReportService';
 import { getStreakData } from './StreakService';
 import { TRAINING_CATEGORIES } from '../data/trainingData';
+import { VoiceCalibrationService } from './VoiceCalibrationService';
 
 /**
  * Analyze user's practice history to find weak areas
@@ -46,14 +47,84 @@ const analyzeWeakAreas = () => {
 };
 
 /**
- * Get recommended focus areas based on weak areas
+ * Analyze voice quality metrics and recommend exercises
+ * Based on baseline vocal metrics and recent practice data
+ */
+const analyzeVoiceMetrics = () => {
+    const baseline = VoiceCalibrationService.getBaseline();
+    const recommendations = [];
+
+    if (!baseline) return recommendations;
+
+    // Analyze vocal weight (H1-H2)
+    const h1h2Mean = baseline.vocalWeight?.h1h2?.mean || 0;
+    if (h1h2Mean < 2) {
+        // Pressed/heavy voice
+        recommendations.push({
+            category: 'sovte',
+            reason: 'Your voice tends to be pressed - SOVTEs will help lighten it',
+            priority: 'high',
+            metric: 'vocalWeight'
+        });
+    } else if (h1h2Mean > 8) {
+        // Very breathy voice
+        recommendations.push({
+            category: 'resonance',
+            reason: 'Your voice is quite breathy - resonance work will add clarity',
+            priority: 'medium',
+            metric: 'vocalWeight'
+        });
+    }
+
+    // Analyze F2 (resonance)
+    const f2Mean = baseline.formants?.f2?.mean || 0;
+    const pitchMean = baseline.pitch?.mean || 0;
+
+    // Rough heuristic: if F2 is low relative to expected for pitch
+    if (pitchMean > 0 && f2Mean > 0) {
+        // For higher pitches, expect higher F2
+        const expectedF2 = pitchMean < 150 ? 1400 : pitchMean > 200 ? 2200 : 1800;
+        const f2Difference = f2Mean - expectedF2;
+
+        if (f2Difference < -300) {
+            recommendations.push({
+                category: 'resonance',
+                reason: 'Your F2 is lower than typical - resonance exercises can brighten your voice',
+                priority: 'medium',
+                metric: 'f2'
+            });
+        }
+    }
+
+    // Analyze pitch range
+    const pitchRange = baseline.pitch?.max - baseline.pitch?.min || 0;
+    if (pitchRange < 50) {
+        recommendations.push({
+            category: 'pitch',
+            reason: 'Your pitch range is limited - explore more variation',
+            priority: 'medium',
+            metric: 'pitch'
+        });
+    }
+
+    return recommendations;
+};
+
+/**
+ * Get recommended focus areas based on weak areas and voice metrics
  */
 export const getRecommendedFocusAreas = () => {
     const weakAreas = analyzeWeakAreas();
     const streak = getStreakData();
     const activity = getActivitySummary();
+    const voiceMetrics = analyzeVoiceMetrics();
 
     const recommendations = [];
+
+    // Prioritize voice quality recommendations first
+    if (voiceMetrics.length > 0) {
+        recommendations.push(...voiceMetrics.slice(0, 1));
+    }
 
     // If new user (< 3 sessions), recommend fundamentals
     if (activity.last30Days.sessions < 3) {
