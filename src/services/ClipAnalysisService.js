@@ -43,15 +43,15 @@ function extractPitch(samples, sampleRate) {
 }
 
 /**
- * Estimate F1 using simple spectral peak detection
- * (Simplified version - for full LPC analysis, use FormantAnalyzer)
- * @param {Float32Array} samples 
- * @param {number} sampleRate 
- * @returns {number} Estimated F1 in Hz
+ * Extract formants (F1 and F2) and vocal features using spectral peak detection
+ * Research: F2 is more important than F1 for gender perception
+ * @param {Float32Array} samples
+ * @param {number} sampleRate
+ * @param {number} pitch - Pitch in Hz (needed for H1-H2)
+ * @returns {Object} { f1, f2, h1h2 }
  */
-function estimateF1(samples, sampleRate) {
-    // Simple FFT-based estimation
-    const fftSize = 1024;
+function extractFormants(samples, sampleRate, pitch) {
+    const fftSize = 2048;
     const paddedSamples = new Float32Array(fftSize);
     for (let i = 0; i < Math.min(samples.length, fftSize); i++) {
         paddedSamples[i] = samples[i];
@@ -62,28 +62,56 @@ function estimateF1(samples, sampleRate) {
         paddedSamples[i] *= 0.5 * (1 - Math.cos(2 * Math.PI * i / fftSize));
     }
 
-    // Simple DFT for formant region (200-1200 Hz)
-    const minBin = Math.floor(200 * fftSize / sampleRate);
-    const maxBin = Math.floor(1200 * fftSize / sampleRate);
-
-    let peakBin = minBin;
-    let peakMag = 0;
-
-    for (let bin = minBin; bin < maxBin; bin++) {
+    // Compute spectrum
+    const spectrum = new Float32Array(fftSize / 2);
+    for (let bin = 0; bin < fftSize / 2; bin++) {
         let re = 0, im = 0;
         for (let i = 0; i < fftSize; i++) {
             const angle = -2 * Math.PI * bin * i / fftSize;
             re += paddedSamples[i] * Math.cos(angle);
             im += paddedSamples[i] * Math.sin(angle);
         }
-        const mag = Math.sqrt(re * re + im * im);
-        if (mag > peakMag) {
-            peakMag = mag;
-            peakBin = bin;
+        spectrum[bin] = Math.sqrt(re * re + im * im);
+    }
+
+    const freqBinWidth = sampleRate / fftSize;
+
+    // Extract F1 (200-1200 Hz)
+    const f1MinBin = Math.floor(200 / freqBinWidth);
+    const f1MaxBin = Math.floor(1200 / freqBinWidth);
+    let f1 = 0, f1Mag = 0;
+    for (let bin = f1MinBin; bin < f1MaxBin; bin++) {
+        if (spectrum[bin] > f1Mag) {
+            f1Mag = spectrum[bin];
+            f1 = bin * freqBinWidth;
         }
     }
 
-    return peakBin * sampleRate / fftSize;
+    // Extract F2 (1200-3500 Hz) - CRITICAL for gender perception
+    const f2MinBin = Math.floor(1200 / freqBinWidth);
+    const f2MaxBin = Math.floor(3500 / freqBinWidth);
+    let f2 = 0, f2Mag = 0;
+    for (let bin = f2MinBin; bin < f2MaxBin; bin++) {
+        if (spectrum[bin] > f2Mag) {
+            f2Mag = spectrum[bin];
+            f2 = bin * freqBinWidth;
+        }
+    }
+
+    // Extract H1-H2 (vocal weight) - Research: Garellek & Keating (2010)
+    let h1h2 = 0;
+    if (pitch > 50 && pitch < 500) {
+        const h1Bin = Math.round(pitch / freqBinWidth);
+        const h2Bin = Math.round((pitch * 2) / freqBinWidth);
+
+        if (h1Bin < fftSize / 2 && h2Bin < fftSize / 2) {
+            const h1Amplitude = 10 * Math.log10(spectrum[h1Bin] + 1e-10);
+            const h2Amplitude = 10 * Math.log10(spectrum[h2Bin] + 1e-10);
+            h1h2 = h1Amplitude - h2Amplitude;
+        }
+    }
+
+    return { f1, f2, h1h2 };
 }
 
 /**
@@ -118,19 +146,31 @@ export async function analyzeClip(audioBlob, windowSizeMs = 1000) {
 
         // Extract features
         const pitch = extractPitch(windowData, sampleRate);
-        const f1 = pitch > 0 ? estimateF1(windowData, sampleRate) : 0;
+        const formants = pitch > 0 ? extractFormants(windowData, sampleRate, pitch) : { f1: 0, f2: 0, h1h2: 0 };
 
-        // Predict gender
+        // Predict gender using enhanced multi-factor model
         const prediction = pitch > 0
-            ? predictGenderPerception(pitch, f1, null)
-            : { score: 0.5, label: '--', pitchContribution: 0.5, resonanceContribution: 0.5 };
+            ? predictGenderPerception(pitch, formants.f1, null, {
+                f2: formants.f2 > 1000 ? formants.f2 : undefined,
+                h1h2: formants.h1h2
+            })
+            : {
+                score: 0.5,
+                label: '--',
+                pitchContribution: 0.5,
+                resonanceContribution: 0.5,
+                vocalWeightContribution: 0.5
+            };
 
         pitchTrace.push({
             time,
             pitch: pitch || null,
-            f1: f1 || null,
+            f1: formants.f1 || null,
+            f2: formants.f2 || null,
+            h1h2: formants.h1h2 || null,
             genderScore: prediction.score,
-            label: prediction.label
+            label: prediction.label,
+            vocalWeightContribution: prediction.vocalWeightContribution
         });
 
         // Aggregate into larger windows for the bar chart
@@ -170,10 +210,19 @@ export async function analyzeClip(audioBlob, windowSizeMs = 1000) {
         : 0;
     const genderStability = Math.max(0, 1 - Math.sqrt(genderVariance) * 2);
 
-    // Calculate average F1
+    // Calculate average formants and vocal weight
     const avgF1 = voicedPoints.length > 0
         ? voicedPoints.reduce((s, p) => s + (p.f1 || 0), 0) / voicedPoints.length
         : 0;
+    const avgF2 = voicedPoints.length > 0
+        ? voicedPoints.reduce((s, p) => s + (p.f2 || 0), 0) / voicedPoints.length
+        : 0;
+    const avgH1H2 = voicedPoints.length > 0
+        ? voicedPoints.reduce((s, p) => s + (p.h1h2 || 0), 0) / voicedPoints.length
+        : 0;
+    const avgVocalWeight = voicedPoints.length > 0
+        ? voicedPoints.reduce((s, p) => s + (p.vocalWeightContribution || 0.5), 0) / voicedPoints.length
+        : 0.5;
 
     return {
         duration,
@@ -185,6 +234,9 @@ export async function analyzeClip(audioBlob, windowSizeMs = 1000) {
             avgGenderScore,
             avgPitch,
             avgF1,
+            avgF2,
+            avgH1H2,
+            avgVocalWeight,
             pitchRange,
             genderStability,
             voicedPercentage: voicedPoints.length / pitchTrace.length,
