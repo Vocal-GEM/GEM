@@ -258,12 +258,12 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                                 onClick={stopRecording}
                                 className="w-20 h-20 rounded-full bg-red-500 animate-pulse
                                            flex items-center justify-center shadow-lg shadow-red-500/30 
-                                           hover:bg-red-600 transition-colors"
+                                           hover:bg-red-600 transition-colors relative z-10"
                             >
                                 <Square className="w-8 h-8 text-white" fill="white" />
                             </button>
-                            {/* Recording indicator ring */}
-                            <div className="absolute inset-0 rounded-full border-4 border-red-500/50 animate-ping" />
+                            {/* Recording indicator ring - pointer-events-none so it doesn't block clicks */}
+                            <div className="absolute inset-0 rounded-full border-4 border-red-500/50 animate-ping pointer-events-none" />
                         </div>
                         <div className="flex items-center gap-2 text-red-400">
                             <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
