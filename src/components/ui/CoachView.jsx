@@ -10,6 +10,7 @@ import { historyService } from '../../utils/historyService';
 import ChatMessage from './ChatMessage';
 import EmptyState from './EmptyState';
 import { useNavigation } from '../../context/NavigationContext';
+import TensionReliefPanel from './TensionReliefPanel';
 
 const CoachView = () => {
     const audioContext = useAudio();
@@ -136,9 +137,17 @@ const CoachView = () => {
                 >
                     Programs
                 </button>
+                <button
+                    onClick={() => setMode('tension')}
+                    className={`flex-1 py-4 text-sm font-bold uppercase tracking-wider transition-colors border-b-2 ${mode === 'tension' ? 'border-blue-500 text-white' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
+                >
+                    Tension Relief
+                </button>
             </div>
 
-            {mode === 'programs' ? (
+            {mode === 'tension' ? (
+                <TensionReliefPanel />
+            ) : mode === 'programs' ? (
                 <div className="flex-1 overflow-y-auto p-4 lg:p-8 space-y-6">
                     <div className="text-center mb-8">
                         <h2 className="text-2xl font-bold mb-2">Structured Programs</h2>
