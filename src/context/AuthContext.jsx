@@ -16,6 +16,8 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const initAuth = async () => {
             try {
+                // Wake up the backend (Render cold-start can take 30-60s)
+                // This ping happens early so signup/login is faster when user reaches it
                 const res = await fetch(`${API_URL}/api/me`, { credentials: 'include' });
                 if (res.ok) {
                     const data = await res.json();
@@ -24,7 +26,7 @@ export const AuthProvider = ({ children }) => {
                     }
                 }
             } catch (e) {
-                console.warn("Backend not reachable at " + API_URL);
+                console.warn("Backend not reachable at " + API_URL + " - it may be waking up (cold start)");
             } finally {
                 setIsAuthLoading(false);
             }

@@ -8,7 +8,7 @@ from ..extensions import limiter
 auth_bp = Blueprint('auth', __name__, url_prefix='/api')
 
 @auth_bp.route('/signup', methods=['POST'])
-@limiter.limit("3 per hour")
+@limiter.limit("10 per hour")
 def signup():
     data = request.json
     username = data.get('username')

@@ -55,6 +55,9 @@ const Signup = ({ onSwitchToLogin, onClose }) => {
                             placeholder="Choose a username"
                             required
                         />
+                        <p className="text-xs text-slate-500 mt-1">
+                            3-30 characters: letters, numbers, and underscores only
+                        </p>
                     </div>
                     <div>
                         <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Password</label>
@@ -66,6 +69,9 @@ const Signup = ({ onSwitchToLogin, onClose }) => {
                             placeholder="••••••••"
                             required
                         />
+                        <p className="text-xs text-slate-500 mt-1">
+                            Min 8 characters with at least one letter and one number
+                        </p>
                     </div>
                     <div>
                         <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Confirm Password</label>
