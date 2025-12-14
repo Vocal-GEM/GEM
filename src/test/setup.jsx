@@ -191,6 +191,7 @@ vi.mock('lucide-react', () => {
         Loader2: createIcon('loader-2'),
         LogOut: createIcon('log-out'),
         Menu: createIcon('menu'),
+        MessageCircle: createIcon('message-circle'),
         MessageSquare: createIcon('message-square'),
         Mic: createIcon('mic'),
         Mic2: createIcon('mic-2'),

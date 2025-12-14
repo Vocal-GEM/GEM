@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertTriangle, X, Info } from 'lucide-react';
+import { AlertTriangle, Info } from 'lucide-react';
 
 /**
  * Content Warning Component 

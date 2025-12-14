@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
     MessageCircle, Mic, MicOff, Volume2, VolumeX,
-    ArrowLeft, Send, RotateCcw, Clock, Target,
+    ArrowLeft, Send, RotateCcw, Clock,
     Sparkles, CheckCircle, X, User, Activity,
     Lightbulb, TrendingUp, Award, Zap, Heart, Star,
     ChevronRight, Info
@@ -785,7 +785,7 @@ const ConversationPractice = ({ onClose }) => {
 
                                     {/* Messages */}
                                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                                        {messages.map((msg, idx) => (
+                                        {messages.map((msg) => (
                                             <ConversationMessage
                                                 key={msg.id}
                                                 message={msg}

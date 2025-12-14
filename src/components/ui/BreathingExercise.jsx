@@ -21,7 +21,6 @@ const BreathingExercise = ({ onComplete, onSkip }) => {
     const [currentPhase, setCurrentPhase] = useState(0);
     const [timeInPhase, setTimeInPhase] = useState(0);
     const [cycle, setCycle] = useState(1);
-    const [_isComplete, setIsComplete] = useState(false);
 
     const phase = BREATHING_PHASES[currentPhase];
     const progress = (timeInPhase / phase.duration) * 100;
@@ -52,7 +51,6 @@ const BreathingExercise = ({ onComplete, onSkip }) => {
                     if (nextPhase === 0) {
                         // Completed a cycle
                         if (cycle >= TOTAL_CYCLES) {
-                            setIsComplete(true);
                             clearInterval(timer);
                             setTimeout(() => onComplete?.(), 500);
                             return 0;

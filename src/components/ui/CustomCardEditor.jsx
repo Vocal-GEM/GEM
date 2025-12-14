@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Plus, Trash2, Star, Copy, X, FolderPlus, FileText } from 'lucide-react';
 import {
     getCollections,
@@ -19,17 +19,17 @@ const CustomCardEditor = ({ onClose }) => {
     const [importText, setImportText] = useState('');
     const [showImport, setShowImport] = useState(false);
 
-    useEffect(() => {
-        loadCollections();
-    }, []);
-
-    const loadCollections = () => {
+    const loadCollections = useCallback(() => {
         const data = getCollections();
         setCollections(data);
         if (data.length > 0 && !activeCollection) {
             setActiveCollection(data[0]);
         }
-    };
+    }, [activeCollection]);
+
+    useEffect(() => {
+        loadCollections();
+    }, [loadCollections]);
 
     const handleCreateCollection = () => {
         if (!newCollectionName.trim()) return;
@@ -128,8 +128,8 @@ const CustomCardEditor = ({ onClose }) => {
                                 <div
                                     key={coll.id}
                                     className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${activeCollection?.id === coll.id
-                                            ? 'bg-blue-600 text-white'
-                                            : 'text-slate-300 hover:bg-slate-800'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'text-slate-300 hover:bg-slate-800'
                                         }`}
                                     onClick={() => setActiveCollection(coll)}
                                 >
