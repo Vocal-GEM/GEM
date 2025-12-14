@@ -8,6 +8,7 @@ import VoiceCalibrationWizard from '../ui/VoiceCalibrationWizard';
 import { VoiceCalibrationService } from '../../services/VoiceCalibrationService';
 import { SelfCareService } from '../../services/SelfCareService';
 import SelfCareOnboarding from '../ui/SelfCareOnboarding';
+import MicrophoneSelector from '../settings/MicrophoneSelector';
 
 const SettingsView = () => {
     const { t } = useTranslation();
@@ -134,6 +135,22 @@ const SettingsView = () => {
                         onSkip={() => setShowSelfCareWizard(false)}
                     />
                 )}
+
+                {/* Audio Input Settings */}
+                <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden mb-8">
+                    <div className="p-6 border-b border-slate-800">
+                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                            <div className="text-violet-400">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" /></svg>
+                            </div>
+                            Audio Input
+                        </h2>
+                        <p className="text-slate-400 mt-1">Select your microphone device.</p>
+                    </div>
+                    <div className="p-6">
+                        <MicrophoneSelector />
+                    </div>
+                </div>
 
                 {/* Self-Care Plan Settings */}
                 <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden mb-8">

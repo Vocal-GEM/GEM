@@ -139,7 +139,7 @@ export class AudioEngine {
         this.passthroughGain.connect(this.audioContext.destination);
     }
 
-    async start() {
+    async start(deviceId = null) {
         if (this.isActive) return;
 
         try {
@@ -151,7 +151,20 @@ export class AudioEngine {
             source.buffer = buffer;
             source.connect(this.audioContext.destination);
             source.start(0);
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+            const constraints = {
+                audio: {
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false
+                }
+            };
+
+            if (deviceId) {
+                constraints.audio.deviceId = { exact: deviceId };
+            }
+
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
             this.microphone = this.audioContext.createMediaStreamSource(stream);
             this.analyser = this.audioContext.createAnalyser();
             this.analyser.fftSize = 2048;

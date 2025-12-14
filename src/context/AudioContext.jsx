@@ -53,12 +53,38 @@ export const AudioProvider = ({ children }) => {
         }
     }, [settings.listenMode]);
 
+    const [availableDevices, setAvailableDevices] = useState([]);
+    const [selectedDeviceId, setSelectedDeviceId] = useState(localStorage.getItem('selectedMicId') || 'default');
+
+    useEffect(() => {
+        // Enumerate devices
+        const loadDevices = async () => {
+            try {
+                // Request permission first to get labels
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                stream.getTracks().forEach(t => t.stop()); // Stop immediately
+
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const audioInputs = devices.filter(d => d.kind === 'audioinput');
+                setAvailableDevices(audioInputs);
+            } catch (e) {
+                console.error("Failed to load devices", e);
+            }
+        };
+
+        loadDevices();
+        navigator.mediaDevices.addEventListener('devicechange', loadDevices);
+        return () => navigator.mediaDevices.removeEventListener('devicechange', loadDevices);
+    }, []);
+
     useEffect(() => {
         const isFirstTime = !localStorage.getItem('hasVisited');
         if (isFirstTime) { localStorage.setItem('hasVisited', 'true'); }
+        // ... (rest of init)
 
         try {
             audioEngineRef.current = new AudioEngine((data) => {
+                // ... (data handler)
                 const currentHistory = dataRef.current.history;
                 let pitchToStore = data.pitch;
 
@@ -97,7 +123,7 @@ export const AudioProvider = ({ children }) => {
             setAudioError("Audio initialization failed. Your browser may not support required features.");
         }
 
-        // iOS Audio Unlock
+        // ... (audio unlock logic)
         const unlockAudio = () => {
             if (audioEngineRef.current && audioEngineRef.current.context && audioEngineRef.current.context.state === 'suspended') {
                 audioEngineRef.current.context.resume().then(() => {
@@ -128,13 +154,26 @@ export const AudioProvider = ({ children }) => {
                 audioEngineRef.current.stop();
                 setIsAudioActive(false);
             } else {
-                await audioEngineRef.current.start();
+                await audioEngineRef.current.start(selectedDeviceId !== 'default' ? selectedDeviceId : null);
                 setIsAudioActive(true);
             }
         } catch (err) {
             console.error("[AudioContext] Failed to toggle audio:", err);
             setAudioError(err.message || "Failed to start audio engine");
             setIsAudioActive(false);
+        }
+    };
+
+    const selectDevice = async (deviceId) => {
+        setSelectedDeviceId(deviceId);
+        localStorage.setItem('selectedMicId', deviceId);
+
+        // If active, restart with new device
+        if (audioEngineRef.current?.isActive) {
+            audioEngineRef.current.stop();
+            // Short delay to ensure clean stop
+            await new Promise(r => setTimeout(r, 100));
+            await audioEngineRef.current.start(deviceId !== 'default' ? deviceId : null);
         }
     };
 
@@ -175,8 +214,11 @@ export const AudioProvider = ({ children }) => {
         stopRecording,
         isRecording,
         audioError,
+        availableDevices,
+        selectedDeviceId,
+        selectDevice,
         audioContext: audioEngineRef.current?.audioContext
-    }), [isAudioActive, isRecording, audioError]);
+    }), [isAudioActive, isRecording, audioError, availableDevices, selectedDeviceId]);
 
     return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>;
 };
