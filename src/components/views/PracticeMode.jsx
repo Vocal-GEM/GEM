@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, Suspense, useCallback } from 'react';
-import { Play, Square, Mic, Volume2, Activity, BarChart2, RefreshCw, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer, Sparkles } from 'lucide-react';
+import { Play, Square, Mic, Volume2, Activity, BarChart2, RefreshCw, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer, Sparkles, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAudio } from '../../context/AudioContext';
@@ -45,6 +45,7 @@ import DAFMode from '../ui/DAFMode';
 import EnvironmentCheck from '../ui/EnvironmentCheck';
 import ToolExercises from '../ui/ToolExercises';
 import PracticeWellnessCheck from '../ui/PracticeWellnessCheck';
+import ConversationPractice from '../ui/ConversationPractice';
 
 
 import { CoachingEngine } from '../../utils/CoachingEngine';
@@ -99,6 +100,7 @@ const PracticeMode = ({
     const [showEnvironmentCheck, setShowEnvironmentCheck] = useState(false);
     const [showWellnessCheck, setShowWellnessCheck] = useState(false);
     const [showProgressiveStacking, setShowProgressiveStacking] = useState(false);
+    const [showConversationPractice, setShowConversationPractice] = useState(false);
     const [lastSessionDuration, setLastSessionDuration] = useState(0);
 
     // Tour for DAF mode - placed after showDAF is declared
@@ -420,6 +422,10 @@ const PracticeMode = ({
                             <RefreshCw size={20} className="text-green-400" />
                             <span className="text-xs font-bold">Recalibrate</span>
                         </button>
+                        <button onClick={() => setShowConversationPractice(true)} className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
+                            <MessageCircle size={20} className="text-violet-400" />
+                            <span className="text-xs font-bold">AI Convo</span>
+                        </button>
                     </div>
 
                     {/* Comparison Tool (if needed) */}
@@ -578,6 +584,11 @@ const PracticeMode = ({
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Conversation Practice Modal */}
+            {showConversationPractice && (
+                <ConversationPractice onClose={() => setShowConversationPractice(false)} />
             )}
         </div>
     );
