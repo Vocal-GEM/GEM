@@ -186,7 +186,7 @@ const MicroSession = ({ onClose }) => {
                                 <div
                                     key={idx}
                                     className={`flex-1 h-1 rounded-full ${idx < currentIndex ? 'bg-teal-500' :
-                                            idx === currentIndex ? 'bg-teal-400' : 'bg-slate-700'
+                                        idx === currentIndex ? 'bg-teal-400' : 'bg-slate-700'
                                         }`}
                                 />
                             ))}
@@ -208,8 +208,8 @@ const MicroSession = ({ onClose }) => {
                                 {exercises[currentIndex]?.title}
                             </h3>
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${exercises[currentIndex]?.difficulty === 'beginner' ? 'bg-green-500/20 text-green-300' :
-                                    exercises[currentIndex]?.difficulty === 'intermediate' ? 'bg-amber-500/20 text-amber-300' :
-                                        'bg-red-500/20 text-red-300'
+                                exercises[currentIndex]?.difficulty === 'intermediate' ? 'bg-amber-500/20 text-amber-300' :
+                                    'bg-red-500/20 text-red-300'
                                 }`}>
                                 {exercises[currentIndex]?.difficulty || 'beginner'}
                             </span>
@@ -235,7 +235,7 @@ const MicroSession = ({ onClose }) => {
 
                         {/* Quick rating */}
                         <div className="mt-4">
-                            <p className="text-xs text-slate-400 text-center mb-2">How'd it go?</p>
+                            <p className="text-xs text-slate-400 text-center mb-2">How&apos;d it go?</p>
                             <RatingButtons onRate={completeExercise} />
                         </div>
                     </div>

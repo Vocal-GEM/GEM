@@ -133,7 +133,7 @@ const QuickVoiceCheck = ({ onClose }) => {
                 {/* Header */}
                 <div className="text-center mb-6">
                     <h2 className="text-2xl font-bold text-white mb-1">Quick Voice Check</h2>
-                    <p className="text-slate-400 text-sm">Speak for 5 seconds to see how you're doing</p>
+                    <p className="text-slate-400 text-sm">Speak for 5 seconds to see how you&apos;re doing</p>
                 </div>
 
                 {/* Status-based content */}

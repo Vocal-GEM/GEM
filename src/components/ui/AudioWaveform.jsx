@@ -76,7 +76,7 @@ const AudioWaveform = ({ audioUrl, isPlaying = false, currentTime = 0, duration 
     // Redraw on playback update
     useEffect(() => {
         drawWaveform();
-    }, [currentTime, isPlaying]);
+    }, [currentTime, isPlaying, drawWaveform]);
 
     return (
         <div className="w-full h-16 bg-slate-800 rounded-lg overflow-hidden">

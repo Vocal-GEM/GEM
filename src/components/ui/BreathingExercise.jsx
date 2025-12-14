@@ -5,7 +5,7 @@
  * Uses animated circle visualization for inhale/hold/exhale.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { X, SkipForward } from 'lucide-react';
 
 // Breathing phases with durations in seconds
@@ -154,10 +154,10 @@ const BreathingExercise = ({ onComplete, onSkip }) => {
                     <div
                         key={p.name}
                         className={`w-3 h-3 rounded-full transition-all ${idx === currentPhase
-                                ? 'bg-white ring-2 ring-white/50 ring-offset-2 ring-offset-black'
-                                : idx < currentPhase || (currentPhase === 0 && cycle > 1)
-                                    ? 'bg-emerald-500'
-                                    : 'bg-slate-700'
+                            ? 'bg-white ring-2 ring-white/50 ring-offset-2 ring-offset-black'
+                            : idx < currentPhase || (currentPhase === 0 && cycle > 1)
+                                ? 'bg-emerald-500'
+                                : 'bg-slate-700'
                             }`}
                     />
                 ))}

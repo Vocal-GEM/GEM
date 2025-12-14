@@ -8,7 +8,7 @@
 import { useState, useEffect } from 'react';
 import {
     Calendar, Clock, CheckCircle, Circle, ChevronRight,
-    RefreshCw, Zap, Target, Award, BookOpen
+    RefreshCw, Zap
 } from 'lucide-react';
 import AdaptiveCurriculumService from '../../services/AdaptiveCurriculumService';
 
@@ -40,7 +40,7 @@ const AdaptiveCurriculumPanel = ({ onStartSession, embedded = false, onClose }) 
         setIsGenerating(false);
     };
 
-    const handleExerciseComplete = (weekIdx, dayIdx, exerciseId) => {
+    const _handleExerciseComplete = (weekIdx, dayIdx, exerciseId) => {
         AdaptiveCurriculumService.markExerciseComplete(weekIdx, dayIdx, exerciseId);
         loadCurriculum();
     };
@@ -150,8 +150,8 @@ const AdaptiveCurriculumPanel = ({ onStartSession, embedded = false, onClose }) 
                         <div
                             key={weekIdx}
                             className={`rounded-xl border transition-all ${weekIdx === curriculum.currentWeek
-                                    ? 'border-purple-500/50 bg-purple-500/5'
-                                    : 'border-slate-700 bg-slate-800/30'
+                                ? 'border-purple-500/50 bg-purple-500/5'
+                                : 'border-slate-700 bg-slate-800/30'
                                 }`}
                         >
                             {/* Week Header */}
@@ -161,10 +161,10 @@ const AdaptiveCurriculumPanel = ({ onStartSession, embedded = false, onClose }) 
                             >
                                 <div className="flex items-center gap-3">
                                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${week.completedDays >= 6
-                                            ? 'bg-emerald-500/20 text-emerald-400'
-                                            : weekIdx === curriculum.currentWeek
-                                                ? 'bg-purple-500/20 text-purple-400'
-                                                : 'bg-slate-700 text-slate-400'
+                                        ? 'bg-emerald-500/20 text-emerald-400'
+                                        : weekIdx === curriculum.currentWeek
+                                            ? 'bg-purple-500/20 text-purple-400'
+                                            : 'bg-slate-700 text-slate-400'
                                         }`}>
                                         {week.completedDays >= 6 ? (
                                             <CheckCircle size={16} />
@@ -192,10 +192,10 @@ const AdaptiveCurriculumPanel = ({ onStartSession, embedded = false, onClose }) 
                                         <div
                                             key={dayIdx}
                                             className={`flex items-center gap-3 p-3 rounded-lg ${day.isRestDay
-                                                    ? 'bg-slate-800/30'
-                                                    : day.completed
-                                                        ? 'bg-emerald-500/10'
-                                                        : 'bg-slate-800/50'
+                                                ? 'bg-slate-800/30'
+                                                : day.completed
+                                                    ? 'bg-emerald-500/10'
+                                                    : 'bg-slate-800/50'
                                                 }`}
                                         >
                                             {day.completed ? (
