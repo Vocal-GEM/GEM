@@ -18,3 +18,7 @@ bleach==6.1.0
 pypdf==3.17.4
 Flask-Migrate==4.0.7
 soundfile==0.12.1
+numpy>=1.26.0
+scipy>=1.11.0
+librosa>=0.10.1
+faster-whisper>=1.0.1

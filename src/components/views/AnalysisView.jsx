@@ -12,6 +12,7 @@ import Toast from '../ui/Toast';
 
 import { CoachEngine } from '../../utils/coachEngine';
 import { getTargetNorms } from '../../data/VoiceNorms';
+import { transcriptionEngine } from '../../utils/transcriptionEngine';
 
 import ClipCapture from '../ui/ClipCapture';
 
@@ -87,12 +88,22 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                 showToast(t('analysis.toasts.analysisComplete'), "success");
 
             } catch (backendError) {
-                // Backend unavailable - use client-side fallback
+                // Backend unavailable - use client-side transcription fallback
                 console.warn("Backend analysis unavailable, using client-side fallback:", backendError);
+                showToast(t('analysis.toasts.backendUnavailable'), "info");
+
+                // Try client-side transcription
+                let transcription = null;
+                try {
+                    showToast(t('analysis.toasts.loadingModel'), "info");
+                    transcription = await transcriptionEngine.transcribe(blob);
+                } catch (transcribeError) {
+                    console.warn("Client-side transcription failed:", transcribeError);
+                }
 
                 // Create fallback results from AudioEngine's realtime analysis
                 const fallbackResults = {
-                    transcript: `(${t('analysis.transcript.unavailable')})`,
+                    transcript: transcription?.text || `(${t('analysis.transcript.unavailable')})`,
                     duration: duration,
                     overall: {
                         pitch: {
@@ -109,12 +120,17 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                         hnr: analysis?.hnr || 0,
                         intensity: analysis?.intensity || 0
                     },
-                    words: [],
+                    // Include words from client-side transcription (no per-word metrics)
+                    words: transcription?.words?.map(w => ({
+                        text: w.text,
+                        start: w.start,
+                        end: w.end,
+                        metrics: null // No per-word metrics in client fallback
+                    })) || [],
                     isClientSideFallback: true
                 };
 
                 setLocalResults(fallbackResults);
-                showToast(t('analysis.toasts.backendUnavailable'), "info");
             }
 
             // Set audio player source regardless of backend status

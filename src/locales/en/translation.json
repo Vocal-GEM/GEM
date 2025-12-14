@@ -166,7 +166,9 @@
         },
         "toasts": {
             "analysisComplete": "Analysis complete!",
-            "backendUnavailable": "Recording saved! Full analysis requires backend server.",
+            "backendUnavailable": "Using browser-based transcription...",
+            "loadingModel": "Loading speech model (first time may take a moment)...",
+            "transcribing": "Transcribing your speech...",
             "cleanSuccess": "Audio cleaned successfully!",
             "cleanFail": "Failed to clean audio. Is the backend running?",
             "noAudio": "No audio to clean"

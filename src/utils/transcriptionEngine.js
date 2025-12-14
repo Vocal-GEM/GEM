@@ -5,12 +5,31 @@ class TranscriptionEngine {
         this.pipe = null;
         this.modelName = 'Xenova/whisper-tiny'; // Use tiny for better performance on client
         this.isLoading = false;
+        this.loadError = null;
+    }
+
+    /**
+     * Check if the model is ready to use
+     */
+    isReady() {
+        return this.pipe !== null;
+    }
+
+    /**
+     * Get current status of the engine
+     */
+    getStatus() {
+        if (this.pipe) return 'ready';
+        if (this.isLoading) return 'loading';
+        if (this.loadError) return 'error';
+        return 'idle';
     }
 
     async initialize() {
         if (this.pipe) return;
 
         this.isLoading = true;
+        this.loadError = null;
         try {
             // Disable local models to force fetching from Hugging Face Hub
             // This prevents 404s on local files returning HTML (which causes JSON.parse error)
@@ -19,6 +38,7 @@ class TranscriptionEngine {
             this.pipe = await pipeline('automatic-speech-recognition', this.modelName);
         } catch (error) {
             console.error('Failed to load Whisper model:', error);
+            this.loadError = error;
             if (error.message.includes('JSON.parse') || error.message.includes('unexpected character')) {
                 throw new Error('Failed to load speech model. Please check your internet connection.');
             }
