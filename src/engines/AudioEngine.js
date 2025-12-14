@@ -330,10 +330,20 @@ export class AudioEngine {
 
                     // Trigger update
                     if (this.onAudioUpdate) {
-                        this.onAudioUpdate({
+                        const metricData = {
                             ...this.latestBackendAnalysis,
                             live: true
-                        });
+                        };
+
+                        // Store metrics if recording
+                        if (this.isRecording && this.recordingMetrics) {
+                            this.recordingMetrics.push({
+                                timestamp: Date.now() - (this.recordingStartTime || Date.now()),
+                                metrics: metricData
+                            });
+                        }
+
+                        this.onAudioUpdate(metricData);
                     }
                 }
             };
@@ -536,7 +546,7 @@ export class AudioEngine {
 
             // For now, just call the update handler with some dummy data or processed data
             if (this.onAudioUpdate) {
-                this.onAudioUpdate({
+                const metricData = {
                     volume: maxAmp,
                     pitch: pitch || 0,
                     clarity: confidence || 0,
@@ -550,7 +560,17 @@ export class AudioEngine {
                     weightLabel: weightLabel, // Descriptive label (e.g., "Light", "Heavy")
                     f3Noise: f3Noise,
                     harmonicRatio: harmonicRatio
-                });
+                };
+
+                // Store metrics if recording
+                if (this.isRecording && this.recordingMetrics) {
+                    this.recordingMetrics.push({
+                        timestamp: Date.now() - (this.recordingStartTime || Date.now()),
+                        metrics: metricData
+                    });
+                }
+
+                this.onAudioUpdate(metricData);
             }
         };
 
@@ -667,6 +687,7 @@ export class AudioEngine {
 
             this.mediaRecorder.start(100); // Collect data every 100ms
             this.isRecording = true;
+            this.recordingMetrics = []; // Initialize metrics buffer
             this.recordingStartTime = Date.now();
             console.log('[AudioEngine] Recording started');
         } catch (error) {
@@ -706,7 +727,8 @@ export class AudioEngine {
                     analysis: {
                         // Return latest analysis data
                         ...this.latestBackendAnalysis
-                    }
+                    },
+                    recordingMetrics: this.recordingMetrics || [] // Return full history
                 });
             };
 

@@ -16,6 +16,82 @@ import { transcriptionEngine } from '../../utils/transcriptionEngine';
 
 import ClipCapture from '../ui/ClipCapture';
 
+// --- Helpers & Sub-Components ---
+
+const hzToNote = (hz) => {
+    if (!hz || hz <= 0) return 'N/A';
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const log2 = Math.log2(hz / 440);
+    const noteNum = Math.round(12 * log2) + 69;
+    const noteName = notes[noteNum % 12];
+    const octave = Math.floor(noteNum / 12) - 1;
+    return `${noteName}${octave}`;
+};
+
+const WordItem = ({ word, colorClass, isActive, onClick }) => {
+    const [isHovered, setIsHovered] = useState(false);
+
+    // Vocal Weight Styling
+    let weightStyle = "";
+    const weightLabel = word.metrics?.weight?.label; // "Pressed", "Breathy", "Efficient"
+
+    if (weightLabel === 'Pressed') weightStyle = "font-extrabold tracking-tight"; // Visual "squeezing"
+    else if (weightLabel === 'Breathy') weightStyle = "font-light italic tracking-wide"; // Visual "airiness"
+    else if (weightLabel === 'Hollow') weightStyle = "font-thin opacity-80";
+    else if (weightLabel === 'Efficient') weightStyle = "font-medium";
+
+    return (
+        <span
+            className={`relative inline-block mr-1.5 mb-1 py-0.5 px-1 rounded cursor-pointer transition-all duration-200 select-none ${colorClass} ${weightStyle} ${isActive ? 'bg-blue-500/20 ring-1 ring-blue-500/50' : 'hover:bg-white/5'}`}
+            onClick={onClick}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            {word.text}
+
+            {/* Detailed Tooltip */}
+            {isHovered && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-slate-900/95 border border-slate-700 rounded-xl shadow-2xl backdrop-blur-sm z-50 p-3 pointer-events-none animate-in fade-in zoom-in-95 duration-200">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2">
+                        <span className="font-bold text-white text-sm">"{word.text}"</span>
+                        <span className="text-xs text-slate-400">{(word.end - word.start).toFixed(2)}s</span>
+                    </div>
+
+                    <div className="space-y-1.5 text-xs">
+                        {word.metrics?.pitch?.mean ? (
+                            <div className="flex justify-between items-center">
+                                <span className="text-slate-400">Pitch:</span>
+                                <span className="font-mono text-blue-300">
+                                    {word.metrics.pitch.mean.toFixed(0)}Hz
+                                    <span className="opacity-50 mx-1">|</span>
+                                    {hzToNote(word.metrics.pitch.mean)}
+                                </span>
+                            </div>
+                        ) : (
+                            <div className="text-slate-500 italic">No pitch data</div>
+                        )}
+
+                        {word.metrics?.weight?.val !== undefined && (
+                            <div className="flex justify-between items-center">
+                                <span className="text-slate-400">Weight:</span>
+                                <span className={`font-medium ${weightLabel === 'Pressed' ? 'text-red-300' :
+                                    weightLabel === 'Breathy' ? 'text-cyan-300' :
+                                        'text-green-300'
+                                    }`}>
+                                    {weightLabel || 'Unknown'} <span className="opacity-50">({word.metrics.weight.val.toFixed(0)})</span>
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Arrow */}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900/95"></div>
+                </div>
+            )}
+        </span>
+    );
+};
+
 const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) => {
     const { settings } = useSettings();
     const { t } = useTranslation();
@@ -41,6 +117,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
     // Playback controls
     const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
     const [isLooping, setIsLooping] = useState(false);
+    const [loopRange, setLoopRange] = useState(null); // { start, end }
     const [isCleaning, setIsCleaning] = useState(false);
 
     const showToast = (message, type = 'info') => {
@@ -102,6 +179,9 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                 }
 
                 // Create fallback results from AudioEngine's realtime analysis
+                const { recordingMetrics } = recordingResult;
+                const center = targetRange ? (targetRange.min + targetRange.max) / 2 : 200;
+
                 const fallbackResults = {
                     transcript: transcription?.text || `(${t('analysis.transcript.unavailable')})`,
                     duration: duration,
@@ -120,13 +200,80 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                         hnr: analysis?.hnr || 0,
                         intensity: analysis?.intensity || 0
                     },
-                    // Include words from client-side transcription (no per-word metrics)
-                    words: transcription?.words?.map(w => ({
-                        text: w.text,
-                        start: w.start,
-                        end: w.end,
-                        metrics: null // No per-word metrics in client fallback
-                    })) || [],
+                    // Include words from client-side transcription with mapped pitch metrics
+                    words: transcription?.words?.map(w => {
+                        let avgPitch = null;
+                        let avgWeight = null;
+                        let avgLabel = null;
+
+                        // Map recording metrics to word duration
+                        if (recordingMetrics && recordingMetrics.length > 0) {
+                            const startMs = w.start * 1000;
+                            const endMs = w.end * 1000;
+                            // Filter metrics that fall within this word's timeframe
+                            const relevantMetrics = recordingMetrics.filter(m =>
+                                m.timestamp >= startMs && m.timestamp <= endMs
+                            );
+
+                            // Calculate average pitch (filtering out silence/unvoiced < 50Hz)
+                            const pitches = relevantMetrics
+                                .map(m => m.metrics?.pitch)
+                                .filter(p => p && p > 50);
+
+                            // Calculate average weight metrics
+                            const weights = relevantMetrics
+                                .map(m => m.metrics?.weight)
+                                .filter(w => w !== undefined);
+
+                            // Determine modal label
+                            const labels = relevantMetrics
+                                .map(m => m.metrics?.weightLabel)
+                                .filter(l => l && l !== 'Unknown');
+
+                            // Simple mode function
+                            const getMode = (arr) => {
+                                if (arr.length === 0) return null;
+                                const counts = {};
+                                let maxCount = 0;
+                                let mode = null;
+                                arr.forEach(val => {
+                                    counts[val] = (counts[val] || 0) + 1;
+                                    if (counts[val] > maxCount) {
+                                        maxCount = counts[val];
+                                        mode = val;
+                                    }
+                                });
+                                return mode;
+                            }
+
+                            if (pitches.length > 0) {
+                                avgPitch = pitches.reduce((a, b) => a + b, 0) / pitches.length;
+                            }
+
+                            if (weights.length > 0) {
+                                avgWeight = weights.reduce((a, b) => a + b, 0) / weights.length;
+                            }
+
+                            avgLabel = getMode(labels);
+                        }
+
+                        // Calculate deviation for coloring
+                        let deviations = 0;
+                        if (avgPitch) {
+                            deviations = Math.abs(avgPitch - center) / center;
+                        }
+
+                        return {
+                            text: w.text,
+                            start: w.start,
+                            end: w.end,
+                            metrics: {
+                                pitch: avgPitch ? { mean: avgPitch } : null,
+                                weight: avgWeight !== null ? { val: avgWeight, label: avgLabel } : null
+                            },
+                            deviations: deviations
+                        };
+                    }) || [],
                     isClientSideFallback: true
                 };
 
@@ -193,9 +340,28 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
     useEffect(() => {
         if (audioRef.current) {
             audioRef.current.playbackRate = playbackSpeed;
-            audioRef.current.loop = isLooping;
+            // audioRef.current.loop = isLooping; // Handled manually for segment looping
         }
     }, [playbackSpeed, isLooping]);
+
+    // Loop Logic
+    useEffect(() => {
+        if (!isLooping || !loopRange || !audioRef.current || !isPlaying) return;
+
+        const handleTimeUpdate = () => {
+            const time = audioRef.current.currentTime;
+            // Add small buffer to avoid glitching at exact boundary
+            if (time >= loopRange.end) {
+                audioRef.current.currentTime = loopRange.start;
+                // Ensure it keeps playing
+                if (audioRef.current.paused) audioRef.current.play();
+            }
+        };
+
+        const audioEl = audioRef.current;
+        audioEl.addEventListener('timeupdate', handleTimeUpdate);
+        return () => audioEl.removeEventListener('timeupdate', handleTimeUpdate);
+    }, [isLooping, loopRange, isPlaying]);
 
     const generateCoachFeedback = async () => {
         // Mock feedback generation
@@ -209,7 +375,13 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
 
     const handleWordClick = (word) => {
         if (audioRef.current) {
-            audioRef.current.currentTime = word.start;
+            // If already looping this word, toggle off? Or just restart?
+            // Let's set loop range to this word
+            const buffer = 0.1; // 100ms buffer
+            setLoopRange({ start: Math.max(0, word.start - buffer), end: word.end + buffer });
+            setIsLooping(true);
+
+            audioRef.current.currentTime = Math.max(0, word.start - buffer);
             audioRef.current.play();
             setIsPlaying(true);
         }
@@ -312,17 +484,13 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                                 <>
                                     <div className="text-lg leading-relaxed">
                                         {analysisResults.words.map((word, i) => (
-                                            <span
+                                            <WordItem
                                                 key={i}
+                                                word={word}
+                                                colorClass={getWordColor(word.deviations)}
+                                                isActive={currentPlayTime >= word.start && currentPlayTime <= word.end}
                                                 onClick={() => handleWordClick(word)}
-                                                className={`${getWordColor(word.deviations)} cursor-pointer hover:underline transition-colors mr-2 ${currentPlayTime >= word.start && currentPlayTime <= word.end
-                                                    ? 'font-bold underline'
-                                                    : ''
-                                                    }`}
-                                                title={`Pitch: ${word.metrics?.pitch?.mean?.toFixed(1) || 'N/A'} Hz`}
-                                            >
-                                                {word.text}
-                                            </span>
+                                            />
                                         ))}
                                     </div>
 
