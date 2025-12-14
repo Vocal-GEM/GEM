@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, LogOut, Clock } from 'lucide-react';
+import { X, LogOut, Clock, AlertTriangle } from 'lucide-react';
 
 import { indexedDB } from '../../services/IndexedDBManager';
 import { useSettings } from '../../context/SettingsContext';
@@ -7,6 +7,7 @@ import { useSettings } from '../../context/SettingsContext';
 const UserProfile = ({ user, onClose, onLogout }) => {
     const { settings } = useSettings();
     const [totalSeconds, setTotalSeconds] = useState(0);
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     useEffect(() => {
         const loadStats = async () => {
@@ -26,7 +27,13 @@ const UserProfile = ({ user, onClose, onLogout }) => {
         return `${minutes}m`;
     };
 
+    const handleLogoutClick = () => {
+        setShowLogoutConfirm(true);
+    };
 
+    const handleConfirmLogout = () => {
+        onLogout();
+    };
 
     if (!user) return null;
 
@@ -54,7 +61,7 @@ const UserProfile = ({ user, onClose, onLogout }) => {
                             </div>
                         </div>
                         <button
-                            onClick={onLogout}
+                            onClick={handleLogoutClick}
                             className="w-full p-4 bg-red-900/20 hover:bg-red-900/40 border border-red-500/30 rounded-xl text-left flex items-center gap-3 transition-colors"
                         >
                             <LogOut className="w-5 h-5 text-red-400" />
@@ -78,8 +85,53 @@ const UserProfile = ({ user, onClose, onLogout }) => {
                     </section>
                 </div>
             </div>
+
+            {/* Logout Confirmation Dialog */}
+            {showLogoutConfirm && (
+                <div className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="bg-slate-900 border border-red-500/30 rounded-2xl w-full max-w-sm shadow-2xl p-6">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 bg-red-500/20 rounded-full">
+                                <AlertTriangle className="w-6 h-6 text-red-400" />
+                            </div>
+                            <h3 className="text-xl font-bold text-white">Log Out?</h3>
+                        </div>
+
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
+                            <p className="text-sm text-red-200 mb-2">
+                                <strong>Warning:</strong> Logging out will clear all local data on this device:
+                            </p>
+                            <ul className="text-sm text-red-300/80 list-disc list-inside space-y-1">
+                                <li>Practice history & recordings</li>
+                                <li>Journey progress</li>
+                                <li>Settings & calibration</li>
+                            </ul>
+                        </div>
+
+                        <p className="text-sm text-slate-400 mb-6">
+                            Your synced data will be available when you log back in.
+                        </p>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setShowLogoutConfirm(false)}
+                                className="flex-1 px-4 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-300 font-bold transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleConfirmLogout}
+                                className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-500 rounded-xl text-white font-bold transition-colors"
+                            >
+                                Log Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
 export default UserProfile;
+

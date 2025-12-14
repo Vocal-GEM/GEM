@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { indexedDB } from '../services/IndexedDBManager';
+import { syncToServer, syncFromServer } from '../services/DataSyncService';
 
 const AuthContext = createContext();
 
@@ -23,6 +25,8 @@ export const AuthProvider = ({ children }) => {
                     const data = await res.json();
                     if (data.user) {
                         setUser(data.user);
+                        // Restore user data from server on app load if logged in
+                        await syncFromServer();
                     }
                 }
             } catch (e) {
@@ -45,6 +49,11 @@ export const AuthProvider = ({ children }) => {
             if (res.ok) {
                 const data = await res.json();
                 setUser(data.user);
+
+                // Pull user data from server after successful login
+                console.log('[Auth] Login successful, syncing data from server...');
+                await syncFromServer();
+
                 return true;
             }
         } catch (e) { console.error(e); }
@@ -64,6 +73,11 @@ export const AuthProvider = ({ children }) => {
 
             if (res.ok) {
                 setUser(data.user);
+
+                // If there's existing local data, sync it to the new account
+                console.log('[Auth] Signup successful, syncing local data to server...');
+                await syncToServer();
+
                 return { success: true };
             } else {
                 return { success: false, error: data.error || 'Signup failed' };
@@ -74,11 +88,35 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    /**
+     * Clear all local data (IndexedDB + localStorage)
+     * Called on logout to prevent cross-user data access
+     */
+    const clearLocalData = async () => {
+        try {
+            console.log('[Auth] Clearing all local data...');
+            await indexedDB.factoryReset();
+            console.log('[Auth] Local data cleared successfully');
+        } catch (e) {
+            console.error('[Auth] Failed to clear local data:', e);
+        }
+    };
+
     const logout = async () => {
         try {
+            // Sync data to server BEFORE clearing (preserve user's progress)
+            console.log('[Auth] Syncing data to server before logout...');
+            await syncToServer();
+
+            // Clear local data (so next user starts fresh)
+            await clearLocalData();
+
             await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
             setUser(null);
-        } catch (e) { console.error(e); }
+        } catch (e) {
+            console.error(e);
+            setUser(null); // Still clear user state even if API fails
+        }
     };
 
     const value = {
@@ -91,3 +129,5 @@ export const AuthProvider = ({ children }) => {
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+

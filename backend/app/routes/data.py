@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 import os
 import datetime
-from ..models import db, Stats, Journal, Settings
+from ..models import db, Stats, Journal, Settings, UserData
 from ..validators import sanitize_html
 from ..extensions import limiter
 
@@ -138,3 +138,78 @@ def upload_file():
         url = storage_service.upload_file(file, filename, content_type=file.content_type)
         
         return jsonify({"url": url})
+
+@data_bp.route('/user-data', methods=['GET'])
+@login_required
+def get_user_data():
+    """Get all synced user data for restoring on login"""
+    user_data = current_user.user_data
+    
+    if not user_data:
+        return jsonify({}), 200
+    
+    return jsonify({
+        "journeyProgress": user_data.journey_progress,
+        "voiceBaseline": user_data.voice_baseline,
+        "skillAssessment": user_data.skill_assessment,
+        "courseProgress": user_data.course_progress,
+        "streakData": user_data.streak_data,
+        "practiceGoals": user_data.practice_goals,
+        "selfCarePlan": user_data.self_care_plan,
+        "programProgress": user_data.program_progress,
+        "onboardingComplete": user_data.onboarding_complete,
+        "tutorialSeen": user_data.tutorial_seen,
+        "compassSeen": user_data.compass_seen,
+        "calibrationDone": user_data.calibration_done,
+        "updatedAt": user_data.updated_at.isoformat() if user_data.updated_at else None
+    })
+
+@data_bp.route('/user-data', methods=['POST'])
+@login_required
+@limiter.limit("30 per minute")
+def save_user_data():
+    """Save all syncable user data from client"""
+    data = request.json
+    
+    # Get or create UserData record
+    user_data = current_user.user_data
+    if not user_data:
+        user_data = UserData(user_id=current_user.id)
+        db.session.add(user_data)
+    
+    # Update fields if provided
+    if 'journeyProgress' in data:
+        user_data.journey_progress = data['journeyProgress']
+    if 'voiceBaseline' in data:
+        user_data.voice_baseline = data['voiceBaseline']
+    if 'skillAssessment' in data:
+        user_data.skill_assessment = data['skillAssessment']
+    if 'courseProgress' in data:
+        user_data.course_progress = data['courseProgress']
+    if 'streakData' in data:
+        user_data.streak_data = data['streakData']
+    if 'practiceGoals' in data:
+        user_data.practice_goals = data['practiceGoals']
+    if 'selfCarePlan' in data:
+        user_data.self_care_plan = data['selfCarePlan']
+    if 'programProgress' in data:
+        user_data.program_progress = data['programProgress']
+    
+    # Update onboarding flags
+    if data.get('onboardingComplete'):
+        user_data.onboarding_complete = True
+    if data.get('tutorialSeen'):
+        user_data.tutorial_seen = True
+    if data.get('compassSeen'):
+        user_data.compass_seen = True
+    if data.get('calibrationDone'):
+        user_data.calibration_done = True
+    
+    try:
+        db.session.commit()
+        return jsonify({"status": "saved", "updatedAt": user_data.updated_at.isoformat()})
+    except Exception as e:
+        db.session.rollback()
+        print(f"UserData save error: {e}")
+        return jsonify({"error": "Failed to save user data"}), 500
+
