@@ -99,6 +99,4 @@ export const withConfetti = (WrappedComponent) => {
     };
 };
 
-import { setGlobalConfettiTrigger } from '../../utils/ConfettiUtils';
-
 export default Confetti;

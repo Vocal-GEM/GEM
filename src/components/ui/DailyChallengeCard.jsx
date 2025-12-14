@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Zap, CheckCircle, Star, TrendingUp, Gift } from 'lucide-react';
 import { getTodayChallenges, completeChallenge, getXPForNextLevel } from '../../services/DailyChallengeService';
 
@@ -99,8 +99,8 @@ const DailyChallengeCard = () => {
                         <div
                             key={challenge.id}
                             className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${isComplete
-                                    ? 'bg-emerald-500/10 border-emerald-500/30'
-                                    : 'bg-slate-800/50 border-slate-700 hover:border-slate-600 cursor-pointer'
+                                ? 'bg-emerald-500/10 border-emerald-500/30'
+                                : 'bg-slate-800/50 border-slate-700 hover:border-slate-600 cursor-pointer'
                                 }`}
                             onClick={() => !isComplete && handleComplete(challenge.id)}
                         >

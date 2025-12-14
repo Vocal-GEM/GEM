@@ -123,7 +123,7 @@ const VoiceMetricsPanel = ({ dataRef, isActive }) => {
  * Coaching Tips Component
  * Shows contextual tips based on scenario
  */
-const CoachingTips = ({ scenario, turnCount }) => {
+const CoachingTips = ({ turnCount }) => {
     const tips = [
         { icon: Heart, text: "Speak naturally - this is practice, not perfection!", color: 'text-pink-400' },
         { icon: TrendingUp, text: "Focus on your resonance while speaking", color: 'text-emerald-400' },
@@ -779,7 +779,7 @@ const ConversationPractice = ({ onClose }) => {
                                     {/* Coaching tip */}
                                     <div className="px-4 pt-3">
                                         <AnimatePresence mode="wait">
-                                            <CoachingTips scenario={currentScenario} turnCount={turnCount} />
+                                            <CoachingTips turnCount={turnCount} />
                                         </AnimatePresence>
                                     </div>
 

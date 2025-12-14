@@ -53,7 +53,7 @@ const WordItem = ({ word, colorClass, isActive, onClick }) => {
             {isHovered && (
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-slate-900/95 border border-slate-700 rounded-xl shadow-2xl backdrop-blur-sm z-50 p-3 pointer-events-none animate-in fade-in zoom-in-95 duration-200">
                     <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2">
-                        <span className="font-bold text-white text-sm">"{word.text}"</span>
+                        <span className="font-bold text-white text-sm">&quot;{word.text}&quot;</span>
                         <span className="text-xs text-slate-400">{(word.end - word.start).toFixed(2)}s</span>
                     </div>
 
