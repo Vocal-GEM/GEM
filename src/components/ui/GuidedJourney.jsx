@@ -237,7 +237,15 @@ const GuidedJourney = ({ onClose }) => {
                     >
                         <JourneyStep
                             step={currentStep}
-                            onComplete={() => completeStep(currentStep.id)}
+                            onComplete={() => {
+                                // When an embedded exercise calls onComplete, 
+                                // mark step complete AND advance to next step
+                                completeStep(currentStep.id);
+                                const result = advanceStep();
+                                if (result === 'complete') {
+                                    setShowCompletionScreen(true);
+                                }
+                            }}
                             isCompleted={completedSteps.includes(currentStep.id)}
                         />
                     </div>

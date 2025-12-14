@@ -56,7 +56,7 @@ const Signup = ({ onSwitchToLogin, onClose }) => {
                             required
                         />
                         <p className="text-xs text-slate-500 mt-1">
-                            3-30 characters: letters, numbers, and underscores only
+                            3-30 characters: letters, numbers, underscores, hyphens, and periods
                         </p>
                     </div>
                     <div>

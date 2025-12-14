@@ -5,8 +5,9 @@ import { SelfCareService, SELF_CARE_PROMPTS, SELF_CARE_RESOURCES } from '../../s
 /**
  * SelfCareOnboarding - Guided wizard for creating a self-care plan
  * Walks users through the 5 reflection questions before starting voice work.
+ * When embedded=true, renders inline (for GuidedJourney). Otherwise renders as modal.
  */
-const SelfCareOnboarding = ({ onComplete, onSkip }) => {
+const SelfCareOnboarding = ({ onComplete, onSkip, embedded = false }) => {
     const [currentStep, setCurrentStep] = useState(0); // 0 = intro, 1-5 = prompts, 6 = summary
     const [answers, setAnswers] = useState(() => {
         // Load existing answers if any
@@ -52,9 +53,18 @@ const SelfCareOnboarding = ({ onComplete, onSkip }) => {
 
     const isOnSummary = currentStep === totalSteps - 1;
 
+    // Container classes: modal vs inline embedded
+    const containerClass = embedded
+        ? "w-full" // Inline mode for GuidedJourney
+        : "fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto";
+
+    const innerClass = embedded
+        ? "bg-slate-900/50 border border-slate-700 rounded-2xl w-full shadow-xl"
+        : "bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl shadow-2xl my-8";
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-            <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl shadow-2xl my-8">
+        <div className={containerClass}>
+            <div className={innerClass}>
                 {/* Header */}
                 <div className="bg-gradient-to-r from-pink-600/20 to-purple-600/20 p-6 border-b border-slate-700">
                     <div className="flex items-center justify-between">

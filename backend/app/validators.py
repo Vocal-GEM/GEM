@@ -4,7 +4,7 @@ from email_validator import validate_email, EmailNotValidError
 
 def validate_username(username):
     """
-    Validate username: 3-30 chars, alphanumeric + underscore
+    Validate username: 3-30 chars, alphanumeric + common special characters
     """
     if not username:
         return False, "Username is required"
@@ -12,8 +12,9 @@ def validate_username(username):
     if len(username) < 3 or len(username) > 30:
         return False, "Username must be between 3 and 30 characters"
     
-    if not re.match(r'^[a-zA-Z0-9_]+$', username):
-        return False, "Username can only contain letters, numbers, and underscores"
+    # Allow letters, numbers, underscores, hyphens, and periods
+    if not re.match(r'^[a-zA-Z0-9_.\-]+$', username):
+        return False, "Username can only contain letters, numbers, underscores, hyphens, and periods"
         
     return True, None
 
