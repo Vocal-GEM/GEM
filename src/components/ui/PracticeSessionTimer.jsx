@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { Timer, Droplets, Coffee, AlertTriangle, X, Pause } from 'lucide-react';
+import { Timer, Droplets, Coffee, AlertTriangle } from 'lucide-react';
 
 const HYDRATION_INTERVAL = 15 * 60 * 1000; // 15 minutes
 const REST_WARNING = 20 * 60; // 20 minutes in seconds
@@ -162,8 +162,8 @@ const ReminderPopup = ({
                         <button
                             onClick={primaryAction.onClick}
                             className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${urgent
-                                    ? 'bg-red-500 hover:bg-red-400 text-white'
-                                    : 'bg-white/20 hover:bg-white/30 text-white'
+                                ? 'bg-red-500 hover:bg-red-400 text-white'
+                                : 'bg-white/20 hover:bg-white/30 text-white'
                                 }`}
                         >
                             {primaryAction.label}

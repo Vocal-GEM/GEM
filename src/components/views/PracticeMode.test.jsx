@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import { vi, describe, it, expect } from 'vitest';
 import PracticeMode from './PracticeMode';
@@ -11,6 +11,7 @@ import { SettingsProvider } from '../../context/SettingsContext';
 import { TourProvider } from '../../context/TourContext';
 import { PracticeCardsProvider } from '../../context/PracticeCardsContext';
 
+/* eslint-disable no-undef */
 // Mock navigator.mediaDevices
 global.navigator.mediaDevices = {
     enumerateDevices: vi.fn().mockResolvedValue([]),
@@ -18,6 +19,7 @@ global.navigator.mediaDevices = {
     addEventListener: vi.fn(),
     removeEventListener: vi.fn()
 };
+/* eslint-enable no-undef */
 
 // Mock dependencies
 vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));

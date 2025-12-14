@@ -1,10 +1,10 @@
-import React from 'react';
 import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AudioProvider, useAudio } from './AudioContext';
 import { SettingsProvider } from './SettingsContext';
 import { ProfileProvider } from './ProfileContext';
 
+/* eslint-disable no-undef */
 // Mock navigator.mediaDevices
 const mockEnumerateDevices = vi.fn().mockResolvedValue([
     { deviceId: 'default', kind: 'audioinput', label: 'Default Microphone' },

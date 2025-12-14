@@ -7,8 +7,8 @@
 
 import { useState, useEffect } from 'react';
 import {
-    Trophy, Target, CheckCircle,
-    ChevronRight, Volume2, X, Sparkles, ArrowRight
+    Trophy, Target,
+    ChevronRight, Volume2, X, Sparkles
 } from 'lucide-react';
 import { useTTS } from '../../hooks/useTTS';
 import SessionSummaryService from '../../services/SessionSummaryService';
