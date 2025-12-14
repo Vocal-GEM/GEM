@@ -40,11 +40,6 @@ const AdaptiveCurriculumPanel = ({ onStartSession, embedded = false, onClose }) 
         setIsGenerating(false);
     };
 
-    const _handleExerciseComplete = (weekIdx, dayIdx, exerciseId) => {
-        AdaptiveCurriculumService.markExerciseComplete(weekIdx, dayIdx, exerciseId);
-        loadCurriculum();
-    };
-
     const Wrapper = embedded ? 'div' : 'div';
     const wrapperClass = embedded
         ? 'bg-slate-900/50 rounded-2xl border border-slate-700 overflow-hidden h-full'

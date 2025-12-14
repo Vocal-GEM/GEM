@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Phone, PhoneOff, Play, Pause, RotateCcw, CheckCircle, Star } from 'lucide-react';
+import { Phone, PhoneOff, RotateCcw, CheckCircle, Star } from 'lucide-react';
 
 // Simulated phone scenarios
 const SCENARIOS = [
@@ -51,7 +51,6 @@ const CallSimulator = ({ onClose }) => {
     const [selectedScenario, setSelectedScenario] = useState(null);
     const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
     const [isCallActive, setIsCallActive] = useState(false);
-    const [isRecording, setIsRecording] = useState(false);
     const [completedPrompts, setCompletedPrompts] = useState([]);
     const [showReview, setShowReview] = useState(false);
 

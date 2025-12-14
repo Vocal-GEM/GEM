@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { X, SkipForward } from 'lucide-react';
+import { SkipForward } from 'lucide-react';
 
 // Breathing phases with durations in seconds
 const BREATHING_PHASES = [
@@ -21,7 +21,7 @@ const BreathingExercise = ({ onComplete, onSkip }) => {
     const [currentPhase, setCurrentPhase] = useState(0);
     const [timeInPhase, setTimeInPhase] = useState(0);
     const [cycle, setCycle] = useState(1);
-    const [isComplete, setIsComplete] = useState(false);
+    const [_isComplete, setIsComplete] = useState(false);
 
     const phase = BREATHING_PHASES[currentPhase];
     const progress = (timeInPhase / phase.duration) * 100;

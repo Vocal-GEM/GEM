@@ -4,9 +4,8 @@ import { useProfile } from '../../context/ProfileContext';
 import { useAuth } from '../../context/AuthContext';
 
 const SmartCoachWidget = ({ onStartSession }) => {
-    const { activeProfile: activeProfileId, voiceProfiles, goals } = useProfile();
+    const { goals } = useProfile();
     const { user } = useAuth();
-    const _activeProfile = voiceProfiles?.find(p => p.id === activeProfileId);
 
     // Determine greeting based on time of day
     const hour = new Date().getHours();

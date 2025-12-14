@@ -325,7 +325,7 @@ const SessionSummary = ({ summary, voiceStats, onRestart, onNewScenario }) => {
                 transition={{ delay: 0.4 }}
                 className="text-slate-400 mb-6"
             >
-                You practiced with {summary.character} in the "{summary.scenarioTitle}" scenario
+                You practiced with {summary.character} in the &quot;{summary.scenarioTitle}&quot; scenario
             </motion.p>
 
             <motion.div
@@ -859,8 +859,8 @@ const ConversationPractice = ({ onClose }) => {
                                                     onClick={toggleMicrophone}
                                                     disabled={isProcessing || isSpeaking}
                                                     className={`p-3 rounded-xl transition-all ${isListening
-                                                            ? 'bg-red-500 text-white shadow-lg shadow-red-500/30'
-                                                            : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
+                                                        ? 'bg-red-500 text-white shadow-lg shadow-red-500/30'
+                                                        : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
                                                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                                                     title={isListening ? 'Stop listening' : 'Start voice input'}
                                                 >
