@@ -371,4 +371,205 @@ export class DSP {
         if (count === 0 || totalEnergy === 0) return -100;
         return 10 * Math.log10(totalEnergy / count);
     }
+
+    /**
+     * Calculate H1-H2 (Vocal Weight Indicator)
+     * Difference between first harmonic (F0) and second harmonic (2*F0) amplitudes.
+     * Higher H1-H2 = Breathy/Light phonation (more energy in fundamental)
+     * Lower H1-H2 = Pressed/Heavy phonation (more energy in harmonics)
+     *
+     * Research values (Garellek & Keating 2010):
+     * - Breathy: +6 to +12 dB
+     * - Modal: 0 to +4 dB
+     * - Pressed: -3 to +2 dB
+     *
+     * @param {Float32Array} freqData - FFT magnitude data in dB
+     * @param {number} pitch - Fundamental frequency (Hz)
+     * @param {number} sampleRate - Audio sample rate
+     * @returns {number} H1-H2 difference in dB
+     */
+    static calculateH1H2(freqData, pitch, sampleRate) {
+        if (!pitch || pitch < 50) return 0;
+
+        const fftSize = freqData.length * 2;
+        const binSize = sampleRate / fftSize;
+
+        // Helper to get amplitude in dB at a specific frequency
+        const getAmplitudeAtFreq = (f) => {
+            const bin = Math.round(f / binSize);
+            if (bin < 0 || bin >= freqData.length) return -100;
+
+            // Average surrounding bins to handle spectral leakage
+            let maxDb = -100;
+            for (let i = -1; i <= 1; i++) {
+                if (bin + i >= 0 && bin + i < freqData.length) {
+                    maxDb = Math.max(maxDb, freqData[bin + i]);
+                }
+            }
+            return maxDb;
+        };
+
+        const H1 = getAmplitudeAtFreq(pitch);      // First harmonic (F0)
+        const H2 = getAmplitudeAtFreq(pitch * 2);  // Second harmonic (2*F0)
+
+        return H1 - H2;
+    }
+
+    /**
+     * Calculate H1-A1 (Alternative vocal weight measure)
+     * Difference between first harmonic and first formant peak amplitude.
+     * @param {Float32Array} freqData - FFT magnitude data in dB
+     * @param {number} pitch - Fundamental frequency (Hz)
+     * @param {number} sampleRate - Audio sample rate
+     * @returns {number} H1-A1 difference in dB
+     */
+    static calculateH1A1(freqData, pitch, sampleRate) {
+        if (!pitch || pitch < 50) return 0;
+
+        const fftSize = freqData.length * 2;
+        const binSize = sampleRate / fftSize;
+
+        const getAmplitudeAtFreq = (f) => {
+            const bin = Math.round(f / binSize);
+            if (bin < 0 || bin >= freqData.length) return -100;
+            let maxDb = -100;
+            for (let i = -1; i <= 1; i++) {
+                if (bin + i >= 0 && bin + i < freqData.length) {
+                    maxDb = Math.max(maxDb, freqData[bin + i]);
+                }
+            }
+            return maxDb;
+        };
+
+        const H1 = getAmplitudeAtFreq(pitch);
+
+        // Find A1 (peak in F1 region, typically 300-1000 Hz)
+        const f1StartBin = Math.floor(300 / binSize);
+        const f1EndBin = Math.min(Math.floor(1000 / binSize), freqData.length - 1);
+
+        let A1 = -100;
+        for (let i = f1StartBin; i <= f1EndBin; i++) {
+            A1 = Math.max(A1, freqData[i]);
+        }
+
+        return H1 - A1;
+    }
+
+    /**
+     * Calculate Spectral Centroid
+     * The "center of mass" of the spectrum.
+     * Higher centroid = brighter, lighter sound
+     * Lower centroid = darker, heavier sound
+     *
+     * @param {Float32Array} freqData - FFT magnitude data in dB
+     * @param {number} sampleRate - Audio sample rate
+     * @returns {number} Spectral centroid in Hz
+     */
+    static calculateSpectralCentroid(freqData, sampleRate) {
+        const fftSize = freqData.length * 2;
+        const binSize = sampleRate / fftSize;
+
+        let weightedSum = 0;
+        let totalMagnitude = 0;
+
+        // Only analyze up to 8kHz (relevant for voice)
+        const maxBin = Math.min(Math.floor(8000 / binSize), freqData.length - 1);
+
+        for (let i = 1; i < maxBin; i++) {
+            // Convert dB to linear magnitude
+            const magnitude = Math.pow(10, freqData[i] / 20);
+            const frequency = i * binSize;
+
+            weightedSum += frequency * magnitude;
+            totalMagnitude += magnitude;
+        }
+
+        if (totalMagnitude === 0) return 0;
+        return weightedSum / totalMagnitude;
+    }
+
+    /**
+     * Calculate Improved Vocal Weight
+     * Multi-factor approach based on phonetics research.
+     * Combines H1-H2, spectral centroid, and spectral tilt.
+     *
+     * @param {Float32Array} freqData - FFT magnitude data in dB
+     * @param {number} pitch - Fundamental frequency (Hz)
+     * @param {number} sampleRate - Audio sample rate
+     * @returns {Object} { weight: 0-100, h1h2: dB, centroid: Hz, label: string }
+     */
+    static calculateVocalWeight(freqData, pitch, sampleRate) {
+        if (!pitch || pitch < 50) {
+            return { weight: 50, h1h2: 0, centroid: 0, label: 'Unknown' };
+        }
+
+        // Calculate H1-H2 (primary measure)
+        const h1h2 = this.calculateH1H2(freqData, pitch, sampleRate);
+
+        // Calculate spectral centroid (supporting measure)
+        const centroid = this.calculateSpectralCentroid(freqData, sampleRate);
+
+        // Calculate spectral tilt (0-4kHz comparison)
+        const fftSize = freqData.length * 2;
+        const binSize = sampleRate / fftSize;
+        const bin1k = Math.floor(1000 / binSize);
+        const bin4k = Math.floor(4000 / binSize);
+
+        let sumLow = 0, sumHigh = 0;
+        for (let i = 1; i < bin1k; i++) {
+            sumLow += Math.pow(10, freqData[i] / 10);
+        }
+        for (let i = bin1k; i < bin4k; i++) {
+            sumHigh += Math.pow(10, freqData[i] / 10);
+        }
+
+        const dbLow = 10 * Math.log10(sumLow + 1e-10);
+        const dbHigh = 10 * Math.log10(sumHigh + 1e-10);
+        const spectralTilt = (dbHigh - dbLow) / 2.0;
+
+        // Weight calculation based on H1-H2 (primary factor, 70% weight)
+        // Research: Breathy ~9.5dB, Modal ~2dB, Pressed ~0dB
+        // Map to 0-100 scale: 0 = Heavy/Pressed, 100 = Light/Breathy
+        let h1h2Weight = 0;
+        if (h1h2 <= 0) {
+            h1h2Weight = 0; // Very pressed/heavy
+        } else if (h1h2 >= 10) {
+            h1h2Weight = 100; // Very breathy/light
+        } else {
+            // Linear mapping: 0dB -> 0, 10dB -> 100
+            h1h2Weight = h1h2 * 10;
+        }
+
+        // Centroid contribution (20% weight)
+        // Typical range: 300-1500 Hz for voice
+        // Higher centroid = lighter
+        let centroidWeight = 50;
+        if (centroid > 0) {
+            centroidWeight = Math.min(100, Math.max(0, (centroid - 300) / 12));
+        }
+
+        // Spectral tilt contribution (10% weight)
+        // Negative tilt = heavy, positive = light
+        let tiltWeight = 50 - (spectralTilt * 3);
+        tiltWeight = Math.min(100, Math.max(0, tiltWeight));
+
+        // Combine factors
+        const weight = (h1h2Weight * 0.70) + (centroidWeight * 0.20) + (tiltWeight * 0.10);
+
+        // Determine label
+        let label = 'Balanced';
+        if (weight < 25) label = 'Very Heavy/Pressed';
+        else if (weight < 40) label = 'Heavy';
+        else if (weight < 60) label = 'Balanced';
+        else if (weight < 75) label = 'Light';
+        else label = 'Very Light/Breathy';
+
+        return {
+            weight: Math.round(weight),
+            h1h2: parseFloat(h1h2.toFixed(2)),
+            centroid: Math.round(centroid),
+            spectralTilt: parseFloat(spectralTilt.toFixed(2)),
+            label
+        };
+    }
 }
