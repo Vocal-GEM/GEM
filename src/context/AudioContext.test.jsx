@@ -5,6 +5,23 @@ import { AudioProvider, useAudio } from './AudioContext';
 import { SettingsProvider } from './SettingsContext';
 import { ProfileProvider } from './ProfileContext';
 
+// Mock navigator.mediaDevices
+const mockEnumerateDevices = vi.fn().mockResolvedValue([
+    { deviceId: 'default', kind: 'audioinput', label: 'Default Microphone' },
+    { deviceId: 'mic1', kind: 'audioinput', label: 'Microphone 1' }
+]);
+
+const mockGetUserMedia = vi.fn().mockResolvedValue({
+    getTracks: () => [{ stop: vi.fn() }]
+});
+
+global.navigator.mediaDevices = {
+    enumerateDevices: mockEnumerateDevices,
+    getUserMedia: mockGetUserMedia,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn()
+};
+
 // Mock AuthContext
 vi.mock('./AuthContext', () => ({
     useAuth: () => ({ user: { id: 'test' } }),

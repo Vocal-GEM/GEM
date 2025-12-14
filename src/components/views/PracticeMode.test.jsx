@@ -11,6 +11,14 @@ import { SettingsProvider } from '../../context/SettingsContext';
 import { TourProvider } from '../../context/TourContext';
 import { PracticeCardsProvider } from '../../context/PracticeCardsContext';
 
+// Mock navigator.mediaDevices
+global.navigator.mediaDevices = {
+    enumerateDevices: vi.fn().mockResolvedValue([]),
+    getUserMedia: vi.fn().mockResolvedValue({ getTracks: () => [{ stop: vi.fn() }] }),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn()
+};
+
 // Mock dependencies
 vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
