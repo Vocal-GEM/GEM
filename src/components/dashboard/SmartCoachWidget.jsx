@@ -43,7 +43,7 @@ const SmartCoachWidget = ({ onStartSession }) => {
                         <span>Smart Coach</span>
                     </div>
                     <h2 className="text-3xl md:text-4xl font-bold !text-white mb-2">
-                        {greeting}, {user?.username || 'Riley'}
+                        {greeting}{user?.username ? `, ${user.username}` : ''}
                     </h2>
                     <p className="!text-indigo-100 text-lg max-w-xl">
                         Ready to level up? Your daily focus is <strong className="!text-white">{dailyFocus}</strong>.

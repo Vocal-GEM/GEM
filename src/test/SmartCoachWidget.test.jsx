@@ -1,7 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import SmartCoachWidget from '../components/dashboard/SmartCoachWidget';
 import { ProfileContext } from '../context/ProfileContext';
+import { useAuth } from '../context/AuthContext';
 
 // Mock Lucide icons to avoid issues
 vi.mock('lucide-react', () => ({
@@ -12,7 +13,7 @@ vi.mock('lucide-react', () => ({
     Calendar: () => <div data-testid="icon-calendar" />
 }));
 
-// Mock IndexedDBManager to prevent unhandled rejections
+// Mock IndexedDBManager
 vi.mock('../services/IndexedDBManager', () => ({
     indexedDB: {
         ensureReady: vi.fn().mockResolvedValue(true),
@@ -25,11 +26,16 @@ vi.mock('../services/IndexedDBManager', () => ({
 
 // Mock AuthContext
 vi.mock('../context/AuthContext', () => ({
-    useAuth: () => ({ user: { username: 'Riley' } })
+    useAuth: vi.fn()
 }));
 
 describe('SmartCoachWidget', () => {
     const mockOnOpenAdaptiveSession = vi.fn();
+
+    beforeEach(() => {
+        // Default mock implementation
+        useAuth.mockReturnValue({ user: { username: 'Riley' } });
+    });
 
     const renderWidget = (profileData = {}) => {
         const defaultProfile = {
@@ -56,11 +62,25 @@ describe('SmartCoachWidget', () => {
         expect(screen.queryByText(/Feminization/)).not.toBeInTheDocument();
     });
 
+    it('should not render any name if user is not logged in', () => {
+        // Mock no user
+        useAuth.mockReturnValue({ user: null });
+
+        renderWidget();
+
+        // Should match "Good [Time]" but not have a name
+        // We can check that "Riley" is NOT there
+        expect(screen.queryByText(/Riley/)).not.toBeInTheDocument();
+        // And check for basic greeting part
+        const hour = new Date().getHours();
+        let greeting = 'Good Evening';
+        if (hour < 12) greeting = 'Good Morning';
+        else if (hour < 18) greeting = 'Good Afternoon';
+        expect(screen.getByText(new RegExp(greeting))).toBeInTheDocument();
+    });
+
     it('should display a daily focus based on goals', () => {
         renderWidget({ goals: ['resonance'] });
-        // The widget logic picks a random goal or defaults. 
-        // Since we mocked goals, it should likely pick 'Resonance' or similar if logic works.
-        // However, the logic is internal. We can check if *some* focus text is present.
         expect(screen.getByText(/Daily Focus/i)).toBeInTheDocument();
     });
 
