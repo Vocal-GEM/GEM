@@ -53,24 +53,39 @@ class AnalysisEngine {
         });
     }
 
-    logMetric(pitch, resonance, volume) {
+    logMetric(pitch, resonance, volume, options = {}) {
         if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-            this.metricTimeline.push({
+            const metric = {
                 timestamp: Date.now() - this.startTime,
                 pitch,
                 resonance,
                 volume
-            });
+            };
+
+            // Include optional vocal quality metrics
+            if (options.vocalWeight !== undefined) {
+                metric.vocalWeight = options.vocalWeight;
+            }
+            if (options.h1h2 !== undefined) {
+                metric.h1h2 = options.h1h2;
+            }
+            if (options.f2 !== undefined) {
+                metric.f2 = options.f2;
+            }
+
+            this.metricTimeline.push(metric);
         }
     }
 
     /**
-     * Analyzes the recording against a target range and transcript.
+     * Analyzes the recording against target ranges and transcript.
+     * Now supports vocal weight and F2 analysis alongside pitch.
      * @param {Object} recordingData - { blob, duration, metrics }
      * @param {String} transcript - The text spoken by the user
      * @param {Object} targetRange - { min, max } pitch target
+     * @param {Object} options - Optional targets { vocalWeight: {min, max}, f2: {min, max} }
      */
-    analyze(recordingData, transcript, targetRange) {
+    analyze(recordingData, transcript, targetRange, options = {}) {
         const { duration, metrics } = recordingData;
         const words = transcript.split(' ');
         const issues = [];
@@ -112,6 +127,81 @@ class AnalysisEngine {
 
         if (currentIssue) issues.push(currentIssue);
 
+        // Analyze vocal weight consistency if target provided
+        if (options.vocalWeightTarget) {
+            const { min, max } = options.vocalWeightTarget;
+            let vocalWeightIssue = null;
+
+            metrics.forEach((m) => {
+                if (!m.pitch || m.pitch <= 0 || m.volume < 0.02) return; // Skip silence
+                if (m.vocalWeight === undefined && m.h1h2 === undefined) return; // Skip if no data
+
+                const weight = m.vocalWeight !== undefined ? m.vocalWeight : (m.h1h2 / 10) * 100;
+                const isTooHeavy = weight < min;
+                const isTooLight = weight > max;
+
+                if (isTooHeavy) {
+                    if (!vocalWeightIssue || vocalWeightIssue.type !== 'heavy') {
+                        if (vocalWeightIssue) issues.push(vocalWeightIssue);
+                        vocalWeightIssue = { type: 'heavy', start: m.timestamp, end: m.timestamp };
+                    } else {
+                        vocalWeightIssue.end = m.timestamp;
+                    }
+                } else if (isTooLight) {
+                    if (!vocalWeightIssue || vocalWeightIssue.type !== 'light') {
+                        if (vocalWeightIssue) issues.push(vocalWeightIssue);
+                        vocalWeightIssue = { type: 'light', start: m.timestamp, end: m.timestamp };
+                    } else {
+                        vocalWeightIssue.end = m.timestamp;
+                    }
+                } else {
+                    if (vocalWeightIssue) {
+                        issues.push(vocalWeightIssue);
+                        vocalWeightIssue = null;
+                    }
+                }
+            });
+
+            if (vocalWeightIssue) issues.push(vocalWeightIssue);
+        }
+
+        // Analyze F2 consistency if target provided
+        if (options.f2Target) {
+            const { min, max } = options.f2Target;
+            let f2Issue = null;
+
+            metrics.forEach((m) => {
+                if (!m.pitch || m.pitch <= 0 || m.volume < 0.02) return; // Skip silence
+                if (m.f2 === undefined || m.f2 === 0) return; // Skip if no F2 data
+
+                const isTooLow = m.f2 < min;
+                const isTooHigh = m.f2 > max;
+
+                if (isTooLow) {
+                    if (!f2Issue || f2Issue.type !== 'f2_low') {
+                        if (f2Issue) issues.push(f2Issue);
+                        f2Issue = { type: 'f2_low', start: m.timestamp, end: m.timestamp };
+                    } else {
+                        f2Issue.end = m.timestamp;
+                    }
+                } else if (isTooHigh) {
+                    if (!f2Issue || f2Issue.type !== 'f2_high') {
+                        if (f2Issue) issues.push(f2Issue);
+                        f2Issue = { type: 'f2_high', start: m.timestamp, end: m.timestamp };
+                    } else {
+                        f2Issue.end = m.timestamp;
+                    }
+                } else {
+                    if (f2Issue) {
+                        issues.push(f2Issue);
+                        f2Issue = null;
+                    }
+                }
+            });
+
+            if (f2Issue) issues.push(f2Issue);
+        }
+
         // Filter insignificant issues (< 300ms)
         const significantIssues = issues.filter(i => (i.end - i.start) > 300);
 
@@ -125,12 +215,34 @@ class AnalysisEngine {
 
             const affectedWords = words.slice(startWordIndex, endWordIndex + 1).join(' ');
 
+            let feedback = '';
+            switch (issue.type) {
+                case 'low':
+                    feedback = `You dropped your pitch on "${affectedWords}".`;
+                    break;
+                case 'high':
+                    feedback = `You went a bit high on "${affectedWords}".`;
+                    break;
+                case 'heavy':
+                    feedback = `Your voice was too heavy/pressed on "${affectedWords}".`;
+                    break;
+                case 'light':
+                    feedback = `Your voice was too light/breathy on "${affectedWords}".`;
+                    break;
+                case 'f2_low':
+                    feedback = `Your resonance (F2) was too dark on "${affectedWords}".`;
+                    break;
+                case 'f2_high':
+                    feedback = `Your resonance (F2) was too bright on "${affectedWords}".`;
+                    break;
+                default:
+                    feedback = `Issue detected on "${affectedWords}".`;
+            }
+
             return {
                 ...issue,
                 words: affectedWords,
-                feedback: issue.type === 'low'
-                    ? `You dropped your pitch on "${affectedWords}".`
-                    : `You went a bit high on "${affectedWords}".`
+                feedback
             };
         });
 
