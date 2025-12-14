@@ -27,7 +27,6 @@ const MicroSession = ({ onClose }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [timeLeft, setTimeLeft] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
-    const [startTime, setStartTime] = useState(null);
 
     const timerRef = useRef(null);
 
@@ -49,7 +48,6 @@ const MicroSession = ({ onClose }) => {
         }
 
         setTimeLeft(Math.floor((duration.minutes * 60) / duration.exercises));
-        setStartTime(Date.now());
         setPhase('practice');
     };
 

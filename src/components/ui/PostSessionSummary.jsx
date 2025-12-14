@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import {
-    Trophy, TrendingUp, Target, Clock, CheckCircle,
+    Trophy, Target, CheckCircle,
     ChevronRight, Volume2, X, Sparkles, ArrowRight
 } from 'lucide-react';
 import { useTTS } from '../../hooks/useTTS';
@@ -123,8 +123,8 @@ const PostSessionSummary = ({ sessionData, onClose, onStartRecommended }) => {
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             className={`flex-1 py-3 text-sm font-bold capitalize transition-colors ${activeTab === tab
-                                    ? 'text-purple-400 border-b-2 border-purple-500 bg-purple-500/10'
-                                    : 'text-slate-400 hover:text-white'
+                                ? 'text-purple-400 border-b-2 border-purple-500 bg-purple-500/10'
+                                : 'text-slate-400 hover:text-white'
                                 }`}
                         >
                             {tab === 'next' ? 'Next Steps' : tab}
