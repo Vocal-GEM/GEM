@@ -8,10 +8,9 @@
 import { useState, useEffect, useRef } from 'react';
 import {
     Clock, Zap, CheckCircle, ChevronRight,
-    X, Play, Pause, SkipForward, Star
+    X, Play, Pause, SkipForward
 } from 'lucide-react';
 import SpacedRepetitionService from '../../services/SpacedRepetitionService';
-import SkillAssessmentService from '../../services/SkillAssessmentService';
 import { addXP } from '../../services/XPService';
 import { recordPractice } from '../../services/StreakService';
 
@@ -28,7 +27,6 @@ const MicroSession = ({ onClose }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [timeLeft, setTimeLeft] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
-    const [ratings, setRatings] = useState({});
     const [startTime, setStartTime] = useState(null);
 
     const timerRef = useRef(null);
@@ -80,7 +78,6 @@ const MicroSession = ({ onClose }) => {
         // Record in spaced repetition
         if (currentExercise) {
             SpacedRepetitionService.recordReview(currentExercise.id, quality);
-            setRatings(prev => ({ ...prev, [currentExercise.id]: quality }));
         }
 
         if (currentIndex < exercises.length - 1) {

@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Sparkles, Star, Heart, Award, Flame, Zap, Music } from 'lucide-react';
+import { Sparkles, Star, Award, Flame, Zap, Music } from 'lucide-react';
 import { triggerHaptic } from '../../utils/haptics';
 
 // Celebration messages for different achievement types
