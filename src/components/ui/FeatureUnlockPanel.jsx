@@ -4,9 +4,9 @@
  * Shows when new features are unlocked and displays locked feature gates.
  */
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import {
-    Unlock, Lock, Star, ChevronRight, X, Sparkles, Gift
+    Unlock, Lock, Star, X, Sparkles, Gift
 } from 'lucide-react';
 import BeginnerModeService from '../../services/BeginnerModeService';
 import { getXPData } from '../../services/XPService';

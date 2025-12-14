@@ -84,8 +84,8 @@ const TensionReliefPanel = () => {
                                 onTouchStart={startPushToTalk}
                                 onTouchEnd={stopPushToTalk}
                                 className={`p-3 rounded-xl transition-all ${pushToTalkActive
-                                        ? 'bg-red-500 text-white scale-110'
-                                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                                    ? 'bg-red-500 text-white scale-110'
+                                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                                     }`}
                                 title="Hold to speak"
                             >
@@ -143,7 +143,7 @@ const TensionReliefPanel = () => {
                                 <div>
                                     <h4 className="font-bold text-blue-300 mb-2">How it works</h4>
                                     <p className="text-sm text-slate-300 leading-relaxed">
-                                        Describe where you feel tension in your body, and I'll recommend specific exercises and stretches
+                                        Describe where you feel tension in your body, and I&apos;ll recommend specific exercises and stretches
                                         to help release it. Addressing physical tension is crucial for healthy, sustainable voice work.
                                     </p>
                                 </div>
@@ -229,6 +229,73 @@ const TensionReliefPanel = () => {
                                 </div>
                             </div>
                         ))}
+
+                        {/* Exercise Name Search Results */}
+                        {recommendations.exerciseMatches && recommendations.exerciseMatches.length > 0 && (
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <h4 className="text-sm font-bold text-blue-400 uppercase tracking-wider">
+                                        {recommendations.searchType === 'exercise' ? 'Matching Exercises' : 'Related Exercises'}
+                                    </h4>
+                                    <span className="text-xs text-slate-500">
+                                        {recommendations.exerciseMatches.length} result{recommendations.exerciseMatches.length > 1 ? 's' : ''}
+                                    </span>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-3">
+                                    {recommendations.exerciseMatches.map((match, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="glass-panel rounded-xl p-4 hover:bg-white/5 transition-all group"
+                                        >
+                                            <div className="flex items-start gap-4">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <h5 className="font-bold text-white group-hover:text-blue-400 transition-colors">
+                                                            {match.exercise.title}
+                                                        </h5>
+                                                        <span className={`text-xs px-2 py-0.5 rounded-full ${match.matchType === 'exact' ? 'bg-emerald-500/20 text-emerald-400' :
+                                                            match.matchType === 'relevant' ? 'bg-blue-500/20 text-blue-400' :
+                                                                'bg-slate-700 text-slate-400'
+                                                            }`}>
+                                                            {match.matchType}
+                                                        </span>
+                                                        <span className="text-xs px-2 py-0.5 bg-slate-700 rounded-full text-slate-400">
+                                                            {match.exercise.difficulty}
+                                                        </span>
+                                                        <span className="text-xs text-slate-500">
+                                                            {match.exercise.duration}s
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-xs text-slate-500 mb-1">
+                                                        {match.exercise.category}
+                                                    </p>
+                                                    <p className="text-sm text-slate-400 leading-relaxed">
+                                                        {match.exercise.instructions}
+                                                    </p>
+                                                </div>
+                                                <div className="flex flex-col gap-2 shrink-0">
+                                                    <button
+                                                        onClick={() => handleStartExercise(match.exercise)}
+                                                        className="p-2 bg-blue-600 rounded-lg text-white hover:bg-blue-500 transition-colors"
+                                                        title="View details"
+                                                    >
+                                                        <Info className="w-5 h-5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => navigate('practice')}
+                                                        className="p-2 bg-emerald-600 rounded-lg text-white hover:bg-emerald-500 transition-colors"
+                                                        title="Go to practice mode"
+                                                    >
+                                                        <PlayCircle className="w-5 h-5" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 ) : (
                     // No results

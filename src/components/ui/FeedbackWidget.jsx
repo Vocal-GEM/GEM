@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MessageCircle, Bug, Lightbulb, X, Send, Check } from 'lucide-react';
 
 const FeedbackWidget = () => {
@@ -80,12 +80,12 @@ const FeedbackWidget = () => {
                                 key={ft.id}
                                 onClick={() => setType(ft.id)}
                                 className={`flex-1 p-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1 transition-colors ${type === ft.id
-                                        ? ft.color === 'red'
-                                            ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                                            : ft.color === 'amber'
-                                                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                                                : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                                        : 'bg-slate-800 text-slate-400 border border-transparent'
+                                    ? ft.color === 'red'
+                                        ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                        : ft.color === 'amber'
+                                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                            : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                    : 'bg-slate-800 text-slate-400 border border-transparent'
                                     }`}
                             >
                                 {ft.icon}

@@ -6,7 +6,7 @@
 
 import { useState } from 'react';
 import {
-    Download, FileText, Database, CheckCircle,
+    Download, CheckCircle,
     X, ChevronRight, Loader
 } from 'lucide-react';
 import DataExportService from '../../services/DataExportService';

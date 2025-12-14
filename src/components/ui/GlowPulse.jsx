@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 /**
  * GlowPulse - Subtle celebration effect with pulsing glow
@@ -50,14 +50,12 @@ const GlowPulse = ({ trigger, duration = 2000, color = 'teal' }) => {
 
 // Global trigger system
 let globalGlowTrigger = null;
-let globalGlowColor = 'teal';
 
 export const setGlobalGlowTrigger = (trigger) => {
     globalGlowTrigger = trigger;
 };
 
 export const triggerGlobalGlow = (color = 'teal') => {
-    globalGlowColor = color;
     if (globalGlowTrigger) {
         globalGlowTrigger(color);
     }

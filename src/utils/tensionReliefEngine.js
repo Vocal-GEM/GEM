@@ -87,19 +87,80 @@ export const getMultipleRecommendations = (areaKeys) => {
 };
 
 /**
+ * Search exercises by name, instructions, or goals
+ * @param {string} query - Search query
+ * @returns {Array<Object>} - Matching exercises with relevance scores
+ */
+export const searchExercisesByName = (query) => {
+    if (!query || typeof query !== 'string') return [];
+
+    const normalizedQuery = query.toLowerCase().trim();
+    const matches = [];
+
+    EXERCISE_LIBRARY.forEach(exercise => {
+        let score = 0;
+
+        // Exact title match = highest priority
+        if (exercise.title.toLowerCase() === normalizedQuery) {
+            score = 100;
+        }
+        // Partial title match
+        else if (exercise.title.toLowerCase().includes(normalizedQuery)) {
+            score = 80;
+        }
+        // Category match
+        else if (exercise.category.toLowerCase().includes(normalizedQuery)) {
+            score = 60;
+        }
+        // Instructions match
+        else if (exercise.instructions.toLowerCase().includes(normalizedQuery)) {
+            score = 40;
+        }
+        // Goals match
+        else if (exercise.goals && exercise.goals.some(goal => goal.toLowerCase().includes(normalizedQuery))) {
+            score = 50;
+        }
+
+        if (score > 0) {
+            matches.push({
+                exercise,
+                score,
+                matchType: score >= 80 ? 'exact' : score >= 50 ? 'relevant' : 'related'
+            });
+        }
+    });
+
+    // Sort by score (highest first)
+    return matches.sort((a, b) => b.score - a.score);
+};
+
+/**
  * Process user input and return comprehensive recommendations
  * @param {string} input - User's text or voice input
  * @returns {Object} - Recommendations with metadata
  */
 export const processUserInput = (input) => {
     const detectedAreas = parseBodyArea(input);
+    const exerciseMatches = searchExercisesByName(input);
+
+    // If we found exercise matches but no body areas, it's an exercise search
+    if (exerciseMatches.length > 0 && detectedAreas.length === 0) {
+        return {
+            success: true,
+            searchType: 'exercise',
+            message: `Found ${exerciseMatches.length} exercise${exerciseMatches.length > 1 ? 's' : ''} matching "${input}"`,
+            exerciseMatches: exerciseMatches.slice(0, 5), // Limit to top 5
+            recommendations: []
+        };
+    }
 
     if (detectedAreas.length === 0) {
         return {
             success: false,
-            message: "I couldn't identify a specific body area. Try mentioning areas like: jaw, throat, neck, shoulders, tongue, face, or chest.",
+            message: "I couldn't identify a specific body area or exercise. Try mentioning areas like: jaw, throat, neck, shoulders, or exercise names like 'massage', 'lip trills'.",
             suggestions: ['jaw', 'throat', 'neck', 'shoulders'],
-            recommendations: []
+            recommendations: [],
+            exerciseMatches: []
         };
     }
 
@@ -107,11 +168,13 @@ export const processUserInput = (input) => {
 
     return {
         success: true,
+        searchType: 'bodyArea',
         detectedAreas: detectedAreas.map(key => BODY_TENSION_MAP[key].area),
         message: detectedAreas.length === 1
             ? `Found exercises for ${BODY_TENSION_MAP[detectedAreas[0]].area}`
             : `Found exercises for ${detectedAreas.length} areas`,
-        recommendations: recommendations
+        recommendations: recommendations,
+        exerciseMatches: exerciseMatches.slice(0, 3) // Include top 3 exercise matches if any
     };
 };
 

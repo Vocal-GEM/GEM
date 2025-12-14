@@ -40,13 +40,14 @@ const Sidebar = ({ activeView, onViewChange }) => {
     const { user, logout } = useAuth();
     const { openModal } = useNavigation();
 
-    // Consolidated navigation: 6 items instead of 12
+    // Consolidated navigation: 7 items
     const navItems = [
         { id: 'dashboard', label: 'Dashboard', icon: <Home size={20} /> },
         { id: 'practice', label: 'Practice', icon: <Activity size={20} /> },
         { id: 'analysis', label: 'Analysis', icon: <Waves size={20} /> },
         { id: 'history', label: 'History', icon: <BarChart2 size={20} /> },
         { id: 'coach', label: 'Coach', icon: <BookOpen size={20} /> },
+        { id: 'library', label: 'Library', icon: <BookMarked size={20} /> },
         { id: 'camera', label: 'Mirror', icon: <Camera size={20} />, isModal: true },
         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
     ];

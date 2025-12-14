@@ -39,6 +39,7 @@ const ProgressDashboard = lazy(() => import('./components/views/ProgressDashboar
 const CommunityHub = lazy(() => import('./components/views/CommunityHub'));
 const ResearchView = lazy(() => import('./components/views/ResearchView'));
 const PracticeMode = lazy(() => import('./components/views/PracticeMode'));
+const ExerciseLibraryView = lazy(() => import('./components/views/ExerciseLibraryView'));
 
 const AdaptivePracticeSession = lazy(() => import('./components/views/AdaptivePracticeSession'));
 const GuidedJourney = lazy(() => import('./components/ui/GuidedJourney'));
@@ -271,6 +272,14 @@ const App = () => {
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <CoachView />
+                                </Suspense>
+                            </div>
+                        )}
+
+                        {activeTab === 'library' && (
+                            <div className="h-full">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    <ExerciseLibraryView />
                                 </Suspense>
                             </div>
                         )}
