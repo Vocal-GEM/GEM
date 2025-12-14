@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronRight, ChevronLeft, Mic, Target, LineChart, Sparkles, Check } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
 

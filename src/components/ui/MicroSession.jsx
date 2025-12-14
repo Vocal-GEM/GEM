@@ -40,7 +40,6 @@ const MicroSession = ({ onClose }) => {
 
         if (dueExercises.length === 0) {
             // No due exercises, get some random ones
-            const stats = SpacedRepetitionService.getStats();
             setExercises([]);
         } else {
             setExercises(dueExercises.map(ex => ({
@@ -90,8 +89,6 @@ const MicroSession = ({ onClose }) => {
     };
 
     const completeSession = () => {
-        const elapsedMinutes = Math.round((Date.now() - startTime) / 60000);
-
         // Award XP and record practice
         addXP(selectedDuration.xp, 'Micro Session');
         recordPractice();
