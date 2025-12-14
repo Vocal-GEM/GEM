@@ -161,6 +161,7 @@ export class ProgressiveStackingService {
 
     /**
      * Get metric value from audio data
+     * Supports pitch, F2, spectral tilt, volume, and vocal weight
      */
     _getMetricValue(audioData, metric) {
         if (!audioData) return null;
@@ -170,10 +171,24 @@ export class ProgressiveStackingService {
                 return audioData.pitch;
             case 'f2':
                 return audioData.f2 || audioData.formants?.[1];
+            case 'f1':
+                return audioData.f1 || audioData.formants?.[0];
             case 'tilt':
                 return audioData.tilt || audioData.spectralTilt;
             case 'volume':
                 return audioData.volume || audioData.rms;
+            case 'vocalWeight':
+                // Support both vocalWeight (0-100) and h1h2 (dB)
+                if (audioData.vocalWeight !== undefined) {
+                    return audioData.vocalWeight;
+                } else if (audioData.h1h2 !== undefined) {
+                    // Convert H1-H2 (typically -5 to +12 dB) to 0-100 scale
+                    return Math.max(0, Math.min(100, ((audioData.h1h2 + 5) / 17) * 100));
+                }
+                return null;
+            case 'h1h2':
+                // Direct H1-H2 access
+                return audioData.h1h2;
             default:
                 return audioData[metric];
         }
