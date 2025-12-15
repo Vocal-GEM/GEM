@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Play, Pause, SkipForward, ThumbsUp, ThumbsDown, ArrowLeft, CheckCircle, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Play, Pause, SkipForward, ThumbsUp, ThumbsDown, ArrowLeft, CheckCircle, RefreshCw, AlertTriangle, Timer } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useAudio } from '../../context/AudioContext';
 import { PracticeRoutineGenerator } from '../../services/PracticeRoutineGenerator';
@@ -43,9 +43,18 @@ const AdaptivePracticeSession = ({ onClose }) => {
 
     const handlePlayPause = () => {
         setIsPlaying(!isPlaying);
+        const currentExercise = routine[currentIndex];
+
         if (!isPlaying) {
-            // Logic to start audio engine or timer
-            toggleAudio();
+            // Only start audio engine if this exercise needs visualization/audio
+            if (currentExercise && currentExercise.visualization) {
+                toggleAudio();
+            }
+        } else {
+            // Stop audio if it was running
+            if (currentExercise && currentExercise.visualization) {
+                toggleAudio();
+            }
         }
     };
 
@@ -217,8 +226,15 @@ const AdaptivePracticeSession = ({ onClose }) => {
                                 ? 'bg-yellow-500 text-white hover:bg-yellow-400 shadow-yellow-500/20'
                                 : 'bg-green-500 text-white hover:bg-green-400 shadow-green-500/20 pl-1'
                                 }`}
+                            title={isPlaying ? "Pause" : currentExercise.visualization ? "Start Audio" : "Start Timer"}
                         >
-                            {isPlaying ? <Pause size={32} fill="currentColor" /> : <Play size={32} fill="currentColor" />}
+                            {isPlaying ? (
+                                <Pause size={32} fill="currentColor" />
+                            ) : currentExercise.visualization ? (
+                                <Play size={32} fill="currentColor" />
+                            ) : (
+                                <Timer size={32} strokeWidth={2.5} className="-ml-1" />
+                            )}
                         </button>
 
                         <button
