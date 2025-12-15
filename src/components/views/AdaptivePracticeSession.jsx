@@ -147,10 +147,25 @@ const AdaptivePracticeSession = ({ onClose }) => {
                         <div className="absolute inset-0 flex items-center justify-center p-8">
                             <div className="relative w-full h-full flex items-center justify-center">
                                 {/* Show illustration for specific exercises */}
-                                {currentExercise.title === 'Suprahyoid Massage' ? (
+                                {/* Show illustration for specific exercises */}
+                                {{
+                                    'Suprahyoid Massage': '/exercises/suprahyoid-massage.png',
+                                    'Neck Muscle Massage': '/exercises/neck-muscle-massage.png',
+                                    'Circumlaryngeal Massage': '/exercises/circumlaryngeal-massage.png',
+                                    'Jaw & TMJ Massage': '/exercises/jaw-tmj-massage.png',
+                                    'Shoulder & Trapezius Release': '/exercises/shoulder-massage.png',
+                                    'Tongue Pulls': '/exercises/tongue-pulls.png'
+                                }[currentExercise.title] ? (
                                     <img
-                                        src="/exercises/suprahyoid-massage.png"
-                                        alt="Suprahyoid Massage Technique"
+                                        src={{
+                                            'Suprahyoid Massage': '/exercises/suprahyoid-massage.png',
+                                            'Neck Muscle Massage': '/exercises/neck-muscle-massage.png',
+                                            'Circumlaryngeal Massage': '/exercises/circumlaryngeal-massage.png',
+                                            'Jaw & TMJ Massage': '/exercises/jaw-tmj-massage.png',
+                                            'Shoulder & Trapezius Release': '/exercises/shoulder-massage.png',
+                                            'Tongue Pulls': '/exercises/tongue-pulls.png'
+                                        }[currentExercise.title]}
+                                        alt={`${currentExercise.title} Technique`}
                                         className="max-w-full max-h-full object-contain rounded-2xl"
                                         style={{ filter: 'drop-shadow(0 0 40px rgba(20, 184, 166, 0.3))' }}
                                     />
