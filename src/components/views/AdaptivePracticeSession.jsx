@@ -219,6 +219,14 @@ const AdaptivePracticeSession = ({ onClose }) => {
                         </div>
                         <h2 className="text-3xl font-bold text-white mb-4">{currentExercise.title}</h2>
                         <p className="text-lg text-slate-300 leading-relaxed">{currentExercise.instructions}</p>
+
+                        {/* 'Why' Section */}
+                        {currentExercise.why && (
+                            <div className="mt-6 p-4 rounded-xl bg-teal-500/10 border border-teal-500/20">
+                                <p className="text-teal-400 font-bold mb-1 text-sm uppercase tracking-wide">Why we do this</p>
+                                <p className="text-slate-300 italic">{currentExercise.why}</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Controls */}
