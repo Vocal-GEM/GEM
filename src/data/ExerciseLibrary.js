@@ -8,7 +8,7 @@ export const EXERCISE_LIBRARY = [
         duration: 60,
         instructions: 'Gently blow air through your lips to make them vibrate. Slide your pitch up and down comfortably.',
         goals: ['warmup', 'breath'],
-        visualization: 'pitch',
+        visualization: null,
         citations: ['paper_titze_2006', 'paper_nyu_2025']
     },
     {

@@ -164,7 +164,8 @@ const AdaptivePracticeSession = ({ onClose }) => {
                                     'Circumlaryngeal Massage': '/exercises/circumlaryngeal-massage.png',
                                     'Jaw & TMJ Massage': '/exercises/jaw-tmj-massage.png',
                                     'Shoulder & Trapezius Release': '/exercises/shoulder-massage.png',
-                                    'Tongue Pulls': '/exercises/tongue-pulls.png'
+                                    'Tongue Pulls': '/exercises/tongue-pulls.png',
+                                    'Lip Trills': '/exercises/lip-trills.png'
                                 }[currentExercise.title] ? (
                                     <img
                                         src={{
@@ -173,7 +174,8 @@ const AdaptivePracticeSession = ({ onClose }) => {
                                             'Circumlaryngeal Massage': '/exercises/circumlaryngeal-massage.png',
                                             'Jaw & TMJ Massage': '/exercises/jaw-tmj-massage.png',
                                             'Shoulder & Trapezius Release': '/exercises/shoulder-massage.png',
-                                            'Tongue Pulls': '/exercises/tongue-pulls.png'
+                                            'Tongue Pulls': '/exercises/tongue-pulls.png',
+                                            'Lip Trills': '/exercises/lip-trills.png'
                                         }[currentExercise.title]}
                                         alt={`${currentExercise.title} Technique`}
                                         className="max-w-full max-h-full object-contain rounded-2xl"
