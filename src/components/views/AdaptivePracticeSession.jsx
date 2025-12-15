@@ -123,6 +123,7 @@ const AdaptivePracticeSession = ({ onClose }) => {
     }
 
     const currentExercise = routine[currentIndex];
+    const isManualExercise = !currentExercise.visualization;
 
     return (
         <div className="h-full flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -222,18 +223,24 @@ const AdaptivePracticeSession = ({ onClose }) => {
                     <div className="flex items-center gap-4">
                         <button
                             onClick={handlePlayPause}
-                            className={`w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-lg ${isPlaying
+                            className={`flex items-center justify-center transition-all shadow-lg ${isPlaying
                                 ? 'bg-yellow-500 text-white hover:bg-yellow-400 shadow-yellow-500/20'
-                                : 'bg-green-500 text-white hover:bg-green-400 shadow-green-500/20 pl-1'
-                                }`}
-                            title={isPlaying ? "Pause" : currentExercise.visualization ? "Start Audio" : "Start Timer"}
+                                : 'bg-green-500 text-white hover:bg-green-400 shadow-green-500/20'
+                                } ${isManualExercise ? 'px-8 py-4 rounded-xl gap-3 w-auto' : 'w-16 h-16 rounded-full pl-1'}`}
+                            title={isPlaying ? "Pause" : isManualExercise ? "Start Timer" : "Start Audio"}
                         >
                             {isPlaying ? (
                                 <Pause size={32} fill="currentColor" />
-                            ) : currentExercise.visualization ? (
+                            ) : !isManualExercise ? (
                                 <Play size={32} fill="currentColor" />
                             ) : (
-                                <Timer size={32} strokeWidth={2.5} className="-ml-1" />
+                                <Timer size={32} strokeWidth={2.5} />
+                            )}
+
+                            {isManualExercise && (
+                                <span className="font-bold text-lg">
+                                    {isPlaying ? "Pause Timer" : "Start Timer"}
+                                </span>
                             )}
                         </button>
 
