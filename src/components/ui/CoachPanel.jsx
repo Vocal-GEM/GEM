@@ -155,7 +155,9 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
                 {/* Metric 1: Pitch (Simple Bar) */}
                 <div>
                     <div className="flex justify-between text-xs mb-1">
-                        <span className="text-slate-400">Pitch (Target: {targetRange.min}-{targetRange.max}Hz)</span>
+                        <span className="text-slate-400">
+                            Pitch (Target: {activeProfile === 'fem' ? `>${targetRange.min}Hz` : `${targetRange.min}-${targetRange.max}Hz`})
+                        </span>
                         <span className="font-mono text-white font-bold">{Math.round(metrics.pitch)} Hz</span>
                     </div>
                     <div className="h-2 bg-slate-800 rounded-full overflow-hidden relative">
@@ -164,7 +166,9 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
                             className="absolute top-0 bottom-0 bg-emerald-500/20 border-x border-emerald-500/40"
                             style={{
                                 left: `${Math.max(0, Math.min(100, (targetRange.min - 80) / (300 - 80) * 100))}%`,
-                                right: `${100 - Math.max(0, Math.min(100, (targetRange.max - 80) / (300 - 80) * 100))}%`
+                                right: activeProfile === 'fem'
+                                    ? '0%'
+                                    : `${100 - Math.max(0, Math.min(100, (targetRange.max - 80) / (300 - 80) * 100))}%`
                             }}
                         />
                         {/* Current Value Marker */}

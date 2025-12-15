@@ -12,7 +12,7 @@ import { predictGenderPerception, getPerceptionColor, AMBIGUITY_ZONE } from '../
 import GenderTimeline from './GenderTimeline';
 
 const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScore, settings }) => {
-    const { voiceProfiles } = useProfile();
+    const { voiceProfiles, activeProfile } = useProfile();
     const { colorBlindMode } = useSettings();
     const canvasRef = useRef(null);
     const balloonRef = useRef(new Image());
@@ -128,7 +128,8 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             const mascRange = masc?.genderRange || masc?.targetRange;
 
             // Target Zone (Always Winning Color)
-            if (targetRange && freq >= targetRange.min && freq <= targetRange.max) {
+            const isFem = activeProfile === 'fem';
+            if (targetRange && freq >= targetRange.min && (isFem || freq <= targetRange.max)) {
                 if (colorBlindMode) return '#0d9488';
                 return '#22c55e'; // Green
             }
@@ -239,19 +240,22 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             }
 
             if (targetRange && !exercise) {
-                const topY = mapY(targetRange.max);
+                const isFem = activeProfile === 'fem';
+                const topY = isFem ? 0 : mapY(targetRange.max);
                 const botY = mapY(targetRange.min);
                 const h = Math.abs(botY - topY);
 
-                if (topY < height && botY > 0) {
+                if (botY > 0) {
                     ctx.fillStyle = colorBlindMode ? 'rgba(13, 148, 136, 0.1)' : 'rgba(34, 197, 94, 0.1)';
                     ctx.fillRect(30, topY, width - 30, h);
 
                     ctx.strokeStyle = colorBlindMode ? 'rgba(13, 148, 136, 0.5)' : 'rgba(34, 197, 94, 0.5)';
                     ctx.lineWidth = 2;
                     ctx.beginPath();
-                    ctx.moveTo(30, topY);
-                    ctx.lineTo(width, topY);
+                    if (!isFem) {
+                        ctx.moveTo(30, topY);
+                        ctx.lineTo(width, topY);
+                    }
                     ctx.moveTo(30, botY);
                     ctx.lineTo(width, botY);
                     ctx.stroke();
@@ -259,7 +263,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     ctx.fillStyle = colorBlindMode ? '#0d9488' : '#22c55e';
                     ctx.font = 'bold 10px sans-serif';
                     ctx.textAlign = 'left';
-                    ctx.fillText('TARGET ZONE', 35, topY - 5);
+                    ctx.fillText('TARGET ZONE', 35, isFem ? mapY(targetRange.min + 20) : topY - 5);
                 }
             }
 

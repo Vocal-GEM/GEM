@@ -101,7 +101,7 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                     });
                 }
 
-                const isVoiceActive = !isSilent && pitch > 0 && volume > 0.005 && (resonanceConfidence === undefined || resonanceConfidence > 0.2);
+                const isVoiceActive = !isSilent && (pitch > 0 || (volume > 0.01 && resonance > 0)) && (resonanceConfidence === undefined || resonanceConfidence > 0.2);
 
                 if (isVoiceActive) {
                     silenceTimer.current = 0;

@@ -174,10 +174,10 @@ export const EXERCISE_LIBRARY = [
         category: 'resonance',
         difficulty: 'beginner',
         duration: 45,
-        instructions: 'Whisper a siren up and down. This helps raise the larynx naturally without strain.',
+        instructions: 'Use a gentle, breathy whisper (like a sigh), NOT a forced stage whisper. Glide the sound of your whisper up and down. Think "high and light".',
         goals: ['resonance', 'brightness'],
         visualization: 'resonance',
-        why: 'Encourages a high, light throat position without strain.',
+        why: 'Raises resonance without vocal cord engagement. If it tickles/scratches, use less force and more breath.',
         citations: ['paper_nyu_2025']
     },
 
