@@ -142,6 +142,40 @@ const AdaptivePracticeSession = ({ onClose }) => {
                     )}
                     {currentExercise.visualization === 'weight' && <VoiceQualityMeter dataRef={dataRef} userMode="user" showAnalysis={false} />}
 
+                    {/* Exercise Illustration for warmups/massage exercises */}
+                    {currentExercise.category === 'warmup' && !currentExercise.visualization && (
+                        <div className="absolute inset-0 flex items-center justify-center p-8">
+                            <div className="relative w-full h-full flex items-center justify-center">
+                                {/* Show illustration for specific exercises */}
+                                {currentExercise.title === 'Suprahyoid Massage' ? (
+                                    <img
+                                        src="/exercises/suprahyoid-massage.png"
+                                        alt="Suprahyoid Massage Technique"
+                                        className="max-w-full max-h-full object-contain rounded-2xl"
+                                        style={{ filter: 'drop-shadow(0 0 40px rgba(20, 184, 166, 0.3))' }}
+                                    />
+                                ) : (
+                                    /* Generic warmup placeholder */
+                                    <div className="rounded-2xl bg-gradient-to-br from-teal-500/10 to-cyan-500/10 border-2 border-teal-500/30 p-12 max-w-md">
+                                        <div className="text-center space-y-4">
+                                            <div className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-teal-400/20 to-cyan-400/20 flex items-center justify-center border-2 border-teal-400/40">
+                                                <svg className="w-16 h-16 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+                                                </svg>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <p className="text-teal-300 font-bold text-lg">Warmup Exercise</p>
+                                                <p className="text-slate-400 text-sm leading-relaxed">
+                                                    Follow the instructions on the right
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Overlay Timer */}
                     <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
                         <span className={`font-mono text-xl font-bold ${timeLeft < 10 ? 'text-red-400 animate-pulse' : 'text-white'}`}>
