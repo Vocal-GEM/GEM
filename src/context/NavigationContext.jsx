@@ -43,7 +43,9 @@ export const NavigationProvider = ({ children }) => {
         voiceQuality: false,
         course: false,
         feedback: false,
-        commandPalette: false // New Command Palette
+        commandPalette: false, // Command Palette
+        characteristics: false, // Voice Characteristics Explorer
+        moodCheck: false // Pre-session mood check-in
     });
 
     // Initialize Analytics

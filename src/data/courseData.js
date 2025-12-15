@@ -396,11 +396,51 @@ export const getCourseForProfile = (profileId) => {
             return MASCULINIZATION_COURSE;
         case 'neutral':
             return ANDROGYNY_COURSE;
+        case 'singing':
+            // Import dynamically to avoid circular dependency
+            return null; // Use getSingingCourse() from SingingCourse.js instead
         case 'fem':
         default:
             return FEMINIZATION_COURSE;
     }
 };
 
+// Available courses for course selector
+export const AVAILABLE_COURSES = [
+    {
+        id: 'fem',
+        name: 'Feminization',
+        description: 'Master the core pillars of vocal feminization',
+        icon: '💎',
+        color: 'from-pink-500 to-purple-600',
+        moduleCount: 7
+    },
+    {
+        id: 'masc',
+        name: 'Masculinization',
+        description: 'Develop a confident, masculine voice',
+        icon: '🎯',
+        color: 'from-blue-500 to-indigo-600',
+        moduleCount: 1
+    },
+    {
+        id: 'neutral',
+        name: 'Androgynous',
+        description: 'Find balance between ranges',
+        icon: '⚖️',
+        color: 'from-teal-500 to-emerald-600',
+        moduleCount: 1
+    },
+    {
+        id: 'singing',
+        name: 'Singing Voice',
+        description: '4-week curriculum to develop your singing voice',
+        icon: '🎵',
+        color: 'from-amber-500 to-orange-600',
+        moduleCount: 4
+    }
+];
+
 // Backward compatibility
 export const COURSE_DATA = FEMINIZATION_COURSE;
+

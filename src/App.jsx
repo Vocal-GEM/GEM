@@ -40,6 +40,8 @@ const ArticulationView = lazy(() => import('./components/views/ArticulationView'
 const VocalFoldsView = lazy(() => import('./components/views/VocalFoldsView'));
 const VoiceQualityView = lazy(() => import('./components/views/VoiceQualityView'));
 const FeminizationCourse = lazy(() => import('./components/ui/FeminizationCourse'));
+const CharacteristicExplorer = lazy(() => import('./components/ui/CharacteristicExplorer'));
+const MoodCheck = lazy(() => import('./components/ui/MoodCheck'));
 
 // Lazy Loaded Components - Visualizations
 const VoiceQualityAnalysis = lazy(() => import('./components/viz/VoiceQualityAnalysis'));
@@ -425,6 +427,19 @@ const App = () => {
                     <QuickSettings isOpen={showQuickSettings} onClose={() => setShowQuickSettings(false)} />
                     {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
                     {modals.analytics && <AnalyticsDashboard onClose={() => closeModal('analytics')} />}
+                    {modals.characteristics && (
+                        <Suspense fallback={<LoadingSpinner />}>
+                            <CharacteristicExplorer onClose={() => closeModal('characteristics')} />
+                        </Suspense>
+                    )}
+                    {modals.moodCheck && (
+                        <Suspense fallback={<LoadingSpinner />}>
+                            <MoodCheck
+                                onComplete={() => closeModal('moodCheck')}
+                                onClose={() => closeModal('moodCheck')}
+                            />
+                        </Suspense>
+                    )}
 
                     <CelebrationModal
                         achievement={unlockedAchievement}

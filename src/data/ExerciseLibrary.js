@@ -115,5 +115,105 @@ export const EXERCISE_LIBRARY = [
         instructions: 'Start with a loose vocal fry and slowly slide up into a clear tone. Keep the weight light.',
         goals: ['weight', 'relaxation'],
         visualization: 'weight'
+    },
+
+    // --- VOICE CHARACTERISTICS / STYLE ---
+    {
+        id: 'char-warm-onset',
+        title: 'Warm Voice: Soft Onsets',
+        category: 'characteristic',
+        characteristic: 'warm',
+        difficulty: 'beginner',
+        duration: 45,
+        instructions: 'Practice saying "Mmm-hmm" as if agreeing with a friend. Keep it soft and low. Then try: "I understand how you feel."',
+        goals: ['style', 'onset', 'warmth'],
+        visualization: 'weight'
+    },
+    {
+        id: 'char-bubbly-greetings',
+        title: 'Bubbly Voice: Excited Greetings',
+        category: 'characteristic',
+        characteristic: 'bubbly',
+        difficulty: 'beginner',
+        duration: 30,
+        instructions: 'Say "Hi!" as if you just saw your best friend unexpectedly. Let your pitch rise at the end with genuine excitement.',
+        goals: ['style', 'intonation', 'brightness'],
+        visualization: 'pitch'
+    },
+    {
+        id: 'char-professional-articulation',
+        title: 'Professional Voice: Crisp Consonants',
+        category: 'characteristic',
+        characteristic: 'professional',
+        difficulty: 'intermediate',
+        duration: 60,
+        instructions: 'Read: "The TOP TEN TechniqueS for PresenTaTion." Over-articulate T, K, P, S sounds. Be a newscaster.',
+        goals: ['style', 'articulation', 'clarity'],
+        visualization: 'pitch'
+    },
+    {
+        id: 'char-playful-stretch',
+        title: 'Playful Voice: Word Stretching',
+        category: 'characteristic',
+        characteristic: 'playful',
+        difficulty: 'intermediate',
+        duration: 45,
+        instructions: 'Stretch key words playfully: "That\'s soooo interesting!" and "Reeeally?" Add mischief to your voice.',
+        goals: ['style', 'expressiveness', 'range'],
+        visualization: 'pitch'
+    },
+    {
+        id: 'char-confident-grounding',
+        title: 'Confident Voice: Power Pause',
+        category: 'characteristic',
+        characteristic: 'confident',
+        difficulty: 'intermediate',
+        duration: 60,
+        instructions: 'Say something authoritative, pause for 2 seconds, then continue. Own the silence. "I know what I\'m talking about. [pause] Let me explain."',
+        goals: ['style', 'pacing', 'authority'],
+        visualization: 'pitch'
+    },
+    {
+        id: 'char-style-switch',
+        title: 'Style Switching Challenge',
+        category: 'characteristic',
+        difficulty: 'advanced',
+        duration: 90,
+        instructions: 'Say "Hello, how are you today?" in 5 different styles: Warm, Bubbly, Professional, Playful, Confident. Notice how each feels different.',
+        goals: ['style', 'flexibility', 'control'],
+        visualization: 'pitch'
+    },
+
+    // --- MAINTENANCE & RECOVERY ---
+    {
+        id: 'maint-cooldown',
+        title: 'Gentle Cool-Down',
+        category: 'maintenance',
+        difficulty: 'beginner',
+        duration: 90,
+        instructions: 'After practice: 1) Gentle yawn-sigh 5x, 2) Descending humming scales, 3) Slow lip trills descending. Let your voice relax.',
+        goals: ['recovery', 'relaxation', 'health'],
+        visualization: 'pitch'
+    },
+    {
+        id: 'maint-sovt-recovery',
+        title: 'SOVT Recovery',
+        category: 'maintenance',
+        difficulty: 'beginner',
+        duration: 60,
+        instructions: 'Straw phonation or gentle humming on a comfortable pitch. This balances air pressure and helps tired vocal folds recover.',
+        goals: ['recovery', 'health', 'technique'],
+        visualization: 'weight'
+    },
+    {
+        id: 'maint-hydration-hum',
+        title: 'Hydration Check Humming',
+        category: 'maintenance',
+        difficulty: 'beginner',
+        duration: 30,
+        instructions: 'Take a sip of water, then hum gently sliding up and down. Notice how hydration affects your voice\'s smoothness.',
+        goals: ['health', 'awareness', 'warmup'],
+        visualization: 'resonance'
     }
 ];
+
