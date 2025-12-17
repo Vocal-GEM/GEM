@@ -64,7 +64,6 @@ import TourOverlay from './components/ui/TourOverlay';
 
 import CommandPalette from './components/ui/CommandPalette';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
-import QuickSettings from './components/ui/QuickSettings';
 import { analyticsService } from './services/AnalyticsService';
 const App = () => {
     const {
@@ -429,8 +428,6 @@ const App = () => {
 
                         <TourOverlay />
                         <CommandPalette />
-                        <CommandPalette />
-                        <QuickSettings isOpen={false} onClose={() => { }} />
                         {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
                         {modals.analytics && <AnalyticsDashboard onClose={() => closeModal('analytics')} />}
                         {modals.adaptiveSession && (

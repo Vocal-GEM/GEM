@@ -1,5 +1,5 @@
 import { cloneElement, useState, useEffect } from 'react';
-import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen, Flame, Sparkles, Timer } from 'lucide-react';
+import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen, Flame, Sparkles, Timer, Settings, Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import VocalHealthPanel from '../dashboard/VocalHealthPanel';
 import SmartCoachWidget from '../dashboard/SmartCoachWidget';
@@ -60,10 +60,35 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
     const [showQuickWarmup, setShowQuickWarmup] = useState(false);
     const [showVoiceCheck, setShowVoiceCheck] = useState(false);
 
+    // Dashboard customization
+    const [showCustomize, setShowCustomize] = useState(false);
+    const [dashboardSections, setDashboardSections] = useState(() => {
+        const saved = localStorage.getItem('dashboardSections');
+        return saved ? JSON.parse(saved) : {
+            journey: true,
+            smartCoach: true,
+            quickActions: true,
+            vocalHealth: true,
+            sessionSummary: true,
+            exercises: true,
+            challenges: true,
+            stats: true,
+            quickStart: true
+        };
+    });
+
     useEffect(() => {
         const status = checkStreakStatus();
         setStreakData(status);
     }, []);
+
+    useEffect(() => {
+        localStorage.setItem('dashboardSections', JSON.stringify(dashboardSections));
+    }, [dashboardSections]);
+
+    const toggleSection = (section) => {
+        setDashboardSections(prev => ({ ...prev, [section]: !prev[section] }));
+    };
 
     const handleStartJourney = () => {
         openModal('guidedJourney');
@@ -78,7 +103,59 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
 
     return (
         <div className="w-full min-h-screen bg-black p-4 sm:p-6 lg:p-12 text-white">
+            {/* Customize Button */}
+            <div className="flex justify-end mb-4">
+                <button
+                    onClick={() => setShowCustomize(!showCustomize)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
+                        showCustomize
+                            ? 'bg-teal-500/20 border border-teal-500/50 text-teal-400'
+                            : 'bg-slate-900/50 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                    }`}
+                >
+                    <Settings size={16} />
+                    <span className="text-sm font-bold">Customize Dashboard</span>
+                </button>
+            </div>
+
+            {/* Customization Panel */}
+            {showCustomize && (
+                <div className="mb-6 p-6 bg-slate-900/80 rounded-2xl border border-slate-700 animate-in slide-in-from-top-4 fade-in duration-300">
+                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                        <Eye size={20} className="text-teal-400" />
+                        Show/Hide Dashboard Sections
+                    </h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {Object.entries({
+                            journey: 'Guided Journey',
+                            smartCoach: 'Smart Coach',
+                            quickActions: 'Quick Actions',
+                            vocalHealth: 'Vocal Health',
+                            sessionSummary: 'Session Summary',
+                            exercises: 'Recommended Exercises',
+                            challenges: 'Daily Challenges',
+                            stats: 'Statistics',
+                            quickStart: 'Quick Start Cards'
+                        }).map(([key, label]) => (
+                            <button
+                                key={key}
+                                onClick={() => toggleSection(key)}
+                                className={`flex items-center gap-2 p-3 rounded-xl transition-all ${
+                                    dashboardSections[key]
+                                        ? 'bg-teal-500/20 border border-teal-500/50 text-white'
+                                        : 'bg-slate-800/50 border border-slate-700 text-slate-500'
+                                }`}
+                            >
+                                {dashboardSections[key] ? <Eye size={16} /> : <EyeOff size={16} />}
+                                <span className="text-sm font-medium">{label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Guided Journey Entry - Featured prominently for first-time users */}
+            {dashboardSections.journey && (
             <div className="mb-8">
                 <JourneyEntryCard
                     onStart={handleStartJourney}
@@ -89,11 +166,15 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                     isComplete={isJourneyComplete}
                 />
             </div>
+            )}
 
             {/* Smart Coach Widget */}
-            <SmartCoachWidget onStartSession={onOpenAdaptiveSession} />
+            {dashboardSections.smartCoach && (
+                <SmartCoachWidget onStartSession={onOpenAdaptiveSession} />
+            )}
 
             {/* Quick Action Buttons */}
+            {dashboardSections.quickActions && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 {/* 5-Min Warmup Button */}
                 <button
@@ -152,6 +233,7 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                     </div>
                 </button>
             </div>
+            )}
 
             {/* Quick Warmup Modal */}
             {showQuickWarmup && (
@@ -169,22 +251,31 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
             )}
 
             {/* Vocal Health Panel */}
-            <VocalHealthPanel />
+            {dashboardSections.vocalHealth && (
+                <VocalHealthPanel />
+            )}
 
             {/* Session Summary */}
+            {dashboardSections.sessionSummary && (
             <div className="mb-8">
                 <SessionSummaryCard />
             </div>
+            )}
 
             {/* Recommended Exercises */}
-            <RecommendedExercises onViewCategory={(cat) => onViewChange('training', { category: cat })} />
+            {dashboardSections.exercises && (
+                <RecommendedExercises onViewCategory={(cat) => onViewChange('training', { category: cat })} />
+            )}
 
             {/* Daily Challenges */}
+            {dashboardSections.challenges && (
             <div className="mb-8">
                 <DailyChallengeCard />
             </div>
+            )}
 
             {/* Stats Grid */}
+            {dashboardSections.stats && (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
                 <StatCard
                     label={t('dashboard.stats.dsi.label')}
@@ -214,8 +305,11 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                     color="text-amber-400"
                 />
             </div>
+            )}
 
             {/* Quick Actions */}
+            {dashboardSections.quickStart && (
+            <>
             <h2 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">{t('dashboard.quickStart')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
                 <ActionCard
@@ -240,6 +334,8 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                     onClick={() => onViewChange('analysis')}
                 />
             </div>
+            </>
+            )}
         </div>
     );
 };

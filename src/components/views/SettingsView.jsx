@@ -9,6 +9,7 @@ import { VoiceCalibrationService } from '../../services/VoiceCalibrationService'
 import { SelfCareService } from '../../services/SelfCareService';
 import SelfCareOnboarding from '../ui/SelfCareOnboarding';
 import MicrophoneSelector from '../settings/MicrophoneSelector';
+import SettingsPresets from '../ui/SettingsPresets';
 
 const SettingsView = () => {
     const { t } = useTranslation();
@@ -135,6 +136,18 @@ const SettingsView = () => {
                         onSkip={() => setShowSelfCareWizard(false)}
                     />
                 )}
+
+                {/* Settings Presets - Quick Configuration */}
+                <div className="mb-8">
+                    <SettingsPresets
+                        currentSettings={settings}
+                        onApplyPreset={(presetSettings) => {
+                            updateSettings(presetSettings);
+                            setStatus({ type: 'success', message: 'Settings preset applied successfully!' });
+                            setTimeout(() => setStatus({ type: '', message: '' }), 3000);
+                        }}
+                    />
+                </div>
 
                 {/* Audio Input Settings */}
                 <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden mb-8">

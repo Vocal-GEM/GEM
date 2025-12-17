@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, Suspense, useCallback } from 'react';
-import { Play, Square, Mic, Volume2, Activity, BarChart2, RefreshCw, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer, Sparkles, MessageCircle } from 'lucide-react';
+import { Play, Square, Mic, Volume2, Activity, BarChart2, RefreshCw, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer, Sparkles, MessageCircle, Maximize2, Minimize2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAudio } from '../../context/AudioContext';
@@ -102,6 +102,8 @@ const PracticeMode = ({
     const [showProgressiveStacking, setShowProgressiveStacking] = useState(false);
     const [showConversationPractice, setShowConversationPractice] = useState(false);
     const [lastSessionDuration, setLastSessionDuration] = useState(0);
+    const [focusMode, setFocusMode] = useState(false);
+    const [coachPanelCollapsed, setCoachPanelCollapsed] = useState(false);
 
     // Tour for DAF mode - placed after showDAF is declared
     useEffect(() => {
@@ -276,18 +278,45 @@ const PracticeMode = ({
         return () => clearInterval(interval);
     }, [isAudioActive, dataRef]);
 
-    // Tabs Configuration
-    const TABS = [
-        { id: 'overview', label: t('practiceMode.tabs.overview'), icon: Activity },
-        { id: 'pitch', label: t('practiceMode.tabs.pitch'), icon: Mic2 },
-        { id: 'resonance', label: t('practiceMode.tabs.resonance'), icon: Volume2 },
-        { id: 'perception', label: 'Perception', icon: Layers },
-        { id: 'weight', label: t('practiceMode.tabs.weight'), icon: BarChart2 },
-        { id: 'vowel', label: t('practiceMode.tabs.vowel'), icon: BookOpen },
-        { id: 'spectrogram', label: t('practiceMode.tabs.spectrogram'), icon: Activity },
-        { id: 'training', label: t('practiceMode.tabs.training', 'Training'), icon: Dumbbell },
-        { id: 'assessment', label: t('practiceMode.actions.assessment', 'Assessment'), icon: ClipboardCheck },
-    ];
+    // Tab Categories for streamlined navigation
+    const TAB_CATEGORIES = {
+        basics: {
+            label: 'Basics',
+            tabs: [
+                { id: 'overview', label: 'Overview', icon: Activity },
+                { id: 'pitch', label: 'Pitch', icon: Mic2 },
+                { id: 'resonance', label: 'Resonance', icon: Volume2 },
+            ]
+        },
+        advanced: {
+            label: 'Advanced',
+            tabs: [
+                { id: 'perception', label: 'Perception', icon: Layers },
+                { id: 'weight', label: 'Weight', icon: BarChart2 },
+                { id: 'vowel', label: 'Vowels', icon: BookOpen },
+                { id: 'spectrogram', label: 'Spectrogram', icon: Activity },
+            ]
+        },
+        practice: {
+            label: 'Practice',
+            tabs: [
+                { id: 'training', label: 'Training', icon: Dumbbell },
+                { id: 'assessment', label: 'Assessment', icon: ClipboardCheck },
+            ]
+        }
+    };
+
+    // Get current category based on active tab
+    const getCurrentCategory = () => {
+        for (const [categoryKey, category] of Object.entries(TAB_CATEGORIES)) {
+            if (category.tabs.find(tab => tab.id === practiceTab)) {
+                return categoryKey;
+            }
+        }
+        return 'basics';
+    };
+
+    const [activeCategory, setActiveCategory] = useState(getCurrentCategory());
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
@@ -306,10 +335,30 @@ const PracticeMode = ({
                 </div>
             )}
 
-            {/* Header / Tabs - simplified */}
-            <div className="flex flex-col mb-4 gap-4">
+            {/* Header / Tabs - Grouped by Category */}
+            <div className="flex flex-col mb-4 gap-3">
+                {/* Category Selector */}
+                <div className="flex items-center justify-center gap-2 mx-auto">
+                    {Object.entries(TAB_CATEGORIES).map(([categoryKey, category]) => (
+                        <button
+                            key={categoryKey}
+                            onClick={() => {
+                                setActiveCategory(categoryKey);
+                                switchPracticeTab(category.tabs[0].id);
+                            }}
+                            className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${activeCategory === categoryKey
+                                ? 'bg-gradient-to-r from-teal-500 to-violet-600 text-white shadow-lg'
+                                : 'bg-slate-900/50 text-slate-400 hover:text-white hover:bg-slate-800 border border-white/5'
+                                }`}
+                        >
+                            {category.label}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Sub-tabs within Category */}
                 <div id="practice-tabs" className="flex items-center justify-center gap-1 p-1 bg-slate-900/50 rounded-full border border-white/5 w-fit mx-auto">
-                    {TABS.map(tab => (
+                    {TAB_CATEGORIES[activeCategory].tabs.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => switchPracticeTab(tab.id)}
@@ -327,10 +376,10 @@ const PracticeMode = ({
             </div>
 
             {/* Main Content Grid - Rebalanced */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
+            <div className={`grid grid-cols-1 gap-6 w-full transition-all ${focusMode ? '' : 'lg:grid-cols-12'}`}>
 
-                {/* Center Stage: Visualization (Spans 8 cols) */}
-                <div className="lg:col-span-8 flex flex-col gap-6">
+                {/* Center Stage: Visualization (Spans 8 cols, or full width in focus mode) */}
+                <div className={`flex flex-col gap-6 ${focusMode ? '' : 'lg:col-span-8'}`}>
                     <div className="relative w-full aspect-video lg:aspect-auto lg:h-[500px] bg-black rounded-3xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col relative group">
 
                         {/* Visualization Layer */}
@@ -364,6 +413,18 @@ const PracticeMode = ({
 
                         {/* Top Right Tools Overlay */}
                         <div className="absolute top-4 right-4 z-50 flex gap-2 items-center">
+                            {/* Focus Mode Toggle */}
+                            <button
+                                onClick={() => setFocusMode(!focusMode)}
+                                className={`p-2.5 rounded-full transition-all backdrop-blur-sm border ${
+                                    focusMode
+                                        ? 'bg-teal-500/20 border-teal-500/50 text-teal-400'
+                                        : 'bg-black/50 hover:bg-slate-800 text-slate-400 hover:text-white border-white/10'
+                                }`}
+                                title={focusMode ? "Exit Focus Mode" : "Enter Focus Mode"}
+                            >
+                                {focusMode ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+                            </button>
                             {/* Session Timer with Wellness Reminders */}
                             {isAudioActive && (
                                 <PracticeSessionTimer
@@ -404,7 +465,8 @@ const PracticeMode = ({
                         </button>
                     </div>
 
-                    {/* Quick Access Tools (Horizontal Strip) */}
+                    {/* Quick Access Tools (Horizontal Strip) - Hidden in Focus Mode */}
+                    {!focusMode && (
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900/30 p-4 rounded-2xl border border-white/5">
                         <button onClick={() => openModal('warmup')} className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
                             <Play size={20} className="text-orange-400" />
@@ -427,23 +489,36 @@ const PracticeMode = ({
                             <span className="text-xs font-bold">AI Convo</span>
                         </button>
                     </div>
+                    )}
 
-                    {/* Comparison Tool (if needed) */}
-                    {practiceTab !== 'overview' && practiceTab !== 'resonance' && (
+                    {/* Comparison Tool (if needed) - Hidden in Focus Mode */}
+                    {!focusMode && practiceTab !== 'overview' && practiceTab !== 'resonance' && (
                         <div className="mt-2">
                             <ComparisonTool />
                         </div>
                     )}
                 </div>
 
-                {/* Right Column: Dashboard & Metrics (Spans 4 cols) */}
+                {/* Right Column: Dashboard & Metrics (Spans 4 cols) - Hidden in Focus Mode */}
+                {!focusMode && (
                 <div className="lg:col-span-4 flex flex-col gap-4 h-full">
                     {/* Coach Panel - Actionable Feedback */}
-                    <div className="flex-1">
-                        <CoachPanel
-                            dataRef={dataRef}
-                            onNavigate={(tab) => switchPracticeTab(tab)}
-                        />
+                    <div className={`flex-1 transition-all ${coachPanelCollapsed ? 'h-auto' : ''}`}>
+                        {!coachPanelCollapsed ? (
+                            <CoachPanel
+                                dataRef={dataRef}
+                                onNavigate={(tab) => switchPracticeTab(tab)}
+                                onCollapse={() => setCoachPanelCollapsed(true)}
+                            />
+                        ) : (
+                            <button
+                                onClick={() => setCoachPanelCollapsed(false)}
+                                className="w-full p-4 bg-slate-900/50 rounded-2xl border border-slate-800 hover:border-teal-500/50 transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2"
+                            >
+                                <Activity size={18} />
+                                <span className="text-sm font-bold">Show Coach Panel</span>
+                            </button>
+                        )}
                     </div>
 
                     {/* Context-Specific Tools - Only show if specifically needed */}
@@ -478,9 +553,11 @@ const PracticeMode = ({
                         <ToolExercises tool={practiceTab === 'overview' ? 'all' : practiceTab} audioEngine={audioEngineRef.current} />
                     </div>
                 </div>
+                )}
             </div>
 
-            {/* Bottom Row: History & Practice Cards */}
+            {/* Bottom Row: History & Practice Cards - Hidden in Focus Mode */}
+            {!focusMode && (
             <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {practiceTab === 'overview' && (
                     <>
@@ -500,6 +577,7 @@ const PracticeMode = ({
                     </>
                 )}
             </div>
+            )}
 
             {/* Timer Modal */}
             {showTimer && (

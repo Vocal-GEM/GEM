@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Activity, AlertTriangle, ChevronRight, Mic } from 'lucide-react';
+import { Activity, AlertTriangle, ChevronRight, Mic, ChevronDown } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import RegisterGauge from '../viz/RegisterGauge';
 
-const CoachPanel = ({ dataRef, onNavigate }) => {
+const CoachPanel = ({ dataRef, onNavigate, onCollapse }) => {
     const { targetRange, activeProfile } = useProfile();
     const [metrics, setMetrics] = useState({
         pitch: 0,
@@ -118,6 +118,20 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
 
     return (
         <div className="h-full flex flex-col gap-4">
+            {/* Header with Collapse Button */}
+            <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Coach Panel</h3>
+                {onCollapse && (
+                    <button
+                        onClick={onCollapse}
+                        className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-500 hover:text-white transition-colors"
+                        title="Minimize Coach Panel"
+                    >
+                        <ChevronDown size={16} />
+                    </button>
+                )}
+            </div>
+
             {/* 1. The Coach's Insight (Action Card) */}
             <div className={`p-4 rounded-2xl border transition-all duration-500 ${advice
                 ? `bg-${advice.color}-500/10 border-${advice.color}-500/30 shadow-[0_0_15px_rgba(0,0,0,0.3)]`
