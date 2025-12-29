@@ -1,7 +1,7 @@
 import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
-import { getColormapFunction } from '../../utils/colormaps';
+import { generateColormap } from '../../utils/colormaps';
 import { Camera, X } from 'lucide-react';
 
 /**
@@ -28,35 +28,41 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const [cursorData, setCursorData] = useState(null);
     const [showControls, setShowControls] = useState(false);
 
-    // Store spectrum data for tap cursor lookup
-    const spectrumHistoryRef = useRef([]);
-    const MAX_FREQ = 8000;
+    // Optimized History Buffer (Circular Buffer)
+    // We allocate a large flat array to store history instead of pushing/shifting objects.
+    // Each frame stores 'maxBin' floats.
+    // We increase history size to handle large screens (e.g. 4k).
+    // 2500 frames * 2px speed = 5000px width coverage.
+    const HISTORY_FRAMES = 2500;
+    const historyBufferRef = useRef(null); // Float32Array
+    const historyMetaRef = useRef(new Array(HISTORY_FRAMES).fill(null)); // Metadata per frame
+    const historyHeadRef = useRef(0); // Points to the next write position (frame index)
 
     // Spectrogram State
     const speed = 2; // Pixels per frame
+    const MAX_FREQ = 8000;
 
-    // Dynamic colormap based on settings
-    const getColor = useMemo(
-        () => getColormapFunction(settings.spectrogramColorScheme),
+    // Pre-calculate colormap as Uint32Array (ABGR) for fast pixel manipulation
+    const colormap = useMemo(
+        () => generateColormap(settings.spectrogramColorScheme),
         [settings.spectrogramColorScheme]
     );
+
+    // Reusable objects to reduce GC
+    const imageDataRef = useRef(null);
 
     const draw = () => {
         const canvas = canvasRef.current;
         if (!canvas || !dataRef.current) return;
 
-        const ctx = canvas.getContext('2d', { alpha: false });
+        const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: false });
         const width = canvas.width;
         const h = canvas.height;
 
         // 1. Shift existing image to the left
+        // drawImage is optimized by browsers
         ctx.drawImage(canvas, speed, 0, width - speed, h, 0, 0, width - speed, h);
 
-        // 2. Clear the new strip at the right
-        ctx.fillStyle = '#000';
-        ctx.fillRect(width - speed, 0, speed, h);
-
-        // 3. Draw new column at the right edge
         const spectrum = dataRef.current.spectrum;
         if (spectrum && spectrum.length > 0) {
             const sampleRate = audioContext?.sampleRate || 44100;
@@ -65,33 +71,91 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             const hzPerBin = contextNyquist / binsTotal;
             const maxBin = Math.min(binsTotal, Math.ceil(MAX_FREQ / hzPerBin));
 
-            // Store snapshot for tap cursor (keep last N columns)
-            const snapshot = new Float32Array(maxBin);
-            for (let i = 0; i < maxBin; i++) {
-                snapshot[i] = spectrum[i];
-            }
-            spectrumHistoryRef.current.push({ data: snapshot, hzPerBin, maxBin });
-            if (spectrumHistoryRef.current.length > width / speed) {
-                spectrumHistoryRef.current.shift();
+            // --- OPTIMIZATION: History Buffer Management ---
+            // Lazy initialization of history buffer
+            if (!historyBufferRef.current || historyBufferRef.current.length < HISTORY_FRAMES * maxBin) {
+                // Allocate or re-allocate if maxBin grows significantly (unlikely dynamically)
+                historyBufferRef.current = new Float32Array(HISTORY_FRAMES * maxBin);
+                // Also reset meta
+                historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
+                historyHeadRef.current = 0;
             }
 
+            const head = historyHeadRef.current;
+            const buffer = historyBufferRef.current;
+            const offset = head * maxBin;
+
+            // Copy spectrum to history buffer (avoiding new Float32Array per frame)
+            // We only need the first maxBin items
             for (let i = 0; i < maxBin; i++) {
-                const value = spectrum[i];
+                buffer[offset + i] = spectrum[i];
+            }
+
+            // Store metadata for this frame
+            historyMetaRef.current[head] = { hzPerBin, maxBin };
+
+            // Advance head (circular)
+            historyHeadRef.current = (head + 1) % HISTORY_FRAMES;
+            // -----------------------------------------------
+
+            // --- OPTIMIZATION: Direct Pixel Manipulation ---
+            // Instead of thousands of ctx.fillRect calls, we generate the column pixels
+            // directly into an ImageData buffer and put it onto the canvas.
+
+            // Reuse ImageData object
+            if (!imageDataRef.current || imageDataRef.current.height !== h || imageDataRef.current.width !== speed) {
+                imageDataRef.current = ctx.createImageData(speed, h);
+            }
+
+            const imageData = imageDataRef.current;
+            const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
+
+            // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
+            // We map pixels (y) to frequency bins.
+            for (let y = 0; y < h; y++) {
+                // Invert y because canvas 0 is top, but we want low freq at bottom
+                // y=0 is top (high freq), y=h is bottom (low freq)
+                // Bin mapping: 0 -> maxBin (low -> high)
+
+                // Linear mapping matches the original code: y = h - (i / maxBin) * h
+                // So i / maxBin = (h - y) / h = 1 - y/h
+
+                const freqRatio = 1 - (y / h);
+                const binIndex = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+
+                // Get intensity from spectrum
+                const value = spectrum[binIndex] || 0;
+
                 let intensity = 0;
-
                 if (value < 0) {
-                    intensity = Math.max(0, Math.min(255, (value + 100) * 3.6));
+                     // DB-ish scale handling from original code
+                     intensity = Math.max(0, Math.min(255, (value + 100) * 3.6));
                 } else {
-                    intensity = Math.min(255, value * 255 * 2);
+                     // Linear scale handling
+                     intensity = Math.min(255, value * 255 * 2);
                 }
 
+                // Color lookup
+                let color = 0xFF000000; // Black (ABGR: A=255, B=0, G=0, R=0)
                 if (intensity > 10) {
-                    ctx.fillStyle = getColor(intensity);
-                    const y = h - (i / maxBin) * h;
-                    const binHeight = Math.max(1, h / maxBin);
-                    ctx.fillRect(width - speed, y - binHeight, speed, binHeight);
+                     const colorIndex = Math.floor(intensity);
+                     color = colormap[Math.min(255, Math.max(0, colorIndex))];
+                }
+
+                // Write to all columns in the 'speed' strip
+                // Row y has 'speed' pixels
+                const rowOffset = y * speed;
+                for (let x = 0; x < speed; x++) {
+                    data32[rowOffset + x] = color;
                 }
             }
+
+            ctx.putImageData(imageData, width - speed, 0);
+            // -----------------------------------------------
+        } else {
+             // Clear the new strip if no data
+             ctx.fillStyle = '#000';
+             ctx.fillRect(width - speed, 0, speed, h);
         }
 
         requestRef.current = requestAnimationFrame(draw);
@@ -119,16 +183,36 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         const canvasX = (x / rect.width) * canvas.width;
         const canvasY = (y / rect.height) * canvas.height;
 
-        // Get historical spectrum at this position
-        const historyIndex = Math.floor(canvasX / speed);
-        const history = spectrumHistoryRef.current;
+        // Find the frame in history
+        // The rightmost pixel (width-speed) corresponds to the latest frame (historyHead - 1)
+        // x moves left, so we go back in history.
+        // Distance from right edge:
+        const distanceFromRight = canvas.width - canvasX;
+        const framesBack = Math.floor(distanceFromRight / speed);
 
-        if (historyIndex >= 0 && historyIndex < history.length) {
-            const snapshot = history[historyIndex];
+        // Safety check: Don't look further back than our buffer allows
+        if (framesBack >= HISTORY_FRAMES) return;
+
+        let frameIndex = historyHeadRef.current - 1 - framesBack;
+
+        // Handle wrapping
+        if (frameIndex < 0) {
+            frameIndex += HISTORY_FRAMES;
+        }
+
+        const meta = historyMetaRef.current[frameIndex];
+
+        if (meta) {
+            // Retrieve data from flattened buffer
+            const buffer = historyBufferRef.current;
+            const offset = frameIndex * meta.maxBin;
+
             const freqRatio = 1 - (canvasY / canvas.height);
-            const binIndex = Math.floor(freqRatio * snapshot.maxBin);
-            const frequency = binIndex * snapshot.hzPerBin;
-            const rawValue = snapshot.data[binIndex] || 0;
+            const binIndex = Math.floor(freqRatio * meta.maxBin);
+            const frequency = binIndex * meta.hzPerBin;
+
+            // Read value
+            const rawValue = buffer[offset + binIndex] || 0;
 
             // Convert to dB
             let dB = rawValue;
@@ -257,4 +341,3 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
 };
 
 export default Spectrogram;
-
