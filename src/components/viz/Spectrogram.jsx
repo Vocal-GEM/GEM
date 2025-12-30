@@ -1,8 +1,9 @@
-import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
 import { getColormapFunction } from '../../utils/colormaps';
 import { Camera, X } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * Convert frequency to musical note
@@ -22,7 +23,10 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const canvasRef = useRef(null);
     const { dataRef, isAudioActive, audioContext } = useAudio();
     const { settings } = useSettings();
-    const requestRef = useRef();
+    // Unique ID for render coordinator
+    // Use useId directly, assuming React 18+ as seen in package.json (react ^18.3.1)
+    const reactId = useId();
+    const componentId = useRef(reactId).current;
 
     // Tap cursor state
     const [cursorData, setCursorData] = useState(null);
@@ -41,7 +45,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         [settings.spectrogramColorScheme]
     );
 
-    const draw = () => {
+    const draw = useCallback((_deltaTime) => {
         const canvas = canvasRef.current;
         if (!canvas || !dataRef.current) return;
 
@@ -93,16 +97,14 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                 }
             }
         }
-
-        requestRef.current = requestAnimationFrame(draw);
-    };
+    }, [dataRef, audioContext, getColor]); // Removed recursive requestAnimationFrame
 
     useEffect(() => {
         if (isAudioActive) {
-            requestRef.current = requestAnimationFrame(draw);
+            // Subscribe to renderCoordinator instead of using requestAnimationFrame directly
+            return renderCoordinator.subscribe(componentId, draw, renderCoordinator.PRIORITY.MEDIUM);
         }
-        return () => cancelAnimationFrame(requestRef.current);
-    }, [isAudioActive]);
+    }, [isAudioActive, draw, componentId]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position
@@ -257,4 +259,3 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
 };
 
 export default Spectrogram;
-
