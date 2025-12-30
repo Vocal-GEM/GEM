@@ -128,7 +128,17 @@ def upload_file():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
     
+    # Allowed extensions
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp3', 'wav', 'm4a', 'ogg', 'webm'}
+
+    def allowed_file(filename):
+        return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
     if file:
+        if not allowed_file(file.filename):
+            return jsonify({"error": "File type not allowed"}), 400
+
         filename = secure_filename(file.filename)
         # Add timestamp to make unique
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
