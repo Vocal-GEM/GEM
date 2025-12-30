@@ -1,6 +1,7 @@
 import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { getColormapFunction } from '../../utils/colormaps';
 import { Camera, X } from 'lucide-react';
 
@@ -22,7 +23,13 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const canvasRef = useRef(null);
     const { dataRef, isAudioActive, audioContext } = useAudio();
     const { settings } = useSettings();
-    const requestRef = useRef();
+
+    // Lazy initialization of component ID
+    const idRef = useRef(null);
+    if (!idRef.current) {
+        idRef.current = `spectrogram-${Math.random().toString(36).substr(2, 9)}`;
+    }
+    const componentId = idRef.current;
 
     // Tap cursor state
     const [cursorData, setCursorData] = useState(null);
@@ -41,7 +48,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         [settings.spectrogramColorScheme]
     );
 
-    const draw = () => {
+    const draw = useCallback(() => {
         const canvas = canvasRef.current;
         if (!canvas || !dataRef.current) return;
 
@@ -93,16 +100,21 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                 }
             }
         }
-
-        requestRef.current = requestAnimationFrame(draw);
-    };
+    }, [getColor, audioContext]);
 
     useEffect(() => {
+        let unsubscribe;
         if (isAudioActive) {
-            requestRef.current = requestAnimationFrame(draw);
+            unsubscribe = renderCoordinator.subscribe(
+                componentId,
+                draw,
+                renderCoordinator.PRIORITY.MEDIUM
+            );
         }
-        return () => cancelAnimationFrame(requestRef.current);
-    }, [isAudioActive]);
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
+    }, [isAudioActive, draw, componentId]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position
