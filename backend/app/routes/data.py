@@ -119,6 +119,12 @@ def get_data():
         } for j in current_user.journals]
     })
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp3', 'wav', 'm4a', 'ogg', 'webm'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @data_bp.route('/upload', methods=['POST'])
 @login_required
 def upload_file():
@@ -128,7 +134,7 @@ def upload_file():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
     
-    if file:
+    if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         # Add timestamp to make unique
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
@@ -138,6 +144,8 @@ def upload_file():
         url = storage_service.upload_file(file, filename, content_type=file.content_type)
         
         return jsonify({"url": url})
+    else:
+        return jsonify({"error": "File type not allowed"}), 400
 
 @data_bp.route('/user-data', methods=['GET'])
 @login_required
