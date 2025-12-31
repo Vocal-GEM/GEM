@@ -1,5 +1,6 @@
 import re
 import bleach
+import os
 from email_validator import validate_email, EmailNotValidError
 
 def validate_username(username):
@@ -61,3 +62,32 @@ def validate_email_address(email):
         return True, None
     except EmailNotValidError as e:
         return False, str(e)
+
+def validate_file_upload(filename, content_type=None):
+    """
+    Validate file upload by extension and content type.
+    Returns (is_valid, error_message)
+    """
+    if not filename:
+        return False, "Filename is required"
+
+    # Allowed extensions
+    ALLOWED_EXTENSIONS = {
+        # Audio
+        'mp3', 'wav', 'm4a', 'ogg', 'webm',
+        # Images
+        'png', 'jpg', 'jpeg', 'gif',
+        # Documents (only for training)
+        'pdf', 'txt', 'md'
+    }
+
+    # Check extension
+    if '.' not in filename:
+        return False, "File has no extension"
+
+    ext = filename.rsplit('.', 1)[1].lower()
+
+    if ext not in ALLOWED_EXTENSIONS:
+        return False, f"File type '{ext}' is not allowed"
+
+    return True, None
