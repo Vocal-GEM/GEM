@@ -4,6 +4,7 @@ import tempfile
 import soundfile as sf
 from ..voice_quality_analysis import analyze_file, analyze_file_with_transcript, GOAL_PRESETS, clean_audio_signal, load_audio
 from ..asr_transcriber import transcribe_audio_with_words
+from ..validators import validate_file_upload
 
 voice_quality_bp = Blueprint('voice_quality', __name__)
 
@@ -15,6 +16,11 @@ def analyze():
     file = request.files["audio"]
     if file.filename == "":
         return jsonify({"error": "Empty filename."}), 400
+
+    # Security: Validate file type (only audio allowed)
+    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'])
+    if not is_valid:
+        return jsonify({"error": error}), 400
 
     goal_name = request.form.get("goal", "transfem_soft_slightly_breathy")
     if goal_name not in GOAL_PRESETS:
@@ -53,6 +59,11 @@ def clean_audio():
     file = request.files['audio']
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
+
+    # Security: Validate file type (only audio allowed)
+    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'])
+    if not is_valid:
+        return jsonify({"error": error}), 400
 
     try:
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
