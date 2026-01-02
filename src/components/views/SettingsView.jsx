@@ -9,6 +9,7 @@ import { VoiceCalibrationService } from '../../services/VoiceCalibrationService'
 import { SelfCareService } from '../../services/SelfCareService';
 import SelfCareOnboarding from '../ui/SelfCareOnboarding';
 import MicrophoneSelector from '../settings/MicrophoneSelector';
+import ToolHealthCheck from '../ui/ToolHealthCheck';
 
 const SettingsView = () => {
     const { t } = useTranslation();
@@ -135,6 +136,20 @@ const SettingsView = () => {
                         onSkip={() => setShowSelfCareWizard(false)}
                     />
                 )}
+
+                {/* System Status */}
+                <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden mb-8">
+                    <div className="p-6 border-b border-slate-800">
+                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                            <Activity className="text-emerald-400" size={24} />
+                            System Status
+                        </h2>
+                        <p className="text-slate-400 mt-1">Check the health of your audio and connection.</p>
+                    </div>
+                    <div className="p-6">
+                        <ToolHealthCheck />
+                    </div>
+                </div>
 
                 {/* Audio Input Settings */}
                 <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden mb-8">

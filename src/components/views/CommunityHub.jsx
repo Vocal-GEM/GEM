@@ -1,174 +1,88 @@
-import React, { useState, useEffect } from 'react';
-import { Users, Trophy, Medal, Star, Share2, Settings, ChevronRight } from 'lucide-react';
-import {
-    getPublicProfile,
-    updatePublicProfile,
-    getWeeklyChallenges,
-    getLeaderboard
-} from '../../services/CommunityService';
-import { getXPForNextLevel } from '../../services/DailyChallengeService';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Users, TrendingUp, Award, MessageSquare, Shield, Smile } from 'lucide-react';
+import CommunityBenchmarks from '../community/CommunityBenchmarks';
+import GroupChallenges from '../community/GroupChallenges';
+import SuccessStories from '../community/SuccessStories';
+import MentorFinder from '../community/MentorFinder';
+import CelebrationWall from '../community/CelebrationWall';
+import PrivacyManager from '../../services/PrivacyManager';
 
 const CommunityHub = () => {
-    const [profile, setProfile] = useState(getPublicProfile());
-    const [challenges, setChallenges] = useState([]);
-    const [leaderboard, setLeaderboard] = useState([]);
-    const [activeTab, setActiveTab] = useState('leaderboard');
-    const [showSettings, setShowSettings] = useState(false);
+    const [activeTab, setActiveTab] = useState('benchmarks');
 
-    useEffect(() => {
-        setChallenges(getWeeklyChallenges());
-        setLeaderboard(getLeaderboard());
-    }, []);
+    const tabs = [
+        { id: 'benchmarks', label: 'Benchmarks', icon: TrendingUp },
+        { id: 'challenges', label: 'Challenges', icon: Award },
+        { id: 'stories', label: 'Success Stories', icon: Smile },
+        { id: 'mentors', label: 'Mentors', icon: Users },
+        { id: 'wall', label: 'Celebration Wall', icon: MessageSquare },
+    ];
 
-    const handleProfileUpdate = (key, value) => {
-        const updated = updatePublicProfile({ [key]: value });
-        setProfile(updated);
+    const handlePrivacySettings = () => {
+        // Navigate to settings or show modal
+        // For now, simpler alert/dummy
+        alert("Privacy Settings would open here (Tier 6)");
     };
 
-    const xpData = getXPForNextLevel();
-
     return (
-        <div className="max-w-4xl mx-auto pb-20">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-white mb-2">Community</h1>
-                    <p className="text-slate-400">Connect and compete with others</p>
-                </div>
-                <button
-                    onClick={() => setShowSettings(!showSettings)}
-                    className="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-400"
-                >
-                    <Settings size={20} />
-                </button>
-            </div>
+        <div className="flex flex-col h-full bg-slate-900 text-white p-6 overflow-hidden">
+            <header className="mb-8">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+                    Community Hub
+                </h1>
+                <p className="text-slate-400">Connect, share, and grow with the Vocal GEM community.</p>
+            </header>
 
-            {/* Profile Settings */}
-            {showSettings && (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-8 animate-in slide-in-from-top">
-                    <h2 className="text-lg font-bold text-white mb-4">Public Profile</h2>
+            {/* Navigation Tabs */}
+            <nav className="flex space-x-2 mb-6 overflow-x-auto pb-2 noscrollbar">
+                {tabs.map((tab) => {
+                    const Icon = tab.icon;
+                    const isActive = activeTab === tab.id;
+                    return (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap
+                ${isActive
+                                    ? 'bg-purple-600/20 text-purple-300 border border-purple-500/50'
+                                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-transparent'
+                                }`}
+                        >
+                            <Icon size={16} className="mr-2" />
+                            {tab.label}
+                        </button>
+                    );
+                })}
+            </nav>
 
-                    <div className="space-y-4">
-                        <div>
-                            <label className="text-sm text-slate-400 mb-1 block">Display Name</label>
-                            <input
-                                value={profile.displayName}
-                                onChange={(e) => handleProfileUpdate('displayName', e.target.value)}
-                                className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white"
-                                placeholder="Anonymous"
-                            />
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <div className="font-medium text-white">Share Progress</div>
-                                <div className="text-sm text-slate-400">Let others see your milestones</div>
-                            </div>
-                            <button
-                                onClick={() => handleProfileUpdate('shareProgress', !profile.shareProgress)}
-                                className={`w-12 h-6 rounded-full transition-colors relative ${profile.shareProgress ? 'bg-blue-600' : 'bg-slate-600'
-                                    }`}
-                            >
-                                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${profile.shareProgress ? 'translate-x-7' : 'translate-x-1'
-                                    }`} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Tabs */}
-            <div className="flex gap-2 mb-6">
-                {['leaderboard', 'challenges'].map(tab => (
-                    <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${activeTab === tab
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-slate-800 text-slate-400 hover:text-white'
-                            }`}
+            {/* Content Area */}
+            <div className="flex-1 overflow-y-auto min-h-0 bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 backdrop-blur-sm relative">
+                <AnimatePresence mode='wait'>
+                    <motion.div
+                        key={activeTab}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="h-full"
                     >
-                        {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                    </button>
-                ))}
+                        {activeTab === 'benchmarks' && <CommunityBenchmarks />}
+                        {activeTab === 'challenges' && <GroupChallenges />}
+                        {activeTab === 'stories' && <SuccessStories />}
+                        {activeTab === 'mentors' && <MentorFinder />}
+                        {activeTab === 'wall' && <CelebrationWall />}
+                    </motion.div>
+                </AnimatePresence>
             </div>
 
-            {/* Leaderboard */}
-            {activeTab === 'leaderboard' && (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                    <div className="flex items-center gap-2 mb-6">
-                        <Trophy className="text-amber-400" size={24} />
-                        <h2 className="text-xl font-bold text-white">Leaderboard</h2>
-                    </div>
-
-                    <div className="space-y-2">
-                        {leaderboard.map((user, idx) => (
-                            <div
-                                key={idx}
-                                className={`flex items-center gap-4 p-4 rounded-xl transition-colors ${user.isYou
-                                        ? 'bg-blue-600/20 border border-blue-500/30'
-                                        : 'bg-slate-800/50 hover:bg-slate-800'
-                                    }`}
-                            >
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${user.rank === 1 ? 'bg-amber-500 text-black' :
-                                        user.rank === 2 ? 'bg-slate-400 text-black' :
-                                            user.rank === 3 ? 'bg-amber-700 text-white' :
-                                                'bg-slate-700 text-slate-300'
-                                    }`}>
-                                    {user.rank}
-                                </div>
-
-                                <div className="flex-1">
-                                    <div className="font-bold text-white flex items-center gap-2">
-                                        {user.displayName}
-                                        {user.isYou && <span className="text-xs text-blue-400">(You)</span>}
-                                    </div>
-                                    <div className="text-sm text-slate-400">Level {user.level}</div>
-                                </div>
-
-                                <div className="text-right">
-                                    <div className="font-bold text-amber-400">{user.xp.toLocaleString()}</div>
-                                    <div className="text-xs text-slate-500">XP</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+            <div className="mt-4 flex justify-between items-center text-xs text-slate-500">
+                <div className="flex items-center gap-2">
+                    <Shield size={12} />
+                    <span>Community Guidelines Apply</span>
                 </div>
-            )}
-
-            {/* Weekly Challenges */}
-            {activeTab === 'challenges' && (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                    <div className="flex items-center gap-2 mb-6">
-                        <Medal className="text-purple-400" size={24} />
-                        <h2 className="text-xl font-bold text-white">Weekly Challenges</h2>
-                    </div>
-
-                    <div className="space-y-4">
-                        {challenges.map((challenge, idx) => (
-                            <div
-                                key={idx}
-                                className="bg-gradient-to-r from-purple-900/30 to-slate-900 border border-purple-500/20 rounded-xl p-5"
-                            >
-                                <div className="flex items-start justify-between">
-                                    <div>
-                                        <h3 className="text-lg font-bold text-white mb-1">{challenge.title}</h3>
-                                        <p className="text-slate-400">{challenge.description}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <div className="text-xl font-bold text-purple-400">+{challenge.xpReward}</div>
-                                        <div className="text-xs text-slate-500">XP</div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <p className="text-center text-sm text-slate-500 mt-4">
-                        Week {challenges[0]?.weekNumber} • Resets Sunday
-                    </p>
-                </div>
-            )}
+                <button onClick={handlePrivacySettings} className="hover:text-purple-400 transition-colors">Privacy Settings</button>
+            </div>
         </div>
     );
 };

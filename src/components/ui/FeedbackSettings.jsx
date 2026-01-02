@@ -339,8 +339,8 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                                                 feedback: { ...settings.feedback, audioMode: mode }
                                             })}
                                             className={`p-2 rounded-lg text-xs font-bold capitalize transition-colors ${(settings.feedback?.audioMode || 'tones') === mode
-                                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                                                    : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
+                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                                                : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
                                                 }`}
                                         >
                                             {mode}
@@ -371,8 +371,8 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                                                 feedback: { ...settings.feedback, visualTheme: theme.id }
                                             })}
                                             className={`p-3 rounded-lg text-left transition-colors border ${(settings.feedback?.visualTheme || 'orb') === theme.id
-                                                    ? 'bg-purple-500/20 border-purple-500/50 text-white'
-                                                    : 'bg-slate-700/50 border-transparent text-slate-400 hover:bg-slate-700'
+                                                ? 'bg-purple-500/20 border-purple-500/50 text-white'
+                                                : 'bg-slate-700/50 border-transparent text-slate-400 hover:bg-slate-700'
                                                 }`}
                                         >
                                             <div className="text-xs font-bold">{theme.name}</div>
@@ -590,14 +590,45 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
 
                         <div className="bg-slate-800 p-4 rounded-xl space-y-4">
                             <div>
-                                <div className="flex justify-between text-xs text-slate-400 mb-1">
-                                    <div className="flex items-center gap-1">
-                                        <span>Smoothing</span>
-                                        <InfoTooltip content="Higher values make the pitch line smoother but less responsive to quick changes." />
+                                <div className="mb-4">
+                                    <div className="flex justify-between text-xs text-slate-400 mb-2">
+                                        <div className="flex items-center gap-1">
+                                            <span>Pitch Smoothing</span>
+                                            <InfoTooltip content="Reduces jitter for a cleaner line. 'High' is smoother but slightly slower." />
+                                        </div>
+                                        <span className="capitalize text-white font-bold">{settings.pitchSmoothing || 'medium'}</span>
                                     </div>
-                                    <span>{settings.smoothing || 5}</span>
+                                    <div className="grid grid-cols-4 gap-2">
+                                        {['off', 'low', 'medium', 'high'].map(level => (
+                                            <button
+                                                key={level}
+                                                onClick={() => setSettings({ ...settings, pitchSmoothing: level })}
+                                                className={`p-2 rounded-lg text-xs font-bold capitalize transition-colors ${(settings.pitchSmoothing || 'medium') === level
+                                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                                                    : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
+                                                    }`}
+                                            >
+                                                {level}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
-                                <input type="range" min="1" max="20" step="1" value={settings.smoothing || 5} onChange={(e) => setSettings({ ...settings, smoothing: parseInt(e.target.value) })} className="w-full accent-slate-500 h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer" />
+
+                                <div className="mb-4 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="text-xs text-slate-400">Signal Validation</div>
+                                        <InfoTooltip content="Prevents bad data (clipping, silence) from affecting your score." />
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={settings.signalValidation !== false}
+                                            onChange={(e) => setSettings({ ...settings, signalValidation: e.target.checked })}
+                                            className="sr-only peer"
+                                        />
+                                        <div className="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500"></div>
+                                    </label>
+                                </div>
                             </div>
 
                             <div>

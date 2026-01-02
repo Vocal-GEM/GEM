@@ -8,6 +8,7 @@ import { SettingsProvider } from './context/SettingsContext'
 import { AudioProvider } from './context/AudioContext'
 import { AuthProvider } from './context/AuthContext'
 import { ProfileProvider } from './context/ProfileContext'
+import { VoiceProfileProvider } from './context/VoiceProfileContext'
 import { StatsProvider } from './context/StatsContext'
 import { JournalProvider } from './context/JournalContext'
 import { ClientProvider } from './context/ClientContext'
@@ -34,25 +35,27 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <SettingsProvider>
                 <AuthProvider>
                     <ProfileProvider>
-                        <AudioProvider>
-                            <NavigationProvider>
-                                <LayoutProvider>
-                                    <StatsProvider>
-                                        <JournalProvider>
-                                            <ClientProvider>
-                                                <GuidedJourneyProvider>
-                                                    <PracticeCardsProvider>
-                                                        <HashRouter>
-                                                            <App />
-                                                        </HashRouter>
-                                                    </PracticeCardsProvider>
-                                                </GuidedJourneyProvider>
-                                            </ClientProvider>
-                                        </JournalProvider>
-                                    </StatsProvider>
-                                </LayoutProvider>
-                            </NavigationProvider>
-                        </AudioProvider>
+                        <VoiceProfileProvider>
+                            <AudioProvider>
+                                <NavigationProvider>
+                                    <LayoutProvider>
+                                        <StatsProvider>
+                                            <JournalProvider>
+                                                <ClientProvider>
+                                                    <GuidedJourneyProvider>
+                                                        <PracticeCardsProvider>
+                                                            <HashRouter>
+                                                                <App />
+                                                            </HashRouter>
+                                                        </PracticeCardsProvider>
+                                                    </GuidedJourneyProvider>
+                                                </ClientProvider>
+                                            </JournalProvider>
+                                        </StatsProvider>
+                                    </LayoutProvider>
+                                </NavigationProvider>
+                            </AudioProvider>
+                        </VoiceProfileProvider>
                     </ProfileProvider>
                 </AuthProvider>
             </SettingsProvider>

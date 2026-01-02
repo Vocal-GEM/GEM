@@ -5,6 +5,8 @@ import { ResonanceCalculator } from '../utils/ResonanceCalculator';
 import { FormantAnalyzer } from '../utils/FormantAnalyzer';
 import { validateAudioSignal, getSignalQualityMessage } from '../utils/signalValidator';
 import { PitchSmoother } from '../utils/PitchSmoother';
+import McLeodPitchDetector from '../services/audio/McLeodPitchDetector';
+import LPCFormantTracker from '../services/audio/LPCFormantTracker';
 
 
 
@@ -59,6 +61,11 @@ export class AudioEngine {
         // NEW: Signal validation and pitch smoothing
         this.pitchSmoother = new PitchSmoother(5); // Medium smoothing
         this.signalValidationEnabled = true;
+
+        // IN-FORMANT UPGRADE: Professional Detectors
+        this.mcleodDetector = new McLeodPitchDetector({ sampleRate: 44100, bufferSize: 2048 });
+        this.lpcTracker = new LPCFormantTracker({ sampleRate: 44100, order: 12 });
+        this.useHighQualityAudio = true; // Toggle for MPM/LPC
 
         // Noise Gate
         this.adaptiveThreshold = 0.0001;
@@ -442,9 +449,21 @@ export class AudioEngine {
 
             // Fallback to main thread if worklet is not active or data is stale
             if ((!workletActive || pitch === 0) && !this.isLiveAnalysisActive) {
-                const yinResult = DSP.calculatePitchYIN(dataArray, this.audioContext.sampleRate, 0.2);
-                pitch = yinResult.pitch;
-                confidence = yinResult.confidence;
+                // IN-FORMANT UPGRADE: Use McLeod if HQ mode is on
+                if (this.useHighQualityAudio) {
+                    const mcleodResult = this.mcleodDetector.detect(dataArray);
+                    if (mcleodResult) {
+                        pitch = mcleodResult.frequency;
+                        confidence = mcleodResult.clarity;
+                    }
+                }
+
+                // Fallback to YIN if McLeod fails or is disabled (and still no pitch)
+                if (pitch === 0) {
+                    const yinResult = DSP.calculatePitchYIN(dataArray, this.audioContext.sampleRate, 0.2);
+                    pitch = yinResult.pitch;
+                    confidence = yinResult.confidence;
+                }
             }
 
             // Apply smoothing (important for both sources to reduce visual jitter)
@@ -478,6 +497,18 @@ export class AudioEngine {
             // Also smooth H1-H2 for UI display
             this.smoothedH1H2 = this.smoothedH1H2 || 0;
             this.smoothedH1H2 = this.smoothedH1H2 * 0.70 + weightAnalysis.h1h2 * 0.30;
+
+            // IN-FORMANT UPGRADE: LPC Formant Tracking
+            // Calculate real formants (F1/F2) using LPC
+            let formants = [];
+            if (this.useHighQualityAudio && pitch > 50) {
+                formants = this.lpcTracker.track(dataArray);
+            }
+            // Smooth Formants
+            if (formants.length >= 2) {
+                this.smoothedF1 = this.smoothedF1 * 0.8 + formants[0].frequency * 0.2;
+                this.smoothedF2 = this.smoothedF2 * 0.8 + formants[1].frequency * 0.2;
+            }
 
             const weight = this.smoothedWeight;
             const h1h2 = this.smoothedH1H2;
@@ -552,6 +583,11 @@ export class AudioEngine {
                         h1: weightAnalysis.h1,
                         h2: weightAnalysis.h2,
                         centroid: weightAnalysis.centroid
+                    },
+                    formants: {
+                        f1: this.smoothedF1 || 0,
+                        f2: this.smoothedF2 || 0,
+                        raw: formants
                     }
                 };
 

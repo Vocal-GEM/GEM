@@ -15,6 +15,18 @@ except ImportError:
     scipy = None
     sliding_window_view = None
 
+# VoiceLab-inspired advanced analysis
+try:
+    from app.services.voicelab_service import estimate_vtl, compute_perturbation_pca, measure_ltas, measure_speech_rate, run_voicelab_analysis
+    _voicelab_available = True
+except ImportError:
+    _voicelab_available = False
+    estimate_vtl = None
+    compute_perturbation_pca = None
+    measure_ltas = None
+    measure_speech_rate = None
+    run_voicelab_analysis = None
+
 # ----------------------
 # Goal presets
 # ----------------------
@@ -1624,6 +1636,24 @@ def analyze_file(path, goal_name="transfem_soft_slightly_breathy"):
     # RBI Analysis
     rbi_series, rbi_stats = compute_rbi_series(y, sr)
     
+    # VoiceLab-inspired advanced metrics (VTL, enhanced perturbations)
+    voicelab_data = {}
+    if _voicelab_available:
+        try:
+            vtl_result = estimate_vtl(sound)
+            perturbation_result = compute_perturbation_pca(sound, 75, 600)
+            ltas_result = measure_ltas(sound)
+            rate_result = measure_speech_rate(sound)
+            
+            voicelab_data = {
+                "vtl": vtl_result,
+                "perturbation_pca": perturbation_result,
+                "ltas": ltas_result,
+                "speech_rate": rate_result
+            }
+        except Exception as e:
+            voicelab_data = {"error": str(e)}
+    
     # Mean RBI (ignoring Nones)
     valid_rbis = [x for x in rbi_series if x is not None]
     rbi_mean = float(np.mean(valid_rbis)) if valid_rbis else 0.0
@@ -1651,7 +1681,17 @@ def analyze_file(path, goal_name="transfem_soft_slightly_breathy"):
         "f3_noise_ratio": float(f3_noise_ratio),
         "spectral_tilt_slope": float(spectral_tilt_slope),  # NEW: For flow phonation
         "phonation_state": phonation_state["state"],        # NEW: breathy/flow/neutral/pressed
-        "onset_type": onset_analysis["type"]                # NEW: hard_attack/breathy_onset/coordinated
+        "onset_type": onset_analysis["type"],                # NEW: hard_attack/breathy_onset/coordinated
+        # VoiceLab-inspired metrics
+        "vtl_cm": voicelab_data.get("vtl", {}).get("vtl_cm"),
+        "formant_means": voicelab_data.get("vtl", {}).get("formant_means"),
+        "jitter_pca": voicelab_data.get("perturbation_pca", {}).get("jitter_pca"),
+        "shimmer_pca": voicelab_data.get("perturbation_pca", {}).get("shimmer_pca"),
+        # Phase 2 metrics
+        "ltas_mean_db": voicelab_data.get("ltas", {}).get("mean_db"),
+        "ltas_slope": voicelab_data.get("ltas", {}).get("slope_db_per_khz"),
+        "speech_rate": voicelab_data.get("speech_rate", {}).get("speech_rate_syl_per_sec"),
+        "syllable_count": voicelab_data.get("speech_rate", {}).get("syllables_estimated")
     }
     
     # Reconstruct frame data for timeline

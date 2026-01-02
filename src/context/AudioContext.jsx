@@ -31,7 +31,17 @@ export const AudioProvider = ({ children }) => {
     useEffect(() => {
         settingsRef.current = settings;
         if (audioEngineRef.current) {
-            audioEngineRef.current.setNoiseGate(settings.noiseGate);
+            // Prioritize calibrated threshold if available
+            const gate = settings.micProfile?.gateThreshold || settings.noiseGate || 0.005;
+            audioEngineRef.current.setNoiseGate(gate);
+
+            // Sync Tier 1 Settings
+            if (audioEngineRef.current.setPitchSmoothing) {
+                audioEngineRef.current.setPitchSmoothing(settings.pitchSmoothing);
+            }
+            if (audioEngineRef.current.setSignalValidation) {
+                audioEngineRef.current.setSignalValidation(settings.signalValidation);
+            }
         }
     }, [settings]);
 

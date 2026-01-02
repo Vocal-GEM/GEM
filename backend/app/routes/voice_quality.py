@@ -100,8 +100,76 @@ def clean_audio():
     finally:
         # send_file requires the file to exist when it returns.
         # We perform cleanup only if exception occurred or rely on OS temp cleaning.
-        # Ideally we'd use after_request to delete.
+        # ideally we'd use after_request to delete.
         pass
+
+# ----------------------
+# Voice Manipulation (Voice Lab / PSOLA)
+# ----------------------
+
+@voice_quality_bp.route('/api/voice-quality/manipulate', methods=['POST'])
+def manipulate_file():
+    """
+    Endpoint to shift pitch and formants of an uploaded file.
+    Proposed usage: "Goal Preview" - letting users hear themselves higher/brighter.
+    """
+    if 'audio' not in request.files:
+        return jsonify({'error': 'No audio file provided'}), 400
+        
+    file = request.files['audio']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    # Security check
+    is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'])
+    if not is_valid:
+        return jsonify({"error": error_msg}), 400
+        
+    # Parameters
+    try:
+        pitch_shift = float(request.form.get("pitch_shift", 0.0))  # semitones
+        formant_shift = float(request.form.get("formant_shift", 1.0)) # ratio (e.g. 1.1)
+    except ValueError:
+        return jsonify({"error": "Invalid numerical parameters"}), 400
+        
+    tmp_path = None
+    processed_path = None
+    
+    try:
+        # Save temp
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+            tmp_path = tmp.name
+            file.save(tmp_path)
+            
+        # Load via Parselmouth
+        import parselmouth
+        from ..services.voicelab_service import manipulate_voice
+        
+        sound = parselmouth.Sound(tmp_path)
+        manipulated = manipulate_voice(sound, pitch_shift, formant_shift)
+        
+        if manipulated is None:
+             return jsonify({"error": "Manipulation failed"}), 500
+             
+        # Save output
+        processed_path = tmp_path.replace(".wav", "_manipulated.wav")
+        manipulated.save(processed_path, "WAV")
+        
+        return send_file(
+            processed_path,
+            mimetype="audio/wav",
+            as_attachment=True,
+            download_name="manipulated_voice.wav"
+        )
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        # Cleanup
+        if tmp_path and os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        # Note: We can't delete processed_path here because send_file needs it.
+        # In production, use a background task or temp dir cleanup policy.
 
 @voice_quality_bp.route('/api/voice-quality/goals', methods=['GET'])
 def get_goals():

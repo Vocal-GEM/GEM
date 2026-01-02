@@ -172,20 +172,22 @@ const SelfCareOnboarding = ({ onComplete, onSkip, embedded = false }) => {
                             </div>
 
                             {/* Resources */}
-                            <div className="mt-6 p-4 bg-purple-500/10 rounded-xl border border-purple-500/20">
-                                <h4 className="text-sm font-bold text-purple-300 mb-2">Recommended Resources</h4>
-                                {SELF_CARE_RESOURCES.map((r, i) => (
-                                    <a
-                                        key={i}
-                                        href={r.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="block text-sm text-purple-400 hover:text-purple-300 underline"
-                                    >
-                                        {r.name}
-                                    </a>
-                                ))}
-                            </div>
+                            {SELF_CARE_RESOURCES.length > 0 && (
+                                <div className="mt-6 p-4 bg-purple-500/10 rounded-xl border border-purple-500/20">
+                                    <h4 className="text-sm font-bold text-purple-300 mb-2">Recommended Resources</h4>
+                                    {SELF_CARE_RESOURCES.map((r, i) => (
+                                        <a
+                                            key={i}
+                                            href={r.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block text-sm text-purple-400 hover:text-purple-300 underline"
+                                        >
+                                            {r.name}
+                                        </a>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

@@ -47,13 +47,8 @@ export const SELF_CARE_PROMPTS = [
 ];
 
 // Resources referenced in the curriculum
-export const SELF_CARE_RESOURCES = [
-    {
-        name: 'TransVoiceLessons (Zheanna Erose)',
-        url: 'https://www.youtube.com/c/TransVoiceLessons',
-        description: 'Excellent YouTube channel for trans feminine voice training'
-    }
-];
+// Resources referenced in the curriculum
+export const SELF_CARE_RESOURCES = [];
 
 class SelfCareServiceClass {
     /**

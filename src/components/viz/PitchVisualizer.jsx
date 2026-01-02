@@ -453,6 +453,41 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     ctx.fillText('STABILITY', barX - 5, barY + 6);
                 }
             }
+
+            // IN-FORMANT UPGRADE: Draw Formants if visible
+            // Formants F1 (300-1000) and F2 (800-2500) might be above the pitch view (defaults 50-350), 
+            // but if user zooms out, we should see them.
+            if (dataRef.current.formants) {
+                const { f1, f2 } = dataRef.current.formants;
+                if (f1 > 0 && f1 > yMin && f1 < yMax) {
+                    const y = mapY(f1);
+                    ctx.strokeStyle = 'rgba(168, 85, 247, 0.4)'; // Purple transparent
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([2, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(width - 50, y);
+                    ctx.lineTo(width, y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = 'rgba(168, 85, 247, 0.8)';
+                    ctx.font = '9px sans-serif';
+                    ctx.fillText('F1', width - 52, y + 3);
+                }
+                if (f2 > 0 && f2 > yMin && f2 < yMax) {
+                    const y = mapY(f2);
+                    ctx.strokeStyle = 'rgba(216, 180, 254, 0.4)'; // Light Purple
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([2, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(width - 50, y);
+                    ctx.lineTo(width, y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = 'rgba(216, 180, 254, 0.8)';
+                    ctx.font = '9px sans-serif';
+                    ctx.fillText('F2', width - 52, y + 3);
+                }
+            }
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -476,7 +511,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     <div className="text-2xl font-bold text-blue-400 font-mono">
                         {frequencyToNote(dataRef.current.pitch)}
                     </div>
-                    <div className="text-[10px] text-slate-500 font-mono">
+                    <div className="text-[10px] text-slate-500 font-mono flex items-center gap-1">
                         {Math.round(dataRef.current.pitch)} Hz
                         {getCentsDeviation(dataRef.current.pitch) !== 0 && (
                             <span className={`ml-1 ${getCentsDeviation(dataRef.current.pitch) > 0 ? 'text-orange-400' : 'text-cyan-400'}`}>
@@ -484,6 +519,19 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                             </span>
                         )}
                     </div>
+                    {/* IN-FORMANT UPGRADE: Formant Display */}
+                    {dataRef.current.formants && dataRef.current.formants.f1 > 0 && (
+                        <div className="mt-2 pt-2 border-t border-slate-700/50">
+                            <div className="flex gap-3 text-[9px] font-mono text-slate-400">
+                                <div>
+                                    <span className="text-purple-400 font-bold">F1</span> {Math.round(dataRef.current.formants.f1)}
+                                </div>
+                                <div>
+                                    <span className="text-purple-400 font-bold">F2</span> {Math.round(dataRef.current.formants.f2)}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 

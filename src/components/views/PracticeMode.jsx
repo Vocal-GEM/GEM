@@ -6,13 +6,16 @@ import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
 import { useTour } from '../../context/TourContext';
 
+import VisualizerSkeleton from '../ui/VisualizerSkeleton';
+
 // Components
-import DynamicOrb from '../viz/DynamicOrb';
-import PitchVisualizer from '../viz/PitchVisualizer';
-import ResonanceOrb from '../viz/ResonanceOrb';
-import VoiceQualityMeter from '../viz/VoiceQualityMeter';
-import VowelSpacePlot from '../viz/VowelSpacePlot';
-import Spectrogram from '../viz/Spectrogram';
+const DynamicOrb = lazy(() => import('../viz/DynamicOrb'));
+const PitchVisualizer = lazy(() => import('../viz/PitchVisualizer'));
+const ResonanceOrb = lazy(() => import('../viz/ResonanceOrb'));
+const VoiceQualityMeter = lazy(() => import('../viz/VoiceQualityMeter'));
+const VowelSpacePlot = lazy(() => import('../viz/VowelSpacePlot'));
+const Spectrogram = lazy(() => import('../viz/Spectrogram'));
+
 import PracticeCardsPanel from '../ui/PracticeCardsPanel';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorBoundary from '../ui/ErrorBoundary';
@@ -336,7 +339,7 @@ const PracticeMode = ({
                         {/* Visualization Layer */}
                         <div className="flex-1 relative z-10">
                             <ErrorBoundary>
-                                <Suspense fallback={<LoadingSpinner />}>
+                                <Suspense fallback={<VisualizerSkeleton />}>
                                     {practiceTab === 'overview' && (
                                         <DynamicOrb
                                             dataRef={dataRef}

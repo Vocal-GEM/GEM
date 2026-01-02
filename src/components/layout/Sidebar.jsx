@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, User, Waves, Search, FileText, HelpCircle, Layers, BookMarked, Camera, Briefcase, ClipboardCheck } from 'lucide-react';
+import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, User, Users, Waves, Search, FileText, HelpCircle, Layers, BookMarked, Camera, Briefcase, ClipboardCheck } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
@@ -44,10 +44,15 @@ const Sidebar = ({ activeView, onViewChange }) => {
     const navItems = [
         { id: 'dashboard', label: 'Dashboard', icon: <Home size={20} /> },
         { id: 'practice', label: 'Practice', icon: <Activity size={20} /> },
+        { id: 'community', label: 'Community', icon: <Users size={20} /> },
         { id: 'analysis', label: 'Analysis', icon: <Waves size={20} /> },
         { id: 'analytics', label: 'Analytics', icon: <BarChart2 size={20} /> },
         { id: 'coach', label: 'Coach', icon: <BookOpen size={20} /> },
+        { id: 'marketplace', label: 'Marketplace', icon: <Briefcase size={20} /> },
         { id: 'library', label: 'Library', icon: <BookMarked size={20} /> },
+        { id: 'client-dashboard', label: 'Pro Dashboard', icon: <Briefcase size={20} /> },
+        { id: 'capev', label: 'CAPE-V', icon: <ClipboardCheck size={20} /> },
+        { id: 'spectrogram', label: 'Signal Lab', icon: <Waves size={20} /> },
         { id: 'camera', label: 'Mirror', icon: <Camera size={20} />, isModal: true },
         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
     ];

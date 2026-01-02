@@ -19,6 +19,7 @@ import AssessmentModule from './components/ui/AssessmentModule';
 import WarmUpModule from './components/ui/WarmUpModule';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 import FloatingCamera from './components/ui/FloatingCamera';
+import OfflineIndicator from './components/ui/OfflineIndicator';
 
 // Lazy Loaded Components - UI
 const Sidebar = lazy(() => import('./components/layout/Sidebar'));
@@ -29,6 +30,7 @@ const ClinicalAssessmentView = lazy(() => import('./components/views/ClinicalAss
 
 const CAPEVAssessment = lazy(() => import('./components/professional/CAPEVAssessment'));
 const ClientDashboard = lazy(() => import('./components/professional/ClientDashboard'));
+const SpectrogramComparison = lazy(() => import('./components/professional/SpectrogramComparison'));
 
 const SettingsView = lazy(() => import('./components/views/SettingsView'));
 const AnalysisHub = lazy(() => import('./components/views/AnalysisHub'));
@@ -73,7 +75,23 @@ import CommandPalette from './components/ui/CommandPalette';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
 import QuickSettings from './components/ui/QuickSettings';
 import { analyticsService } from './services/AnalyticsService';
+import { useVoiceProfile } from './context/VoiceProfileContext';
+import IntakeQuestionnaire from './components/ui/IntakeQuestionnaire';
+// VoiceTwinDiscovery is not used in App directly, it's a widget in Dashboard
+// But if we want it accessible elsewhere we can import it. 
+// For now removing the unused import line causing confusion.
+
 const App = () => {
+    const { profile, loading: voiceLoading } = useVoiceProfile();
+    const [showIntake, setShowIntake] = useState(false);
+
+    useEffect(() => {
+        const onboarded = localStorage.getItem('gem_voice_profile_onboarding_done');
+        if (!onboarded && !voiceLoading && profile && !profile.goals?.voiceType) {
+            setShowIntake(true);
+        }
+    }, [voiceLoading, profile]);
+
     const {
         audioEngineRef,
         dataRef,
@@ -372,6 +390,14 @@ const App = () => {
                             </div>
                         )}
 
+                        {activeTab === 'spectrogram' && (
+                            <div className="h-full">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    <SpectrogramComparison />
+                                </Suspense>
+                            </div>
+                        )}
+
                         {/* Modals & Overlays */}
                         <FeedbackSettings
                             isOpen={showSettings || modals.settings}
@@ -484,17 +510,11 @@ const App = () => {
                             <Suspense fallback={<LoadingSpinner />}>
                                 <GuidedJourney onClose={() => closeModal('guidedJourney')} />
                             </Suspense>
-                        )}
-                        {modals.practiceCards && (
+                        )}                        {modals.practiceCards && (
                             <Suspense fallback={<LoadingSpinner />}>
                                 <PracticeCardsPanel onClose={() => closeModal('practiceCards')} />
                             </Suspense>
                         )}
-
-                        <CelebrationModal
-                            achievement={unlockedAchievement}
-                            onClose={closeAchievement}
-                        />
                     </main>
 
                     {/* Mobile Bottom Navigation */}
@@ -503,6 +523,23 @@ const App = () => {
                     </div>
                 </div>
             </LanguageProvider>
+            {/* Global Overlays */}
+            <OfflineIndicator />
+            <CelebrationModal
+                achievement={unlockedAchievement}
+                onClose={closeAchievement}
+            />
+            <TourOverlay />
+            <ErrorRecovery />
+            {showIntake && (
+                <IntakeQuestionnaire
+                    onComplete={() => {
+                        localStorage.setItem('gem_voice_profile_onboarding_done', 'true');
+                        setShowIntake(false);
+                    }}
+                    onClose={() => setShowIntake(false)}
+                />
+            )}
         </TourProvider >
     );
 };

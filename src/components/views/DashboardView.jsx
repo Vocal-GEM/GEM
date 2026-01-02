@@ -13,6 +13,10 @@ import QuickVoiceCheck from '../ui/QuickVoiceCheck';
 import { useGuidedJourney } from '../../context/GuidedJourneyContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { checkStreakStatus, getStreakMessage } from '../../services/StreakService';
+import RecommendedToolsWidget from '../ui/RecommendedToolsWidget';
+import MoodCheckIn from '../ui/MoodCheckIn';
+import PersonalMilestonesDisplay from '../ui/PersonalMilestonesDisplay';
+import VoiceTwinDiscovery from '../ui/VoiceTwinDiscovery';
 
 const StatCard = ({ label, value, subtext, icon, color }) => (
     <div className="bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
@@ -90,8 +94,18 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                 />
             </div>
 
+            {/* Mood Check In */}
+            <div className="mb-8">
+                <MoodCheckIn />
+            </div>
+
             {/* Smart Coach Widget */}
             <SmartCoachWidget onStartSession={onOpenAdaptiveSession} />
+
+            {/* Recommended Tools */}
+            <div className="mb-8">
+                <RecommendedToolsWidget />
+            </div>
 
             {/* Quick Action Buttons */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -172,8 +186,9 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
             <VocalHealthPanel />
 
             {/* Session Summary */}
-            <div className="mb-8">
+            <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <SessionSummaryCard />
+                <PersonalMilestonesDisplay />
             </div>
 
             {/* Recommended Exercises */}
@@ -239,6 +254,11 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                     color="text-teal-400"
                     onClick={() => onViewChange('analysis')}
                 />
+            </div>
+
+            {/* Community & Voice Twins */}
+            <div className="mt-8 mb-8">
+                <VoiceTwinDiscovery />
             </div>
         </div>
     );

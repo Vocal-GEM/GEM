@@ -561,5 +561,16 @@
             "resonance": "Resonance",
             "weight": "Weight"
         }
+    },
+    "marketplace": {
+        "title": "Voice Training Marketplace",
+        "subtitle": "Discover exercise packs created by the community and professionals",
+        "search": "Search packs...",
+        "buy": "Buy",
+        "free": "Free",
+        "download": "Download"
+    },
+    "temp": {
+        "ignore": "me"
     }
 }
