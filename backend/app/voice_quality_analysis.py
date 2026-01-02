@@ -4,6 +4,7 @@ try:
     from parselmouth.praat import call
     import soundfile as sf
     import scipy.signal
+    from numpy.lib.stride_tricks import sliding_window_view
     _deps_available = True
 except ImportError:
     _deps_available = False
@@ -12,6 +13,7 @@ except ImportError:
     call = None
     sf = None
     scipy = None
+    sliding_window_view = None
 
 # ----------------------
 # Goal presets
@@ -968,46 +970,6 @@ def classify_phonation_state(spectral_tilt, h1_h2, hnr, jitter, shimmer):
 # RBI Implementation
 # ----------------------
 
-def compute_raw_rbi_features(frame, sr, f0):
-    """
-    Compute raw spectral features for RBI: ratio_HL, centroid, tilt_flipped.
-    """
-    # FFT
-    window = np.hanning(len(frame))
-    spectrum = np.fft.rfft(frame * window)
-    mag_sq = np.abs(spectrum) ** 2
-    freqs = np.fft.rfftfreq(len(frame), 1/sr)
-    
-    # 1. HF/LF Ratio
-    # LF: 0-1.5k, HF: 3-6k
-    lf_mask = (freqs >= 0) & (freqs < 1500)
-    hf_mask = (freqs >= 3000) & (freqs < 6000)
-    
-    e_lf = np.sum(mag_sq[lf_mask])
-    e_hf = np.sum(mag_sq[hf_mask])
-    
-    ratio_hl = np.log10((e_hf + 1e-12) / (e_lf + 1e-12))
-    
-    # 2. Centroid
-    total_energy = np.sum(mag_sq) + 1e-12
-    centroid = np.sum(freqs * mag_sq) / total_energy
-    
-    # 3. Tilt (Slope of log mag in 300-4000 Hz)
-    band_mask = (freqs >= 300) & (freqs <= 4000)
-    if np.sum(band_mask) > 1:
-        f_band = freqs[band_mask]
-        y_band = 20 * np.log10(mag_sq[band_mask] + 1e-12) # Power to dB
-        # Linear regression y = ax + b
-        A = np.vstack([f_band, np.ones_like(f_band)]).T
-        slope, _ = np.linalg.lstsq(A, y_band, rcond=None)[0]
-        tilt = slope
-    else:
-        tilt = 0.0
-        
-    tilt_flipped = -tilt # Higher = Brighter
-    
-    return ratio_hl, centroid, tilt_flipped
-
 # RBI Weights - Tuned for balanced contribution
 # Ratio (0.4): Primary indicator of brightness/darkness (spectral slope proxy)
 # Centroid (0.25): Center of mass, correlates well with resonance
@@ -1020,8 +982,64 @@ RBI_WEIGHTS = {
     "f0": 0.10
 }
 
+def compute_raw_rbi_features_vectorized(frames, sr):
+    """
+    Vectorized version of compute_raw_rbi_features.
+    """
+    # frames: (N, frame_len)
+    N, frame_len = frames.shape
+
+    # Windowing
+    window = np.hanning(frame_len)
+    windowed_frames = frames * window
+
+    # FFT
+    spectrum = np.fft.rfft(windowed_frames, axis=1)
+    mag_sq = np.abs(spectrum) ** 2
+    freqs = np.fft.rfftfreq(frame_len, 1/sr)
+    
+    # 1. HF/LF Ratio
+    # LF: 0-1.5k, HF: 3-6k
+    lf_mask = (freqs >= 0) & (freqs < 1500)
+    hf_mask = (freqs >= 3000) & (freqs < 6000)
+    
+    e_lf = np.sum(mag_sq[:, lf_mask], axis=1)
+    e_hf = np.sum(mag_sq[:, hf_mask], axis=1)
+    
+    ratio_hl = np.log10((e_hf + 1e-12) / (e_lf + 1e-12))
+    
+    # 2. Centroid
+    total_energy = np.sum(mag_sq, axis=1) + 1e-12
+    centroid = np.sum(freqs * mag_sq, axis=1) / total_energy
+    
+    # 3. Tilt
+    band_mask = (freqs >= 300) & (freqs <= 4000)
+
+    mag_band = mag_sq[:, band_mask] # (N, M)
+    y_band = 20 * np.log10(mag_band + 1e-12) # (N, M)
+    f_band = freqs[band_mask] # (M,)
+
+    M_points = len(f_band)
+    if M_points > 1:
+        sum_x = np.sum(f_band)
+        sum_xx = np.sum(f_band**2)
+        denom = M_points * sum_xx - sum_x**2
+
+        sum_y = np.sum(y_band, axis=1) # (N,)
+        sum_xy = np.sum(f_band * y_band, axis=1) # (N,)
+
+        slope = (M_points * sum_xy - sum_x * sum_y) / denom
+        tilt = slope
+    else:
+        tilt = np.zeros(N)
+        
+    tilt_flipped = -tilt
+    
+    return ratio_hl, centroid, tilt_flipped
+
 def compute_rbi_series(y, sr, frame_length_s=0.04, hop_length_s=0.01):
     """
+    Compute RBI for the entire file using the 3-pass approach (Vectorized).
     Compute RBI for the entire file using the 3-pass approach.
     Optimized version using vectorized operations.
     """
@@ -1054,6 +1072,52 @@ def compute_rbi_series(y, sr, frame_length_s=0.04, hop_length_s=0.01):
     sound = parselmouth.Sound(y, sr)
     pitch_obj = sound.to_pitch(time_step=hop_length_s, pitch_floor=75, pitch_ceiling=600)
     
+    # Create frames view
+    # Limit number of frames to match legacy loop: range(0, len(y_pre) - frame_len, hop_len)
+    num_frames = (len(y_pre) - frame_len - 1) // hop_len + 1
+    
+    # sliding_window_view returns all possible windows. We stride it by hop_len.
+    frames_view = sliding_window_view(y_pre, window_shape=frame_len)[::hop_len]
+    
+    # Truncate to match legacy length if necessary
+    if len(frames_view) > num_frames:
+        frames_view = frames_view[:num_frames]
+        
+    n_frames = len(frames_view)
+    
+    # Timestamps (start times)
+    starts = np.arange(0, n_frames) * hop_len
+    times = starts / sr
+
+    # RMS Energy (Vectorized)
+    rms_values = np.sqrt(np.mean(frames_view**2, axis=1) + 1e-12)
+    energies_db = 20 * np.log10(rms_values)
+
+    # Adaptive Threshold
+    mean_energy = np.mean(energies_db) if len(energies_db) > 0 else -100
+    energy_threshold = max(mean_energy - 20, -50)
+
+    # F0
+    # Query pitch at t + frame_length/2
+    query_times = times + frame_length_s/2
+    # Parselmouth lookup (list comprehension is fast enough for 1D lookup)
+    f0_values = np.array([pitch_obj.get_value_at_time(t) for t in query_times])
+    f0_values = np.nan_to_num(f0_values, nan=0.0)
+
+    # Validity Check
+    is_voiced = (energies_db > energy_threshold) & (f0_values > 75) & (f0_values < 500)
+
+    valid_indices = np.where(is_voiced)[0]
+
+    if len(valid_indices) == 0:
+        return [None] * n_frames, {}
+        
+    # Compute features only for voiced frames
+    valid_frames = frames_view[is_voiced]
+    
+    ratios, centroids, tilts = compute_raw_rbi_features_vectorized(valid_frames, sr)
+
+    # Pass 2: Global Stats
     # Interpolate F0 to frame centers
     starts = np.arange(n_frames) * hop_len
     centers_t = (starts + frame_len/2) / sr
@@ -1126,6 +1190,37 @@ def compute_rbi_series(y, sr, frame_length_s=0.04, hop_length_s=0.01):
         "tilt_min": np.percentile(tilts_flipped, 5), "tilt_max": np.percentile(tilts_flipped, 95)
     }
     
+    # Pass 3: Normalize and Compute RBI
+    # Vectorized Normalization
+    r_norm = np.clip((ratios - stats["ratio_min"]) / (stats["ratio_max"] - stats["ratio_min"] + 1e-9), 0.0, 1.0)
+    c_norm = np.clip((centroids - stats["centroid_min"]) / (stats["centroid_max"] - stats["centroid_min"] + 1e-9), 0.0, 1.0)
+    t_norm = np.clip((tilts - stats["tilt_min"]) / (stats["tilt_max"] - stats["tilt_min"] + 1e-9), 0.0, 1.0)
+    
+    valid_f0s = f0_values[is_voiced]
+    f0_clip = np.clip(valid_f0s, 120, 300)
+    f0_norm = (f0_clip - 120) / (300 - 120)
+    
+    raw_scores = (RBI_WEIGHTS["ratio"] * r_norm) + \
+                 (RBI_WEIGHTS["centroid"] * c_norm) + \
+                 (RBI_WEIGHTS["tilt"] * t_norm) + \
+                 (RBI_WEIGHTS["f0"] * f0_norm)
+
+    current_rbis = np.clip(raw_scores * 100, 0, 100)
+    
+    # Smoothing
+    rbi_values = [None] * n_frames
+    last_rbi = 50.0
+    valid_rbi_iter = iter(current_rbis)
+    
+    for i in range(n_frames):
+        if is_voiced[i]:
+            val = next(valid_rbi_iter)
+            alpha = 0.2
+            smoothed_rbi = (alpha * val) + ((1 - alpha) * last_rbi)
+            last_rbi = smoothed_rbi
+            rbi_values[i] = smoothed_rbi
+        else:
+            rbi_values[i] = None
     # 8. Normalize and Score
     def norm_vec(val, vmin, vmax):
         width = vmax - vmin
