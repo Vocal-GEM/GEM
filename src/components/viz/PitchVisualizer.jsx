@@ -10,6 +10,7 @@ import { NormsService } from '../../services/NormsService';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import { predictGenderPerception, getPerceptionColor, AMBIGUITY_ZONE } from '../../services/GenderPerceptionPredictor';
 import GenderTimeline from './GenderTimeline';
+import FeedbackManager from './FeedbackManager';
 
 const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScore, settings }) => {
     const { voiceProfiles, activeProfile } = useProfile();
@@ -672,6 +673,9 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     </div>
                 </div>
             )}
+
+            {/* Tier 3 Feedback System Overlay */}
+            <FeedbackManager dataRef={dataRef} targetRange={targetRange} active={!settings?.feedback?.focusMode} />
         </div>
     );
 });

@@ -2,6 +2,10 @@ import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { indexedDB } from '../services/IndexedDBManager';
 import { textToSpeechService } from '../services/TextToSpeechService';
 import i18n from '../i18n';
+import { getAdaptiveFeedbackController } from '../services/AdaptiveFeedback';
+import { HapticFeedback } from '../services/HapticFeedback';
+import { getAudioFeedback } from '../services/AudioFeedback';
+import { getThemeService } from '../services/FeedbackThemes';
 
 const SettingsContext = createContext(null);
 
@@ -38,6 +42,17 @@ export const SettingsProvider = ({ children }) => {
             spectrum: true
         },
 
+        // Feedback Settings
+        feedback: {
+            sensitivity: 0.5, // 0 to 1
+            hapticEnabled: true,
+            hapticIntensity: 1.0,
+            audioMode: 'tones', // 'tones', 'verbal', 'chimes', 'off'
+            audioVolume: 0.5,
+            visualTheme: 'orb', // 'orb', 'graph', 'arrow', 'numeric'
+            focusMode: { enabled: false, metric: null }
+        },
+
         genderFeedbackMode: 'neutral', // 'default' | 'neutral' | 'off'
 
         disable3D: false, // Safe Mode (2D Fallback)
@@ -62,7 +77,23 @@ export const SettingsProvider = ({ children }) => {
         },
 
         // Visualization
-        spectrogramColorScheme: 'heatmap' // 'heatmap' | 'magma' | 'viridis' | 'grayscale'
+        spectrogramColorScheme: 'heatmap', // 'heatmap' | 'magma' | 'viridis' | 'grayscale'
+
+        // --- NEW: Standardized Voice Goals (Tier 1) ---
+        pitchTarget: { min: 170, max: 240, habitual: 210 }, // Hz
+        resonanceTarget: 1.0, // AU (1.0 = neutral)
+
+        // Audio Processing
+        pitchSmoothing: 'medium', // 'off', 'low', 'medium', 'high'
+        signalValidation: true,   // Enable/disable signal quality checks
+
+        // Microphone Profile (from Calibration)
+        micProfile: {
+            qualityScore: 0,
+            noiseFloor: -100,
+            gateThreshold: 0.005,
+            calibratedAt: null
+        }
     });
 
 
@@ -158,6 +189,35 @@ export const SettingsProvider = ({ children }) => {
             }
         });
     }, [settings.performanceMode, settings.visualizationQuality]);
+
+    // Sync feedback settings to services
+    useEffect(() => {
+        if (!settings.feedback) return;
+
+        // Sync Adaptive Feedback
+        const adaptiveController = getAdaptiveFeedbackController();
+        // adaptiveController.updateSensitivity(settings.feedback.sensitivity); (Method to be added or handled by getThresholds param)
+
+        // Sync Haptic
+        if (!settings.feedback.hapticEnabled) {
+            HapticFeedback.disable();
+        } else {
+            HapticFeedback.enable();
+            HapticFeedback.setIntensity(settings.feedback.hapticIntensity);
+        }
+
+        // Sync Audio
+        const audioFeedback = getAudioFeedback();
+        audioFeedback.setMode(settings.feedback.audioMode);
+        audioFeedback.setVolume(settings.feedback.audioVolume);
+
+        // Sync Visual Theme
+        const themeService = getThemeService();
+        if (settings.feedback.visualTheme !== themeService.currentTheme) {
+            themeService.setTheme(settings.feedback.visualTheme);
+        }
+
+    }, [settings.feedback]);
 
 
     const updateSettings = (newSettings) => {

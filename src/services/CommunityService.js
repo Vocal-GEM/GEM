@@ -1,11 +1,108 @@
 import { getXPData } from './DailyChallengeService';
 
+const API_BASE = '/api/community';
+
 /**
  * CommunityService - Handles community features and sharing
  */
 
 const STORAGE_KEY = 'gem_community';
 const PROFILE_KEY = 'gem_public_profile';
+
+/**
+ * Share a voice sample anonymously
+ * @param {Blob} audioBlob - Recorded audio
+ * @param {Object} metadata - Context and settings
+ */
+export const shareVoiceAnonymously = async (audioBlob, metadata) => {
+    try {
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'recording.wav');
+        formData.append('context', metadata.context || '');
+        formData.append('expiration_days', metadata.expirationDays || 7);
+
+        const response = await fetch(`${API_BASE}/share-voice`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) throw new Error('Upload failed');
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to share voice:', error);
+        throw error;
+    }
+};
+
+/**
+ * Get community benchmarks
+ */
+export const getCommunityBenchmarks = async (voiceType, experienceLevel) => {
+    try {
+        const params = new URLSearchParams({
+            voice_goal: voiceType,
+            experience_level: experienceLevel
+        });
+
+        const response = await fetch(`${API_BASE}/benchmarks?${params}`);
+        if (!response.ok) throw new Error('Failed to fetch benchmarks');
+        return await response.json();
+    } catch (error) {
+        console.error('Benchmark fetch failed:', error);
+        // Fallback to simulated data
+        return getSimulatedBenchmarks(voiceType);
+    }
+};
+
+/**
+ * Get success stories
+ */
+export const getSuccessStories = async (filters = {}) => {
+    try {
+        const params = new URLSearchParams(filters);
+        const response = await fetch(`${API_BASE}/success-stories?${params}`);
+        if (!response.ok) throw new Error('Failed to fetch stories');
+        return await response.json();
+    } catch (error) {
+        console.error('Story fetch failed:', error);
+        return { stories: [] };
+    }
+};
+
+/**
+ * Submit a success story
+ */
+export const submitSuccessStory = async (storyData) => {
+    try {
+        const response = await fetch(`${API_BASE}/success-stories`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(storyData)
+        });
+
+        if (!response.ok) throw new Error('Submission failed');
+        return await response.json();
+    } catch (error) {
+        console.error('Story submission failed:', error);
+        throw error;
+    }
+};
+
+/**
+ * Join a group challenge
+ */
+export const joinGroupChallenge = async (challengeId) => {
+    try {
+        const response = await fetch(`${API_BASE}/challenges/group/${challengeId}/join`, {
+            method: 'POST'
+        });
+        if (!response.ok) throw new Error('Join failed');
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to join challenge:', error);
+        throw error;
+    }
+};
 
 /**
  * Get user's public profile settings
@@ -38,90 +135,32 @@ export const updatePublicProfile = (updates) => {
     return newProfile;
 };
 
-/**
- * Get community data (local simulation)
- */
-export const getCommunityData = () => {
-    try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            return JSON.parse(stored);
-        }
-    } catch (e) {
-        console.error('CommunityService: Failed to load', e);
-    }
+/* --- Privacy & Local Helpers --- */
+
+const getSimulatedBenchmarks = (voiceType) => {
+    // Fallback data when offline
     return {
-        sharedMilestones: [],
-        challenges: [],
-        leaderboard: []
+        benchmarks: {
+            avg_pitch: { value: voiceType === 'feminine' ? 210 : 110, sample_size: 100 },
+            avg_resonance: { value: 0.65, sample_size: 100 }
+        }
     };
 };
 
-/**
- * Share a milestone to community
- */
-export const shareMilestone = (milestone) => {
-    const data = getCommunityData();
-    const profile = getPublicProfile();
-
-    if (!profile.shareProgress) {
-        return { success: false, message: 'Sharing disabled in settings' };
+export const getLeaderboard = async () => {
+    try {
+        // Try to fetch real leaderboard if endpoint existed
+        // For now, use the simulated one or implement backend endpoint
+        return getSimulatedLeaderboard();
+    } catch (e) {
+        return getSimulatedLeaderboard();
     }
-
-    const sharedMilestone = {
-        id: `milestone_${Date.now()}`,
-        userId: getAnonymousId(),
-        displayName: profile.displayName,
-        type: milestone.type,
-        title: milestone.title,
-        description: milestone.description,
-        timestamp: new Date().toISOString()
-    };
-
-    data.sharedMilestones.unshift(sharedMilestone);
-    if (data.sharedMilestones.length > 50) {
-        data.sharedMilestones = data.sharedMilestones.slice(0, 50);
-    }
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    return { success: true, milestone: sharedMilestone };
 };
 
-/**
- * Get weekly challenges
- */
-export const getWeeklyChallenges = () => {
-    const weekNumber = getWeekNumber();
-
-    // Simulated weekly challenges based on week number
-    const challengePool = [
-        { id: 'streak-7', title: '7-Day Streak', description: 'Practice every day for a week', xpReward: 200 },
-        { id: 'pitch-master', title: 'Pitch Master', description: 'Complete 10 pitch exercises', xpReward: 150 },
-        { id: 'journal-5', title: 'Voice Logger', description: 'Record 5 voice journal entries', xpReward: 100 },
-        { id: 'resonance-pro', title: 'Resonance Pro', description: 'Complete 15 resonance exercises', xpReward: 175 },
-        { id: 'variety', title: 'All-Rounder', description: 'Practice from 5 different categories', xpReward: 125 },
-        { id: 'time-30', title: 'Dedicated', description: 'Practice for 30 minutes total', xpReward: 100 }
-    ];
-
-    // Select 2 challenges based on week
-    const idx1 = weekNumber % challengePool.length;
-    const idx2 = (weekNumber + 3) % challengePool.length;
-
-    return [
-        { ...challengePool[idx1], weekNumber },
-        { ...challengePool[idx2], weekNumber }
-    ];
-};
-
-/**
- * Get leaderboard (simulated)
- */
-export const getLeaderboard = () => {
-    // const { getXPData } = require('./DailyChallengeService'); // Removed: require is not defined in ESM
+const getSimulatedLeaderboard = () => {
     const userData = getXPData();
     const profile = getPublicProfile();
 
-    // Simulated other users
     const simulated = [
         { displayName: 'VocalStar', level: 12, xp: 7200, isYou: false },
         { displayName: 'PitchPerfect', level: 10, xp: 5000, isYou: false },
@@ -130,7 +169,6 @@ export const getLeaderboard = () => {
         { displayName: 'ToneMaster', level: 5, xp: 1250, isYou: false }
     ];
 
-    // Add current user
     const currentUser = {
         displayName: profile.displayName,
         level: userData.level,
@@ -144,17 +182,40 @@ export const getLeaderboard = () => {
     return combined.map((user, idx) => ({ ...user, rank: idx + 1 }));
 };
 
-/**
- * Helpers
- */
-const getAnonymousId = () => {
-    let id = localStorage.getItem('gem_anonymous_id');
-    if (!id) {
-        id = `anon_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        localStorage.setItem('gem_anonymous_id', id);
-    }
-    return id;
+const getSimulatedChallenges = () => {
+    // Keep existing simulated logic
+    const weekNumber = getWeekNumber();
+    const challengePool = [
+        { id: 'streak-7', title: '7-Day Streak', description: 'Practice every day for a week', xpReward: 200 },
+        { id: 'pitch-master', title: 'Pitch Master', description: 'Complete 10 pitch exercises', xpReward: 150 },
+        { id: 'journal-5', title: 'Voice Logger', description: 'Record 5 voice journal entries', xpReward: 100 },
+        { id: 'resonance-pro', title: 'Resonance Pro', description: 'Complete 15 resonance exercises', xpReward: 175 },
+    ];
+
+    // Select 2
+    const idx1 = weekNumber % challengePool.length;
+    const idx2 = (weekNumber + 3) % challengePool.length;
+
+    return [
+        { ...challengePool[idx1], weekNumber },
+        { ...challengePool[idx2], weekNumber }
+    ];
 };
+
+export const getWeeklyChallenges = async () => {
+    try {
+        const response = await fetch(`${API_BASE}/challenges/group`);
+        if (response.ok) {
+            const data = await response.json();
+            // Transform if necessary to match UI expectation
+            // Or merge with local challenges
+            return [...getSimulatedChallenges(), ...data.challenges];
+        }
+        return getSimulatedChallenges();
+    } catch (e) {
+        return getSimulatedChallenges();
+    }
+}
 
 const getWeekNumber = () => {
     const now = new Date();
@@ -165,10 +226,13 @@ const getWeekNumber = () => {
 };
 
 export default {
+    shareVoiceAnonymously,
+    getCommunityBenchmarks,
+    getSuccessStories,
+    submitSuccessStory,
+    joinGroupChallenge,
     getPublicProfile,
     updatePublicProfile,
-    getCommunityData,
-    shareMilestone,
-    getWeeklyChallenges,
-    getLeaderboard
+    getLeaderboard,
+    getWeeklyChallenges
 };

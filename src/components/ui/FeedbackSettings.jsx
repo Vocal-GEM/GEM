@@ -264,48 +264,135 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                         </div>
                     </section>
 
-                    {/* Biofeedback Config */}
+                    {/* Real-Time Feedback Config */}
                     <section>
-                        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Biofeedback Triggers</h3>
+                        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Real-Time Feedback</h3>
+
+                        {/* Sensitivity Slider */}
+                        <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 mb-4">
+                            <div className="flex justify-between text-xs text-slate-400 mb-2">
+                                <span className="font-bold text-white">Feedback Sensitivity</span>
+                                <span className="text-blue-400 font-mono">{(settings.feedback?.sensitivity || 0.5) * 100}%</span>
+                            </div>
+                            <input
+                                type="range"
+                                min="0"
+                                max="1"
+                                step="0.05"
+                                value={settings.feedback?.sensitivity || 0.5}
+                                onChange={(e) => setSettings({
+                                    ...settings,
+                                    feedback: { ...settings.feedback, sensitivity: parseFloat(e.target.value) }
+                                })}
+                                className="w-full accent-blue-500 h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+                            />
+                            <div className="flex justify-between text-[10px] text-slate-500 mt-2">
+                                <span>Strict (High Precision)</span>
+                                <span>Lenient (Beginner)</span>
+                            </div>
+                        </div>
+
                         <div className="space-y-3">
+                            {/* Haptic Toggle */}
                             <div className="flex items-center justify-between p-3 bg-slate-800 rounded-xl">
                                 <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-lg ${settings.vibration ? 'bg-green-500/20 text-green-400' : 'bg-slate-700 text-slate-400'}`}><Vibrate className="w-5 h-5" /></div>
+                                    <div className={`p-2 rounded-lg ${(settings.feedback?.hapticEnabled ?? settings.vibration) ? 'bg-green-500/20 text-green-400' : 'bg-slate-700 text-slate-400'}`}>
+                                        <Vibrate className="w-5 h-5" />
+                                    </div>
                                     <div>
                                         <div className="text-sm font-bold text-white">Haptic Vibration</div>
-                                        <div className="text-[10px] text-slate-400">Vibrate when off-target</div>
+                                        <div className="text-[10px] text-slate-400">Vibrate patterns on phone/laptop</div>
                                     </div>
                                 </div>
                                 <label className="relative inline-flex items-center cursor-pointer p-2">
-                                    <input type="checkbox" checked={settings.vibration} onChange={(e) => setSettings({ ...settings, vibration: e.target.checked })} className="sr-only peer" />
+                                    <input
+                                        type="checkbox"
+                                        checked={settings.feedback?.hapticEnabled ?? settings.vibration}
+                                        onChange={(e) => setSettings({
+                                            ...settings,
+                                            vibration: e.target.checked,
+                                            feedback: { ...settings.feedback, hapticEnabled: e.target.checked }
+                                        })}
+                                        className="sr-only peer"
+                                    />
                                     <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
                                 </label>
                             </div>
 
-                            <div className="flex items-center justify-between p-3 bg-slate-800 rounded-xl">
-                                <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-lg ${settings.tone ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-700 text-slate-400'}`}><Volume2 className="w-5 h-5" /></div>
+                            {/* Audio Mode */}
+                            <div className="p-3 bg-slate-800 rounded-xl">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className={`p-2 rounded-lg ${(settings.feedback?.audioMode || 'tones') !== 'off' ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-700 text-slate-400'}`}>
+                                        <Volume2 className="w-5 h-5" />
+                                    </div>
                                     <div>
-                                        <div className="text-sm font-bold text-white">Audio Guide Tone</div>
-                                        <div className="text-[10px] text-slate-400">Play tone when off-target</div>
+                                        <div className="text-sm font-bold text-white">Audio Feedback Style</div>
                                     </div>
                                 </div>
-                                <label className="relative inline-flex items-center cursor-pointer p-2">
-                                    <input type="checkbox" checked={settings.tone} onChange={(e) => setSettings({ ...settings, tone: e.target.checked })} className="sr-only peer" />
-                                    <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
-                                </label>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {['tones', 'verbal', 'chimes', 'off'].map(mode => (
+                                        <button
+                                            key={mode}
+                                            onClick={() => setSettings({
+                                                ...settings,
+                                                tone: mode !== 'off',
+                                                feedback: { ...settings.feedback, audioMode: mode }
+                                            })}
+                                            className={`p-2 rounded-lg text-xs font-bold capitalize transition-colors ${(settings.feedback?.audioMode || 'tones') === mode
+                                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                                                    : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
+                                                }`}
+                                        >
+                                            {mode}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Visual Theme */}
+                            <div className="p-3 bg-slate-800 rounded-xl">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="p-2 rounded-lg bg-purple-500/20 text-purple-400">
+                                        <Eye className="w-5 h-5" />
+                                    </div>
+                                    <div className="text-sm font-bold text-white">Visual Theme</div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {[
+                                        { id: 'orb', name: 'Resonance Orb', desc: 'Abstract & Organic' },
+                                        { id: 'graph', name: 'Analysis Graph', desc: 'Detailed Plotting' },
+                                        { id: 'arrow', name: 'Directional', desc: 'Simple Guidance' },
+                                        { id: 'numeric', name: 'Data Focus', desc: 'Big Numbers' }
+                                    ].map(theme => (
+                                        <button
+                                            key={theme.id}
+                                            onClick={() => setSettings({
+                                                ...settings,
+                                                feedback: { ...settings.feedback, visualTheme: theme.id }
+                                            })}
+                                            className={`p-3 rounded-lg text-left transition-colors border ${(settings.feedback?.visualTheme || 'orb') === theme.id
+                                                    ? 'bg-purple-500/20 border-purple-500/50 text-white'
+                                                    : 'bg-slate-700/50 border-transparent text-slate-400 hover:bg-slate-700'
+                                                }`}
+                                        >
+                                            <div className="text-xs font-bold">{theme.name}</div>
+                                            <div className="text-[10px] opacity-60">{theme.desc}</div>
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
                         {/* Trigger Conditions */}
                         <div className="mt-4 p-4 bg-slate-800/50 rounded-xl border border-white/5 space-y-3">
-                            <div className="flex items-center gap-2 p-2">
+                            <div className="text-xs font-bold text-slate-500 uppercase mb-2">Auto-Intervention Triggers</div>
+                            <div className="flex items-center gap-2 p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
                                 <input type="checkbox" checked={settings.triggerLowPitch} onChange={(e) => setSettings({ ...settings, triggerLowPitch: e.target.checked })} className="accent-blue-500 w-5 h-5 rounded" />
-                                <span className="text-sm text-slate-300">Trigger when Pitch is too LOW</span>
+                                <span className="text-sm text-slate-300">Warn when Pitch drops too low</span>
                             </div>
-                            <div className="flex items-center gap-2 p-2">
+                            <div className="flex items-center gap-2 p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
                                 <input type="checkbox" checked={settings.triggerDarkRes} onChange={(e) => setSettings({ ...settings, triggerDarkRes: e.target.checked })} className="accent-blue-500 w-5 h-5 rounded" />
-                                <span className="text-sm text-slate-300">Trigger when Resonance is too DARK</span>
+                                <span className="text-sm text-slate-300">Warn when Resonance gets too dark</span>
                             </div>
                         </div>
                     </section>

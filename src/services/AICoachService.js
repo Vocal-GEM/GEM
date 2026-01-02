@@ -6,11 +6,15 @@ import { getActivitySummary, getReports } from './SessionReportService';
 import { getStreakData } from './StreakService';
 import { generateVoiceFingerprint } from './AdvancedAnalyticsService';
 import { TRAINING_CATEGORIES } from '../data/trainingData';
+import TechniqueRecognizer from './TechniqueRecognizer';
+import ErrorPatternDetector from './ErrorPatternDetector';
+
+// --- Existing Helper Functions (kept for backward compatibility) ---
 
 /**
  * Analyze user's practice patterns and weaknesses
  */
-const analyzeUserProgress = () => {
+export const analyzeUserProgress = () => {
     const reports = getReports();
     const streak = getStreakData();
     const fingerprint = generateVoiceFingerprint();
@@ -130,6 +134,7 @@ const selectExercises = (categoryId, count) => {
 
 /**
  * Generate real-time coaching feedback based on pitch/formants
+ * Preserved for legacy components, but ContextAwareCoach is preferred
  */
 export const generateCoachingFeedback = (metrics) => {
     const feedback = [];
@@ -231,9 +236,163 @@ export const getTodayRecommendation = () => {
     };
 };
 
+
+// --- New Context-Aware Coach Class ---
+
+export class ContextAwareCoach {
+    constructor(profileContext, historyContext) {
+        this.profile = profileContext || {};
+        this.history = historyContext || {};
+        this.conversationHistory = [];
+    }
+
+    /**
+     * Build full context object for AI
+     */
+    buildContext(userState) {
+        const progress = analyzeUserProgress();
+
+        return {
+            // Current session context
+            session: {
+                currentExercise: userState.currentExercise || 'Free Practice',
+                timeInSession: userState.sessionDuration || 0,
+                recentMetrics: userState.last5Readings || [],
+                currentMood: userState.moodCheck || 'neutral',
+                detectedTechnique: userState.detectedTechnique || null
+            },
+
+            // Historical context
+            history: {
+                sessionsThisWeek: progress.streak.count || 0,
+                streakDays: progress.streak.currentStreak || 0,
+                recentErrors: ErrorPatternDetector.getErrorPatternStats().topErrors,
+                recentAchievements: progress.streak.milestones || []
+            },
+
+            // Profile context
+            profile: {
+                voiceGoal: this.profile.voiceGoal || 'feminine_voice',
+                experienceLevel: this.profile.experienceLevel || 'beginner',
+                preferredStyle: this.profile.coachingStyle || 'encouraging',
+                name: this.profile.name || 'Student'
+            }
+        };
+    }
+
+    /**
+     * Generate system prompt for AI
+     */
+    buildSystemPrompt(context) {
+        const personaPrompts = {
+            encouraging: "You are a warm, supportive voice coach. Celebrate every small win. Use positive reinforcement.",
+            technical: "You are a precise, technical voice coach. Focus on acoustics, physiology, and actionable mechanics.",
+            balanced: "You are a balanced voice coach. Combine technical accuracy with supportive encouragement."
+        };
+
+        const basePrompt = personaPrompts[context.profile.preferredStyle] || personaPrompts.balanced;
+
+        // Ensure voice goal is defined to prevent undefined access
+        const voiceGoal = context.profile.voiceGoal || 'feminine_voice';
+
+        let goalContext = "";
+        if (voiceGoal === 'feminine_voice') {
+            goalContext = "The user's goal is voice feminization. Focus on raising pitch resonance (R1), increasing pitch (F0), and lightening vocal weight.";
+        } else if (voiceGoal === 'masculine_voice') {
+            goalContext = "The user's goal is voice masculinization. Focus on lowering resonance, lowering pitch, and increasing vocal weight.";
+        }
+
+        let sessionContext = `User is currently doing: ${context.session.currentExercise}.`;
+        if (context.session.detectedTechnique) {
+            sessionContext += ` I detect they are performing: ${context.session.detectedTechnique.technique} (Confidence: ${(context.session.detectedTechnique.confidence * 100).toFixed(0)}%).`;
+        }
+
+        let errorContext = "";
+        if (context.history.recentErrors && context.history.recentErrors.length > 0) {
+            errorContext = `Recent struggle areas: ${context.history.recentErrors.map(e => e.type.replace('_', ' ')).join(', ')}. Offer tips to help with these if relevant.`;
+        }
+
+        return `${basePrompt}
+        
+${goalContext}
+
+${sessionContext}
+
+${errorContext}
+
+Streak: ${context.history.streakDays} days.
+Experience Level: ${context.profile.experienceLevel}.
+
+Keep responses concise (under 2 sentences) unless asked for a detailed explanation.`;
+    }
+
+    /**
+     * Analyze audio buffer for technique and errors
+     */
+    analyzeAudio(audioData) {
+        // 1. Detect Technique
+        const technique = TechniqueRecognizer.recognizeTechnique(audioData);
+
+        // 2. Detect Errors
+        const errors = ErrorPatternDetector.analyzeSession({
+            pitchHistory: audioData.pitchHistory,
+            amplitudeHistory: audioData.amplitudeHistory || [],
+            resonanceHistory: audioData.resonanceHistory || [],
+            currentMetrics: audioData.metrics
+        });
+
+        // 3. Record Errors
+        if (errors.length > 0) {
+            ErrorPatternDetector.recordSessionErrors(errors);
+        }
+
+        return {
+            technique,
+            errors,
+            feedback: technique.feedback
+        };
+    }
+
+    /**
+     * Get response from AI (Simulated for now, would connect to backend)
+     */
+    async getResponse(userMessage, userState = {}) {
+        const context = this.buildContext(userState);
+        const systemPrompt = this.buildSystemPrompt(context);
+
+        // Add to history
+        this.conversationHistory.push({ role: 'user', content: userMessage });
+
+        // TODO: Replace with actual API call to backend
+        // const response = await fetch('/api/coach/chat', ...);
+
+        // Simulated response logic for prototype
+        let aiContent = "I'm listening. Tell me more about how that felt.";
+
+        if (userMessage.toLowerCase().includes('pitch')) {
+            aiContent = "For pitch, focus on where you feel the buzzing sensation. For a higher pitch, try to feel it in your nose or forehead.";
+        } else if (userMessage.toLowerCase().includes('tired')) {
+            aiContent = "If you're feeling tired, that's a sign to take a break. Vocal fatigue is real. Let's do some gentle lip trills or just rest.";
+        } else if (context.session.detectedTechnique && context.session.detectedTechnique.technique !== 'unknown') {
+            aiContent = `I hear you doing ${context.session.detectedTechnique.technique}. ${context.session.detectedTechnique.feedback}`;
+        } else if (userMessage.toLowerCase().includes('hello') || userMessage.toLowerCase().includes('hi')) {
+            aiContent = "Hello! Ready to work on your voice today? What's your focus?";
+        }
+
+        // Add to history
+        this.conversationHistory.push({ role: 'assistant', content: aiContent });
+
+        return {
+            message: aiContent,
+            contextUsed: context
+        };
+    }
+}
+
 export default {
     generateWeeklyCurriculum,
     generateCoachingFeedback,
     getTodayRecommendation,
-    analyzeUserProgress
+    analyzeUserProgress,
+    ContextAwareCoach
 };

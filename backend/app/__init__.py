@@ -139,6 +139,14 @@ def create_app():
     csrf.exempt(voice_quality_bp)
     app.register_blueprint(voice_quality_bp)
 
+    from .routes.community import community_bp
+    csrf.exempt(community_bp)
+    app.register_blueprint(community_bp, url_prefix='/api/community')
+
+    from .routes.marketplace import marketplace_bp
+    csrf.exempt(marketplace_bp)
+    app.register_blueprint(marketplace_bp, url_prefix='/api/marketplace')
+
     socketio.init_app(app)
     
     # Import socket handlers to register them
