@@ -30,6 +30,9 @@ const Toast = ({ message, type = 'info', onClose, duration = 3000 }) => {
     const role = safeType === 'error' || safeType === 'warning' ? 'alert' : 'status';
     const ariaLive = safeType === 'error' || safeType === 'warning' ? 'assertive' : 'polite';
 
+    const role = type === 'error' || type === 'warning' ? 'alert' : 'status';
+    const ariaLive = type === 'error' || type === 'warning' ? 'assertive' : 'polite';
+
     return (
         <div
             role={role}
@@ -42,6 +45,14 @@ const Toast = ({ message, type = 'info', onClose, duration = 3000 }) => {
                 onClick={onClose}
                 aria-label="Close notification"
                 className={`ml-2 hover:opacity-70 ${safeType === 'success' ? 'text-emerald-400' : safeType === 'error' ? 'text-red-400' : safeType === 'warning' ? 'text-amber-400' : 'text-blue-400'}`}
+            className={`fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[100] flex items-center gap-3 px-6 py-4 rounded-xl border backdrop-blur-md shadow-xl animate-in fade-in slide-in-from-bottom-4 ${style.bg}`}
+        >
+            <Icon className={`w-5 h-5 ${style.text}`} />
+            <span className={`font-medium ${style.text}`}>{message}</span>
+            <button
+                onClick={onClose}
+                aria-label="Close notification"
+                className={`ml-2 hover:opacity-70 ${style.text}`}
             >
                 <X className="w-4 h-4" />
             </button>
