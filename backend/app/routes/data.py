@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 import os
 import datetime
 from ..models import db, Stats, Journal, Settings, UserData
+from ..validators import sanitize_html, validate_file_upload
 from ..validators import sanitize_html, validate_file_extension
 from ..extensions import limiter
 
@@ -141,6 +142,10 @@ def upload_file():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
     
+    # Security Validation
+    is_valid, error = validate_file_upload(file.filename, file.content_type)
+    if not is_valid:
+        return jsonify({"error": error}), 400
     # Allowed extensions
     # Strict allowed extensions
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp3', 'wav', 'm4a', 'ogg', 'webm'}

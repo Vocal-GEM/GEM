@@ -1,3 +1,7 @@
+## 2024-05-23 - Insecure File Upload Vulnerability
+**Vulnerability:** The application relied solely on `werkzeug.utils.secure_filename` for file uploads, which only sanitizes the filename string (e.g., removing paths) but does not validate the file extension or content type. This allowed users to upload potentially dangerous files like `.py` scripts.
+**Learning:** `secure_filename` is insufficient for security; it prevents path traversal but not malicious file content or types.
+**Prevention:** Implemented a strict allowlist-based validation (`validate_file_upload`) in `backend/app/validators.py` that checks extensions against a safe list (audio, images, docs). Integrated this validation into all upload endpoints (`data.py`, `voice_quality.py`).
 ## 2024-05-23 - Unrestricted File Upload Vulnerability
 **Vulnerability:** The `/api/upload` endpoint in `backend/app/routes/data.py` accepted files with any extension.
 **Learning:** Even when using `secure_filename`, the file extension itself must be validated against an allowlist to prevent RCE (e.g., uploading `.php` or `.py` scripts) or XSS (e.g., uploading `.html`). Flask's `secure_filename` only cleans the string, it does not validate intent.
