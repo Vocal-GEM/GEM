@@ -21,12 +21,6 @@ def analyze():
 
     # Security: Validate file type (only audio allowed)
     is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'])
-    # Security check - Audio only
-    is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'])
-    if not is_valid:
-        return jsonify({"error": error_msg}), 400
-    # Security Validation
-    is_valid, error = validate_file_upload(file.filename, file.content_type)
     if not is_valid:
         return jsonify({"error": error}), 400
 
@@ -73,10 +67,6 @@ def clean_audio():
     is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'])
     if not is_valid:
         return jsonify({"error": error}), 400
-    # Security check - Audio only
-    is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'])
-    if not is_valid:
-        return jsonify({"error": error_msg}), 400
 
     try:
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
