@@ -14,6 +14,10 @@ class User(UserMixin, db.Model):
     user_data = db.relationship('UserData', backref='user', uselist=False, lazy=True)
 
 class Journal(db.Model):
+    __table_args__ = (
+        db.Index('idx_journal_user_client', 'user_id', 'client_id'),
+    )
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     date = db.Column(db.String(50), nullable=False)

@@ -395,6 +395,7 @@ export class AudioEngine {
 
         const bufferLength = this.analyser.frequencyBinCount; // 1024 if fftSize is 2048
         const dataArray = new Float32Array(bufferLength);
+        const freqData = new Float32Array(bufferLength);
 
         // Buffers for calculating perturbation metrics over time (e.g., last 10-20 frames)
         this.visualPitchBuffer = []; // Store 1/F0
@@ -412,8 +413,6 @@ export class AudioEngine {
 
             // --- NEW: Spectral Tilt Calculation ---
             // We need frequency data for tilt/weight analysis
-            const freqBufferLength = this.analyser.frequencyBinCount;
-            const freqData = new Float32Array(freqBufferLength);
             this.analyser.getFloatFrequencyData(freqData);
 
             // Approximate Spectral Tilt (db/octave proxy)

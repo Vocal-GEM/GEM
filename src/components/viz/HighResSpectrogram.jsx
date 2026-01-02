@@ -21,9 +21,12 @@ const MAX_FREQ = 8000;
 
 const HighResSpectrogram = ({ dataRef }) => {
     const canvasRef = useRef(null);
-    const tempCanvasRef = useRef(null);
     const lastFormantsRef = useRef({ f1: 0, f2: 0 });
     const { settings } = useSettings();
+
+    // Reusable buffers
+    const imgDataRef = useRef(null);
+    const data32Ref = useRef(null);
 
     // Tap cursor state  
     const [cursorData, setCursorData] = useState(null);
@@ -37,14 +40,9 @@ const HighResSpectrogram = ({ dataRef }) => {
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d', { willReadFrequently: true, alpha: false });
-
-        // Offscreen canvas for scrolling
-        if (!tempCanvasRef.current) {
-            tempCanvasRef.current = document.createElement('canvas');
-        }
-        const tempCanvas = tempCanvasRef.current;
-        const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+        // Remove 'willReadFrequently: true' to allow GPU acceleration since we use drawImage(canvas)
+        // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
+        const ctx = canvas.getContext('2d', { alpha: false });
 
         // Set dimensions
         const dpr = window.devicePixelRatio || 1;
@@ -52,10 +50,22 @@ const HighResSpectrogram = ({ dataRef }) => {
         canvas.width = rect.width * dpr;
         canvas.height = 512; // Higher vertical resolution
 
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
+        const scrollSpeed = 2;
 
+        // Pre-allocate buffers for the column update
+        // We reuse these every frame to avoid garbage collection
+        if (!imgDataRef.current || imgDataRef.current.height !== canvas.height) {
+            imgDataRef.current = ctx.createImageData(scrollSpeed, canvas.height);
+            data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
+        }
+        const width = canvas.width;
+        const height = canvas.height;
+        const scrollSpeed = 2;
 
+        // Pre-allocate buffer for one column of pixels
+        // Optimized: Reuse this buffer every frame to avoid allocation
+        const imgData = ctx.createImageData(scrollSpeed, height);
+        const data32 = new Uint32Array(imgData.data.buffer);
 
         const loop = () => {
             if (!dataRef.current || !dataRef.current.spectrum) {
@@ -65,16 +75,25 @@ const HighResSpectrogram = ({ dataRef }) => {
             const spectrum = dataRef.current.spectrum;
             const width = canvas.width;
             const height = canvas.height;
-            const scrollSpeed = 2;
 
             // 1. Shift existing content to left
-            tempCtx.drawImage(canvas, 0, 0);
-            ctx.drawImage(tempCanvas, -scrollSpeed, 0);
+            // Optimization: Draw canvas onto itself instead of using an offscreen temp canvas.
+            // This avoids double-copying the entire canvas (Canvas -> Temp -> Canvas).
+            ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
 
             // 2. Draw new column
-            const imgData = ctx.createImageData(scrollSpeed, height);
-            const data = new Uint32Array(imgData.data.buffer);
+            // Use pre-allocated buffers
+            const imgData = imgDataRef.current;
+            const data = data32Ref.current;
 
+
+            // 1. Shift existing content to left
+            // Optimized: Draw canvas onto itself instead of using tempCanvas
+            // This copies from (scrollSpeed, 0) to (0, 0)
+            ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
+
+            // 2. Draw new column
+            // Optimized: Reuse pre-allocated TypedArray
             const maxBin = Math.floor(spectrum.length / 3);
 
             for (let y = 0; y < height; y++) {
@@ -88,7 +107,7 @@ const HighResSpectrogram = ({ dataRef }) => {
                 const color = colormap[Math.floor(intensity)];
 
                 for (let x = 0; x < scrollSpeed; x++) {
-                    data[y * scrollSpeed + x] = color;
+                    data32[y * scrollSpeed + x] = color;
                 }
             }
 
@@ -117,8 +136,6 @@ const HighResSpectrogram = ({ dataRef }) => {
             drawFormant(f1, last.f1, 'rgba(255, 50, 50, 0.9)');
             drawFormant(f2, last.f2, 'rgba(255, 50, 50, 0.9)');
             lastFormantsRef.current = { f1, f2 };
-
-
         };
 
         let unsubscribe;
@@ -269,4 +286,3 @@ const HighResSpectrogram = ({ dataRef }) => {
 };
 
 export default HighResSpectrogram;
-

@@ -4,6 +4,7 @@ import google.generativeai as genai
 import os
 from werkzeug.utils import secure_filename
 from ..utils.rag import rag_system
+from ..validators import validate_file_upload
 # rag_system = None
 
 ai_bp = Blueprint('ai', __name__, url_prefix='/api')
@@ -33,6 +34,11 @@ def train_coach():
         return jsonify({"error": "No selected file"}), 400
         
     if file:
+        # Security: Validate file extension
+        is_valid, error = validate_file_upload(file.filename, allowed_extensions={'pdf', 'txt', 'md'})
+        if not is_valid:
+            return jsonify({"error": error}), 400
+
         filename = secure_filename(file.filename)
         # Save temp
         temp_path = os.path.join('uploads', filename)
