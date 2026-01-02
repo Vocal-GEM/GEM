@@ -2,10 +2,8 @@ import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react'
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import { getColormapFunction } from '../../utils/colormaps';
 import { generateColormap } from '../../utils/colormaps';
 import { Camera, X } from 'lucide-react';
-import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * Convert frequency to musical note
@@ -32,10 +30,6 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         idRef.current = `spectrogram-${Math.random().toString(36).substr(2, 9)}`;
     }
     const componentId = idRef.current;
-    // Unique ID for render coordinator
-    // Use useId directly, assuming React 18+ as seen in package.json (react ^18.3.1)
-    const reactId = useId();
-    const componentId = useRef(reactId).current;
 
     // Tap cursor state
     const [cursorData, setCursorData] = useState(null);
@@ -61,11 +55,6 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         [settings.spectrogramColorScheme]
     );
 
-    const draw = useCallback((_deltaTime) => {
-    // Reusable objects to reduce GC
-    const imageDataRef = useRef(null);
-
-    const draw = () => {
     const draw = useCallback(() => {
         const canvas = canvasRef.current;
         if (!canvas || !dataRef.current) return;
@@ -118,11 +107,16 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             // directly into an ImageData buffer and put it onto the canvas.
 
             // Reuse ImageData object
-            if (!imageDataRef.current || imageDataRef.current.height !== h || imageDataRef.current.width !== speed) {
-                imageDataRef.current = ctx.createImageData(speed, h);
+            // Reusable objects to reduce GC
+            if (!canvas.imageDataRef) {
+                canvas.imageDataRef = ctx.createImageData(speed, h);
+            }
+            // Ensure size match
+            if (canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
+                canvas.imageDataRef = ctx.createImageData(speed, h);
             }
 
-            const imageData = imageDataRef.current;
+            const imageData = canvas.imageDataRef;
             const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
 
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
@@ -143,18 +137,18 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
 
                 let intensity = 0;
                 if (value < 0) {
-                     // DB-ish scale handling from original code
-                     intensity = Math.max(0, Math.min(255, (value + 100) * 3.6));
+                    // DB-ish scale handling from original code
+                    intensity = Math.max(0, Math.min(255, (value + 100) * 3.6));
                 } else {
-                     // Linear scale handling
-                     intensity = Math.min(255, value * 255 * 2);
+                    // Linear scale handling
+                    intensity = Math.min(255, value * 255 * 2);
                 }
 
                 // Color lookup
                 let color = 0xFF000000; // Black (ABGR: A=255, B=0, G=0, R=0)
                 if (intensity > 10) {
-                     const colorIndex = Math.floor(intensity);
-                     color = colormap[Math.min(255, Math.max(0, colorIndex))];
+                    const colorIndex = Math.floor(intensity);
+                    color = colormap[Math.min(255, Math.max(0, colorIndex))];
                 }
 
                 // Write to all columns in the 'speed' strip
@@ -164,9 +158,15 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                     data32[rowOffset + x] = color;
                 }
             }
+
+            ctx.putImageData(imageData, width - speed, 0);
+            // -----------------------------------------------
+        } else {
+            // Clear the new strip if no data
+            ctx.fillStyle = '#000';
+            ctx.fillRect(width - speed, 0, speed, h);
         }
-    }, [getColor, audioContext]);
-    }, [dataRef, audioContext, getColor]); // Removed recursive requestAnimationFrame
+    }, [isAudioActive, audioContext, colormap]);
 
     useEffect(() => {
         let unsubscribe;
@@ -181,36 +181,6 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             if (unsubscribe) unsubscribe();
         };
     }, [isAudioActive, draw, componentId]);
-            // Subscribe to renderCoordinator instead of using requestAnimationFrame directly
-            return renderCoordinator.subscribe(componentId, draw, renderCoordinator.PRIORITY.MEDIUM);
-        }
-    }, [isAudioActive, draw, componentId]);
-
-            ctx.putImageData(imageData, width - speed, 0);
-            // -----------------------------------------------
-        } else {
-             // Clear the new strip if no data
-             ctx.fillStyle = '#000';
-             ctx.fillRect(width - speed, 0, speed, h);
-        }
-    }, [getColor, dataRef, audioContext]);
-
-    useEffect(() => {
-        if (!isAudioActive) return;
-
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'spectrogram',
-                draw,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
-
-        return () => {
-            if (unsubscribe) unsubscribe();
-        };
-    }, [isAudioActive, draw]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position
