@@ -1,6 +1,13 @@
 import re
 import bleach
+import os
 from email_validator import validate_email, EmailNotValidError
+
+ALLOWED_EXTENSIONS = {
+    'audio': {'wav', 'mp3', 'ogg', 'm4a', 'flac', 'webm'},
+    'image': {'jpg', 'jpeg', 'png', 'gif', 'webp'},
+    'document': {'pdf', 'txt', 'csv', 'json'}
+}
 
 def validate_username(username):
     """
@@ -61,3 +68,99 @@ def validate_email_address(email):
         return True, None
     except EmailNotValidError as e:
         return False, str(e)
+
+ALLOWED_EXTENSIONS = {
+    'audio': {'wav', 'mp3', 'ogg', 'm4a', 'flac', 'webm'},
+    'image': {'jpg', 'jpeg', 'png', 'gif', 'webp'},
+    'document': {'pdf', 'txt', 'csv', 'json'}
+}
+
+def validate_file_upload(filename, allowed_types=None):
+    """
+    Validates file extension against allowed types.
+    allowed_types: list of categories ('audio', 'image', 'document') or None for all.
+    """
+    if not filename or '.' not in filename:
+        return False, "Invalid filename"
+
+    ext = filename.rsplit('.', 1)[1].lower()
+
+    allowed = set()
+    if allowed_types is None:
+        for cat in ALLOWED_EXTENSIONS.values():
+            allowed.update(cat)
+    else:
+        for cat in allowed_types:
+            if cat in ALLOWED_EXTENSIONS:
+                allowed.update(ALLOWED_EXTENSIONS[cat])
+            else:
+                 # Handle if a specific extension set is passed or just ignore unknown categories
+                 pass
+
+    if ext not in allowed:
+         return False, f"File type '{ext}' not allowed"
+def validate_file_upload(filename, allowed_extensions=None):
+    """
+    Validate file upload based on extension.
+
+    Args:
+        filename (str): The name of the file
+        allowed_extensions (set): Set of allowed extensions (without dot).
+                                 If None, uses a default safe list.
+
+    Returns:
+        tuple: (bool, str or None) - (is_valid, error_message)
+def validate_file_upload(filename, content_type=None):
+    """
+    Validate file upload by extension and content type.
+    Returns (is_valid, error_message)
+def validate_file_extension(filename):
+    """
+    Validate file extension against allowed list.
+    Allowed: png, jpg, jpeg, gif, mp3, wav, m4a, ogg, webm
+    """
+    if not filename:
+        return False, "Filename is required"
+
+    if allowed_extensions is None:
+        # Default safe extensions
+        allowed_extensions = {
+            'png', 'jpg', 'jpeg', 'gif', 'webp', # Images
+            'pdf', 'txt', 'md', 'csv', 'json',   # Documents
+            'wav', 'mp3', 'ogg', 'm4a', 'webm'   # Audio
+        }
+
+    # Allowed extensions
+    ALLOWED_EXTENSIONS = {
+        # Audio
+        'mp3', 'wav', 'm4a', 'ogg', 'webm',
+        # Images
+        'png', 'jpg', 'jpeg', 'gif',
+        # Documents (only for training)
+        'pdf', 'txt', 'md'
+    }
+
+    # Check extension
+    if '.' not in filename:
+        return False, "File has no extension"
+
+    ext = filename.rsplit('.', 1)[1].lower()
+
+    if ext not in allowed_extensions:
+        return False, f"File type '{ext}' is not allowed"
+    if ext not in ALLOWED_EXTENSIONS:
+        return False, f"File type '{ext}' is not allowed"
+    allowed_extensions = {
+        'png', 'jpg', 'jpeg', 'gif', # Images
+        'mp3', 'wav', 'm4a', 'ogg', 'webm' # Audio
+    }
+
+    if '.' not in filename:
+        return False, "File must have an extension"
+
+    ext = filename.rsplit('.', 1)[1].lower()
+
+    if ext not in allowed_extensions:
+        return False, f"File type not allowed. Allowed types: {', '.join(sorted(allowed_extensions))}"
+
+    return True, None
