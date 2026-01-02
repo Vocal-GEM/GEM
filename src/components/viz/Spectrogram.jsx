@@ -1,6 +1,8 @@
 import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
+import { renderCoordinator } from '../../services/RenderCoordinator';
+import { getColormapFunction } from '../../utils/colormaps';
 import { generateColormap } from '../../utils/colormaps';
 import { Camera, X } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -23,6 +25,13 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const canvasRef = useRef(null);
     const { dataRef, isAudioActive, audioContext } = useAudio();
     const { settings } = useSettings();
+
+    // Lazy initialization of component ID
+    const idRef = useRef(null);
+    if (!idRef.current) {
+        idRef.current = `spectrogram-${Math.random().toString(36).substr(2, 9)}`;
+    }
+    const componentId = idRef.current;
     // Unique ID for render coordinator
     // Use useId directly, assuming React 18+ as seen in package.json (react ^18.3.1)
     const reactId = useId();
@@ -156,10 +165,22 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                 }
             }
         }
+    }, [getColor, audioContext]);
     }, [dataRef, audioContext, getColor]); // Removed recursive requestAnimationFrame
 
     useEffect(() => {
+        let unsubscribe;
         if (isAudioActive) {
+            unsubscribe = renderCoordinator.subscribe(
+                componentId,
+                draw,
+                renderCoordinator.PRIORITY.MEDIUM
+            );
+        }
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
+    }, [isAudioActive, draw, componentId]);
             // Subscribe to renderCoordinator instead of using requestAnimationFrame directly
             return renderCoordinator.subscribe(componentId, draw, renderCoordinator.PRIORITY.MEDIUM);
         }
