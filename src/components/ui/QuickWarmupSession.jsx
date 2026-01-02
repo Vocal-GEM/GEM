@@ -174,13 +174,21 @@ const QuickWarmupSession = ({ onClose }) => {
                 <button
                     onClick={onClose}
                     className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+                    aria-label="Close session"
                 >
                     <X size={24} />
                 </button>
             </div>
 
             {/* Progress bar */}
-            <div className="h-1 bg-slate-800">
+            <div
+                className="h-1 bg-slate-800"
+                role="progressbar"
+                aria-valuenow={Math.round((elapsedTime / totalTime) * 100)}
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-label="Session progress"
+            >
                 <div
                     className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-1000"
                     style={{ width: `${(elapsedTime / totalTime) * 100}%` }}
@@ -198,6 +206,7 @@ const QuickWarmupSession = ({ onClose }) => {
                                     ? 'bg-amber-500 ring-2 ring-amber-500/50 ring-offset-2 ring-offset-black'
                                     : 'bg-slate-700'
                             }`}
+                        aria-hidden="true"
                     />
                 ))}
             </div>
@@ -213,7 +222,10 @@ const QuickWarmupSession = ({ onClose }) => {
                 <h2 className="text-3xl font-bold text-white mb-2">{currentExercise.name}</h2>
 
                 {/* Timer */}
-                <div className="text-6xl font-mono font-bold text-amber-400 mb-6">
+                <div
+                    className="text-6xl font-mono font-bold text-amber-400 mb-6"
+                    role="timer"
+                >
                     {formatTime(timeRemaining)}
                 </div>
 
@@ -237,6 +249,7 @@ const QuickWarmupSession = ({ onClose }) => {
                                 ? 'bg-amber-600 hover:bg-amber-500'
                                 : 'bg-gradient-to-br from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400'
                             }`}
+                        aria-label={isPlaying ? "Pause exercise" : "Start exercise"}
                     >
                         {isPlaying ? <Pause size={36} /> : <Play size={36} className="ml-1" />}
                     </button>
@@ -245,6 +258,7 @@ const QuickWarmupSession = ({ onClose }) => {
                         onClick={handleSkip}
                         className="p-4 bg-slate-800 hover:bg-slate-700 rounded-full text-slate-300 hover:text-white transition-colors"
                         title="Skip to next exercise"
+                        aria-label="Skip to next exercise"
                     >
                         <SkipForward size={24} />
                     </button>
