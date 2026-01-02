@@ -125,6 +125,12 @@ def get_data():
         } for j in current_user.journals]
     })
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp3', 'wav', 'm4a', 'ogg', 'webm'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @data_bp.route('/upload', methods=['POST'])
 @login_required
 def upload_file():
