@@ -3,6 +3,12 @@ import bleach
 import os
 from email_validator import validate_email, EmailNotValidError
 
+ALLOWED_EXTENSIONS = {
+    'audio': {'wav', 'mp3', 'ogg', 'm4a', 'flac', 'webm'},
+    'image': {'jpg', 'jpeg', 'png', 'gif', 'webp'},
+    'document': {'pdf', 'txt', 'csv', 'json'}
+}
+
 def validate_username(username):
     """
     Validate username: 3-30 chars, alphanumeric + common special characters
@@ -88,6 +94,7 @@ def validate_file_upload(filename, allowed_types=None):
             if cat in ALLOWED_EXTENSIONS:
                 allowed.update(ALLOWED_EXTENSIONS[cat])
             else:
+                 # Handle if a specific extension set is passed or just ignore unknown categories
                  pass
 
     if ext not in allowed:
