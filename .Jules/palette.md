@@ -1,3 +1,6 @@
+## 2024-05-23 - Accessible Loading States
+**Learning:** Foundational components like `LoadingSpinner` are often used as generic `Suspense` fallbacks without accessibility attributes, creating "silent" waiting periods for screen reader users.
+**Action:** When creating or auditing loading components, always include `role="status"` and a visually hidden label. Defaulting to `aria-live="polite"` prevents announcements from interrupting the user but ensures they are aware of the state change.
 ## 2024-05-23 - Accessibility Patterns in UI Library
 **Learning:** Many core UI components (like Toast, LoadingSpinner) in this custom library are missing fundamental accessibility attributes (ARIA roles, labels, live regions), indicating a pattern of "visual-only" component design that needs systematic review.
 **Action:** When touching any UI component (`src/components/ui/`), proactively check for and add missing ARIA attributes (role, aria-label, aria-live) even if not explicitly requested, as the baseline accessibility is low.
