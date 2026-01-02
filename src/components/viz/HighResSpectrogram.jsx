@@ -24,6 +24,10 @@ const HighResSpectrogram = ({ dataRef }) => {
     const lastFormantsRef = useRef({ f1: 0, f2: 0 });
     const { settings } = useSettings();
 
+    // Reusable buffers
+    const imgDataRef = useRef(null);
+    const data32Ref = useRef(null);
+
     // Tap cursor state  
     const [cursorData, setCursorData] = useState(null);
     const [showControls, setShowControls] = useState(false);
@@ -36,6 +40,7 @@ const HighResSpectrogram = ({ dataRef }) => {
 
     useEffect(() => {
         const canvas = canvasRef.current;
+        // Remove 'willReadFrequently: true' to allow GPU acceleration since we use drawImage(canvas)
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
 
@@ -45,6 +50,14 @@ const HighResSpectrogram = ({ dataRef }) => {
         canvas.width = rect.width * dpr;
         canvas.height = 512; // Higher vertical resolution
 
+        const scrollSpeed = 2;
+
+        // Pre-allocate buffers for the column update
+        // We reuse these every frame to avoid garbage collection
+        if (!imgDataRef.current || imgDataRef.current.height !== canvas.height) {
+            imgDataRef.current = ctx.createImageData(scrollSpeed, canvas.height);
+            data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
+        }
         const width = canvas.width;
         const height = canvas.height;
         const scrollSpeed = 2;
@@ -60,6 +73,19 @@ const HighResSpectrogram = ({ dataRef }) => {
             }
 
             const spectrum = dataRef.current.spectrum;
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // 1. Shift existing content to left
+            // Optimization: Draw canvas onto itself instead of using an offscreen temp canvas.
+            // This avoids double-copying the entire canvas (Canvas -> Temp -> Canvas).
+            ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
+
+            // 2. Draw new column
+            // Use pre-allocated buffers
+            const imgData = imgDataRef.current;
+            const data = data32Ref.current;
+
 
             // 1. Shift existing content to left
             // Optimized: Draw canvas onto itself instead of using tempCanvas
@@ -110,8 +136,6 @@ const HighResSpectrogram = ({ dataRef }) => {
             drawFormant(f1, last.f1, 'rgba(255, 50, 50, 0.9)');
             drawFormant(f2, last.f2, 'rgba(255, 50, 50, 0.9)');
             lastFormantsRef.current = { f1, f2 };
-
-
         };
 
         let unsubscribe;
@@ -262,4 +286,3 @@ const HighResSpectrogram = ({ dataRef }) => {
 };
 
 export default HighResSpectrogram;
-
