@@ -1,3 +1,8 @@
+import os
+import sys
+import unittest
+import io
+import time
 import unittest
 import io
 import sys
@@ -8,6 +13,14 @@ from werkzeug.security import generate_password_hash
 # Add backend to path
 sys.path.append(os.path.join(os.getcwd(), 'backend'))
 
+# Mock google.generativeai and other potentially slow modules before importing app
+sys.modules['google.generativeai'] = MagicMock()
+sys.modules['pypdf'] = MagicMock()
+sys.modules['numpy'] = MagicMock()
+
+# Mock load_knowledge_base to prevent slow initialization
+import backend.app
+backend.app.load_knowledge_base = MagicMock()
 # Mock modules to prevent startup hang
 mock_loader = MagicMock()
 sys.modules['app.utils.auto_loader'] = mock_loader
@@ -34,6 +47,10 @@ class TestUploadSecurity(unittest.TestCase):
 
         with self.app.app_context():
             db.create_all()
+            user = User(username='testuser')
+            user.password_hash = generate_password_hash('password123')
+            db.session.add(user)
+            db.session.commit()
             # Create user if not exists
             if not User.query.filter_by(username='testuser').first():
                 user = User(username='testuser', password_hash=generate_password_hash('password123'))
@@ -51,6 +68,22 @@ class TestUploadSecurity(unittest.TestCase):
             'password': 'password123'
         })
 
+    def test_upload_allowed_file(self):
+        self.login()
+        data = {
+            'file': (io.BytesIO(b"dummy image content"), 'test.png')
+        }
+        response = self.client.post('/api/upload', data=data, content_type='multipart/form-data')
+        self.assertEqual(response.status_code, 200)
+
+    def test_upload_blocked_extension(self):
+        self.login()
+        data = {
+            'file': (io.BytesIO(b"print('Exploit!')"), 'exploit.py')
+        }
+        response = self.client.post('/api/upload', data=data, content_type='multipart/form-data')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("File type not allowed", str(response.json))
     def test_upload_allowed_extension(self):
         self.login()
         data = {
@@ -74,6 +107,7 @@ class TestUploadSecurity(unittest.TestCase):
     def test_upload_no_extension(self):
         self.login()
         data = {
+            'file': (io.BytesIO(b"content"), 'testfile')
             'file': (io.BytesIO(b"dummy content"), 'testfile')
         }
         response = self.client.post('/api/upload', data=data, content_type='multipart/form-data')
