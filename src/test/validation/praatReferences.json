@@ -1,0 +1,47 @@
+[
+    {
+        "filename": "sustained_ah_cis_female.wav",
+        "description": "Sustained /a/ vowel, cisgender female speaker",
+        "voiceType": "cis_female",
+        "praatValues": {
+            "meanPitch": 215.4,
+            "minPitch": 210.2,
+            "maxPitch": 220.1,
+            "jitter": 0.45,
+            "shimmer": 1.2,
+            "hnr": 25.3,
+            "f1": 750,
+            "f2": 1400,
+            "f3": 2800
+        }
+    },
+    {
+        "filename": "sustained_ah_cis_male.wav",
+        "description": "Sustained /a/ vowel, cisgender male speaker",
+        "voiceType": "cis_male",
+        "praatValues": {
+            "meanPitch": 115.8,
+            "minPitch": 112.5,
+            "maxPitch": 118.2,
+            "jitter": 0.52,
+            "shimmer": 1.5,
+            "hnr": 22.1,
+            "f1": 650,
+            "f2": 1100,
+            "f3": 2500
+        }
+    },
+    {
+        "filename": "pitch_glide_trans_female.wav",
+        "description": "Pitch glide up, transgender female speaker",
+        "voiceType": "trans_female",
+        "praatValues": {
+            "meanPitch": 185.2,
+            "minPitch": 145.0,
+            "maxPitch": 245.0,
+            "jitter": 0.6,
+            "shimmer": 1.8,
+            "hnr": 23.5
+        }
+    }
+]
