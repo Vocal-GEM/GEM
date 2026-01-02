@@ -102,6 +102,71 @@ def load_audio(path, target_sr=16000):
 def pre_emphasis(y, coeff=0.97):
     return np.append(y[0], y[1:] - coeff * y[:-1])
 
+def compute_raw_rbi_features(frame, sr, f0):
+    """
+    Compute raw spectral features for RBI: ratio_HL, centroid, tilt_flipped.
+    """
+    # FFT
+    window = np.hanning(len(frame))
+    spectrum = np.fft.rfft(frame * window)
+    mag_sq = np.abs(spectrum) ** 2
+    freqs = np.fft.rfftfreq(len(frame), 1/sr)
+    
+    # 1. HF/LF Ratio
+    # LF: 0-1.5k, HF: 3-6k
+    lf_mask = (freqs >= 0) & (freqs < 1500)
+    hf_mask = (freqs >= 3000) & (freqs < 6000)
+    
+    e_lf = np.sum(mag_sq[lf_mask])
+    e_hf = np.sum(mag_sq[hf_mask])
+    
+    ratio_hl = np.log10((e_hf + 1e-12) / (e_lf + 1e-12))
+    
+    # 2. Centroid
+    total_energy = np.sum(mag_sq) + 1e-12
+    centroid = np.sum(freqs * mag_sq) / total_energy
+    
+    # 3. Tilt (Slope of log mag in 300-4000 Hz)
+    band_mask = (freqs >= 300) & (freqs <= 4000)
+    if np.sum(band_mask) > 1:
+        f_band = freqs[band_mask]
+        y_band = 20 * np.log10(mag_sq[band_mask] + 1e-12) # Power to dB
+        # Linear regression y = ax + b
+        A = np.vstack([f_band, np.ones_like(f_band)]).T
+        slope, _ = np.linalg.lstsq(A, y_band, rcond=None)[0]
+        tilt = slope
+    else:
+        tilt = 0.0
+        
+    tilt_flipped = -tilt # Higher = Brighter
+    
+    return ratio_hl, centroid, tilt_flipped
+
+def clean_audio_signal(y, sr):
+    """
+    Apply bandpass filter and normalization to clean the audio signal.
+    """
+    if scipy is None: return y
+    
+    # 1. Bandpass Filter (80Hz - 8000Hz)
+    # Removes low rumble and high frequency hiss/aliasing
+    nyquist = 0.5 * sr
+    low = 80 / nyquist
+    high = min(8000 / nyquist, 0.99) # Ensure high is < 1
+    
+    b, a = scipy.signal.butter(4, [low, high], btype='band')
+    y_clean = scipy.signal.filtfilt(b, a, y)
+    
+    # 2. Noise Gate-ish (Simple silence suppression)
+    # (Optional, skipping for now to avoid artifacts)
+    
+    # 3. Peak Normalization (-1 dB)
+    max_val = np.max(np.abs(y_clean))
+    if max_val > 0:
+        y_clean = y_clean / max_val * 0.89  # approx -1dB
+        
+    return y_clean
+
 def compute_cpp_praat(sound):
     if not isinstance(sound, parselmouth.Sound):
         sound = parselmouth.Sound(sound)
