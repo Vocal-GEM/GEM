@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useId } from 'react';
 import { Info } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useAudio } from '../../context/AudioContext';
 import { useFeedback } from '../../hooks/useFeedback';
 import FeedbackControls from '../ui/FeedbackControls';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * ResonanceOrb - Visual feedback for voice resonance
@@ -19,6 +20,7 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
     const { activeProfile } = useProfile();
     const orbRef = useRef(null);
     const labelRef = useRef(null);
+    const componentId = useId();
 
     // Debug state
     const [debugInfo, setDebugInfo] = useState(null);
@@ -54,7 +56,7 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
     useEffect(() => {
         let frameCount = 0;
 
-        const loop = () => {
+        const update = () => {
             if (orbRef.current && dataRef.current) {
                 const { resonance, pitch, volume, f1, f2, debug, weight, resonanceScore, isBackendActive, resonanceConfidence, isSilent, tilt } = dataRef.current;
 
@@ -227,12 +229,16 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                     }
                 }
             }
-            requestAnimationFrame(loop);
         };
 
-        const id = requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(id);
-    }, [calibration, dataRef, showDebug, size, colorBlindMode]);
+        const unsubscribe = renderCoordinator.subscribe(
+            `ResonanceOrb-${componentId}`,
+            update,
+            renderCoordinator.PRIORITY.CRITICAL
+        );
+
+        return () => unsubscribe();
+    }, [calibration, dataRef, showDebug, size, colorBlindMode, componentId]);
 
     // Helper to render sparkline
     const renderSparkline = (data, key, color, height = 30) => {
