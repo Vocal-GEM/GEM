@@ -15,5 +15,15 @@ describe('LoadingSpinner', () => {
 
         // Verify sr-only class is applied to text
         expect(screen.getByText('Loading...')).toHaveClass('sr-only');
+describe('LoadingSpinner Component', () => {
+    it('renders with accessibility attributes', () => {
+        render(<LoadingSpinner />);
+
+        // Should have role="status" to announce loading state
+        const spinner = screen.getByRole('status');
+        expect(spinner).toBeInTheDocument();
+
+        // Should have a label for screen readers
+        expect(spinner).toHaveAttribute('aria-label', 'Loading');
     });
 });
