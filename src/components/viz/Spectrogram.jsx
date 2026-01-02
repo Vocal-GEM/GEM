@@ -22,8 +22,6 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const canvasRef = useRef(null);
     const { dataRef, isAudioActive, audioContext } = useAudio();
     const { settings } = useSettings();
-    const requestRef = useRef();
-
     // Tap cursor state
     const [cursorData, setCursorData] = useState(null);
     const [showControls, setShowControls] = useState(false);
@@ -52,6 +50,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const imageDataRef = useRef(null);
 
     const draw = () => {
+    const draw = useCallback(() => {
         const canvas = canvasRef.current;
         if (!canvas || !dataRef.current) return;
 
@@ -157,16 +156,24 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
              ctx.fillStyle = '#000';
              ctx.fillRect(width - speed, 0, speed, h);
         }
-
-        requestRef.current = requestAnimationFrame(draw);
-    };
+    }, [getColor, dataRef, audioContext]);
 
     useEffect(() => {
-        if (isAudioActive) {
-            requestRef.current = requestAnimationFrame(draw);
-        }
-        return () => cancelAnimationFrame(requestRef.current);
-    }, [isAudioActive]);
+        if (!isAudioActive) return;
+
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                'spectrogram',
+                draw,
+                renderCoordinator.PRIORITY.MEDIUM
+            );
+        });
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
+    }, [isAudioActive, draw]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position

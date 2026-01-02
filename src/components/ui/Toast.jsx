@@ -20,11 +20,22 @@ const Toast = ({ message, type = 'success', onClose, duration = 3000 }) => {
     const style = styles[type] || styles.success;
     const Icon = style.icon;
 
+    const role = type === 'error' || type === 'warning' ? 'alert' : 'status';
+    const ariaLive = type === 'error' || type === 'warning' ? 'assertive' : 'polite';
+
     return (
-        <div className={`fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[100] flex items-center gap-3 px-6 py-4 rounded-xl border backdrop-blur-md shadow-xl animate-in fade-in slide-in-from-bottom-4 ${style.bg}`}>
+        <div
+            role={role}
+            aria-live={ariaLive}
+            className={`fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[100] flex items-center gap-3 px-6 py-4 rounded-xl border backdrop-blur-md shadow-xl animate-in fade-in slide-in-from-bottom-4 ${style.bg}`}
+        >
             <Icon className={`w-5 h-5 ${style.text}`} />
             <span className={`font-medium ${style.text}`}>{message}</span>
-            <button onClick={onClose} className={`ml-2 hover:opacity-70 ${style.text}`}>
+            <button
+                onClick={onClose}
+                aria-label="Close notification"
+                className={`ml-2 hover:opacity-70 ${style.text}`}
+            >
                 <X className="w-4 h-4" />
             </button>
         </div>
