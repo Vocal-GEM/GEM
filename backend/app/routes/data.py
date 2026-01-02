@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 import os
 import datetime
 from ..models import db, Stats, Journal, Settings, UserData
-from ..validators import sanitize_html
+from ..validators import sanitize_html, validate_file_extension
 from ..extensions import limiter
 
 data_bp = Blueprint('data', __name__, url_prefix='/api')
@@ -140,6 +140,12 @@ def upload_file():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
     
+    # Security: Validate file extension
+    is_valid, error = validate_file_extension(file.filename)
+    if not is_valid:
+        return jsonify({"error": error}), 400
+
+    if file:
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         # Add timestamp to make unique
