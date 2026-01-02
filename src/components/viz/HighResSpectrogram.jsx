@@ -1,7 +1,8 @@
-import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback, memo } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { generateColormap } from '../../utils/colormaps';
 import { Camera, X } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * Convert frequency to musical note with cents
@@ -19,7 +20,7 @@ const hzToNote = (hz) => {
 
 const MAX_FREQ = 8000;
 
-const HighResSpectrogram = ({ dataRef }) => {
+const HighResSpectrogram = memo(({ dataRef }) => {
     const canvasRef = useRef(null);
     const lastFormantsRef = useRef({ f1: 0, f2: 0 });
     const { settings } = useSettings();
@@ -32,6 +33,9 @@ const HighResSpectrogram = ({ dataRef }) => {
     const [cursorData, setCursorData] = useState(null);
     const [showControls, setShowControls] = useState(false);
 
+    // Component ID for RenderCoordinator
+    const componentId = useRef(`high-res-spectrogram-${Math.random().toString(36).substr(2, 9)}`).current;
+
     // Dynamic colormap based on settings
     const colormap = useMemo(
         () => generateColormap(settings.spectrogramColorScheme),
@@ -40,6 +44,8 @@ const HighResSpectrogram = ({ dataRef }) => {
 
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
+
         // Remove 'willReadFrequently: true' to allow GPU acceleration since we use drawImage(canvas)
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
@@ -51,6 +57,8 @@ const HighResSpectrogram = ({ dataRef }) => {
         canvas.height = 512; // Higher vertical resolution
 
         const scrollSpeed = 2;
+        const width = canvas.width;
+        const height = canvas.height;
 
         // Pre-allocate buffers for the column update
         // We reuse these every frame to avoid garbage collection
@@ -58,14 +66,6 @@ const HighResSpectrogram = ({ dataRef }) => {
             imgDataRef.current = ctx.createImageData(scrollSpeed, canvas.height);
             data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
         }
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2;
-
-        // Pre-allocate buffer for one column of pixels
-        // Optimized: Reuse this buffer every frame to avoid allocation
-        const imgData = ctx.createImageData(scrollSpeed, height);
-        const data32 = new Uint32Array(imgData.data.buffer);
 
         const loop = () => {
             if (!dataRef.current || !dataRef.current.spectrum) {
@@ -73,8 +73,6 @@ const HighResSpectrogram = ({ dataRef }) => {
             }
 
             const spectrum = dataRef.current.spectrum;
-            const width = canvas.width;
-            const height = canvas.height;
 
             // 1. Shift existing content to left
             // Optimization: Draw canvas onto itself instead of using an offscreen temp canvas.
@@ -84,15 +82,8 @@ const HighResSpectrogram = ({ dataRef }) => {
             // 2. Draw new column
             // Use pre-allocated buffers
             const imgData = imgDataRef.current;
-            const data = data32Ref.current;
+            const data32 = data32Ref.current;
 
-
-            // 1. Shift existing content to left
-            // Optimized: Draw canvas onto itself instead of using tempCanvas
-            // This copies from (scrollSpeed, 0) to (0, 0)
-            ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
-
-            // 2. Draw new column
             // Optimized: Reuse pre-allocated TypedArray
             const maxBin = Math.floor(spectrum.length / 3);
 
@@ -138,19 +129,16 @@ const HighResSpectrogram = ({ dataRef }) => {
             lastFormantsRef.current = { f1, f2 };
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'high-res-spectrogram',
-                loop,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            loop,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
-    }, [dataRef, colormap]);
+    }, [dataRef, colormap, componentId]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position
@@ -283,6 +271,6 @@ const HighResSpectrogram = ({ dataRef }) => {
             )}
         </div>
     );
-};
+});
 
 export default HighResSpectrogram;
