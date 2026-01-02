@@ -1,3 +1,7 @@
+## 2024-12-30 - Unrestricted File Upload
+**Vulnerability:** The file upload endpoint `backend/app/routes/data.py` used `secure_filename` but did not validate file extensions, allowing upload of potentially malicious files (e.g., .py, .html).
+**Learning:** `secure_filename` only sanitizes the filename string (e.g., directory traversal), it does NOT validate the file type or extension.
+**Prevention:** Always implement an explicit whitelist of allowed file extensions (and MIME types if possible) and validate strictly before processing uploads.
 ## 2024-05-23 - Unrestricted File Upload
 **Vulnerability:** The file upload endpoint `/api/upload` relied solely on `secure_filename` which cleans the filename but does not validate the file extension or content. This allowed uploading arbitrary files (e.g., .php, .exe) which could lead to Remote Code Execution (RCE) or stored XSS.
 **Learning:** `secure_filename` is insufficient for security; it only ensures the filename is safe for the filesystem, not that the file content/type is safe for the application.

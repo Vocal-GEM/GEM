@@ -140,6 +140,13 @@ def upload_file():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
     
+    # Strict allowed extensions
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp3', 'wav', 'm4a', 'ogg', 'webm'}
+
+    def allowed_file(filename):
+        return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
     # Security: Validate file extension
     is_valid, error = validate_file_extension(file.filename)
     if not is_valid:
@@ -156,6 +163,8 @@ def upload_file():
         url = storage_service.upload_file(file, filename, content_type=file.content_type)
         
         return jsonify({"url": url})
+    else:
+        return jsonify({"error": "File type not allowed"}), 400
 
     return jsonify({"error": "File type not allowed"}), 400
 
