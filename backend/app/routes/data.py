@@ -9,6 +9,12 @@ from ..extensions import limiter
 
 data_bp = Blueprint('data', __name__, url_prefix='/api')
 
+ALLOWED_EXTENSIONS = {'wav', 'mp3', 'ogg', 'm4a', 'flac', 'aac', 'jpg', 'jpeg', 'png'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @data_bp.route('/sync', methods=['POST'])
 @login_required
 @limiter.limit("100 per minute")
