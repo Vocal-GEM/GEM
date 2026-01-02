@@ -61,3 +61,26 @@ def validate_email_address(email):
         return True, None
     except EmailNotValidError as e:
         return False, str(e)
+
+def validate_file_extension(filename):
+    """
+    Validate file extension against allowed list.
+    Allowed: png, jpg, jpeg, gif, mp3, wav, m4a, ogg, webm
+    """
+    if not filename:
+        return False, "Filename is required"
+
+    allowed_extensions = {
+        'png', 'jpg', 'jpeg', 'gif', # Images
+        'mp3', 'wav', 'm4a', 'ogg', 'webm' # Audio
+    }
+
+    if '.' not in filename:
+        return False, "File must have an extension"
+
+    ext = filename.rsplit('.', 1)[1].lower()
+
+    if ext not in allowed_extensions:
+        return False, f"File type not allowed. Allowed types: {', '.join(sorted(allowed_extensions))}"
+
+    return True, None
