@@ -8,6 +8,8 @@ import { useJournal } from './context/JournalContext';
 import { useNavigation } from './context/NavigationContext';
 import { LanguageProvider } from './context/LanguageContext';
 import MigrationModal from './components/ui/MigrationModal';
+import { DialectTours } from './components/culture/DialectTours';
+import { AnalyticsDashboardV2 } from './components/analytics/AnalyticsDashboardV2';
 import JournalForm from './components/ui/JournalForm';
 import Login from './components/ui/Login';
 import Signup from './components/ui/Signup';
@@ -23,6 +25,10 @@ const Sidebar = lazy(() => import('./components/layout/Sidebar'));
 const DashboardView = lazy(() => import('./components/views/DashboardView'));
 
 const ClinicalAssessmentView = lazy(() => import('./components/views/ClinicalAssessmentView'));
+
+
+const CAPEVAssessment = lazy(() => import('./components/professional/CAPEVAssessment'));
+const ClientDashboard = lazy(() => import('./components/professional/ClientDashboard'));
 
 const SettingsView = lazy(() => import('./components/views/SettingsView'));
 const AnalysisHub = lazy(() => import('./components/views/AnalysisHub'));
@@ -45,6 +51,7 @@ const AdaptivePracticeSession = lazy(() => import('./components/views/AdaptivePr
 const GuidedJourney = lazy(() => import('./components/ui/GuidedJourney'));
 const PracticeCardsPanel = lazy(() => import('./components/ui/PracticeCardsPanel'));
 const ProgramView = lazy(() => import('./components/views/ProgramView'));
+const MarketplaceView = lazy(() => import('./components/views/MarketplaceView'));
 
 // Lazy Loaded Components - Visualizations
 // Lazy Loaded Components - Visualizations
@@ -316,6 +323,15 @@ const App = () => {
                             </div>
                         )}
 
+                        {activeTab === 'analytics' && (
+                            <div className="p-4 lg:p-8">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    {/* Tier 7: Advanced Analytics */}
+                                    <AnalyticsDashboardV2 />
+                                </Suspense>
+                            </div>
+                        )}
+
                         {activeTab === 'research' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
@@ -324,10 +340,34 @@ const App = () => {
                             </div>
                         )}
 
+                        {activeTab === 'marketplace' && (
+                            <div className="h-full">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    <MarketplaceView />
+                                </Suspense>
+                            </div>
+                        )}
+
                         {activeTab === 'assessment' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <ClinicalAssessmentView />
+                                </Suspense>
+                            </div>
+                        )}
+
+                        {activeTab === 'capev' && (
+                            <div className="p-4 lg:p-8">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    <CAPEVAssessment />
+                                </Suspense>
+                            </div>
+                        )}
+
+                        {activeTab === 'client-dashboard' && (
+                            <div className="h-full">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    <ClientDashboard />
                                 </Suspense>
                             </div>
                         )}

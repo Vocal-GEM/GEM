@@ -5,6 +5,7 @@ import os
 from werkzeug.utils import secure_filename
 from ..utils.rag import rag_system
 from ..validators import validate_file_upload
+from ..extensions import limiter
 # rag_system = None
 
 ai_bp = Blueprint('ai', __name__, url_prefix='/api')
@@ -20,6 +21,7 @@ else:
 
 @ai_bp.route('/train', methods=['POST'])
 @login_required
+@limiter.limit("5 per hour")
 def train_coach():
     # Security Check: Only allow admin to upload
     admin_username = os.environ.get('ADMIN_USERNAME')
@@ -102,6 +104,7 @@ def list_knowledge_base():
 
 @ai_bp.route('/chat', methods=['POST'])
 @login_required
+@limiter.limit("10 per minute")
 def chat():
     if not model:
         return jsonify({

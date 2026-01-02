@@ -1,12 +1,14 @@
 from flask import Blueprint, request, jsonify
 import os
 import requests
+from ..extensions import limiter
 
 tts_bp = Blueprint('tts', __name__, url_prefix='/api/tts')
 
 ELEVENLABS_API_KEY = os.environ.get('ELEVENLABS_API_KEY')
 
 @tts_bp.route('/synthesize', methods=['POST'])
+@limiter.limit("5 per minute")
 def synthesize_speech():
     """
     Proxy endpoint for ElevenLabs TTS API.
@@ -65,6 +67,7 @@ def synthesize_speech():
 
 
 @tts_bp.route('/voices', methods=['GET'])
+@limiter.limit("20 per minute")
 def get_voices():
     """
     Fetch available voices from ElevenLabs API.

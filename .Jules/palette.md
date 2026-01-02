@@ -18,3 +18,6 @@
 ## 2024-05-23 - Accessibility Improvements
 **Learning:** Toast components often misuse `role="alert"` for all messages. Differentiating between `status` (polite) and `alert` (assertive) based on message type (success vs error) significantly improves the screen reader experience by not interrupting users for non-critical updates.
 **Action:** When implementing toast/notification systems, always dynamically set ARIA roles based on the severity of the content.
+## 2024-05-24 - Flexible Loading Component
+**Learning:** Hardcoding dimensions (like `min-h-[200px]`) in generic loading components restricts their reuse in smaller contexts (like buttons), leading to code duplication or hacky overrides.
+**Action:** Use `tailwind-merge` to provide sensible defaults but allow full overrides via `className`, enabling a single component to serve both full-page and inline loading needs.

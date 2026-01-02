@@ -1,6 +1,8 @@
 import { useEffect, useRef, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { generateColormap } from '../../utils/colormaps';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Camera, X } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
@@ -25,6 +27,10 @@ const HighResSpectrogram = memo(({ dataRef }) => {
     const lastFormantsRef = useRef({ f1: 0, f2: 0 });
     const { settings } = useSettings();
 
+    // Generate unique component ID
+    const uniqueId = useId();
+    const componentId = `spectrogram-highres-${uniqueId}`;
+
     // Reusable buffers
     const imgDataRef = useRef(null);
     const data32Ref = useRef(null);
@@ -42,7 +48,7 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         [settings.spectrogramColorScheme]
     );
 
-    useEffect(() => {
+    const draw = useCallback(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -60,11 +66,12 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         const width = canvas.width;
         const height = canvas.height;
 
-        // Pre-allocate buffers for the column update
-        // We reuse these every frame to avoid garbage collection
-        if (!imgDataRef.current || imgDataRef.current.height !== canvas.height) {
-            imgDataRef.current = ctx.createImageData(scrollSpeed, canvas.height);
-            data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
+        // Note: resizing canvas clears it, so we should check if size actually changed.
+        // The effect below handles the initial sizing and resizing logic.
+
+        const ctx = canvas.getContext('2d', { alpha: false });
+        if (!dataRef.current || !dataRef.current.spectrum) {
+            return;
         }
 
         const loop = () => {
@@ -73,11 +80,23 @@ const HighResSpectrogram = memo(({ dataRef }) => {
             }
 
             const spectrum = dataRef.current.spectrum;
+        const spectrum = dataRef.current.spectrum;
+        const width = canvas.width;
+        const height = canvas.height;
+        const scrollSpeed = 2;
 
-            // 1. Shift existing content to left
-            // Optimization: Draw canvas onto itself instead of using an offscreen temp canvas.
-            // This avoids double-copying the entire canvas (Canvas -> Temp -> Canvas).
-            ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
+        // Ensure buffers are ready
+        if (!imgDataRef.current || imgDataRef.current.height !== height) {
+            imgDataRef.current = ctx.createImageData(scrollSpeed, height);
+            data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
+        }
+
+        const imgData = imgDataRef.current;
+        const data32 = data32Ref.current;
+
+        // 1. Shift existing content to left
+        // Optimization: Draw canvas onto itself instead of using an offscreen temp canvas.
+        ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
 
             // 2. Draw new column
             // Use pre-allocated buffers
@@ -86,21 +105,67 @@ const HighResSpectrogram = memo(({ dataRef }) => {
 
             // Optimized: Reuse pre-allocated TypedArray
             const maxBin = Math.floor(spectrum.length / 3);
+        // 2. Draw new column
+        // Reuse pre-allocated TypedArray
+        const maxBin = Math.floor(spectrum.length / 3);
 
-            for (let y = 0; y < height; y++) {
-                const freqRatio = (height - 1 - y) / height;
-                const binIndex = Math.floor(freqRatio * maxBin);
-                const val = spectrum[binIndex] || 0;
+        for (let y = 0; y < height; y++) {
+            const freqRatio = (height - 1 - y) / height;
+            const binIndex = Math.floor(freqRatio * maxBin);
+            const val = spectrum[binIndex] || 0;
 
-                let intensity = Math.log10(val + 1) * 60;
-                intensity = Math.min(255, Math.max(0, intensity));
+            let intensity = Math.log10(val + 1) * 60;
+            intensity = Math.min(255, Math.max(0, intensity));
 
-                const color = colormap[Math.floor(intensity)];
+            const color = colormap[Math.floor(intensity)];
 
-                for (let x = 0; x < scrollSpeed; x++) {
-                    data32[y * scrollSpeed + x] = color;
-                }
+            // Fill all pixels in the scrollSpeed strip for this row
+            const rowOffset = y * scrollSpeed;
+            for (let x = 0; x < scrollSpeed; x++) {
+                data32[rowOffset + x] = color;
             }
+        }
+
+        ctx.putImageData(imgData, width - scrollSpeed, 0);
+
+        // 3. Draw Formant Overlay (F1 & F2)
+        const { f1, f2 } = dataRef.current;
+        const last = lastFormantsRef.current;
+
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        const drawFormant = (currFreq, lastFreq, color) => {
+            if (currFreq > 0 && lastFreq > 0) {
+                const currY = height * (1 - currFreq / MAX_FREQ);
+                const lastY = height * (1 - lastFreq / MAX_FREQ);
+                ctx.beginPath();
+                ctx.strokeStyle = color;
+                ctx.moveTo(width - scrollSpeed * 2, lastY);
+                ctx.lineTo(width - scrollSpeed, currY);
+                ctx.stroke();
+            }
+        };
+
+        drawFormant(f1, last.f1, 'rgba(255, 50, 50, 0.9)');
+        drawFormant(f2, last.f2, 'rgba(255, 50, 50, 0.9)');
+        lastFormantsRef.current = { f1, f2 };
+    }, [dataRef, colormap]);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (canvas) {
+            // Set dimensions once
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            // We set width/height only if they are different to avoid clearing canvas if possible,
+            // but usually we want to reset on mount/resize.
+            if (canvas.width !== rect.width * dpr || canvas.height !== 512) {
+                canvas.width = rect.width * dpr;
+                canvas.height = 512; // Higher vertical resolution
+            }
+        }
 
             ctx.putImageData(imgData, width - scrollSpeed, 0);
 
@@ -132,6 +197,9 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         const unsubscribe = renderCoordinator.subscribe(
             componentId,
             loop,
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            draw,
             renderCoordinator.PRIORITY.MEDIUM
         );
 
@@ -139,6 +207,7 @@ const HighResSpectrogram = memo(({ dataRef }) => {
             unsubscribe();
         };
     }, [dataRef, colormap, componentId]);
+    }, [draw, componentId]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position
