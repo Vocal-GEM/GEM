@@ -1,8 +1,10 @@
 
-
 const LoadingSpinner = () => {
     return (
         <div
+            className="flex items-center justify-center h-full min-h-[200px] w-full"
+            role="status"
+            aria-label="Loading"
             role="status"
             aria-label="Loading"
             className="flex items-center justify-center h-full min-h-[200px] w-full"
