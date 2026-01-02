@@ -1,3 +1,7 @@
+## 2025-02-14 - File Upload Vulnerability
+**Vulnerability:** Unrestricted file uploads in `voice_quality.py` and `data.py` allowed uploading arbitrary file types (including potentially executable ones).
+**Learning:** `secure_filename` only sanitizes the name, it does not validate the file type or extension. Explicit validation is required.
+**Prevention:** Implemented strict allowlist validation for file extensions in `backend/app/validators.py` and enforced it on all upload endpoints.
 ## 2024-05-23 - Insecure File Upload Vulnerability
 **Vulnerability:** The application relied solely on `werkzeug.utils.secure_filename` for file uploads, which only sanitizes the filename string (e.g., removing paths) but does not validate the file extension or content type. This allowed users to upload potentially dangerous files like `.py` scripts.
 **Learning:** `secure_filename` is insufficient for security; it prevents path traversal but not malicious file content or types.

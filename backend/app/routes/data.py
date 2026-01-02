@@ -142,6 +142,10 @@ def upload_file():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
     
+    # Security check
+    is_valid, error_msg = validate_file_upload(file.filename)
+    if not is_valid:
+        return jsonify({"error": error_msg}), 400
     # Security Validation
     is_valid, error = validate_file_upload(file.filename, file.content_type)
     if not is_valid:

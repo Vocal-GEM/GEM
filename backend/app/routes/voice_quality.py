@@ -17,6 +17,10 @@ def analyze():
     if file.filename == "":
         return jsonify({"error": "Empty filename."}), 400
 
+    # Security check - Audio only
+    is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'])
+    if not is_valid:
+        return jsonify({"error": error_msg}), 400
     # Security Validation
     is_valid, error = validate_file_upload(file.filename, file.content_type)
     if not is_valid:
@@ -59,6 +63,11 @@ def clean_audio():
     file = request.files['audio']
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
+
+    # Security check - Audio only
+    is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'])
+    if not is_valid:
+        return jsonify({"error": error_msg}), 400
 
     try:
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:

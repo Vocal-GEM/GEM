@@ -63,6 +63,35 @@ def validate_email_address(email):
     except EmailNotValidError as e:
         return False, str(e)
 
+ALLOWED_EXTENSIONS = {
+    'audio': {'wav', 'mp3', 'ogg', 'm4a', 'flac', 'webm'},
+    'image': {'jpg', 'jpeg', 'png', 'gif', 'webp'},
+    'document': {'pdf', 'txt', 'csv', 'json'}
+}
+
+def validate_file_upload(filename, allowed_types=None):
+    """
+    Validates file extension against allowed types.
+    allowed_types: list of categories ('audio', 'image', 'document') or None for all.
+    """
+    if not filename or '.' not in filename:
+        return False, "Invalid filename"
+
+    ext = filename.rsplit('.', 1)[1].lower()
+
+    allowed = set()
+    if allowed_types is None:
+        for cat in ALLOWED_EXTENSIONS.values():
+            allowed.update(cat)
+    else:
+        for cat in allowed_types:
+            if cat in ALLOWED_EXTENSIONS:
+                allowed.update(ALLOWED_EXTENSIONS[cat])
+            else:
+                 pass
+
+    if ext not in allowed:
+         return False, f"File type '{ext}' not allowed"
 def validate_file_upload(filename, allowed_extensions=None):
     """
     Validate file upload based on extension.
