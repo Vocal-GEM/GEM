@@ -2224,3 +2224,13 @@ def classify_laryngeal_mechanism(f0, spectral_slope, jitter, hnr):
         }
 
 
+
+
+def clean_audio_signal(y, sr):
+    if scipy is None or not _deps_available:
+        return y
+    try:
+        return scipy.signal.wiener(y)
+    except Exception:
+        return y
+
