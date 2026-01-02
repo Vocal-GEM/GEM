@@ -8,6 +8,7 @@ from flask_migrate import Migrate
 
 db = SQLAlchemy()
 login_manager = LoginManager()
+# Rate limiter initialization
 limiter = Limiter(key_func=get_remote_address)
 csrf = CSRFProtect()
 socketio = SocketIO(cors_allowed_origins="*", async_mode='threading') # Allow all for now, restrict in prod

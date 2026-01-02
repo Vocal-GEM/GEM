@@ -5,10 +5,12 @@ import soundfile as sf
 from ..voice_quality_analysis import analyze_file, analyze_file_with_transcript, GOAL_PRESETS, clean_audio_signal, load_audio
 from ..asr_transcriber import transcribe_audio_with_words
 from ..validators import validate_file_upload
+from ..extensions import limiter
 
 voice_quality_bp = Blueprint('voice_quality', __name__)
 
 @voice_quality_bp.route('/api/voice-quality/analyze', methods=['POST'])
+@limiter.limit("10 per minute")
 def analyze():
     if "audio" not in request.files:
         return jsonify({"error": "No audio file uploaded (field name 'audio' required)."}), 400
@@ -58,6 +60,7 @@ def analyze():
     return jsonify(result)
 
 @voice_quality_bp.route('/api/voice-quality/clean', methods=['POST'])
+@limiter.limit("5 per minute")
 def clean_audio():
     if 'audio' not in request.files:
         return jsonify({'error': 'No audio file provided'}), 400
