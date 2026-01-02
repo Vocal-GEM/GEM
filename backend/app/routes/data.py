@@ -155,6 +155,11 @@ def upload_file():
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
     if file:
+        # Security: Validate file extension
+        is_valid, error = validate_file_upload(file.filename)
+        if not is_valid:
+            return jsonify({"error": error}), 400
+
         if not allowed_file(file.filename):
             return jsonify({"error": "File type not allowed"}), 400
 
