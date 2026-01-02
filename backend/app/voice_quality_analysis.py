@@ -1040,15 +1040,35 @@ def compute_raw_rbi_features_vectorized(frames, sr):
 def compute_rbi_series(y, sr, frame_length_s=0.04, hop_length_s=0.01):
     """
     Compute RBI for the entire file using the 3-pass approach (Vectorized).
+    Compute RBI for the entire file using the 3-pass approach.
+    Optimized version using vectorized operations.
     """
     # Pre-processing
     y_pre = pre_emphasis(y)
     
-    # Frame generator
     frame_len = int(frame_length_s * sr)
     hop_len = int(hop_length_s * sr)
     
-    # Pitch tracking for the whole file
+    # 1. Create Frames using stride tricks for efficiency
+    n_samples = len(y_pre)
+    stop = n_samples - frame_len
+
+    # Match range(0, len(y_pre) - frame_len, hop_len)
+    if stop <= 0:
+        return [], {}
+
+    n_frames = (stop - 1) // hop_len + 1
+
+    shape = (n_frames, frame_len)
+    strides = (y_pre.strides[0] * hop_len, y_pre.strides[0])
+    frames = np.lib.stride_tricks.as_strided(y_pre, shape=shape, strides=strides)
+
+    # 2. RMS Energy (Vectorized)
+    frames_sq = frames ** 2
+    rms = np.sqrt(np.mean(frames_sq, axis=1) + 1e-12)
+    energy_db = 20 * np.log10(rms)
+
+    # 3. F0 Tracking
     sound = parselmouth.Sound(y, sr)
     pitch_obj = sound.to_pitch(time_step=hop_length_s, pitch_floor=75, pitch_ceiling=600)
     
@@ -1098,10 +1118,76 @@ def compute_rbi_series(y, sr, frame_length_s=0.04, hop_length_s=0.01):
     ratios, centroids, tilts = compute_raw_rbi_features_vectorized(valid_frames, sr)
 
     # Pass 2: Global Stats
+    # Interpolate F0 to frame centers
+    starts = np.arange(n_frames) * hop_len
+    centers_t = (starts + frame_len/2) / sr
+    
+    pitch_vals = pitch_obj.selected_array['frequency']
+    pitch_times = pitch_obj.xs()
+    
+    # Interpolate (0 where undefined)
+    f0s = np.interp(centers_t, pitch_times, pitch_vals, left=0, right=0)
+    
+    # 4. Adaptive Threshold
+    mean_energy = np.mean(energy_db) if len(energy_db) > 0 else -100
+    energy_threshold = max(mean_energy - 20, -50)
+
+    # 5. Gate (Voiced Detection)
+    is_voiced = (energy_db > energy_threshold) & (f0s > 75) & (f0s < 500)
+
+    voiced_indices = np.where(is_voiced)[0]
+
+    # Pass 2: Global Stats
+    if len(voiced_indices) == 0:
+        return [None] * n_frames, {}
+        
+    voiced_frames = frames[voiced_indices]
+    voiced_f0s = f0s[voiced_indices]
+
+    # 6. FFT for voiced frames only
+    window = np.hanning(frame_len)
+    windowed_frames = voiced_frames * window
+
+    spectra = np.fft.rfft(windowed_frames, axis=1)
+    mag_sq = np.abs(spectra) ** 2
+    freqs = np.fft.rfftfreq(frame_len, 1/sr)
+
+    # 6a. Ratio HL
+    lf_mask = (freqs >= 0) & (freqs < 1500)
+    hf_mask = (freqs >= 3000) & (freqs < 6000)
+
+    e_lf = np.sum(mag_sq[:, lf_mask], axis=1)
+    e_hf = np.sum(mag_sq[:, hf_mask], axis=1)
+
+    ratios = np.log10((e_hf + 1e-12) / (e_lf + 1e-12))
+
+    # 6b. Centroid
+    total_energy = np.sum(mag_sq, axis=1) + 1e-12
+    centroids = np.sum(freqs * mag_sq, axis=1) / total_energy
+
+    # 6c. Tilt
+    band_mask = (freqs >= 300) & (freqs <= 4000)
+    tilts = np.zeros(len(voiced_indices))
+
+    if np.sum(band_mask) > 1:
+        f_band = freqs[band_mask]
+        y_band = 20 * np.log10(mag_sq[:, band_mask] + 1e-12)
+        
+        # Linear regression vectorized
+        # A = [f, 1]
+        A = np.vstack([f_band, np.ones_like(f_band)]).T
+        # Pseudo-inverse for batch least squares
+        pinv = np.linalg.pinv(A)
+        coeffs = y_band @ pinv.T
+        tilts = coeffs[:, 0]
+        
+    tilts_flipped = -tilts
+    
+    # 7. Stats
     stats = {
         "ratio_min": np.percentile(ratios, 5), "ratio_max": np.percentile(ratios, 95),
         "centroid_min": np.percentile(centroids, 5), "centroid_max": np.percentile(centroids, 95),
-        "tilt_min": np.percentile(tilts, 5), "tilt_max": np.percentile(tilts, 95)
+        "tilt_min": np.percentile(tilts_flipped, 5), "tilt_max": np.percentile(tilts_flipped, 95)
     }
     
     # Pass 3: Normalize and Compute RBI
@@ -1135,8 +1221,40 @@ def compute_rbi_series(y, sr, frame_length_s=0.04, hop_length_s=0.01):
             rbi_values[i] = smoothed_rbi
         else:
             rbi_values[i] = None
+    # 8. Normalize and Score
+    def norm_vec(val, vmin, vmax):
+        width = vmax - vmin
+        if width <= 0: return np.full_like(val, 0.5)
+        return np.clip((val - vmin) / (width + 1e-9), 0.0, 1.0)
+
+    r_norm = norm_vec(ratios, stats["ratio_min"], stats["ratio_max"])
+    c_norm = norm_vec(centroids, stats["centroid_min"], stats["centroid_max"])
+    t_norm = norm_vec(tilts_flipped, stats["tilt_min"], stats["tilt_max"])
+    
+    f0_clip = np.clip(voiced_f0s, 120, 300)
+    f0_norm = (f0_clip - 120) / (300 - 120)
+    
+    raw_score = (RBI_WEIGHTS["ratio"] * r_norm) + \
+                (RBI_WEIGHTS["centroid"] * c_norm) + \
+                (RBI_WEIGHTS["tilt"] * t_norm) + \
+                (RBI_WEIGHTS["f0"] * f0_norm)
+
+    current_rbi = np.clip(raw_score * 100, 0, 100)
+    
+    # Smoothing
+    smoothed_values = []
+    last_rbi = 50.0
+    for val in current_rbi:
+        s = (0.2 * val) + (0.8 * last_rbi)
+        smoothed_values.append(s)
+        last_rbi = s
+    
+    # Map back to timeline
+    final_rbi_values = [None] * n_frames
+    for idx, val in zip(voiced_indices, smoothed_values):
+        final_rbi_values[idx] = val
             
-    return rbi_values, stats
+    return final_rbi_values, stats
 
 # ----------------------
 # Main Analysis
