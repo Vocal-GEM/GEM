@@ -3,9 +3,17 @@ import { describe, it, expect } from 'vitest';
 import LoadingSpinner from './LoadingSpinner';
 
 describe('LoadingSpinner', () => {
+    it('renders with role="status"', () => {
     it('renders with accessibility attributes', () => {
         render(<LoadingSpinner />);
 
+    it('contains accessible label', () => {
+        render(<LoadingSpinner />);
+        // The label should be visually hidden but available to screen readers
+        const label = screen.getByText('Loading...');
+        expect(label).toBeInTheDocument();
+        expect(label).toHaveClass('sr-only');
+    });
         const spinner = screen.getByRole('status');
         expect(spinner).toBeInTheDocument();
 
