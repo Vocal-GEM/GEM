@@ -3,6 +3,8 @@ import { DSP } from '../utils/DSP';
 import { PitchDetector } from '../utils/PitchDetector';
 import { ResonanceCalculator } from '../utils/ResonanceCalculator';
 import { FormantAnalyzer } from '../utils/FormantAnalyzer';
+import { validateAudioSignal, getSignalQualityMessage } from '../utils/signalValidator';
+import { PitchSmoother } from '../utils/PitchSmoother';
 
 
 
@@ -53,6 +55,10 @@ export class AudioEngine {
         this.smoothedF2 = 0;
         this.shimmerBuffer = [];
         this.lastAmp = 0;
+
+        // NEW: Signal validation and pitch smoothing
+        this.pitchSmoother = new PitchSmoother(5); // Medium smoothing
+        this.signalValidationEnabled = true;
 
         // Noise Gate
         this.adaptiveThreshold = 0.0001;
@@ -253,119 +259,40 @@ export class AudioEngine {
         try {
             if (!this.isActive) await this.start();
 
-            // Load AudioWorklet if not already loaded
+            // Load PitchWorklet
             try {
-                await this.audioContext.audioWorklet.addModule(new URL('../audio/voice-quality-processor.js', import.meta.url));
+                await this.audioContext.audioWorklet.addModule(new URL('../audio/PitchWorklet.js', import.meta.url));
             } catch (e) {
-                // Ignore if already added or handle specific errors
                 console.warn("AudioWorklet addModule warning:", e);
             }
 
-            this.workletNode = new AudioWorkletNode(this.audioContext, 'voice-quality-processor');
+            this.workletNode = new AudioWorkletNode(this.audioContext, 'pitch-processor');
 
-            // Configure the worklet
+            // Configure
             this.workletNode.port.postMessage({
                 type: 'config',
                 sampleRate: this.audioContext.sampleRate,
-                targetSamples: Math.round(this.audioContext.sampleRate * 0.25)
+                minFreq: 60,
+                maxFreq: 1200,
+                threshold: 0.1
             });
 
             this.workletNode.port.onmessage = (e) => {
-                if (e.data.type === 'chunk') {
-                    const pcm = new Float32Array(e.data.pcm);
-
-                    // Calculate Intensity locally for UI responsiveness
-                    const rms = DSP.calculateRMS(pcm);
-                    const intensity = DSP.calculateDB(rms, this.calibrationOffset);
-
-                    // --- Jitter / Shimmer Calculation (Main Thread from Worklet Chunks) ---
-                    // Note: Worklet chunks might be small (e.g. 128 or 4096 frames). 
-                    // YIN needs ~2048 for good low pitch detection.
-
-                    // We can reuse the buffers we defined (ensure they are initialized)
-                    if (!this.analysisPitchBuffer) this.analysisPitchBuffer = [];
-                    if (!this.analysisAmpBuffer) this.analysisAmpBuffer = [];
-
-                    // Calculate Pitch on this chunk (might be less accurate if chunk is small)
-                    // If chunk is small, we might want to circular buffer Pcm data?
-                    // Assuming chunk size is decent (set to 0.25s in config -> ~11000 samples? No, 4096 usually)
-                    const { pitch, confidence } = DSP.calculatePitchYIN(pcm, this.audioContext.sampleRate, 0.2);
-
-                    let jitter = 0;
-                    let shimmer = 0;
-                    let hnr = 0;
-
-                    let maxAmp = 0;
-                    for (let i = 0; i < pcm.length; i++) if (Math.abs(pcm[i]) > maxAmp) maxAmp = Math.abs(pcm[i]);
-
-                    if (pitch > 50 && confidence > 0.8) {
-                        const period = 1.0 / pitch;
-                        this.analysisPitchBuffer.push(period);
-                        this.analysisAmpBuffer.push(maxAmp);
-
-                        if (this.analysisPitchBuffer.length > 15) this.analysisPitchBuffer.shift();
-                        if (this.analysisAmpBuffer.length > 15) this.analysisAmpBuffer.shift();
-
-                        if (this.analysisPitchBuffer.length > 5) {
-                            jitter = DSP.calculateJitter(this.analysisPitchBuffer);
-                            shimmer = DSP.calculateShimmer(this.analysisAmpBuffer);
-                        }
-
-                        // Simple HNR proxy from confidence
-                        hnr = 10 * Math.log10(confidence / (1.001 - confidence));
-                    } else {
-                        // Decay
-                        if (Math.random() > 0.9) { // Slow decay
-                            this.analysisPitchBuffer = [];
-                            this.analysisAmpBuffer = [];
-                        }
-                    }
-
-                    // Update latest analysis with local metrics
-                    this.latestBackendAnalysis = {
-                        ...this.latestBackendAnalysis,
-                        intensity: intensity,
-                        pitch: pitch,
-                        jitter: jitter,
-                        shimmer: shimmer,
-                        hnr: hnr,
-                        clarity: confidence,
-                        timestamp: Date.now()
+                if (e.data.type === 'pitch') {
+                    // Update latest pitch from worklet
+                    this.latestWorkletPitch = {
+                        pitch: e.data.pitch,
+                        confidence: e.data.confidence,
+                        timestamp: e.data.timestamp,
+                        latency: e.data.latency
                     };
-
-                    // Emit to socket
-                    if (this.socket && this.socket.connected) {
-                        this.socket.emit('audio_chunk', {
-                            pcm: e.data.pcm,
-                            sr: e.data.sr
-                        });
-                    }
-
-                    // Trigger update
-                    if (this.onAudioUpdate) {
-                        const metricData = {
-                            ...this.latestBackendAnalysis,
-                            live: true
-                        };
-
-                        // Store metrics if recording
-                        if (this.isRecording && this.recordingMetrics) {
-                            this.recordingMetrics.push({
-                                timestamp: Date.now() - (this.recordingStartTime || Date.now()),
-                                metrics: metricData
-                            });
-                        }
-
-                        this.onAudioUpdate(metricData);
-                    }
                 }
             };
 
-            // Connect: Source -> Worklet -> Destination (mute)
-            // We need to connect the microphone to the worklet
+            // Connect
             if (this.microphone) {
                 this.microphone.connect(this.workletNode);
-                this.workletNode.connect(this.audioContext.destination); // Needed for processing to happen? Usually yes, but maybe gain 0
+                this.workletNode.connect(this.audioContext.destination); // Keep alive
             }
 
             this.isLiveAnalysisActive = true;
@@ -387,33 +314,30 @@ export class AudioEngine {
         }
 
         this.isLiveAnalysisActive = false;
-        this.debugInfo.state = 'running'; // Revert to normal running state
+        this.latestWorkletPitch = null;
+        this.debugInfo.state = 'running';
     }
 
     startProcessing() {
         if (!this.isActive) return;
 
-        const bufferLength = this.analyser.frequencyBinCount; // 1024 if fftSize is 2048
+        const bufferLength = this.analyser.frequencyBinCount;
         const dataArray = new Float32Array(bufferLength);
         const freqData = new Float32Array(bufferLength);
 
-        // Buffers for calculating perturbation metrics over time (e.g., last 10-20 frames)
-        this.visualPitchBuffer = []; // Store 1/F0
-        this.visualAmpBuffer = [];   // Store Peak Amplitude
+        // Buffers for calculating perturbation metrics
+        this.visualPitchBuffer = [];
+        this.visualAmpBuffer = [];
 
         const loop = () => {
             if (!this.isActive) return;
             this.animationFrameId = requestAnimationFrame(loop);
 
-            // If Live Analysis (Worklet) is active, it handles the metrics and updates.
-            // We exit here to avoid redundant processing and double-updates.
-            if (this.isLiveAnalysisActive) return;
-
+            // Fetch data (always needed for visualization/RMS)
             this.analyser.getFloatTimeDomainData(dataArray);
-
-            // --- NEW: Spectral Tilt Calculation ---
-            // We need frequency data for tilt/weight analysis
             this.analyser.getFloatFrequencyData(freqData);
+
+            // Hybrid Approach: Use Worklet for Pitch if active, Main Thread for the rest
 
             // Approximate Spectral Tilt (db/octave proxy)
             // Compare Energy in 0-1kHz vs 1kHz-4kHz
@@ -473,10 +397,61 @@ export class AudioEngine {
                 return; // Skip further processing for this frame
             }
 
+            // NEW: Signal Validation
+            if (this.signalValidationEnabled) {
+                const validation = validateAudioSignal(dataArray, this.audioContext.sampleRate);
+
+                // If signal has critical issues, show warning and skip analysis
+                if (!validation.isValid) {
+                    if (this.onAudioUpdate) {
+                        this.onAudioUpdate({
+                            volume: maxAmp,
+                            pitch: 0,
+                            clarity: 0,
+                            intensity: intensity,
+                            warning: validation.issues[0].message,
+                            signalQuality: getSignalQualityMessage(validation),
+                            confidence: validation.confidence,
+                            isSilent: false,
+                            hasIssues: true
+                        });
+                    }
+                    return; // Skip pitch detection for bad signal
+                }
+
+                // Store validation confidence for use in metrics
+                this.lastSignalConfidence = validation.confidence;
+            }
+
+
             // 2. Pitch Detection (YIN)
-            // Use local DSP static for synchronous calculation or this.pitchDetector if preferred.
-            // Using DSP.calculatePitchYIN for direct access.
-            const { pitch, confidence } = DSP.calculatePitchYIN(dataArray, this.audioContext.sampleRate, 0.2);
+            let pitch = 0;
+            let confidence = 0;
+
+            // Check if we have fresh data from the AudioWorklet (Low Latency path)
+            const workletActive = this.isLiveAnalysisActive && this.latestWorkletPitch;
+
+            if (workletActive) {
+                const lp = this.latestWorkletPitch;
+                // Allow a small timeout for worklet data validity (e.g. 100ms)
+                if (Date.now() - lp.timestamp < 100) {
+                    pitch = lp.pitch;
+                    confidence = lp.confidence;
+                }
+            }
+
+            // Fallback to main thread if worklet is not active or data is stale
+            if ((!workletActive || pitch === 0) && !this.isLiveAnalysisActive) {
+                const yinResult = DSP.calculatePitchYIN(dataArray, this.audioContext.sampleRate, 0.2);
+                pitch = yinResult.pitch;
+                confidence = yinResult.confidence;
+            }
+
+            // Apply smoothing (important for both sources to reduce visual jitter)
+            const rawPitch = pitch;
+            const smoothedPitch = this.pitchSmoother.process(rawPitch);
+            pitch = smoothedPitch !== null ? smoothedPitch : rawPitch;
+
 
             // --- QUAD-CORE ANALYSIS METRICS ---
             let f3Noise = -100;
@@ -559,6 +534,7 @@ export class AudioEngine {
             // For now, just call the update handler with some dummy data or processed data
             if (this.onAudioUpdate) {
                 const metricData = {
+                    ...this.latestBackendAnalysis, // Include backend/socket metrics (RBI, etc.)
                     volume: maxAmp,
                     pitch: pitch || 0,
                     clarity: confidence || 0,
@@ -666,6 +642,39 @@ export class AudioEngine {
         this.filterMin = min;
         this.filterMax = max;
     }
+
+    /**
+     * Enable or disable signal validation
+     * @param {boolean} enabled - Whether to validate signal before analysis
+     */
+    setSignalValidation(enabled) {
+        this.signalValidationEnabled = enabled;
+    }
+
+    /**
+     * Set pitch smoothing intensity
+     * @param {'low'|'medium'|'high'|'off'} intensity - Smoothing intensity
+     */
+    setPitchSmoothing(intensity) {
+        if (intensity === 'off') {
+            this.pitchSmoother.setWindowSize(1); // No smoothing
+        } else {
+            const windowSizes = {
+                low: 3,
+                medium: 5,
+                high: 9
+            };
+            this.pitchSmoother.setWindowSize(windowSizes[intensity] || 5);
+        }
+    }
+
+    /**
+     * Reset pitch smoother buffer (useful when switching contexts)
+     */
+    resetPitchSmoothing() {
+        this.pitchSmoother.reset();
+    }
+
 
     /**
      * Start recording audio to a clip

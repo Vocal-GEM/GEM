@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, User, Waves, Search, FileText, HelpCircle, Layers, BookMarked, Camera } from 'lucide-react';
+import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, User, Waves, Search, FileText, HelpCircle, Layers, BookMarked, Camera, Briefcase, ClipboardCheck } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
@@ -45,7 +45,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
         { id: 'dashboard', label: 'Dashboard', icon: <Home size={20} /> },
         { id: 'practice', label: 'Practice', icon: <Activity size={20} /> },
         { id: 'analysis', label: 'Analysis', icon: <Waves size={20} /> },
-        { id: 'history', label: 'History', icon: <BarChart2 size={20} /> },
+        { id: 'analytics', label: 'Analytics', icon: <BarChart2 size={20} /> },
         { id: 'coach', label: 'Coach', icon: <BookOpen size={20} /> },
         { id: 'library', label: 'Library', icon: <BookMarked size={20} /> },
         { id: 'camera', label: 'Mirror', icon: <Camera size={20} />, isModal: true },
