@@ -1,8 +1,9 @@
-import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
 import { generateColormap } from '../../utils/colormaps';
 import { Camera, X } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * Convert frequency to musical note
@@ -22,6 +23,11 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const canvasRef = useRef(null);
     const { dataRef, isAudioActive, audioContext } = useAudio();
     const { settings } = useSettings();
+    // Unique ID for render coordinator
+    // Use useId directly, assuming React 18+ as seen in package.json (react ^18.3.1)
+    const reactId = useId();
+    const componentId = useRef(reactId).current;
+
     // Tap cursor state
     const [cursorData, setCursorData] = useState(null);
     const [showControls, setShowControls] = useState(false);
@@ -46,6 +52,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         [settings.spectrogramColorScheme]
     );
 
+    const draw = useCallback((_deltaTime) => {
     // Reusable objects to reduce GC
     const imageDataRef = useRef(null);
 
@@ -148,6 +155,15 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                     data32[rowOffset + x] = color;
                 }
             }
+        }
+    }, [dataRef, audioContext, getColor]); // Removed recursive requestAnimationFrame
+
+    useEffect(() => {
+        if (isAudioActive) {
+            // Subscribe to renderCoordinator instead of using requestAnimationFrame directly
+            return renderCoordinator.subscribe(componentId, draw, renderCoordinator.PRIORITY.MEDIUM);
+        }
+    }, [isAudioActive, draw, componentId]);
 
             ctx.putImageData(imageData, width - speed, 0);
             // -----------------------------------------------
