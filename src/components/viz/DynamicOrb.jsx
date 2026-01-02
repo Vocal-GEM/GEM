@@ -196,13 +196,14 @@ void main() {
   finalColor += finalColor * u_intensity * (0.5 + u_resonance_norm);
   finalColor += vec3(0.15);
 
-  // --- TARGET ZONE INDICATOR ---
-  // If in target zone, add a golden rim/glow
-  if (u_in_target > 0.5) {
-      vec3 gold = vec3(1.0, 0.8, 0.2);
-      float rim = pow(1.0 - abs(dot(finalNormal, viewDir)), 4.0);
-      finalColor += gold * rim * 2.0 * (0.5 + 0.5 * sin(u_time * 5.0)); // Pulsing gold rim
-  }
+   // --- TARGET ZONE INDICATOR ---
+   // If in target zone, add a strong emerald glow
+   if (u_in_target > 0.5) {
+       vec3 targetColor = vec3(0.2, 1.0, 0.6); // Emerald Green
+       float rim = pow(1.0 - abs(dot(finalNormal, viewDir)), 3.0); // Wider rim
+       finalColor += targetColor * rim * 3.0 * (0.6 + 0.4 * sin(u_time * 8.0)); // Faster, brighter pulse
+       finalColor += targetColor * 0.2; // Ambient glow boost
+   }
 
   float alpha = 0.92 + u_roughness * 0.08;
   
@@ -576,6 +577,19 @@ const DynamicOrb = memo(({ dataRef, calibration, externalDataRef, audioEngine, t
       )}
 
       <OrbLegend mode={mode} />
+
+      {/* Axis Labels - Only show in Gem Mode */}
+      {mode === 'gem' && (
+        <>
+          {/* Pitch Axis (Vertical) */}
+          <div className="absolute top-12 left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-widest text-slate-500 font-bold opacity-50 pointer-events-none select-none">High Pitch</div>
+          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-widest text-slate-500 font-bold opacity-50 pointer-events-none select-none">Low Pitch</div>
+
+          {/* Resonance Axis (Horizontal) */}
+          <div className="absolute left-6 top-1/2 -translate-y-1/2 text-[9px] uppercase tracking-widest text-slate-500 font-bold opacity-50 -rotate-90 md:rotate-0 pointer-events-none select-none">Dark</div>
+          <div className="absolute right-6 top-1/2 -translate-y-1/2 text-[9px] uppercase tracking-widest text-slate-500 font-bold opacity-50 rotate-90 md:rotate-0 pointer-events-none select-none">Bright</div>
+        </>
+      )}
 
       {/* Controls */}
       <div className="absolute top-4 left-4 z-10 flex gap-2 p-2 rounded-full bg-slate-900/50 backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

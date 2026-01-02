@@ -105,6 +105,7 @@ const PracticeMode = ({
     const [showProgressiveStacking, setShowProgressiveStacking] = useState(false);
     const [showConversationPractice, setShowConversationPractice] = useState(false);
     const [lastSessionDuration, setLastSessionDuration] = useState(0);
+    const [isFocusMode, setIsFocusMode] = useState(false);
 
     // Tour for DAF mode - placed after showDAF is declared
     useEffect(() => {
@@ -310,7 +311,7 @@ const PracticeMode = ({
             )}
 
             {/* Header / Tabs - simplified */}
-            <div className="flex flex-col mb-4 gap-4">
+            <div className="flex flex-col mb-4 gap-4 py-2">
                 <div id="practice-tabs" className="flex items-center justify-center gap-1 p-1 bg-slate-900/50 rounded-full border border-white/5 w-fit mx-auto">
                     {TABS.map(tab => (
                         <button
@@ -330,11 +331,11 @@ const PracticeMode = ({
             </div>
 
             {/* Main Content Grid - Rebalanced */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full transition-all duration-500 ease-in-out">
 
-                {/* Center Stage: Visualization (Spans 8 cols) */}
-                <div className="lg:col-span-8 flex flex-col gap-6">
-                    <div className="relative w-full aspect-video lg:aspect-auto lg:h-[500px] bg-black rounded-3xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col relative group">
+                {/* Center Stage: Visualization (Spans 8 cols normally, 12 in focus mode) */}
+                <div className={`flex flex-col gap-6 transition-all duration-500 ease-in-out ${isFocusMode ? 'lg:col-span-12' : 'lg:col-span-8'}`}>
+                    <div className={`relative w-full aspect-video ${isFocusMode ? 'lg:h-[70vh]' : 'lg:h-[500px]'} bg-black rounded-3xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col relative group transition-all duration-500`}>
 
                         {/* Visualization Layer */}
                         <div className="flex-1 relative z-10">
@@ -386,6 +387,15 @@ const PracticeMode = ({
                                     <Timer size={18} />
                                 </button>
                             )}
+
+                            {/* Focus Mode Toggle */}
+                            <button
+                                onClick={() => setIsFocusMode(!isFocusMode)}
+                                className={`p-2.5 rounded-full transition-all backdrop-blur-sm border border-white/10 ${isFocusMode ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'bg-black/50 text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+                                title={isFocusMode ? "Exit Focus Mode" : "Enter Focus Mode"}
+                            >
+                                {isFocusMode ? <Layers size={18} /> : <Square size={18} />}
+                            </button>
                         </div>
                     </div>
 
@@ -440,7 +450,7 @@ const PracticeMode = ({
                 </div>
 
                 {/* Right Column: Dashboard & Metrics (Spans 4 cols) */}
-                <div className="lg:col-span-4 flex flex-col gap-4 h-full">
+                <div className={`lg:col-span-4 flex flex-col gap-4 h-full transition-all duration-500 ${isFocusMode ? 'hidden opacity-0 pointer-events-none' : 'opacity-100'}`}>
                     {/* Coach Panel - Actionable Feedback */}
                     <div className="flex-1">
                         <CoachPanel

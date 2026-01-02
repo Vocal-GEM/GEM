@@ -79,13 +79,14 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                     </div>
                     <div>
                         <h3 className="text-sm font-bold text-white">Laryngeal Register</h3>
-                        <p className="text-xs text-slate-400">Mechanism: {registerData.mechanism}</p>
+                        <p className="text-xs text-slate-300">Mechanism: {registerData.mechanism}</p>
                     </div>
                 </div>
                 <button
-                    className="text-slate-600 hover:text-slate-300 transition-colors"
+                    className="text-slate-500 hover:text-white transition-colors"
                     onMouseEnter={() => setShowTooltip(true)}
                     onMouseLeave={() => setShowTooltip(false)}
+                    aria-label="More info about Laryngeal Register"
                 >
                     <Info size={16} />
                 </button>
@@ -93,20 +94,22 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
 
             {/* Tooltip */}
             {showTooltip && (
-                <div className="absolute z-50 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg text-xs text-slate-300 max-w-xs shadow-xl">
-                    Detects vocal fold vibration mechanism.
-                    M1 (Chest) = Thick folds.
-                    M2 (Head) = Thin folds.
-                    Mix = Blending zone.
+                <div className="absolute z-50 mt-2 p-3 bg-slate-900 border border-slate-700/50 rounded-lg text-xs text-slate-200 max-w-xs shadow-xl ring-1 ring-black">
+                    <p className="font-bold mb-1">Detects vocal fold vibration mechanism.</p>
+                    <ul className="space-y-1 opacity-90">
+                        <li>• <strong className="text-amber-400">M1 (Chest)</strong>: Thick folds.</li>
+                        <li>• <strong className="text-cyan-400">M2 (Head)</strong>: Thin folds.</li>
+                        <li>• <strong className="text-green-400">Mix</strong>: Blending zone.</li>
+                    </ul>
                 </div>
             )}
 
             {/* Gauge: M2 <-> M1 */}
-            <div className="relative h-12 bg-slate-800 rounded-xl overflow-hidden mb-2">
-                <div className={`absolute inset-0 ${getGradient()} opacity-50`} />
+            <div className="relative h-12 bg-slate-950 rounded-xl overflow-hidden mb-2 ring-1 ring-white/5">
+                <div className={`absolute inset-0 ${getGradient()} opacity-40`} />
 
                 {/* Zones Labels */}
-                <div className="absolute inset-0 flex justify-between px-3 items-center text-[10px] font-bold text-white/50">
+                <div className="absolute inset-0 flex justify-between px-3 items-center text-[11px] font-bold text-white/70">
                     <span>M2 (Head)</span>
                     <span>Mix</span>
                     <span>M1 (Chest)</span>
@@ -115,7 +118,7 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                 {/* Needle */}
                 {/* Mix Ratio 0 = M2 (Left), 100 = M1 (Right) */}
                 <div
-                    className="absolute top-1 bottom-1 w-1 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-300 ease-out"
+                    className="absolute top-1 bottom-1 w-1 bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)] transition-all duration-300 ease-out rounded-full"
                     style={{
                         left: `${Math.max(5, Math.min(95, registerData.mixRatio))}%`
                     }}
@@ -124,17 +127,20 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
 
             {/* Slope Value (Debug/Technical) */}
             <div className="flex justify-end mb-3">
-                <span className="text-[10px] text-slate-500 font-mono">
-                    Tilt: {registerData.slope.toFixed(1)} dB/oct
-                </span>
+                <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-slate-800/50 border border-white/5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                    <span className="text-[10px] text-slate-400 font-mono font-medium">
+                        Tilt: <span className="text-slate-300">{registerData.slope.toFixed(1)}</span> dB/oct
+                    </span>
+                </div>
             </div>
 
             {/* Current Mechanism Card */}
-            <div className={`flex items-center justify-between p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 mb-3`}>
+            <div className={`flex items-center justify-between p-3 rounded-xl bg-slate-800/80 border border-slate-700/50 mb-3`}>
                 <span className={`font-bold text-${registerData.color}-400 text-sm`}>
                     {registerData.label}
                 </span>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-slate-300">
                     {registerData.description}
                 </span>
             </div>
