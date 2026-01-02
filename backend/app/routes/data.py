@@ -9,6 +9,7 @@ from ..extensions import limiter
 
 data_bp = Blueprint('data', __name__, url_prefix='/api')
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp3', 'wav', 'm4a', 'ogg', 'webm'}
 ALLOWED_EXTENSIONS = {'wav', 'mp3', 'ogg', 'm4a', 'flac', 'aac', 'jpg', 'jpeg', 'png'}
 
 def allowed_file(filename):
@@ -170,6 +171,8 @@ def upload_file():
         return jsonify({"url": url})
     else:
         return jsonify({"error": "File type not allowed"}), 400
+
+    return jsonify({"error": "File type not allowed"}), 400
 
     return jsonify({"error": "File type not allowed"}), 400
 
