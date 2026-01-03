@@ -128,6 +128,7 @@ def get_data():
 
 @data_bp.route('/upload', methods=['POST'])
 @login_required
+@limiter.limit("10 per minute")
 def upload_file():
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
