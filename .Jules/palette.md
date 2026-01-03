@@ -21,3 +21,6 @@
 ## 2024-05-24 - Flexible Loading Component
 **Learning:** Hardcoding dimensions (like `min-h-[200px]`) in generic loading components restricts their reuse in smaller contexts (like buttons), leading to code duplication or hacky overrides.
 **Action:** Use `tailwind-merge` to provide sensible defaults but allow full overrides via `className`, enabling a single component to serve both full-page and inline loading needs.
+## 2026-01-03 - Component Corruption
+**Learning:** Multiple conflicting definitions within a single component file (likely from bad merges) can go unnoticed if the file exports the last definition, but it creates a maintainability nightmare and breaks tools.
+**Action:** Always check the entire file content when fixing a component, not just the function you are editing, to spot and clean up duplicate/conflicting code blocks.
