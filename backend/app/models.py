@@ -264,7 +264,7 @@ class ResearchDataPoint(db.Model):
     collected_at = db.Column(db.DateTime, default=datetime.utcnow)
     data_type = db.Column(db.String(50), nullable=False)
     acoustic_features = db.Column(db.JSON)  # Anonymized features only
-    metadata = db.Column(db.JSON)  # Session context (non-identifying)
+    session_metadata = db.Column(db.JSON)  # Session context (non-identifying)
 
 class NormativeVoiceData(db.Model):
     """Aggregated normative data from diverse populations"""
