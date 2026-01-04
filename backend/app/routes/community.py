@@ -6,6 +6,7 @@ from ..models import (
     GroupChallenge, GroupChallengeParticipant, ModerationFlag,
     CommunityBenchmark, User
 )
+from ..validators import validate_file_upload
 from datetime import datetime, timedelta
 import os
 import secrets
@@ -79,6 +80,12 @@ def share_voice():
             return jsonify({'error': 'No audio file provided'}), 400
         
         audio_file = request.files['audio']
+
+        # Security: Validate file type
+        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
+        if not is_valid:
+            return jsonify({'error': error}), 400
+
         context = request.form.get('context', '')
         expiration_days = int(request.form.get('expiration_days', 7))
         
