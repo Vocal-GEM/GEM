@@ -8,6 +8,11 @@ from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
 import os
 import tempfile
+import logging
+from ..validators import validate_file_upload
+
+logger = logging.getLogger(__name__)
+
 try:
     import numpy as np
     import librosa
@@ -276,6 +281,11 @@ def analyze_audio():
     file = request.files['audio']
     if file.filename == '':
         return jsonify({'error': 'Empty filename'}), 400
+
+    # Validate file type
+    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'])
+    if not is_valid:
+        return jsonify({'error': error}), 400
     
     # Save to temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_file:
@@ -330,10 +340,8 @@ def analyze_audio():
         return jsonify(response), 200
         
     except Exception as e:
-        print(f"Analysis error: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
+        logger.error(f"Analysis error: {e}", exc_info=True)
+        return jsonify({'error': 'An error occurred during analysis'}), 500
         
     finally:
         # Clean up temp file
