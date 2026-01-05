@@ -8,6 +8,8 @@ from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
 import os
 import tempfile
+from ..extensions import limiter
+from ..validators import validate_file_upload
 try:
     import numpy as np
     import librosa
@@ -258,6 +260,7 @@ def transcribe_with_timing(audio_path):
 
 
 @analysis_bp.route('/api/analyze', methods=['POST'])
+@limiter.limit("10 per minute")
 def analyze_audio():
     """
     Analyze uploaded audio file and return comprehensive voice metrics.
@@ -276,6 +279,11 @@ def analyze_audio():
     file = request.files['audio']
     if file.filename == '':
         return jsonify({'error': 'Empty filename'}), 400
+
+    # Validate file type
+    is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'])
+    if not is_valid:
+        return jsonify({'error': error_msg}), 400
     
     # Save to temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_file:
