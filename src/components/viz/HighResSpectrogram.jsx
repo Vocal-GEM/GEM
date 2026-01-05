@@ -1,10 +1,8 @@
-import { useEffect, useRef, useMemo, useState, useCallback, memo } from 'react';
-import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback, memo, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { generateColormap } from '../../utils/colormaps';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Camera, X } from 'lucide-react';
-import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * Convert frequency to musical note with cents
@@ -31,16 +29,13 @@ const HighResSpectrogram = memo(({ dataRef }) => {
     const uniqueId = useId();
     const componentId = `spectrogram-highres-${uniqueId}`;
 
-    // Reusable buffers
+    // Reusable buffers to avoid GC
     const imgDataRef = useRef(null);
     const data32Ref = useRef(null);
 
     // Tap cursor state  
     const [cursorData, setCursorData] = useState(null);
     const [showControls, setShowControls] = useState(false);
-
-    // Component ID for RenderCoordinator
-    const componentId = useRef(`high-res-spectrogram-${Math.random().toString(36).substr(2, 9)}`).current;
 
     // Dynamic colormap based on settings
     const colormap = useMemo(
@@ -52,64 +47,56 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        // Remove 'willReadFrequently: true' to allow GPU acceleration since we use drawImage(canvas)
-        // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
-        const ctx = canvas.getContext('2d', { alpha: false });
-
-        // Set dimensions
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = 512; // Higher vertical resolution
-
-        const scrollSpeed = 2;
-        const width = canvas.width;
-        const height = canvas.height;
-
-        // Note: resizing canvas clears it, so we should check if size actually changed.
-        // The effect below handles the initial sizing and resizing logic.
-
-        const ctx = canvas.getContext('2d', { alpha: false });
+        // Check if data is available
         if (!dataRef.current || !dataRef.current.spectrum) {
             return;
         }
 
-        const loop = () => {
-            if (!dataRef.current || !dataRef.current.spectrum) {
-                return;
-            }
+        const ctx = canvas.getContext('2d', { alpha: false });
 
-            const spectrum = dataRef.current.spectrum;
-        const spectrum = dataRef.current.spectrum;
+        // Set dimensions (handle resize lazily)
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        // We force height to 512 for resolution, but match width to container
+        const targetWidth = Math.floor(rect.width * dpr);
+        const targetHeight = 512;
+
+        if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            // Clear buffers on resize
+            imgDataRef.current = null;
+            data32Ref.current = null;
+        }
+
         const width = canvas.width;
         const height = canvas.height;
-        const scrollSpeed = 2;
+        const scrollSpeed = 2; // px per frame
 
         // Ensure buffers are ready
+        // Optimization: Create ImageData with 'scrollSpeed' width (not canvas width)
+        // so we fill it vertically as a strip.
         if (!imgDataRef.current || imgDataRef.current.height !== height) {
             imgDataRef.current = ctx.createImageData(scrollSpeed, height);
             data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
         }
 
+        const spectrum = dataRef.current.spectrum;
         const imgData = imgDataRef.current;
         const data32 = data32Ref.current;
 
         // 1. Shift existing content to left
         // Optimization: Draw canvas onto itself instead of using an offscreen temp canvas.
+        // This is usually GPU accelerated.
         ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
 
-            // 2. Draw new column
-            // Use pre-allocated buffers
-            const imgData = imgDataRef.current;
-            const data32 = data32Ref.current;
-
-            // Optimized: Reuse pre-allocated TypedArray
-            const maxBin = Math.floor(spectrum.length / 3);
         // 2. Draw new column
         // Reuse pre-allocated TypedArray
-        const maxBin = Math.floor(spectrum.length / 3);
+        const maxBin = Math.floor(spectrum.length / 3); // 0-8kHz roughly matches 1/3 of typical nyquist
 
         for (let y = 0; y < height; y++) {
+            // Map y to frequency (0 at bottom, MAX_FREQ at top)
+            // y=0 is top, y=height is bottom
             const freqRatio = (height - 1 - y) / height;
             const binIndex = Math.floor(freqRatio * maxBin);
             const val = spectrum[binIndex] || 0;
@@ -120,59 +107,22 @@ const HighResSpectrogram = memo(({ dataRef }) => {
             const color = colormap[Math.floor(intensity)];
 
             // Fill all pixels in the scrollSpeed strip for this row
+            // The strip is 'scrollSpeed' pixels wide
             const rowOffset = y * scrollSpeed;
             for (let x = 0; x < scrollSpeed; x++) {
                 data32[rowOffset + x] = color;
             }
         }
 
+        // Put the new strip on the right edge
         ctx.putImageData(imgData, width - scrollSpeed, 0);
 
         // 3. Draw Formant Overlay (F1 & F2)
         const { f1, f2 } = dataRef.current;
         const last = lastFormantsRef.current;
 
-        ctx.lineWidth = 3;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-
-        const drawFormant = (currFreq, lastFreq, color) => {
-            if (currFreq > 0 && lastFreq > 0) {
-                const currY = height * (1 - currFreq / MAX_FREQ);
-                const lastY = height * (1 - lastFreq / MAX_FREQ);
-                ctx.beginPath();
-                ctx.strokeStyle = color;
-                ctx.moveTo(width - scrollSpeed * 2, lastY);
-                ctx.lineTo(width - scrollSpeed, currY);
-                ctx.stroke();
-            }
-        };
-
-        drawFormant(f1, last.f1, 'rgba(255, 50, 50, 0.9)');
-        drawFormant(f2, last.f2, 'rgba(255, 50, 50, 0.9)');
-        lastFormantsRef.current = { f1, f2 };
-    }, [dataRef, colormap]);
-
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (canvas) {
-            // Set dimensions once
-            const dpr = window.devicePixelRatio || 1;
-            const rect = canvas.getBoundingClientRect();
-            // We set width/height only if they are different to avoid clearing canvas if possible,
-            // but usually we want to reset on mount/resize.
-            if (canvas.width !== rect.width * dpr || canvas.height !== 512) {
-                canvas.width = rect.width * dpr;
-                canvas.height = 512; // Higher vertical resolution
-            }
-        }
-
-            ctx.putImageData(imgData, width - scrollSpeed, 0);
-
-            // 3. Draw Formant Overlay (F1 & F2)
-            const { f1, f2 } = dataRef.current;
-            const last = lastFormantsRef.current;
-
+        // Only draw if we have valid formants
+        if (f1 > 0 || f2 > 0) {
             ctx.lineWidth = 3;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
@@ -183,6 +133,8 @@ const HighResSpectrogram = memo(({ dataRef }) => {
                     const lastY = height * (1 - lastFreq / MAX_FREQ);
                     ctx.beginPath();
                     ctx.strokeStyle = color;
+                    // Draw from previous frame's position to current
+                    // Previous position was at 'width - scrollSpeed', now moved to 'width - scrollSpeed * 2'
                     ctx.moveTo(width - scrollSpeed * 2, lastY);
                     ctx.lineTo(width - scrollSpeed, currY);
                     ctx.stroke();
@@ -191,12 +143,14 @@ const HighResSpectrogram = memo(({ dataRef }) => {
 
             drawFormant(f1, last.f1, 'rgba(255, 50, 50, 0.9)');
             drawFormant(f2, last.f2, 'rgba(255, 50, 50, 0.9)');
-            lastFormantsRef.current = { f1, f2 };
-        };
+        }
 
-        const unsubscribe = renderCoordinator.subscribe(
-            componentId,
-            loop,
+        lastFormantsRef.current = { f1, f2 };
+
+    }, [dataRef, colormap]);
+
+    // Subscription management
+    useEffect(() => {
         const unsubscribe = renderCoordinator.subscribe(
             componentId,
             draw,
@@ -206,8 +160,8 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         return () => {
             unsubscribe();
         };
-    }, [dataRef, colormap, componentId]);
-    }, [draw, componentId]);
+    }, [componentId, draw]);
+
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position
@@ -220,11 +174,12 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         const y = e.clientY - rect.top;
 
         // Map y to frequency
+        // y=0 is top (high freq)
         const canvasY = (y / rect.height) * canvas.height;
         const freqRatio = 1 - (canvasY / canvas.height);
         const frequency = freqRatio * MAX_FREQ;
 
-        // Get current dB from live spectrum
+        // Get current dB from live spectrum (approximate since we don't store history in this view)
         const spectrum = dataRef.current?.spectrum;
         let dB = -100;
         if (spectrum) {
@@ -273,21 +228,21 @@ const HighResSpectrogram = memo(({ dataRef }) => {
 
     return (
         <div
-            className="relative h-full w-full bg-black rounded-xl overflow-hidden border border-slate-800"
+            className="relative h-full w-full bg-black rounded-xl overflow-hidden border border-slate-800 group"
             onMouseEnter={() => setShowControls(true)}
             onMouseLeave={() => setShowControls(false)}
         >
             <canvas
                 ref={canvasRef}
-                className="w-full h-full cursor-crosshair"
+                className="w-full h-full cursor-crosshair block"
                 onClick={handleCanvasClick}
             />
 
             {/* Overlay Labels */}
-            <div className="absolute top-2 left-2 text-xs font-bold text-white/70 bg-black/50 px-2 rounded">
+            <div className="absolute top-2 left-2 text-xs font-bold text-white/70 bg-black/50 px-2 rounded pointer-events-none">
                 High-Res Spectrogram (0-8kHz)
             </div>
-            <div className="absolute bottom-2 right-2 text-[10px] text-white/50 font-mono">
+            <div className="absolute bottom-2 right-2 text-[10px] text-white/50 font-mono pointer-events-none">
                 Time →
             </div>
 
@@ -334,12 +289,14 @@ const HighResSpectrogram = memo(({ dataRef }) => {
 
             {/* Tap hint */}
             {showControls && !cursorData && (
-                <div className="absolute bottom-2 left-2 text-[10px] text-white/40 bg-black/50 px-2 py-1 rounded animate-in fade-in duration-200">
+                <div className="absolute bottom-2 left-2 text-[10px] text-white/40 bg-black/50 px-2 py-1 rounded animate-in fade-in duration-200 pointer-events-none">
                     Click to inspect Hz/dB
                 </div>
             )}
         </div>
     );
 });
+
+HighResSpectrogram.displayName = 'HighResSpectrogram';
 
 export default HighResSpectrogram;
