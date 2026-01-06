@@ -15,8 +15,16 @@ sys.path.append(os.path.join(os.getcwd(), 'backend'))
 
 # Mock google.generativeai and other potentially slow modules before importing app
 sys.modules['google.generativeai'] = MagicMock()
+sys.modules['google.genai'] = MagicMock()
 sys.modules['pypdf'] = MagicMock()
 sys.modules['numpy'] = MagicMock()
+sys.modules['soundfile'] = MagicMock()
+sys.modules['librosa'] = MagicMock()
+sys.modules['scipy'] = MagicMock()
+sys.modules['faster_whisper'] = MagicMock()
+sys.modules['boto3'] = MagicMock()
+sys.modules['botocore'] = MagicMock()
+sys.modules['backend.app.voice_quality_analysis'] = MagicMock()
 
 # Mock load_knowledge_base to prevent slow initialization
 import backend.app
@@ -31,8 +39,8 @@ mock_rag = MagicMock()
 sys.modules['app.utils.rag'] = mock_rag
 sys.modules['backend.app.utils.rag'] = mock_rag
 
-from app import create_app, db
-from app.models import User
+from backend.app import create_app, db
+from backend.app.models import User
 
 class TestUploadSecurity(unittest.TestCase):
     def setUp(self):
@@ -83,7 +91,9 @@ class TestUploadSecurity(unittest.TestCase):
         }
         response = self.client.post('/api/upload', data=data, content_type='multipart/form-data')
         self.assertEqual(response.status_code, 400)
-        self.assertIn("File type not allowed", str(response.json))
+        # Note: Depending on implementation, exact error message might vary slightly
+        self.assertIn("File type 'py' not allowed", str(response.json))
+
     def test_upload_allowed_extension(self):
         self.login()
         data = {
@@ -107,7 +117,6 @@ class TestUploadSecurity(unittest.TestCase):
     def test_upload_no_extension(self):
         self.login()
         data = {
-            'file': (io.BytesIO(b"content"), 'testfile')
             'file': (io.BytesIO(b"dummy content"), 'testfile')
         }
         response = self.client.post('/api/upload', data=data, content_type='multipart/form-data')
