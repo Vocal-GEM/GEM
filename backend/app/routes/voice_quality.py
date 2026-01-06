@@ -101,6 +101,7 @@ def clean_audio():
 # ----------------------
 
 @voice_quality_bp.route('/api/voice-quality/manipulate', methods=['POST'])
+@limiter.limit("5 per minute")
 def manipulate_file():
     """
     Endpoint to shift pitch and formants of an uploaded file.
