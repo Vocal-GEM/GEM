@@ -37,3 +37,8 @@
 **Vulnerability:** Missing rate limiting on resource-intensive endpoints (`/chat`, `/analyze`, `/synthesize`) exposed the application to DoS attacks and excessive API costs (Gemini/ElevenLabs).
 **Learning:** External API integrations and CPU-heavy tasks must always be rate-limited to prevent abuse and cost overruns.
 **Prevention:** Applied `Flask-Limiter` decorators (`@limiter.limit`) to all high-cost/high-compute endpoints in `ai.py`, `voice_quality.py`, and `tts.py`.
+
+## 2025-05-23 - Path Traversal & Rate Limiting in Community Routes
+**Vulnerability:** The `share_voice` endpoint in `backend/app/routes/community.py` used raw filenames for uploads, creating a potential path traversal risk. It also lacked rate limiting, exposing the server to DoS attacks via heavy audio processing.
+**Learning:** Even when filenames are prefixed with IDs/timestamps, failure to sanitize the original filename with `secure_filename` is a security bad practice that can lead to filesystem attacks. Resource-intensive endpoints must always have strict rate limits.
+**Prevention:** Applied `werkzeug.utils.secure_filename` to sanitize uploads and added `@limiter.limit` to `share_voice` (5/hour) and `submit_success_story` (10/minute).
