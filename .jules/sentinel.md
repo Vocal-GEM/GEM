@@ -37,3 +37,7 @@
 **Vulnerability:** Missing rate limiting on resource-intensive endpoints (`/chat`, `/analyze`, `/synthesize`) exposed the application to DoS attacks and excessive API costs (Gemini/ElevenLabs).
 **Learning:** External API integrations and CPU-heavy tasks must always be rate-limited to prevent abuse and cost overruns.
 **Prevention:** Applied `Flask-Limiter` decorators (`@limiter.limit`) to all high-cost/high-compute endpoints in `ai.py`, `voice_quality.py`, and `tts.py`.
+## 2026-01-06 - Unrestricted File Upload in Community Module
+**Vulnerability:** The `share_voice` endpoint in `community.py` failed to validate file extensions, relying only on `secure_filename`.
+**Learning:** Vulnerabilities can persist in less-frequently touched modules even when core modules are secured. Consistency across all Blueprints is vital.
+**Prevention:** Applied `validate_file_upload` to `community.py` and audited imports.
