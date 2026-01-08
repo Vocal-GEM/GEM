@@ -48,6 +48,7 @@
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.9.6",
     "react-use": "^17.6.0",
+    "recharts": "^3.6.0",
     "remark-gfm": "^4.0.1",
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^3.4.0",
@@ -62,6 +63,7 @@
     "fake-indexeddb": "^6.2.5",
     "jsdom": "^27.2.0",
     "rollup-plugin-visualizer": "^6.0.5",
-    "vitest": "^4.0.14"
+    "vitest": "^4.0.14",
+    "workbox-window": "^7.4.0"
   }
 }
