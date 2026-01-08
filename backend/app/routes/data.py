@@ -26,6 +26,10 @@ def sync_data():
     
     data = request.json
     queue = data.get('queue', [])
+
+    # Security: Limit queue size to prevent DoS
+    if len(queue) > 100:
+        return jsonify({"error": "Queue too large (max 100 items)"}), 400
     
     # Legacy support / Direct sync
     if not queue:
@@ -128,6 +132,7 @@ def get_data():
 
 @data_bp.route('/upload', methods=['POST'])
 @login_required
+@limiter.limit("10 per minute")
 def upload_file():
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
