@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useId } from 'react';
 import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
-import { useProfile } from '../../context/ProfileContext';
 import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const QuadCoreCard = ({ icon: Icon, title, score, label, value, color, unit }) => (
     <div className="bg-slate-800/50 rounded-xl p-3 border border-white/5 relative overflow-hidden group hover:bg-slate-800/80 transition-colors">
@@ -73,10 +73,12 @@ const FeedbackBanner = ({ feedback }) => {
 };
 
 const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioActive }) => {
-    const { targetRange } = useProfile();
     const serviceRef = useRef(new QuadCoreAnalysisService());
     const [analysis, setAnalysis] = useState(null);
-    const frameRef = useRef(null);
+
+    // Generate unique component ID
+    const uniqueId = useId();
+    const componentId = `voice-quality-${uniqueId}`;
 
     useEffect(() => {
         const loop = () => {
@@ -90,15 +92,21 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                     setAnalysis(results);
                 }
             }
-            frameRef.current = requestAnimationFrame(loop);
         };
 
-        if (isAudioActive) loop();
+        let unsubscribe;
+        if (isAudioActive) {
+            unsubscribe = renderCoordinator.subscribe(
+                componentId,
+                loop,
+                renderCoordinator.PRIORITY.MEDIUM
+            );
+        }
 
         return () => {
-            if (frameRef.current) cancelAnimationFrame(frameRef.current);
+            if (unsubscribe) unsubscribe();
         };
-    }, [isAudioActive, dataRef]);
+    }, [isAudioActive, dataRef, componentId]);
 
     return (
         <div className="bg-slate-900/50 rounded-2xl p-4 sm:p-6 border border-white/5 h-full flex flex-col">
