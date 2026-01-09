@@ -1,4 +1,5 @@
 import { useEffect, useRef, useMemo, useState, useCallback, memo, useId } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback, useId, memo } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { generateColormap } from '../../utils/colormaps';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -44,6 +45,7 @@ const HighResSpectrogram = memo(({ dataRef }) => {
     );
 
     // Render loop callback
+    // Drawing logic - encapsulated to be called by RenderCoordinator
     const draw = useCallback(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -61,6 +63,10 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         const scrollSpeed = 2;
 
         // Ensure buffers are ready and match current height
+        // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
+        const ctx = canvas.getContext('2d', { alpha: false });
+
+        // Ensure buffers are ready and match height
         if (!imgDataRef.current || imgDataRef.current.height !== height) {
             try {
                 imgDataRef.current = ctx.createImageData(scrollSpeed, height);
@@ -129,6 +135,7 @@ const HighResSpectrogram = memo(({ dataRef }) => {
     }, [dataRef, colormap]);
 
     // Handle resize and subscription
+    // Setup effect for subscription and sizing
     useEffect(() => {
         const canvas = canvasRef.current;
         if (canvas) {
@@ -147,6 +154,7 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         const unsubscribe = renderCoordinator.subscribe(
             componentId,
             draw, // Use the optimized draw function
+            draw,
             renderCoordinator.PRIORITY.MEDIUM
         );
 
