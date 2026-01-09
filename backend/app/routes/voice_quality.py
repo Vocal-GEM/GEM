@@ -6,6 +6,7 @@ from ..voice_quality_analysis import analyze_file, analyze_file_with_transcript,
 from ..asr_transcriber import transcribe_audio_with_words
 from ..validators import validate_file_upload
 from ..extensions import limiter
+from ..utils.cleanup import cleanup_file_after_request
 
 voice_quality_bp = Blueprint('voice_quality', __name__)
 
@@ -89,6 +90,8 @@ def clean_audio():
             except Exception as e:
                 print(f"Error removing temp file: {e}")
             return response
+        # Schedule cleanup after response
+        cleanup_file_after_request(tmp_path)
 
         return send_file(
             tmp_path, 
@@ -101,6 +104,8 @@ def clean_audio():
         print(f"Cleaning error: {e}")
         # If we failed before send_file, clean up manually
         if tmp_path and os.path.exists(tmp_path):
+        # Manual cleanup on error since after_request might not run if we crash before return
+        if os.path.exists(tmp_path):
             try:
                 os.remove(tmp_path)
             except:
@@ -167,6 +172,9 @@ def manipulate_file():
             except Exception as e:
                 print(f"Error removing processed file: {e}")
             return response
+        # Schedule cleanup for both files
+        cleanup_file_after_request(tmp_path)
+        cleanup_file_after_request(processed_path)
 
         return send_file(
             processed_path,
@@ -190,6 +198,18 @@ def manipulate_file():
                 os.remove(tmp_path)
             except:
                 pass
+        # Manual cleanup on error
+        if tmp_path and os.path.exists(tmp_path):
+             try:
+                os.remove(tmp_path)
+             except:
+                pass
+        if processed_path and os.path.exists(processed_path):
+             try:
+                os.remove(processed_path)
+             except:
+                pass
+        return jsonify({'error': str(e)}), 500
 
 @voice_quality_bp.route('/api/voice-quality/goals', methods=['GET'])
 def get_goals():
