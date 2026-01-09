@@ -19,7 +19,7 @@ const LoadingSpinner = ({
     const borderThickness = {
         sm: 'border-2',
         md: 'border-4',
-        lg: 'border-4', // visual choice: large doesn't necessarily need huge borders
+        lg: 'border-4',
         xl: 'border-8'
     };
 
@@ -34,6 +34,8 @@ const LoadingSpinner = ({
                 size === 'sm' ? 'h-auto min-h-0' : 'h-full min-h-[200px]',
                 className
             ))}
+            role="status"
+            aria-live="polite"
         >
             <div className={twMerge(clsx("relative", dimensions[size] || dimensions.md))}>
                 {/* Track circle */}
