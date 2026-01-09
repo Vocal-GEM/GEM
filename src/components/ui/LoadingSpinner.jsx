@@ -25,6 +25,8 @@ const LoadingSpinner = ({
 
     return (
         <div
+            role="status"
+            aria-live="polite"
             className={twMerge(clsx(
                 "flex items-center justify-center w-full",
                 // For 'sm', we usually want inline or small container.

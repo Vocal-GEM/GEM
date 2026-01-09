@@ -3,6 +3,13 @@ import { describe, it, expect } from 'vitest';
 import LoadingSpinner from './LoadingSpinner';
 
 describe('LoadingSpinner', () => {
+    it('renders with accessibility attributes', () => {
+        render(<LoadingSpinner />);
+
+        const spinner = screen.getByRole('status');
+        expect(spinner).toBeInTheDocument();
+
+        // Check for visually hidden loading text
     it('renders with default accessibility attributes', () => {
         render(<LoadingSpinner />);
 
@@ -27,6 +34,8 @@ describe('LoadingSpinner', () => {
 
     it('renders with different sizes', () => {
         const { rerender } = render(<LoadingSpinner size="sm" />);
+        // We can't easily check for specific size classes without implementation details,
+        // but we can check it renders without error.
         expect(screen.getByRole('status')).toBeInTheDocument();
 
         rerender(<LoadingSpinner size="xl" />);
