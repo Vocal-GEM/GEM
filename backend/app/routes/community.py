@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
+from ..extensions import db
 from ..extensions import db, limiter
 from ..validators import validate_file_upload
 from ..models import (
@@ -8,6 +9,7 @@ from ..models import (
     GroupChallenge, GroupChallengeParticipant, ModerationFlag,
     CommunityBenchmark,
 )
+from ..validators import validate_file_upload
 from datetime import datetime, timedelta
 import os
 import secrets
@@ -89,6 +91,8 @@ def share_voice():
 
         audio_file = request.files['audio']
 
+        # Security: Validate file extension
+        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
         # Security: Validate file type
         is_valid, error = validate_file_upload(
             audio_file.filename, allowed_types=['audio'])
@@ -108,6 +112,7 @@ def share_voice():
             'UPLOAD_FOLDER', 'uploads/shared')
         os.makedirs(upload_folder, exist_ok=True)
         
+        # Security: Sanitize filename
         safe_filename = secure_filename(audio_file.filename)
         filename = f"{current_user.id}_{datetime.now().timestamp()}_{safe_filename}"
 
