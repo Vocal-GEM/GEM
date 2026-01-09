@@ -32,6 +32,11 @@ describe('LoadingSpinner', () => {
         expect(container.firstChild).toHaveClass('my-custom-class');
     });
 
+    it('overrides default min-height when custom class is provided', () => {
+         const { container } = render(<LoadingSpinner className="min-h-0" />);
+         expect(container.firstChild).toHaveClass('min-h-0');
+    });
+
     it('renders with different sizes', () => {
         const { rerender } = render(<LoadingSpinner size="sm" />);
         // We can't easily check for specific size classes without implementation details,
