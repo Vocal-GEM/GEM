@@ -1,4 +1,8 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import Toast from './Toast';
+
+describe('Toast Component', () => {
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Toast from './Toast';
 
@@ -30,12 +34,14 @@ describe('Toast Component', () => {
   it('calls onClose when close button is clicked', () => {
     const onClose = vi.fn();
     render(<Toast message="Test Message" onClose={onClose} />);
+    // Finding by role button is safe even if aria-label is missing, as long as it's a <button>
 
     const closeButton = screen.getByRole('button');
     fireEvent.click(closeButton);
     expect(onClose).toHaveBeenCalled();
   });
 
+  // Accessibility tests
   it('has correct accessibility attributes for error type', () => {
     render(<Toast message="Error occurred" type="error" onClose={() => {}} />);
 
@@ -56,6 +62,7 @@ describe('Toast Component', () => {
 
   it('close button has accessible label', () => {
     render(<Toast message="Test" onClose={() => {}} />);
+    expect(screen.getByLabelText('Close')).toBeInTheDocument();
     // This will pass only if the button has aria-label="Close"
     // Using getAllByRole because sometimes buttons might be rendered multiple times in bad implementations, but here we expect one.
     // However, if the button has no accessible name, this query will fail to find it by name.
