@@ -35,6 +35,11 @@ def sync_data():
             for j in data['journals']:
                 queue.append({'type': 'JOURNAL_ADD', 'payload': j})
 
+    # Security: Limit queue size to prevent DoS
+    MAX_QUEUE_SIZE = 100
+    if len(queue) > MAX_QUEUE_SIZE:
+        return jsonify({"error": f"Queue size exceeds maximum limit of {MAX_QUEUE_SIZE}"}), 400
+
     processed_count = 0
     
     for item in queue:
