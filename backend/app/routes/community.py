@@ -11,6 +11,9 @@ from ..models import (
 from datetime import datetime, timedelta
 import os
 import secrets
+import hashlib
+from werkzeug.utils import secure_filename
+from ..validators import validate_file_upload
 
 community_bp = Blueprint('community', __name__)
 
@@ -95,10 +98,18 @@ def share_voice():
         context = request.form.get('context', '')
         expiration_days = int(request.form.get('expiration_days', 7))
 
+        # Security: Validate file extension
+        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
+        if not is_valid:
+            return jsonify({'error': error}), 400
+        
         # Save original file
         upload_folder = current_app.config.get(
             'UPLOAD_FOLDER', 'uploads/shared')
         os.makedirs(upload_folder, exist_ok=True)
+        
+        safe_filename = secure_filename(audio_file.filename)
+        filename = f"{current_user.id}_{datetime.now().timestamp()}_{safe_filename}"
 
         safe_filename = secure_filename(audio_file.filename)
         filename = f"{
