@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, send_file
+from flask import Blueprint, request, jsonify, send_file, after_this_request
 import os
 import tempfile
 import soundfile as sf
@@ -69,6 +69,7 @@ def clean_audio():
     if not is_valid:
         return jsonify({"error": error}), 400
 
+    tmp_path = None
     try:
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
             tmp_path = tmp.name
@@ -81,6 +82,14 @@ def clean_audio():
         # Save back to temp
         sf.write(tmp_path, y_clean, sr)
         
+        @after_this_request
+        def remove_file(response):
+            try:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+            except Exception as e:
+                print(f"Error removing temp file: {e}")
+            return response
         # Schedule cleanup after response
         cleanup_file_after_request(tmp_path)
 
@@ -93,6 +102,8 @@ def clean_audio():
 
     except Exception as e:
         print(f"Cleaning error: {e}")
+        # If we failed before send_file, clean up manually
+        if tmp_path and os.path.exists(tmp_path):
         # Manual cleanup on error since after_request might not run if we crash before return
         if os.path.exists(tmp_path):
             try:
@@ -153,6 +164,14 @@ def manipulate_file():
         processed_path = tmp_path.replace(".wav", "_manipulated.wav")
         manipulated.save(processed_path, "WAV")
         
+        @after_this_request
+        def remove_processed_file(response):
+            try:
+                if processed_path and os.path.exists(processed_path):
+                    os.remove(processed_path)
+            except Exception as e:
+                print(f"Error removing processed file: {e}")
+            return response
         # Schedule cleanup for both files
         cleanup_file_after_request(tmp_path)
         cleanup_file_after_request(processed_path)
@@ -165,6 +184,20 @@ def manipulate_file():
         )
 
     except Exception as e:
+        # If error occurred, clean up processed file too since we won't send it
+        if processed_path and os.path.exists(processed_path):
+             try:
+                os.remove(processed_path)
+             except:
+                pass
+        return jsonify({'error': str(e)}), 500
+    finally:
+        # Cleanup original temp file immediately (always safe as it's not the one being sent)
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except:
+                pass
         # Manual cleanup on error
         if tmp_path and os.path.exists(tmp_path):
              try:
