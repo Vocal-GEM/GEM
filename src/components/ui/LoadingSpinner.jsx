@@ -33,6 +33,8 @@ const LoadingSpinner = ({
                 size === 'sm' ? 'h-auto min-h-0' : 'h-full min-h-[200px]',
                 className
             ))}
+            role="status"
+            aria-live="polite"
         >
             <div className={twMerge(clsx("relative", dimensions[size] || dimensions.md))}>
                 {/* Track circle */}
