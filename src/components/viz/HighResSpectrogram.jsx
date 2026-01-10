@@ -259,6 +259,21 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     useEffect(() => {
         const unsubscribe = renderCoordinator.subscribe(
             componentId,
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            // We force a specific height for high-res rendering
+            // Note: We avoid clearing if dimensions haven't changed, but here we enforce initial size
+             if (canvas.width !== rect.width * dpr || canvas.height !== 512) {
+                canvas.width = rect.width * dpr;
+                canvas.height = 512;
+            }
+        }
+    }, []); // Run once on mount
+
+    // Render loop subscription
+    useEffect(() => {
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
             // Set dimensions once or on resize
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.getBoundingClientRect();

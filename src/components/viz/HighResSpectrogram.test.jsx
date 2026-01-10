@@ -1,6 +1,9 @@
 import { render, screen, cleanup, act } from '@testing-library/react';
 import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import HighResSpectrogram from './HighResSpectrogram';
+import { SettingsProvider } from '../../context/SettingsContext';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import React from 'react';
 import HighResSpectrogram from './HighResSpectrogram';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -59,6 +62,12 @@ describe('HighResSpectrogram', () => {
 
   beforeEach(() => {
     dataRef = {
+        current: {
+            spectrum: new Float32Array(1024).fill(0.5),
+            f1: 500,
+            f2: 1500
+        }
+    };
       current: {
         spectrum: new Float32Array(1024).fill(0.5),
         f1: 500,
@@ -119,6 +128,7 @@ describe('HighResSpectrogram', () => {
     expect(renderCoordinator.subscribe).toHaveBeenCalled();
     const [id, callback, priority] = renderCoordinator.subscribe.mock.calls[0];
 
+    // Priority check
     expect(priority).toBe(renderCoordinator.PRIORITY.MEDIUM);
     expect(typeof callback).toBe('function');
   });
