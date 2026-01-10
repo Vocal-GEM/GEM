@@ -77,7 +77,7 @@ export const getPreferencesForStyle = (style) => {
                 showSpectrogram: true,
                 showGraphs: true,
                 audioCues: false,
-                text detailed: true
+                textDetailed: true
             };
         case 'auditory':
             return {
