@@ -21,7 +21,8 @@ def analyze():
         return jsonify({"error": "Empty filename."}), 400
 
     # Security: Validate file type (only audio allowed)
-    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'])
+    # Pass file object for content validation
+    is_valid, error = validate_file_upload(file, allowed_types=['audio'])
     if not is_valid:
         return jsonify({"error": error}), 400
 
@@ -130,7 +131,7 @@ def manipulate_file():
         return jsonify({'error': 'No selected file'}), 400
 
     # Security check
-    is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'])
+    is_valid, error_msg = validate_file_upload(file, allowed_types=['audio'])
     if not is_valid:
         return jsonify({"error": error_msg}), 400
         
