@@ -16,6 +16,14 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Mock SettingsContext
+vi.mock('../../context/SettingsContext', () => ({
+  useSettings: () => ({
+    settings: { spectrogramColorScheme: 'inferno' }
+  }),
+  SettingsProvider: ({ children }) => <div>{children}</div>
+}));
+
+// Mock Canvas
 const mockSettings = {
   spectrogramColorScheme: 'magma'
 };
@@ -40,6 +48,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   moveTo: vi.fn(),
   lineTo: vi.fn(),
   stroke: vi.fn(),
+  canvas: { width: 800, height: 512 },
   fillRect: vi.fn(),
   fillText: vi.fn(),
   canvas: { width: 800, height: 512 }
@@ -64,6 +73,7 @@ describe('HighResSpectrogram', () => {
     vi.clearAllMocks();
   });
 
+  it('subscribes to RenderCoordinator on mount', () => {
   it('renders successfully', () => {
     render(
       <SettingsProvider>
