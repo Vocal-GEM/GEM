@@ -8,6 +8,8 @@ from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
 import os
 import tempfile
+from ..extensions import limiter
+from ..validators import validate_file_upload
 from ..validators import validate_file_upload
 from ..extensions import limiter
 try:
@@ -281,6 +283,10 @@ def analyze_audio():
     if file.filename == '':
         return jsonify({'error': 'Empty filename'}), 400
 
+    # Validate file type
+    is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'])
+    if not is_valid:
+        return jsonify({'error': error_msg}), 400
     # Security: Validate file type
     is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'])
     if not is_valid:
