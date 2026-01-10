@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
+from ..extensions import db, limiter
 from ..extensions import db
 from ..extensions import db, limiter
 from ..validators import validate_file_upload
@@ -112,6 +113,9 @@ def share_voice():
             'UPLOAD_FOLDER', 'uploads/shared')
         os.makedirs(upload_folder, exist_ok=True)
         
+        # Security: Use secure_filename to prevent path traversal/bad characters
+        safe_filename = secure_filename(audio_file.filename)
+        filename = f"{current_user.id}_{datetime.now().timestamp()}_{safe_filename}"
         # Security: Sanitize filename
         safe_filename = secure_filename(audio_file.filename)
         filename = f"{current_user.id}_{datetime.now().timestamp()}_{safe_filename}"
@@ -252,6 +256,7 @@ def get_success_stories():
 
 @community_bp.route('/success-stories', methods=['POST'])
 @login_required
+@limiter.limit("10 per minute")
 def submit_success_story():
     """Submit a success story"""
     try:
