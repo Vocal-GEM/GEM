@@ -1,8 +1,11 @@
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, act } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import React from 'react';
 import HighResSpectrogram from './HighResSpectrogram';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import { SettingsProvider } from '../../context/SettingsContext';
+import React from 'react';
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
@@ -22,10 +25,12 @@ vi.mock('../../context/SettingsContext', () => ({
   SettingsProvider: ({ children }) => <div>{children}</div>
 }));
 
-// Mock Canvas
+// Mock Canvas getContext
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   createImageData: vi.fn(() => ({
-    data: { buffer: new ArrayBuffer(1024) },
+    data: { buffer: new ArrayBuffer(800 * 512 * 4) },
+    width: 800,
+    height: 512
     height: 512,
     width: 2
   })),
@@ -66,9 +71,25 @@ describe('HighResSpectrogram', () => {
       </SettingsProvider>
     );
     // Implicit assertion: no error thrown
+        <SettingsProvider>
+            <HighResSpectrogram dataRef={dataRef} />
+        </SettingsProvider>
+    );
+    // Implicit assertion: no error thrown
+      <SettingsProvider>
+        <HighResSpectrogram dataRef={dataRef} />
+      </SettingsProvider>
+    );
+
+    expect(renderCoordinator.subscribe).toHaveBeenCalled();
   });
 
-  it('subscribes to RenderCoordinator on mount', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('renders successfully and subscribes to coordinator', () => {
     render(
       <SettingsProvider>
         <HighResSpectrogram dataRef={dataRef} />
