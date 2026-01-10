@@ -26,7 +26,7 @@ const HighResSpectrogram = memo(({ dataRef }) => {
     const lastFormantsRef = useRef({ f1: 0, f2: 0 });
     const { settings } = useSettings();
 
-    // Generate unique component ID
+    // Generate unique component ID for RenderCoordinator
     const uniqueId = useId();
     const componentId = `spectrogram-highres-${uniqueId}`;
 
@@ -50,6 +50,14 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
+        // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
+        const ctx = canvas.getContext('2d', { alpha: false });
+
+        // Set dimensions logic is handled in useEffect, but we read them here
+        const width = canvas.width;
+        const height = canvas.height;
+        const scrollSpeed = 2;
+
         // Use { alpha: false } to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
 
@@ -58,9 +66,6 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         }
 
         const spectrum = dataRef.current.spectrum;
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2;
 
         // Ensure buffers are ready and match current height
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
@@ -78,15 +83,16 @@ const HighResSpectrogram = memo(({ dataRef }) => {
             }
         }
 
-        const imgData = imgDataRef.current;
-        const data32 = data32Ref.current;
-
         // 1. Shift existing content to left
         // Optimization: Draw canvas onto itself instead of using an offscreen temp canvas.
         ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
 
         // 2. Draw new column
-        // Reuse pre-allocated TypedArray
+        // Use pre-allocated buffers
+        const imgData = imgDataRef.current;
+        const data32 = data32Ref.current;
+
+        // Optimized: Reuse pre-allocated TypedArray
         const maxBin = Math.floor(spectrum.length / 3);
 
         for (let y = 0; y < height; y++) {

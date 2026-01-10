@@ -4,6 +4,7 @@ import React from 'react';
 import HighResSpectrogram from './HighResSpectrogram';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import { SettingsProvider } from '../../context/SettingsContext';
+import React from 'react';
 
 // Mock RenderCoordinator
 vi.mock('../../services/RenderCoordinator', () => ({
@@ -53,6 +54,21 @@ describe('HighResSpectrogram', () => {
       }
     };
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('renders successfully and subscribes to coordinator', () => {
+    render(
+      <SettingsProvider>
+        <HighResSpectrogram dataRef={dataRef} />
+      </SettingsProvider>
+    );
+
+    expect(renderCoordinator.subscribe).toHaveBeenCalled();
   });
 
   afterEach(() => {

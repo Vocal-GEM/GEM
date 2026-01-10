@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState, useId, useCallback } from 'react';
 import { useEffect, useRef, useState, useId } from 'react';
 import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
 import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
@@ -75,23 +76,36 @@ const FeedbackBanner = ({ feedback }) => {
 const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioActive }) => {
     const serviceRef = useRef(new QuadCoreAnalysisService());
     const [analysis, setAnalysis] = useState(null);
+    const componentId = useId();
 
     // Generate unique component ID
     const uniqueId = useId();
     const componentId = `voice-quality-${uniqueId}`;
 
-    useEffect(() => {
-        const loop = () => {
-            if (dataRef.current && isAudioActive) {
-                const results = serviceRef.current.analyze(dataRef.current, {
-                    targetF2: 2000 // Default to neutral/chem until calibration is fuller
-                    // TODO: pull from calibration context if available
-                });
+    const analyze = useCallback(() => {
+        if (dataRef.current) {
+            const results = serviceRef.current.analyze(dataRef.current, {
+                targetF2: 2000 // Default to neutral/chem until calibration is fuller
+                // TODO: pull from calibration context if available
+            });
 
-                if (results) {
-                    setAnalysis(results);
-                }
+            if (results) {
+                setAnalysis(results);
             }
+        }
+    }, [dataRef]);
+
+    useEffect(() => {
+        let unsubscribe;
+
+        if (isAudioActive) {
+            // Use RenderCoordinator instead of raw requestAnimationFrame
+            // We use a lower priority (LOW) because full analysis doesn't need to happen every 60fps
+            // This frees up resources for smoother visualizations
+            unsubscribe = renderCoordinator.subscribe(
+                `voice-quality-${componentId}`,
+                analyze,
+                renderCoordinator.PRIORITY.LOW
         };
 
         let unsubscribe;
@@ -106,6 +120,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
         return () => {
             if (unsubscribe) unsubscribe();
         };
+    }, [isAudioActive, componentId, analyze]);
     }, [isAudioActive, dataRef, componentId]);
 
     return (
