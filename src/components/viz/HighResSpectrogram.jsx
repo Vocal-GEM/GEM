@@ -63,6 +63,17 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
 
+        // Set dimensions
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+
+        // Only update dimensions if they changed (avoids flickering)
+        if (canvas.width !== rect.width * dpr || canvas.height !== 512) {
+            canvas.width = rect.width * dpr;
+            canvas.height = 512; // Higher vertical resolution
+        }
+
+        const scrollSpeed = 2;
         // Set dimensions logic is handled in useEffect, but we read them here
         const width = canvas.width;
         const height = canvas.height;

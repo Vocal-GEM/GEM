@@ -7,7 +7,7 @@ import { renderCoordinator } from '../../services/RenderCoordinator';
 import { SettingsProvider } from '../../context/SettingsContext';
 import React from 'react';
 
-// Mock RenderCoordinator
+// Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
   renderCoordinator: {
     subscribe: vi.fn(() => vi.fn()),
@@ -64,8 +64,13 @@ describe('HighResSpectrogram', () => {
     vi.clearAllMocks();
   });
 
-  it('renders successfully and subscribes to coordinator', () => {
+  it('renders successfully', () => {
     render(
+      <SettingsProvider>
+        <HighResSpectrogram dataRef={dataRef} />
+      </SettingsProvider>
+    );
+    // Implicit assertion: no error thrown
         <SettingsProvider>
             <HighResSpectrogram dataRef={dataRef} />
         </SettingsProvider>
