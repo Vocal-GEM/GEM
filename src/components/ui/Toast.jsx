@@ -29,6 +29,8 @@ const Toast = ({ message, type = 'success', onClose, duration = 3000 }) => {
   return (
     <div
       className={`fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[100] flex items-center gap-3 px-6 py-4 rounded-xl border backdrop-blur-md shadow-xl animate-in fade-in slide-in-from-bottom-4 ${style.bg}`}
+      role={style.role}
+      aria-live={style.live}
       role={isAlert ? 'alert' : 'status'}
       aria-live={isAlert ? 'assertive' : 'polite'}
       aria-atomic="true"

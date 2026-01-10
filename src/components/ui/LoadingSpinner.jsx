@@ -94,7 +94,7 @@ const LoadingSpinner = ({
             <div className={twMerge(clsx("relative", dimensions[size] || dimensions.md))}>
                 <div
                     className={clsx(
-                        "absolute top-0 left-0 w-full h-full rounded-full border-slate-700",
+                        "absolute top-0 left-0 w-full h-full rounded-full border-slate-700 opacity-20",
                         borderThickness[size] || borderThickness.md
                     )}
                 ></div>

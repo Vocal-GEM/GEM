@@ -1,4 +1,5 @@
 
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import { render, screen, act } from '@testing-library/react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
@@ -38,6 +39,20 @@ describe('Toast Component', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('has accessible role for error', () => {
+    render(<Toast message="Error" type="error" onClose={() => {}} />);
+    const alert = screen.getByRole('alert');
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute('aria-live', 'assertive');
+    expect(alert).toHaveAttribute('aria-atomic', 'true');
+  });
+
+  it('has accessible role for success', () => {
+    render(<Toast message="Success" type="success" onClose={() => {}} />);
+    const status = screen.getByRole('status');
+    expect(status).toBeInTheDocument();
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).toHaveAttribute('aria-atomic', 'true');
   it('has correct role and aria attributes for success', () => {
     render(<Toast message="Success" type="success" onClose={() => {}} />);
     const toast = screen.getByRole('status');
@@ -91,6 +106,15 @@ describe('Toast Component', () => {
       const alert = screen.getByRole('alert');
       expect(alert).toBeInTheDocument();
   it('close button has accessible label', () => {
+    const onClose = vi.fn();
+    render(<Toast message="Test" onClose={onClose} />);
+
+    // Look for button by label
+    const button = screen.getByRole('button', { name: /close notification/i });
+    expect(button).toBeInTheDocument();
+
+    fireEvent.click(button);
+    expect(onClose).toHaveBeenCalled();
     render(<Toast message="Test" onClose={() => {}} />);
     const button = screen.getByRole('button', { name: /close/i });
     expect(button).toBeInTheDocument();
