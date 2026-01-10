@@ -1,3 +1,5 @@
+import { render, screen, fireEvent, act } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
 
 import { render, screen, act, fireEvent } from '@testing-library/react';
 import { render, screen, act } from '@testing-library/react';
@@ -130,6 +132,7 @@ describe('Toast Component', () => {
     render(<Toast message="Test Message" onClose={onClose} />);
     // Finding by role button is safe even if aria-label is missing, as long as it's a <button>
 
+    // We expect this to be improved with a proper label
     // Now we can find by label since we added it
     const closeButton = screen.getByLabelText('Close notification');
     const closeButton = screen.getByRole('button');
@@ -137,6 +140,14 @@ describe('Toast Component', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  // Accessibility tests - These are expected to fail initially
+  it('has correct accessibility attributes for error type', () => {
+    render(<Toast message="Error occurred" type="error" onClose={() => {}} />);
+
+    const alert = screen.getByRole('alert');
+    expect(alert).toBeInTheDocument();
+    // Error messages should be assertive
+    // Note: The implementation might use aria-live on the container
   // Accessibility tests
   it('has correct accessibility attributes for error type', () => {
     render(<Toast message="Error occurred" type="error" onClose={() => {}} />);
@@ -148,6 +159,8 @@ describe('Toast Component', () => {
     const { rerender } = render(<Toast message="Success" type="success" onClose={() => {}} />);
     expect(screen.getByText('Success')).toBeInTheDocument();
 
+    const status = screen.getByRole('status');
+    expect(status).toBeInTheDocument();
     rerender(<Toast message="Error" type="error" onClose={() => {}} />);
     expect(screen.getByText('Error')).toBeInTheDocument();
   });
@@ -170,6 +183,7 @@ describe('Toast Component', () => {
     const button = screen.getByRole('button', { name: /close/i });
     expect(button).toBeInTheDocument();
 
+    // This checks for aria-label="Close" or similar
     const button = screen.getByRole('button', { name: /close notification/i });
     expect(button).toBeInTheDocument();
     expect(screen.getByLabelText('Close')).toBeInTheDocument();
