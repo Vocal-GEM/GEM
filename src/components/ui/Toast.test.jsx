@@ -1,3 +1,5 @@
+
+import { render, screen, act } from '@testing-library/react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import Toast from './Toast';
@@ -16,6 +18,9 @@ describe('Toast Component', () => {
     vi.useRealTimers();
   });
 
+  it('renders message correctly', () => {
+    render(<Toast message="Test message" onClose={() => {}} />);
+    expect(screen.getByText('Test message')).toBeInTheDocument();
   it('renders with correct message', () => {
     render(<Toast message="Test Message" onClose={() => {}} />);
     expect(screen.getByText('Test Message')).toBeInTheDocument();
@@ -23,6 +28,7 @@ describe('Toast Component', () => {
 
   it('calls onClose after duration', () => {
     const onClose = vi.fn();
+    render(<Toast message="Test message" onClose={onClose} duration={3000} />);
     render(<Toast message="Test" onClose={onClose} duration={3000} />);
 
     act(() => {
@@ -30,6 +36,22 @@ describe('Toast Component', () => {
     });
 
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('has correct role and aria attributes for success', () => {
+    render(<Toast message="Success" type="success" onClose={() => {}} />);
+    const toast = screen.getByRole('status');
+    expect(toast).toBeInTheDocument();
+    expect(toast).toHaveAttribute('aria-live', 'polite');
+    expect(toast).toHaveAttribute('aria-atomic', 'true');
+  });
+
+  it('has correct role and aria attributes for error', () => {
+    render(<Toast message="Error" type="error" onClose={() => {}} />);
+    const toast = screen.getByRole('alert');
+    expect(toast).toBeInTheDocument();
+    expect(toast).toHaveAttribute('aria-live', 'assertive');
+    expect(toast).toHaveAttribute('aria-atomic', 'true');
   });
 
   it('calls onClose when close button clicked', () => {
@@ -70,6 +92,8 @@ describe('Toast Component', () => {
       expect(alert).toBeInTheDocument();
   it('close button has accessible label', () => {
     render(<Toast message="Test" onClose={() => {}} />);
+    const button = screen.getByRole('button', { name: /close/i });
+    expect(button).toBeInTheDocument();
 
     const button = screen.getByRole('button', { name: /close notification/i });
     expect(button).toBeInTheDocument();
