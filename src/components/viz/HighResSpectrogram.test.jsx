@@ -1,3 +1,4 @@
+import { render, screen, cleanup, act } from '@testing-library/react';
 import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
@@ -24,10 +25,12 @@ vi.mock('../../context/SettingsContext', () => ({
   SettingsProvider: ({ children }) => <div>{children}</div>
 }));
 
-// Mock Canvas
+// Mock Canvas getContext
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   createImageData: vi.fn(() => ({
     data: { buffer: new ArrayBuffer(800 * 512 * 4) },
+    width: 800,
+    height: 512
     height: 512,
     width: 2
   })),
@@ -63,6 +66,11 @@ describe('HighResSpectrogram', () => {
 
   it('renders successfully and subscribes to coordinator', () => {
     render(
+        <SettingsProvider>
+            <HighResSpectrogram dataRef={dataRef} />
+        </SettingsProvider>
+    );
+    // Implicit assertion: no error thrown
       <SettingsProvider>
         <HighResSpectrogram dataRef={dataRef} />
       </SettingsProvider>

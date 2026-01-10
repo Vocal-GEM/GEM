@@ -1,3 +1,4 @@
+import { useEffect, useRef, useMemo, useState, useCallback, memo } from 'react';
 import { useEffect, useRef, useMemo, useState, useCallback, memo, useId } from 'react';
 import { useEffect, useRef, useMemo, useState, useCallback, useId, memo } from 'react';
 import { useSettings } from '../../context/SettingsContext';
@@ -38,6 +39,14 @@ const HighResSpectrogram = memo(({ dataRef }) => {
     const [cursorData, setCursorData] = useState(null);
     const [showControls, setShowControls] = useState(false);
 
+    // Component ID for RenderCoordinator
+    // Lazy initialization to ensure stability and unique ID
+    const componentIdRef = useRef(null);
+    if (!componentIdRef.current) {
+        componentIdRef.current = `high-res-spectrogram-${Math.random().toString(36).substr(2, 9)}`;
+    }
+    const componentId = componentIdRef.current;
+
     // Dynamic colormap based on settings
     const colormap = useMemo(
         () => generateColormap(settings.spectrogramColorScheme),
@@ -50,6 +59,7 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
+        // Remove 'willReadFrequently: true' to allow GPU acceleration since we use drawImage(canvas)
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
 
