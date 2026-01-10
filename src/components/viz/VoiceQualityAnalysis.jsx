@@ -74,6 +74,39 @@ const FeedbackBanner = ({ feedback }) => {
 };
 
 const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioActive }) => {
+    // We import useProfile but targetRange was unused.
+    // If we need it later, we can uncomment.
+    useProfile();
+
+    const serviceRef = useRef(new QuadCoreAnalysisService());
+    const [analysis, setAnalysis] = useState(null);
+
+    // Generate unique component ID for RenderCoordinator
+    const componentId = useId();
+
+    useEffect(() => {
+        const updateAnalysis = () => {
+            if (dataRef.current && isAudioActive) {
+                const results = serviceRef.current.analyze(dataRef.current, {
+                    targetF2: 2000 // Default to neutral/chem until calibration is fuller
+                    // TODO: pull from calibration context if available
+                });
+
+                if (results) {
+                    setAnalysis(results);
+                }
+            }
+        };
+
+        let unsubscribe;
+
+        if (isAudioActive) {
+            // Subscribe to RenderCoordinator instead of using internal RAF loop
+            // Use LOW priority as this is UI analysis updates, not 60fps animation
+            unsubscribe = renderCoordinator.subscribe(
+                `VoiceQualityAnalysis-${componentId}`,
+                updateAnalysis,
+                renderCoordinator.PRIORITY.LOW
     const serviceRef = useRef(new QuadCoreAnalysisService());
     const [analysis, setAnalysis] = useState(null);
     const componentId = useId();
