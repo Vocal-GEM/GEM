@@ -87,6 +87,9 @@ describe('HighResSpectrogram', () => {
         <HighResSpectrogram dataRef={dataRef} />
       </SettingsProvider>
     );
+
+    // Check if component rendered (by looking for overlay text)
+    expect(screen.getByText(/High-Res Spectrogram/i)).toBeDefined();
     // Implicit assertion: no error thrown
         <SettingsProvider>
             <HighResSpectrogram dataRef={dataRef} />
