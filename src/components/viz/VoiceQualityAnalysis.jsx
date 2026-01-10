@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useId, useCallback } from 'react';
+import { useEffect, useRef, useState, useId } from 'react';
 import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
-import { useProfile } from '../../context/ProfileContext';
 import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const QuadCoreCard = ({ icon: Icon, title, score, label, value, color, unit }) => (
     <div className="bg-slate-800/50 rounded-xl p-3 border border-white/5 relative overflow-hidden group hover:bg-slate-800/80 transition-colors">
@@ -73,13 +74,18 @@ const FeedbackBanner = ({ feedback }) => {
 };
 
 const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioActive }) => {
-    const { targetRange } = useProfile();
+    // We import useProfile but targetRange was unused.
+    // If we need it later, we can uncomment.
+    useProfile();
+
     const serviceRef = useRef(new QuadCoreAnalysisService());
     const [analysis, setAnalysis] = useState(null);
-    const frameRef = useRef(null);
+
+    // Generate unique component ID for RenderCoordinator
+    const componentId = useId();
 
     useEffect(() => {
-        const loop = () => {
+        const updateAnalysis = () => {
             if (dataRef.current && isAudioActive) {
                 const results = serviceRef.current.analyze(dataRef.current, {
                     targetF2: 2000 // Default to neutral/chem until calibration is fuller
@@ -90,15 +96,65 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                     setAnalysis(results);
                 }
             }
-            frameRef.current = requestAnimationFrame(loop);
         };
 
-        if (isAudioActive) loop();
+        let unsubscribe;
+
+        if (isAudioActive) {
+            // Subscribe to RenderCoordinator instead of using internal RAF loop
+            // Use LOW priority as this is UI analysis updates, not 60fps animation
+            unsubscribe = renderCoordinator.subscribe(
+                `VoiceQualityAnalysis-${componentId}`,
+                updateAnalysis,
+                renderCoordinator.PRIORITY.LOW
+    const serviceRef = useRef(new QuadCoreAnalysisService());
+    const [analysis, setAnalysis] = useState(null);
+    const componentId = useId();
+
+    // Generate unique component ID
+    const uniqueId = useId();
+    const componentId = `voice-quality-${uniqueId}`;
+
+    const analyze = useCallback(() => {
+        if (dataRef.current) {
+            const results = serviceRef.current.analyze(dataRef.current, {
+                targetF2: 2000 // Default to neutral/chem until calibration is fuller
+                // TODO: pull from calibration context if available
+            });
+
+            if (results) {
+                setAnalysis(results);
+            }
+        }
+    }, [dataRef]);
+
+    useEffect(() => {
+        let unsubscribe;
+
+        if (isAudioActive) {
+            // Use RenderCoordinator instead of raw requestAnimationFrame
+            // We use a lower priority (LOW) because full analysis doesn't need to happen every 60fps
+            // This frees up resources for smoother visualizations
+            unsubscribe = renderCoordinator.subscribe(
+                `voice-quality-${componentId}`,
+                analyze,
+                renderCoordinator.PRIORITY.LOW
+        };
+
+        let unsubscribe;
+        if (isAudioActive) {
+            unsubscribe = renderCoordinator.subscribe(
+                componentId,
+                loop,
+                renderCoordinator.PRIORITY.MEDIUM
+            );
+        }
 
         return () => {
-            if (frameRef.current) cancelAnimationFrame(frameRef.current);
+            if (unsubscribe) unsubscribe();
         };
-    }, [isAudioActive, dataRef]);
+    }, [isAudioActive, componentId, analyze]);
+    }, [isAudioActive, dataRef, componentId]);
 
     return (
         <div className="bg-slate-900/50 rounded-2xl p-4 sm:p-6 border border-white/5 h-full flex flex-col">
