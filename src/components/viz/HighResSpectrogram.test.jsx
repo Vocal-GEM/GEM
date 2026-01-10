@@ -70,6 +70,13 @@ describe('HighResSpectrogram', () => {
 
   afterEach(() => {
     cleanup();
+  });
+
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
     vi.clearAllMocks();
   });
 

@@ -33,7 +33,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const componentId = useId();
     // Generate unique component ID for RenderCoordinator
     const uniqueId = useId();
-    const componentId = `spectrogram-highres-${uniqueId}`;
+    const componentId = useRef(`spectrogram-highres-${uniqueId}`).current;
 
     // Reusable buffers to avoid garbage collection churn
     const imgDataRef = useRef(null);
@@ -65,9 +65,8 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const draw = useCallback(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
+        if (!dataRef.current || !dataRef.current.spectrum) return;
 
-        // Remove 'willReadFrequently: true' to allow GPU acceleration since we use drawImage(canvas)
-        // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
 
         // Set dimensions
@@ -86,6 +85,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const height = canvas.height;
         const scrollSpeed = 2;
 
+        const spectrum = dataRef.current.spectrum;
         // Use { alpha: false } to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
 
@@ -182,6 +182,25 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
     }, [dataRef, colormap]);
 
+    // Handle resize efficiently with ResizeObserver
+    useEffect(() => {
+        const container = containerRef.current;
+        const canvas = canvasRef.current;
+        if (!container || !canvas) return;
+
+        const updateSize = () => {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = container.getBoundingClientRect();
+
+            // Only update if dimensions actually changed to prevent flickering/clearing
+            const newWidth = Math.floor(rect.width * dpr);
+            const newHeight = 512; // Fixed high vertical resolution
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                // Buffers will be recreated in next draw call
+                imgDataRef.current = null;
     // Handle Resize with ResizeObserver
     // Handle resize and subscription
     // Setup effect for subscription and sizing
@@ -226,8 +245,25 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
                 canvas.width = targetWidth;
                 canvas.height = 512; // Higher vertical resolution
             }
-        }
+        };
 
+        // Initial size
+        updateSize();
+
+        const resizeObserver = new ResizeObserver(() => {
+            // Debounce slightly or just run directly (usually RO is efficient enough)
+            requestAnimationFrame(updateSize);
+        });
+
+        resizeObserver.observe(container);
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
+
+    // Subscribe to RenderCoordinator
+    useEffect(() => {
         const unsubscribe = renderCoordinator.subscribe(
             componentId,
             draw, // Use the optimized draw function
