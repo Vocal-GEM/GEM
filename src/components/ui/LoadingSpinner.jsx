@@ -92,6 +92,9 @@ const LoadingSpinner = ({
         >
             <div className={clsx("relative", dimensions[size] || dimensions.md)}>
                 {/* Track circle */}
+        >
+            <div className={clsx("relative", dimensions[size] || dimensions.md)}>
+                {/* Track circle */}
             ))}
             role="status"
             aria-live="polite"
