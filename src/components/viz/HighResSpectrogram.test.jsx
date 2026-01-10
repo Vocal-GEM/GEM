@@ -1,10 +1,16 @@
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, act } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import HighResSpectrogram from './HighResSpectrogram';
 import { SettingsProvider } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
+import React from 'react';
+import HighResSpectrogram from './HighResSpectrogram';
+import { renderCoordinator } from '../../services/RenderCoordinator';
+import { SettingsProvider } from '../../context/SettingsContext';
+import React from 'react';
 
-// Mock RenderCoordinator
+// Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
   renderCoordinator: {
     subscribe: vi.fn(() => vi.fn()),
@@ -13,6 +19,14 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Mock SettingsContext
+vi.mock('../../context/SettingsContext', () => ({
+  useSettings: () => ({
+    settings: { spectrogramColorScheme: 'inferno' }
+  }),
+  SettingsProvider: ({ children }) => <div>{children}</div>
+}));
+
+// Mock Canvas
 const mockSettings = {
   spectrogramColorScheme: 'magma'
 };
@@ -22,10 +36,12 @@ vi.mock('../../context/SettingsContext', () => ({
   SettingsProvider: ({ children }) => <div>{children}</div>
 }));
 
-// Mock Canvas
+// Mock Canvas getContext
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   createImageData: vi.fn(() => ({
-    data: { buffer: new ArrayBuffer(1024) },
+    data: { buffer: new ArrayBuffer(800 * 512 * 4) },
+    width: 800,
+    height: 512
     height: 512,
     width: 2
   })),
@@ -38,6 +54,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   canvas: { width: 800, height: 512 },
   fillRect: vi.fn(),
   fillText: vi.fn(),
+  canvas: { width: 800, height: 512 }
 }));
 
 describe('HighResSpectrogram', () => {
@@ -51,6 +68,49 @@ describe('HighResSpectrogram', () => {
             f2: 1500
         }
     };
+      current: {
+        spectrum: new Float32Array(1024).fill(0.5),
+        f1: 500,
+        f2: 1500
+      }
+    };
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('subscribes to RenderCoordinator on mount', () => {
+  it('renders successfully', () => {
+    render(
+      <SettingsProvider>
+        <HighResSpectrogram dataRef={dataRef} />
+      </SettingsProvider>
+    );
+
+    // Check if component rendered (by looking for overlay text)
+    expect(screen.getByText(/High-Res Spectrogram/i)).toBeDefined();
+    // Implicit assertion: no error thrown
+        <SettingsProvider>
+            <HighResSpectrogram dataRef={dataRef} />
+        </SettingsProvider>
+    );
+    // Implicit assertion: no error thrown
+      <SettingsProvider>
+        <HighResSpectrogram dataRef={dataRef} />
+      </SettingsProvider>
+    );
+
+    expect(renderCoordinator.subscribe).toHaveBeenCalled();
   });
 
   afterEach(() => {
@@ -59,15 +119,6 @@ describe('HighResSpectrogram', () => {
   });
 
   it('renders successfully and subscribes to coordinator', () => {
-    render(
-      <SettingsProvider>
-        <HighResSpectrogram dataRef={dataRef} />
-      </SettingsProvider>
-    );
-    // Implicit assertion: no error thrown
-  });
-
-  it('subscribes to RenderCoordinator on mount', () => {
     render(
       <SettingsProvider>
         <HighResSpectrogram dataRef={dataRef} />
