@@ -42,6 +42,8 @@ describe('Toast Component', () => {
     render(<Toast message="Test Message" onClose={onClose} />);
     // Finding by role button is safe even if aria-label is missing, as long as it's a <button>
 
+    // Now we can find by label since we added it
+    const closeButton = screen.getByLabelText('Close notification');
     const closeButton = screen.getByRole('button');
     fireEvent.click(closeButton);
     expect(onClose).toHaveBeenCalled();
@@ -68,6 +70,9 @@ describe('Toast Component', () => {
       expect(alert).toBeInTheDocument();
   it('close button has accessible label', () => {
     render(<Toast message="Test" onClose={() => {}} />);
+
+    const button = screen.getByRole('button', { name: /close notification/i });
+    expect(button).toBeInTheDocument();
     expect(screen.getByLabelText('Close')).toBeInTheDocument();
     // This will pass only if the button has aria-label="Close"
     // Using getAllByRole because sometimes buttons might be rendered multiple times in bad implementations, but here we expect one.
