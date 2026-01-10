@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import LoadingSpinner from './LoadingSpinner';
 
 const Login = ({ onSwitchToSignup, onClose }) => {
     const { login } = useAuth();
@@ -33,15 +34,16 @@ const Login = ({ onSwitchToSignup, onClose }) => {
             <div className="bg-slate-900 border border-slate-700 p-6 rounded-2xl w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-white">Welcome Back</h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-white"><X /></button>
+                    <button onClick={onClose} className="text-slate-400 hover:text-white" aria-label="Close login modal"><X /></button>
                 </div>
 
-                {error && <div className="bg-red-500/20 text-red-400 p-3 rounded-lg mb-4 text-sm">{error}</div>}
+                {error && <div className="bg-red-500/20 text-red-400 p-3 rounded-lg mb-4 text-sm" role="alert">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Username</label>
+                        <label htmlFor="login-username" className="block text-xs font-bold text-slate-400 uppercase mb-1">Username</label>
                         <input
+                            id="login-username"
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
@@ -51,8 +53,9 @@ const Login = ({ onSwitchToSignup, onClose }) => {
                         />
                     </div>
                     <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Password</label>
+                        <label htmlFor="login-password" className="block text-xs font-bold text-slate-400 uppercase mb-1">Password</label>
                         <input
+                            id="login-password"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -67,7 +70,7 @@ const Login = ({ onSwitchToSignup, onClose }) => {
                         disabled={loading}
                         className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
                     >
-                        {loading ? 'Logging in...' : 'Log In'}
+                        {loading ? <LoadingSpinner size="sm" className="h-auto min-h-0" /> : 'Log In'}
                     </button>
                 </form>
 
