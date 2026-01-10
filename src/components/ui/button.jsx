@@ -1,8 +1,9 @@
 import React from "react";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
+import LoadingSpinner from "./LoadingSpinner";
 
-const Button = React.forwardRef(({ className, variant, size, asChild = false, ...props }, ref) => {
+const Button = React.forwardRef(({ className, variant, size, asChild = false, isLoading, children, ...props }, ref) => {
   const Comp = asChild ? "span" : "button"; // Simple placeholder for Slot
   return (
     <Comp
@@ -22,9 +23,23 @@ const Button = React.forwardRef(({ className, variant, size, asChild = false, ..
         },
         className
       ))}
+      disabled={props.disabled || isLoading}
       ref={ref}
       {...props}
-    />
+    >
+      {isLoading ? (
+        size === 'icon' ? (
+          <LoadingSpinner size="sm" />
+        ) : (
+          <>
+            <LoadingSpinner size="sm" className="mr-2" />
+            {children}
+          </>
+        )
+      ) : (
+        children
+      )}
+    </Comp>
   );
 });
 Button.displayName = "Button";
