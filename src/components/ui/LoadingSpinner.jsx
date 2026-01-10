@@ -90,6 +90,9 @@ const LoadingSpinner = ({
                 className
             )}
         >
+            <div className={twMerge("relative", dimensions[size] || dimensions.md)}>
+                {/* Track circle */}
+        >
             <div className={clsx("relative", dimensions[size] || dimensions.md)}>
                 {/* Track circle */}
         >
