@@ -24,3 +24,9 @@
 ## 2026-01-03 - Component Corruption
 **Learning:** Multiple conflicting definitions within a single component file (likely from bad merges) can go unnoticed if the file exports the last definition, but it creates a maintainability nightmare and breaks tools.
 **Action:** Always check the entire file content when fixing a component, not just the function you are editing, to spot and clean up duplicate/conflicting code blocks.
+## 2024-05-24 - File Integrity and Accessibility
+**Learning:** Merge conflicts or copy-paste errors in foundational components (like `LoadingSpinner`) can lead to malformed code that might technically render but fail silently or be completely inaccessible.
+**Action:** When fixing "broken" components, treat it as an opportunity to audit and enforce accessibility standards (roles, labels) during the reconstruction, rather than just restoring the previous (potentially flawed) state.
+## 2024-05-22 - QuickActions Accessibility & Build Stabilization
+**Learning:** Invisible elements (opacity: 0) remain in the accessibility tree, confusing screen reader users. `pointer-events: none` does not prevent keyboard focus in all contexts.
+**Action:** Use `aria-hidden="true"` and `tabIndex={-1}` for visually hidden interactive elements, or `visibility: hidden` if layout allows.
