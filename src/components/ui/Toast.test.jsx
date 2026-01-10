@@ -140,6 +140,7 @@ describe('Toast Component', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  // Accessibility tests
   // Accessibility tests - These are expected to fail initially
   it('has correct accessibility attributes for error type', () => {
     render(<Toast message="Error occurred" type="error" onClose={() => {}} />);
