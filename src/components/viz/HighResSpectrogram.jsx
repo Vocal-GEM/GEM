@@ -1,4 +1,5 @@
 import { useEffect, useRef, useMemo, useState, useCallback, memo, useId } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback, useId, memo } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { generateColormap } from '../../utils/colormaps';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -43,6 +44,8 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         [settings.spectrogramColorScheme]
     );
 
+    // Render loop callback
+    // Drawing logic - encapsulated to be called by RenderCoordinator
     const draw = useCallback(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -55,16 +58,29 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         const height = canvas.height;
         const scrollSpeed = 2;
 
+        // Use { alpha: false } to encourage GPU acceleration
+        const ctx = canvas.getContext('2d', { alpha: false });
+
         if (!dataRef.current || !dataRef.current.spectrum) {
             return;
         }
 
         const spectrum = dataRef.current.spectrum;
 
-        // Ensure buffers are ready
+        // Ensure buffers are ready and match current height
+        // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
+        const ctx = canvas.getContext('2d', { alpha: false });
+
+        // Ensure buffers are ready and match height
         if (!imgDataRef.current || imgDataRef.current.height !== height) {
-            imgDataRef.current = ctx.createImageData(scrollSpeed, height);
-            data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
+            try {
+                imgDataRef.current = ctx.createImageData(scrollSpeed, height);
+                data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
+            } catch (e) {
+                // Fallback for environments where createImageData might fail
+                console.error("Failed to create image data", e);
+                return;
+            }
         }
 
         // 1. Shift existing content to left
@@ -121,24 +137,29 @@ const HighResSpectrogram = memo(({ dataRef }) => {
         drawFormant(f1, last.f1, 'rgba(255, 50, 50, 0.9)');
         drawFormant(f2, last.f2, 'rgba(255, 50, 50, 0.9)');
         lastFormantsRef.current = { f1, f2 };
+
     }, [dataRef, colormap]);
 
+    // Handle resize and subscription
+    // Setup effect for subscription and sizing
     useEffect(() => {
         const canvas = canvasRef.current;
         if (canvas) {
-            // Set dimensions once
+            // Set dimensions once or on resize
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.getBoundingClientRect();
             // We set width/height only if they are different to avoid clearing canvas if possible,
             // but usually we want to reset on mount/resize.
-            if (canvas.width !== rect.width * dpr || canvas.height !== 512) {
-                canvas.width = rect.width * dpr;
+            const targetWidth = rect.width * dpr;
+            if (canvas.width !== targetWidth || canvas.height !== 512) {
+                canvas.width = targetWidth;
                 canvas.height = 512; // Higher vertical resolution
             }
         }
 
         const unsubscribe = renderCoordinator.subscribe(
             componentId,
+            draw, // Use the optimized draw function
             draw,
             renderCoordinator.PRIORITY.MEDIUM
         );

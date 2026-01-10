@@ -1,5 +1,6 @@
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import React from 'react';
 import HighResSpectrogram from './HighResSpectrogram';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import { SettingsProvider } from '../../context/SettingsContext';
@@ -26,7 +27,7 @@ vi.mock('../../context/SettingsContext', () => ({
 // Mock Canvas
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   createImageData: vi.fn(() => ({
-    data: { buffer: new ArrayBuffer(1024) },
+    data: { buffer: new ArrayBuffer(800 * 512 * 4) },
     height: 512,
     width: 2
   })),
@@ -70,7 +71,12 @@ describe('HighResSpectrogram', () => {
     expect(renderCoordinator.subscribe).toHaveBeenCalled();
   });
 
-  it('subscribes to RenderCoordinator on mount', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('renders successfully and subscribes to coordinator', () => {
     render(
       <SettingsProvider>
         <HighResSpectrogram dataRef={dataRef} />

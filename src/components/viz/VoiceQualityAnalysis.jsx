@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useId, useCallback } from 'react';
+import { useEffect, useRef, useState, useId } from 'react';
 import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
-import { useProfile } from '../../context/ProfileContext';
 import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
@@ -74,10 +74,13 @@ const FeedbackBanner = ({ feedback }) => {
 };
 
 const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioActive }) => {
-    const { targetRange } = useProfile();
     const serviceRef = useRef(new QuadCoreAnalysisService());
     const [analysis, setAnalysis] = useState(null);
     const componentId = useId();
+
+    // Generate unique component ID
+    const uniqueId = useId();
+    const componentId = `voice-quality-${uniqueId}`;
 
     const analyze = useCallback(() => {
         if (dataRef.current) {
@@ -103,6 +106,14 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                 `voice-quality-${componentId}`,
                 analyze,
                 renderCoordinator.PRIORITY.LOW
+        };
+
+        let unsubscribe;
+        if (isAudioActive) {
+            unsubscribe = renderCoordinator.subscribe(
+                componentId,
+                loop,
+                renderCoordinator.PRIORITY.MEDIUM
             );
         }
 
@@ -110,6 +121,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
             if (unsubscribe) unsubscribe();
         };
     }, [isAudioActive, componentId, analyze]);
+    }, [isAudioActive, dataRef, componentId]);
 
     return (
         <div className="bg-slate-900/50 rounded-2xl p-4 sm:p-6 border border-white/5 h-full flex flex-col">

@@ -125,7 +125,9 @@ class TestSecurityUpload(unittest.TestCase):
         response = self.client.post('/api/upload', data=data, content_type='multipart/form-data')
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json['error'], "File type not allowed")
+        # The error message now includes the file type: "File type 'html' not allowed"
+        self.assertIn("File type", response.json['error'])
+        self.assertIn("not allowed", response.json['error'])
 
 if __name__ == '__main__':
     unittest.main()
