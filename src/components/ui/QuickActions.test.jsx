@@ -24,13 +24,35 @@ describe('QuickActions', () => {
         expect(screen.getByRole('button', { name: /quick actions/i })).toBeInTheDocument();
     });
 
-    it('should expand menu when clicked', () => {
+    it('should have correct accessibility attributes', () => {
         render(<QuickActions />);
         const fab = screen.getByRole('button', { name: /quick actions/i });
+
+        // Initial state
+        expect(fab).toHaveAttribute('aria-expanded', 'false');
+        expect(fab).toHaveAttribute('aria-haspopup', 'true');
+        expect(fab).toHaveAttribute('aria-controls', 'quick-actions-menu');
+
+        // Buttons should be hidden from accessibility tree initially
+        const practiceButton = screen.queryByText('Practice');
+        expect(practiceButton).toBeInTheDocument();
+        // Since we are finding by text which is in a span, we check the button parent
+        const button = practiceButton.closest('button');
+        expect(button).toHaveAttribute('aria-hidden', 'true');
+        expect(button).toHaveAttribute('tabIndex', '-1');
+    });
+
+    it('should expand menu when clicked and update attributes', () => {
+        render(<QuickActions />);
+        const fab = screen.getByRole('button', { name: /quick actions/i });
+
         fireEvent.click(fab);
-        expect(screen.getByText('Practice')).toBeInTheDocument();
-        expect(screen.getByText('Journal')).toBeInTheDocument();
-        expect(screen.getByText('Listen Mode')).toBeInTheDocument();
+
+        expect(fab).toHaveAttribute('aria-expanded', 'true');
+
+        const practiceButton = screen.getByText('Practice').closest('button');
+        expect(practiceButton).toHaveAttribute('aria-hidden', 'false');
+        expect(practiceButton).toHaveAttribute('tabIndex', '0');
     });
 
     it('should call onAction when an action is clicked', () => {
@@ -47,8 +69,13 @@ describe('QuickActions', () => {
 
     it('should toggle listen mode when clicked', () => {
         render(<QuickActions />);
+
+        // Open menu
         fireEvent.click(screen.getByRole('button', { name: /quick actions/i }));
+
+        // Click Listen Mode
         fireEvent.click(screen.getByText('Listen Mode'));
+
         expect(mockUpdateSettings).toHaveBeenCalledWith({ ...mockSettings, listenMode: true });
     });
 });
