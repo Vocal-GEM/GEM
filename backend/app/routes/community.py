@@ -2,21 +2,15 @@ from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
-from ..extensions import db
-from ..extensions import db, limiter
-from ..validators import validate_file_upload
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
     GroupChallenge, GroupChallengeParticipant, ModerationFlag,
     CommunityBenchmark,
 )
-from ..validators import validate_file_upload
 from datetime import datetime, timedelta
 import os
 import secrets
-import hashlib
-from werkzeug.utils import secure_filename
-from ..validators import validate_file_upload
+from ..validators import validate_file_upload, sanitize_html
 
 community_bp = Blueprint('community', __name__)
 
@@ -93,39 +87,26 @@ def share_voice():
         audio_file = request.files['audio']
 
         # Security: Validate file type
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
-        # Security: Validate file extension
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
-        # Security: Validate file type
         is_valid, error = validate_file_upload(
-            audio_file.filename, allowed_types=['audio'])
+            audio_file.filename, allowed_types=['audio']
+        )
         if not is_valid:
             return jsonify({'error': error}), 400
 
         context = request.form.get('context', '')
+        if context:
+            context = sanitize_html(context)
         expiration_days = int(request.form.get('expiration_days', 7))
 
-        # Security: Validate file extension
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
-        if not is_valid:
-            return jsonify({'error': error}), 400
-        
         # Save original file
         upload_folder = current_app.config.get(
             'UPLOAD_FOLDER', 'uploads/shared')
         os.makedirs(upload_folder, exist_ok=True)
-        
-        # Security: Use secure_filename to prevent path traversal/bad characters
-        safe_filename = secure_filename(audio_file.filename)
-        filename = f"{current_user.id}_{datetime.now().timestamp()}_{safe_filename}"
-        # Security: Sanitize filename
-        safe_filename = secure_filename(audio_file.filename)
-        filename = f"{current_user.id}_{datetime.now().timestamp()}_{safe_filename}"
 
+        # Security: Use secure_filename to prevent path traversal
         safe_filename = secure_filename(audio_file.filename)
-        filename = f"{
-            current_user.id}_{
-            datetime.now().timestamp()}_{safe_filename}"
+        ts = datetime.now().timestamp()
+        filename = f"{current_user.id}_{ts}_{safe_filename}"
         filepath = os.path.join(upload_folder, filename)
         audio_file.save(filepath)
 
@@ -236,14 +217,22 @@ def get_success_stories():
 
         result = []
         for story in stories:
+            before_audio = (
+                f"/api/community/story-audio/{story.id}/before"
+                if story.before_audio else None
+            )
+            after_audio = (
+                f"/api/community/story-audio/{story.id}/after"
+                if story.after_audio else None
+            )
             result.append({
                 'id': story.id,
                 'title': story.title,
                 'story': story.story,
                 'timeline_months': story.timeline_months,
                 'voice_goal': story.voice_goal,
-                'before_audio': f"/api/community/story-audio/{story.id}/before" if story.before_audio else None,
-                'after_audio': f"/api/community/story-audio/{story.id}/after" if story.after_audio else None,
+                'before_audio': before_audio,
+                'after_audio': after_audio,
                 'upvotes': story.upvotes,
                 'techniques_used': story.techniques_used,
                 'created_at': story.created_at.isoformat()
@@ -268,14 +257,19 @@ def submit_success_story():
         is_safe, flagged = check_moderation(
             data.get('title', '') + ' ' + data.get('story', ''))
 
+        # Security: Sanitize HTML content
+        title = sanitize_html(data.get('title', ''))
+        story_content = sanitize_html(data.get('story', ''))
+
         story = SuccessStory(
             user_id=current_user.id,
-            title=data.get('title'),
-            story=data.get('story'),
+            title=title,
+            story=story_content,
             timeline_months=data.get('timeline_months'),
             voice_goal=data.get('voice_goal'),
             consent_public=data.get('consent_public', False),
-            approved=is_safe,  # Auto-approve if passes moderation
+            # Auto-approve if passes moderation
+            approved=is_safe,
             techniques_used=data.get('techniques_used', [])
         )
 
@@ -293,11 +287,15 @@ def submit_success_story():
             db.session.add(flag)
             db.session.commit()
 
+        if is_safe:
+            msg = 'Story submitted successfully'
+        else:
+            msg = 'Story submitted for review'
         return jsonify({
             'success': True,
             'story_id': story.id,
             'approved': story.approved,
-            'message': 'Story submitted successfully' if is_safe else 'Story submitted for review'
+            'message': msg
         })
 
     except Exception as e:
