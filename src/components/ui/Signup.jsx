@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import LoadingSpinner from './LoadingSpinner';
 
 const Signup = ({ onSwitchToLogin, onClose }) => {
     const { signup } = useAuth();
@@ -39,15 +40,16 @@ const Signup = ({ onSwitchToLogin, onClose }) => {
             <div className="bg-slate-900 border border-slate-700 p-6 rounded-2xl w-full max-w-sm shadow-2xl">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-white">Create Account</h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-white"><X /></button>
+                    <button onClick={onClose} className="text-slate-400 hover:text-white" aria-label="Close signup modal"><X /></button>
                 </div>
 
-                {error && <div className="bg-red-500/20 text-red-400 p-3 rounded-lg mb-4 text-sm">{error}</div>}
+                {error && <div className="bg-red-500/20 text-red-400 p-3 rounded-lg mb-4 text-sm" role="alert">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Username</label>
+                        <label htmlFor="signup-username" className="block text-xs font-bold text-slate-400 uppercase mb-1">Username</label>
                         <input
+                            id="signup-username"
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
@@ -60,8 +62,9 @@ const Signup = ({ onSwitchToLogin, onClose }) => {
                         </p>
                     </div>
                     <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Password</label>
+                        <label htmlFor="signup-password" className="block text-xs font-bold text-slate-400 uppercase mb-1">Password</label>
                         <input
+                            id="signup-password"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -74,8 +77,9 @@ const Signup = ({ onSwitchToLogin, onClose }) => {
                         </p>
                     </div>
                     <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Confirm Password</label>
+                        <label htmlFor="signup-confirm" className="block text-xs font-bold text-slate-400 uppercase mb-1">Confirm Password</label>
                         <input
+                            id="signup-confirm"
                             type="password"
                             value={confirm}
                             onChange={(e) => setConfirm(e.target.value)}
@@ -90,7 +94,7 @@ const Signup = ({ onSwitchToLogin, onClose }) => {
                         disabled={loading}
                         className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
                     >
-                        {loading ? 'Creating Account...' : 'Sign Up'}
+                        {loading ? <LoadingSpinner size="sm" className="h-auto min-h-0" /> : 'Sign Up'}
                     </button>
                 </form>
 
