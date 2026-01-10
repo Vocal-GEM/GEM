@@ -82,11 +82,16 @@ const LoadingSpinner = ({
     return (
         <div
             role="status"
+            className={twMerge(
             aria-live="polite"
             className={twMerge(clsx(
                 "flex items-center justify-center w-full",
                 containerClass,
                 className
+            )}
+        >
+            <div className={clsx("relative", dimensions[size] || dimensions.md)}>
+                {/* Track circle */}
             ))}
             role="status"
             aria-live="polite"
