@@ -260,6 +260,7 @@ def transcribe_with_timing(audio_path):
 
 
 @analysis_bp.route('/api/analyze', methods=['POST'])
+@limiter.limit("5 per minute")
 @limiter.limit("10 per minute")
 def analyze_audio():
     """
@@ -285,6 +286,11 @@ def analyze_audio():
     if not is_valid:
         return jsonify({"error": error}), 400
     
+    # Security: Validate file type
+    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'])
+    if not is_valid:
+        return jsonify({"error": error}), 400
+
     # Save to temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_file:
         temp_path = temp_file.name
