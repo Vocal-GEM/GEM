@@ -283,19 +283,10 @@ def analyze_audio():
     if file.filename == '':
         return jsonify({'error': 'Empty filename'}), 400
 
-    # Validate file type
-    is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'])
+    # Validate file type and content
+    is_valid, error_msg = validate_file_upload(file, allowed_types=['audio'])
     if not is_valid:
         return jsonify({'error': error_msg}), 400
-    # Security: Validate file type
-    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'])
-    if not is_valid:
-        return jsonify({"error": error}), 400
-    
-    # Security: Validate file type
-    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'])
-    if not is_valid:
-        return jsonify({"error": error}), 400
 
     # Save to temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_file:
