@@ -37,6 +37,10 @@
 **Vulnerability:** Missing rate limiting on resource-intensive endpoints (`/chat`, `/analyze`, `/synthesize`) exposed the application to DoS attacks and excessive API costs (Gemini/ElevenLabs).
 **Learning:** External API integrations and CPU-heavy tasks must always be rate-limited to prevent abuse and cost overruns.
 **Prevention:** Applied `Flask-Limiter` decorators (`@limiter.limit`) to all high-cost/high-compute endpoints in `ai.py`, `voice_quality.py`, and `tts.py`.
+## 2026-01-04 - Community File Upload Security
+**Vulnerability:** The `share_voice` endpoint in `backend/app/routes/community.py` allowed unrestricted file uploads, enabling potential RCE via malicious scripts (e.g., .php).
+**Learning:** Always validate file types explicitly, even when using `secure_filename`. Relative imports in Blueprint routes work, but testing them requires careful mocking of the package structure.
+**Prevention:** Added `validate_file_upload` check restricting uploads to audio types only. Confirmed `backend/app/validators.py` exists and functions correctly.
 
 ## 2025-05-23 - Path Traversal & Rate Limiting in Community Routes
 **Vulnerability:** The `share_voice` endpoint in `backend/app/routes/community.py` used raw filenames for uploads, creating a potential path traversal risk. It also lacked rate limiting, exposing the server to DoS attacks via heavy audio processing.

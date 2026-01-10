@@ -92,6 +92,8 @@ def share_voice():
 
         audio_file = request.files['audio']
 
+        # Security: Validate file type
+        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
         # Security: Validate file extension
         is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
         # Security: Validate file type
