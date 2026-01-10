@@ -8,7 +8,6 @@ import { useJournal } from './context/JournalContext';
 import { useNavigation } from './context/NavigationContext';
 import { LanguageProvider } from './context/LanguageContext';
 import MigrationModal from './components/ui/MigrationModal';
-import { DialectTours } from './components/culture/DialectTours';
 import { AnalyticsDashboardV2 } from './components/analytics/AnalyticsDashboardV2';
 import JournalForm from './components/ui/JournalForm';
 import Login from './components/ui/Login';
