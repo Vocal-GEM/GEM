@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
 from ..extensions import db
 from ..extensions import db, limiter
-from ..validators import validate_file_upload
+from ..validators import validate_file_upload, sanitize_html
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
     GroupChallenge, GroupChallengeParticipant, ModerationFlag,
@@ -264,19 +264,28 @@ def submit_success_story():
     try:
         data = request.get_json()
 
+        # Security: Sanitize HTML inputs
+        title = sanitize_html(data.get('title', ''))
+        story_content = sanitize_html(data.get('story', ''))
+
+        # Sanitize techniques list if present
+        techniques = data.get('techniques_used', [])
+        if not isinstance(techniques, list):
+            techniques = []
+        techniques = [sanitize_html(str(t)) for t in techniques]
+
         # Moderation check
-        is_safe, flagged = check_moderation(
-            data.get('title', '') + ' ' + data.get('story', ''))
+        is_safe, flagged = check_moderation(title + ' ' + story_content)
 
         story = SuccessStory(
             user_id=current_user.id,
-            title=data.get('title'),
-            story=data.get('story'),
+            title=title,
+            story=story_content,
             timeline_months=data.get('timeline_months'),
             voice_goal=data.get('voice_goal'),
             consent_public=data.get('consent_public', False),
             approved=is_safe,  # Auto-approve if passes moderation
-            techniques_used=data.get('techniques_used', [])
+            techniques_used=techniques
         )
 
         db.session.add(story)
