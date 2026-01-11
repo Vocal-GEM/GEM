@@ -59,3 +59,8 @@
 **Vulnerability:** The `share_voice` endpoint accepted any file type and saved it to disk with an insecure filename construction, allowing potential Remote Code Execution (RCE) via malicious uploads (e.g., .html, .php) or path traversal.
 **Learning:** Relying on frontend validation or assuming "trusted users" (authenticated) is insufficient. Filenames must always be sanitized and validated against a strict allowlist on the backend before any filesystem operations.
 **Prevention:** Always use `secure_filename` and explicit content-type/extension validation (e.g. `validate_file_upload`) for every file upload endpoint.
+
+## 2024-05-22 - Stored XSS in Community Features
+**Vulnerability:** User input in `submit_success_story` (title, story), `share_voice` (context), and `request_connection` (message) was stored directly in the database without sanitization. An attacker could inject malicious scripts (e.g., `<script>`) that would execute when other users viewed these stories or messages.
+**Learning:** Even with backend API validation (like checking file types or bad words), explicit HTML sanitization is required for any text field that might be rendered or stored. `check_moderation` only flagged keywords but didn't prevent code injection.
+**Prevention:** Apply `sanitize_html` (using `bleach`) to all user-submitted text fields before saving to the database. Ensure this pattern is followed for all new endpoints accepting text input.

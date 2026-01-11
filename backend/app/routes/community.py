@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
 from ..extensions import db
 from ..extensions import db, limiter
-from ..validators import validate_file_upload
+from ..validators import validate_file_upload, sanitize_html
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
     GroupChallenge, GroupChallengeParticipant, ModerationFlag,
@@ -103,6 +103,9 @@ def share_voice():
             return jsonify({'error': error}), 400
 
         context = request.form.get('context', '')
+        # Security: Sanitize context
+        context = sanitize_html(context)
+
         expiration_days = int(request.form.get('expiration_days', 7))
 
         # Security: Validate file extension
@@ -264,14 +267,18 @@ def submit_success_story():
     try:
         data = request.get_json()
 
+        # Security: Sanitize inputs
+        title = sanitize_html(data.get('title', ''))
+        story_content = sanitize_html(data.get('story', ''))
+
         # Moderation check
         is_safe, flagged = check_moderation(
-            data.get('title', '') + ' ' + data.get('story', ''))
+            title + ' ' + story_content)
 
         story = SuccessStory(
             user_id=current_user.id,
-            title=data.get('title'),
-            story=data.get('story'),
+            title=title,
+            story=story_content,
             timeline_months=data.get('timeline_months'),
             voice_goal=data.get('voice_goal'),
             consent_public=data.get('consent_public', False),
@@ -450,6 +457,9 @@ def request_connection():
         connection_id = data.get('connection_id')
         connection_type = data.get('connection_type', 'pen_pal')
         message = data.get('message', '')
+
+        # Security: Sanitize message
+        message = sanitize_html(message)
 
         if not connection_id:
             return jsonify({'error': 'Connection ID required'}), 400
