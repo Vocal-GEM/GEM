@@ -40,8 +40,6 @@ const QualityVisualizer = ({ dataRef }) => {
                     historyRef.current[key].shift();
                 }
             });
-
-            requestAnimationFrame(loop);
         };
 
         let unsubscribe;
