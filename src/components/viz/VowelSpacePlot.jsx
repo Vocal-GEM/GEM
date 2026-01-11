@@ -1,10 +1,12 @@
+import { useMemo, useRef, useEffect, useState, useCallback, useId } from 'react';
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
-import { useRef, useEffect, useState } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRecording = false }) => {
     const { colorBlindMode } = useSettings();
     const { profile } = useProfile();
+    const componentId = useId();
 
     // Determine ranges based on profile (default to feminine if unknown or not set)
     const isMasc = profile?.gender === 'masc';
@@ -18,14 +20,11 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
     const maxF2 = isMasc ? 2500 : 3000;
 
     // Vowel targets (approximate)
-    const targets = {
+    const targets = useMemo(() => ({
         'i': { label: '/i/', f1: isMasc ? 270 : 300, f2: isMasc ? 2200 : 2500, color: colorBlindMode ? '#9333ea' : '#ec4899' }, // Pink/Purple
         'a': { label: '/a/', f1: isMasc ? 750 : 850, f2: isMasc ? 1200 : 1700, color: colorBlindMode ? '#0d9488' : '#3b82f6' }, // Blue/Teal
         'u': { label: '/u/', f1: isMasc ? 270 : 300, f2: isMasc ? 700 : 800, color: colorBlindMode ? '#f59e0b' : '#10b981' }   // Green/Amber
-    };
-
-    const getXPos = (val) => 100 - ((val - minF2) / (maxF2 - minF2)) * 100;
-    const getYPos = (val) => ((val - minF1) / (maxF1 - minF1)) * 100;
+    }), [isMasc, colorBlindMode]);
 
     const pointRef = useRef(null);
     const labelRef = useRef(null);
@@ -34,120 +33,132 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
     const [currentVowel, setCurrentVowel] = useState('');
     const [hitScore, setHitScore] = useState(0);
 
-    // Animation Loop
-    useEffect(() => {
+    // Drawing Logic
+    const draw = useCallback(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
 
-        let animationId;
+        const getXPos = (val) => 100 - ((val - minF2) / (maxF2 - minF2)) * 100;
+        const getYPos = (val) => ((val - minF1) / (maxF1 - minF1)) * 100;
 
-        const render = () => {
-            // Clear Canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Clear Canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw Target Zones
-            Object.entries(targets).forEach(([key, t]) => {
-                const isActive = targetVowel === key;
-                const opacity = isActive ? 0.6 : (targetVowel ? 0.1 : 0.3);
+        // Draw Target Zones
+        Object.entries(targets).forEach(([key, t]) => {
+            const isActive = targetVowel === key;
+            const opacity = isActive ? 0.6 : (targetVowel ? 0.1 : 0.3);
 
-                const x = (getXPos(t.f2) / 100) * canvas.width;
-                const y = (getYPos(t.f1) / 100) * canvas.height;
+            const x = (getXPos(t.f2) / 100) * canvas.width;
+            const y = (getYPos(t.f1) / 100) * canvas.height;
 
-                // Glowing effect for active target
-                if (isActive) {
-                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, 60);
-                    gradient.addColorStop(0, `${t.color}40`);
-                    gradient.addColorStop(1, `${t.color}00`);
-                    ctx.fillStyle = gradient;
-                    ctx.beginPath();
-                    ctx.arc(x, y, 60, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    // Pulse Ring
-                    const time = Date.now() / 500;
-                    const pulseSize = 20 + Math.sin(time) * 5;
-                    ctx.strokeStyle = t.color;
-                    ctx.lineWidth = 2;
-                    ctx.beginPath();
-                    ctx.arc(x, y, pulseSize, 0, Math.PI * 2);
-                    ctx.stroke();
-                }
-
-                // Core Circle
-                ctx.fillStyle = t.color;
-                ctx.globalAlpha = opacity;
+            // Glowing effect for active target
+            if (isActive) {
+                const gradient = ctx.createRadialGradient(x, y, 0, x, y, 60);
+                gradient.addColorStop(0, `${t.color}40`);
+                gradient.addColorStop(1, `${t.color}00`);
+                ctx.fillStyle = gradient;
                 ctx.beginPath();
-                ctx.arc(x, y, 10, 0, Math.PI * 2);
+                ctx.arc(x, y, 60, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Label
-                ctx.globalAlpha = isActive ? 1 : 0.5;
-                ctx.fillStyle = '#fff';
-                ctx.font = isActive ? 'bold 16px Inter' : '12px Inter';
-                ctx.textAlign = 'center';
-                ctx.fillText(t.label, x, y + 25);
-                ctx.globalAlpha = 1;
-            });
-
-            // Update User Dot
-            if (dataRef && dataRef.current && isRecording) {
-                const { f1, f2, vowel, clarity } = dataRef.current;
-
-                if (f1 && f2 && clarity > 0.4) {
-                    const x = (getXPos(f2) / 100) * canvas.width;
-                    const y = (getYPos(f1) / 100) * canvas.height;
-
-                    // Smooth transition (lerp could be added here for smoother movement)
-                    if (pointRef.current) {
-                        pointRef.current.style.transform = `translate(${x}px, ${y}px)`;
-                        pointRef.current.style.opacity = '1';
-                    }
-
-                    // Check Hit
-                    if (targetVowel) {
-                        const t = targets[targetVowel];
-                        const tx = (getXPos(t.f2) / 100) * canvas.width;
-                        const ty = (getYPos(t.f1) / 100) * canvas.height;
-                        const distance = Math.hypot(x - tx, y - ty);
-
-                        // Hit threshold
-                        if (distance < 50) {
-                            setHitScore(prev => Math.min(100, prev + 1));
-                        }
-                    }
-
-                    if (labelRef.current) {
-                        labelRef.current.innerText = `${f1.toFixed(0)} / ${f2.toFixed(0)} Hz`;
-                        // Move label with point
-                        labelRef.current.style.transform = `translate(${x + 15}px, ${y}px)`;
-                    }
-
-                    setCurrentVowel(vowel);
-                } else if (pointRef.current) {
-                    pointRef.current.style.opacity = '0.1';
-                }
+                // Pulse Ring
+                const time = Date.now() / 500;
+                const pulseSize = 20 + Math.sin(time) * 5;
+                ctx.strokeStyle = t.color;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(x, y, pulseSize, 0, Math.PI * 2);
+                ctx.stroke();
             }
 
-            animationId = requestAnimationFrame(render);
-        };
+            // Core Circle
+            ctx.fillStyle = t.color;
+            ctx.globalAlpha = opacity;
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fill();
 
-        // Resize handler
+            // Label
+            ctx.globalAlpha = isActive ? 1 : 0.5;
+            ctx.fillStyle = '#fff';
+            ctx.font = isActive ? 'bold 16px Inter' : '12px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText(t.label, x, y + 25);
+            ctx.globalAlpha = 1;
+        });
+
+        // Update User Dot
+        if (dataRef && dataRef.current && isRecording) {
+            const { f1, f2, vowel, clarity } = dataRef.current;
+
+            if (f1 && f2 && clarity > 0.4) {
+                const x = (getXPos(f2) / 100) * canvas.width;
+                const y = (getYPos(f1) / 100) * canvas.height;
+
+                // Smooth transition
+                if (pointRef.current) {
+                    pointRef.current.style.transform = `translate(${x}px, ${y}px)`;
+                    pointRef.current.style.opacity = '1';
+                }
+
+                // Check Hit
+                if (targetVowel) {
+                    const t = targets[targetVowel];
+                    const tx = (getXPos(t.f2) / 100) * canvas.width;
+                    const ty = (getYPos(t.f1) / 100) * canvas.height;
+                    const distance = Math.hypot(x - tx, y - ty);
+
+                    // Hit threshold
+                    if (distance < 50) {
+                        setHitScore(prev => Math.min(100, prev + 1));
+                    }
+                }
+
+                if (labelRef.current) {
+                    labelRef.current.innerText = `${f1.toFixed(0)} / ${f2.toFixed(0)} Hz`;
+                    // Move label with point
+                    labelRef.current.style.transform = `translate(${x + 15}px, ${y}px)`;
+                }
+
+                setCurrentVowel(vowel);
+            } else if (pointRef.current) {
+                pointRef.current.style.opacity = '0.1';
+            }
+        }
+    }, [targets, targetVowel, isRecording, dataRef, minF1, maxF1, minF2, maxF2]);
+
+    // Handle Resize
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
         const resize = () => {
             if (!canvas.parentElement) return;
             canvas.width = canvas.parentElement.clientWidth;
             canvas.height = canvas.parentElement.clientHeight;
         };
+
         window.addEventListener('resize', resize);
         resize();
 
-        render();
+        return () => window.removeEventListener('resize', resize);
+    }, []);
+
+    // Subscribe to RenderCoordinator
+    useEffect(() => {
+        // Subscribe to the render loop
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            draw,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
 
         return () => {
-            cancelAnimationFrame(animationId);
-            window.removeEventListener('resize', resize);
+            unsubscribe();
         };
-    }, [targetVowel, isMasc, isRecording, colorBlindMode]);
+    }, [draw, componentId]);
 
     return (
         <div className="w-full h-full relative bg-slate-950 rounded-xl overflow-hidden shadow-inner">
