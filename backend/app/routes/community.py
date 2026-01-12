@@ -55,12 +55,9 @@ def anonymize_audio(audio_path):
 
         return anon_path
     except ImportError:
-        # If librosa not available, just copy the file
-        # In production, you'd want to ensure librosa is installed
-        import shutil
-        anon_path = audio_path.replace('.', '_anon.')
-        shutil.copy(audio_path, anon_path)
-        return anon_path
+        # If librosa not available, we cannot anonymize.
+        # Fail securely - do not copy the raw file.
+        raise ImportError("Audio anonymization library (librosa) not available")
 
 
 def check_moderation(text):
@@ -129,8 +126,16 @@ def share_voice():
         filepath = os.path.join(upload_folder, filename)
         audio_file.save(filepath)
 
-        # Anonymize audio
-        anon_filepath = anonymize_audio(filepath)
+        try:
+            # Anonymize audio
+            anon_filepath = anonymize_audio(filepath)
+        finally:
+            # Security: Always remove the original raw file to prevent PII retention
+            if os.path.exists(filepath):
+                try:
+                    os.remove(filepath)
+                except OSError:
+                    pass
 
         # Create share record
         share_id = generate_share_id()
