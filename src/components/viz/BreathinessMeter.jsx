@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Wind, CheckCircle2, AlertTriangle, Info, Sparkles, Activity, HelpCircle } from 'lucide-react';
 
 /**
@@ -41,13 +42,11 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const oqIndicatorRef = useRef(null);
     const lastOqRef = useRef(50);
     const ventricularRef = useRef(null);
+    const componentId = useId();
 
     useEffect(() => {
-        const loop = () => {
-            if (!dataRef.current) {
-                requestAnimationFrame(loop);
-                return;
-            }
+        const update = () => {
+            if (!dataRef.current) return;
 
             const { breathinessGrbas, oq_percent, oq_zone, ventricular_detected, ventricular_severity, ventricular_feedback } = dataRef.current;
 
@@ -146,13 +145,16 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
                     ventricularRef.current.style.display = 'none';
                 }
             }
-
-            requestAnimationFrame(loop);
         };
 
-        // Start the animation loop
-        requestAnimationFrame(loop);
-    }, [dataRef, colorBlindMode]);
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            update,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+
+        return unsubscribe;
+    }, [dataRef, colorBlindMode, componentId]);
 
     // Determine if in sweet spot for static rendering
     const breathinessGrbas = dataRef.current?.breathinessGrbas;
