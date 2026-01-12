@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from app.models import db, ExercisePack, PackExercise, PackDownload, PackReview, User
+from app.extensions import limiter
 from flask_login import login_required, current_user
 import uuid
 from datetime import datetime
@@ -65,6 +66,7 @@ def get_pack_details(pack_id):
 
 @marketplace_bp.route('/packs', methods=['POST'])
 @login_required
+@limiter.limit("10 per hour")
 def create_pack():
     data = request.get_json()
     
@@ -101,6 +103,7 @@ def create_pack():
 
 @marketplace_bp.route('/packs/<pack_id>/download', methods=['POST'])
 @login_required
+@limiter.limit("60 per minute")
 def download_pack(pack_id):
     pack = ExercisePack.query.get_or_404(pack_id)
     

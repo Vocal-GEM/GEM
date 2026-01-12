@@ -104,8 +104,6 @@ def clean_audio():
         print(f"Cleaning error: {e}")
         # If we failed before send_file, clean up manually
         if tmp_path and os.path.exists(tmp_path):
-        # Manual cleanup on error since after_request might not run if we crash before return
-        if os.path.exists(tmp_path):
             try:
                 os.remove(tmp_path)
             except:
