@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { Wind, CheckCircle2, AlertTriangle, Info, Sparkles, Activity, HelpCircle } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * BreathinessMeter Component
@@ -15,6 +16,9 @@ import { Wind, CheckCircle2, AlertTriangle, Info, Sparkles, Activity, HelpCircle
  * - Warnings for excessive breathiness
  * - NEW: Estimated Open Quotient display
  * - NEW: Ventricular (false vocal fold) engagement warning
+ *
+ * Performance Optimization:
+ * - Uses RenderCoordinator for centralized animation loop control
  */
 
 // Zone configuration based on research
@@ -34,6 +38,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const zoneRef = useRef(null);
     const feedbackRef = useRef(null);
     const lastValueRef = useRef(50);
+    const componentId = useId();
 
     // NEW: Refs for OQ and ventricular displays
     const oqValueRef = useRef(null);
@@ -43,11 +48,8 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const ventricularRef = useRef(null);
 
     useEffect(() => {
-        const loop = () => {
-            if (!dataRef.current) {
-                requestAnimationFrame(loop);
-                return;
-            }
+        const updateMeter = () => {
+            if (!dataRef.current) return;
 
             const { breathinessGrbas, oq_percent, oq_zone, ventricular_detected, ventricular_severity, ventricular_feedback } = dataRef.current;
 
@@ -146,13 +148,16 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
                     ventricularRef.current.style.display = 'none';
                 }
             }
-
-            requestAnimationFrame(loop);
         };
 
-        // Start the animation loop
-        requestAnimationFrame(loop);
-    }, [dataRef, colorBlindMode]);
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            updateMeter,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+
+        return () => unsubscribe();
+    }, [dataRef, colorBlindMode, componentId]);
 
     // Determine if in sweet spot for static rendering
     const breathinessGrbas = dataRef.current?.breathinessGrbas;
