@@ -2,21 +2,16 @@ from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
-from ..extensions import db
-from ..extensions import db, limiter
 from ..validators import validate_file_upload
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
     GroupChallenge, GroupChallengeParticipant, ModerationFlag,
     CommunityBenchmark,
 )
-from ..validators import validate_file_upload
 from datetime import datetime, timedelta
 import os
 import secrets
 import hashlib
-from werkzeug.utils import secure_filename
-from ..validators import validate_file_upload
 
 community_bp = Blueprint('community', __name__)
 
@@ -93,10 +88,6 @@ def share_voice():
         audio_file = request.files['audio']
 
         # Security: Validate file type
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
-        # Security: Validate file extension
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
-        # Security: Validate file type
         is_valid, error = validate_file_upload(
             audio_file.filename, allowed_types=['audio'])
         if not is_valid:
@@ -105,32 +96,28 @@ def share_voice():
         context = request.form.get('context', '')
         expiration_days = int(request.form.get('expiration_days', 7))
 
-        # Security: Validate file extension
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
-        if not is_valid:
-            return jsonify({'error': error}), 400
-        
         # Save original file
         upload_folder = current_app.config.get(
             'UPLOAD_FOLDER', 'uploads/shared')
         os.makedirs(upload_folder, exist_ok=True)
-        
+
         # Security: Use secure_filename to prevent path traversal/bad characters
         safe_filename = secure_filename(audio_file.filename)
         filename = f"{current_user.id}_{datetime.now().timestamp()}_{safe_filename}"
-        # Security: Sanitize filename
-        safe_filename = secure_filename(audio_file.filename)
-        filename = f"{current_user.id}_{datetime.now().timestamp()}_{safe_filename}"
 
-        safe_filename = secure_filename(audio_file.filename)
-        filename = f"{
-            current_user.id}_{
-            datetime.now().timestamp()}_{safe_filename}"
         filepath = os.path.join(upload_folder, filename)
         audio_file.save(filepath)
 
         # Anonymize audio
-        anon_filepath = anonymize_audio(filepath)
+        try:
+            anon_filepath = anonymize_audio(filepath)
+        finally:
+            # Ensure original is deleted for privacy
+            if os.path.exists(filepath):
+                try:
+                    os.remove(filepath)
+                except Exception as e:
+                    current_app.logger.error(f"Failed to delete original file: {e}")
 
         # Create share record
         share_id = generate_share_id()
