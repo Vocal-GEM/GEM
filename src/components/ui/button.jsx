@@ -1,9 +1,15 @@
 import React from "react";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
+import LoadingSpinner from "./LoadingSpinner";
 
-const Button = React.forwardRef(({ className, variant, size, asChild = false, ...props }, ref) => {
+const Button = React.forwardRef(({ className, variant, size, asChild = false, isLoading = false, children, ...props }, ref) => {
   const Comp = asChild ? "span" : "button"; // Simple placeholder for Slot
+
+  // Determine if we should hide the text/children or show spinner alongside
+  // For 'icon' size, we usually want to replace the icon with the spinner
+  const isIcon = size === "icon";
+
   return (
     <Comp
       className={twMerge(clsx(
@@ -23,8 +29,22 @@ const Button = React.forwardRef(({ className, variant, size, asChild = false, ..
         className
       ))}
       ref={ref}
+      disabled={props.disabled || isLoading}
       {...props}
-    />
+    >
+      {isLoading ? (
+        <>
+          <LoadingSpinner
+            size="sm"
+            className={clsx(isIcon ? "mr-0" : "mr-2")}
+            label="Loading"
+          />
+          {!isIcon && children}
+        </>
+      ) : (
+        children
+      )}
+    </Comp>
   );
 });
 Button.displayName = "Button";
