@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
 from ..extensions import db
 from ..extensions import db, limiter
-from ..validators import validate_file_upload
+from ..validators import validate_file_upload, sanitize_html
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
     GroupChallenge, GroupChallengeParticipant, ModerationFlag,
@@ -263,20 +263,43 @@ def submit_success_story():
     """Submit a success story"""
     try:
         data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Invalid request data'}), 400
+
+        title = data.get('title', '')
+        content = data.get('story', '')
+        techniques = data.get('techniques_used', [])
+
+        # Input validation
+        if not title or not content:
+            return jsonify({'error': 'Title and story are required'}), 400
+
+        if len(title) > 200:
+            return jsonify({'error': 'Title exceeds 200 characters'}), 400
+
+        if len(content) > 5000:
+            return jsonify({'error': 'Story exceeds 5000 characters'}), 400
+
+        # Security: Sanitize inputs to prevent Stored XSS
+        clean_title = sanitize_html(title)
+        clean_story = sanitize_html(content)
+
+        clean_techniques = []
+        if isinstance(techniques, list):
+            clean_techniques = [sanitize_html(str(t)) for t in techniques]
 
         # Moderation check
-        is_safe, flagged = check_moderation(
-            data.get('title', '') + ' ' + data.get('story', ''))
+        is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
 
         story = SuccessStory(
             user_id=current_user.id,
-            title=data.get('title'),
-            story=data.get('story'),
+            title=clean_title,
+            story=clean_story,
             timeline_months=data.get('timeline_months'),
             voice_goal=data.get('voice_goal'),
             consent_public=data.get('consent_public', False),
             approved=is_safe,  # Auto-approve if passes moderation
-            techniques_used=data.get('techniques_used', [])
+            techniques_used=clean_techniques
         )
 
         db.session.add(story)
