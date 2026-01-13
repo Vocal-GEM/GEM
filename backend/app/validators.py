@@ -5,7 +5,7 @@ from email_validator import validate_email, EmailNotValidError
 ALLOWED_EXTENSIONS = {
     'audio': {'wav', 'mp3', 'ogg', 'm4a', 'flac', 'webm'},
     'image': {'jpg', 'jpeg', 'png', 'gif', 'webp'},
-    'document': {'pdf', 'txt', 'csv', 'json'}
+    'document': {'pdf', 'txt', 'csv', 'json', 'md'}
 }
 
 def validate_username(username):

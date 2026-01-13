@@ -37,7 +37,7 @@ def train_coach():
         
     if file:
         # Security: Validate file extension
-        is_valid, error = validate_file_upload(file.filename, allowed_extensions={'pdf', 'txt', 'md'})
+        is_valid, error = validate_file_upload(file.filename, allowed_types=['document'])
         if not is_valid:
             return jsonify({"error": error}), 400
 
