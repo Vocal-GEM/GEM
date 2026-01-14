@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { Wind, CheckCircle2, AlertTriangle, Info, Sparkles, Activity, HelpCircle } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * BreathinessMeter Component
@@ -29,6 +30,7 @@ const ZONES = [
 
 const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const { colorBlindMode } = useSettings();
+    const componentId = useId();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
     const zoneRef = useRef(null);
@@ -44,10 +46,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
 
     useEffect(() => {
         const loop = () => {
-            if (!dataRef.current) {
-                requestAnimationFrame(loop);
-                return;
-            }
+            if (!dataRef.current) return;
 
             const { breathinessGrbas, oq_percent, oq_zone, ventricular_detected, ventricular_severity, ventricular_feedback } = dataRef.current;
 
@@ -147,12 +146,16 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
                 }
             }
 
-            requestAnimationFrame(loop);
         };
 
-        // Start the animation loop
-        requestAnimationFrame(loop);
-    }, [dataRef, colorBlindMode]);
+        const unsubscribe = renderCoordinator.subscribe(
+            `BreathinessMeter-${componentId}`,
+            loop,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+
+        return () => unsubscribe();
+    }, [dataRef, colorBlindMode, componentId]);
 
     // Determine if in sweet spot for static rendering
     const breathinessGrbas = dataRef.current?.breathinessGrbas;
