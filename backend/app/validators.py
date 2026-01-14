@@ -1,5 +1,6 @@
 import re
 import bleach
+import filetype
 from email_validator import validate_email, EmailNotValidError
 
 ALLOWED_EXTENSIONS = {
@@ -68,10 +69,11 @@ def validate_email_address(email):
     except EmailNotValidError as e:
         return False, str(e)
 
-def validate_file_upload(filename, allowed_types=None):
+def validate_file_upload(filename, allowed_types=None, file_stream=None):
     """
-    Validates file extension against allowed types.
+    Validates file extension and content (magic numbers) against allowed types.
     allowed_types: list of categories ('audio', 'image', 'document') or None for all.
+    file_stream: (optional) file object/stream to check magic numbers
     """
     if not filename or '.' not in filename:
         return False, "Invalid filename"
@@ -91,5 +93,71 @@ def validate_file_upload(filename, allowed_types=None):
 
     if ext not in allowed:
          return False, f"File type '{ext}' not allowed"
-    
+
+    # Validate magic numbers if file_stream is provided
+    if file_stream:
+        # Read header to guess type
+        # Note: filetype.guess handles bytes or buffer.
+        # For FileStorage/stream, we might need to read a bit or rely on filetype handling it.
+        # filetype.guess does NOT advance the file pointer if it's a file path,
+        # but for a stream/bytes, it reads.
+
+        # We need to save the current position to reset it later
+        current_pos = file_stream.tell()
+
+        # Read first 2048 bytes (usually enough for magic numbers)
+        header = file_stream.read(2048)
+        file_stream.seek(current_pos) # Reset position immediately
+
+        kind = filetype.guess(header)
+
+        # If kind is None, filetype couldn't determine the type.
+        # This happens for text files (txt, csv, json, md) as they don't have magic numbers.
+        # We should skip magic number check for those or check if they are binary.
+
+        if kind:
+            # If we detected a type, ensure it matches the extension
+            # Note: kind.extension might not exactly match (e.g. jpeg vs jpg), so we check MIME or if it's in our allowed list
+
+            # Map of detected extension to our allowed extensions (if needed)
+            # But simpler: check if the detected extension is allowed.
+
+            # However, if I upload 'malware.exe' renamed to 'image.jpg':
+            # 1. ext is 'jpg' (allowed)
+            # 2. kind.extension is 'exe' (not allowed)
+            # So we must verify kind.extension is in allowed list OR matches the declared extension.
+
+            # But strictly speaking, we want to ensure the CONTENT matches the EXTENSION.
+            # So if ext is 'jpg', kind.extension should be 'jpg' or 'jpeg'.
+
+            detected_ext = kind.extension
+            if detected_ext == 'jpeg': detected_ext = 'jpg'
+
+            # Allow compatible types (e.g. m4a/mp4 usually detected as mp4)
+            if ext == 'm4a' and detected_ext == 'mp4':
+                pass
+            elif ext != detected_ext:
+                 # Check if detected type is also allowed?
+                 # If I rename a valid png to jpg, it's probably fine security-wise, but maybe confusing.
+                 # But if I rename exe to jpg, detected_ext will be exe (or not allowed).
+
+                 # Let's enforce that the detected type must be one of the ALLOWED types.
+                 if detected_ext not in allowed:
+                     return False, f"File content detected as '{detected_ext}', which is not allowed"
+
+                 # And arguably we should warn if it doesn't match the extension,
+                 # but for now let's just ensure the content is safe.
+        else:
+            # Could not determine type (likely text file or unknown binary)
+            # If extension implies binary (jpg, mp3, pdf), but we couldn't detect it, that's suspicious?
+            # txt, csv, json don't have magic numbers usually.
+
+            # List of extensions that SHOULD have magic numbers
+            binary_extensions = ALLOWED_EXTENSIONS['audio'] | ALLOWED_EXTENSIONS['image'] | {'pdf'}
+
+            if ext in binary_extensions:
+                # If we expect a binary file but filetype failed, it might be a corrupted file or a text file masquerading.
+                # We should reject this as suspicious for strictly binary formats.
+                return False, f"Could not determine file type for extension '{ext}' (possibly corrupted or invalid format)"
+
     return True, None
