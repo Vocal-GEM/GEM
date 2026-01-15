@@ -45,6 +45,7 @@ const SpectrogramMesh = ({ dataRef }) => {
 
     // Buffer for historical data
     const historyRef = useRef(new Float32Array(numCols * numRows));
+    const tempColor = useMemo(() => new THREE.Color(), []);
 
     useFrame(() => {
         if (!meshRef.current) return;
@@ -106,10 +107,10 @@ const SpectrogramMesh = ({ dataRef }) => {
                 // Color map: Blue -> Purple -> Red -> Yellow
                 const t = Math.min(1, val / 2); // Normalize somewhat
 
-                const color = new THREE.Color();
-                color.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
+                // Use shared tempColor to avoid creating new object every iteration
+                tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
 
-                colors.setXYZ(index, color.r, color.g, color.b);
+                colors.setXYZ(index, tempColor.r, tempColor.g, tempColor.b);
             }
         }
         colors.needsUpdate = true;
