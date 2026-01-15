@@ -4,19 +4,17 @@ from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
 from ..extensions import db
 from ..extensions import db, limiter
-from ..validators import validate_file_upload
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
     GroupChallenge, GroupChallengeParticipant, ModerationFlag,
     CommunityBenchmark,
 )
-from ..validators import validate_file_upload
 from datetime import datetime, timedelta
 import os
 import secrets
 import hashlib
 from werkzeug.utils import secure_filename
-from ..validators import validate_file_upload
+from ..validators import validate_file_upload, sanitize_html
 
 community_bp = Blueprint('community', __name__)
 
@@ -264,19 +262,30 @@ def submit_success_story():
     try:
         data = request.get_json()
 
+        # Security: Sanitize inputs to prevent Stored XSS
+        title = sanitize_html(data.get('title', ''))
+        story_content = sanitize_html(data.get('story', ''))
+
+        # Sanitize list items if present
+        techniques = data.get('techniques_used', [])
+        if isinstance(techniques, list):
+            techniques = [sanitize_html(str(t)) for t in techniques]
+        else:
+            techniques = []
+
         # Moderation check
         is_safe, flagged = check_moderation(
-            data.get('title', '') + ' ' + data.get('story', ''))
+            title + ' ' + story_content)
 
         story = SuccessStory(
             user_id=current_user.id,
-            title=data.get('title'),
-            story=data.get('story'),
+            title=title,
+            story=story_content,
             timeline_months=data.get('timeline_months'),
             voice_goal=data.get('voice_goal'),
             consent_public=data.get('consent_public', False),
             approved=is_safe,  # Auto-approve if passes moderation
-            techniques_used=data.get('techniques_used', [])
+            techniques_used=techniques
         )
 
         db.session.add(story)
