@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { Sun, Moon, Info, Smile } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * BrightnessMeter - Visual F2 brightness tracking with /i/ reference
@@ -15,7 +16,7 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
         f2Target: 2300
     });
     const [showTooltip, setShowTooltip] = useState(false);
-    const animationRef = useRef();
+    const componentId = useId();
 
     useEffect(() => {
         const update = () => {
@@ -41,12 +42,15 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
                     });
                 }
             }
-            animationRef.current = requestAnimationFrame(update);
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
-    }, [dataRef]);
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            update,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+        return unsubscribe;
+    }, [dataRef, componentId]);
 
     const getZoneColor = () => {
         switch (brightness.zone) {
