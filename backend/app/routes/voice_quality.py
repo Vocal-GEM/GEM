@@ -103,9 +103,8 @@ def clean_audio():
     except Exception as e:
         print(f"Cleaning error: {e}")
         # If we failed before send_file, clean up manually
-        if tmp_path and os.path.exists(tmp_path):
         # Manual cleanup on error since after_request might not run if we crash before return
-        if os.path.exists(tmp_path):
+        if tmp_path and os.path.exists(tmp_path):
             try:
                 os.remove(tmp_path)
             except:
@@ -117,6 +116,7 @@ def clean_audio():
 # ----------------------
 
 @voice_quality_bp.route('/api/voice-quality/manipulate', methods=['POST'])
+@limiter.limit("5 per minute")
 def manipulate_file():
     """
     Endpoint to shift pitch and formants of an uploaded file.
@@ -198,18 +198,6 @@ def manipulate_file():
                 os.remove(tmp_path)
             except:
                 pass
-        # Manual cleanup on error
-        if tmp_path and os.path.exists(tmp_path):
-             try:
-                os.remove(tmp_path)
-             except:
-                pass
-        if processed_path and os.path.exists(processed_path):
-             try:
-                os.remove(processed_path)
-             except:
-                pass
-        return jsonify({'error': str(e)}), 500
 
 @voice_quality_bp.route('/api/voice-quality/goals', methods=['GET'])
 def get_goals():
