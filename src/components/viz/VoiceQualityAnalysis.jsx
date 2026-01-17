@@ -78,6 +78,10 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
 
     const serviceRef = useRef(new QuadCoreAnalysisService());
     const [analysis, setAnalysis] = useState(null);
+    const componentId = useId();
+
+    const analyze = useCallback(() => {
+        if (dataRef.current) {
 
     // Generate unique component ID for RenderCoordinator
     const uniqueId = useId();
@@ -99,6 +103,9 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
         let unsubscribe;
 
         if (isAudioActive) {
+            unsubscribe = renderCoordinator.subscribe(
+                `VoiceQualityAnalysis-${componentId}`,
+                analyze,
             // Subscribe to RenderCoordinator instead of using internal RAF loop
             // Use LOW priority as this is UI analysis updates, not 60fps animation
             unsubscribe = renderCoordinator.subscribe(
@@ -111,6 +118,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
         return () => {
             if (unsubscribe) unsubscribe();
         };
+    }, [isAudioActive, componentId, analyze]);
     }, [isAudioActive, componentId, updateAnalysis]);
 
     return (
