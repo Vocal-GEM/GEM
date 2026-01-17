@@ -1,3 +1,9 @@
+import clsx from "clsx";
+import { twMerge } from "tailwind-merge";
+
+const LoadingSpinner = ({ size = "md", label = "Loading...", className }) => {
+  // Size controls dimensions
+  const dimensions = {
 import React from 'react';
 import { twMerge } from 'tailwind-merge';
 import clsx from 'clsx';
@@ -107,6 +113,17 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
       >
         {/* Track circle */}
         <div
+          className={clsx(
+            "absolute top-0 left-0 w-full h-full rounded-full border-slate-700 opacity-20",
+            borderThickness[size] || borderThickness.md,
+          )}
+        ></div>
+        {/* Spinning segment */}
+        <div
+          className={clsx(
+            "absolute top-0 left-0 w-full h-full border-t-blue-500 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
+            borderThickness[size] || borderThickness.md,
+          )}
           className={twMerge(clsx(
             "absolute top-0 left-0 w-full h-full rounded-full",
             trackColor,
