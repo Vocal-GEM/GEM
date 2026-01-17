@@ -3,6 +3,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import HighResSpectrogram from './HighResSpectrogram';
 import { SettingsProvider } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
+import { render, cleanup, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import HighResSpectrogram from './HighResSpectrogram';
+import { renderCoordinator } from '../../services/RenderCoordinator';
+import { SettingsProvider } from '../../context/SettingsContext';
 import React from 'react';
 
 // Mock dependencies
@@ -27,6 +32,14 @@ global.ResizeObserver = vi.fn(function() {
   this.unobserve = vi.fn();
   this.disconnect = vi.fn();
 });
+const mockSettings = {
+  spectrogramColorScheme: 'magma'
+};
+
+vi.mock('../../context/SettingsContext', () => ({
+  useSettings: () => ({ settings: mockSettings }),
+  SettingsProvider: ({ children }) => <div>{children}</div>
+}));
 
 // Mock Canvas getContext
 const mockContext = {
@@ -34,6 +47,8 @@ const mockContext = {
     data: { buffer: new ArrayBuffer(w * h * 4) },
     width: w,
     height: h
+    height: h,
+    width: w
   })),
   drawImage: vi.fn(),
   putImageData: vi.fn(),
@@ -45,6 +60,8 @@ const mockContext = {
   fillText: vi.fn(),
   canvas: { width: 800, height: 512 }
 };
+  scale: vi.fn(), // Added scale to mock
+}));
 
 HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext);
 
@@ -61,6 +78,31 @@ describe('HighResSpectrogram', () => {
     };
 
     // Element.prototype.getBoundingClientRect mock
+    Element.prototype.getBoundingClientRect = vi.fn(() => ({
+      width: 800,
+      height: 512,
+      top: 0,
+      left: 0,
+      right: 800,
+      bottom: 512,
+    }));
+
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+      current: {
+        spectrum: new Float32Array(1024).fill(0.5),
+        f1: 500,
+        f2: 1500
+      }
+    };
+
+    // Add getBoundingClientRect mock
     Element.prototype.getBoundingClientRect = vi.fn(() => ({
       width: 800,
       height: 512,
