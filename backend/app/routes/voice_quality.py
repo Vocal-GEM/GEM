@@ -21,7 +21,7 @@ def analyze():
         return jsonify({"error": "Empty filename."}), 400
 
     # Security: Validate file type (only audio allowed)
-    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'])
+    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'], file_stream=file)
     if not is_valid:
         return jsonify({"error": error}), 400
 
@@ -67,7 +67,7 @@ def clean_audio():
         return jsonify({'error': 'No selected file'}), 400
 
     # Security: Validate file type (only audio allowed)
-    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'])
+    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'], file_stream=file)
     if not is_valid:
         return jsonify({"error": error}), 400
 
@@ -134,7 +134,7 @@ def manipulate_file():
         return jsonify({'error': 'No selected file'}), 400
 
     # Security check
-    is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'])
+    is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'], file_stream=file)
     if not is_valid:
         return jsonify({"error": error_msg}), 400
         
@@ -194,6 +194,7 @@ def manipulate_file():
                 os.remove(processed_path)
              except:
                 pass
+        # Cleanup original temp file
         # Security: Do not expose internal error details to client
         print(f"Voice manipulation error: {e}")
         return jsonify({'error': 'An internal error occurred during voice manipulation.'}), 500
@@ -204,6 +205,7 @@ def manipulate_file():
                 os.remove(tmp_path)
             except:
                 pass
+        return jsonify({'error': str(e)}), 500
 
 @voice_quality_bp.route('/api/voice-quality/goals', methods=['GET'])
 def get_goals():
