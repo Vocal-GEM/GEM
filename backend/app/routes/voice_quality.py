@@ -47,7 +47,9 @@ def analyze():
         else:
             result = analyze_file(tmp_path, goal_name=goal_name)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        # Security: Do not expose internal error details to client
+        print(f"Voice quality analysis error: {e}")
+        return jsonify({"error": "An internal error occurred during voice quality analysis."}), 500
     finally:
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
@@ -109,7 +111,9 @@ def clean_audio():
                 os.remove(tmp_path)
             except:
                 pass
-        return jsonify({'error': str(e)}), 500
+        # Security: Do not expose internal error details to client
+        print(f"Voice cleaning error: {e}")
+        return jsonify({'error': 'An internal error occurred during audio cleaning.'}), 500
 
 # ----------------------
 # Voice Manipulation (Voice Lab / PSOLA)
@@ -190,7 +194,9 @@ def manipulate_file():
                 os.remove(processed_path)
              except:
                 pass
-        return jsonify({'error': str(e)}), 500
+        # Security: Do not expose internal error details to client
+        print(f"Voice manipulation error: {e}")
+        return jsonify({'error': 'An internal error occurred during voice manipulation.'}), 500
     finally:
         # Cleanup original temp file immediately (always safe as it's not the one being sent)
         if tmp_path and os.path.exists(tmp_path):

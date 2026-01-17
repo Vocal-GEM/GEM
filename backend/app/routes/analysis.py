@@ -353,7 +353,8 @@ def analyze_audio():
         print(f"Analysis error: {e}")
         import traceback
         traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
+        # Security: Do not expose internal error details to client
+        return jsonify({'error': 'An internal error occurred during analysis.'}), 500
         
     finally:
         # Clean up temp file
