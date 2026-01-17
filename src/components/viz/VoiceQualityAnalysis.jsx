@@ -110,6 +110,8 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
             // Subscribe to RenderCoordinator instead of using internal RAF loop
             // Use LOW priority as this is UI analysis updates, not 60fps animation
             unsubscribe = renderCoordinator.subscribe(
+                componentId,
+                analyze,
                 `VoiceQualityAnalysis-${componentId}`,
                 analyze,
             unsubscribe = renderCoordinator.subscribe(

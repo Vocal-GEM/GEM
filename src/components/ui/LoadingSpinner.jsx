@@ -5,7 +5,6 @@ import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
 const LoadingSpinner = ({ size = "md", label = "Loading...", className }) => {
-  // Size controls dimensions
   const dimensions = {
 import React from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -76,6 +75,7 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
     xl: "w-24 h-24",
   };
 
+  const borderThickness = {
   // Border width controls thickness
   const borderThickness = {
     xs: "border-2",
@@ -85,6 +85,9 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
     xl: "border-8",
   };
 
+  const containerClass = size === 'sm'
+    ? 'inline-flex h-auto min-h-0'
+    : 'flex h-full min-h-[200px]';
   // For 'sm' and 'xs', we usually want inline or small container.
   // For other sizes, default to the original min-height, but allow override via className
   const containerClass = (size === 'sm' || size === 'xs') ? 'h-auto min-h-0' : 'h-full min-h-[200px]';
@@ -103,6 +106,7 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
     <div
       className={twMerge(
         clsx(
+          "items-center justify-center w-full",
           "flex items-center justify-center w-full",
           containerClass,
           className,
