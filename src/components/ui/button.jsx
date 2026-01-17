@@ -1,13 +1,18 @@
 import React from "react";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
+import LoadingSpinner from "./LoadingSpinner";
 
-const Button = React.forwardRef(({ className, variant, size, asChild = false, ...props }, ref) => {
+const Button = React.forwardRef(({ className, variant, size, asChild = false, isLoading, children, disabled, ...props }, ref) => {
   const Comp = asChild ? "span" : "button"; // Simple placeholder for Slot
+  const isDisabled = isLoading || disabled;
+
   return (
     <Comp
       className={twMerge(clsx(
-        "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        // Apply disabled styles via class to support non-button elements or explicit loading state
+        isDisabled && "pointer-events-none opacity-50",
         {
           "bg-slate-900 text-slate-50 hover:bg-slate-900/90": variant === "default" || !variant,
           "bg-red-500 text-slate-50 hover:bg-red-500/90": variant === "destructive",
@@ -22,9 +27,24 @@ const Button = React.forwardRef(({ className, variant, size, asChild = false, ..
         },
         className
       ))}
+      disabled={isDisabled}
+      aria-disabled={isDisabled}
       ref={ref}
       {...props}
-    />
+    >
+      {isLoading ? (
+        size === "icon" ? (
+          <LoadingSpinner size="sm" variant="current" />
+        ) : (
+          <>
+            <LoadingSpinner size="xs" variant="current" className="mr-2" />
+            {children}
+          </>
+        )
+      ) : (
+        children
+      )}
+    </Comp>
   );
 });
 Button.displayName = "Button";

@@ -2,9 +2,10 @@ import React from 'react';
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
-const LoadingSpinner = ({ size = "md", label = "Loading...", className }) => {
+const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant = "default" }) => {
   // Size controls dimensions
   const dimensions = {
+    xs: "w-4 h-4",
     sm: "w-6 h-6",
     md: "w-12 h-12",
     lg: "w-16 h-16",
@@ -13,12 +14,23 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className }) => {
 
   // Border width controls thickness
   const borderThickness = {
+    xs: "border-2",
     sm: "border-2",
     md: "border-4",
     lg: "border-4",
     xl: "border-8",
   };
 
+  // For 'sm' and 'xs', we usually want inline or small container.
+  // For other sizes, default to the original min-height, but allow override via className
+  const containerClass = (size === 'sm' || size === 'xs') ? 'h-auto min-h-0' : 'h-full min-h-[200px]';
+
+  // Define color styles based on variant
+  // 'default' matches original hardcoded colors (slate track, blue spinner)
+  // 'current' uses currentColor for flexible styling (e.g. inside buttons)
+  const isCurrent = variant === 'current';
+  const trackColor = isCurrent ? "border-current opacity-20" : "border-slate-700 opacity-20";
+  const spinnerColor = isCurrent ? "border-t-current" : "border-t-blue-500";
   // For 'sm', we usually want inline or small container.
   // For other sizes, default to the original min-height, but allow override via className
   const containerClass = size === 'sm' ? 'h-auto min-h-0' : 'h-full min-h-[200px]';
@@ -40,17 +52,19 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className }) => {
       >
         {/* Track circle */}
         <div
-          className={clsx(
-            "absolute top-0 left-0 w-full h-full rounded-full border-slate-700 opacity-20",
+          className={twMerge(clsx(
+            "absolute top-0 left-0 w-full h-full rounded-full",
+            trackColor,
             borderThickness[size] || borderThickness.md,
-          )}
+          ))}
         ></div>
         {/* Spinning segment */}
         <div
-          className={clsx(
-            "absolute top-0 left-0 w-full h-full border-t-blue-500 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
+          className={twMerge(clsx(
+            "absolute top-0 left-0 w-full h-full border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
+            spinnerColor,
             borderThickness[size] || borderThickness.md,
-          )}
+          ))}
         ></div>
       </div>
       <span className="sr-only">{label}</span>
