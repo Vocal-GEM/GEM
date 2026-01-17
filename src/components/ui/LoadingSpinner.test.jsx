@@ -38,4 +38,9 @@ describe("LoadingSpinner", () => {
     rerender(<LoadingSpinner size="xl" />);
     expect(screen.getByRole("status")).toBeInTheDocument();
   });
+
+  it('overrides default min-height when custom class is provided', () => {
+      const { container } = render(<LoadingSpinner className="min-h-0" />);
+      expect(container.firstChild).toHaveClass('min-h-0');
+  });
 });

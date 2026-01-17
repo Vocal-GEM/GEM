@@ -62,6 +62,12 @@ describe('Toast Component', () => {
     const alert = screen.getByRole('alert');
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveAttribute('aria-live', 'assertive');
+    expect(alert).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText('Error:')).toHaveClass('sr-only');
+  });
+
+  it('has correct accessibility attributes for success type', () => {
+    render(<Toast message="Success!" type="success" onClose={() => {}} />);
     expect(screen.getByText('Warning:')).toHaveClass('sr-only');
   });
 
@@ -71,6 +77,8 @@ describe('Toast Component', () => {
     const status = screen.getByRole('status');
     expect(status).toBeInTheDocument();
     expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText('Success:')).toHaveClass('sr-only');
     expect(screen.getByText('Information:')).toHaveClass('sr-only');
   });
 
