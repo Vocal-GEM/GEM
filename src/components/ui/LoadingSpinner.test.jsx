@@ -39,8 +39,10 @@ describe("LoadingSpinner", () => {
     expect(screen.getByRole("status")).toBeInTheDocument();
   });
 
-  it('overrides default min-height when custom class is provided', () => {
-      const { container } = render(<LoadingSpinner className="min-h-0" />);
-      expect(container.firstChild).toHaveClass('min-h-0');
+  it("renders with current color variant", () => {
+    const { container } = render(<LoadingSpinner variant="current" />);
+    // Check if the spinner segment uses border-t-current
+    const spinnerSegment = container.querySelector('.border-t-current');
+    expect(spinnerSegment).toBeInTheDocument();
   });
 });
