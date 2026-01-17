@@ -1,11 +1,110 @@
 
-> vocal-gem@0.1.0 dev /app
+> vocal-gem@0.1.0 dev
 > vite
 
 
-  VITE v5.4.21  ready in 365 ms
+  VITE v5.4.21  ready in 488 ms
 
   ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
-7:22:59 AM [vite] page reload src/main.jsx
-7:23:05 AM [vite] hmr update /src/components/ui/ToastVerification.jsx, /src/index.css
+7:34:52 AM [vite] Pre-transform error: /app/src/components/ui/Toast.jsx: 'import' and 'export' may only appear at the top level. (13:0)
+
+  11 |   className
+  12 | }) => {
+> 13 | import { twMerge } from 'tailwind-merge';
+     | ^
+  14 | import clsx from 'clsx';
+  15 |
+  16 | const Toast = ({ message, type = 'success', onClose, duration = 3000, className }) => {
+Error:   Failed to scan for dependencies from entries:
+  /app/index.html
+/app/ios/App/App/public/index.html
+
+  [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mUnexpected "{"[0m
+
+    src/components/ui/Toast.jsx:13:7:
+[37m      13 │ import [32m{[37m twMerge } from 'tailwind-merge';
+         ╵        [32m^[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useEffect" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:2:9:
+[37m      2 │ import { [32museEffect[37m, useRef, useState, useId, useCallback } from 're...
+        ╵          [32m~~~~~~~~~[0m
+
+  The symbol "useEffect" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:1:9:
+[37m      1 │ import { [32museEffect[37m, useRef, useState, useId } from 'react';
+        ╵          [32m~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useRef" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:2:20:
+[37m      2 │ import { useEffect, [32museRef[37m, useState, useId, useCallback } from 're...
+        ╵                     [32m~~~~~~[0m
+
+  The symbol "useRef" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:1:20:
+[37m      1 │ import { useEffect, [32museRef[37m, useState, useId } from 'react';
+        ╵                     [32m~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useState" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:2:28:
+[37m      2 │ import { useEffect, useRef, [32museState[37m, useId, useCallback } from 're...
+        ╵                             [32m~~~~~~~~[0m
+
+  The symbol "useState" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:1:28:
+[37m      1 │ import { useEffect, useRef, [32museState[37m, useId } from 'react';
+        ╵                             [32m~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useId" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:2:38:
+[37m      2 │ ...t { useEffect, useRef, useState, [32museId[37m, useCallback } from 'react';
+        ╵                                     [32m~~~~~[0m
+
+  The symbol "useId" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:1:38:
+[37m      1 │ import { useEffect, useRef, useState, [32museId[37m } from 'react';
+        ╵                                       [32m~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected ")" but found ";"[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:144:13:
+[37m      144 │             )[32m;[37m
+          │              [32m^[37m
+          ╵              [32m)[0m
+
+
+    at failureErrorWithLog (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:1472:15)
+    at /app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:945:25
+    at runOnEndCallbacks (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:1315:45)
+    at buildResponseToResult (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:943:7)
+    at /app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:955:9
+    at new Promise (<anonymous>)
+    at requestCallbacks.on-end (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:954:54)
+    at handleRequest (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:647:17)
+    at handleIncomingPacket (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:672:7)
+    at Socket.readFromStdout (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:600:7)
+    at Socket.emit (node:events:519:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+7:36:23 AM [vite] page reload src/components/viz/VoiceQualityAnalysis.jsx
+npm notice
+npm notice New minor version of npm available! 11.6.2 -> 11.7.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.7.0
+npm notice To update run: npm install -g npm@11.7.0
+npm notice
