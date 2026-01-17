@@ -1,13 +1,5 @@
-import { render, cleanup } from '@testing-library/react';
+import { render, cleanup, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import HighResSpectrogram from './HighResSpectrogram';
-import { render, screen, cleanup, act } from '@testing-library/react';
-import { render, cleanup } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import HighResSpectrogram from './HighResSpectrogram';
-import { SettingsProvider } from '../../context/SettingsContext';
-import { renderCoordinator } from '../../services/RenderCoordinator';
-import React from 'react';
 import HighResSpectrogram from './HighResSpectrogram';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import { SettingsProvider } from '../../context/SettingsContext';
@@ -22,14 +14,6 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Mock SettingsContext
-vi.mock('../../context/SettingsContext', () => ({
-  useSettings: () => ({
-    settings: { spectrogramColorScheme: 'inferno' }
-  }),
-  SettingsProvider: ({ children }) => <div>{children}</div>
-}));
-
-// Mock Canvas
 const mockSettings = {
   spectrogramColorScheme: 'magma'
 };
@@ -45,12 +29,6 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     data: { buffer: new ArrayBuffer(w * h * 4) },
     height: h,
     width: w
-  createImageData: vi.fn(() => ({
-    data: { buffer: new ArrayBuffer(800 * 512 * 4) },
-    width: 800,
-    height: 512
-    height: 512,
-    width: 2
   })),
   drawImage: vi.fn(),
   putImageData: vi.fn(),
@@ -61,7 +39,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   canvas: { width: 800, height: 512 },
   fillRect: vi.fn(),
   fillText: vi.fn(),
-  canvas: { width: 800, height: 512 }
+  scale: vi.fn(), // Added scale to mock
 }));
 
 // Mock URL.createObjectURL for screenshot test
@@ -71,7 +49,14 @@ describe('HighResSpectrogram', () => {
   let dataRef;
 
   beforeEach(() => {
-    dataRef = { current: { spectrum: new Float32Array(1024), f1: 0, f2: 0 } };
+    dataRef = {
+      current: {
+        spectrum: new Float32Array(1024).fill(0.5),
+        f1: 500,
+        f2: 1500
+      }
+    };
+
     // Add getBoundingClientRect mock
     Element.prototype.getBoundingClientRect = vi.fn(() => ({
       width: 800,
@@ -81,60 +66,8 @@ describe('HighResSpectrogram', () => {
       right: 800,
       bottom: 512,
     }));
-    dataRef = {
-        current: {
-            spectrum: new Float32Array(1024).fill(0.5),
-            f1: 500,
-            f2: 1500
-        }
-    };
-      current: {
-        spectrum: new Float32Array(1024).fill(0.5),
-        f1: 500,
-        f2: 1500
-      }
-    };
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    cleanup();
-  });
 
     vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    cleanup();
-    vi.clearAllMocks();
-  });
-
-  it('subscribes to RenderCoordinator on mount', () => {
-  it('renders successfully', () => {
-    render(
-      <SettingsProvider>
-        <HighResSpectrogram dataRef={dataRef} />
-      </SettingsProvider>
-    );
-
-    expect(renderCoordinator.subscribe).toHaveBeenCalled();
-  });
-
-  it('subscribes with correct priority', () => {
-    // Check if component rendered (by looking for overlay text)
-    expect(screen.getByText(/High-Res Spectrogram/i)).toBeDefined();
-    // Implicit assertion: no error thrown
-        <SettingsProvider>
-            <HighResSpectrogram dataRef={dataRef} />
-        </SettingsProvider>
-    );
-    // Implicit assertion: no error thrown
-      <SettingsProvider>
-        <HighResSpectrogram dataRef={dataRef} />
-      </SettingsProvider>
-    );
-
-    expect(renderCoordinator.subscribe).toHaveBeenCalled();
   });
 
   afterEach(() => {

@@ -82,6 +82,13 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
 
     const analyze = useCallback(() => {
         if (dataRef.current) {
+
+    // Generate unique component ID for RenderCoordinator
+    const uniqueId = useId();
+    const componentId = `VoiceQualityAnalysis-${uniqueId}`;
+
+    const updateAnalysis = useCallback(() => {
+        if (dataRef.current && isAudioActive) {
             const results = serviceRef.current.analyze(dataRef.current, {
                 targetF2: 2000 // Default to neutral/chem until calibration is fuller
             });
@@ -90,7 +97,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                 setAnalysis(results);
             }
         }
-    }, [dataRef]);
+    }, [isAudioActive, dataRef]);
 
     useEffect(() => {
         let unsubscribe;
@@ -99,6 +106,11 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
             unsubscribe = renderCoordinator.subscribe(
                 `VoiceQualityAnalysis-${componentId}`,
                 analyze,
+            // Subscribe to RenderCoordinator instead of using internal RAF loop
+            // Use LOW priority as this is UI analysis updates, not 60fps animation
+            unsubscribe = renderCoordinator.subscribe(
+                componentId,
+                updateAnalysis,
                 renderCoordinator.PRIORITY.LOW
             );
         }
@@ -107,6 +119,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
             if (unsubscribe) unsubscribe();
         };
     }, [isAudioActive, componentId, analyze]);
+    }, [isAudioActive, componentId, updateAnalysis]);
 
     return (
         <div className="bg-slate-900/50 rounded-2xl p-4 sm:p-6 border border-white/5 h-full flex flex-col">
