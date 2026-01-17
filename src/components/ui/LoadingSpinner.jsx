@@ -31,6 +31,9 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
   const isCurrent = variant === 'current';
   const trackColor = isCurrent ? "border-current opacity-20" : "border-slate-700 opacity-20";
   const spinnerColor = isCurrent ? "border-t-current" : "border-t-blue-500";
+  // For 'sm', we usually want inline or small container.
+  // For other sizes, default to the original min-height, but allow override via className
+  const containerClass = size === 'sm' ? 'h-auto min-h-0' : 'h-full min-h-[200px]';
 
   return (
     <div

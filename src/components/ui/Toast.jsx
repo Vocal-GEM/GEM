@@ -43,6 +43,10 @@ const Toast = ({ message, type = 'success', onClose, duration = 3000 }) => {
       live: 'polite',
       label: 'Information'
     },
+    success: { bg: 'bg-green-500/10 border-green-500/50', text: 'text-green-400', icon: CheckCircle, role: 'status', live: 'polite', label: 'Success' },
+    error: { bg: 'bg-red-500/10 border-red-500/50', text: 'text-red-400', icon: XCircle, role: 'alert', live: 'assertive', label: 'Error' },
+    warning: { bg: 'bg-yellow-500/10 border-yellow-500/50', text: 'text-yellow-400', icon: AlertTriangle, role: 'alert', live: 'assertive', label: 'Warning' },
+    info: { bg: 'bg-blue-500/10 border-blue-500/50', text: 'text-blue-400', icon: Info, role: 'status', live: 'polite', label: 'Information' },
   };
 
   const style = styles[type] || styles.success;
