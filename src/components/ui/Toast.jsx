@@ -1,5 +1,15 @@
 import React, { useEffect } from 'react';
 import { X, CheckCircle, AlertTriangle, Info, XCircle } from 'lucide-react';
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+const Toast = ({
+  message,
+  type = 'success',
+  onClose,
+  duration = 3000,
+  className
+}) => {
 import { twMerge } from 'tailwind-merge';
 import clsx from 'clsx';
 
@@ -46,6 +56,8 @@ const Toast = ({ message, type = 'success', onClose, duration = 3000, className 
       bg: 'bg-blue-500/10 border-blue-500/50',
       text: 'text-blue-400',
       icon: Info,
+      label: 'Information'
+    },
       role: 'status',
       live: 'polite',
       label: 'Information'
@@ -59,6 +71,8 @@ const Toast = ({ message, type = 'success', onClose, duration = 3000, className 
   const style = styles[type] || styles.success;
   const Icon = style.icon;
 
+  // UX/A11y Logic: Determine role and aria-live based on toast type
+  // Errors and warnings are alerts (assertive), success/info are status updates (polite)
   return (
     <div
       className={`fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[100] flex items-center gap-3 px-6 py-4 rounded-xl border backdrop-blur-md shadow-xl animate-in fade-in slide-in-from-bottom-4 ${style.bg}`}
@@ -66,9 +80,13 @@ const Toast = ({ message, type = 'success', onClose, duration = 3000, className 
       aria-live={style.live}
       aria-atomic="true"
   const isAlert = type === 'error' || type === 'warning';
+  const role = isAlert ? 'alert' : 'status';
+  const ariaLive = isAlert ? 'assertive' : 'polite';
 
   return (
     <div
+      role={role}
+      aria-live={ariaLive}
       role={isAlert ? 'alert' : 'status'}
       aria-live={isAlert ? 'assertive' : 'polite'}
       aria-atomic="true"
@@ -93,7 +111,26 @@ const Toast = ({ message, type = 'success', onClose, duration = 3000, className 
       role={style.role}
       aria-live={style.live}
       aria-atomic="true"
+      className={twMerge(
+        clsx(
+          "fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[100]",
+          "flex items-center gap-3 px-6 py-4 rounded-xl border backdrop-blur-md shadow-xl",
+          "animate-in fade-in slide-in-from-bottom-4",
+          style.bg,
+          className
+        )
+      )}
     >
+      <Icon className={clsx("w-5 h-5", style.text)} aria-hidden="true" />
+      <span className="sr-only">{style.label}: </span>
+      <span className={clsx("font-medium", style.text)}>{message}</span>
+      <button
+        onClick={onClose}
+        className={clsx(
+          "ml-2 hover:opacity-70 p-1 rounded-full",
+          "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-current",
+          style.text
+        )}
       <Icon className={`w-5 h-5 ${style.text}`} aria-hidden="true" />
       <span className="sr-only">{style.label}: </span>
       <span className={`font-medium ${style.text}`}>{message}</span>

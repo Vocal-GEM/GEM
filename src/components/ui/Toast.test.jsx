@@ -56,6 +56,34 @@ describe('Toast Component', () => {
     expect(screen.getByText('Success:')).toHaveClass('sr-only');
   });
 
+  it('has correct accessibility attributes for warning type', () => {
+    render(<Toast message="Warning!" type="warning" onClose={() => {}} />);
+
+    const alert = screen.getByRole('alert');
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute('aria-live', 'assertive');
+    expect(screen.getByText('Warning:')).toHaveClass('sr-only');
+  });
+
+  it('has correct accessibility attributes for info type', () => {
+    render(<Toast message="Info!" type="info" onClose={() => {}} />);
+
+    const status = screen.getByRole('status');
+    expect(status).toBeInTheDocument();
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getByText('Information:')).toHaveClass('sr-only');
+  });
+
+  it('applies custom className', () => {
+    render(<Toast message="Test" className="custom-class" onClose={() => {}} />);
+    const toast = screen.getByRole('status');
+    expect(toast).toHaveClass('custom-class');
+  });
+
+  it('close button has accessible label', () => {
+    render(<Toast message="Test" onClose={() => {}} />);
+    expect(screen.getByRole('button', { name: /close notification/i })).toBeInTheDocument();
+  });
   it('close button has accessible label', () => {
     render(<Toast message="Test" onClose={() => {}} />);
     expect(screen.getByRole('button', { name: /close notification/i })).toBeInTheDocument();
