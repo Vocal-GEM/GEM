@@ -1,3 +1,39 @@
+import React from 'react';
+import { twMerge } from 'tailwind-merge';
+import clsx from 'clsx';
+
+const LoadingSpinner = ({
+  size = 'md',
+  label = 'Loading...',
+  className
+}) => {
+  const dimensions = {
+    sm: 'w-6 h-6',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16',
+    xl: 'w-24 h-24'
+  };
+
+  const borderThickness = {
+    sm: 'border-2',
+    md: 'border-4',
+    lg: 'border-4',
+    xl: 'border-8'
+  };
+
+  // For 'sm', we usually want inline behavior (like in a button).
+  // For other sizes, default to a larger container but allow override.
+  const defaultLayout = size === 'sm' ? 'inline-flex min-h-0' : 'flex w-full h-full min-h-[200px]';
+
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className={twMerge(clsx(
+        "items-center justify-center",
+        defaultLayout,
+        className
+      ))}
 import React from "react";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -124,6 +160,8 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
         {/* Track circle */}
         <div
           className={clsx(
+            "absolute top-0 left-0 w-full h-full rounded-full border-slate-700 opacity-20",
+            borderThickness[size] || borderThickness.md
             "absolute top-0 left-0 w-full h-full rounded-full",
             trackColor,
             borderThickness[size] || borderThickness.md
@@ -139,6 +177,7 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
               borderThickness[size] || borderThickness.md
             )
           className={clsx(
+            "absolute top-0 left-0 w-full h-full border-t-blue-500 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
             "absolute top-0 left-0 w-full h-full border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
             spinnerColor,
             borderThickness[size] || borderThickness.md
