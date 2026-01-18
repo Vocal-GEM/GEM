@@ -23,6 +23,9 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
     xl: "border-8",
   };
 
+  // For 'sm', we usually want inline or small container.
+  // For other sizes, default to the original min-height, but allow override via className
+  const defaultMinHeight = size === "sm" ? "min-h-0" : "min-h-[200px]";
   // For 'sm' and 'xs', we usually want inline or small container.
   // For other sizes, default to the original min-height, but allow override via className
   const containerClass = (size === 'sm' || size === 'xs') ? 'inline-flex h-auto min-h-0' : 'flex h-full min-h-[200px]';
@@ -54,6 +57,12 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
       aria-live="polite"
       className={twMerge(
         clsx(
+          "flex items-center justify-center w-full",
+          // Default min-height for visibility, can be overridden by className
+          "h-full",
+          defaultMinHeight,
+          className,
+        ),
           containerBase,
           containerSize,
           className
