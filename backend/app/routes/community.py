@@ -97,7 +97,7 @@ def share_voice():
         if not is_valid:
             return jsonify({'error': error}), 400
 
-        context = request.form.get('context', '')
+        context = sanitize_html(request.form.get('context', ''))
         expiration_days = int(request.form.get('expiration_days', 7))
         
         # Save original file
@@ -254,6 +254,11 @@ def submit_success_story():
     try:
         data = request.get_json()
 
+        # Sanitize inputs
+        title = sanitize_html(data.get('title', ''))
+        story_content = sanitize_html(data.get('story', ''))
+
+        # Sanitize techniques list
         # Security: Sanitize inputs to prevent Stored XSS
         title = sanitize_html(data.get('title', ''))
         story_content = sanitize_html(data.get('story', ''))
@@ -273,6 +278,8 @@ def submit_success_story():
         else:
             techniques = []
 
+        # Moderation check
+        is_safe, flagged = check_moderation(title + ' ' + story_content)
         # Moderation check
         is_safe, flagged = check_moderation(title + ' ' + story_text)
         # Moderation check
@@ -470,7 +477,7 @@ def request_connection():
         data = request.get_json()
         connection_id = data.get('connection_id')
         connection_type = data.get('connection_type', 'pen_pal')
-        message = data.get('message', '')
+        message = sanitize_html(data.get('message', ''))
 
         if not connection_id:
             return jsonify({'error': 'Connection ID required'}), 400
