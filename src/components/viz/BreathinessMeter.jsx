@@ -2,6 +2,7 @@ import { useEffect, useRef, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Wind, CheckCircle2, AlertTriangle, Info, Sparkles, Activity, HelpCircle } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * BreathinessMeter Component
@@ -30,6 +31,7 @@ const ZONES = [
 
 const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const { colorBlindMode } = useSettings();
+    const componentId = useId();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
     const zoneRef = useRef(null);
@@ -47,6 +49,8 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
 
     // Optimized: Use RenderCoordinator to manage animation loop
     useEffect(() => {
+        const loop = () => {
+            if (!dataRef.current) return;
         const loop = (delta, currentTime) => {
             if (!dataRef.current) {
                 return;
@@ -153,6 +157,13 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
         };
 
         const unsubscribe = renderCoordinator.subscribe(
+            `BreathinessMeter-${componentId}`,
+            loop,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+
+        return () => unsubscribe();
+    }, [dataRef, colorBlindMode, componentId]);
             `breathiness-meter-${componentId}`,
         };
 

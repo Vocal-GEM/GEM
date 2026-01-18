@@ -1,3 +1,5 @@
+import { render, cleanup } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, cleanup, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
@@ -9,6 +11,7 @@ import { SettingsProvider } from '../../context/SettingsContext';
 vi.mock('../../services/RenderCoordinator', () => ({
   renderCoordinator: {
     subscribe: vi.fn(() => vi.fn()),
+    PRIORITY: { MEDIUM: 2, LOW: 3 }
     PRIORITY: { CRITICAL: 0, MEDIUM: 2 }
   }
 }));
@@ -20,6 +23,20 @@ vi.mock('../../context/SettingsContext', () => ({
   SettingsProvider: ({ children }) => <div>{children}</div>
 }));
 
+// Mock lucide-react
+vi.mock('lucide-react', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    Wind: () => <div data-testid="icon-wind" />,
+    CheckCircle2: () => <div data-testid="icon-check" />,
+    AlertTriangle: () => <div data-testid="icon-alert" />,
+    Info: () => <div data-testid="icon-info" />,
+    Sparkles: () => <div data-testid="icon-sparkles" />,
+    Activity: () => <div data-testid="icon-activity" />,
+    HelpCircle: () => <div data-testid="icon-help" />
+  };
+});
 // Mock Lucide icons
 vi.mock('lucide-react', () => ({
   Wind: () => <div data-testid="icon-wind" />,
@@ -35,6 +52,8 @@ describe('BreathinessMeter', () => {
   let dataRef;
 
   beforeEach(() => {
+    dataRef = { current: { breathinessGrbas: { composite_score: 50 }, oq_percent: 50 } };
+    vi.clearAllMocks();
     dataRef = {
       current: {
         breathinessGrbas: { composite_score: 40 },
@@ -49,6 +68,9 @@ describe('BreathinessMeter', () => {
 
   afterEach(() => {
     cleanup();
+  });
+
+  it('subscribes to RenderCoordinator on mount', () => {
     vi.clearAllMocks();
     vi.unstubAllGlobals();
   });
@@ -60,6 +82,12 @@ describe('BreathinessMeter', () => {
       </SettingsProvider>
     );
 
+    expect(renderCoordinator.subscribe).toHaveBeenCalled();
+    const [, , priority] = renderCoordinator.subscribe.mock.calls[0];
+    expect(priority).toBe(renderCoordinator.PRIORITY.MEDIUM);
+  });
+
+  it('unsubscribes on unmount', () => {
     await waitFor(() => {
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
     });
