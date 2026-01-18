@@ -75,6 +75,11 @@ const FeedbackBanner = ({ feedback }) => {
 };
 
 const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioActive }) => {
+    // Ensure useProfile is called if needed
+    useProfile();
+
+    const serviceRef = useRef(new QuadCoreAnalysisService());
+    const [analysis, setAnalysis] = useState(null);
     useProfile(); // Keep if needed for side effects or future use, though currently unused variables are ignored
 
     const serviceRef = useRef(new QuadCoreAnalysisService());
