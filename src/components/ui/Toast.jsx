@@ -44,6 +44,8 @@ const Toast = ({
       bg: 'bg-green-500/10 border-green-500/50',
       text: 'text-green-400',
       icon: CheckCircle,
+      role: 'status',
+      label: 'Success',
       label: 'Success'
     success: { bg: 'bg-green-500/10 border-green-500/50', text: 'text-green-400', icon: CheckCircle, label: 'Success' },
     error: { bg: 'bg-red-500/10 border-red-500/50', text: 'text-red-400', icon: XCircle, label: 'Error' },
@@ -85,6 +87,8 @@ const Toast = ({
       bg: 'bg-red-500/10 border-red-500/50',
       text: 'text-red-400',
       icon: XCircle,
+      role: 'alert',
+      label: 'Error',
       label: 'Error'
       role: 'alert',
       label: 'Error',
@@ -95,6 +99,8 @@ const Toast = ({
       bg: 'bg-yellow-500/10 border-yellow-500/50',
       text: 'text-yellow-400',
       icon: AlertTriangle,
+      role: 'alert',
+      label: 'Warning',
       label: 'Warning'
       role: 'alert',
       label: 'Warning',
@@ -105,6 +111,10 @@ const Toast = ({
       bg: 'bg-blue-500/10 border-blue-500/50',
       text: 'text-blue-400',
       icon: Info,
+      role: 'status',
+      label: 'Information',
+      live: 'polite'
+    },
       label: 'Information'
     },
       role: 'status',
