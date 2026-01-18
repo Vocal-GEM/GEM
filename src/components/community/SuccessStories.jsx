@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Pause, Heart, MessageCircle, Mic, Star } from 'lucide-react';
+import { Play, Pause, Heart } from 'lucide-react';
 import CommunityService from '../../services/CommunityService';
 import ModerationService from '../../services/ModerationService';
+import Toast from '../ui/Toast';
+import { Button } from '../ui/button';
 
 const AudioPlayerResult = ({ src, label }) => {
     const [playing, setPlaying] = useState(false);
@@ -27,6 +29,7 @@ const AudioPlayerResult = ({ src, label }) => {
         <button
             onClick={toggle}
             className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 rounded-full px-3 py-1.5 text-xs transition-colors"
+            aria-label={`${playing ? 'Pause' : 'Play'} ${label} audio`}
         >
             {playing ? <Pause size={12} className="text-purple-400" /> : <Play size={12} className="text-purple-400" />}
             <span className="text-slate-300">{label}</span>
@@ -34,19 +37,40 @@ const AudioPlayerResult = ({ src, label }) => {
     );
 };
 
+const getMockStories = () => [
+    {
+        id: 1,
+        title: "Finally found my authentic voice",
+        story: "After 8 months of daily practice, I can finally speak on the phone without anxiety. The pitch monitor was a game changer for me.",
+        voice_goal: "feminine",
+        timeline_months: 8,
+        upvotes: 42,
+        before_audio: "mock_url",
+        after_audio: "mock_url",
+        created_at: new Date().toISOString()
+    },
+    {
+        id: 2,
+        title: "Consistency is key!",
+        story: "I struggled with resonance for the longest time. Using the 'brightness' exercises really helped me unlock a cleaner sound.",
+        voice_goal: "masculine",
+        timeline_months: 5,
+        upvotes: 28,
+        created_at: new Date().toISOString()
+    }
+];
+
 const SuccessStories = () => {
     const [stories, setStories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [toast, setToast] = useState(null);
 
     // Form state
     const [formData, setFormData] = useState({ title: '', story: '', voice_goal: 'feminine', timeline_months: 6 });
 
-    useEffect(() => {
-        loadStories();
-    }, []);
-
-    const loadStories = async () => {
+    const loadStories = React.useCallback(async () => {
         setLoading(true);
         try {
             const data = await CommunityService.getSuccessStories();
@@ -61,49 +85,34 @@ const SuccessStories = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    const getMockStories = () => [
-        {
-            id: 1,
-            title: "Finally found my authentic voice",
-            story: "After 8 months of daily practice, I can finally speak on the phone without anxiety. The pitch monitor was a game changer for me.",
-            voice_goal: "feminine",
-            timeline_months: 8,
-            upvotes: 42,
-            before_audio: "mock_url",
-            after_audio: "mock_url",
-            created_at: new Date().toISOString()
-        },
-        {
-            id: 2,
-            title: "Consistency is key!",
-            story: "I struggled with resonance for the longest time. Using the 'brightness' exercises really helped me unlock a cleaner sound.",
-            voice_goal: "masculine",
-            timeline_months: 5,
-            upvotes: 28,
-            created_at: new Date().toISOString()
-        }
-    ];
+    useEffect(() => {
+        loadStories();
+    }, [loadStories]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const check = ModerationService.preCheckContent(formData.title + ' ' + formData.story);
-        if (!check.safe) {
-            alert('Your story contains flagged words. Please revise.');
-            return;
-        }
+        setIsSubmitting(true);
 
         try {
+            const check = ModerationService.preCheckContent(formData.title + ' ' + formData.story);
+            if (!check.safe) {
+                setToast({ message: 'Your story contains flagged words. Please revise.', type: 'warning' });
+                return;
+            }
+
             await CommunityService.submitSuccessStory({
                 ...formData,
                 consent_public: true
             });
             setShowForm(false);
-            alert('Story submitted for review!');
+            setToast({ message: 'Story submitted for review!', type: 'success' });
             loadStories();
         } catch (error) {
-            alert('Failed to submit story');
+            setToast({ message: 'Failed to submit story', type: 'error' });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -173,12 +182,24 @@ const SuccessStories = () => {
                         </div>
 
                         <div className="pt-2">
-                            <button type="submit" className="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded-lg font-medium">
+                            <Button
+                                type="submit"
+                                isLoading={isSubmitting}
+                                className="bg-green-600 hover:bg-green-500 text-white w-full sm:w-auto"
+                            >
                                 Submit Story
-                            </button>
+                            </Button>
                         </div>
                     </form>
                 </motion.div>
+            )}
+
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -192,7 +213,7 @@ const SuccessStories = () => {
                         </div>
 
                         <p className="text-slate-400 text-sm mb-4 line-clamp-3 leading-relaxed">
-                            "{story.story}"
+                            &quot;{story.story}&quot;
                         </p>
 
                         <div className="flex items-center gap-3 mb-4">
