@@ -139,6 +139,10 @@ const Toast = ({
 
   return (
     <div
+      role={isAlert ? 'alert' : 'status'}
+      aria-live={isAlert ? 'assertive' : 'polite'}
+      aria-atomic="true"
+      className={`fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[100] flex items-center gap-3 px-6 py-4 rounded-xl border backdrop-blur-md shadow-xl animate-in fade-in slide-in-from-bottom-4 ${style.bg}`}
       role={style.role}
       aria-live={isAlert ? 'assertive' : 'polite'}
   return (
@@ -209,6 +213,7 @@ const Toast = ({
       <span className={`font-medium ${style.text}`}>{message}</span>
       <button
         onClick={onClose}
+        className={`ml-2 hover:opacity-70 ${style.text} p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-current`}
         className={clsx(
           "ml-2 hover:opacity-70 p-1 rounded-full transition-opacity",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 focus-visible:ring-current",

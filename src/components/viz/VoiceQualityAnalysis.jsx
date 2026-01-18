@@ -5,6 +5,8 @@ import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService'
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import { useProfile } from '../../context/ProfileContext';
 
+// Optional: import { useProfile } from '../../context/ProfileContext';
+
 const QuadCoreCard = ({ icon: Icon, title, score, label, value, color, unit }) => (
     <div className="bg-slate-800/50 rounded-xl p-3 border border-white/5 relative overflow-hidden group hover:bg-slate-800/80 transition-colors">
         <div className="flex items-center gap-2 mb-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
@@ -75,6 +77,17 @@ const FeedbackBanner = ({ feedback }) => {
 };
 
 const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioActive }) => {
+    // const { activeProfile } = useProfile(); // Commented out as import was missing in original
+    const serviceRef = useRef(new QuadCoreAnalysisService());
+    const [analysis, setAnalysis] = useState(null);
+
+    // Generate unique component ID for RenderCoordinator
+    const uniqueId = useId();
+    // Sanitize ID for RenderCoordinator (remove colons)
+    const componentId = `VoiceQualityAnalysis-${uniqueId.replace(/:/g, '')}`;
+
+    const updateAnalysis = useCallback(() => {
+        if (dataRef.current && isAudioActive) {
     // Ensure useProfile is called if needed
     useProfile();
 
@@ -116,6 +129,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                 setAnalysis(results);
             }
         }
+    }, [dataRef, isAudioActive]);
     }, [isAudioActive, dataRef]);
 
     useEffect(() => {

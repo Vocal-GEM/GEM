@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
+from ..validators import validate_file_upload
 from ..extensions import db
 from ..extensions import db, limiter
 from ..validators import validate_file_upload, sanitize_html
@@ -91,6 +92,8 @@ def share_voice():
         audio_file = request.files['audio']
 
         # Security: Validate file type
+        is_valid, error = validate_file_upload(
+            audio_file.filename, allowed_types=['audio'])
         is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
         is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'], file_stream=audio_file)
         if not is_valid:
@@ -99,17 +102,24 @@ def share_voice():
         context = sanitize_html(request.form.get('context', ''))
         expiration_days = int(request.form.get('expiration_days', 7))
 
+        # Save original file
         
         # Save original file temporarily
         upload_folder = current_app.config.get(
             'UPLOAD_FOLDER', 'uploads/shared')
         os.makedirs(upload_folder, exist_ok=True)
-        
+
         # Security: Use secure_filename to prevent path traversal/bad characters
         safe_filename = secure_filename(audio_file.filename)
         filename = f"{current_user.id}_{datetime.now().timestamp()}_{safe_filename}"
+
         filepath = os.path.join(upload_folder, filename)
 
+        # Anonymize audio
+        try:
+            anon_filepath = anonymize_audio(filepath)
+        finally:
+            # Ensure original is deleted for privacy
         try:
             audio_file.save(filepath)
 
@@ -121,6 +131,7 @@ def share_voice():
                 try:
                     os.remove(filepath)
                 except Exception as e:
+                    current_app.logger.error(f"Failed to delete original file: {e}")
                     current_app.logger.error(f"Failed to remove temp file {filepath}: {str(e)}")
 
         # Create share record

@@ -89,6 +89,13 @@ describe('HighResSpectrogram', () => {
       bottom: 512,
     }));
 
+    dataRef = {
+      current: {
+        spectrum: new Float32Array(1024).fill(0.5),
+        f1: 500,
+        f2: 1500
+      }
+    };
     vi.clearAllMocks();
   });
 
@@ -161,6 +168,9 @@ describe('HighResSpectrogram', () => {
     const [, callback, priority] = renderCoordinator.subscribe.mock.calls[0];
     expect(priority).toBe(renderCoordinator.PRIORITY.MEDIUM);
     expect(typeof callback).toBe('function');
+
+    // Check if component rendered (by looking for overlay text)
+    expect(screen.getByText(/High-Res Spectrogram/i)).toBeDefined();
   });
 
   it('cleans up subscription on unmount', () => {
