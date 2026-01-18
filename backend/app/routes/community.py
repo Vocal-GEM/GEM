@@ -99,6 +99,7 @@ def share_voice():
 
         context = sanitize_html(request.form.get('context', ''))
         expiration_days = int(request.form.get('expiration_days', 7))
+
         
         # Save original file
         upload_folder = current_app.config.get(

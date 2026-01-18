@@ -282,6 +282,10 @@ def analyze_audio():
     if file.filename == '':
         return jsonify({'error': 'Empty filename'}), 400
 
+    # Validate file type
+    is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'], file_stream=file)
+    if not is_valid:
+        return jsonify({'error': error_msg}), 400
     # Security: Validate file type (only audio allowed)
     is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'], file_stream=file)
     if not is_valid:
