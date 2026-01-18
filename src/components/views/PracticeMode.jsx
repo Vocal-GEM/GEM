@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Suspense, useCallback } from 'react';
+import { useState, useEffect, useRef, Suspense, useCallback, lazy } from 'react';
 import { Play, Square, Mic, Volume2, Activity, BarChart2, RefreshCw, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer, Sparkles, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '../../context/NavigationContext';
