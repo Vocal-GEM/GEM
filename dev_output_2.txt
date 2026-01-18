@@ -1,0 +1,10 @@
+
+> vocal-gem@0.1.0 dev
+> vite
+
+
+  VITE v5.4.21  ready in 451 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+7:38:50 AM [vite] page reload src/main.jsx
