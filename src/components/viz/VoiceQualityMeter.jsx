@@ -24,7 +24,6 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
                 if (isSilent) {
                     // Optional: Drift slowly to 50% if silence persists? 
                     // For now, just freeze to avoid "drop to zero" artifacts
-                    requestAnimationFrame(loop);
                     return;
                 }
 
@@ -71,7 +70,7 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
                     if (metricsRef.current.centroid) metricsRef.current.centroid.innerText = centroid || '-';
                 }
             }
-            requestAnimationFrame(loop);
+            // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
         let unsubscribe;

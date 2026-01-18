@@ -6,7 +6,7 @@ from email_validator import validate_email, EmailNotValidError
 ALLOWED_EXTENSIONS = {
     'audio': {'wav', 'mp3', 'ogg', 'm4a', 'flac', 'webm'},
     'image': {'jpg', 'jpeg', 'png', 'gif', 'webp'},
-    'document': {'pdf', 'txt', 'csv', 'json'}
+    'document': {'pdf', 'txt', 'csv', 'json', 'md'}
 }
 
 def validate_username(username):
@@ -74,6 +74,40 @@ def validate_file_upload(filename, allowed_types=None, file_stream=None):
     Validates file extension and content (magic numbers) against allowed types.
     allowed_types: list of categories ('audio', 'image', 'document') or None for all.
     file_stream: (optional) file object/stream to check magic numbers
+def validate_magic_number(file_stream, ext):
+    """
+    Validate file content using magic numbers for common types.
+    Returns True if valid or if type check is skipped, False if invalid.
+    """
+    if not file_stream:
+        return True # Skip if no stream provided
+
+    try:
+        # Save current position
+        pos = file_stream.tell()
+        file_stream.seek(0)
+        header = file_stream.read(10) # Read enough bytes
+        file_stream.seek(pos) # Reset position
+
+        if ext == 'pdf':
+            return header.startswith(b'%PDF-')
+        elif ext == 'png':
+            return header.startswith(b'\x89PNG\r\n\x1a\n')
+        elif ext in ['jpg', 'jpeg']:
+            return header.startswith(b'\xff\xd8')
+        elif ext == 'gif':
+            return header.startswith(b'GIF87a') or header.startswith(b'GIF89a')
+
+        return True
+    except Exception as e:
+        print(f"Magic number validation error: {e}")
+        return False
+
+def validate_file_upload(filename, allowed_types=None, file_stream=None):
+    """
+    Validates file extension and optional content against allowed types.
+    allowed_types: list of categories ('audio', 'image', 'document') or None for all.
+    file_stream: Optional file object to validate magic numbers.
     """
     if not filename or '.' not in filename:
         return False, "Invalid filename"
@@ -89,7 +123,9 @@ def validate_file_upload(filename, allowed_types=None, file_stream=None):
             if cat in ALLOWED_EXTENSIONS:
                 allowed.update(ALLOWED_EXTENSIONS[cat])
             else:
-                 pass
+                # Security enhancement: Fail on unknown categories to prevent logic errors
+                # like passing extensions instead of categories.
+                return False, f"Invalid category '{cat}' in allowed_types configuration"
 
     if ext not in allowed:
          return False, f"File type '{ext}' not allowed"
@@ -160,4 +196,9 @@ def validate_file_upload(filename, allowed_types=None, file_stream=None):
                 # We should reject this as suspicious for strictly binary formats.
                 return False, f"Could not determine file type for extension '{ext}' (possibly corrupted or invalid format)"
 
+    # Magic number check
+    if file_stream:
+        if not validate_magic_number(file_stream, ext):
+             return False, "File content does not match extension"
+    
     return True, None

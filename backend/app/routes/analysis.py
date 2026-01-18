@@ -10,7 +10,6 @@ import os
 import tempfile
 from ..extensions import limiter
 from ..validators import validate_file_upload
-from ..validators import validate_file_upload
 from ..extensions import limiter
 try:
     import numpy as np
@@ -287,6 +286,10 @@ def analyze_audio():
     is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'], file_stream=file)
     if not is_valid:
         return jsonify({'error': error_msg}), 400
+    # Security: Validate file type (only audio allowed)
+    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'], file_stream=file)
+    if not is_valid:
+        return jsonify({"error": error}), 400
 
     # Save to temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_file:
@@ -344,7 +347,8 @@ def analyze_audio():
         print(f"Analysis error: {e}")
         import traceback
         traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
+        # Security: Do not expose internal error details to client
+        return jsonify({'error': 'An internal error occurred during analysis.'}), 500
         
     finally:
         # Clean up temp file
