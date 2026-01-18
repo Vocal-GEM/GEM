@@ -26,6 +26,12 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const lastFormantsRef = useRef({ f1: 0, f2: 0 });
     const { settings } = useSettings();
 
+    // Unique component ID for RenderCoordinator
+    // Component ID for RenderCoordinator
+    const uniqueId = useId();
+    const componentId = `spectrogram-highres-${uniqueId}`;
+
+    // Reusable buffers to avoid garbage collection churn
     // Reusable buffers to avoid GC
     const imgDataRef = useRef(null);
     const data32Ref = useRef(null);
@@ -63,8 +69,26 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const spectrum = dataRef.current.spectrum;
 
         // Ensure buffers are ready and match current height
+        const width = canvas.width;
+        const height = canvas.height;
+        const scrollSpeed = 2; // px per frame
+
+        // Optimization: Use alpha: false for better performance
+        const ctx = canvas.getContext('2d', { alpha: false });
+
+        // Ensure buffers are ready and match current height
+        // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
+        const ctx = canvas.getContext('2d', { alpha: false });
+
+        const width = canvas.width;
+        const height = canvas.height;
+        const scrollSpeed = 2; // px per frame
+        const spectrum = dataRef.current.spectrum;
+
+        // Ensure buffers are ready and match height
         if (!imgDataRef.current || imgDataRef.current.height !== height) {
             try {
+                // Optimization: Create ImageData with 'scrollSpeed' width
                 imgDataRef.current = ctx.createImageData(scrollSpeed, height);
                 data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
             } catch (e) {
@@ -75,11 +99,24 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         const imgData = imgDataRef.current;
         const data32 = data32Ref.current;
+        const spectrum = dataRef.current.spectrum;
 
         // 1. Shift existing content to left
         ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
 
         // 2. Draw new column
+        // Optimization: Draw canvas onto itself. GPU accelerated.
+        ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
+
+        // 2. Draw new column
+        // Map 0-8kHz (approx 1/3 of typical 22/24kHz Nyquist)
+        // Optimization: Draw canvas onto itself instead of using an offscreen temp canvas.
+        // Copy the current canvas (from x=scrollSpeed to the end) to x=0
+        // This is much faster on GPU-accelerated contexts.
+        ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
+
+        // 2. Draw new column
+        // Optimized: Reuse pre-allocated TypedArray
         const maxBin = Math.floor(spectrum.length / 3);
 
         for (let y = 0; y < height; y++) {
@@ -92,6 +129,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
             const color = colormap[Math.floor(intensity)];
 
+            // Fill all pixels in the scrollSpeed strip for this row
             const rowOffset = y * scrollSpeed;
             for (let x = 0; x < scrollSpeed; x++) {
                 data32[rowOffset + x] = color;
@@ -116,6 +154,8 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
                     const lastY = height * (1 - lastFreq / MAX_FREQ);
                     ctx.beginPath();
                     ctx.strokeStyle = color;
+                    // Draw from previous frame's position (shifted left by scrollSpeed)
+                    // Previous point was at 'width - scrollSpeed', now at 'width - scrollSpeed * 2'
                     ctx.moveTo(width - scrollSpeed * 2, lastY);
                     ctx.lineTo(width - scrollSpeed, currY);
                     ctx.stroke();
@@ -128,9 +168,10 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         lastFormantsRef.current = { f1, f2 };
 
-    }, [dataRef, colormap]);
+    }, [dataRef, colormap, componentId]);
 
     // Initial canvas setup
+    // Handle Resize with ResizeObserver
     useEffect(() => {
         const container = containerRef.current;
         const canvas = canvasRef.current;
@@ -142,22 +183,47 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             const rect = container.getBoundingClientRect();
 
             const newWidth = Math.floor(rect.width * dpr);
+            // We keep height fixed at 512 for vertical resolution
+            const newWidth = Math.round(rect.width * dpr);
             const newHeight = 512;
 
             if (canvas.width !== newWidth || canvas.height !== newHeight) {
                 canvas.width = newWidth;
                 canvas.height = newHeight;
                 imgDataRef.current = null;
+                data32Ref.current = null;
             }
         };
 
+        const resizeObserver = new ResizeObserver(() => {
+            // Run in animation frame to avoid resize loops/tearing
+            requestAnimationFrame(updateSize);
         const resizeObserver = new ResizeObserver((entries) => {
             for (const entry of entries) {
                 requestAnimationFrame(updateSize);
+                const { width } = entry.contentRect;
+                const dpr = window.devicePixelRatio || 1;
+
+                // Only update if width actually changed significantly to avoid loops
+                // We keep height fixed at 512 for vertical resolution
+                const newWidth = Math.round(width * dpr);
+                if (canvas.width !== newWidth) {
+                    canvas.width = newWidth;
+                    canvas.height = 512;
+                    // Buffers will be recreated in next draw call
+                    imgDataRef.current = null;
+                }
             }
         });
 
         resizeObserver.observe(container);
+
+        // Initial size set
+        const rect = container.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(rect.width * dpr);
+        canvas.height = 512;
+        // Initial sizing
         updateSize();
 
         return () => {
@@ -178,6 +244,9 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         };
     }, [componentId, draw]);
 
+    /**
+     * Handle canvas click - show Hz/dB/Note at tap position
+     */
     const handleCanvasClick = useCallback((e) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -185,10 +254,12 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const rect = canvas.getBoundingClientRect();
         const y = e.clientY - rect.top;
 
+        // Map y to frequency
         const canvasY = (y / rect.height) * canvas.height;
         const freqRatio = 1 - (canvasY / canvas.height);
         const frequency = freqRatio * MAX_FREQ;
 
+        // Get current dB from live spectrum
         const spectrum = dataRef.current?.spectrum;
         let dB = -100;
         if (spectrum) {

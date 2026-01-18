@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -45,6 +45,11 @@ const SpectrogramMesh = ({ dataRef }) => {
 
     // Buffer for historical data
     const historyRef = useRef(new Float32Array(numCols * numRows));
+    const tempColor = useMemo(() => new THREE.Color(), []);
+
+    // Reusable color object to prevent GC
+    // Optimization: Reuse Color object to avoid thousands of allocations per frame
+    const tempColor = useMemo(() => new THREE.Color(), []);
 
     // Reusable color object to avoid GC in loop
     // optimization: bolt
@@ -119,6 +124,11 @@ const SpectrogramMesh = ({ dataRef }) => {
 
                     colors.setXYZ(index, tempColor.r, tempColor.g, tempColor.b);
                 }
+                // Use shared tempColor to avoid creating new object every iteration
+                // Optimization: Reuse tempColor object
+                tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
+
+                colors.setXYZ(index, tempColor.r, tempColor.g, tempColor.b);
             }
             colors.needsUpdate = true;
         }
