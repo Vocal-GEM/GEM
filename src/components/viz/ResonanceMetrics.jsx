@@ -1,5 +1,6 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useId } from 'react';
 import { Info } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const ResonanceMetrics = ({ dataRef }) => {
     const [metrics, setMetrics] = useState({
@@ -11,6 +12,7 @@ const ResonanceMetrics = ({ dataRef }) => {
     const [showTooltip, setShowTooltip] = useState(null);
     const requestRef = useRef();
     const lastUpdateRef = useRef(0);
+    const componentId = useId();
 
     useEffect(() => {
         const updateMetrics = () => {
@@ -32,12 +34,16 @@ const ResonanceMetrics = ({ dataRef }) => {
                     });
                 }
             }
-            requestRef.current = requestAnimationFrame(updateMetrics);
         };
 
-        requestRef.current = requestAnimationFrame(updateMetrics);
-        return () => cancelAnimationFrame(requestRef.current);
-    }, [dataRef]);
+        const unsubscribe = renderCoordinator.subscribe(
+            `resonance-metrics-${componentId}`,
+            updateMetrics,
+            renderCoordinator.PRIORITY.LOW
+        );
+
+        return () => unsubscribe();
+    }, [dataRef, componentId]);
 
     const MetricCard = ({ label, value, unit, color, tooltip, id }) => (
         <div className="bg-slate-800/50 rounded-xl p-4 border border-white/5 relative group">
