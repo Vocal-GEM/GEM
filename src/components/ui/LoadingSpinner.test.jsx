@@ -31,6 +31,11 @@ describe("LoadingSpinner", () => {
     expect(container.firstChild).toHaveClass("min-h-0");
   });
 
+  it("overrides default min-height when custom class is provided", () => {
+    const { container } = render(<LoadingSpinner className="min-h-0" />);
+    expect(container.firstChild).toHaveClass("min-h-0");
+  });
+
   it("renders with different sizes", () => {
     const { rerender } = render(<LoadingSpinner size="sm" />);
     expect(screen.getByRole("status")).toBeInTheDocument();

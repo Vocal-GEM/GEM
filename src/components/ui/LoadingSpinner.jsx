@@ -27,6 +27,7 @@ const LoadingSpinner = ({
     xl: 'border-8',
   };
 
+const LoadingSpinner = ({ size = "md", label = "Loading...", className }) => {
   // 'sm' and 'xs' are treated as "inline/compact" mode by default
   // This helps when using the spinner inside buttons or small containers
 const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant = "default" }) => {
@@ -38,7 +39,6 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
     xl: "w-24 h-24",
   };
 
-  // Border width controls thickness
   const borderThickness = {
     xs: "border-2",
     sm: "border-2",
@@ -49,6 +49,7 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
 
   // For 'sm', we usually want inline or small container.
   // For other sizes, default to the original min-height, but allow override via className
+  const containerClass = size === 'sm' ? 'h-auto min-h-0' : 'h-full min-h-[200px]';
   const defaultMinHeight = size === "sm" ? "min-h-0" : "min-h-[200px]";
   // For 'sm' and 'xs', we usually want inline or small container.
   // For other sizes, default to the original min-height, but allow override via className
@@ -107,6 +108,7 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
       className={twMerge(
         clsx(
           "flex items-center justify-center w-full",
+          containerClass,
           // Default min-height for visibility, can be overridden by className
           "h-full",
           defaultMinHeight,

@@ -80,6 +80,12 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
 
     const serviceRef = useRef(new QuadCoreAnalysisService());
     const [analysis, setAnalysis] = useState(null);
+    const componentId = useId();
+
+    const analyze = useCallback(() => {
+        if (dataRef.current) {
+            const results = serviceRef.current.analyze(dataRef.current, {
+                targetF2: 2000
     useProfile(); // Keep if needed for side effects or future use, though currently unused variables are ignored
 
     const serviceRef = useRef(new QuadCoreAnalysisService());
@@ -141,13 +147,10 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                     <Activity size={14} className="text-purple-400" />
                     Quad-Core Analyzer
                 </div>
-                {/* Status dot */}
                 <div className={`w-2 h-2 rounded-full ${isAudioActive ? 'bg-green-500 animate-pulse' : 'bg-slate-700'}`} />
             </div>
 
-            {/* 2x2 Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
-                {/* Module A: Texture */}
                 <QuadCoreCard
                     icon={Wind}
                     title="Texture"
@@ -158,10 +161,9 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                     unit="dB"
                 />
 
-                {/* Module B: Health */}
                 <QuadCoreCard
                     icon={Heart}
-                    title="Health" // Flow
+                    title="Health"
                     color={colorBlindMode ? 'text-teal-400' : 'text-emerald-400'}
                     score={analysis?.scores.health.status || 'Flow'}
                     label={analysis?.scores.health.label || '--'}
@@ -169,10 +171,9 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                     unit=" tilt"
                 />
 
-                {/* Module C: Color */}
                 <QuadCoreCard
                     icon={Sun}
-                    title="Color" // Resonance
+                    title="Color"
                     color={colorBlindMode ? 'text-yellow-400' : 'text-amber-400'}
                     score={analysis?.scores.color.percentage || 0}
                     label={analysis?.scores.color.label || '--'}
@@ -180,10 +181,9 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                     unit="Hz"
                 />
 
-                {/* Module D: Mix */}
                 <QuadCoreCard
                     icon={Layers}
-                    title="Registration" // Mix
+                    title="Registration"
                     color={colorBlindMode ? 'text-purple-400' : 'text-fuchsia-400'}
                     score={analysis?.scores.mix.percentage || 0}
                     label={analysis?.scores.mix.label || '--'}
@@ -192,10 +192,8 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                 />
             </div>
 
-            {/* Feedback Section */}
             <FeedbackBanner feedback={analysis?.feedback} />
 
-            {/* Controls */}
             <button
                 onClick={toggleAudio}
                 className={`w-full mt-6 py-3 rounded-xl text-sm font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg ${isAudioActive
