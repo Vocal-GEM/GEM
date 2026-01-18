@@ -1,9 +1,11 @@
+import React from "react";
+import clsx from "clsx";
+import { twMerge } from "tailwind-merge";
 import React from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant = "default" }) => {
-  // Size controls dimensions
   const dimensions = {
     xs: "w-4 h-4",
     sm: "w-6 h-6",
@@ -21,6 +23,10 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
     xl: "border-8",
   };
 
+  // For 'sm' and 'xs', we usually want inline or small container.
+  // For other sizes, default to the original min-height, but allow override via className
+  const containerClass = (size === 'sm' || size === 'xs') ? 'inline-flex h-auto min-h-0' : 'flex h-full min-h-[200px]';
+
   // Determine container classes based on size
   // 'sm' and 'xs' are treated as "inline/compact" mode by default
   const isSmall = size === 'sm' || size === 'xs';
@@ -37,6 +43,13 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
 
   return (
     <div
+      className={twMerge(clsx(
+        "items-center justify-center w-full",
+        containerClass,
+        className
+      ))}
+      role="status"
+      aria-live="polite"
       role="status"
       aria-live="polite"
       className={twMerge(
@@ -47,24 +60,23 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
         )
       )}
     >
-      <div
-        className={twMerge(clsx("relative", dimensions[size] || dimensions.md))}
-      >
+      <div className={twMerge(clsx("relative", dimensions[size] || dimensions.md))}>
         {/* Track circle */}
         <div
           className={clsx(
             "absolute top-0 left-0 w-full h-full rounded-full",
             trackColor,
+            borderThickness[size] || borderThickness.md
             borderThickness[size] || borderThickness.md,
           )}
         ></div>
         {/* Spinning segment */}
         <div
-          className={twMerge(clsx(
+          className={clsx(
             "absolute top-0 left-0 w-full h-full border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
             spinnerColor,
-            borderThickness[size] || borderThickness.md,
-          ))}
+            borderThickness[size] || borderThickness.md
+          )}
         ></div>
       </div>
       <span className="sr-only">{label}</span>
