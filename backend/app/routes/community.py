@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
+from ..extensions import db
+from ..extensions import db, limiter
 from ..validators import validate_file_upload, sanitize_html
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
@@ -250,6 +252,18 @@ def submit_success_story():
     try:
         data = request.get_json()
 
+        # Input sanitization
+        title = sanitize_html(data.get('title', ''))
+        story_text = sanitize_html(data.get('story', ''))
+
+        techniques = data.get('techniques_used', [])
+        if isinstance(techniques, list):
+            techniques = [sanitize_html(str(t)) for t in techniques]
+        else:
+            techniques = []
+
+        # Moderation check
+        is_safe, flagged = check_moderation(title + ' ' + story_text)
         # Security: Sanitize HTML content
         title = sanitize_html(data.get('title', ''))
         story_content = sanitize_html(data.get('story', ''))
@@ -261,6 +275,7 @@ def submit_success_story():
         story = SuccessStory(
             user_id=current_user.id,
             title=title,
+            story=story_text,
             story=story_content,
             title=sanitize_html(data.get('title')),
             story=sanitize_html(data.get('story')),
@@ -268,7 +283,7 @@ def submit_success_story():
             voice_goal=data.get('voice_goal'),
             consent_public=data.get('consent_public', False),
             approved=is_safe,  # Auto-approve if passes moderation
-            techniques_used=data.get('techniques_used', [])
+            techniques_used=techniques
         )
 
         db.session.add(story)
