@@ -9,12 +9,25 @@ describe('LoadingSpinner', () => {
 
     // It should have role="status"
     const spinner = screen.getByRole('status');
+import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
+import LoadingSpinner from "./LoadingSpinner";
+
+describe("LoadingSpinner", () => {
+  it("renders with default accessibility attributes", () => {
+    render(<LoadingSpinner />);
+
+    // It should have role="status"
+    const spinner = screen.getByRole("status");
     expect(spinner).toBeInTheDocument();
     expect(spinner).toHaveAttribute('aria-live', 'polite');
 
     // It should have a visually hidden label "Loading..." by default
     const srText = screen.getByText('Loading...');
     expect(srText).toHaveClass('sr-only');
+    const srText = screen.getByText("Loading...");
+    expect(srText).toBeInTheDocument();
+    expect(srText).toHaveClass("sr-only");
   });
 
   it('renders with custom label', () => {
@@ -30,6 +43,19 @@ describe('LoadingSpinner', () => {
   it('overrides default min-height when custom class is provided', () => {
     const { container } = render(<LoadingSpinner className="min-h-0" />);
     expect(container.firstChild).toHaveClass('min-h-0');
+  it("applies custom className", () => {
+    const { container } = render(<LoadingSpinner className="my-custom-class" />);
+    expect(container.firstChild).toHaveClass("my-custom-class");
+  });
+
+  it("overrides default min-height when custom class is provided", () => {
+    const { container } = render(<LoadingSpinner className="min-h-0" />);
+    expect(container.firstChild).toHaveClass("min-h-0");
+  });
+
+  it("overrides default min-height when custom class is provided", () => {
+    const { container } = render(<LoadingSpinner className="min-h-0" />);
+    expect(container.firstChild).toHaveClass("min-h-0");
   });
 
   it('renders with different sizes', () => {
@@ -43,5 +69,10 @@ describe('LoadingSpinner', () => {
   it('uses inline layout for small size', () => {
     const { container } = render(<LoadingSpinner size="sm" />);
     expect(container.firstChild).toHaveClass('inline-flex');
+  it("renders with current color variant", () => {
+    const { container } = render(<LoadingSpinner variant="current" />);
+    // Check if the spinner segment uses border-t-current
+    const spinnerSegment = container.querySelector('.border-t-current');
+    expect(spinnerSegment).toBeInTheDocument();
   });
 });
