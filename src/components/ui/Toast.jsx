@@ -52,6 +52,9 @@ const Toast = ({
       label: 'Information',
       live: 'polite'
     },
+      live: 'polite',
+      label: 'Information'
+    }
   };
 
   const style = styles[type] || styles.success;
@@ -67,6 +70,15 @@ const Toast = ({
         style.bg,
         className
       ))}
+      className={twMerge(
+        clsx(
+          "fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[100]",
+          "flex items-center gap-3 px-6 py-4 rounded-xl border backdrop-blur-md shadow-xl",
+          "animate-in fade-in slide-in-from-bottom-4",
+          style.bg,
+          className
+        )
+      )}
     >
       <Icon className={clsx("w-5 h-5", style.text)} aria-hidden="true" />
       <span className="sr-only">{style.label}: </span>
@@ -75,6 +87,8 @@ const Toast = ({
         onClick={onClose}
         className={clsx(
           "ml-2 hover:opacity-70 p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-current",
+          "ml-2 hover:opacity-70 p-1 rounded-full",
+          "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-current",
           style.text
         )}
         aria-label="Close notification"

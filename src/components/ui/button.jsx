@@ -13,6 +13,7 @@ const Button = React.forwardRef(({
   children,
   ...props
 }, ref) => {
+const Button = React.forwardRef(({ className, variant, size, asChild = false, isLoading = false, children, disabled, ...props }, ref) => {
   const Comp = asChild ? "span" : "button"; // Simple placeholder for Slot
   const isDisabled = isLoading || disabled;
 

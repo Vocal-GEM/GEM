@@ -1,6 +1,9 @@
 import React from "react";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
+import React from 'react';
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant = "default" }) => {
   const dimensions = {
@@ -11,6 +14,7 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
     xl: "w-24 h-24",
   };
 
+  // Border width controls thickness
   const borderThickness = {
     xs: "border-2",
     sm: "border-2",
@@ -23,6 +27,16 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
   // For other sizes, default to the original min-height, but allow override via className
   const containerClass = (size === 'sm' || size === 'xs') ? 'inline-flex h-auto min-h-0' : 'flex h-full min-h-[200px]';
 
+  // Determine container classes based on size
+  // 'sm' and 'xs' are treated as "inline/compact" mode by default
+  const isSmall = size === 'sm' || size === 'xs';
+
+  const containerBase = "flex items-center justify-center";
+  const containerSize = isSmall ? "w-auto h-auto min-h-0 inline-flex" : "w-full h-full min-h-[200px]";
+
+  // Define color styles based on variant
+  // 'default' matches original hardcoded colors (slate track, blue spinner)
+  // 'current' uses currentColor for flexible styling (e.g. inside buttons)
   const isCurrent = variant === 'current';
   const trackColor = isCurrent ? "border-current opacity-20" : "border-slate-700 opacity-20";
   const spinnerColor = isCurrent ? "border-t-current" : "border-t-blue-500";
@@ -36,6 +50,15 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
       ))}
       role="status"
       aria-live="polite"
+      role="status"
+      aria-live="polite"
+      className={twMerge(
+        clsx(
+          containerBase,
+          containerSize,
+          className
+        )
+      )}
     >
       <div className={twMerge(clsx("relative", dimensions[size] || dimensions.md))}>
         {/* Track circle */}
@@ -44,6 +67,7 @@ const LoadingSpinner = ({ size = "md", label = "Loading...", className, variant 
             "absolute top-0 left-0 w-full h-full rounded-full",
             trackColor,
             borderThickness[size] || borderThickness.md
+            borderThickness[size] || borderThickness.md,
           )}
         ></div>
         {/* Spinning segment */}
