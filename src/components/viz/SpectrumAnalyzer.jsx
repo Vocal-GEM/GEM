@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useId } from 'react';
 import { lpcAnalyzer } from '../../utils/lpcAnalysis';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Camera, X } from 'lucide-react';
 
 /**
@@ -22,6 +23,7 @@ const SpectrumAnalyzer = ({ dataRef, userMode }) => {
     const canvasRef = useRef(null);
     const [cursorData, setCursorData] = useState(null);
     const [showControls, setShowControls] = useState(false);
+    const componentId = useId();
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -123,19 +125,16 @@ const SpectrumAnalyzer = ({ dataRef, userMode }) => {
             }
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'spectrum-analyzer',
-                draw,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            draw,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
-    }, [dataRef, userMode]);
+    }, [dataRef, userMode, componentId]);
 
     /**
      * Handle canvas click - show Hz/dB at position
@@ -252,4 +251,3 @@ const SpectrumAnalyzer = ({ dataRef, userMode }) => {
 };
 
 export default SpectrumAnalyzer;
-
