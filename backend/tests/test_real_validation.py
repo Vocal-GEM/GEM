@@ -65,7 +65,10 @@ class TestRealValidation(unittest.TestCase):
         # So PDF is not allowed there regardless of magic number.
 
         # Let's try a fake JPG.
-        fake_jpg = (BytesIO(b'Not a JPG'), 'fake.jpg')
+        # We use a valid PNG header so filetype detects it as PNG (which is allowed),
+        # but the extension is .jpg, so validate_magic_number will fail.
+        png_header = b'\x89PNG\r\n\x1a\n'
+        fake_jpg = (BytesIO(png_header + b'Not a JPG'), 'fake.jpg')
         data_jpg = {'file': fake_jpg}
 
         response = self.client.post('/api/upload', data=data_jpg, content_type='multipart/form-data')
