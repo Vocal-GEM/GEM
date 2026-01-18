@@ -10,20 +10,29 @@ const ResonanceMetrics = ({ dataRef }) => {
         resonanceScore: 0
     });
     const [showTooltip, setShowTooltip] = useState(null);
+    const requestRef = useRef();
+    const lastUpdateRef = useRef(0);
     const componentId = useId();
 
     useEffect(() => {
         const updateMetrics = () => {
-            if (dataRef.current) {
-                // resonanceScore is now the RBI (0-100) from backend
-                // resonance is the spectral centroid (Hz)
-                const { f1, f2, resonance, resonanceScore } = dataRef.current;
-                setMetrics({
-                    f1: f1 ? Math.round(f1) : 0,
-                    f2: f2 ? Math.round(f2) : 0,
-                    centroid: Math.round(resonance || 0),
-                    resonanceScore: Math.round(resonanceScore || 0)
-                });
+            const now = performance.now();
+
+            // Throttle updates to ~15fps (every ~66ms) to reduce React render cycles
+            // Text metrics don't need to update at 60fps
+            if (now - lastUpdateRef.current >= 66) {
+                if (dataRef.current) {
+                    lastUpdateRef.current = now;
+                    // resonanceScore is now the RBI (0-100) from backend
+                    // resonance is the spectral centroid (Hz)
+                    const { f1, f2, resonance, resonanceScore } = dataRef.current;
+                    setMetrics({
+                        f1: f1 ? Math.round(f1) : 0,
+                        f2: f2 ? Math.round(f2) : 0,
+                        centroid: Math.round(resonance || 0),
+                        resonanceScore: Math.round(resonanceScore || 0)
+                    });
+                }
             }
         };
 
