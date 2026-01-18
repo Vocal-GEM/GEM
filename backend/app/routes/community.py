@@ -10,6 +10,7 @@ from ..models import (
     GroupChallenge, GroupChallengeParticipant, ModerationFlag,
     CommunityBenchmark,
 )
+from ..validators import validate_file_upload, sanitize_html
 from datetime import datetime, timedelta
 import os
 import secrets
@@ -252,6 +253,10 @@ def submit_success_story():
     try:
         data = request.get_json()
 
+        # Sanitize inputs
+        title = sanitize_html(data.get('title', ''))
+        story_text = sanitize_html(data.get('story', ''))
+        voice_goal = sanitize_html(data.get('voice_goal', ''))
         # Input sanitization
         title = sanitize_html(data.get('title', ''))
         story_text = sanitize_html(data.get('story', ''))
@@ -262,6 +267,8 @@ def submit_success_story():
         else:
             techniques = []
 
+        # Moderation check
+        is_safe, flagged = check_moderation(title + ' ' + story_text)
         # Moderation check
         is_safe, flagged = check_moderation(title + ' ' + story_text)
         # Security: Sanitize HTML content
@@ -280,7 +287,7 @@ def submit_success_story():
             title=sanitize_html(data.get('title')),
             story=sanitize_html(data.get('story')),
             timeline_months=data.get('timeline_months'),
-            voice_goal=data.get('voice_goal'),
+            voice_goal=voice_goal,
             consent_public=data.get('consent_public', False),
             approved=is_safe,  # Auto-approve if passes moderation
             techniques_used=techniques
