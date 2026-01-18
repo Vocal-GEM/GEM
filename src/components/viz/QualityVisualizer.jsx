@@ -41,7 +41,7 @@ const QualityVisualizer = ({ dataRef }) => {
                 }
             });
 
-            requestAnimationFrame(loop);
+            // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
         let unsubscribe;
