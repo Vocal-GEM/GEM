@@ -16,6 +16,7 @@ import os
 import secrets
 import hashlib
 from werkzeug.utils import secure_filename
+from ..validators import validate_file_upload, sanitize_html
 
 community_bp = Blueprint('community', __name__)
 
@@ -253,6 +254,11 @@ def submit_success_story():
     try:
         data = request.get_json()
 
+        # Security: Sanitize inputs to prevent Stored XSS
+        title = sanitize_html(data.get('title', ''))
+        story_content = sanitize_html(data.get('story', ''))
+
+        # Sanitize list items if present
         # Sanitize inputs
         title = sanitize_html(data.get('title', ''))
         story_text = sanitize_html(data.get('story', ''))
@@ -282,6 +288,7 @@ def submit_success_story():
         story = SuccessStory(
             user_id=current_user.id,
             title=title,
+            story=story_content,
             story=story_text,
             story=story_content,
             title=sanitize_html(data.get('title')),
