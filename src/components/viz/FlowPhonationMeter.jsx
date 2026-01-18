@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { Wind, Activity, AlertTriangle, CheckCircle2, RotateCcw, Zap } from 'lucide-react';
+import renderCoordinator from '../../services/RenderCoordinator';
 
 /**
  * FlowPhonationMeter Component
@@ -34,11 +35,11 @@ const FlowPhonationMeter = ({ dataRef, onReset, showDetails = true }) => {
     const [pressedDuration, setPressedDuration] = useState(0);
     const [showResetPrompt, setShowResetPrompt] = useState(false);
     const pressedStartRef = useRef(null);
+    const subscriberId = useId();
 
     useEffect(() => {
         const loop = () => {
             if (!dataRef.current) {
-                requestAnimationFrame(loop);
                 return;
             }
 
@@ -104,12 +105,17 @@ const FlowPhonationMeter = ({ dataRef, onReset, showDetails = true }) => {
                     setShowResetPrompt(false);
                 }
             }
-
-            requestAnimationFrame(loop);
         };
 
-        requestAnimationFrame(loop);
-    }, [dataRef, colorBlindMode, showResetPrompt]);
+        // Subscribe to RenderCoordinator instead of using internal RAF
+        const unsubscribe = renderCoordinator.subscribe(
+            subscriberId,
+            loop,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+
+        return unsubscribe;
+    }, [dataRef, colorBlindMode, showResetPrompt, subscriberId]);
 
     const handleReset = () => {
         setShowResetPrompt(false);

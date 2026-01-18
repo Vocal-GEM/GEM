@@ -107,6 +107,7 @@ const ContourVisualizer = ({ dataRef }) => {
                     ctx.stroke();
                 }
             }
+            // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
         let unsubscribe;
