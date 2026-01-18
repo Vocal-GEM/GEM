@@ -13,8 +13,11 @@ const ContourVisualizer = ({ dataRef }) => {
     const historyRef = useRef([]);
     const maxHistory = 300; // ~5 seconds at 60fps
 
+    // Throttling ref for UI updates
+    const lastUiUpdateRef = useRef(0);
+
     useEffect(() => {
-        const loop = () => {
+        const loop = (delta, currentTime) => {
             if (!dataRef.current) return;
 
             const { prosody, isSilent, clarity } = dataRef.current;
@@ -24,12 +27,15 @@ const ContourVisualizer = ({ dataRef }) => {
             const shouldUpdate = !isSilent && (clarity === undefined || clarity > 0.5);
 
             if (prosody && shouldUpdate) {
-                // Update local state for UI text
-                setMetrics({
-                    contour: prosody.contour || 0,
-                    slopeDirection: prosody.slopeDirection || 'flat',
-                    semitoneRange: prosody.semitoneRange || 0
-                });
+                // Throttle UI updates to 10fps (every 100ms) to reduce React renders
+                if (currentTime - lastUiUpdateRef.current > 100) {
+                    setMetrics({
+                        contour: prosody.contour || 0,
+                        slopeDirection: prosody.slopeDirection || 'flat',
+                        semitoneRange: prosody.semitoneRange || 0
+                    });
+                    lastUiUpdateRef.current = currentTime;
+                }
 
                 // Update history
                 historyRef.current.push(prosody.contour || 0);
@@ -101,8 +107,7 @@ const ContourVisualizer = ({ dataRef }) => {
                     ctx.stroke();
                 }
             }
-
-            requestAnimationFrame(loop);
+            // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
         let unsubscribe;
