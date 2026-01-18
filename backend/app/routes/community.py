@@ -91,22 +91,12 @@ def share_voice():
         audio_file = request.files['audio']
 
         # Security: Validate file type
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
-        # Security: Validate file extension
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
-        # Security: Validate file type
-        is_valid, error = validate_file_upload(
-            audio_file.filename, allowed_types=['audio'])
+        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'], file_stream=audio_file)
         if not is_valid:
             return jsonify({'error': error}), 400
 
         context = request.form.get('context', '')
         expiration_days = int(request.form.get('expiration_days', 7))
-
-        # Security: Validate file extension
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
-        if not is_valid:
-            return jsonify({'error': error}), 400
         
         # Save original file
         upload_folder = current_app.config.get(
@@ -274,11 +264,21 @@ def submit_success_story():
 
         # Moderation check
         is_safe, flagged = check_moderation(title + ' ' + story_text)
+        # Security: Sanitize HTML content
+        title = sanitize_html(data.get('title', ''))
+        story_content = sanitize_html(data.get('story', ''))
+
+        # Moderation check
+        is_safe, flagged = check_moderation(
+            title + ' ' + story_content)
 
         story = SuccessStory(
             user_id=current_user.id,
             title=title,
             story=story_text,
+            story=story_content,
+            title=sanitize_html(data.get('title')),
+            story=sanitize_html(data.get('story')),
             timeline_months=data.get('timeline_months'),
             voice_goal=data.get('voice_goal'),
             consent_public=data.get('consent_public', False),
