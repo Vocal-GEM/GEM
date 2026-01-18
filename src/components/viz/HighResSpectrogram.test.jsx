@@ -1,10 +1,4 @@
 import { render, cleanup, screen } from '@testing-library/react';
-import { render, screen, cleanup } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import HighResSpectrogram from './HighResSpectrogram';
-import { SettingsProvider } from '../../context/SettingsContext';
-import { renderCoordinator } from '../../services/RenderCoordinator';
-import { render, cleanup, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import HighResSpectrogram from './HighResSpectrogram';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -20,19 +14,6 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Mock SettingsContext
-vi.mock('../../context/SettingsContext', () => ({
-  useSettings: () => ({
-    settings: { spectrogramColorScheme: 'inferno' }
-  }),
-  SettingsProvider: ({ children }) => <div>{children}</div>
-}));
-
-// Mock ResizeObserver
-global.ResizeObserver = vi.fn(function() {
-  this.observe = vi.fn();
-  this.unobserve = vi.fn();
-  this.disconnect = vi.fn();
-});
 const mockSettings = {
   spectrogramColorScheme: 'magma'
 };
@@ -42,14 +23,19 @@ vi.mock('../../context/SettingsContext', () => ({
   SettingsProvider: ({ children }) => <div>{children}</div>
 }));
 
+// Mock ResizeObserver
+global.ResizeObserver = vi.fn(function() {
+  this.observe = vi.fn();
+  this.unobserve = vi.fn();
+  this.disconnect = vi.fn();
+});
+
 // Mock Canvas getContext
 const mockContext = {
   createImageData: vi.fn((w, h) => ({
     data: { buffer: new ArrayBuffer(w * h * 4) },
     width: w,
     height: h
-    height: h,
-    width: w
   })),
   drawImage: vi.fn(),
   putImageData: vi.fn(),
@@ -58,12 +44,10 @@ const mockContext = {
   lineTo: vi.fn(),
   stroke: vi.fn(),
   fillRect: vi.fn(),
-  fillText: vi.fn()
   fillText: vi.fn(),
+  scale: vi.fn(),
   canvas: { width: 800, height: 512 }
 };
-  scale: vi.fn(), // Added scale to mock
-}));
 
 HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext);
 
@@ -72,58 +56,6 @@ describe('HighResSpectrogram', () => {
 
   beforeEach(() => {
     dataRef = {
-      current: {
-        spectrum: new Float32Array(1024).fill(0.5),
-        f1: 500,
-        f2: 1500
-      }
-    };
-
-    // Add getBoundingClientRect mock
-    Element.prototype.getBoundingClientRect = vi.fn(() => ({
-      width: 800,
-      height: 512,
-      top: 0,
-      left: 0,
-      right: 800,
-      bottom: 512,
-    }));
-
-    dataRef = {
-      current: {
-        spectrum: new Float32Array(1024).fill(0.5),
-        f1: 500,
-        f2: 1500
-      }
-    };
-    vi.clearAllMocks();
-  });
-
-        current: {
-            spectrum: new Float32Array(1024).fill(0.5),
-            f1: 500,
-            f2: 1500
-        }
-    };
-
-    // Element.prototype.getBoundingClientRect mock
-    Element.prototype.getBoundingClientRect = vi.fn(() => ({
-      width: 800,
-      height: 512,
-      top: 0,
-      left: 0,
-      right: 800,
-      bottom: 512,
-    }));
-
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    cleanup();
-    vi.clearAllMocks();
-  });
-
       current: {
         spectrum: new Float32Array(1024).fill(0.5),
         f1: 500,
@@ -156,21 +88,13 @@ describe('HighResSpectrogram', () => {
       </SettingsProvider>
     );
 
-    // Check if component rendered (by looking for overlay text if present, or just existence)
-    // The component has "High-Res Spectrogram" text usually?
-    // Based on previous file content, expected screen.getByText(/High-Res Spectrogram/i).
-    // Let's check the implementation of HighResSpectrogram.jsx if needed,
-    // but the test primarily checks subscription.
-
+    // Check if component rendered (by looking for overlay text)
     expect(screen.getByText(/High-Res Spectrogram/i)).toBeDefined();
     expect(renderCoordinator.subscribe).toHaveBeenCalled();
 
     const [, callback, priority] = renderCoordinator.subscribe.mock.calls[0];
     expect(priority).toBe(renderCoordinator.PRIORITY.MEDIUM);
     expect(typeof callback).toBe('function');
-
-    // Check if component rendered (by looking for overlay text)
-    expect(screen.getByText(/High-Res Spectrogram/i)).toBeDefined();
   });
 
   it('cleans up subscription on unmount', () => {
