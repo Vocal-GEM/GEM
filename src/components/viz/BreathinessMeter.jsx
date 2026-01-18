@@ -43,6 +43,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const oqIndicatorRef = useRef(null);
     const lastOqRef = useRef(50);
     const ventricularRef = useRef(null);
+    const componentId = useId();
 
     // Optimized: Use RenderCoordinator to manage animation loop
     useEffect(() => {
@@ -148,6 +149,11 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
                     ventricularRef.current.style.display = 'none';
                 }
             }
+
+        };
+
+        const unsubscribe = renderCoordinator.subscribe(
+            `breathiness-meter-${componentId}`,
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -159,6 +165,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
         return () => {
             unsubscribe();
         };
+    }, [dataRef, colorBlindMode, componentId]);
     }, [dataRef, colorBlindMode, id]);
 
     // Determine if in sweet spot for static rendering
