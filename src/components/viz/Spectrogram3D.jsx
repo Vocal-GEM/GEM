@@ -45,6 +45,7 @@ const SpectrogramMesh = ({ dataRef }) => {
 
     // Buffer for historical data
     const historyRef = useRef(new Float32Array(numCols * numRows));
+    const tempColor = useMemo(() => new THREE.Color(), []);
 
     // Reusable color object to prevent GC
     // Optimization: Reuse Color object to avoid thousands of allocations per frame
@@ -110,6 +111,7 @@ const SpectrogramMesh = ({ dataRef }) => {
                 // Color map: Blue -> Purple -> Red -> Yellow
                 const t = Math.min(1, val / 2); // Normalize somewhat
 
+                // Use shared tempColor to avoid creating new object every iteration
                 // Optimization: Reuse tempColor object
                 tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
 
