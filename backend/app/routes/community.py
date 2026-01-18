@@ -54,13 +54,11 @@ def anonymize_audio(audio_path):
         sf.write(anon_path, y_stretched, sr)
 
         return anon_path
-    except ImportError:
-        # If librosa not available, just copy the file
-        # In production, you'd want to ensure librosa is installed
-        import shutil
-        anon_path = audio_path.replace('.', '_anon.')
-        shutil.copy(audio_path, anon_path)
-        return anon_path
+    except ImportError as e:
+        # Fail securely - do not copy raw file if anonymization fails
+        # Log error and raise
+        current_app.logger.error(f"Failed to anonymize audio (librosa missing?): {str(e)}")
+        raise e
 
 
 def check_moderation(text):
@@ -93,6 +91,7 @@ def share_voice():
         audio_file = request.files['audio']
 
         # Security: Validate file type
+        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
         is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'], file_stream=audio_file)
         if not is_valid:
             return jsonify({'error': error}), 400
@@ -101,7 +100,7 @@ def share_voice():
         expiration_days = int(request.form.get('expiration_days', 7))
 
         
-        # Save original file
+        # Save original file temporarily
         upload_folder = current_app.config.get(
             'UPLOAD_FOLDER', 'uploads/shared')
         os.makedirs(upload_folder, exist_ok=True)
@@ -109,19 +108,20 @@ def share_voice():
         # Security: Use secure_filename to prevent path traversal/bad characters
         safe_filename = secure_filename(audio_file.filename)
         filename = f"{current_user.id}_{datetime.now().timestamp()}_{safe_filename}"
-        # Security: Sanitize filename
-        safe_filename = secure_filename(audio_file.filename)
-        filename = f"{current_user.id}_{datetime.now().timestamp()}_{safe_filename}"
-
-        safe_filename = secure_filename(audio_file.filename)
-        filename = f"{
-            current_user.id}_{
-            datetime.now().timestamp()}_{safe_filename}"
         filepath = os.path.join(upload_folder, filename)
-        audio_file.save(filepath)
 
-        # Anonymize audio
-        anon_filepath = anonymize_audio(filepath)
+        try:
+            audio_file.save(filepath)
+
+            # Anonymize audio
+            anon_filepath = anonymize_audio(filepath)
+        finally:
+            # Security: Always remove the original raw audio file
+            if os.path.exists(filepath):
+                try:
+                    os.remove(filepath)
+                except Exception as e:
+                    current_app.logger.error(f"Failed to remove temp file {filepath}: {str(e)}")
 
         # Create share record
         share_id = generate_share_id()
