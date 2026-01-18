@@ -1,3 +1,4 @@
+import { render, cleanup, screen } from '@testing-library/react';
 import { render, screen, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import HighResSpectrogram from './HighResSpectrogram';
@@ -57,6 +58,7 @@ const mockContext = {
   lineTo: vi.fn(),
   stroke: vi.fn(),
   fillRect: vi.fn(),
+  fillText: vi.fn()
   fillText: vi.fn(),
   canvas: { width: 800, height: 512 }
 };
@@ -70,6 +72,26 @@ describe('HighResSpectrogram', () => {
 
   beforeEach(() => {
     dataRef = {
+      current: {
+        spectrum: new Float32Array(1024).fill(0.5),
+        f1: 500,
+        f2: 1500
+      }
+    };
+
+    // Add getBoundingClientRect mock
+    Element.prototype.getBoundingClientRect = vi.fn(() => ({
+      width: 800,
+      height: 512,
+      top: 0,
+      left: 0,
+      right: 800,
+      bottom: 512,
+    }));
+
+    vi.clearAllMocks();
+  });
+
         current: {
             spectrum: new Float32Array(1024).fill(0.5),
             f1: 500,
@@ -126,6 +148,12 @@ describe('HighResSpectrogram', () => {
         <HighResSpectrogram dataRef={dataRef} />
       </SettingsProvider>
     );
+
+    // Check if component rendered (by looking for overlay text if present, or just existence)
+    // The component has "High-Res Spectrogram" text usually?
+    // Based on previous file content, expected screen.getByText(/High-Res Spectrogram/i).
+    // Let's check the implementation of HighResSpectrogram.jsx if needed,
+    // but the test primarily checks subscription.
 
     expect(screen.getByText(/High-Res Spectrogram/i)).toBeDefined();
     expect(renderCoordinator.subscribe).toHaveBeenCalled();

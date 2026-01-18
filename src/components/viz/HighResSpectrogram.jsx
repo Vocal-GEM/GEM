@@ -31,6 +31,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const uniqueId = useId();
     const componentId = `spectrogram-highres-${uniqueId}`;
 
+    // Reusable buffers to avoid garbage collection churn
     // Reusable buffers to avoid GC
     const imgDataRef = useRef(null);
     const data32Ref = useRef(null);
@@ -57,6 +58,9 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const width = canvas.width;
         const height = canvas.height;
         const scrollSpeed = 2; // px per frame
+
+        // Optimization: Use alpha: false for better performance
+        const ctx = canvas.getContext('2d', { alpha: false });
 
         // Ensure buffers are ready and match current height
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
@@ -151,7 +155,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         lastFormantsRef.current = { f1, f2 };
 
-    }, [dataRef, colormap]);
+    }, [dataRef, colormap, componentId]);
 
     // Handle Resize with ResizeObserver
     useEffect(() => {
@@ -199,6 +203,11 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         resizeObserver.observe(container);
 
+        // Initial size set
+        const rect = container.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(rect.width * dpr);
+        canvas.height = 512;
         // Initial sizing
         updateSize();
 
@@ -231,7 +240,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const y = e.clientY - rect.top;
 
         // Map y to frequency
-        // y=0 is top (high freq)
         const canvasY = (y / rect.height) * canvas.height;
         const freqRatio = 1 - (canvasY / canvas.height);
         const frequency = freqRatio * MAX_FREQ;
