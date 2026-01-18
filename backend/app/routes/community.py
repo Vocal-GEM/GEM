@@ -250,12 +250,18 @@ def submit_success_story():
     try:
         data = request.get_json()
 
+        # Security: Sanitize HTML content
+        title = sanitize_html(data.get('title', ''))
+        story_content = sanitize_html(data.get('story', ''))
+
         # Moderation check
         is_safe, flagged = check_moderation(
-            data.get('title', '') + ' ' + data.get('story', ''))
+            title + ' ' + story_content)
 
         story = SuccessStory(
             user_id=current_user.id,
+            title=title,
+            story=story_content,
             title=sanitize_html(data.get('title')),
             story=sanitize_html(data.get('story')),
             timeline_months=data.get('timeline_months'),
