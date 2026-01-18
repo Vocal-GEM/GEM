@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
-from ..validators import validate_file_upload
+from ..validators import validate_file_upload, sanitize_html
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
     GroupChallenge, GroupChallengeParticipant, ModerationFlag,
@@ -256,8 +256,8 @@ def submit_success_story():
 
         story = SuccessStory(
             user_id=current_user.id,
-            title=data.get('title'),
-            story=data.get('story'),
+            title=sanitize_html(data.get('title')),
+            story=sanitize_html(data.get('story')),
             timeline_months=data.get('timeline_months'),
             voice_goal=data.get('voice_goal'),
             consent_public=data.get('consent_public', False),

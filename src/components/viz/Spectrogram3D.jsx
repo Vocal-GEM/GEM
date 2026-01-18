@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -47,6 +47,7 @@ const SpectrogramMesh = ({ dataRef }) => {
     const historyRef = useRef(new Float32Array(numCols * numRows));
 
     // Reusable color object to prevent GC
+    // Optimization: Reuse Color object to avoid thousands of allocations per frame
     const tempColor = useMemo(() => new THREE.Color(), []);
 
     useFrame(() => {
