@@ -262,6 +262,8 @@ def submit_success_story():
             user_id=current_user.id,
             title=title,
             story=story_content,
+            title=sanitize_html(data.get('title')),
+            story=sanitize_html(data.get('story')),
             timeline_months=data.get('timeline_months'),
             voice_goal=data.get('voice_goal'),
             consent_public=data.get('consent_public', False),
