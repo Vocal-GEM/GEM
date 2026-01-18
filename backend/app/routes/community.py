@@ -254,6 +254,30 @@ def submit_success_story():
     """Submit a success story"""
     try:
         data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Invalid request data'}), 400
+
+        title = data.get('title', '')
+        content = data.get('story', '')
+        techniques = data.get('techniques_used', [])
+
+        # Input validation
+        if not title or not content:
+            return jsonify({'error': 'Title and story are required'}), 400
+
+        if len(title) > 200:
+            return jsonify({'error': 'Title exceeds 200 characters'}), 400
+
+        if len(content) > 5000:
+            return jsonify({'error': 'Story exceeds 5000 characters'}), 400
+
+        # Security: Sanitize inputs to prevent Stored XSS
+        clean_title = sanitize_html(title)
+        clean_story = sanitize_html(content)
+
+        clean_techniques = []
+        if isinstance(techniques, list):
+            clean_techniques = [sanitize_html(str(t)) for t in techniques]
 
         # Sanitize inputs
         title = sanitize_html(data.get('title', ''))
@@ -290,6 +314,12 @@ def submit_success_story():
         story_content = sanitize_html(data.get('story', ''))
 
         # Moderation check
+        is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
+
+        story = SuccessStory(
+            user_id=current_user.id,
+            title=clean_title,
+            story=clean_story,
         is_safe, flagged = check_moderation(
             title + ' ' + story_content)
 
@@ -305,6 +335,7 @@ def submit_success_story():
             voice_goal=voice_goal,
             consent_public=data.get('consent_public', False),
             approved=is_safe,  # Auto-approve if passes moderation
+            techniques_used=clean_techniques
             techniques_used=techniques
         )
 
