@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useId } from 'react';
 import { useAudio } from '../../context/AudioContext';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const LTASPlot = ({ width = 600, height = 300 }) => {
     const { dataRef } = useAudio();
@@ -7,10 +8,9 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
     const [isRecording, setIsRecording] = useState(false);
     const accumulatorRef = useRef(new Float32Array(1024).fill(0)); // Assuming 1024 bins from AudioEngine
     const frameCountRef = useRef(0);
+    const componentId = useId();
 
     useEffect(() => {
-        let animationId;
-
         const draw = () => {
             if (!canvasRef.current) return;
             const ctx = canvasRef.current.getContext('2d');
@@ -85,12 +85,17 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
                 ctx.stroke();
             }
 
-            animationId = requestAnimationFrame(draw);
+            // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
-        draw();
-        return () => cancelAnimationFrame(animationId);
-    }, [isRecording]);
+        const unsubscribe = renderCoordinator.subscribe(
+            `ltas-plot-${componentId}`,
+            draw,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+
+        return () => unsubscribe();
+    }, [isRecording, componentId, dataRef]);
 
     const reset = () => {
         accumulatorRef.current.fill(0);
