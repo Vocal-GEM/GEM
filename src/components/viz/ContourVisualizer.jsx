@@ -17,8 +17,13 @@ const ContourVisualizer = ({ dataRef }) => {
     const lastUiUpdateRef = useRef(0);
 
     useEffect(() => {
+        // NOTE: This loop is driven by RenderCoordinator, not a local requestAnimationFrame.
+        // RenderCoordinator handles the recursion and passes (delta, currentTime).
         const loop = (delta, currentTime) => {
             if (!dataRef.current) return;
+
+            // Fallback if currentTime is not passed (though RenderCoordinator should pass it)
+            const now = currentTime || performance.now();
 
             const { prosody, isSilent, clarity } = dataRef.current;
 
@@ -28,12 +33,14 @@ const ContourVisualizer = ({ dataRef }) => {
 
             if (prosody && shouldUpdate) {
                 // Throttle UI updates to 10fps (every 100ms) to reduce React renders
+                if (now - lastUiUpdateRef.current > 100) {
                 if (currentTime - lastUiUpdateRef.current > 100) {
                     setMetrics({
                         contour: prosody.contour || 0,
                         slopeDirection: prosody.slopeDirection || 'flat',
                         semitoneRange: prosody.semitoneRange || 0
                     });
+                    lastUiUpdateRef.current = now;
                     lastUiUpdateRef.current = currentTime;
                 }
 
