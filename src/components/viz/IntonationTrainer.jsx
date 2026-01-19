@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useId, useMemo } from 'react';
 import { TrendingUp, RefreshCw, ChevronRight, ChevronLeft, Play, History, Volume2 } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 // Simple DTW-like scoring (Euclidean distance between resampled curves)
 const calculateScore = (trace, patternPoints) => {
@@ -77,8 +78,12 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
     const [history, setHistory] = useState([]);
     const [showHistory, setShowHistory] = useState(false);
 
+    // Unique component ID for RenderCoordinator
+    const uniqueId = useId();
+    const componentId = `intonation-trainer-${uniqueId}`;
+
     // Patterns: Array of { name, points: [{x, y}] } where x,y are 0-1 normalized
-    const patterns = [
+    const patterns = useMemo(() => [
         {
             name: "Rising Question",
             description: "Start mid, dip slightly, then rise sharply at the end.",
@@ -110,7 +115,7 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
                 { x: 0, y: 0.5 }, { x: 1, y: 0.5 }
             ]
         }
-    ];
+    ], []);
 
     // Trace history: Array of {x, y}
     const traceRef = useRef([]);
@@ -121,8 +126,6 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
         const ctx = canvas.getContext('2d');
         const width = canvas.width;
         const height = canvas.height;
-
-        let animationId;
 
         const draw = () => {
             // Clear
@@ -234,23 +237,20 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
                 ctx.fill();
             }
 
-            animationId = requestAnimationFrame(draw);
+            // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'intonation-trainer',
-                draw,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            draw,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
 
         return () => {
             if (unsubscribe) unsubscribe();
-            cancelAnimationFrame(animationId);
         };
-    }, [selectedPattern, isActive, isTracing, duration, targetRange]); // Added dependencies
+        // Adding missing dependencies to dependency array to satisfy linter
+    }, [selectedPattern, isActive, isTracing, duration, targetRange, componentId, dataRef, patterns, score]);
 
     const nextPattern = () => {
         setSelectedPattern((prev) => (prev + 1) % patterns.length);

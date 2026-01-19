@@ -34,12 +34,14 @@ const ContourVisualizer = ({ dataRef }) => {
             if (prosody && shouldUpdate) {
                 // Throttle UI updates to 10fps (every 100ms) to reduce React renders
                 if (now - lastUiUpdateRef.current > 100) {
+                if (currentTime - lastUiUpdateRef.current > 100) {
                     setMetrics({
                         contour: prosody.contour || 0,
                         slopeDirection: prosody.slopeDirection || 'flat',
                         semitoneRange: prosody.semitoneRange || 0
                     });
                     lastUiUpdateRef.current = now;
+                    lastUiUpdateRef.current = currentTime;
                 }
 
                 // Update history
@@ -112,6 +114,7 @@ const ContourVisualizer = ({ dataRef }) => {
                     ctx.stroke();
                 }
             }
+            // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
         let unsubscribe;
