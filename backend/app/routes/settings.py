@@ -1,7 +1,11 @@
+import logging
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
 from ..models import db, Settings
 from ..extensions import limiter
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 settings_bp = Blueprint('settings', __name__, url_prefix='/api/settings')
 
@@ -34,4 +38,6 @@ def update_settings():
         return jsonify(updated_prefs)
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+        # Security: Log the error internally but return a generic message to the user
+        logger.error(f"Error saving settings: {str(e)}")
+        return jsonify({"error": "An error occurred while saving settings"}), 500
