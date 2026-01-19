@@ -29,6 +29,19 @@ const Button = React.forwardRef(({ className, variant, size, asChild = false, is
         className
       ))}
       ref={ref}
+      disabled={isLoading || props.disabled}
+      aria-busy={isLoading}
+      {...props}
+    >
+      {isLoading ? (
+        size === "icon" ? (
+          <LoadingSpinner size="sm" className="text-current" />
+        ) : (
+          <>
+            <LoadingSpinner size="sm" className="mr-2 text-current" />
+            {children}
+          </>
+        )
       disabled={props.disabled || isLoading}
       {...props}
     >

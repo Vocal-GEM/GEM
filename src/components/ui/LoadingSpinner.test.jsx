@@ -52,6 +52,8 @@ describe("LoadingSpinner", () => {
   });
 
   it('overrides default min-height when custom class is provided', () => {
+      const { container } = render(<LoadingSpinner className="min-h-0" />);
+      expect(container.firstChild).toHaveClass('min-h-0');
     const { container } = render(<LoadingSpinner className="min-h-0" />);
     expect(container.firstChild).toHaveClass('min-h-0');
   it("applies custom className", () => {
