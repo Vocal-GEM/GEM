@@ -3,6 +3,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import HighResSpectrogram from './HighResSpectrogram';
 import { SettingsProvider } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
+import { renderCoordinator } from '../../services/RenderCoordinator';
+import { SettingsProvider } from '../../context/SettingsContext';
 import React from 'react';
 
 // Mock dependencies
@@ -23,12 +25,21 @@ vi.mock('../../context/SettingsContext', () => ({
   SettingsProvider: ({ children }) => <div>{children}</div>
 }));
 
+// Mock ResizeObserver
+global.ResizeObserver = vi.fn(function() {
+  this.observe = vi.fn();
+  this.unobserve = vi.fn();
+  this.disconnect = vi.fn();
+});
+
 // Mock Canvas getContext
-HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+const mockContext = {
   createImageData: vi.fn((w, h) => ({
     data: { buffer: new ArrayBuffer(w * h * 4) },
     height: h,
     width: w
+    width: w,
+    height: h
   })),
   drawImage: vi.fn(),
   putImageData: vi.fn(),
@@ -36,13 +47,15 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   moveTo: vi.fn(),
   lineTo: vi.fn(),
   stroke: vi.fn(),
-  canvas: { width: 800, height: 512 },
   fillRect: vi.fn(),
   fillText: vi.fn()
 }));
+  fillText: vi.fn(),
+  scale: vi.fn(),
+  canvas: { width: 800, height: 512 }
+};
 
-// Mock URL.createObjectURL for screenshot test
-globalThis.URL.createObjectURL = vi.fn();
+HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext);
 
 describe('HighResSpectrogram', () => {
   let dataRef;
@@ -74,6 +87,14 @@ describe('HighResSpectrogram', () => {
     vi.clearAllMocks();
   });
 
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
   it('renders successfully and subscribes to coordinator', () => {
     render(
       <SettingsProvider>
@@ -83,9 +104,12 @@ describe('HighResSpectrogram', () => {
 
     // Check if component rendered (by looking for overlay text if present, or just checking if subscribe was called)
     expect(renderCoordinator.subscribe).toHaveBeenCalled();
-    const [, callback, priority] = renderCoordinator.subscribe.mock.calls[0];
 
-    // Priority check
+    // Check if component rendered (by looking for overlay text)
+    expect(screen.getByText(/High-Res Spectrogram/i)).toBeDefined();
+    expect(renderCoordinator.subscribe).toHaveBeenCalled();
+
+    const [, callback, priority] = renderCoordinator.subscribe.mock.calls[0];
     expect(priority).toBe(renderCoordinator.PRIORITY.MEDIUM);
     expect(typeof callback).toBe('function');
   });
@@ -102,5 +126,30 @@ describe('HighResSpectrogram', () => {
 
     unmount();
     expect(unsubscribe).toHaveBeenCalled();
+  });
+
+  it('draws when callback is executed', () => {
+     render(
+      <SettingsProvider>
+        <HighResSpectrogram dataRef={dataRef} />
+      </SettingsProvider>
+    );
+
+    // Get the draw callback
+    const drawCallback = renderCoordinator.subscribe.mock.calls[0][1];
+
+    // Execute it
+    drawCallback();
+
+    // Verify canvas calls
+    expect(mockContext.drawImage).toHaveBeenCalled();
+    // 2 pixels shift
+    expect(mockContext.drawImage).toHaveBeenCalledWith(
+        expect.anything(),
+        2, 0, expect.any(Number), expect.any(Number),
+        0, 0, expect.any(Number), expect.any(Number)
+    );
+
+    expect(mockContext.putImageData).toHaveBeenCalled();
   });
 });

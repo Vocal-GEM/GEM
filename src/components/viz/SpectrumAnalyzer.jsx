@@ -136,6 +136,7 @@ const SpectrumAnalyzer = ({ dataRef, userMode }) => {
             unsubscribe();
         };
     }, [draw, componentId]);
+    }, [dataRef, userMode, componentId]);
 
     /**
      * Handle canvas click - show Hz/dB at position

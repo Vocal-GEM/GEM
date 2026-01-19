@@ -1,6 +1,9 @@
 from flask import Blueprint, jsonify, request
 from app.models import db, ExercisePack, PackExercise, PackDownload, PackReview, User
+from app.extensions import limiter
 from flask_login import login_required, current_user
+from ..extensions import limiter
+from ..validators import sanitize_html
 import uuid
 from datetime import datetime
 
@@ -65,15 +68,20 @@ def get_pack_details(pack_id):
 
 @marketplace_bp.route('/packs', methods=['POST'])
 @login_required
+@limiter.limit("10 per hour")
 def create_pack():
     data = request.get_json()
     
+    # Security: Sanitize inputs to prevent Stored XSS
+    title = sanitize_html(data.get('title', ''))
+    description = sanitize_html(data.get('description', ''))
+
     pack_id = str(uuid.uuid4())
     pack = ExercisePack(
         id=pack_id,
         creator_id=current_user.id,
-        title=data.get('title'),
-        description=data.get('description'),
+        title=title,
+        description=description,
         category=data.get('category'),
         target_audience=data.get('target_audience'),
         voice_goal=data.get('voice_goal'),
@@ -84,12 +92,16 @@ def create_pack():
     
     exercises = data.get('exercises', [])
     for idx, ex in enumerate(exercises):
+        # Security: Sanitize exercise content
+        ex_title = sanitize_html(ex.get('title', ''))
+        ex_instructions = sanitize_html(ex.get('instructions', ''))
+
         exercise = PackExercise(
             id=str(uuid.uuid4()),
             pack_id=pack_id,
             order_index=idx,
-            title=ex.get('title'),
-            instructions=ex.get('instructions'),
+            title=ex_title,
+            instructions=ex_instructions,
             tool_id=ex.get('tool_id'),
             target_metrics=ex.get('target_metrics')
         )
@@ -101,6 +113,8 @@ def create_pack():
 
 @marketplace_bp.route('/packs/<pack_id>/download', methods=['POST'])
 @login_required
+@limiter.limit("60 per minute")
+@limiter.limit("20 per minute")
 def download_pack(pack_id):
     pack = ExercisePack.query.get_or_404(pack_id)
     
