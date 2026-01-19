@@ -17,6 +17,9 @@ import { renderCoordinator } from '../../services/RenderCoordinator';
  * - Warnings for excessive breathiness
  * - NEW: Estimated Open Quotient display
  * - NEW: Ventricular (false vocal fold) engagement warning
+ *
+ * Performance Optimization:
+ * - Uses RenderCoordinator for centralized animation loop control
  */
 
 // Zone configuration based on research
@@ -37,6 +40,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const zoneRef = useRef(null);
     const feedbackRef = useRef(null);
     const lastValueRef = useRef(50);
+    const componentId = useId();
     const id = useId();
 
     // NEW: Refs for OQ and ventricular displays
@@ -49,6 +53,8 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
 
     // Optimized: Use RenderCoordinator to manage animation loop
     useEffect(() => {
+        const updateMeter = () => {
+            if (!dataRef.current) return;
         const loop = () => {
             if (!dataRef.current) return;
         const loop = (delta, currentTime) => {
@@ -153,6 +159,11 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
                     ventricularRef.current.style.display = 'none';
                 }
             }
+        };
+
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            updateMeter,
 
         };
 
