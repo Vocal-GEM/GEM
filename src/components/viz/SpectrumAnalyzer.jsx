@@ -25,106 +25,107 @@ const SpectrumAnalyzer = ({ dataRef, userMode }) => {
     const [showControls, setShowControls] = useState(false);
     const componentId = useId();
 
-    useEffect(() => {
+    const draw = useCallback(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
 
-        const draw = () => {
-            if (!dataRef.current) {
-                return;
-            }
+        if (!dataRef.current) {
+            return;
+        }
 
-            const { timeDomainData, spectrum } = dataRef.current;
-            const width = canvas.width;
-            const height = canvas.height;
+        const { timeDomainData, spectrum } = dataRef.current;
+        const width = canvas.width;
+        const height = canvas.height;
 
-            // Clear canvas
-            ctx.fillStyle = '#0f172a';
-            ctx.fillRect(0, 0, width, height);
+        // Clear canvas
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, width, height);
 
-            // Draw Grid
-            ctx.strokeStyle = '#334155';
-            ctx.lineWidth = 1;
+        // Draw Grid
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let f = 1000; f < MAX_FREQ; f += 1000) {
+            const x = (f / MAX_FREQ) * width;
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height);
+            ctx.fillStyle = '#64748b';
+            ctx.fillText(`${f / 1000}k`, x + 2, height - 5);
+        }
+        ctx.stroke();
+
+        // 1. Draw FFT Spectrum (Raw)
+        if (spectrum) {
             ctx.beginPath();
-            for (let f = 1000; f < MAX_FREQ; f += 1000) {
-                const x = (f / MAX_FREQ) * width;
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, height);
-                ctx.fillStyle = '#64748b';
-                ctx.fillText(`${f / 1000}k`, x + 2, height - 5);
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 1;
+
+            const maxBin = Math.floor(spectrum.length * (MAX_FREQ / 24000));
+
+            for (let i = 0; i < maxBin; i++) {
+                const x = (i / maxBin) * width;
+                const val = spectrum[i];
+                const y = height - (val / 255) * height;
+
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
             }
             ctx.stroke();
+        }
 
-            // 1. Draw FFT Spectrum (Raw)
-            if (spectrum) {
+        // 2. Draw LPC Envelope (Smooth)
+        if (timeDomainData && userMode === 'slp') {
+            const floatData = new Float32Array(timeDomainData.length);
+            for (let i = 0; i < timeDomainData.length; i++) {
+                floatData[i] = (timeDomainData[i] - 128) / 128;
+            }
+
+            const lpcResult = lpcAnalyzer.analyze(floatData);
+
+            if (lpcResult && lpcResult.envelope) {
+                const { envelope, formants } = lpcResult;
+
                 ctx.beginPath();
-                ctx.strokeStyle = '#475569';
-                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#f472b6';
+                ctx.lineWidth = 3;
 
-                const maxBin = Math.floor(spectrum.length * (MAX_FREQ / 24000));
+                const maxEnvIndex = Math.floor(envelope.length * (MAX_FREQ / 24000));
 
-                for (let i = 0; i < maxBin; i++) {
-                    const x = (i / maxBin) * width;
-                    const val = spectrum[i];
-                    const y = height - (val / 255) * height;
+                for (let i = 0; i < maxEnvIndex; i++) {
+                    const x = (i / maxEnvIndex) * width;
+                    const val = envelope[i];
+                    const y = height - ((val + 20) / 80) * height;
 
                     if (i === 0) ctx.moveTo(x, y);
                     else ctx.lineTo(x, y);
                 }
                 ctx.stroke();
-            }
 
-            // 2. Draw LPC Envelope (Smooth)
-            if (timeDomainData && userMode === 'slp') {
-                const floatData = new Float32Array(timeDomainData.length);
-                for (let i = 0; i < timeDomainData.length; i++) {
-                    floatData[i] = (timeDomainData[i] - 128) / 128;
-                }
+                // Draw Formant Peaks
+                ctx.fillStyle = '#fbbf24';
+                formants.forEach((f, idx) => {
+                    if (f.freq < MAX_FREQ) {
+                        const x = (f.freq / MAX_FREQ) * width;
+                        const y = height - ((f.amp + 20) / 80) * height;
 
-                const lpcResult = lpcAnalyzer.analyze(floatData);
+                        ctx.beginPath();
+                        ctx.arc(x, y, 4, 0, Math.PI * 2);
+                        ctx.fill();
 
-                if (lpcResult && lpcResult.envelope) {
-                    const { envelope, formants } = lpcResult;
-
-                    ctx.beginPath();
-                    ctx.strokeStyle = '#f472b6';
-                    ctx.lineWidth = 3;
-
-                    const maxEnvIndex = Math.floor(envelope.length * (MAX_FREQ / 24000));
-
-                    for (let i = 0; i < maxEnvIndex; i++) {
-                        const x = (i / maxEnvIndex) * width;
-                        const val = envelope[i];
-                        const y = height - ((val + 20) / 80) * height;
-
-                        if (i === 0) ctx.moveTo(x, y);
-                        else ctx.lineTo(x, y);
-                    }
-                    ctx.stroke();
-
-                    // Draw Formant Peaks
-                    ctx.fillStyle = '#fbbf24';
-                    formants.forEach((f, idx) => {
-                        if (f.freq < MAX_FREQ) {
-                            const x = (f.freq / MAX_FREQ) * width;
-                            const y = height - ((f.amp + 20) / 80) * height;
-
-                            ctx.beginPath();
-                            ctx.arc(x, y, 4, 0, Math.PI * 2);
-                            ctx.fill();
-
-                            if (idx < 3) {
-                                ctx.fillStyle = '#fff';
-                                ctx.font = '10px sans-serif';
-                                ctx.fillText(`F${idx + 1}`, x + 5, y - 5);
-                                ctx.fillStyle = '#fbbf24';
-                            }
+                        if (idx < 3) {
+                            ctx.fillStyle = '#fff';
+                            ctx.font = '10px sans-serif';
+                            ctx.fillText(`F${idx + 1}`, x + 5, y - 5);
+                            ctx.fillStyle = '#fbbf24';
                         }
-                    });
-                }
+                    }
+                });
             }
-        };
+        }
+    }, [dataRef, userMode]);
 
+    useEffect(() => {
         const unsubscribe = renderCoordinator.subscribe(
             componentId,
             draw,
@@ -134,6 +135,7 @@ const SpectrumAnalyzer = ({ dataRef, userMode }) => {
         return () => {
             unsubscribe();
         };
+    }, [draw, componentId]);
     }, [dataRef, userMode, componentId]);
 
     /**
