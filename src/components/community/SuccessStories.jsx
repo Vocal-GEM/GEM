@@ -8,19 +8,28 @@ import { Button } from '../ui/button';
 
 const AudioPlayerResult = ({ src, label }) => {
     const [playing, setPlaying] = useState(false);
-    const audio = React.useRef(new Audio(src));
+    // ⚡ Bolt: Use useRef(null) and lazy init to avoid creating Audio objects on every render
+    const audioRef = React.useRef(null);
 
     useEffect(() => {
-        const aud = audio.current;
-        aud.onended = () => setPlaying(false);
-        return () => aud.pause();
+        const audio = new Audio(src);
+        audioRef.current = audio;
+
+        audio.onended = () => setPlaying(false);
+
+        return () => {
+            audio.pause();
+            audio.onended = null;
+        };
     }, [src]);
 
     const toggle = () => {
+        if (!audioRef.current) return;
+
         if (playing) {
-            audio.current.pause();
+            audioRef.current.pause();
         } else {
-            audio.current.play();
+            audioRef.current.play();
         }
         setPlaying(!playing);
     };
