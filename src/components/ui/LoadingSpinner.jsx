@@ -37,6 +37,9 @@ const LoadingSpinner = ({
     ? 'inline-flex w-auto h-auto min-h-0'
     : 'w-full h-full min-h-[200px]';
 
+  // Define color styles based on variant
+  // 'default' matches original hardcoded colors (slate track, blue spinner)
+  // 'current' uses currentColor for flexible styling (e.g. inside buttons)
   const isCurrent = variant === 'current';
   const trackColor = isCurrent
     ? 'border-current opacity-20'

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Square, Play, Pause, Trash2, Calendar, Clock, Music, Plus, X, Tag, FileText } from 'lucide-react';
+import LoadingSpinner from '../ui/LoadingSpinner';
 import { getRecordings, saveRecording, deleteRecording, updateRecording } from '../../services/VoiceJournalService';
 import { recordPractice } from '../../services/StreakService';
 import { JOURNAL_TEMPLATES, getTemplateById, formatTemplateAsEntry } from '../../data/journalTemplates';
@@ -7,6 +8,7 @@ import { JOURNAL_TEMPLATES, getTemplateById, formatTemplateAsEntry } from '../..
 const VoiceJournalView = () => {
     const [recordings, setRecordings] = useState([]);
     const [isRecording, setIsRecording] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const [playingId, setPlayingId] = useState(null);
     const [showRecordModal, setShowRecordModal] = useState(false);
     const [notes, setNotes] = useState('');
@@ -83,6 +85,7 @@ const VoiceJournalView = () => {
     const handleSave = async () => {
         if (!currentBlob) return;
 
+        setIsSaving(true);
         try {
             await saveRecording({
                 audioBlob: currentBlob,
@@ -98,6 +101,8 @@ const VoiceJournalView = () => {
             loadRecordings();
         } catch (err) {
             console.error('Failed to save recording:', err);
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -176,12 +181,13 @@ const VoiceJournalView = () => {
                                 {/* Play Button */}
                                 <button
                                     onClick={() => handlePlay(recording)}
+                                    aria-label={playingId === recording.id ? "Pause recording" : "Play recording"}
                                     className={`p-4 rounded-full transition-colors ${playingId === recording.id
                                         ? 'bg-pink-500 text-white'
                                         : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
                                         }`}
                                 >
-                                    {playingId === recording.id ? <Pause size={24} /> : <Play size={24} />}
+                                    {playingId === recording.id ? <Pause size={24} aria-hidden="true" /> : <Play size={24} aria-hidden="true" />}
                                 </button>
 
                                 {/* Info */}
@@ -207,9 +213,10 @@ const VoiceJournalView = () => {
                                 {/* Actions */}
                                 <button
                                     onClick={() => handleDelete(recording.id)}
+                                    aria-label="Delete recording"
                                     className="p-2 text-slate-500 hover:text-red-400 transition-colors"
                                 >
-                                    <Trash2 size={18} />
+                                    <Trash2 size={18} aria-hidden="true" />
                                 </button>
                             </div>
                         </div>
@@ -223,8 +230,12 @@ const VoiceJournalView = () => {
                     <div className="w-full max-w-md bg-slate-900 rounded-2xl p-6 border border-slate-700">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-bold text-white">New Recording</h2>
-                            <button onClick={() => { setShowRecordModal(false); setCurrentBlob(null); }} className="text-slate-400 hover:text-white">
-                                <X size={20} />
+                            <button
+                                onClick={() => { setShowRecordModal(false); setCurrentBlob(null); }}
+                                className="text-slate-400 hover:text-white"
+                                aria-label="Close modal"
+                            >
+                                <X size={20} aria-hidden="true" />
                             </button>
                         </div>
 
@@ -232,17 +243,18 @@ const VoiceJournalView = () => {
                         <div className="text-center mb-6">
                             {!currentBlob ? (
                                 <>
-                                    <div className="text-4xl font-mono text-white mb-4">{formatTime(recordingTime)}</div>
+                                    <div className="text-4xl font-mono text-white mb-4" role="timer" aria-label="Recording duration">{formatTime(recordingTime)}</div>
                                     <button
                                         onClick={isRecording ? stopRecording : startRecording}
+                                        aria-label={isRecording ? "Stop recording" : "Start recording"}
                                         className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto transition-all ${isRecording
                                             ? 'bg-red-500 animate-pulse'
                                             : 'bg-pink-500 hover:bg-pink-400'
                                             }`}
                                     >
-                                        {isRecording ? <Square size={32} className="text-white" /> : <Mic size={32} className="text-white" />}
+                                        {isRecording ? <Square size={32} className="text-white" aria-hidden="true" /> : <Mic size={32} className="text-white" aria-hidden="true" />}
                                     </button>
-                                    <p className="text-slate-400 text-sm mt-4">
+                                    <p className="text-slate-400 text-sm mt-4" aria-live="polite">
                                         {isRecording ? 'Tap to stop' : 'Tap to start recording'}
                                     </p>
                                 </>
@@ -252,11 +264,11 @@ const VoiceJournalView = () => {
 
                                     {/* Template Selector */}
                                     <div className="mb-4">
-                                        <label className="flex items-center gap-2 text-sm text-slate-400 mb-2">
-                                            <FileText size={14} />
+                                        <label id="template-label" className="flex items-center gap-2 text-sm text-slate-400 mb-2">
+                                            <FileText size={14} aria-hidden="true" />
                                             Use a template (optional)
                                         </label>
-                                        <div className="flex flex-wrap gap-2">
+                                        <div className="flex flex-wrap gap-2" role="group" aria-labelledby="template-label">
                                             {JOURNAL_TEMPLATES.slice(0, 4).map(template => (
                                                 <button
                                                     key={template.id}
@@ -264,12 +276,13 @@ const VoiceJournalView = () => {
                                                         setSelectedTemplate(template.id);
                                                         setNotes(formatTemplateAsEntry(template));
                                                     }}
+                                                    aria-pressed={selectedTemplate === template.id}
                                                     className={`px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 transition-all ${selectedTemplate === template.id
                                                             ? 'bg-purple-500 text-white'
                                                             : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                                                         }`}
                                                 >
-                                                    <span>{template.icon}</span>
+                                                    <span aria-hidden="true">{template.icon}</span>
                                                     {template.name}
                                                 </button>
                                             ))}
@@ -280,7 +293,8 @@ const VoiceJournalView = () => {
                                         value={notes}
                                         onChange={(e) => setNotes(e.target.value)}
                                         placeholder="Add notes about this recording..."
-                                        className="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 resize-none"
+                                        aria-label="Recording notes"
+                                        className="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 resize-none focus:ring-2 focus:ring-pink-500 focus:outline-none"
                                         rows={5}
                                     />
                                 </>
@@ -292,15 +306,24 @@ const VoiceJournalView = () => {
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => { setCurrentBlob(null); setRecordingTime(0); }}
-                                    className="flex-1 py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700"
+                                    className="flex-1 py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 focus:ring-2 focus:ring-slate-500 focus:outline-none"
+                                    disabled={isSaving}
                                 >
                                     Re-record
                                 </button>
                                 <button
                                     onClick={handleSave}
-                                    className="flex-1 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-xl hover:opacity-90"
+                                    disabled={isSaving}
+                                    className="flex-1 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:ring-2 focus:ring-pink-500 focus:outline-none"
                                 >
-                                    Save
+                                    {isSaving ? (
+                                        <>
+                                            <LoadingSpinner size="sm" variant="current" />
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        'Save'
+                                    )}
                                 </button>
                             </div>
                         )}

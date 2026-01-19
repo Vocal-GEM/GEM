@@ -30,6 +30,9 @@
 ## 2024-05-22 - QuickActions Accessibility & Build Stabilization
 **Learning:** Invisible elements (opacity: 0) remain in the accessibility tree, confusing screen reader users. `pointer-events: none` does not prevent keyboard focus in all contexts.
 **Action:** Use `aria-hidden="true"` and `tabIndex={-1}` for visually hidden interactive elements, or `visibility: hidden` if layout allows.
+## 2025-05-20 - Loading Spinner Variants
+**Learning:** Button components often pass props like `variant` to their children (like `LoadingSpinner`), but if the child doesn't explicitly handle them, it breaks the visual consistency (e.g., blue spinner on blue button).
+**Action:** Ensure utility components like `LoadingSpinner` accept and handle context-aware props (like `variant="current"`) to inherit parent styles (e.g., using `currentColor`).
 
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
