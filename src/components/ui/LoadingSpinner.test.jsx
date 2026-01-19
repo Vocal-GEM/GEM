@@ -20,6 +20,9 @@ describe("LoadingSpinner", () => {
     // It should have role="status"
     const spinner = screen.getByRole("status");
     expect(spinner).toBeInTheDocument();
+
+    // It should have a visually hidden label "Loading..." by default
+    const srText = screen.getByText("Loading...");
     expect(spinner).toHaveAttribute('aria-live', 'polite');
 
     // It should have a visually hidden label "Loading..." by default
@@ -35,6 +38,14 @@ describe("LoadingSpinner", () => {
     expect(screen.getByText('Processing data...')).toBeInTheDocument();
   });
 
+  it("applies custom className", () => {
+    const { container } = render(<LoadingSpinner className="my-custom-class" />);
+    expect(container.firstChild).toHaveClass("my-custom-class");
+  });
+
+  it("overrides default min-height when custom class is provided", () => {
+    const { container } = render(<LoadingSpinner className="min-h-0" />);
+    expect(container.firstChild).toHaveClass("min-h-0");
   it('applies custom className', () => {
     const { container } = render(<LoadingSpinner className="my-custom-class" />);
     expect(container.firstChild).toHaveClass('my-custom-class');
