@@ -362,6 +362,17 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
 
+            // Optimized: Batch segments by color to reduce draw calls
+            let currentColor = null;
+            let batchActive = false;
+
+            const flush = () => {
+                if (batchActive) {
+                    ctx.stroke();
+                    batchActive = false;
+                }
+            };
+
             for (let i = 1; i < history.length; i++) {
                 const p1 = history[i - 1];
                 const p2 = history[i];
@@ -372,28 +383,38 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     const x2 = 30 + (i / (history.length - 1)) * (width - 30);
                     const y2 = mapY(p2);
 
-                    const grad = ctx.createLinearGradient(x1, y1, x2, y2);
-                    grad.addColorStop(0, getPitchColor(p1));
-                    grad.addColorStop(1, getPitchColor(p2));
+                    // Use p1 color for the segment (simplification for performance)
+                    const color = getPitchColor(p1);
 
-                    ctx.strokeStyle = grad;
-                    ctx.beginPath();
-                    ctx.moveTo(x1, y1);
-                    ctx.lineTo(x2, y2);
-                    ctx.stroke();
+                    if (color !== currentColor) {
+                        flush();
+                        currentColor = color;
+                        ctx.strokeStyle = color;
+                        ctx.beginPath();
+                        ctx.moveTo(x1, y1);
+                        ctx.lineTo(x2, y2);
+                        batchActive = true;
+                    } else {
+                        if (!batchActive) {
+                            // Start new batch after silence
+                            ctx.strokeStyle = color;
+                            ctx.beginPath();
+                            ctx.moveTo(x1, y1);
+                            ctx.lineTo(x2, y2);
+                            batchActive = true;
+                        } else {
+                            // Continue existing path
+                            ctx.lineTo(x2, y2);
+                        }
+                    }
+                } else {
+                    // Gap/Silence detected
+                    flush();
                 }
             }
-
-            history.forEach((p, i) => {
-                if (p > 0) {
-                    const x = 30 + (i / (history.length - 1)) * (width - 30);
-                    const y = mapY(p);
-                    ctx.fillStyle = getPitchColor(p);
-                    ctx.beginPath();
-                    ctx.arc(x, y, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            });
+            flush();
+            // Optimized: Removed the dot-drawing loop (history.forEach) which caused O(N) arc/fill calls.
+            // The line itself provides sufficient visual feedback.
 
             ctx.shadowBlur = 0;
             const currentP = history[history.length - 1];
