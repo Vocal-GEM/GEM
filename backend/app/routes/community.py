@@ -2,22 +2,16 @@ from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
-from ..validators import validate_file_upload
-from ..extensions import db
-from ..extensions import db, limiter
 from ..validators import validate_file_upload, sanitize_html
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
     GroupChallenge, GroupChallengeParticipant, ModerationFlag,
     CommunityBenchmark,
 )
-from ..validators import validate_file_upload, sanitize_html
 from datetime import datetime, timedelta
 import os
 import secrets
 import hashlib
-from werkzeug.utils import secure_filename
-from ..validators import validate_file_upload, sanitize_html
 
 community_bp = Blueprint('community', __name__)
 
@@ -93,17 +87,13 @@ def share_voice():
 
         # Security: Validate file type
         is_valid, error = validate_file_upload(
-            audio_file.filename, allowed_types=['audio'])
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'], file_stream=audio_file)
+            audio_file.filename, allowed_types=['audio'], file_stream=audio_file)
         if not is_valid:
             return jsonify({'error': error}), 400
 
         context = sanitize_html(request.form.get('context', ''))
         expiration_days = int(request.form.get('expiration_days', 7))
 
-        # Save original file
-        
         # Save original file temporarily
         upload_folder = current_app.config.get(
             'UPLOAD_FOLDER', 'uploads/shared')
@@ -115,11 +105,6 @@ def share_voice():
 
         filepath = os.path.join(upload_folder, filename)
 
-        # Anonymize audio
-        try:
-            anon_filepath = anonymize_audio(filepath)
-        finally:
-            # Ensure original is deleted for privacy
         try:
             audio_file.save(filepath)
 
@@ -132,7 +117,6 @@ def share_voice():
                     os.remove(filepath)
                 except Exception as e:
                     current_app.logger.error(f"Failed to delete original file: {e}")
-                    current_app.logger.error(f"Failed to remove temp file {filepath}: {str(e)}")
 
         # Create share record
         share_id = generate_share_id()
@@ -285,44 +269,11 @@ def submit_success_story():
         # Security: Sanitize inputs to prevent Stored XSS
         clean_title = sanitize_html(title)
         clean_story = sanitize_html(content)
+        voice_goal = sanitize_html(data.get('voice_goal', ''))
 
         clean_techniques = []
         if isinstance(techniques, list):
             clean_techniques = [sanitize_html(str(t)) for t in techniques]
-
-        # Sanitize inputs
-        title = sanitize_html(data.get('title', ''))
-        story_content = sanitize_html(data.get('story', ''))
-
-        # Sanitize techniques list
-        # Security: Sanitize inputs to prevent Stored XSS
-        title = sanitize_html(data.get('title', ''))
-        story_content = sanitize_html(data.get('story', ''))
-
-        # Sanitize list items if present
-        # Sanitize inputs
-        title = sanitize_html(data.get('title', ''))
-        story_text = sanitize_html(data.get('story', ''))
-        voice_goal = sanitize_html(data.get('voice_goal', ''))
-        # Input sanitization
-        title = sanitize_html(data.get('title', ''))
-        story_text = sanitize_html(data.get('story', ''))
-
-        techniques = data.get('techniques_used', [])
-        if isinstance(techniques, list):
-            techniques = [sanitize_html(str(t)) for t in techniques]
-        else:
-            techniques = []
-
-        # Moderation check
-        is_safe, flagged = check_moderation(title + ' ' + story_content)
-        # Moderation check
-        is_safe, flagged = check_moderation(title + ' ' + story_text)
-        # Moderation check
-        is_safe, flagged = check_moderation(title + ' ' + story_text)
-        # Security: Sanitize HTML content
-        title = sanitize_html(data.get('title', ''))
-        story_content = sanitize_html(data.get('story', ''))
 
         # Moderation check
         is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
@@ -331,23 +282,11 @@ def submit_success_story():
             user_id=current_user.id,
             title=clean_title,
             story=clean_story,
-        is_safe, flagged = check_moderation(
-            title + ' ' + story_content)
-
-        story = SuccessStory(
-            user_id=current_user.id,
-            title=title,
-            story=story_content,
-            story=story_text,
-            story=story_content,
-            title=sanitize_html(data.get('title')),
-            story=sanitize_html(data.get('story')),
             timeline_months=data.get('timeline_months'),
             voice_goal=voice_goal,
             consent_public=data.get('consent_public', False),
             approved=is_safe,  # Auto-approve if passes moderation
             techniques_used=clean_techniques
-            techniques_used=techniques
         )
 
         db.session.add(story)

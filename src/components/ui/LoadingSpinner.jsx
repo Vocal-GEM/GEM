@@ -1,4 +1,6 @@
 import React from 'react';
+import { twMerge } from 'tailwind-merge';
+import clsx from 'clsx';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -26,6 +28,8 @@ const LoadingSpinner = ({
 
   // Determine container classes based on size
   // 'sm' and 'xs' are treated as "inline/compact" mode by default
+  // For 'sm' and 'xs', we usually want inline or small container.
+  // For other sizes, default to the original min-height, but allow override via className
   const isSmall = size === 'sm' || size === 'xs';
 
   const containerBase = 'flex items-center justify-center';
