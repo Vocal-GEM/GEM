@@ -1,3 +1,8 @@
+import { render, cleanup } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import BreathinessMeter from './BreathinessMeter';
+import { renderCoordinator } from '../../services/RenderCoordinator';
+import React from 'react';
 
 import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -20,6 +25,13 @@ vi.mock('../../services/RenderCoordinator', () => ({
     unsubscribe: vi.fn(),
     PRIORITY: { MEDIUM: 2 }
   }
+}));
+
+// Mock SettingsContext
+vi.mock('../../context/SettingsContext', () => ({
+  useSettings: () => ({
+    colorBlindMode: false
+  })
 }));
 
     PRIORITY: { MEDIUM: 2, LOW: 3 }
@@ -121,6 +133,13 @@ describe('BreathinessMeter', () => {
   let dataRef;
 
   beforeEach(() => {
+    dataRef = {
+        current: {
+            breathinessGrbas: { composite_score: 50 },
+            breathinessScore: 50
+        }
+    };
+    vi.clearAllMocks();
     dataRef = { current: { breathinessGrbas: { composite_score: 50 }, oq_percent: 50 } };
     vi.clearAllMocks();
     dataRef = {
@@ -140,6 +159,17 @@ describe('BreathinessMeter', () => {
   });
 
   it('subscribes to RenderCoordinator on mount', () => {
+    render(<BreathinessMeter dataRef={dataRef} />);
+    expect(renderCoordinator.subscribe).toHaveBeenCalled();
+  });
+
+  it('unsubscribes on unmount', () => {
+    const unsubscribe = vi.fn();
+    renderCoordinator.subscribe.mockReturnValue(unsubscribe);
+
+    const { unmount } = render(<BreathinessMeter dataRef={dataRef} />);
+    unmount();
+
     vi.clearAllMocks();
     vi.unstubAllGlobals();
   });

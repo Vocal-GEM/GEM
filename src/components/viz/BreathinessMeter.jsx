@@ -53,6 +53,8 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
 
     // Optimized: Use RenderCoordinator to manage animation loop
     useEffect(() => {
+        const update = () => {
+            if (!dataRef.current) return;
         const updateMeter = () => {
             if (!dataRef.current) return;
         const loop = () => {
@@ -159,6 +161,16 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
                     ventricularRef.current.style.display = 'none';
                 }
             }
+        };
+
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            update,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+
+        return unsubscribe;
+    }, [dataRef, colorBlindMode, componentId]);
         };
 
         const unsubscribe = renderCoordinator.subscribe(
