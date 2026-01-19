@@ -1,0 +1,183 @@
+
+> vocal-gem@0.1.0 dev /app
+> vite
+
+
+  VITE v5.4.21  ready in 997 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+7:15:26 AM [vite] Pre-transform error: /app/src/components/ui/LoadingSpinner.jsx: 'import' and 'export' may only appear at the top level. (56:0)
+
+  54 |     </div>
+  55 |   );
+> 56 | import { twMerge } from 'tailwind-merge';
+     | ^
+  57 | import clsx from 'clsx';
+  58 |
+  59 | const LoadingSpinner = ({
+7:15:30 AM [vite] Pre-transform error: /app/src/components/ui/LoadingSpinner.jsx: 'import' and 'export' may only appear at the top level. (56:0)
+
+  54 |     </div>
+  55 |   );
+> 56 | import { twMerge } from 'tailwind-merge';
+     | ^
+  57 | import clsx from 'clsx';
+  58 |
+  59 | const LoadingSpinner = ({
+7:15:30 AM [vite] Pre-transform error: /app/src/components/ui/LoadingSpinner.jsx: 'import' and 'export' may only appear at the top level. (56:0)
+
+  54 |     </div>
+  55 |   );
+> 56 | import { twMerge } from 'tailwind-merge';
+     | ^
+  57 | import clsx from 'clsx';
+  58 |
+  59 | const LoadingSpinner = ({
+Error:   Failed to scan for dependencies from entries:
+  /app/index.html
+/app/ios/App/App/public/index.html
+
+  [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mUnexpected "{"[0m
+
+    src/components/ui/LoadingSpinner.jsx:56:7:
+[37m      56 │ import [32m{[37m twMerge } from 'tailwind-merge';
+         ╵        [32m^[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useEffect" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:2:9:
+[37m      2 │ import { [32museEffect[37m, useRef, useState, useId } from 'react';
+        ╵          [32m~~~~~~~~~[0m
+
+  The symbol "useEffect" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:1:9:
+[37m      1 │ import { [32museEffect[37m, useRef, useState, useId, useCallback } from 're...
+        ╵          [32m~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useRef" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:2:20:
+[37m      2 │ import { useEffect, [32museRef[37m, useState, useId } from 'react';
+        ╵                     [32m~~~~~~[0m
+
+  The symbol "useRef" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:1:20:
+[37m      1 │ import { useEffect, [32museRef[37m, useState, useId, useCallback } from 're...
+        ╵                     [32m~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useState" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:2:28:
+[37m      2 │ import { useEffect, useRef, [32museState[37m, useId } from 'react';
+        ╵                             [32m~~~~~~~~[0m
+
+  The symbol "useState" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:1:28:
+[37m      1 │ import { useEffect, useRef, [32museState[37m, useId, useCallback } from 're...
+        ╵                             [32m~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useId" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:2:38:
+[37m      2 │ import { useEffect, useRef, useState, [32museId[37m } from 'react';
+        ╵                                       [32m~~~~~[0m
+
+  The symbol "useId" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:1:38:
+[37m      1 │ ...t { useEffect, useRef, useState, [32museId[37m, useCallback } from 'react';
+        ╵                                     [32m~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected ")" but found "const"[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:110:4:
+[37m      110 │     [32mconst[37m serviceRef = useRef(new QuadCoreAnalysisService());
+          │     [32m~~~~~[37m
+          ╵     [32m)[0m
+
+
+    at failureErrorWithLog (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:1472:15)
+    at /app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:945:25
+    at runOnEndCallbacks (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:1315:45)
+    at buildResponseToResult (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:943:7)
+    at /app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:955:9
+    at new Promise (<anonymous>)
+    at requestCallbacks.on-end (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:954:54)
+    at handleRequest (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:647:17)
+    at handleIncomingPacket (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:672:7)
+    at Socket.readFromStdout (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:600:7)
+    at Socket.emit (node:events:519:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+7:16:22 AM [vite] Pre-transform error: /app/src/components/viz/VoiceQualityAnalysis.jsx: Identifier 'useEffect' has already been declared. (2:9)
+
+  1 | import { useEffect, useRef, useState, useId, useCallback } from 'react';
+> 2 | import { useEffect, useRef, useState, useId } from 'react';
+    |          ^
+  3 | import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
+  4 | import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
+  5 | import { renderCoordinator } from '../../services/RenderCoordinator';
+7:16:23 AM [vite] Internal server error: /app/src/components/viz/VoiceQualityAnalysis.jsx: Identifier 'useEffect' has already been declared. (2:9)
+
+  1 | import { useEffect, useRef, useState, useId, useCallback } from 'react';
+> 2 | import { useEffect, useRef, useState, useId } from 'react';
+    |          ^
+  3 | import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
+  4 | import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
+  5 | import { renderCoordinator } from '../../services/RenderCoordinator';
+  Plugin: vite:react-babel
+  File: /app/src/components/viz/VoiceQualityAnalysis.jsx:2:9
+  1  |  import { useEffect, useRef, useState, useId, useCallback } from 'react';
+  2  |  import { useEffect, useRef, useState, useId } from 'react';
+     |           ^
+  3  |  import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
+  4  |  import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
+      at constructor (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:367:19)
+      at JSXParserMixin.raise (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:6624:19)
+      at ScopeHandler.checkRedeclarationInScope (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:1646:19)
+      at ScopeHandler.declareName (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:1612:12)
+      at JSXParserMixin.declareNameFromIdentifier (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:7594:16)
+      at JSXParserMixin.checkIdentifier (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:7590:12)
+      at JSXParserMixin.checkLVal (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:7527:12)
+      at JSXParserMixin.finishImportSpecifier (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14342:10)
+      at JSXParserMixin.parseImportSpecifier (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14499:17)
+      at JSXParserMixin.parseNamedImportSpecifiers (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14478:36)
+      at JSXParserMixin.parseImportSpecifiersAndAfter (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14318:37)
+      at JSXParserMixin.parseImport (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14311:17)
+      at JSXParserMixin.parseStatementContent (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12952:27)
+      at JSXParserMixin.parseStatementLike (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12843:17)
+      at JSXParserMixin.parseModuleItem (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12820:17)
+      at JSXParserMixin.parseBlockOrModuleBlockBody (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:13392:36)
+      at JSXParserMixin.parseBlockBody (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:13385:10)
+      at JSXParserMixin.parseProgram (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12698:10)
+      at JSXParserMixin.parseTopLevel (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12688:25)
+      at JSXParserMixin.parse (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14568:25)
+      at parse (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14602:38)
+      at parser (/app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/parser/index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (/app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
+      at normalizeFile.next (<anonymous>)
+      at run (/app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/transformation/index.js:22:50)
+      at run.next (<anonymous>)
+      at transform (/app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (/app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:261:32)
+      at /app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:223:11)
+      at /app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:189:28
+      at /app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/gensync-utils/async.js:67:7
+      at /app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:113:33
+      at step (/app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:287:14)
+      at /app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:223:11)

@@ -13,9 +13,17 @@ const ContourVisualizer = ({ dataRef }) => {
     const historyRef = useRef([]);
     const maxHistory = 300; // ~5 seconds at 60fps
 
+    // Throttling ref for UI updates
+    const lastUiUpdateRef = useRef(0);
+
     useEffect(() => {
-        const loop = () => {
+        // NOTE: This loop is driven by RenderCoordinator, not a local requestAnimationFrame.
+        // RenderCoordinator handles the recursion and passes (delta, currentTime).
+        const loop = (delta, currentTime) => {
             if (!dataRef.current) return;
+
+            // Fallback if currentTime is not passed (though RenderCoordinator should pass it)
+            const now = currentTime || performance.now();
 
             const { prosody, isSilent, clarity } = dataRef.current;
 
@@ -24,12 +32,17 @@ const ContourVisualizer = ({ dataRef }) => {
             const shouldUpdate = !isSilent && (clarity === undefined || clarity > 0.5);
 
             if (prosody && shouldUpdate) {
-                // Update local state for UI text
-                setMetrics({
-                    contour: prosody.contour || 0,
-                    slopeDirection: prosody.slopeDirection || 'flat',
-                    semitoneRange: prosody.semitoneRange || 0
-                });
+                // Throttle UI updates to 10fps (every 100ms) to reduce React renders
+                if (now - lastUiUpdateRef.current > 100) {
+                if (currentTime - lastUiUpdateRef.current > 100) {
+                    setMetrics({
+                        contour: prosody.contour || 0,
+                        slopeDirection: prosody.slopeDirection || 'flat',
+                        semitoneRange: prosody.semitoneRange || 0
+                    });
+                    lastUiUpdateRef.current = now;
+                    lastUiUpdateRef.current = currentTime;
+                }
 
                 // Update history
                 historyRef.current.push(prosody.contour || 0);
@@ -101,8 +114,7 @@ const ContourVisualizer = ({ dataRef }) => {
                     ctx.stroke();
                 }
             }
-
-            requestAnimationFrame(loop);
+            // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
         let unsubscribe;
