@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState, useId, useCallback } from 'react';
 import React, { useEffect, useRef, useState, useId, useCallback } from 'react';
 import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
 import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
@@ -102,6 +103,12 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
         let unsubscribe;
 
         if (isAudioActive) {
+            // Use RenderCoordinator instead of raw requestAnimationFrame
+            // We use a lower priority (LOW) because full analysis doesn't need to happen every 60fps
+            // This frees up resources for smoother visualizations
+            unsubscribe = renderCoordinator.subscribe(
+                componentId,
+                analyze,
             // Subscribe to RenderCoordinator instead of using internal RAF loop
             // Use LOW priority as this is UI analysis updates, not 60fps animation
             unsubscribe = renderCoordinator.subscribe(
@@ -114,6 +121,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
         return () => {
             if (unsubscribe) unsubscribe();
         };
+    }, [isAudioActive, componentId, analyze]);
     }, [isAudioActive, componentId, updateAnalysis]);
 
     return (
