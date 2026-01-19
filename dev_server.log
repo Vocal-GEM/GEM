@@ -1,0 +1,13 @@
+
+> vocal-gem@0.1.0 dev
+> vite
+
+
+  VITE v5.4.21  ready in 350 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+7:23:06 AM [vite] ✨ new dependencies optimized: @react-three/fiber, three, @react-three/drei
+7:23:06 AM [vite] ✨ optimized dependencies changed. reloading
+7:25:14 AM [vite] ✨ new dependencies optimized: @xenova/transformers
+7:25:14 AM [vite] ✨ optimized dependencies changed. reloading
