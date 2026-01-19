@@ -1,18 +1,15 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { useAudio } from './context/AudioContext';
 import { useSettings } from './context/SettingsContext';
-import { useAuth } from './context/AuthContext';
 import { useProfile } from './context/ProfileContext';
 import { useStats } from './context/StatsContext';
 import { useJournal } from './context/JournalContext';
 import { useNavigation } from './context/NavigationContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { FEATURES } from './config/featureFlags';
 import MigrationModal from './components/ui/MigrationModal';
 import { AnalyticsDashboardV2 } from './components/analytics/AnalyticsDashboardV2';
 import JournalForm from './components/ui/JournalForm';
-import Login from './components/ui/Login';
-import Signup from './components/ui/Signup';
-import UserProfile from './components/ui/UserProfile';
 import VocalHealthTips from './components/ui/VocalHealthTips';
 import AssessmentModule from './components/ui/AssessmentModule';
 import WarmUpModule from './components/ui/WarmUpModule';
@@ -39,12 +36,9 @@ const TutorialWizard = lazy(() => import('./components/ui/TutorialWizard'));
 const CompassWizard = lazy(() => import('./components/ui/CompassWizard'));
 const CalibrationWizard = lazy(() => import('./components/ui/CalibrationWizard'));
 const HistoryView = lazy(() => import('./components/ui/HistoryView'));
-const CoachView = lazy(() => import('./components/views/CoachView'));
 const GlossaryView = lazy(() => import('./components/views/GlossaryView'));
 const VoiceJournalView = lazy(() => import('./components/views/VoiceJournalView'));
 const ProgressDashboard = lazy(() => import('./components/views/ProgressDashboard'));
-const CommunityHub = lazy(() => import('./components/views/CommunityHub'));
-const ResearchView = lazy(() => import('./components/views/ResearchView'));
 const PracticeMode = lazy(() => import('./components/views/PracticeMode'));
 const ExerciseLibraryView = lazy(() => import('./components/views/ExerciseLibraryView'));
 
@@ -52,7 +46,6 @@ const AdaptivePracticeSession = lazy(() => import('./components/views/AdaptivePr
 const GuidedJourney = lazy(() => import('./components/ui/GuidedJourney'));
 const PracticeCardsPanel = lazy(() => import('./components/ui/PracticeCardsPanel'));
 const ProgramView = lazy(() => import('./components/views/ProgramView'));
-const MarketplaceView = lazy(() => import('./components/views/MarketplaceView'));
 
 // Lazy Loaded Components - Visualizations
 // Lazy Loaded Components - Visualizations
@@ -104,10 +97,6 @@ const App = () => {
         setShowSettings
     } = useSettings();
 
-    const {
-        user,
-        logout
-    } = useAuth();
 
     const {
         calibration,
@@ -148,15 +137,6 @@ const App = () => {
 
 
 
-
-    const showLogin = modals.login;
-    const setShowLogin = (v) => v ? openModal('login') : closeModal('login');
-
-    const showSignup = modals.signup;
-    const setShowSignup = (v) => v ? openModal('signup') : closeModal('signup');
-
-    const showProfile = modals.profile;
-    const setShowProfile = (v) => v ? openModal('profile') : closeModal('profile');
 
     const showCamera = modals.camera;
     const setShowCamera = (v) => v ? openModal('camera') : closeModal('camera');
@@ -254,7 +234,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'analysis' && (
+                        {FEATURES.analysis && activeTab === 'analysis' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <AnalysisHub dataRef={dataRef} targetRange={targetRange} />
@@ -264,7 +244,7 @@ const App = () => {
 
 
 
-                        {activeTab === 'learn' && (
+                        {FEATURES.learn && activeTab === 'learn' && (
                             <Suspense fallback={<LoadingSpinner />}>
                                 <LearnView />
                             </Suspense>
@@ -276,7 +256,7 @@ const App = () => {
                             </Suspense>
                         )}
 
-                        {activeTab === 'program' && (
+                        {FEATURES.program && activeTab === 'program' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <ProgramView onNavigate={setActiveTab} />
@@ -284,7 +264,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'history' && (
+                        {FEATURES.history && activeTab === 'history' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <HistoryView stats={stats} journals={journals} onLogClick={() => setShowJournalForm(true)} />
@@ -292,15 +272,8 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'coach' && (
-                            <div className="p-4 lg:p-8">
-                                <Suspense fallback={<LoadingSpinner />}>
-                                    <CoachView />
-                                </Suspense>
-                            </div>
-                        )}
 
-                        {activeTab === 'library' && (
+                        {FEATURES.library && activeTab === 'library' && (
                             <div className="h-full">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <ExerciseLibraryView />
@@ -308,7 +281,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'glossary' && (
+                        {FEATURES.glossary && activeTab === 'glossary' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <GlossaryView />
@@ -316,7 +289,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'journal' && (
+                        {FEATURES.journal && activeTab === 'journal' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <VoiceJournalView />
@@ -324,7 +297,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'progress' && (
+                        {FEATURES.progress && activeTab === 'progress' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <ProgressDashboard />
@@ -332,15 +305,8 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'community' && (
-                            <div className="p-4 lg:p-8">
-                                <Suspense fallback={<LoadingSpinner />}>
-                                    <CommunityHub />
-                                </Suspense>
-                            </div>
-                        )}
 
-                        {activeTab === 'analytics' && (
+                        {FEATURES.analytics && activeTab === 'analytics' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     {/* Tier 7: Advanced Analytics */}
@@ -349,23 +315,9 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'research' && (
-                            <div className="p-4 lg:p-8">
-                                <Suspense fallback={<LoadingSpinner />}>
-                                    <ResearchView />
-                                </Suspense>
-                            </div>
-                        )}
 
-                        {activeTab === 'marketplace' && (
-                            <div className="h-full">
-                                <Suspense fallback={<LoadingSpinner />}>
-                                    <MarketplaceView />
-                                </Suspense>
-                            </div>
-                        )}
 
-                        {activeTab === 'assessment' && (
+                        {FEATURES.assessment && activeTab === 'assessment' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <ClinicalAssessmentView />
@@ -373,7 +325,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'capev' && (
+                        {FEATURES.capev && activeTab === 'capev' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <CAPEVAssessment />
@@ -381,7 +333,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'client-dashboard' && (
+                        {FEATURES['client-dashboard'] && activeTab === 'client-dashboard' && (
                             <div className="h-full">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <ClientDashboard />
@@ -389,7 +341,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'spectrogram' && (
+                        {FEATURES.spectrogram && activeTab === 'spectrogram' && (
                             <div className="h-full">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <SpectrogramComparison />
@@ -424,7 +376,6 @@ const App = () => {
                                 const url = URL.createObjectURL(blob);
                                 const a = document.createElement('a'); a.href = url; a.download = 'vocal-gem-data.json'; a.click();
                             }}
-                            user={user}
                         />
 
                         <FeedbackModal
@@ -485,9 +436,6 @@ const App = () => {
                             )
                         }
 
-                        {showLogin && <Login onSwitchToSignup={() => { setShowLogin(false); setShowSignup(true); }} onClose={() => setShowLogin(false)} />}
-                        {showSignup && <Signup onSwitchToLogin={() => { setShowSignup(false); setShowLogin(true); }} onClose={() => setShowSignup(false)} />}
-                        {showProfile && <UserProfile user={user} onClose={() => setShowProfile(false)} onLogout={() => { logout(); setShowProfile(false); }} />}
                         {showVocalHealthTips && <VocalHealthTips onClose={() => setShowVocalHealthTips(false)} />}
                         {showAssessment && <AssessmentModule onClose={() => setShowAssessment(false)} />}
                         {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}

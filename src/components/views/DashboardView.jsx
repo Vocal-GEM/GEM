@@ -16,7 +16,7 @@ import { checkStreakStatus, getStreakMessage } from '../../services/StreakServic
 import RecommendedToolsWidget from '../ui/RecommendedToolsWidget';
 import MoodCheckIn from '../ui/MoodCheckIn';
 import PersonalMilestonesDisplay from '../ui/PersonalMilestonesDisplay';
-import VoiceTwinDiscovery from '../ui/VoiceTwinDiscovery';
+
 
 const StatCard = ({ label, value, subtext, icon, color }) => (
     <div className="bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
@@ -256,10 +256,7 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                 />
             </div>
 
-            {/* Community & Voice Twins */}
-            <div className="mt-8 mb-8">
-                <VoiceTwinDiscovery />
-            </div>
+
         </div>
     );
 };
