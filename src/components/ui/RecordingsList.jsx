@@ -10,10 +10,15 @@ const RecordingsList = () => {
     const [editName, setEditName] = useState('');
 
     // Audio playback refs
-    const audioRef = useRef(new Audio());
+    // ⚡ Bolt: Use useRef(null) and lazy init to avoid creating Audio objects on every render
+    const audioRef = useRef(null);
     const [audioUrl, setAudioUrl] = useState(null);
 
     useEffect(() => {
+        if (!audioRef.current) {
+            audioRef.current = new Audio();
+        }
+
         loadRecordings();
         const audio = audioRef.current;
 
