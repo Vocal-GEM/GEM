@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
 from app.models import ResearchStudy, StudyParticipant, ResearchDataPoint, db
+from app.extensions import limiter
 from datetime import datetime
 import uuid
 
@@ -21,6 +22,7 @@ def get_studies():
 
 @research_bp.route('/studies/<study_id>/enroll', methods=['POST'])
 @login_required
+@limiter.limit("5 per minute")
 def enroll_participant(study_id):
     """Enroll current user in a study"""
     data = request.json
@@ -60,6 +62,7 @@ def enroll_participant(study_id):
     })
 
 @research_bp.route('/studies/<study_id>/data', methods=['POST'])
+@limiter.limit("60 per minute")
 def submit_data(study_id):
     """Submit anonymized research data point"""
     # Note: This endpoint might not require login if using participant_id auth token
@@ -90,6 +93,7 @@ def submit_data(study_id):
     return jsonify({'message': 'Data received'})
 
 @research_bp.route('/studies/<study_id>/withdraw', methods=['POST'])
+@limiter.limit("5 per minute")
 def withdraw_participant(study_id):
     """Withdraw from a study"""
     data = request.json
