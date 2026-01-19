@@ -3,6 +3,7 @@ import sys
 import os
 import tempfile
 import shutil
+import json
 from unittest.mock import MagicMock, patch
 from flask import Flask
 from flask_login import LoginManager
@@ -27,6 +28,7 @@ class TestCommunitySecurity(unittest.TestCase):
         self.app = Flask(__name__)
         self.app.config['UPLOAD_FOLDER'] = self.test_dir
         self.app.config['SECRET_KEY'] = 'test'
+        self.app.register_blueprint(community.community_bp, url_prefix='/api/community')
 
         self.login_manager = LoginManager()
         self.login_manager.init_app(self.app)
@@ -34,6 +36,8 @@ class TestCommunitySecurity(unittest.TestCase):
         # Mock DB
         self.patcher_db = patch('backend.app.routes.community.db')
         self.mock_db = self.patcher_db.start()
+
+        self.client = self.app.test_client()
 
     def tearDown(self):
         if os.path.exists(self.test_dir):
@@ -87,6 +91,49 @@ class TestCommunitySecurity(unittest.TestCase):
 
                         # SECURITY VERIFICATION: Original raw file must be deleted
                         self.assertEqual(len(original_files), 0, "Original raw file should be deleted!")
+
+    def test_submit_success_story_sanitizes_html(self):
+        """
+        Test that submitting a story with XSS payload results in sanitized content.
+        """
+        payload = {
+            "title": "My Story <script>alert('XSS')</script>",
+            "story": "This is a story with <b>bold</b> and <img src=x onerror=alert(1)>",
+            "timeline_months": 12,
+            "voice_goal": "feminine",
+            "consent_public": True,
+            "techniques_used": ["pitch", "resonance"]
+        }
+
+        # Mock SuccessStory constructor to capture arguments
+        with patch('backend.app.routes.community.SuccessStory') as MockSuccessStory:
+            mock_story_instance = MockSuccessStory.return_value
+            mock_story_instance.id = 123
+            mock_story_instance.approved = True
+
+            # Setup login
+            mock_user = MagicMock()
+            mock_user.id = '123'
+            mock_user.is_authenticated = True
+
+            with patch('flask_login.utils._get_user', return_value=mock_user):
+                 # Mock check_moderation to allow everything
+                with patch('backend.app.routes.community.check_moderation', return_value=(True, [])):
+
+                    response = self.client.post('/api/community/success-stories',
+                                            data=json.dumps(payload),
+                                            content_type='application/json')
+
+                    self.assertEqual(response.status_code, 200)
+
+                    call_args = MockSuccessStory.call_args[1]
+
+                    # Verify malicious tags are removed
+                    self.assertNotIn("<script>", call_args['title'])
+                    self.assertNotIn("<img", call_args['story'])
+
+                    # Verify allowed tags are kept
+                    self.assertIn("<b>bold</b>", call_args['story'])
 
 if __name__ == '__main__':
     unittest.main()

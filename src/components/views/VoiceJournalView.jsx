@@ -16,13 +16,22 @@ const VoiceJournalView = () => {
 
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
-    const audioRef = useRef(new Audio());
+    // ⚡ Bolt: Use useRef(null) and lazy init to avoid creating Audio objects on every render
+    const audioRef = useRef(null);
     const timerRef = useRef(null);
 
     useEffect(() => {
+        if (!audioRef.current) {
+            audioRef.current = new Audio();
+        }
+
         loadRecordings();
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
         };
     }, []);
 
