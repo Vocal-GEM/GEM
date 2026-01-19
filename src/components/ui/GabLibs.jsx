@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Mic, Play, BookOpen, Volume2, ChevronLeft } from 'lucide-react';
 import { GAB_LIBS_STORIES } from '../../data/trainingData';
 
@@ -10,7 +10,20 @@ const GabLibs = () => {
     const chunksRef = useRef([]);
 
     // Temporary audio playback
-    const audioRef = useRef(new Audio());
+    // ⚡ Bolt: Use useRef(null) and lazy init to avoid creating Audio objects on every render
+    const audioRef = useRef(null);
+
+    useEffect(() => {
+        if (!audioRef.current) {
+            audioRef.current = new Audio();
+        }
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
+        };
+    }, []);
 
     const startRecording = async (keyword) => {
         try {

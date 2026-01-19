@@ -2,21 +2,16 @@ from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
-from ..extensions import db
-from ..extensions import db, limiter
-from ..validators import validate_file_upload
+from ..validators import validate_file_upload, sanitize_html
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
     GroupChallenge, GroupChallengeParticipant, ModerationFlag,
     CommunityBenchmark,
 )
-from ..validators import validate_file_upload
 from datetime import datetime, timedelta
 import os
 import secrets
 import hashlib
-from werkzeug.utils import secure_filename
-from ..validators import validate_file_upload
 
 community_bp = Blueprint('community', __name__)
 
@@ -58,6 +53,11 @@ def anonymize_audio(audio_path):
         # If librosa not available, we cannot anonymize.
         # Fail securely - do not copy the raw file.
         raise ImportError("Audio anonymization library (librosa) not available")
+    except ImportError as e:
+        # Fail securely - do not copy raw file if anonymization fails
+        # Log error and raise
+        current_app.logger.error(f"Failed to anonymize audio (librosa missing?): {str(e)}")
+        raise e
 
 
 def check_moderation(text):
@@ -90,41 +90,24 @@ def share_voice():
         audio_file = request.files['audio']
 
         # Security: Validate file type
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
-        # Security: Validate file extension
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
-        # Security: Validate file type
         is_valid, error = validate_file_upload(
-            audio_file.filename, allowed_types=['audio'])
+            audio_file.filename, allowed_types=['audio'], file_stream=audio_file)
         if not is_valid:
             return jsonify({'error': error}), 400
 
-        context = request.form.get('context', '')
+        context = sanitize_html(request.form.get('context', ''))
         expiration_days = int(request.form.get('expiration_days', 7))
 
-        # Security: Validate file extension
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
-        if not is_valid:
-            return jsonify({'error': error}), 400
-        
-        # Save original file
+        # Save original file temporarily
         upload_folder = current_app.config.get(
             'UPLOAD_FOLDER', 'uploads/shared')
         os.makedirs(upload_folder, exist_ok=True)
-        
+
         # Security: Use secure_filename to prevent path traversal/bad characters
         safe_filename = secure_filename(audio_file.filename)
         filename = f"{current_user.id}_{datetime.now().timestamp()}_{safe_filename}"
-        # Security: Sanitize filename
-        safe_filename = secure_filename(audio_file.filename)
-        filename = f"{current_user.id}_{datetime.now().timestamp()}_{safe_filename}"
 
-        safe_filename = secure_filename(audio_file.filename)
-        filename = f"{
-            current_user.id}_{
-            datetime.now().timestamp()}_{safe_filename}"
         filepath = os.path.join(upload_folder, filename)
-        audio_file.save(filepath)
 
         try:
             # Anonymize audio
@@ -136,6 +119,17 @@ def share_voice():
                     os.remove(filepath)
                 except OSError:
                     pass
+            audio_file.save(filepath)
+
+            # Anonymize audio
+            anon_filepath = anonymize_audio(filepath)
+        finally:
+            # Security: Always remove the original raw audio file
+            if os.path.exists(filepath):
+                try:
+                    os.remove(filepath)
+                except Exception as e:
+                    current_app.logger.error(f"Failed to delete original file: {e}")
 
         # Create share record
         share_id = generate_share_id()
@@ -268,20 +262,44 @@ def submit_success_story():
     """Submit a success story"""
     try:
         data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Invalid request data'}), 400
+
+        title = data.get('title', '')
+        content = data.get('story', '')
+        techniques = data.get('techniques_used', [])
+
+        # Input validation
+        if not title or not content:
+            return jsonify({'error': 'Title and story are required'}), 400
+
+        if len(title) > 200:
+            return jsonify({'error': 'Title exceeds 200 characters'}), 400
+
+        if len(content) > 5000:
+            return jsonify({'error': 'Story exceeds 5000 characters'}), 400
+
+        # Security: Sanitize inputs to prevent Stored XSS
+        clean_title = sanitize_html(title)
+        clean_story = sanitize_html(content)
+        voice_goal = sanitize_html(data.get('voice_goal', ''))
+
+        clean_techniques = []
+        if isinstance(techniques, list):
+            clean_techniques = [sanitize_html(str(t)) for t in techniques]
 
         # Moderation check
-        is_safe, flagged = check_moderation(
-            data.get('title', '') + ' ' + data.get('story', ''))
+        is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
 
         story = SuccessStory(
             user_id=current_user.id,
-            title=data.get('title'),
-            story=data.get('story'),
+            title=clean_title,
+            story=clean_story,
             timeline_months=data.get('timeline_months'),
-            voice_goal=data.get('voice_goal'),
+            voice_goal=voice_goal,
             consent_public=data.get('consent_public', False),
             approved=is_safe,  # Auto-approve if passes moderation
-            techniques_used=data.get('techniques_used', [])
+            techniques_used=clean_techniques
         )
 
         db.session.add(story)
@@ -454,7 +472,7 @@ def request_connection():
         data = request.get_json()
         connection_id = data.get('connection_id')
         connection_type = data.get('connection_type', 'pen_pal')
-        message = data.get('message', '')
+        message = sanitize_html(data.get('message', ''))
 
         if not connection_id:
             return jsonify({'error': 'Connection ID required'}), 400
