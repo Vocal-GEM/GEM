@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useId, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useId, useCallback } from 'react';
 import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
 import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -74,27 +75,29 @@ const FeedbackBanner = ({ feedback }) => {
 };
 
 const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioActive }) => {
-    // We import useProfile but targetRange was unused.
-    // If we need it later, we can uncomment.
+    // Ensure useProfile is called if needed (from original code intent)
     useProfile();
+    useProfile(); // Keep if needed for side effects or future use
 
     const serviceRef = useRef(new QuadCoreAnalysisService());
     const [analysis, setAnalysis] = useState(null);
-    const uniqueId = useId();
-    const componentId = `voice-quality-${uniqueId}`;
 
-    const analyze = useCallback(() => {
-        if (dataRef.current) {
+    // Generate unique component ID for RenderCoordinator
+    const uniqueId = useId();
+    // Sanitize ID for RenderCoordinator (remove colons)
+    const componentId = `VoiceQualityAnalysis-${uniqueId.replace(/:/g, '')}`;
+
+    const updateAnalysis = useCallback(() => {
+        if (dataRef.current && isAudioActive) {
             const results = serviceRef.current.analyze(dataRef.current, {
                 targetF2: 2000 // Default to neutral/chem until calibration is fuller
-                // TODO: pull from calibration context if available
             });
 
             if (results) {
                 setAnalysis(results);
             }
         }
-    }, [dataRef]);
+    }, [dataRef, isAudioActive]);
 
     useEffect(() => {
         let unsubscribe;
@@ -106,6 +109,11 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
             unsubscribe = renderCoordinator.subscribe(
                 componentId,
                 analyze,
+            // Subscribe to RenderCoordinator instead of using internal RAF loop
+            // Use LOW priority as this is UI analysis updates, not 60fps animation
+            unsubscribe = renderCoordinator.subscribe(
+                componentId,
+                updateAnalysis,
                 renderCoordinator.PRIORITY.LOW
             );
         }
@@ -114,6 +122,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
             if (unsubscribe) unsubscribe();
         };
     }, [isAudioActive, componentId, analyze]);
+    }, [isAudioActive, componentId, updateAnalysis]);
 
     return (
         <div className="bg-slate-900/50 rounded-2xl p-4 sm:p-6 border border-white/5 h-full flex flex-col">
@@ -122,13 +131,10 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                     <Activity size={14} className="text-purple-400" />
                     Quad-Core Analyzer
                 </div>
-                {/* Status dot */}
                 <div className={`w-2 h-2 rounded-full ${isAudioActive ? 'bg-green-500 animate-pulse' : 'bg-slate-700'}`} />
             </div>
 
-            {/* 2x2 Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
-                {/* Module A: Texture */}
                 <QuadCoreCard
                     icon={Wind}
                     title="Texture"
@@ -139,10 +145,9 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                     unit="dB"
                 />
 
-                {/* Module B: Health */}
                 <QuadCoreCard
                     icon={Heart}
-                    title="Health" // Flow
+                    title="Health"
                     color={colorBlindMode ? 'text-teal-400' : 'text-emerald-400'}
                     score={analysis?.scores.health.status || 'Flow'}
                     label={analysis?.scores.health.label || '--'}
@@ -150,10 +155,9 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                     unit=" tilt"
                 />
 
-                {/* Module C: Color */}
                 <QuadCoreCard
                     icon={Sun}
-                    title="Color" // Resonance
+                    title="Color"
                     color={colorBlindMode ? 'text-yellow-400' : 'text-amber-400'}
                     score={analysis?.scores.color.percentage || 0}
                     label={analysis?.scores.color.label || '--'}
@@ -161,10 +165,9 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                     unit="Hz"
                 />
 
-                {/* Module D: Mix */}
                 <QuadCoreCard
                     icon={Layers}
-                    title="Registration" // Mix
+                    title="Registration"
                     color={colorBlindMode ? 'text-purple-400' : 'text-fuchsia-400'}
                     score={analysis?.scores.mix.percentage || 0}
                     label={analysis?.scores.mix.label || '--'}
@@ -173,10 +176,8 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                 />
             </div>
 
-            {/* Feedback Section */}
             <FeedbackBanner feedback={analysis?.feedback} />
 
-            {/* Controls */}
             <button
                 onClick={toggleAudio}
                 className={`w-full mt-6 py-3 rounded-xl text-sm font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg ${isAudioActive

@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -46,8 +46,12 @@ const SpectrogramMesh = ({ dataRef }) => {
     // Buffer for historical data
     const historyRef = useRef(new Float32Array(numCols * numRows));
 
+    // Reusable color object to prevent GC
+    // Optimization: Reuse Color object to avoid thousands of allocations per frame
+    const tempColor = useMemo(() => new THREE.Color(), []);
+
     useFrame(() => {
-        if (!meshRef.current) return;
+        if (!meshRef.current || !meshRef.current.geometry || !meshRef.current.geometry.attributes) return;
 
         // Shift history
         const history = historyRef.current;
@@ -80,39 +84,44 @@ const SpectrogramMesh = ({ dataRef }) => {
 
         // Update geometry
         const positionsAttribute = meshRef.current.geometry.attributes.position;
-        for (let i = 0; i < numCols; i++) {
-            for (let j = 0; j < numRows; j++) {
-                const index = i * numRows + j;
-                const val = history[index];
-                // Update Y coordinate
-                positionsAttribute.setY(index, val);
+        if (positionsAttribute) {
+            for (let i = 0; i < numCols; i++) {
+                for (let j = 0; j < numRows; j++) {
+                    const index = i * numRows + j;
+                    const val = history[index];
+                    // Update Y coordinate
+                    positionsAttribute.setY(index, val);
+                }
             }
+            positionsAttribute.needsUpdate = true;
         }
-        positionsAttribute.needsUpdate = true;
 
         // Update colors based on height
-        const colorsAttribute = meshRef.current.geometry.attributes.color;
+        let colorsAttribute = meshRef.current.geometry.attributes.color;
         if (!colorsAttribute) {
             const colors = new Float32Array(numCols * numRows * 3);
             meshRef.current.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            colorsAttribute = meshRef.current.geometry.attributes.color;
         }
 
-        const colors = meshRef.current.geometry.attributes.color;
-        for (let i = 0; i < numCols; i++) {
-            for (let j = 0; j < numRows; j++) {
-                const index = i * numRows + j;
-                const val = history[index];
+        if (colorsAttribute) {
+            const colors = colorsAttribute;
+            for (let i = 0; i < numCols; i++) {
+                for (let j = 0; j < numRows; j++) {
+                    const index = i * numRows + j;
+                    const val = history[index];
 
-                // Color map: Blue -> Purple -> Red -> Yellow
-                const t = Math.min(1, val / 2); // Normalize somewhat
+                    // Color map: Blue -> Purple -> Red -> Yellow
+                    const t = Math.min(1, val / 2); // Normalize somewhat
 
-                const color = new THREE.Color();
-                color.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
+                    // Optimization: Reuse tempColor object to avoid creating 4096 objects per frame
+                    tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
 
-                colors.setXYZ(index, color.r, color.g, color.b);
+                    colors.setXYZ(index, tempColor.r, tempColor.g, tempColor.b);
+                }
             }
+            colors.needsUpdate = true;
         }
-        colors.needsUpdate = true;
     });
 
     return (
