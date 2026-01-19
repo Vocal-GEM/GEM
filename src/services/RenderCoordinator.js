@@ -10,6 +10,7 @@ class RenderCoordinator {
         }
 
         this.subscribers = new Map();
+        this.sortedSubscribersCache = null;
         this.isRunning = false;
         this.rafId = null;
         this.lastFrameTime = 0;
@@ -65,6 +66,9 @@ class RenderCoordinator {
             enabled: true
         });
 
+        // Invalidate cache
+        this.sortedSubscribersCache = null;
+
         // Start loop if not running
         if (!this.isRunning) {
             this.start();
@@ -80,6 +84,9 @@ class RenderCoordinator {
      */
     unsubscribe(id) {
         this.subscribers.delete(id);
+
+        // Invalidate cache
+        this.sortedSubscribersCache = null;
 
         // Stop loop if no subscribers
         if (this.subscribers.size === 0) {
@@ -137,12 +144,14 @@ class RenderCoordinator {
             // Calculate actual delta in seconds for smooth animations
             const delta = deltaTime / 1000;
 
-            // Sort subscribers by priority
-            const sortedSubscribers = Array.from(this.subscribers.entries())
-                .sort((a, b) => a[1].priority - b[1].priority);
+            // Sort subscribers by priority (cached)
+            if (!this.sortedSubscribersCache) {
+                this.sortedSubscribersCache = Array.from(this.subscribers.entries())
+                    .sort((a, b) => a[1].priority - b[1].priority);
+            }
 
             // Call each enabled subscriber
-            for (const [id, subscriber] of sortedSubscribers) {
+            for (const [id, subscriber] of this.sortedSubscribersCache) {
                 if (subscriber.enabled) {
                     try {
                         subscriber.callback(delta, currentTime);
