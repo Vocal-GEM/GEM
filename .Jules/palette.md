@@ -30,3 +30,7 @@
 ## 2024-05-22 - QuickActions Accessibility & Build Stabilization
 **Learning:** Invisible elements (opacity: 0) remain in the accessibility tree, confusing screen reader users. `pointer-events: none` does not prevent keyboard focus in all contexts.
 **Action:** Use `aria-hidden="true"` and `tabIndex={-1}` for visually hidden interactive elements, or `visibility: hidden` if layout allows.
+
+## 2026-01-18 - Replacing Native Alerts
+**Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
+**Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
