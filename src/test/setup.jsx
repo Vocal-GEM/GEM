@@ -194,6 +194,7 @@ vi.mock('lucide-react', () => {
         MessageCircle: createIcon('message-circle'),
         MessageSquare: createIcon('message-square'),
         Mic: createIcon('mic'),
+        MicOff: createIcon('mic-off'),
         Mic2: createIcon('mic-2'),
         Minus: createIcon('minus'),
         Moon: createIcon('moon'),

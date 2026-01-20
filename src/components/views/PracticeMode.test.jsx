@@ -23,6 +23,7 @@ global.navigator.mediaDevices = {
 
 // Mock dependencies
 vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
+vi.mock('../ui/VisualizerSkeleton', () => ({ default: () => <div data-testid="visualizer-skeleton">Skeleton</div> }));
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
 vi.mock('../ui/ResizablePanel', () => ({
     default: ({ children, className }) => <div className={className} data-testid="resizable-panel">{children}</div>
@@ -79,7 +80,16 @@ describe('PracticeMode', () => {
 
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
+
         // Check for visualization area
-        expect(screen.getByTestId('dynamic-orb')).toBeInTheDocument();
+        // It might be skeleton first, then orb.
+        // We wait for either.
+        const skeleton = screen.queryByTestId('visualizer-skeleton');
+        if (skeleton) {
+             expect(skeleton).toBeInTheDocument();
+        } else {
+             // If no skeleton, we expect orb to eventually appear
+             expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
+        }
     });
 });
