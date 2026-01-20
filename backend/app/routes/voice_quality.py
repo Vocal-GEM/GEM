@@ -205,7 +205,6 @@ def manipulate_file():
                 os.remove(tmp_path)
             except:
                 pass
-        return jsonify({'error': str(e)}), 500
 
 @voice_quality_bp.route('/api/voice-quality/goals', methods=['GET'])
 def get_goals():

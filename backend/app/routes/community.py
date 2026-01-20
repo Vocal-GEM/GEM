@@ -8,7 +8,6 @@ from ..models import (
     GroupChallenge, GroupChallengeParticipant, ModerationFlag,
     CommunityBenchmark,
 )
-from ..validators import validate_file_upload, sanitize_html
 from datetime import datetime, timedelta
 import os
 import secrets
@@ -277,24 +276,7 @@ def submit_success_story():
         if isinstance(techniques, list):
             clean_techniques = [sanitize_html(str(t)) for t in techniques]
 
-        # Sanitize input
-        title = sanitize_html(data.get('title', ''))
-        story_text = sanitize_html(data.get('story', ''))
-
-        # Sanitize techniques_used (list of strings)
-        techniques = data.get('techniques_used', [])
-        if isinstance(techniques, list):
-            techniques = [sanitize_html(str(t)) for t in techniques]
-        else:
-            techniques = []
-
         # Moderation check
-        is_safe, flagged = check_moderation(title + ' ' + story_text)
-
-        story = SuccessStory(
-            user_id=current_user.id,
-            title=title,
-            story=story_text,
         is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
 
         story = SuccessStory(
@@ -305,7 +287,6 @@ def submit_success_story():
             voice_goal=voice_goal,
             consent_public=data.get('consent_public', False),
             approved=is_safe,  # Auto-approve if passes moderation
-            techniques_used=techniques
             techniques_used=clean_techniques
         )
 
