@@ -16,8 +16,16 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { voiceProfiles, activeProfile } = useProfile();
     const { colorBlindMode } = useSettings();
     const canvasRef = useRef(null);
-    const balloonRef = useRef(new Image());
-    const birdRef = useRef(new Image());
+    const balloonRef = useRef(null);
+    const birdRef = useRef(null);
+
+    if (typeof window !== 'undefined' && !balloonRef.current) {
+        balloonRef.current = new Image();
+    }
+    if (typeof window !== 'undefined' && !birdRef.current) {
+        birdRef.current = new Image();
+    }
+
     const gameRef = useRef({ score: 0, lastUpdate: Date.now(), lastPitch: 0 });
 
     const [zoomRange, setZoomRange] = useState({ min: 50, max: 350 });
