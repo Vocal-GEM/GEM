@@ -5,7 +5,10 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
     const { dataRef } = useAudio();
     const canvasRef = useRef(null);
     const [isRecording, setIsRecording] = useState(false);
-    const accumulatorRef = useRef(new Float32Array(1024).fill(0)); // Assuming 1024 bins from AudioEngine
+    const accumulatorRef = useRef(null);
+    if (!accumulatorRef.current) {
+        accumulatorRef.current = new Float32Array(1024).fill(0);
+    }
     const frameCountRef = useRef(0);
 
     useEffect(() => {
