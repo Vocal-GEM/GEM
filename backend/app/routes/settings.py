@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_login import login_required, current_user
 from ..models import db, Settings
 from ..extensions import limiter
@@ -34,4 +34,6 @@ def update_settings():
         return jsonify(updated_prefs)
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+        current_app.logger.error(f"Error updating settings: {str(e)}")
+        # Security: Return generic error message to avoid leaking internal details
+        return jsonify({"error": "An error occurred while updating settings"}), 500
