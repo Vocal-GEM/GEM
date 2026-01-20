@@ -59,3 +59,8 @@
 **Vulnerability:** The `share_voice` endpoint accepted any file type and saved it to disk with an insecure filename construction, allowing potential Remote Code Execution (RCE) via malicious uploads (e.g., .html, .php) or path traversal.
 **Learning:** Relying on frontend validation or assuming "trusted users" (authenticated) is insufficient. Filenames must always be sanitized and validated against a strict allowlist on the backend before any filesystem operations.
 **Prevention:** Always use `secure_filename` and explicit content-type/extension validation (e.g. `validate_file_upload`) for every file upload endpoint.
+
+## 2025-02-20 - Sensitive Error Information Leak
+**Vulnerability:** The `update_settings` endpoint in `backend/app/routes/settings.py` caught all exceptions and returned `str(e)` in the JSON response, leaking internal error details (e.g., database connection strings, schema details).
+**Learning:** Returning raw exception strings to the client is a security risk. Error handling must catch exceptions, log them securely on the server, and return generic error messages to the client.
+**Prevention:** Use `current_app.logger.error` to log the full exception and return a static, generic error message (e.g., "An error occurred") to the user.
