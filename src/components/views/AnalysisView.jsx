@@ -41,11 +41,15 @@ const WordItem = ({ word, colorClass, isActive, onClick }) => {
     else if (weightLabel === 'Efficient') weightStyle = "font-medium";
 
     return (
-        <span
-            className={`relative inline-block mr-1.5 mb-1 py-0.5 px-1 rounded cursor-pointer transition-all duration-200 select-none ${colorClass} ${weightStyle} ${isActive ? 'bg-blue-500/20 ring-1 ring-blue-500/50' : 'hover:bg-white/5'}`}
+        <button
+            type="button"
+            className={`relative inline-block mr-1.5 mb-1 py-0.5 px-1 rounded cursor-pointer transition-all duration-200 select-none text-left ${colorClass} ${weightStyle} ${isActive ? 'bg-blue-500/20 ring-1 ring-blue-500/50' : 'hover:bg-white/5'} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400`}
             onClick={onClick}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onFocus={() => setIsHovered(true)}
+            onBlur={() => setIsHovered(false)}
+            aria-label={`Play word: ${word.text}`}
         >
             {word.text}
 
@@ -88,7 +92,7 @@ const WordItem = ({ word, colorClass, isActive, onClick }) => {
                     <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900/95"></div>
                 </div>
             )}
-        </span>
+        </button>
     );
 };
 
@@ -825,7 +829,8 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                                 <select
                                     value={playbackSpeed}
                                     onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value))}
-                                    className="bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer"
+                                    className="bg-transparent text-white text-sm font-medium cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+                                    aria-label={t('analysis.controls.speed')}
                                 >
                                     <option value="0.5">0.5x</option>
                                     <option value="0.75">0.75x</option>
