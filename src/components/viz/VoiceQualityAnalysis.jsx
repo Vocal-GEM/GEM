@@ -78,7 +78,11 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
     // If we need it later, we can uncomment.
     useProfile();
 
-    const serviceRef = useRef(new QuadCoreAnalysisService());
+    // Lazy initialization to avoid instantiation on every render
+    const serviceRef = useRef(null);
+    if (!serviceRef.current) {
+        serviceRef.current = new QuadCoreAnalysisService();
+    }
     const [analysis, setAnalysis] = useState(null);
 
     // Generate unique component ID for RenderCoordinator
