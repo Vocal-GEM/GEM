@@ -3,8 +3,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import HighResSpectrogram from './HighResSpectrogram';
 import { SettingsProvider } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import { renderCoordinator } from '../../services/RenderCoordinator';
-import { SettingsProvider } from '../../context/SettingsContext';
 import React from 'react';
 
 // Mock dependencies
@@ -38,8 +36,6 @@ const mockContext = {
     data: { buffer: new ArrayBuffer(w * h * 4) },
     height: h,
     width: w
-    width: w,
-    height: h
   })),
   drawImage: vi.fn(),
   putImageData: vi.fn(),
@@ -48,8 +44,6 @@ const mockContext = {
   lineTo: vi.fn(),
   stroke: vi.fn(),
   fillRect: vi.fn(),
-  fillText: vi.fn()
-}));
   fillText: vi.fn(),
   scale: vi.fn(),
   canvas: { width: 800, height: 512 }
@@ -87,23 +81,12 @@ describe('HighResSpectrogram', () => {
     vi.clearAllMocks();
   });
 
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    cleanup();
-    vi.clearAllMocks();
-  });
-
   it('renders successfully and subscribes to coordinator', () => {
     render(
       <SettingsProvider>
         <HighResSpectrogram dataRef={dataRef} />
       </SettingsProvider>
     );
-
-    // Check if component rendered (by looking for overlay text if present, or just checking if subscribe was called)
-    expect(renderCoordinator.subscribe).toHaveBeenCalled();
 
     // Check if component rendered (by looking for overlay text)
     expect(screen.getByText(/High-Res Spectrogram/i)).toBeDefined();

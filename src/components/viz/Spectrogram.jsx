@@ -42,7 +42,8 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     // 2500 frames * 2px speed = 5000px width coverage.
     const HISTORY_FRAMES = 2500;
     const historyBufferRef = useRef(null); // Float32Array
-    const historyMetaRef = useRef(new Array(HISTORY_FRAMES).fill(null)); // Metadata per frame
+    const historyMetaRef = useRef(null); // Metadata per frame
+    if (!historyMetaRef.current) historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
     const historyHeadRef = useRef(0); // Points to the next write position (frame index)
 
     // Spectrogram State
