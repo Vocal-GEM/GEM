@@ -1,4 +1,4 @@
-import { useEffect, useState, useId } from 'react';
+import { useEffect, useState, useId, useRef } from 'react';
 import { Info } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
@@ -10,7 +10,6 @@ const ResonanceMetrics = ({ dataRef }) => {
         resonanceScore: 0
     });
     const [showTooltip, setShowTooltip] = useState(null);
-    const requestRef = useRef();
     const lastUpdateRef = useRef(0);
     const componentId = useId();
 
