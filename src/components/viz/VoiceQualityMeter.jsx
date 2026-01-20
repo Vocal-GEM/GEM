@@ -16,76 +16,55 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
     const componentId = useId();
 
     const loop = useCallback(() => {
-        if (indicatorRef.current && valueRef.current && dataRef.current) {
-            const { weight, isSilent } = dataRef.current;
-            const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
+        if (!indicatorRef.current || !valueRef.current || !dataRef.current) return;
 
-            // If silent, freeze the indicator (or drift very slowly to neutral if desired)
-            // Here we just freeze it to prevent spikes
-            if (isSilent) {
-                // Optional: Drift slowly to 50% if silence persists?
-                // For now, just freeze to avoid "drop to zero" artifacts
-                return;
-            }
+        const { weight, isSilent, debug } = dataRef.current;
+        const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
 
-            // Map Weight: DSP returns 100 (Light) -> 0 (Heavy).
-            // UI expects: Left (0%) = Light, Right (100%) = Heavy.
-            // So we need to invert the DSP value: 100 - weight.
-            let rawWeight = weight || 50; // Default to balanced if missing
-            let target = 100 - rawWeight;
-            target = Math.max(0, Math.min(100, target));
+        // If silent, freeze the indicator
+        if (isSilent) return;
 
-            // Smoother interpolation (0.05 instead of 0.1)
-            const nextLeft = curLeft + (target - curLeft) * 0.05;
-            indicatorRef.current.style.left = `${nextLeft}%`;
+        // Map Weight: DSP returns 100 (Light) -> 0 (Heavy).
+        // UI expects: Left (0%) = Light, Right (100%) = Heavy.
+        let rawWeight = weight !== undefined ? weight : 50;
+        let target = 100 - rawWeight;
+        target = Math.max(0, Math.min(100, target));
 
-            // Color based on position
-            if (colorBlindMode) {
-                if (nextLeft > 70) {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.8)] transition-colors duration-75 bg-orange-500";
-                } else if (nextLeft < 30) {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.8)] transition-colors duration-75 bg-teal-400";
-                } else {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)] transition-colors duration-75 bg-purple-500";
-    useEffect(() => {
-        const loop = () => {
-            if (indicatorRef.current && valueRef.current) {
-                const { weight, isSilent } = dataRef.current;
-                const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
+        // Smoother interpolation
+        const nextLeft = curLeft + (target - curLeft) * 0.05;
+        indicatorRef.current.style.left = `${nextLeft}%`;
 
-                // If silent, freeze the indicator (or drift very slowly to neutral if desired)
-                // Here we just freeze it to prevent spikes
-                if (isSilent) {
-                    // Optional: Drift slowly to 50% if silence persists? 
-                    // For now, just freeze to avoid "drop to zero" artifacts
-                    return;
-                }
+        // Color based on position
+        if (colorBlindMode) {
+            if (nextLeft > 70) {
+                indicatorRef.current.className = "absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.8)] transition-colors duration-75 bg-orange-500 border border-white/50 z-10";
+            } else if (nextLeft < 30) {
+                indicatorRef.current.className = "absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.8)] transition-colors duration-75 bg-teal-400 border border-white/50 z-10";
             } else {
-                if (nextLeft > 70) {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(255,100,100,0.8)] transition-colors duration-75 bg-red-500";
-                } else if (nextLeft < 30) {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-blue-400";
-                } else {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 bg-emerald-500";
-                }
+                indicatorRef.current.className = "absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)] transition-colors duration-75 bg-purple-500 border border-white/50 z-10";
             }
-
-            // Update value display (Show "Heaviness", not "Lightness")
-            valueRef.current.innerText = Math.round(target);
-
-            // Update metrics display
-            // Update metrics display
-            if (dataRef.current.debug) {
-                const { h1, h2, centroid } = dataRef.current.debug;
-                if (metricsRef.current.h1) metricsRef.current.h1.innerText = h1 ? h1.toFixed(1) : '-';
-                if (metricsRef.current.h2) metricsRef.current.h2.innerText = h2 ? h2.toFixed(1) : '-';
-                if (metricsRef.current.diff) metricsRef.current.diff.innerText = (h1 && h2) ? (h1 - h2).toFixed(1) : '-';
-                if (metricsRef.current.centroid) metricsRef.current.centroid.innerText = centroid || '-';
+        } else {
+             if (nextLeft > 70) {
+                indicatorRef.current.className = "absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_10px_rgba(255,100,100,0.8)] transition-colors duration-75 bg-red-500 border border-white/50 z-10";
+            } else if (nextLeft < 30) {
+                indicatorRef.current.className = "absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-blue-400 border border-white/50 z-10";
+            } else {
+                indicatorRef.current.className = "absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 bg-emerald-500 border border-white/50 z-10";
             }
         }
+
+        // Update value display
+        valueRef.current.innerText = Math.round(target);
+
+        // Update metrics display
+        if (debug && metricsRef.current.h1) {
+            const { h1, h2, centroid } = debug;
+            if (metricsRef.current.h1) metricsRef.current.h1.innerText = h1 ? h1.toFixed(1) : '-';
+            if (metricsRef.current.h2) metricsRef.current.h2.innerText = h2 ? h2.toFixed(1) : '-';
+            if (metricsRef.current.diff) metricsRef.current.diff.innerText = (h1 !== undefined && h2 !== undefined) ? (h1 - h2).toFixed(1) : '-';
+            if (metricsRef.current.centroid) metricsRef.current.centroid.innerText = centroid ? Math.round(centroid) : '-';
+        }
     }, [dataRef, colorBlindMode]);
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
 
     useEffect(() => {
         const unsubscribe = renderCoordinator.subscribe(
@@ -93,16 +72,13 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
             loop,
             renderCoordinator.PRIORITY.CRITICAL
         );
-
-        return () => {
-            unsubscribe();
-        };
+        return () => unsubscribe();
     }, [loop, componentId]);
 
     const labels = userMode === 'slp' ? ['Low Energy', 'Vocal Weight', 'High Energy'] : ['Light / Airy', 'Vocal Weight', 'Heavy / Pressed'];
 
-    // Strain Check
-    const isStrained = dataRef.current?.weight > 80;
+    // Warn if Heavy (Target > 70-80, which means Weight < 20-30)
+    const isStrained = dataRef.current?.weight !== undefined && dataRef.current.weight < 30;
     const isSilent = dataRef.current?.isSilent;
 
     return (
@@ -110,7 +86,7 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
             <div className="absolute top-4 right-4 z-20">
                 <FeedbackControls settings={feedbackSettings} setSettings={setFeedbackSettings} />
             </div>
-            {/* Header */}
+             {/* Header */}
             <div className="flex justify-between items-end text-xs font-bold text-slate-400 tracking-wider mb-4">
                 <span className="w-24 text-left">{labels[0]}</span>
                 <div className="flex flex-col items-center">
@@ -122,26 +98,20 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
 
             {/* Meter Bar */}
             <div className="relative h-12 bg-slate-900/80 rounded-full overflow-hidden shadow-inner border border-white/5 mb-6">
-                {/* Dynamic Gradient Background */}
-                <div className={`absolute inset-0 bg-gradient-to-r ${colorBlindMode ? 'from-orange-500/20 via-purple-500/20 to-teal-500/20' : 'from-red-500/20 via-emerald-500/20 to-blue-500/20'}`}></div>
+                {/* Dynamic Gradient Background: Blue/Teal (Light) -> Emerald (Neutral) -> Red/Orange (Heavy) */}
+                <div className={`absolute inset-0 bg-gradient-to-r ${colorBlindMode ? 'from-teal-500/20 via-purple-500/20 to-orange-500/20' : 'from-blue-500/20 via-emerald-500/20 to-red-500/20'}`}></div>
 
-                {/* Grid Lines & Labels */}
+                {/* Grid Lines */}
                 <div className="absolute left-[30%] top-0 bottom-0 w-px bg-white/10 dashed-line"></div>
-                <div className="absolute left-[30%] top-1 text-[8px] text-slate-500 -translate-x-1/2 font-mono">30</div>
-
                 <div className="absolute left-[70%] top-0 bottom-0 w-px bg-white/10 dashed-line"></div>
-                <div className="absolute left-[70%] top-1 text-[8px] text-slate-500 -translate-x-1/2 font-mono">70</div>
-
                 <div className="absolute left-[50%] top-2 bottom-2 w-px bg-white/5"></div>
 
-                {/* Target Zone Labels */}
                 <div className="absolute top-1/2 -translate-y-1/2 w-full flex justify-between px-4 pointer-events-none">
                     <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest w-[30%] text-center">Light</div>
                     <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest w-[40%] text-center">Neutral</div>
                     <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest w-[30%] text-center">Heavy</div>
                 </div>
 
-                {/* Indicator */}
                 <div
                     ref={indicatorRef}
                     className={`absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_15px_rgba(100,255,100,0.6)] border border-white/50 transition-all duration-100 ease-out z-10 ${colorBlindMode ? 'bg-purple-500' : 'bg-emerald-500'}`}
@@ -152,32 +122,36 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
             {/* Analysis Panel */}
             {showAnalysis && (
                 <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
-                    <div className="flex items-center justify-center gap-2 mb-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                     <div className="flex items-center justify-center gap-2 mb-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                         <Activity size={12} /> Real-Time Analysis
                     </div>
                     <div className="grid grid-cols-4 gap-2">
+                        {/* H1 */}
                         <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-white/5">
                             <div className="text-[10px] text-slate-500 mb-1">H1 (Fund.)</div>
                             <div ref={el => metricsRef.current.h1 = el} className={`text-lg font-mono font-bold ${colorBlindMode ? 'text-teal-300' : 'text-blue-300'}`}>-</div>
                             <div className="text-[9px] text-slate-600">dB</div>
                         </div>
+                        {/* H2 */}
                         <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-white/5">
                             <div className="text-[10px] text-slate-500 mb-1">H2 (Harm.)</div>
                             <div ref={el => metricsRef.current.h2 = el} className={`text-lg font-mono font-bold ${colorBlindMode ? 'text-purple-300' : 'text-purple-300'}`}>-</div>
                             <div className="text-[9px] text-slate-600">dB</div>
                         </div>
+                        {/* Diff */}
                         <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-white/10 shadow-lg">
                             <div className={`text-[10px] mb-1 font-bold ${colorBlindMode ? 'text-purple-500' : 'text-emerald-500'}`}>Diff</div>
                             <div ref={el => metricsRef.current.diff = el} className="text-lg font-mono text-white font-bold">-</div>
                             <div className="text-[9px] text-slate-600">dB</div>
                         </div>
+                        {/* Centroid */}
                         <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-white/5">
                             <div className="text-[10px] text-slate-500 mb-1">Centroid</div>
                             <div ref={el => metricsRef.current.centroid = el} className="text-lg font-mono text-slate-300">-</div>
                             <div className="text-[9px] text-slate-600">Hz</div>
                         </div>
                     </div>
-                    <div className="mt-3 flex items-start gap-2 text-[10px] text-slate-500 leading-tight bg-slate-800/30 p-2 rounded-lg">
+                     <div className="mt-3 flex items-start gap-2 text-[10px] text-slate-500 leading-tight bg-slate-800/30 p-2 rounded-lg">
                         <Info size={12} className="shrink-0 mt-0.5 text-slate-400" />
                         <div>
                             Weight is calculated from the difference between H1 and H2.
@@ -191,7 +165,7 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
                 </div>
             )}
 
-            {isStrained && (
+             {isStrained && (
                 <div className={`mt-4 text-sm flex items-center justify-center gap-2 animate-pulse font-bold py-3 rounded-xl border shadow-[0_0_20px_rgba(239,68,68,0.2)] ${colorBlindMode ? 'text-orange-400 bg-orange-500/10 border-orange-500/20' : 'text-red-400 bg-red-500/10 border-red-500/20'}`}>
                     <AlertTriangle className="w-5 h-5" /> High Vocal Weight detected. Relax!
                 </div>
