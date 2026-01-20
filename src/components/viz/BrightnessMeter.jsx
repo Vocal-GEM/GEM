@@ -1,4 +1,4 @@
-import { useState, useEffect, useId } from 'react';
+import { useState, useEffect, useId, useRef } from 'react';
 import { Sun, Moon, Info, Smile } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
@@ -7,14 +7,21 @@ import { renderCoordinator } from '../../services/RenderCoordinator';
  * 
  * Based on research: All vowels should have an underlying /i/ posture
  * for bright resonance. F2 is the primary acoustic correlate of brightness.
+ *
+ * Performance Optimization:
+ * - Uses useRef for high-frequency DOM updates (indicator position, F2 text)
+ * - Uses state only for low-frequency zone changes (Dark/Neutral/Bright)
+ * - Subscribes to RenderCoordinator for efficient animation loop
  */
 const BrightnessMeter = ({ dataRef, showTip = true }) => {
-    const [brightness, setBrightness] = useState({
-        score: 0,
-        zone: 'neutral',
-        f2Current: 0,
-        f2Target: 2300
-    });
+    // State for low-frequency updates (UI themes, icons)
+    const [zone, setZone] = useState('neutral');
+
+    // Refs for high-frequency updates (Avoids re-renders)
+    const indicatorRef = useRef(null);
+    const f2CurrentRef = useRef(null);
+    const currentZoneRef = useRef('neutral'); // Track zone inside loop to avoid dependency issues
+
     const [showTooltip, setShowTooltip] = useState(false);
     const componentId = useId();
 
@@ -29,17 +36,27 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
                     const f2Max = 2300; // /i/ target
                     const f2Clamped = Math.max(f2Min, Math.min(f2, f2Max + 300));
                     const score = ((f2Clamped - f2Min) / (f2Max - f2Min)) * 100;
+                    const constrainedScore = Math.max(0, Math.min(100, score));
 
-                    let zone = 'neutral';
-                    if (score < 35) zone = 'dark';
-                    else if (score >= 60) zone = 'bright';
+                    // Direct DOM updates for performance
+                    if (indicatorRef.current) {
+                        indicatorRef.current.style.left = `calc(${constrainedScore}% - 8px)`;
+                    }
 
-                    setBrightness({
-                        score: Math.max(0, Math.min(100, score)),
-                        zone,
-                        f2Current: f2,
-                        f2Target: 2300
-                    });
+                    if (f2CurrentRef.current) {
+                        f2CurrentRef.current.innerText = f2.toFixed(0);
+                    }
+
+                    // Determine zone
+                    let newZone = 'neutral';
+                    if (score < 35) newZone = 'dark';
+                    else if (score >= 60) newZone = 'bright';
+
+                    // Only trigger state update if zone changes
+                    if (newZone !== currentZoneRef.current) {
+                        currentZoneRef.current = newZone;
+                        setZone(newZone);
+                    }
                 }
             }
         };
@@ -53,7 +70,7 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
     }, [dataRef, componentId]);
 
     const getZoneColor = () => {
-        switch (brightness.zone) {
+        switch (zone) {
             case 'dark': return 'from-red-500 to-orange-500';
             case 'bright': return 'from-emerald-500 to-teal-500';
             default: return 'from-yellow-500 to-amber-500';
@@ -61,7 +78,7 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
     };
 
     const getZoneLabel = () => {
-        switch (brightness.zone) {
+        switch (zone) {
             case 'dark': return 'Dark';
             case 'bright': return 'Bright ✓';
             default: return 'Neutral';
@@ -69,7 +86,7 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
     };
 
     const getTip = () => {
-        switch (brightness.zone) {
+        switch (zone) {
             case 'dark': return 'Think /i/ - spread lips slightly like a smile 😊';
             case 'bright': return 'Sweet spot! Maintain this bright posture';
             default: return 'Getting brighter - add more /i/ posture';
@@ -82,7 +99,7 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                     <div className={`p-2 rounded-lg bg-gradient-to-br ${getZoneColor()}`}>
-                        {brightness.zone === 'dark' ? (
+                        {zone === 'dark' ? (
                             <Moon className="w-4 h-4 text-white" />
                         ) : (
                             <Sun className="w-4 h-4 text-white" />
@@ -123,8 +140,9 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
 
                 {/* Current position indicator */}
                 <div
+                    ref={indicatorRef}
                     className={`absolute top-1 bottom-1 w-4 rounded-full bg-gradient-to-b ${getZoneColor()} shadow-lg transition-all duration-200`}
-                    style={{ left: `calc(${brightness.score}% - 8px)` }}
+                    style={{ left: '0%' }}
                 />
             </div>
 
@@ -134,8 +152,8 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
                     <Moon size={10} />
                     Dark
                 </span>
-                <span className={`font-bold ${brightness.zone === 'dark' ? 'text-red-400' :
-                    brightness.zone === 'bright' ? 'text-emerald-400' :
+                <span className={`font-bold ${zone === 'dark' ? 'text-red-400' :
+                    zone === 'bright' ? 'text-emerald-400' :
                         'text-yellow-400'
                     }`}>
                     {getZoneLabel()}
@@ -149,14 +167,14 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
             {/* F2 Values */}
             <div className="grid grid-cols-2 gap-3 mb-3">
                 <div className="bg-slate-800/50 rounded-lg p-2 text-center">
-                    <div className="text-lg font-bold text-white">
-                        {brightness.f2Current > 0 ? brightness.f2Current.toFixed(0) : '—'}
+                    <div ref={f2CurrentRef} className="text-lg font-bold text-white">
+                        —
                     </div>
                     <div className="text-xs text-slate-500">Current F2</div>
                 </div>
                 <div className="bg-slate-800/50 rounded-lg p-2 text-center">
                     <div className="text-lg font-bold text-emerald-400">
-                        {brightness.f2Target}
+                        2300
                     </div>
                     <div className="text-xs text-slate-500">/i/ Target</div>
                 </div>
@@ -164,12 +182,12 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
 
             {/* Tip */}
             {showTip && (
-                <div className={`flex items-start gap-2 p-3 rounded-xl ${brightness.zone === 'dark' ? 'bg-red-500/10 border border-red-500/20' :
-                    brightness.zone === 'bright' ? 'bg-emerald-500/10 border border-emerald-500/20' :
+                <div className={`flex items-start gap-2 p-3 rounded-xl ${zone === 'dark' ? 'bg-red-500/10 border border-red-500/20' :
+                    zone === 'bright' ? 'bg-emerald-500/10 border border-emerald-500/20' :
                         'bg-yellow-500/10 border border-yellow-500/20'
                     }`}>
-                    <Smile className={`w-4 h-4 shrink-0 mt-0.5 ${brightness.zone === 'dark' ? 'text-red-400' :
-                        brightness.zone === 'bright' ? 'text-emerald-400' :
+                    <Smile className={`w-4 h-4 shrink-0 mt-0.5 ${zone === 'dark' ? 'text-red-400' :
+                        zone === 'bright' ? 'text-emerald-400' :
                             'text-yellow-400'
                         }`} />
                     <p className="text-xs text-slate-300">{getTip()}</p>
