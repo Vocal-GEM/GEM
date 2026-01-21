@@ -16,9 +16,14 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { voiceProfiles, activeProfile } = useProfile();
     const { colorBlindMode } = useSettings();
     const canvasRef = useRef(null);
-    const balloonRef = useRef(new Image());
-    const birdRef = useRef(new Image());
-    const gameRef = useRef({ score: 0, lastUpdate: Date.now(), lastPitch: 0 });
+    const balloonRef = useRef(null);
+    const birdRef = useRef(null);
+    const gameRef = useRef(null);
+
+    // Lazy initialization for game state
+    if (!gameRef.current) {
+        gameRef.current = { score: 0, lastUpdate: Date.now(), lastPitch: 0 };
+    }
 
     const [zoomRange, setZoomRange] = useState({ min: 50, max: 350 });
     const [averagePitchRange, setAveragePitchRange] = useState({ lowest: null, highest: null });
@@ -31,6 +36,10 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { settings: feedbackSettings, setSettings: setFeedbackSettings } = useFeedback(audioEngineRef, dataRef);
 
     useEffect(() => {
+        // Lazy initialization for images
+        if (!balloonRef.current) balloonRef.current = new Image();
+        if (!birdRef.current) birdRef.current = new Image();
+
         balloonRef.current.src = '/assets/balloon.png';
         birdRef.current.src = '/assets/bird.png';
     }, []);
