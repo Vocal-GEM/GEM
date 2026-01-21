@@ -44,7 +44,8 @@ const SpectrogramMesh = ({ dataRef }) => {
     }, []);
 
     // Buffer for historical data
-    const historyRef = useRef(new Float32Array(numCols * numRows));
+    const historyRef = useRef(null);
+    if (!historyRef.current) historyRef.current = new Float32Array(numCols * numRows);
 
     // Reusable color object to prevent GC
     // Optimization: Reuse Color object to avoid thousands of allocations per frame
