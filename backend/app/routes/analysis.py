@@ -4,7 +4,7 @@ Provides endpoints for analyzing recorded audio with voice metrics.
 Uses librosa for analysis and faster-whisper for transcription (no compilation needed).
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from werkzeug.utils import secure_filename
 import os
 import tempfile
@@ -298,19 +298,19 @@ def analyze_audio():
     
     try:
         # Load audio with librosa
-        print("Loading audio...")
+        current_app.logger.info("Loading audio...")
         y, sr = librosa.load(temp_path, sr=None)  # Keep original sample rate
         
         # Get overall metrics
-        print("Extracting overall metrics...")
+        current_app.logger.info("Extracting overall metrics...")
         overall_metrics = extract_voice_metrics(y, sr)
         
         # Transcribe and get word timing
-        print("Transcribing audio...")
+        current_app.logger.info("Transcribing audio...")
         transcription = transcribe_with_timing(temp_path)
         
         # Extract metrics for each word
-        print("Analyzing word-level metrics...")
+        current_app.logger.info("Analyzing word-level metrics...")
         words_with_metrics = []
         for word_info in transcription['words']:
             word_metrics = extract_voice_metrics(
@@ -344,9 +344,9 @@ def analyze_audio():
         return jsonify(response), 200
         
     except Exception as e:
-        print(f"Analysis error: {e}")
+        current_app.logger.error(f"Analysis error: {e}")
         import traceback
-        traceback.print_exc()
+        current_app.logger.error(traceback.format_exc())
         # Security: Do not expose internal error details to client
         return jsonify({'error': 'An internal error occurred during analysis.'}), 500
         

@@ -106,7 +106,7 @@ def sync_data():
         return jsonify({"status": "synced", "processed": processed_count})
     except Exception as e:
         db.session.rollback()
-        print(f"Sync Error: {e}")
+        current_app.logger.error(f"Sync Error: {e}")
         return jsonify({"error": "Sync failed"}), 500
 
 @data_bp.route('/data', methods=['GET'])
@@ -233,5 +233,5 @@ def save_user_data():
         return jsonify({"status": "saved", "updatedAt": user_data.updated_at.isoformat()})
     except Exception as e:
         db.session.rollback()
-        print(f"UserData save error: {e}")
+        current_app.logger.error(f"UserData save error: {e}")
         return jsonify({"error": "Failed to save user data"}), 500
