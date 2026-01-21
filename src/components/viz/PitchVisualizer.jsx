@@ -19,6 +19,8 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const balloonRef = useRef(new Image());
     const birdRef = useRef(new Image());
     const gameRef = useRef({ score: 0, lastUpdate: Date.now(), lastPitch: 0 });
+    const runningStatsRef = useRef({ lowest: null, highest: null });
+    const lastUiUpdateRef = useRef(0);
 
     const [zoomRange, setZoomRange] = useState({ min: 50, max: 350 });
     const [averagePitchRange, setAveragePitchRange] = useState({ lowest: null, highest: null });
@@ -57,6 +59,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
     const handleResetAverage = () => {
         setAveragePitchRange({ lowest: null, highest: null });
+        runningStatsRef.current = { lowest: null, highest: null };
     };
 
     // Touch gesture state for pinch-to-zoom
@@ -421,24 +424,35 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             const currentClarity = dataRef.current.clarity || 0;
 
             if (currentP > 0) {
-                setAveragePitchRange(prev => ({
-                    lowest: prev.lowest === null ? currentP : Math.min(prev.lowest, currentP),
-                    highest: prev.highest === null ? currentP : Math.max(prev.highest, currentP)
-                }));
+                // Update running stats immediately for accuracy
+                const prevLow = runningStatsRef.current.lowest;
+                const prevHigh = runningStatsRef.current.highest;
 
-                // Check if in ambiguity zone and update state
-                const f1 = dataRef.current.f1 || 0;
-                const rbi = dataRef.current.resonanceScore;
-                if (currentP >= AMBIGUITY_ZONE.min && currentP <= AMBIGUITY_ZONE.max) {
-                    const prediction = predictGenderPerception(currentP, f1, rbi);
-                    setAmbiguityZoneData({
-                        pitch: currentP,
-                        f1,
-                        rbi,
-                        prediction
-                    });
-                } else {
-                    setAmbiguityZoneData(null);
+                runningStatsRef.current.lowest = prevLow === null ? currentP : Math.min(prevLow, currentP);
+                runningStatsRef.current.highest = prevHigh === null ? currentP : Math.max(prevHigh, currentP);
+
+                // Throttle UI updates to ~10fps (100ms)
+                const now = Date.now();
+                if (now - lastUiUpdateRef.current > 100) {
+                    setAveragePitchRange({ ...runningStatsRef.current });
+
+                    // Check if in ambiguity zone and update state
+                    const f1 = dataRef.current.f1 || 0;
+                    const rbi = dataRef.current.resonanceScore;
+
+                    if (currentP >= AMBIGUITY_ZONE.min && currentP <= AMBIGUITY_ZONE.max) {
+                        const prediction = predictGenderPerception(currentP, f1, rbi);
+                        setAmbiguityZoneData({
+                            pitch: currentP,
+                            f1,
+                            rbi,
+                            prediction
+                        });
+                    } else {
+                        setAmbiguityZoneData(null);
+                    }
+
+                    lastUiUpdateRef.current = now;
                 }
             }
 
