@@ -3,144 +3,27 @@
 > vite
 
 
-  VITE v5.4.21  ready in 408 ms
+  VITE v5.4.21  ready in 589 ms
 
   ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
-7:46:07 AM [vite] Pre-transform error: /app/src/components/ui/LoadingSpinner.jsx: Unexpected token (37:18)
-
-  35 |         className
-  36 |       ))}
-> 37 | import React from "react";
-     |                   ^
-  38 | import clsx from "clsx";
-  39 | import { twMerge } from "tailwind-merge";
-  40 | import React from 'react';
-7:46:07 AM [vite] Pre-transform error: /app/src/components/ui/Toast.jsx: 'import' and 'export' may only appear at the top level. (9:0)
-
-   7 |   useEffect(() => {
-   8 |     if (duration) {
->  9 | import { useEffect } from "react";
-     | ^
-  10 | import { X, CheckCircle, AlertTriangle, Info, XCircle } from "lucide-react";
-  11 | import { twMerge } from "tailwind-merge";
-  12 | import clsx from "clsx";
-7:46:09 AM [vite] Pre-transform error: /app/src/components/ui/LoadingSpinner.jsx: Unexpected token (37:18)
-
-  35 |         className
-  36 |       ))}
-> 37 | import React from "react";
-     |                   ^
-  38 | import clsx from "clsx";
-  39 | import { twMerge } from "tailwind-merge";
-  40 | import React from 'react';
-7:46:09 AM [vite] Pre-transform error: /app/src/components/ui/LoadingSpinner.jsx: Unexpected token (37:18)
-
-  35 |         className
-  36 |       ))}
-> 37 | import React from "react";
-     |                   ^
-  38 | import clsx from "clsx";
-  39 | import { twMerge } from "tailwind-merge";
-  40 | import React from 'react';
 Error:   Failed to scan for dependencies from entries:
   /app/index.html
 /app/ios/App/App/public/index.html
 
-  [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected ">" but found "\"react\""[0m
+  [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected ";" but found ")"[0m
 
-    src/components/ui/LoadingSpinner.jsx:37:18:
-[37m      37 │ import React from [32m"react"[37m;
-         │                   [32m~~~~~~~[37m
-         ╵                   [32m>[0m
-
-
-[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mUnexpected "{"[0m
-
-    src/components/ui/Toast.jsx:9:7:
-[37m      9 │ import [32m{[37m useEffect } from "react";
-        ╵        [32m^[0m
+    src/components/viz/ContourVisualizer.jsx:132:16:
+[37m      132 │     }, [dataRef][32m)[37m;
+          │                 [32m^[37m
+          ╵                 [32m;[0m
 
 
-[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected ")" but found "const"[0m
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mUnexpected "export"[0m
 
-    src/components/ui/button.jsx:64:0:
-[37m      64 │ [32mconst[37m Button = React.forwardRef(({
-         │ [32m~~~~~[37m
-         ╵ [32m)[0m
-
-
-[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useEffect" has already been declared[0m
-
-    src/components/viz/VoiceQualityAnalysis.jsx:2:16:
-[37m      2 │ import React, { [32museEffect[37m, useRef, useState, useId, useCallback } f...
-        ╵                 [32m~~~~~~~~~[0m
-
-  The symbol "useEffect" was originally declared here:
-
-    src/components/viz/VoiceQualityAnalysis.jsx:1:9:
-[37m      1 │ import { [32museEffect[37m, useRef, useState, useId, useCallback } from 're...
-        ╵          [32m~~~~~~~~~[0m
-
-
-[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useRef" has already been declared[0m
-
-    src/components/viz/VoiceQualityAnalysis.jsx:2:27:
-[37m      2 │ import React, { useEffect, [32museRef[37m, useState, useId, useCallback } f...
-        ╵                            [32m~~~~~~[0m
-
-  The symbol "useRef" was originally declared here:
-
-    src/components/viz/VoiceQualityAnalysis.jsx:1:20:
-[37m      1 │ import { useEffect, [32museRef[37m, useState, useId, useCallback } from 're...
-        ╵                     [32m~~~~~~[0m
-
-
-[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useState" has already been declared[0m
-
-    src/components/viz/VoiceQualityAnalysis.jsx:2:35:
-[37m      2 │ ...React, { useEffect, useRef, [32museState[37m, useId, useCallback } from ...
-        ╵                                [32m~~~~~~~~[0m
-
-  The symbol "useState" was originally declared here:
-
-    src/components/viz/VoiceQualityAnalysis.jsx:1:28:
-[37m      1 │ import { useEffect, useRef, [32museState[37m, useId, useCallback } from 're...
-        ╵                             [32m~~~~~~~~[0m
-
-
-[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useId" has already been declared[0m
-
-    src/components/viz/VoiceQualityAnalysis.jsx:2:45:
-[37m      2 │ ..., { useEffect, useRef, useState, [32museId[37m, useCallback } from 'react';
-        ╵                                     [32m~~~~~[0m
-
-  The symbol "useId" was originally declared here:
-
-    src/components/viz/VoiceQualityAnalysis.jsx:1:38:
-[37m      1 │ ...t { useEffect, useRef, useState, [32museId[37m, useCallback } from 'react';
-        ╵                                     [32m~~~~~[0m
-
-
-[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useCallback" has already been declared[0m
-
-    src/components/viz/VoiceQualityAnalysis.jsx:2:52:
-[37m      2 │ ..., { useEffect, useRef, useState, useId, [32museCallback[37m } from 'react';
-        ╵                                            [32m~~~~~~~~~~~[0m
-
-  The symbol "useCallback" was originally declared here:
-
-    src/components/viz/VoiceQualityAnalysis.jsx:1:45:
-[37m      1 │ ...t { useEffect, useRef, useState, useId, [32museCallback[37m } from 'react';
-        ╵                                            [32m~~~~~~~~~~~[0m
-
-
-[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected "}" but found "useProfile"[0m
-
-    src/components/viz/VoiceQualityAnalysis.jsx:102:4:
-[37m      102 │     [32museProfile[37m(); // Keep if needed for side effects or future us...
-          │     [32m~~~~~~~~~~[37m
-          ╵     [32m}[0m
+    src/components/viz/VoiceQualityMeter.jsx:203:0:
+[37m      203 │ [32mexport[37m default VoiceQualityMeter;
+          ╵ [32m~~~~~~[0m
 
 
     at failureErrorWithLog (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:1472:15)
@@ -158,28 +41,7 @@ Error:   Failed to scan for dependencies from entries:
     at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
     at Readable.push (node:internal/streams/readable:392:5)
     at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
-7:46:10 AM [vite] Pre-transform error: /app/src/components/ui/button.jsx: Unexpected token, expected "," (64:0)
-
-  62 |             </>
-  63 |           )
-> 64 | const Button = React.forwardRef(({
-     | ^
-  65 |   className,
-  66 |   variant = "default",
-  67 |   size = "default",
-7:46:10 AM [vite] Pre-transform error: /app/src/components/ui/button.jsx: Unexpected token, expected "," (64:0)
-
-  62 |             </>
-  63 |           )
-> 64 | const Button = React.forwardRef(({
-     | ^
-  65 |   className,
-  66 |   variant = "default",
-  67 |   size = "default",
-7:47:01 AM [vite] hmr update /src/index.css, /src/components/analytics/AnalyticsDashboardV2.jsx, /src/components/analytics/InsightCard.jsx
-7:47:25 AM [vite] page reload src/components/viz/VoiceQualityAnalysis.jsx
-npm notice
-npm notice New minor version of npm available! 11.6.2 -> 11.7.0
-npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.7.0
-npm notice To update run: npm install -g npm@11.7.0
-npm notice
+7:07:37 AM [vite] ✨ new dependencies optimized: @react-three/fiber, three, @react-three/drei
+7:07:37 AM [vite] ✨ optimized dependencies changed. reloading
+7:09:44 AM [vite] hmr update /src/components/ui/button.jsx, /src/index.css
+7:13:07 AM [vite] hmr update /src/components/ui/button.jsx, /src/index.css
