@@ -80,6 +80,6 @@ describe('PracticeMode', () => {
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
         // Check for visualization area
-        expect(screen.getByTestId('dynamic-orb')).toBeInTheDocument();
+        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
     });
 });
