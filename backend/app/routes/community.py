@@ -289,12 +289,6 @@ def submit_success_story():
             techniques = []
 
         # Moderation check
-        is_safe, flagged = check_moderation(title + ' ' + story_text)
-
-        story = SuccessStory(
-            user_id=current_user.id,
-            title=title,
-            story=story_text,
         is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
 
         story = SuccessStory(
@@ -305,7 +299,6 @@ def submit_success_story():
             voice_goal=voice_goal,
             consent_public=data.get('consent_public', False),
             approved=is_safe,  # Auto-approve if passes moderation
-            techniques_used=techniques
             techniques_used=clean_techniques
         )
 
