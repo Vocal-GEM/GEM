@@ -27,8 +27,8 @@ export const FEATURES = {
     // ═══════════════════════════════════════════════════════════
     library: false,
     glossary: false,
-    journal: false,
-    history: false,
+    journal: true,
+    history: true,
     progress: false,
     program: false,
     learn: false,
