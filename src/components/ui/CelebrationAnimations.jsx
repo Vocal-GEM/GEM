@@ -7,7 +7,6 @@ import React, { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { Heart, Star, Trophy, ThumbsUp, Sparkles, TrendingUp } from 'lucide-react';
-import { getHapticFeedback } from '../../services/HapticFeedback'; // Import if singleton wrapper exists, or just use HapticFeedback
 import HapticFeedback from '../../services/HapticFeedback';
 import AudioFeedback, { getAudioFeedback } from '../../services/AudioFeedback';
 

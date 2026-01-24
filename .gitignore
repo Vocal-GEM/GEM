@@ -37,3 +37,4 @@ instance/
 # Editor
 .vscode/
 .idea/
+uploads/

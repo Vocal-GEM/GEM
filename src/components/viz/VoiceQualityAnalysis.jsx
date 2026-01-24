@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState, useId, useCallback } from 'react';
+import { useEffect, useRef, useState, useId } from 'react';
 import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
 import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
 import { renderCoordinator } from '../../services/RenderCoordinator';
+import { useProfile } from '../../contexts/ProfileContext';
+import { useEffect, useRef, useState, useId, useCallback } from 'react';
+import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
+import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
+import { renderCoordinator } from '../../services/RenderCoordinator';
+import { useProfile } from '../../context/ProfileContext';
 
 const QuadCoreCard = ({ icon: Icon, title, score, label, value, color, unit }) => (
     <div className="bg-slate-800/50 rounded-xl p-3 border border-white/5 relative overflow-hidden group hover:bg-slate-800/80 transition-colors">
@@ -74,6 +81,17 @@ const FeedbackBanner = ({ feedback }) => {
 
 const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioActive }) => {
     const serviceRef = useRef(new QuadCoreAnalysisService());
+    useProfile();
+
+    const serviceRef = useRef(new QuadCoreAnalysisService());
+    const serviceRef = useRef(null);
+    useEffect(() => {
+        serviceRef.current = new QuadCoreAnalysisService();
+    }, []);
+    if (!serviceRef.current) {
+        serviceRef.current = new QuadCoreAnalysisService();
+    }
+
     const [analysis, setAnalysis] = useState(null);
 
     // Generate unique component ID for RenderCoordinator
@@ -81,26 +99,26 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
     const componentId = `voice-quality-${uniqueId}`;
 
     const analyze = useCallback(() => {
-        if (dataRef.current) {
+        if (dataRef.current && isAudioActive && serviceRef.current) {
             const results = serviceRef.current.analyze(dataRef.current, {
                 targetF2: 2000 // Default to neutral/chem until calibration is fuller
-                // TODO: pull from calibration context if available
             });
 
             if (results) {
                 setAnalysis(results);
             }
         }
-    }, [dataRef]);
+    }, [dataRef, isAudioActive]);
 
     useEffect(() => {
         let unsubscribe;
 
         if (isAudioActive) {
-            // Use RenderCoordinator instead of raw requestAnimationFrame
-            // We use a lower priority (LOW) because full analysis doesn't need to happen every 60fps
-            // This frees up resources for smoother visualizations
+            // Subscribe to RenderCoordinator instead of using internal RAF loop
+            // Use LOW priority as this is UI analysis updates, not 60fps animation
             unsubscribe = renderCoordinator.subscribe(
+                `VoiceQualityAnalysis-${componentId}`,
+                updateAnalysis,
                 componentId,
                 analyze,
                 renderCoordinator.PRIORITY.LOW
@@ -110,6 +128,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
         return () => {
             if (unsubscribe) unsubscribe();
         };
+    }, [isAudioActive, componentId, dataRef]);
     }, [isAudioActive, componentId, analyze]);
 
     return (
