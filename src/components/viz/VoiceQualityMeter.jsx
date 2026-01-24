@@ -20,22 +20,16 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
             const { weight, isSilent } = dataRef.current;
             const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
 
-            // If silent, freeze the indicator (or drift very slowly to neutral if desired)
-            // Here we just freeze it to prevent spikes
             if (isSilent) {
-                // Optional: Drift slowly to 50% if silence persists?
-                // For now, just freeze to avoid "drop to zero" artifacts
                 return;
             }
 
             // Map Weight: DSP returns 100 (Light) -> 0 (Heavy).
             // UI expects: Left (0%) = Light, Right (100%) = Heavy.
-            // So we need to invert the DSP value: 100 - weight.
-            let rawWeight = weight || 50; // Default to balanced if missing
+            let rawWeight = weight || 50;
             let target = 100 - rawWeight;
             target = Math.max(0, Math.min(100, target));
 
-            // Smoother interpolation (0.05 instead of 0.1)
             const nextLeft = curLeft + (target - curLeft) * 0.05;
             indicatorRef.current.style.left = `${nextLeft}%`;
 
@@ -47,18 +41,6 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
                     indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.8)] transition-colors duration-75 bg-teal-400";
                 } else {
                     indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)] transition-colors duration-75 bg-purple-500";
-    useEffect(() => {
-        const loop = () => {
-            if (indicatorRef.current && valueRef.current) {
-                const { weight, isSilent } = dataRef.current;
-                const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
-
-                // If silent, freeze the indicator (or drift very slowly to neutral if desired)
-                // Here we just freeze it to prevent spikes
-                if (isSilent) {
-                    // Optional: Drift slowly to 50% if silence persists? 
-                    // For now, just freeze to avoid "drop to zero" artifacts
-                    return;
                 }
             } else {
                 if (nextLeft > 70) {
@@ -70,22 +52,18 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
                 }
             }
 
-            // Update value display (Show "Heaviness", not "Lightness")
             valueRef.current.innerText = Math.round(target);
 
-            // Update metrics display
             // Update metrics display
             if (dataRef.current.debug) {
                 const { h1, h2, centroid } = dataRef.current.debug;
                 if (metricsRef.current.h1) metricsRef.current.h1.innerText = h1 ? h1.toFixed(1) : '-';
                 if (metricsRef.current.h2) metricsRef.current.h2.innerText = h2 ? h2.toFixed(1) : '-';
                 if (metricsRef.current.diff) metricsRef.current.diff.innerText = (h1 && h2) ? (h1 - h2).toFixed(1) : '-';
-                if (metricsRef.current.centroid) metricsRef.current.centroid.innerText = centroid || '-';
+                if (metricsRef.current.centroid) metricsRef.current.centroid.innerText = (centroid !== undefined && centroid !== null) ? centroid : '-';
             }
         }
     }, [dataRef, colorBlindMode]);
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
 
     useEffect(() => {
         const unsubscribe = renderCoordinator.subscribe(
@@ -101,8 +79,7 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
 
     const labels = userMode === 'slp' ? ['Low Energy', 'Vocal Weight', 'High Energy'] : ['Light / Airy', 'Vocal Weight', 'Heavy / Pressed'];
 
-    // Strain Check
-    const isStrained = dataRef.current?.weight > 80;
+    const isStrained = dataRef.current?.weight < 20; // weight is 100 (light) to 0 (heavy)
     const isSilent = dataRef.current?.isSilent;
 
     return (
