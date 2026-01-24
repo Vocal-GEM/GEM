@@ -109,6 +109,7 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
     current: "border-current opacity-30",
   };
 
+  const containerClass = size === 'sm' ? 'h-auto min-h-0' : 'h-full min-h-[200px]';
   // For 'xs'/'sm', we usually want inline or small container.
   const containerClass = (size === 'xs' || size === 'sm')
     ? 'inline-flex h-auto min-h-0'
@@ -118,6 +119,7 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
     <div
       className={twMerge(
         clsx(
+          "flex items-center justify-center w-full",
           "inline-flex items-center justify-center",
           'items-center justify-center',
           // For small sizes, use inline-flex and auto width to fit inside buttons/text.

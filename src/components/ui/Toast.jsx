@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { X, CheckCircle, AlertTriangle, Info, XCircle } from 'lucide-react';
 
 const Toast = ({ message, type = 'success', onClose, duration = 3000 }) => {
@@ -11,6 +11,10 @@ const Toast = ({ message, type = 'success', onClose, duration = 3000 }) => {
   }, [duration, onClose]);
 
   const styles = {
+    success: { bg: 'bg-green-500/10 border-green-500/50', text: 'text-green-400', icon: CheckCircle, role: 'status', label: 'Success' },
+    error: { bg: 'bg-red-500/10 border-red-500/50', text: 'text-red-400', icon: XCircle, role: 'alert', label: 'Error' },
+    warning: { bg: 'bg-yellow-500/10 border-yellow-500/50', text: 'text-yellow-400', icon: AlertTriangle, role: 'alert', label: 'Warning' },
+    info: { bg: 'bg-blue-500/10 border-blue-500/50', text: 'text-blue-400', icon: Info, role: 'status', label: 'Information' },
     success: { bg: 'bg-green-500/10 border-green-500/50', text: 'text-green-400', icon: CheckCircle, role: 'status', live: 'polite', label: 'Success' },
     error: { bg: 'bg-red-500/10 border-red-500/50', text: 'text-red-400', icon: XCircle, role: 'alert', live: 'assertive', label: 'Error' },
     warning: { bg: 'bg-yellow-500/10 border-yellow-500/50', text: 'text-yellow-400', icon: AlertTriangle, role: 'alert', live: 'assertive', label: 'Warning' },
@@ -20,6 +24,12 @@ const Toast = ({ message, type = 'success', onClose, duration = 3000 }) => {
   const style = styles[type] || styles.success;
   const Icon = style.icon;
 
+  const isAlert = type === 'error' || type === 'warning';
+
+  return (
+    <div
+      role={style.role}
+      aria-live={isAlert ? 'assertive' : 'polite'}
   return (
     <div
       role={style.role}
