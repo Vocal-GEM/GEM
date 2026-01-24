@@ -263,6 +263,10 @@ const PracticeMode = ({
     useEffect(() => {
         coachingEngineRef.current = new CoachingEngine();
     }, []);
+    // Lazy initialization
+    if (!coachingEngineRef.current) {
+        coachingEngineRef.current = new CoachingEngine();
+    }
 
     useEffect(() => {
         if (!isAudioActive) {

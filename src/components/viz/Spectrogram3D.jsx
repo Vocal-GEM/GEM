@@ -48,6 +48,9 @@ const SpectrogramMesh = ({ dataRef }) => {
     useEffect(() => {
         historyRef.current = new Float32Array(numCols * numRows);
     }, []);
+    if (!historyRef.current) {
+        historyRef.current = new Float32Array(numCols * numRows);
+    }
 
     // Reusable color object to prevent GC
     // Optimization: Reuse Color object to avoid thousands of allocations per frame

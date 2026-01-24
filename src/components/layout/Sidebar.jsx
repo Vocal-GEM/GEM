@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, Waves, Search, FileText, HelpCircle, Layers, BookMarked, Camera, Briefcase, ClipboardCheck } from 'lucide-react';
+import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, Waves, Search, FileText, HelpCircle, Layers, BookMarked, Camera, Briefcase, ClipboardCheck, Mic } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useNavigation } from '../../context/NavigationContext';
 import ProfileManager from '../ui/ProfileManager';
@@ -39,6 +39,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
     const navItems = [
         { id: 'dashboard', label: 'Dashboard', icon: <Home size={20} /> },
         { id: 'practice', label: 'Practice', icon: <Activity size={20} /> },
+        { id: 'journal', label: 'Voice Log', icon: <Mic size={20} /> },
         { id: 'analysis', label: 'Analysis', icon: <Waves size={20} /> },
         { id: 'analytics', label: 'Analytics', icon: <BarChart2 size={20} /> },
         { id: 'library', label: 'Library', icon: <BookMarked size={20} /> },

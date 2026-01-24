@@ -18,6 +18,32 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const canvasRef = useRef(null);
     const balloonRef = useRef(null);
     const birdRef = useRef(null);
+    // Cached dimensions to avoid getBoundingClientRect in loop
+    const dimensionsRef = useRef({ width: 0, height: 0 });
+    const balloonRef = useRef(new Image());
+    const birdRef = useRef(new Image());
+    const balloonRef = useRef(null);
+    const birdRef = useRef(null);
+
+    // Lazy initialization
+    if (!balloonRef.current) {
+        balloonRef.current = new Image();
+    }
+    if (!birdRef.current) {
+        birdRef.current = new Image();
+    }
+
+    if (!balloonRef.current) balloonRef.current = new Image();
+    if (!birdRef.current) birdRef.current = new Image();
+
+    if (!balloonRef.current) {
+        balloonRef.current = new Image();
+    }
+    const birdRef = useRef(null);
+    if (!birdRef.current) {
+        birdRef.current = new Image();
+    }
+    const birdRef = useRef(null);
     const gameRef = useRef({ score: 0, lastUpdate: Date.now(), lastPitch: 0 });
 
     const [zoomRange, setZoomRange] = useState({ min: 50, max: 350 });
@@ -35,6 +61,14 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
         if (!birdRef.current) birdRef.current = new Image();
         balloonRef.current.src = '/assets/balloon.png';
         birdRef.current.src = '/assets/bird.png';
+        if (!balloonRef.current) {
+            balloonRef.current = new Image();
+            balloonRef.current.src = '/assets/balloon.png';
+        }
+        if (!birdRef.current) {
+            birdRef.current = new Image();
+            birdRef.current.src = '/assets/bird.png';
+        }
     }, []);
 
     const handleZoomIn = () => {
@@ -108,11 +142,44 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
     const handlePointerCancel = handlePointerUp;
 
+    // Monitor canvas size with ResizeObserver
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const updateDimensions = () => {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+
+            // Update physical dimensions
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+
+            // Update ref for the loop
+            dimensionsRef.current = {
+                width: rect.width,
+                height: rect.height
+            };
+
+            // Restore scale after resize clears canvas
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+        };
+
+        const observer = new ResizeObserver(updateDimensions);
+        observer.observe(canvas);
+
+        // Initial setup
+        updateDimensions();
+
+        return () => observer.disconnect();
+    }, []);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
+        // Initial scale is handled by the ResizeObserver effect
 
         if (exercise) gameRef.current = { score: 0, lastUpdate: Date.now(), lastPitch: 0 };
 
@@ -174,13 +241,12 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
         const loop = () => {
             // ... (context init omitted, assumes mostly unchanged logic till drawing) ...
             if (!canvas) return;
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
 
-            const width = rect.width;
-            const height = rect.height;
+            // Use cached dimensions - huge performance win
+            // avoiding getBoundingClientRect() in the loop
+            const { width, height } = dimensionsRef.current;
+
+            // Clear using cached logical dimensions
             ctx.clearRect(0, 0, width, height);
 
             // ... (grid drawing lines 114-133 omitted) ...
@@ -331,6 +397,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     if (i % 150 === 0) {
                         const birdY = y + (Math.sin(i + now / 100) * 20);
                         if (birdRef.current && birdRef.current.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
+                        if (birdRef.current?.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
                     }
                 }
                 ctx.stroke(); ctx.setLineDash([]);
@@ -339,6 +406,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 if (currentPitch > 0) {
                     const playerY = mapY(currentPitch);
                     if (balloonRef.current && balloonRef.current.complete) {
+                    if (balloonRef.current?.complete) {
                         ctx.drawImage(balloonRef.current, width - 60, playerY - 25, 50, 50);
                     } else {
                         ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(width - 40, playerY, 15, 0, Math.PI * 2); ctx.fill();
@@ -558,28 +626,30 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 </div>
             )}
 
-            <div className="absolute top-3 right-48 z-20">
-                <FeedbackControls settings={feedbackSettings} setSettings={setFeedbackSettings} />
-            </div>
-
-            <div className="absolute top-3 right-3 flex items-center gap-2 bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2">
-                <div className="flex flex-col items-end">
-                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Average Pitch</div>
-                    {averagePitchRange.lowest !== null && averagePitchRange.highest !== null ? (
-                        <div className="text-sm font-mono font-bold text-emerald-400">
-                            {Math.round(averagePitchRange.lowest)} - {Math.round(averagePitchRange.highest)} Hz
-                        </div>
-                    ) : (
-                        <div className="text-sm font-mono text-slate-500">-- Hz</div>
-                    )}
+            <div className="absolute top-3 right-3 z-20 flex items-start gap-3 pointer-events-none">
+                <div className="pointer-events-auto">
+                    <FeedbackControls settings={feedbackSettings} setSettings={setFeedbackSettings} />
                 </div>
-                <button
-                    onClick={handleResetAverage}
-                    className="w-7 h-7 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-slate-700/50"
-                    title="Reset Average"
-                >
-                    <RotateCcw size={14} />
-                </button>
+
+                <div className="flex items-center gap-2 bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2 pointer-events-auto shadow-lg">
+                    <div className="flex flex-col items-end">
+                        <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Average Pitch</div>
+                        {averagePitchRange.lowest !== null && averagePitchRange.highest !== null ? (
+                            <div className="text-sm font-mono font-bold text-emerald-400">
+                                {Math.round(averagePitchRange.lowest)} - {Math.round(averagePitchRange.highest)} Hz
+                            </div>
+                        ) : (
+                            <div className="text-sm font-mono text-slate-500">-- Hz</div>
+                        )}
+                    </div>
+                    <button
+                        onClick={handleResetAverage}
+                        className="w-7 h-7 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-slate-700/50"
+                        title="Reset Average"
+                    >
+                        <RotateCcw size={14} />
+                    </button>
+                </div>
             </div>
 
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

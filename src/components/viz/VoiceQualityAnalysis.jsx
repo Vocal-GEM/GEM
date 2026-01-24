@@ -82,6 +82,9 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
     useEffect(() => {
         serviceRef.current = new QuadCoreAnalysisService();
     }, []);
+    if (!serviceRef.current) {
+        serviceRef.current = new QuadCoreAnalysisService();
+    }
 
     const [analysis, setAnalysis] = useState(null);
 

@@ -1,15 +1,29 @@
-
 import { ChevronRight, Home } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
 
 const Breadcrumbs = () => {
-    const { history, navigate, activeView } = useNavigation();
+    const { history, navigate, activeView, practiceTab, switchPracticeTab } = useNavigation();
 
-    // If history is empty, show default Home > Active View
-    const displayHistory = history.length > 0 ? history : [
-        { label: 'Home', action: () => navigate('practice') },
-        { label: activeView.charAt(0).toUpperCase() + activeView.slice(1), action: null }
-    ];
+    // Don't show on Dashboard
+    if (activeView === 'dashboard') return null;
+
+    let displayHistory = history;
+
+    if (displayHistory.length === 0) {
+        // Default Breadcrumb Logic
+        displayHistory = [{ label: 'Dashboard', action: () => navigate('dashboard') }];
+
+        if (activeView === 'practice') {
+            if (practiceTab && practiceTab !== 'overview') {
+                 displayHistory.push({ label: 'Practice', action: () => switchPracticeTab('overview') });
+                 displayHistory.push({ label: practiceTab.charAt(0).toUpperCase() + practiceTab.slice(1), action: null });
+            } else {
+                 displayHistory.push({ label: 'Practice', action: null });
+            }
+        } else {
+             displayHistory.push({ label: activeView.charAt(0).toUpperCase() + activeView.slice(1), action: null });
+        }
+    }
 
     return (
         <nav className="flex items-center text-sm text-slate-400 mb-4 animate-in fade-in slide-in-from-left-2" aria-label="Breadcrumb">
@@ -29,7 +43,7 @@ const Breadcrumbs = () => {
                                     onClick={item.action}
                                     className="hover:text-blue-400 transition-colors flex items-center gap-1"
                                 >
-                                    {index === 0 && item.label === 'Home' && <Home size={14} />}
+                                    {index === 0 && item.label === 'Dashboard' && <Home size={14} />}
                                     <span>{item.label}</span>
                                 </button>
                             )}
