@@ -21,6 +21,7 @@ const MAX_FREQ = 5000;
 
 const SpectrumAnalyzer = ({ dataRef, userMode }) => {
     const canvasRef = useRef(null);
+    const floatDataRef = useRef(null);
     const [cursorData, setCursorData] = useState(null);
     const [showControls, setShowControls] = useState(false);
     const componentId = useId();
@@ -76,7 +77,12 @@ const SpectrumAnalyzer = ({ dataRef, userMode }) => {
 
         // 2. Draw LPC Envelope (Smooth)
         if (timeDomainData && userMode === 'slp') {
-            const floatData = new Float32Array(timeDomainData.length);
+            // Optimization: Reuse buffer to avoid GC
+            if (!floatDataRef.current || floatDataRef.current.length !== timeDomainData.length) {
+                floatDataRef.current = new Float32Array(timeDomainData.length);
+            }
+            const floatData = floatDataRef.current;
+
             for (let i = 0; i < timeDomainData.length; i++) {
                 floatData[i] = (timeDomainData[i] - 128) / 128;
             }
@@ -136,7 +142,6 @@ const SpectrumAnalyzer = ({ dataRef, userMode }) => {
             unsubscribe();
         };
     }, [draw, componentId]);
-    }, [dataRef, userMode, componentId]);
 
     /**
      * Handle canvas click - show Hz/dB at position

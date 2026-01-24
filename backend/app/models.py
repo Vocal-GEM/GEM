@@ -73,6 +73,82 @@ class KnowledgeDocument(db.Model):
     embedding = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+# Shared Voice Sample (Tier 10 - Community)
+class SharedVoiceSample(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    share_id = db.Column(db.String(64), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    audio_path = db.Column(db.String(255), nullable=False)
+    context = db.Column(db.String(255))
+    view_count = db.Column(db.Integer, default=0)
+    is_active = db.Column(db.Boolean, default=True)
+    expires_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+# Success Story (Tier 10 - Community)
+class SuccessStory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.String(255), nullable=False)
+    story = db.Column(db.Text, nullable=False)
+    timeline_months = db.Column(db.Integer)
+    voice_goal = db.Column(db.String(50))
+    before_audio = db.Column(db.String(255))
+    after_audio = db.Column(db.String(255))
+    upvotes = db.Column(db.Integer, default=0)
+    techniques_used = db.Column(db.JSON)
+    approved = db.Column(db.Boolean, default=False)
+    consent_public = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+# User Connection (Tier 10 - Community)
+class UserConnection(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) # Requester
+    connection_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) # Recipient
+    connection_type = db.Column(db.String(20)) # 'mentor', 'pen_pal'
+    message = db.Column(db.String(500))
+    status = db.Column(db.String(20), default='pending') # pending, accepted, declined
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    accepted_at = db.Column(db.DateTime)
+
+# Group Challenge (Tier 10 - Community)
+class GroupChallenge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    challenge_id = db.Column(db.String(50), unique=True, nullable=False) # e.g. 'week_42_pitch'
+    week_number = db.Column(db.Integer)
+    goal = db.Column(db.Integer) # Target total
+    total_progress = db.Column(db.Integer, default=0)
+    participant_count = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class GroupChallengeParticipant(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    challenge_id = db.Column(db.Integer, db.ForeignKey('group_challenge.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    progress = db.Column(db.Integer, default=0)
+    completed = db.Column(db.Boolean, default=False)
+    joined_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+# Moderation (Tier 10 - Community)
+class ModerationFlag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content_type = db.Column(db.String(20)) # 'story', 'comment'
+    content_id = db.Column(db.Integer)
+    flagged_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # System or User
+    reason = db.Column(db.String(255))
+    status = db.Column(db.String(20), default='pending') # pending, resolved, dismissed
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+# Benchmarks (Tier 10 - Community)
+class CommunityBenchmark(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    voice_goal = db.Column(db.String(50))
+    experience_level = db.Column(db.String(20))
+    metric_name = db.Column(db.String(50)) # e.g. 'avg_pitch_hz'
+    metric_value = db.Column(db.Float)
+    sample_size = db.Column(db.Integer)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 # Voice Training Marketplace Models (Tier 10)
@@ -188,4 +264,3 @@ class NormativeVoiceData(db.Model):
     sample_size = db.Column(db.Integer, default=0)
     source_study = db.Column(db.String(100))  # Reference to source
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
