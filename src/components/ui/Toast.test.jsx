@@ -37,6 +37,7 @@ describe('Toast Component', () => {
 
   it("calls onClose after duration", () => {
     const onClose = vi.fn();
+    render(<Toast message="Test message" onClose={onClose} duration={3000} />);
     render(<Toast message="Test" onClose={onClose} duration={3000} />);
     render(<Toast message="Test Message" onClose={onClose} duration={3000} />);
 
@@ -47,6 +48,28 @@ describe('Toast Component', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('has accessible role for error', () => {
+    render(<Toast message="Error" type="error" onClose={() => {}} />);
+    const alert = screen.getByRole('alert');
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute('aria-live', 'assertive');
+    expect(alert).toHaveAttribute('aria-atomic', 'true');
+  });
+
+  it('has accessible role for success', () => {
+    render(<Toast message="Success" type="success" onClose={() => {}} />);
+    const status = screen.getByRole('status');
+    expect(status).toBeInTheDocument();
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).toHaveAttribute('aria-atomic', 'true');
+  });
+
+  it('close button has accessible label', () => {
+    const onClose = vi.fn();
+    render(<Toast message="Test" onClose={onClose} />);
+
+    const button = screen.getByRole('button', { name: /close notification/i });
+    expect(button).toBeInTheDocument();
   it('calls onClose when close button is clicked', () => {
     const onClose = vi.fn();
   it('has correct accessibility attributes for success', () => {

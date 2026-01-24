@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useId, useCallback } from 'react';
-import { useEffect, useRef, useState, useId } from 'react';
 import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
 import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -84,6 +83,9 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
     useProfile();
 
     const serviceRef = useRef(new QuadCoreAnalysisService());
+    const [analysis, setAnalysis] = useState(null);
+    const componentId = useId();
+
     const serviceRef = useRef(null);
     useEffect(() => {
         serviceRef.current = new QuadCoreAnalysisService();

@@ -1,4 +1,10 @@
 import React from 'react';
+import clsx from "clsx";
+import { twMerge } from "tailwind-merge";
+
+const LoadingSpinner = ({ size = "md", label = "Loading...", className }) => {
+  // Size controls dimensions
+  const dimensions = {
 import { twMerge } from 'tailwind-merge';
 import clsx from 'clsx';
 
@@ -91,6 +97,14 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
 
   // Border width controls thickness
   const borderThickness = {
+    sm: "border-2",
+    md: "border-4",
+    lg: "border-4",
+    xl: "border-8",
+  };
+
+  // Logic from second implementation: if size is sm, default to inline/no min-height
+  const containerClass = size === 'sm' ? 'h-auto min-h-0' : 'h-full min-h-[200px]';
     xs: "border",
     xs: 'border-2',
     sm: 'border-2',
@@ -178,6 +192,7 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
     <div
       className={twMerge(
         clsx(
+          "flex items-center justify-center w-full",
           "items-center justify-center w-full",
           containerClass,
           className
@@ -199,6 +214,9 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
       )}
       role="status"
       aria-live="polite"
+    >
+      <div
+        className={twMerge(clsx("relative", dimensions[size] || dimensions.md))}
       aria-label={label}
     >
       <div
@@ -209,6 +227,8 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
         {/* Track circle */}
         <div
           className={clsx(
+            "absolute top-0 left-0 w-full h-full rounded-full border-slate-700 opacity-20",
+            borderThickness[size] || borderThickness.md,
             "absolute top-0 left-0 w-full h-full rounded-full border-current opacity-20",
             borderThickness[size] || borderThickness.md
             "absolute top-0 left-0 w-full h-full rounded-full",
@@ -227,6 +247,8 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
         {/* Spinning segment */}
         <div
           className={clsx(
+            "absolute top-0 left-0 w-full h-full border-t-blue-500 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
+            borderThickness[size] || borderThickness.md,
             "absolute top-0 left-0 w-full h-full border-t-current border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
             borderThickness[size] || borderThickness.md
             "absolute top-0 left-0 w-full h-full border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
