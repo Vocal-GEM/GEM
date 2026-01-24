@@ -37,13 +37,7 @@ export const SELF_CARE_PROMPTS = [
         placeholder: "e.g., My partner, my best friend, people in online trans communities...",
         icon: '🤝'
     },
-    {
-        id: 'find-community',
-        question: "How can I find and connect with people who are also doing this work?",
-        hint: "Discord servers, TikTok comments, local trans organizations, voice training communities.",
-        placeholder: "e.g., Join Discord communities, follow voice teachers on social media, local LGBTQ+ groups...",
-        icon: '🌐'
-    }
+
 ];
 
 // Resources referenced in the curriculum

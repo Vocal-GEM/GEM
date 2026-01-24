@@ -126,12 +126,9 @@ const ModuleWrapUp = ({ onComplete }) => {
                         <Shield size={18} className="text-blue-400" /> Need Support?
                     </h5>
                     <p className="text-sm text-slate-400 mb-4">
-                        You are not alone. Connect with the community or get help if you&apos;re stuck.
+                        You are not alone. Get help if you&apos;re stuck.
                     </p>
                     <div className="flex gap-3">
-                        <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm text-white flex items-center gap-2">
-                            <MessageCircle size={16} /> Discord Community
-                        </button>
                         <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm text-white flex items-center gap-2">
                             <Send size={16} /> Email Support
                         </button>
