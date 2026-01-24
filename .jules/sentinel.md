@@ -64,3 +64,14 @@
 **Vulnerability:** User input in `submit_success_story` (title, story), `share_voice` (context), and `request_connection` (message) was stored directly in the database without sanitization. An attacker could inject malicious scripts (e.g., `<script>`) that would execute when other users viewed these stories or messages.
 **Learning:** Even with backend API validation (like checking file types or bad words), explicit HTML sanitization is required for any text field that might be rendered or stored. `check_moderation` only flagged keywords but didn't prevent code injection.
 **Prevention:** Apply `sanitize_html` (using `bleach`) to all user-submitted text fields before saving to the database. Ensure this pattern is followed for all new endpoints accepting text input.
+## 2026-02-14 - Information Leakage & Logic Error in Finally Block
+**Vulnerability:** A `return` statement in a `finally` block in `backend/app/routes/voice_quality.py` was suppressing all exceptions (causing `UnboundLocalError` when no exception occurred) and leaking raw exception strings when an error did occur.
+**Learning:** `return` in `finally` discards any active exception and overrides return values from `try`/`except`. This is a dangerous anti-pattern in Python. Also, using `print()` for error logging is insufficient for production monitoring.
+**Prevention:** Removed the `return` statement from the `finally` block to ensure exceptions propagate or are handled by the `except` block's return. Replaced `print()` with `current_app.logger.error()` for proper logging. Validated with a targeted test suite.
+## 2026-01-23 - Information Leakage in Settings Update
+**Vulnerability:** The `update_settings` endpoint in `backend/app/routes/settings.py` was catching all exceptions and returning `str(e)` in the JSON response. This exposes sensitive details (e.g., database connection errors, SQL syntax issues) to the client.
+**Learning:** Developers often return exception strings during development for debugging but forget to sanitize them for production. Flask Blueprints require `current_app` to access the logger properly.
+**Prevention:**
+1. Always use a generic error message for the client (e.g., "Failed to update settings").
+2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
+3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.

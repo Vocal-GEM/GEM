@@ -10,6 +10,15 @@ class LPCFormantTracker {
         this.sampleRate = config.sampleRate || 44100;
         this.order = config.order || 12; // LPC order (rule of thumb: sampleRate/1000 + 2 for standard speech)
         this.windowSize = config.windowSize || 1024;
+
+        // OPTIMIZATION: Pre-allocate buffers to reuse per frame
+        // This avoids creating ~5 new Float32Arrays (allocating ~6KB) 60 times a second
+        this.windowBuffer = new Float32Array(this.windowSize);
+        this.rBuffer = new Float32Array(this.order + 1);
+        this.aBuffer = new Float32Array(this.order + 1);
+        this.aPrevBuffer = new Float32Array(this.order + 1);
+        // specBuffer size matches the fixed 512 points used in trackPeak
+        this.specBuffer = new Float32Array(512);
     }
 
     /**
@@ -20,220 +29,50 @@ class LPCFormantTracker {
     track(buffer) {
         if (buffer.length < this.order + 1) return [];
 
+        // Ensure window buffer is large enough (just in case input size changes)
+        if (this.windowBuffer.length < buffer.length) {
+            this.windowBuffer = new Float32Array(buffer.length);
+        }
+
         // 1. Apply Window Function (Hamming)
-        const windowed = this.applyWindow(buffer);
+        // Writes into this.windowBuffer
+        this.applyWindow(buffer, this.windowBuffer);
 
         // 2. Autocorrelation
-        const r = this.autocorrelate(windowed, this.order);
+        // Writes into this.rBuffer
+        this.autocorrelate(this.windowBuffer, this.order, this.rBuffer, buffer.length);
 
         // 3. Levinson-Durbin Recursion to get LPC coefficients (a)
-        const { a, error } = this.levinsonDurbin(r, this.order);
+        // Writes into this.aBuffer
+        this.levinsonDurbin(this.rBuffer, this.order, this.aBuffer);
 
         // 4. Find Roots of the polynomial A(z) = 1 + a[1]z^-1 + ... + a[p]z^-p
         // We use a simplified search or standard root solver.
         // For efficiency in JS, we can use the 'Bairstow' method or constructs a Companion Matrix and find eigenvalues.
         // Here we'll use a standard numerical recipe adaptation for JS.
-        const roots = this.findRoots(a);
+        // const roots = this.findRoots(a);
 
         // 5. Convert Roots to Frequencies and Bandwidths
-        const formants = [];
-        for (const root of roots) {
-            // Root z = r * e^(j*theta)
-            // Frequency F = (Fs / 2pi) * theta
-            // Bandwidth B = -(Fs / pi) * ln(r)
+        // ... (Original logic skipped in favor of trackPeak implementation below) ...
 
-            const r = root.magnitude;
-            const theta = root.angle; // in radians
-
-            if (theta < 0) continue; // Ignore negative frequencies (conjugates)
-            if (r >= 1.0) continue; // Ignore unstable poles? (Actually vocal tract poles are inside unit circle)
-
-            const frequency = (theta * this.sampleRate) / (2 * Math.PI);
-            const bandwidth = -(this.sampleRate / Math.PI) * Math.log(r);
-
-            // Filter valid Speech Formants (typically F1 < 1000, F2 < 2500 for adult males, etc, but we keep generic logic)
-            // Valid formant bandwidths are usually < 400Hz (sometimes looser)
-            if (frequency > 50 && frequency < this.sampleRate / 2 && bandwidth < 700) {
-                formants.push({ frequency, bandwidth, magnitude: r });
-            }
-        }
-
-        // Sort by frequency
-        formants.sort((a, b) => a.frequency - b.frequency);
-        return formants;
-    }
-
-    applyWindow(buffer) {
-        const n = buffer.length;
-        const windowed = new Float32Array(n);
-        for (let i = 0; i < n; i++) {
-            // Hamming Window
-            const w = 0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (n - 1));
-            windowed[i] = buffer[i] * w;
-        }
-        return windowed;
-    }
-
-    autocorrelate(buffer, order) {
-        const r = new Float32Array(order + 1);
-        for (let lag = 0; lag <= order; lag++) {
-            let sum = 0;
-            for (let i = 0; i < buffer.length - lag; i++) {
-                sum += buffer[i] * buffer[i + lag];
-            }
-            r[lag] = sum;
-        }
-        return r;
-    }
-
-    levinsonDurbin(r, order) {
-        const a = new Float32Array(order + 1);
-        // Error power
-        let e = r[0];
-
-        a[0] = 1.0;
-
-        // Temporary array for recursion
-        const a_prev = new Float32Array(order + 1);
-        a_prev[0] = 1.0;
-
-        for (let k = 1; k <= order; k++) {
-            let lambda = 0;
-            for (let j = 0; j < k; j++) {
-                lambda += a_prev[j] * r[k - j];
-            }
-
-            const k_coeff = -lambda / e; // Reflection coefficient
-
-            e = e * (1 - k_coeff * k_coeff);
-
-            a[k] = k_coeff;
-            for (let j = 1; j < k; j++) {
-                a[j] = a_prev[j] + k_coeff * a_prev[k - j];
-            }
-
-            // Update a_prev
-            for (let j = 0; j <= k; j++) a_prev[j] = a[j];
-        }
-
-        return { a, error: e };
-    }
-
-    // Simplified root finder using Bairstow's method for real coefficients
-    // Finds complex roots of polynomial: 1 + a1*x + ... + an*x^n = 0
-    // Note: A(z) = 1 + a1 z^-1 ... is equivalent to z^n + a1 z^(n-1) + ... + an = 0 multiplied by z^n
-    // So coefficients map directly for the polynomial P(x).
-    findRoots(a) {
-        // We are solving A(z) = 0.
-        // A(z) = \sum a[k] z^{-k}
-        // Multiply by z^p: P(z) = z^p + a[1]z^{p-1} + ... + a[p]
-
-        const p = a.length - 1;
-        // Coefficients for P(z), highest power first
-        // a[0] corresponds to z^p (coeff 1), a[1] to z^{p-1}, ..., a[p] to z^0
-        const coeffs = [];
-        for (let i = 0; i <= p; i++) {
-            coeffs.push(a[i]); // a[0] is 1.0
-        }
-
-        const roots = [];
-
-        // This is a naive placeholder. Writing a full Bairstow in one go is complex.
-        // For this task, we will implementation a visual estimation for robustness if roots fail, 
-        // OR better: use Laguerre's method adaptation or a simple companion matrix solver if available.
-        // Given constraints, let's implement the Companion Matrix Eigenvalue method which is robust (O(N^3) but N=12 is tiny).
-
-        // Companion Matrix C for monic polynomial:
-        // [ 0   1   0 ... ]
-        // [ 0   0   1 ... ]
-        // [ -cn -cn-1 ... ]  <-- Last row is -coeffs (skipping first 1.0)
-
-        // Actually, let's use a known JS math trick or simplification.
-        // Implementing a full eigenvalue solver here is error-prone.
-        // PLAN B: Use the "Peak Picking" method from the LPC Spectrum. Slower but easier to implement reliably in one file.
-        // 1. Evaluate P(z) spectrum: H(z) = 1 / A(z) on unit circle.
-        // 2. Find peaks in magnitude response.
-
-        return this.findRootsByPeakPicking(a, 512);
-    }
-
-    findRootsByPeakPicking(a, nPoints) {
-        // Eval spectrum at nPoints evenly spaced between 0 and PI (Nyquist).
-        // H(w) = 1 / | A(e^jw) |
-        // We just need minima of |A(e^jw)|
-
-        const spectrum = new Float32Array(nPoints);
-        const peaks = [];
-
-        for (let i = 0; i < nPoints; i++) {
-            const w = (Math.PI * i) / (nPoints - 1);
-            // Calculate A(e^jw) = Sum a[k] * e^(-j*k*w)
-            // = Sum a[k] * (cos(-kw) + j sin(-kw))
-            let re = 0;
-            let im = 0;
-            for (let k = 0; k < a.length; k++) {
-                const angle = -k * w;
-                re += a[k] * Math.cos(angle);
-                im += a[k] * Math.sin(angle);
-            }
-            const magSq = re * re + im * im;
-            spectrum[i] = 1.0 / Math.sqrt(magSq); // Low magSq = Peak in valid spectrum
-        }
-
-        // Find peaks
-        for (let i = 1; i < nPoints - 1; i++) {
-            if (spectrum[i] > spectrum[i - 1] && spectrum[i] > spectrum[i + 1]) {
-                // Peak found
-                // Refine frequency with parabolic interpolation could be good, but simple bin is ok
-                const freq = (i / (nPoints - 1)) * (this.sampleRate / 2);
-
-                // Estimate bandwidth (3dB drop) - crude approx for now
-                // A true root solver gives nice bandwidths. Peak picking is harder.
-                // We will set a default bandwidth or estimate from width.
-                const bandwidth = this.estimateBandwidth(spectrum, i, nPoints);
-
-                // Magnitude
-                const magnitude = spectrum[i];
-
-                peaks.push({
-                    frequency: freq,
-                    bandwidth: bandwidth,
-                    magnitude: 0.9 + (magnitude / 1000) // Dummy conversion to pole-like magnitude
-                });
-            }
-        }
-
-        // Mock root format
-        return peaks.map(p => ({
-            magnitude: 0.8, // Fake pole r, we only have freq
-            angle: (p.frequency * 2 * Math.PI) / this.sampleRate,
-            // We return our calculated values directly in the 'roots' logic if we want, or just return objects.
-            // But the main track method expects 'roots' to process. 
-            // Let's adjust 'track' to handle this format if we swap methods.
-            // -> WAIT: I will refactor 'track' to just use these peaks directly.
-        }));
-    }
-
-    // Adjusted Track Method to use Peak Picking for simplicity/robustness
-    trackPeak(buffer) {
-        if (buffer.length < this.order + 1) return [];
-        const windowed = this.applyWindow(buffer);
-        const r = this.autocorrelate(windowed, this.order);
-        const { a } = this.levinsonDurbin(r, this.order);
+        // Using trackPeak logic directly here
 
         // Use peak picking on the LPC spectrum 1/A(z)
         const psdSize = 512;
         const peaks = [];
-        const spec = new Float32Array(psdSize);
+        const spec = this.specBuffer;
+
+        // Reset spec buffer not strictly needed as we overwrite, but good for safety if logic changes
+        // spec.fill(0);
 
         for (let i = 0; i < psdSize; i++) {
             const w = (Math.PI * i) / (psdSize - 1);
             let re = 0;
             let im = 0;
-            for (let k = 0; k < a.length; k++) {
+            for (let k = 0; k < this.aBuffer.length; k++) {
                 const angle = -k * w;
-                re += a[k] * Math.cos(angle);
-                im += a[k] * Math.sin(angle);
+                re += this.aBuffer[k] * Math.cos(angle);
+                im += this.aBuffer[k] * Math.sin(angle);
             }
             spec[i] = 1.0 / Math.sqrt(re * re + im * im);
         }
@@ -251,10 +90,74 @@ class LPCFormantTracker {
 
         return peaks.sort((a, b) => a.frequency - b.frequency);
     }
-}
 
-// Override track to use the clearer Peak implementation for this V1
-LPCFormantTracker.prototype.track = LPCFormantTracker.prototype.trackPeak;
-LPCFormantTracker.prototype.findRoots = null; // Disable the complex incomplete one
+    applyWindow(buffer, outputBuffer) {
+        const n = buffer.length;
+        for (let i = 0; i < n; i++) {
+            // Hamming Window
+            const w = 0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (n - 1));
+            outputBuffer[i] = buffer[i] * w;
+        }
+        return outputBuffer;
+    }
+
+    autocorrelate(buffer, order, outputBuffer, n) {
+        // buffer is assumed to be windowed and at least length n
+        // outputBuffer size must be >= order + 1
+        for (let lag = 0; lag <= order; lag++) {
+            let sum = 0;
+            for (let i = 0; i < n - lag; i++) {
+                sum += buffer[i] * buffer[i + lag];
+            }
+            outputBuffer[lag] = sum;
+        }
+        return outputBuffer;
+    }
+
+    levinsonDurbin(r, order, a) {
+        // r is autocorrelation array
+        // a is output coefficients array
+
+        // Error power
+        let e = r[0];
+
+        a[0] = 1.0;
+
+        // Use the pre-allocated temp buffer
+        const a_prev = this.aPrevBuffer;
+        a_prev[0] = 1.0;
+
+        // Ensure buffers are cleared beyond index 0 from previous runs?
+        // Actually the loop initializes a[k] and reads a_prev[j<k].
+        // a_prev is updated at end of loop.
+        // We need to be careful about stale data if order changes, but order is fixed.
+
+        for (let k = 1; k <= order; k++) {
+            let lambda = 0;
+            for (let j = 0; j < k; j++) {
+                lambda += a_prev[j] * r[k - j];
+            }
+
+            const k_coeff = -lambda / e; // Reflection coefficient
+
+            e = e * (1 - k_coeff * k_coeff);
+
+            a[k] = k_coeff;
+            for (let j = 1; j < k; j++) {
+                a[j] = a_prev[j] + k_coeff * a_prev[k - j];
+            }
+
+            // Update a_prev for next iteration
+            for (let j = 0; j <= k; j++) a_prev[j] = a[j];
+        }
+
+        return e;
+    }
+
+    // Deprecated methods removed or stubbed
+    findRoots(_a) { return []; }
+    findRootsByPeakPicking(_a, _nPoints) { return []; }
+    trackPeak(buffer) { return this.track(buffer); }
+}
 
 export default LPCFormantTracker;
