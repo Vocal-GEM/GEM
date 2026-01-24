@@ -2,6 +2,10 @@ import React from "react";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 import LoadingSpinner from "./LoadingSpinner";
+import React from 'react';
+import clsx from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import LoadingSpinner from './LoadingSpinner';
 
 const Button = React.forwardRef(
   (
@@ -19,6 +23,12 @@ const Button = React.forwardRef(
   ) => {
     const Comp = asChild ? "span" : "button";
     const isDisabled = isLoading || disabled;
+    const isIcon = size === 'icon';
+
+    // Determine spinner size based on button size
+    let spinnerSize = "xs"; // Default for small/medium buttons
+    if (size === "lg") spinnerSize = "sm";
+    if (size === "icon") spinnerSize = "sm";
 
     return (
       <Comp
@@ -48,6 +58,7 @@ const Button = React.forwardRef(
           )
         )}
         disabled={isDisabled}
+        aria-busy={isLoading}
         aria-disabled={isDisabled}
         aria-busy={isLoading}
         ref={ref}
@@ -55,10 +66,12 @@ const Button = React.forwardRef(
       >
         {isLoading ? (
           size === "icon" ? (
+            <LoadingSpinner size={spinnerSize} variant="current" />
+          isIcon ? (
             <LoadingSpinner size="sm" variant="current" />
           ) : (
             <>
-              <LoadingSpinner size="xs" variant="current" className="mr-2" />
+              <LoadingSpinner size={spinnerSize} variant="current" className="mr-2" />
               {children}
             </>
           )
