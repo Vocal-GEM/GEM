@@ -59,3 +59,8 @@
 **Vulnerability:** The `share_voice` endpoint accepted any file type and saved it to disk with an insecure filename construction, allowing potential Remote Code Execution (RCE) via malicious uploads (e.g., .html, .php) or path traversal.
 **Learning:** Relying on frontend validation or assuming "trusted users" (authenticated) is insufficient. Filenames must always be sanitized and validated against a strict allowlist on the backend before any filesystem operations.
 **Prevention:** Always use `secure_filename` and explicit content-type/extension validation (e.g. `validate_file_upload`) for every file upload endpoint.
+
+## 2026-02-14 - Information Leakage & Logic Error in Finally Block
+**Vulnerability:** A `return` statement in a `finally` block in `backend/app/routes/voice_quality.py` was suppressing all exceptions (causing `UnboundLocalError` when no exception occurred) and leaking raw exception strings when an error did occur.
+**Learning:** `return` in `finally` discards any active exception and overrides return values from `try`/`except`. This is a dangerous anti-pattern in Python. Also, using `print()` for error logging is insufficient for production monitoring.
+**Prevention:** Removed the `return` statement from the `finally` block to ensure exceptions propagate or are handled by the `except` block's return. Replaced `print()` with `current_app.logger.error()` for proper logging. Validated with a targeted test suite.
