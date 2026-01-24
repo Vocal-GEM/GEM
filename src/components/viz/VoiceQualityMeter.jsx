@@ -54,6 +54,7 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
 
             valueRef.current.innerText = Math.round(target);
 
+            // Update metrics display
             if (dataRef.current.debug) {
                 const { h1, h2, centroid } = dataRef.current.debug;
                 if (metricsRef.current.h1) metricsRef.current.h1.innerText = h1 ? h1.toFixed(1) : '-';
