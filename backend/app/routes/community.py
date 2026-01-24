@@ -53,6 +53,10 @@ def anonymize_audio(audio_path):
         sf.write(anon_path, y_stretched, sr)
 
         return anon_path
+    except ImportError:
+        # If librosa not available, we cannot anonymize.
+        # Fail securely - do not copy the raw file.
+        raise ImportError("Audio anonymization library (librosa) not available")
     except ImportError as e:
         # Fail securely - do not copy raw file if anonymization fails
         # Log error and raise
@@ -114,6 +118,15 @@ def share_voice():
         filepath = os.path.join(upload_folder, filename)
 
         try:
+            # Anonymize audio
+            anon_filepath = anonymize_audio(filepath)
+        finally:
+            # Security: Always remove the original raw file to prevent PII retention
+            if os.path.exists(filepath):
+                try:
+                    os.remove(filepath)
+                except OSError:
+                    pass
             audio_file.save(filepath)
 
             # Anonymize audio
