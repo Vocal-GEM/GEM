@@ -8,12 +8,10 @@ from ..models import (
     GroupChallenge, GroupChallengeParticipant, ModerationFlag,
     CommunityBenchmark,
 )
-from ..validators import validate_file_upload, sanitize_html
 from datetime import datetime, timedelta
 import os
 import secrets
 import hashlib
-from werkzeug.utils import secure_filename
 
 community_bp = Blueprint('community', __name__)
 
