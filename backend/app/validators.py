@@ -46,7 +46,7 @@ def validate_password(password):
 
 def sanitize_html(content):
     """
-    Sanitize HTML content using bleach
+    Sanitize HTML content using bleach.
     """
     if not content:
         return ""

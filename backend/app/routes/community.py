@@ -12,6 +12,8 @@ from datetime import datetime, timedelta
 import os
 import secrets
 import hashlib
+from werkzeug.utils import secure_filename
+from ..validators import validate_file_upload, sanitize_html
 
 community_bp = Blueprint('community', __name__)
 
@@ -275,7 +277,22 @@ def submit_success_story():
         if isinstance(techniques, list):
             clean_techniques = [sanitize_html(str(t)) for t in techniques]
 
+        title = sanitize_html(data.get('title', ''))
+        story_content = sanitize_html(data.get('story', ''))
+
+        # Sanitize list of strings
+        techniques = data.get('techniques_used', [])
+        if isinstance(techniques, list):
+            techniques = [sanitize_html(t) for t in techniques]
+
         # Moderation check
+        is_safe, flagged = check_moderation(
+            title + ' ' + story_content)
+
+        story = SuccessStory(
+            user_id=current_user.id,
+            title=title,
+            story=story_content,
         is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
 
         story = SuccessStory(
@@ -286,6 +303,7 @@ def submit_success_story():
             voice_goal=voice_goal,
             consent_public=data.get('consent_public', False),
             approved=is_safe,  # Auto-approve if passes moderation
+            techniques_used=techniques
             techniques_used=clean_techniques
         )
 
