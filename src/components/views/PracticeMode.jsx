@@ -260,6 +260,9 @@ const PracticeMode = ({
     const [coachingPrompt, setCoachingPrompt] = useState(null);
     const coachingEngineRef = useRef(null);
 
+    useEffect(() => {
+        coachingEngineRef.current = new CoachingEngine();
+    }, []);
     // Lazy initialization
     if (!coachingEngineRef.current) {
         coachingEngineRef.current = new CoachingEngine();
@@ -272,7 +275,7 @@ const PracticeMode = ({
         }
 
         const interval = setInterval(() => {
-            if (dataRef.current) {
+            if (dataRef.current && coachingEngineRef.current) {
                 const prompt = coachingEngineRef.current.process(dataRef.current);
                 if (prompt) {
                     setCoachingPrompt(prompt);

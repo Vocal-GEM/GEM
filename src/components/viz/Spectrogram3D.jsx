@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -45,6 +45,9 @@ const SpectrogramMesh = ({ dataRef }) => {
 
     // Buffer for historical data
     const historyRef = useRef(null);
+    useEffect(() => {
+        historyRef.current = new Float32Array(numCols * numRows);
+    }, []);
     if (!historyRef.current) {
         historyRef.current = new Float32Array(numCols * numRows);
     }
@@ -58,6 +61,8 @@ const SpectrogramMesh = ({ dataRef }) => {
 
         // Shift history
         const history = historyRef.current;
+        if (!history) return;
+
         // Move everything back one column
         history.copyWithin(0, numRows);
 

@@ -53,6 +53,10 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     }
     const historyHeadRef = useRef(0); // Points to the next write position (frame index)
 
+    useEffect(() => {
+        historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
+    }, []);
+
     // Spectrogram State
     const speed = 2; // Pixels per frame
     const MAX_FREQ = 8000;
@@ -221,6 +225,8 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         if (frameIndex < 0) {
             frameIndex += HISTORY_FRAMES;
         }
+
+        if (!historyMetaRef.current) return;
 
         const meta = historyMetaRef.current[frameIndex];
 
