@@ -41,6 +41,24 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
   // Inline sizes (xs, sm) shouldn't impose a large minimum height
   const isInline = size === 'xs' || size === 'sm';
   const containerClass = isInline ? 'h-auto min-h-0 inline-flex' : 'h-full min-h-[200px] flex';
+  // Colors for the spinning segment
+  const colors = {
+    default: "border-t-blue-500",
+    white: "border-t-white",
+    current: "border-t-current",
+  };
+
+  // Colors for the background track
+  const trackColors = {
+    default: "border-slate-700",
+    white: "border-white/30",
+    current: "border-current opacity-30",
+  };
+
+  // For 'xs'/'sm', we usually want inline or small container.
+  const containerClass = (size === 'xs' || size === 'sm')
+    ? 'inline-flex h-auto min-h-0'
+    : 'flex h-full min-h-[200px]';
 
   return (
     <div
@@ -63,6 +81,7 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
             "absolute top-0 left-0 w-full h-full rounded-full",
             selectedVariant.track,
             borderThickness[size] || borderThickness.md,
+            trackColors[variant] || trackColors.default
           )}
         ></div>
         {/* Spinning segment */}
@@ -70,7 +89,9 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
           className={clsx(
             "absolute top-0 left-0 w-full h-full rounded-full animate-spin",
             selectedVariant.spin,
+            "absolute top-0 left-0 w-full h-full border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
             borderThickness[size] || borderThickness.md,
+            colors[variant] || colors.default
           )}
         ></div>
       </div>
