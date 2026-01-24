@@ -62,6 +62,7 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
                 if (metricsRef.current.diff) metricsRef.current.diff.innerText = (h1 && h2) ? (h1 - h2).toFixed(1) : '-';
                 if (metricsRef.current.centroid) metricsRef.current.centroid.innerText = (centroid !== undefined && centroid !== null) ? centroid : '-';
             }
+        }, [dataRef, colorBlindMode]);
         }
     }, [dataRef, colorBlindMode]);
 

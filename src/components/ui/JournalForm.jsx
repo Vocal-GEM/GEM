@@ -113,8 +113,9 @@ const JournalForm = ({ onSubmit, onCancel }) => {
 
             {/* Script Input */}
             <div>
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Reading Script (Optional)</label>
+                <label htmlFor="journal-script" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Reading Script (Optional)</label>
                 <textarea
+                    id="journal-script"
                     value={script}
                     onChange={(e) => setScript(e.target.value)}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 min-h-[60px] text-sm"
@@ -138,6 +139,14 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                 ) : (
                     <div className="w-full flex items-center gap-2">
                         <audio src={audioBlobUrl} controls className="w-full h-8" />
+                        <button
+                            type="button"
+                            onClick={() => setAudioBlobUrl(null)}
+                            className="p-2 text-red-400 hover:text-red-300"
+                            aria-label="Delete recording"
+                        >
+                            <Trash2 />
+                        </button>
                         <button type="button" onClick={() => setAudioBlobUrl(null)} className="p-2 text-red-400 hover:text-red-300" aria-label="Delete recording"><Trash2 /></button>
                     </div>
                 )}
@@ -146,7 +155,7 @@ const JournalForm = ({ onSubmit, onCancel }) => {
 
             {/* Notes */}
             <div>
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">How did it feel?</label>
+                <label htmlFor="journal-notes" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">How did it feel?</label>
 
                 {/* Optional Writing Prompt */}
                 <div className="mb-3">
@@ -183,6 +192,7 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                 </div>
 
                 <textarea
+                    id="journal-notes"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 min-h-[80px]"
@@ -222,6 +232,13 @@ const JournalForm = ({ onSubmit, onCancel }) => {
             {/* Sliders */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
+                    <label htmlFor="journal-effort" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Effort (1-10)</label>
+                    <input id="journal-effort" type="range" min="1" max="10" value={effort} onChange={(e) => setEffort(parseInt(e.target.value))} className="w-full accent-blue-500" />
+                    <div className="text-center text-blue-400 font-bold">{effort}</div>
+                </div>
+                <div>
+                    <label htmlFor="journal-confidence" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Confidence (1-10)</label>
+                    <input id="journal-confidence" type="range" min="1" max="10" value={confidence} onChange={(e) => setConfidence(parseInt(e.target.value))} className="w-full accent-emerald-500" />
                     <label htmlFor="effort-slider" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Effort (1-10)</label>
                     <input id="effort-slider" type="range" min="1" max="10" value={effort} onChange={(e) => setEffort(parseInt(e.target.value))} className="w-full accent-blue-500" />
                     <div className="text-center text-blue-400 font-bold">{effort}</div>
