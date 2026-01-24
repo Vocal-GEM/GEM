@@ -17,6 +17,13 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     // Lazy initialization
     if (!flowDetector.current) flowDetector.current = new FlowStateDetector();
     if (!adaptiveController.current) adaptiveController.current = getAdaptiveFeedbackController();
+    if (!flowDetector.current) {
+        flowDetector.current = new FlowStateDetector();
+    }
+    const adaptiveController = useRef(null);
+    if (!adaptiveController.current) {
+        adaptiveController.current = getAdaptiveFeedbackController();
+    }
 
     // State for visual updates
     const [currentPitch, setCurrentPitch] = useState(0);
