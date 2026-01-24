@@ -258,7 +258,12 @@ const PracticeMode = ({
 
     // Coaching State
     const [coachingPrompt, setCoachingPrompt] = useState(null);
-    const coachingEngineRef = useRef(new CoachingEngine());
+    const coachingEngineRef = useRef(null);
+
+    // Lazy initialization
+    if (!coachingEngineRef.current) {
+        coachingEngineRef.current = new CoachingEngine();
+    }
 
     useEffect(() => {
         if (!isAudioActive) {
