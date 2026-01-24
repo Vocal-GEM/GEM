@@ -21,6 +21,11 @@ import { twMerge } from "tailwind-merge";
 const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading...", className }) => {
   // Size controls dimensions
   const dimensions = {
+    xs: "w-3 h-3",
+    sm: "w-5 h-5",
+    md: "w-8 h-8",
+    lg: "w-12 h-12",
+    xl: "w-16 h-16",
     xs: "w-4 h-4",
     sm: "w-6 h-6",
     md: "w-12 h-12",
@@ -30,6 +35,7 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
 
   // Border width controls thickness
   const borderThickness = {
+    xs: "border",
     xs: 'border-2',
     sm: 'border-2',
     md: 'border-4',
@@ -46,11 +52,28 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
   const isSmall = size === 'xs' || size === 'sm';
     xs: "border-2",
     sm: "border-2",
-    md: "border-4",
+    md: "border-[3px]",
     lg: "border-4",
-    xl: "border-8",
+    xl: "border-[5px]",
   };
 
+  // Color variants
+  const variants = {
+    default: {
+      track: "border-slate-200",
+      segment: "border-t-blue-600",
+    },
+    current: {
+      track: "border-current opacity-30",
+      segment: "border-t-current",
+    },
+    white: {
+      track: "border-white/30",
+      segment: "border-t-white",
+    },
+  };
+
+  const selectedVariant = variants[variant] || variants.default;
   // Variants control colors
   const variants = {
     default: {
@@ -95,6 +118,7 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
     <div
       className={twMerge(
         clsx(
+          "inline-flex items-center justify-center",
           'items-center justify-center',
           // For small sizes, use inline-flex and auto width to fit inside buttons/text.
           // For larger sizes, use flex and full width/height defaults for page/container loading.
@@ -110,13 +134,18 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
       )}
       role="status"
       aria-live="polite"
+      aria-label={label}
     >
       <div
+        className={twMerge(clsx("relative rounded-full", dimensions[size] || dimensions.md))}
         className={twMerge(clsx('relative', dimensions[size] || dimensions.md))}
       >
         {/* Track circle */}
         <div
           className={clsx(
+            "absolute top-0 left-0 w-full h-full rounded-full",
+            borderThickness[size] || borderThickness.md,
+            selectedVariant.track
             'absolute top-0 left-0 w-full h-full rounded-full opacity-20',
             // Use border-current for track if variant is current, otherwise slate-700
             variant === 'current' ? 'border-current' : 'border-slate-700',
@@ -130,6 +159,9 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
         {/* Spinning segment */}
         <div
           className={clsx(
+            "absolute top-0 left-0 w-full h-full border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
+            borderThickness[size] || borderThickness.md,
+            selectedVariant.segment
             'absolute top-0 left-0 w-full h-full border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin',
             variants[variant] || variants.default,
             borderThickness[size] || borderThickness.md

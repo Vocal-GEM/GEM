@@ -9,6 +9,13 @@ describe('LoadingSpinner', () => {
     // It should have role="status"
     const spinner = screen.getByRole('status');
     expect(spinner).toBeInTheDocument();
+
+    // It should have aria-live="polite"
+    expect(spinner).toHaveAttribute('aria-live', 'polite');
+
+    // It should have a visually hidden label "Loading..." by default
+    expect(screen.getByText('Loading...')).toHaveClass('sr-only');
+    expect(spinner).toBeInTheDocument();
     expect(spinner).toHaveAttribute('aria-live', 'polite');
 
     // It should have a visually hidden label "Loading..." by default
@@ -40,6 +47,8 @@ describe("LoadingSpinner", () => {
 
   it("renders with custom label", () => {
     render(<LoadingSpinner label="Processing data..." />);
+    // The label is what gives the region its accessible name or description
+    expect(screen.getByLabelText('Processing data...')).toBeInTheDocument();
     expect(screen.getByText('Processing data...')).toBeInTheDocument();
     expect(screen.getByText("Processing data...")).toBeInTheDocument();
   });
@@ -51,6 +60,16 @@ describe("LoadingSpinner", () => {
     expect(container.firstChild).toHaveClass('my-custom-class');
   });
 
+  it('renders with different sizes', () => {
+    const { container, rerender } = render(<LoadingSpinner size="sm" />);
+    // We check for dimension classes roughly or just ensure no crash
+    expect(container.querySelector('.w-5')).toBeInTheDocument(); // sm is w-5
+
+    rerender(<LoadingSpinner size="xl" />);
+    expect(container.querySelector('.w-16')).toBeInTheDocument(); // xl is w-16
+  });
+
+  it('renders with current color variant', () => {
   it('overrides default min-height when custom class is provided', () => {
     const { container } = render(<LoadingSpinner className="min-h-0" />);
     expect(container.firstChild).toHaveClass('min-h-0');
