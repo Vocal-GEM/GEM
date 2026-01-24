@@ -556,28 +556,30 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 </div>
             )}
 
-            <div className="absolute top-3 right-48 z-20">
-                <FeedbackControls settings={feedbackSettings} setSettings={setFeedbackSettings} />
-            </div>
-
-            <div className="absolute top-3 right-3 flex items-center gap-2 bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2">
-                <div className="flex flex-col items-end">
-                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Average Pitch</div>
-                    {averagePitchRange.lowest !== null && averagePitchRange.highest !== null ? (
-                        <div className="text-sm font-mono font-bold text-emerald-400">
-                            {Math.round(averagePitchRange.lowest)} - {Math.round(averagePitchRange.highest)} Hz
-                        </div>
-                    ) : (
-                        <div className="text-sm font-mono text-slate-500">-- Hz</div>
-                    )}
+            <div className="absolute top-3 right-3 z-20 flex items-start gap-3 pointer-events-none">
+                <div className="pointer-events-auto">
+                    <FeedbackControls settings={feedbackSettings} setSettings={setFeedbackSettings} />
                 </div>
-                <button
-                    onClick={handleResetAverage}
-                    className="w-7 h-7 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-slate-700/50"
-                    title="Reset Average"
-                >
-                    <RotateCcw size={14} />
-                </button>
+
+                <div className="flex items-center gap-2 bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2 pointer-events-auto shadow-lg">
+                    <div className="flex flex-col items-end">
+                        <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Average Pitch</div>
+                        {averagePitchRange.lowest !== null && averagePitchRange.highest !== null ? (
+                            <div className="text-sm font-mono font-bold text-emerald-400">
+                                {Math.round(averagePitchRange.lowest)} - {Math.round(averagePitchRange.highest)} Hz
+                            </div>
+                        ) : (
+                            <div className="text-sm font-mono text-slate-500">-- Hz</div>
+                        )}
+                    </div>
+                    <button
+                        onClick={handleResetAverage}
+                        className="w-7 h-7 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-slate-700/50"
+                        title="Reset Average"
+                    >
+                        <RotateCcw size={14} />
+                    </button>
+                </div>
             </div>
 
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
