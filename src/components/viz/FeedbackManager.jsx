@@ -11,8 +11,13 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     const { settings } = useSettings();
     const [alert, setAlert] = useState(null);
     const [celebration, setCelebration] = useState(null);
-    const flowDetector = useRef(new FlowStateDetector());
-    const adaptiveController = useRef(getAdaptiveFeedbackController());
+    const flowDetector = useRef(null);
+    const adaptiveController = useRef(null);
+
+    useEffect(() => {
+        flowDetector.current = new FlowStateDetector();
+        adaptiveController.current = getAdaptiveFeedbackController();
+    }, []);
 
     // State for visual updates
     const [currentPitch, setCurrentPitch] = useState(0);
@@ -31,18 +36,20 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
             }
 
             // 2. Flow State
-            const metrics = {
-                accuracy: (targetRange && data.pitch >= targetRange.min && data.pitch <= targetRange.max) ? 1 : 0,
-                timestamp: Date.now()
-            };
-            flowDetector.current.update(metrics);
-            const flowStats = flowDetector.current.getStats();
-            if (flowStats.isFlowState !== inFlow) {
-                setInFlow(flowStats.isFlowState);
-                if (flowStats.isFlowState) {
-                    // Maybe small celebration for entering flow?
-                    // setCelebration('streak'); 
-                    // But don't interrupt flow with big animations
+            if (flowDetector.current) {
+                const metrics = {
+                    accuracy: (targetRange && data.pitch >= targetRange.min && data.pitch <= targetRange.max) ? 1 : 0,
+                    timestamp: Date.now()
+                };
+                flowDetector.current.update(metrics);
+                const flowStats = flowDetector.current.getStats();
+                if (flowStats.isFlowState !== inFlow) {
+                    setInFlow(flowStats.isFlowState);
+                    if (flowStats.isFlowState) {
+                        // Maybe small celebration for entering flow?
+                        // setCelebration('streak');
+                        // But don't interrupt flow with big animations
+                    }
                 }
             }
 
@@ -91,7 +98,7 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
                     targetValue={targetRange ? (targetRange.min + targetRange.max) / 2 : null}
                     tolerance={tolerance}
                     metricName="Pitch"
-                    duration={adaptiveController.current.getThresholds().feedbackDelay || 2000}
+                    duration={adaptiveController.current ? (adaptiveController.current.getThresholds().feedbackDelay || 2000) : 2000}
                 />
             )}
 
