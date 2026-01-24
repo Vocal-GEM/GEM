@@ -48,6 +48,9 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
     }
 
+    if (!historyMetaRef.current) {
+        historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
+    }
     const historyHeadRef = useRef(0); // Points to the next write position (frame index)
 
     // Spectrogram State
