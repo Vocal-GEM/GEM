@@ -16,7 +16,7 @@ import { checkStreakStatus, getStreakMessage } from '../../services/StreakServic
 import RecommendedToolsWidget from '../ui/RecommendedToolsWidget';
 import MoodCheckIn from '../ui/MoodCheckIn';
 import PersonalMilestonesDisplay from '../ui/PersonalMilestonesDisplay';
-import VoiceTwinDiscovery from '../ui/VoiceTwinDiscovery';
+
 
 const StatCard = ({ label, value, subtext, icon, color }) => (
     <div className="bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
@@ -234,6 +234,13 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
             <h2 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">{t('dashboard.quickStart')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
                 <ActionCard
+                    title="Record Voice Log"
+                    description="Record a quick session to track your progress"
+                    icon={<Mic size={24} />}
+                    color="text-pink-400"
+                    onClick={() => onViewChange('journal')}
+                />
+                <ActionCard
                     title={t('dashboard.actions.training.title')}
                     description={t('dashboard.actions.training.description')}
                     icon={<Dumbbell size={24} />}
@@ -256,10 +263,7 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                 />
             </div>
 
-            {/* Community & Voice Twins */}
-            <div className="mt-8 mb-8">
-                <VoiceTwinDiscovery />
-            </div>
+
         </div>
     );
 };
