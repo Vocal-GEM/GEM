@@ -113,8 +113,9 @@ const JournalForm = ({ onSubmit, onCancel }) => {
 
             {/* Script Input */}
             <div>
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Reading Script (Optional)</label>
+                <label htmlFor="journal-script" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Reading Script (Optional)</label>
                 <textarea
+                    id="journal-script"
                     value={script}
                     onChange={(e) => setScript(e.target.value)}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 min-h-[60px] text-sm"
@@ -131,13 +132,21 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                         type="button"
                         onClick={toggleRecording}
                         className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-red-600 hover:bg-red-500'}`}
+                        aria-label={isRecording ? "Stop recording" : "Start recording"}
                     >
                         {isRecording ? <div className="w-6 h-6 bg-white rounded-sm"></div> : <div className="w-6 h-6 bg-white rounded-full"></div>}
                     </button>
                 ) : (
                     <div className="w-full flex items-center gap-2">
                         <audio src={audioBlobUrl} controls className="w-full h-8" />
-                        <button type="button" onClick={() => setAudioBlobUrl(null)} className="p-2 text-red-400 hover:text-red-300"><Trash2 /></button>
+                        <button
+                            type="button"
+                            onClick={() => setAudioBlobUrl(null)}
+                            className="p-2 text-red-400 hover:text-red-300"
+                            aria-label="Delete recording"
+                        >
+                            <Trash2 />
+                        </button>
                     </div>
                 )}
                 <p className="text-xs text-slate-500">{isRecording ? 'Recording... Read your script!' : 'Tap to record your voice'}</p>
@@ -145,7 +154,7 @@ const JournalForm = ({ onSubmit, onCancel }) => {
 
             {/* Notes */}
             <div>
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">How did it feel?</label>
+                <label htmlFor="journal-notes" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">How did it feel?</label>
 
                 {/* Optional Writing Prompt */}
                 <div className="mb-3">
@@ -162,6 +171,7 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                                     onClick={handleNewPrompt}
                                     className="text-slate-400 hover:text-pink-400 transition-colors"
                                     title="Get another prompt"
+                                    aria-label="Get another prompt"
                                 >
                                     <RefreshCw size={14} />
                                 </button>
@@ -180,6 +190,7 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                 </div>
 
                 <textarea
+                    id="journal-notes"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 min-h-[80px]"
@@ -207,6 +218,7 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                                 : 'bg-slate-800 border-slate-700 hover:bg-slate-700'
                                 }`}
                             title={label}
+                            aria-label={label}
                         >
                             <div className="text-2xl">{emoji}</div>
                         </button>
@@ -217,13 +229,13 @@ const JournalForm = ({ onSubmit, onCancel }) => {
             {/* Sliders */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Effort (1-10)</label>
-                    <input type="range" min="1" max="10" value={effort} onChange={(e) => setEffort(parseInt(e.target.value))} className="w-full accent-blue-500" />
+                    <label htmlFor="journal-effort" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Effort (1-10)</label>
+                    <input id="journal-effort" type="range" min="1" max="10" value={effort} onChange={(e) => setEffort(parseInt(e.target.value))} className="w-full accent-blue-500" />
                     <div className="text-center text-blue-400 font-bold">{effort}</div>
                 </div>
                 <div>
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Confidence (1-10)</label>
-                    <input type="range" min="1" max="10" value={confidence} onChange={(e) => setConfidence(parseInt(e.target.value))} className="w-full accent-emerald-500" />
+                    <label htmlFor="journal-confidence" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Confidence (1-10)</label>
+                    <input id="journal-confidence" type="range" min="1" max="10" value={confidence} onChange={(e) => setConfidence(parseInt(e.target.value))} className="w-full accent-emerald-500" />
                     <div className="text-center text-emerald-400 font-bold">{confidence}</div>
                 </div>
             </div>
