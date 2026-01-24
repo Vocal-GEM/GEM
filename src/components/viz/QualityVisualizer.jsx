@@ -1,5 +1,6 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useId, useCallback } from 'react';
 import { Sparkles, Waves, Wind, Activity } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const QualityVisualizer = ({ dataRef }) => {
     const [metrics, setMetrics] = useState({
@@ -7,6 +8,9 @@ const QualityVisualizer = ({ dataRef }) => {
         shimmer: 0,
         weight: 50
     });
+
+    // Generate unique ID for this component instance
+    const componentId = useId();
 
     // History buffers for sparklines
     const historyRef = useRef({
@@ -16,6 +20,26 @@ const QualityVisualizer = ({ dataRef }) => {
     });
     const maxHistory = 100;
 
+    // Define the loop callback (not creating it inside useEffect to allow useCallback if needed,
+    // though here it captures state setters so it's tricky.
+    // Actually, RenderCoordinator passes deltaTime, but we just need to poll dataRef.)
+    // We use useCallback to keep the function reference stable if possible,
+    // but we depend on dataRef.
+    const loop = useCallback(() => {
+        if (!dataRef.current) return;
+        const data = dataRef.current;
+
+        // Update local state
+        // Jitter/Shimmer are often small values (e.g. 0.01), we might want to scale them for display
+        // Jitter > 0.01 (1%) is often considered rough
+        // Shimmer > 0.35 dB (or 3-4%) is often considered rough.
+        // Assuming the engine returns raw values.
+
+        setMetrics({
+            jitter: data.jitter || 0,
+            shimmer: data.shimmer || 0,
+            weight: data.weight || 50
+        });
     useEffect(() => {
         const loop = () => {
             if (!dataRef.current) return;
@@ -41,25 +65,34 @@ const QualityVisualizer = ({ dataRef }) => {
                 }
             });
 
-            requestAnimationFrame(loop);
+            // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'quality-visualizer',
-                loop,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
+        // Update history
+        ['jitter', 'shimmer', 'weight'].forEach(key => {
+            historyRef.current[key].push(data[key] || 0);
+            if (historyRef.current[key].length > maxHistory) {
+                historyRef.current[key].shift();
+            }
         });
 
-        return () => {
-            if (unsubscribe) unsubscribe();
-        };
+        // REMOVED: requestAnimationFrame(loop) - handled by renderCoordinator
     }, [dataRef]);
 
+    useEffect(() => {
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            loop,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+
+        return () => {
+            unsubscribe();
+        };
+    }, [componentId, loop]);
+
     // Helper to render sparkline
-    const renderSparkline = (key, colorClass, height = 40) => {
+    const renderSparkline = (key, colorClass, _height = 40) => {
         const data = historyRef.current[key];
         if (data.length < 2) return null;
 

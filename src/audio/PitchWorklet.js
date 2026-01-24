@@ -21,6 +21,10 @@ class PitchProcessor extends AudioWorkletProcessor {
         this.processCount = 0;
         this.totalProcessTime = 0;
 
+        // Pre-allocate buffer for YIN algorithm to avoid GC
+        // 2048 covers up to ~21Hz at 44.1kHz, which is well below minFreq
+        this.yinBuffer = new Float32Array(2048);
+
         // Listen for configuration updates
         this.port.onmessage = (event) => {
             if (event.data.type === 'config') {
@@ -84,8 +88,16 @@ class PitchProcessor extends AudioWorkletProcessor {
         const minPeriod = Math.floor(this.sampleRate / this.maxFreq);
         const maxPeriod = Math.floor(this.sampleRate / this.minFreq);
 
+        // Resize buffer if necessary (should be rare)
+        if (this.yinBuffer.length < maxPeriod) {
+            this.yinBuffer = new Float32Array(maxPeriod + 1024);
+        }
+
+        const yinBuffer = this.yinBuffer;
+
         // Step 1: Calculate difference function
-        const yinBuffer = new Float32Array(maxPeriod);
+        // Crucial: Zero out the part we skip (0 to minPeriod) because Step 2 relies on cumulative sum
+        yinBuffer.fill(0, 0, minPeriod);
 
         for (let tau = minPeriod; tau < maxPeriod; tau++) {
             let sum = 0;
