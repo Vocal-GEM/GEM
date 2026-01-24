@@ -60,6 +60,10 @@
 **Learning:** Relying on frontend validation or assuming "trusted users" (authenticated) is insufficient. Filenames must always be sanitized and validated against a strict allowlist on the backend before any filesystem operations.
 **Prevention:** Always use `secure_filename` and explicit content-type/extension validation (e.g. `validate_file_upload`) for every file upload endpoint.
 
+## 2026-02-14 - Information Leakage & Logic Error in Finally Block
+**Vulnerability:** A `return` statement in a `finally` block in `backend/app/routes/voice_quality.py` was suppressing all exceptions (causing `UnboundLocalError` when no exception occurred) and leaking raw exception strings when an error did occur.
+**Learning:** `return` in `finally` discards any active exception and overrides return values from `try`/`except`. This is a dangerous anti-pattern in Python. Also, using `print()` for error logging is insufficient for production monitoring.
+**Prevention:** Removed the `return` statement from the `finally` block to ensure exceptions propagate or are handled by the `except` block's return. Replaced `print()` with `current_app.logger.error()` for proper logging. Validated with a targeted test suite.
 ## 2026-01-23 - Information Leakage in Settings Update
 **Vulnerability:** The `update_settings` endpoint in `backend/app/routes/settings.py` was catching all exceptions and returning `str(e)` in the JSON response. This exposes sensitive details (e.g., database connection errors, SQL syntax issues) to the client.
 **Learning:** Developers often return exception strings during development for debugging but forget to sanitize them for production. Flask Blueprints require `current_app` to access the logger properly.

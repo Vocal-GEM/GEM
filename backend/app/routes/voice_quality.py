@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, send_file, after_this_request
+from flask import Blueprint, request, jsonify, send_file, after_this_request, current_app
 import os
 import tempfile
 import soundfile as sf
@@ -196,7 +196,7 @@ def manipulate_file():
                 pass
         # Cleanup original temp file
         # Security: Do not expose internal error details to client
-        print(f"Voice manipulation error: {e}")
+        current_app.logger.error(f"Voice manipulation error: {e}")
         return jsonify({'error': 'An internal error occurred during voice manipulation.'}), 500
     finally:
         # Cleanup original temp file immediately (always safe as it's not the one being sent)
