@@ -113,6 +113,9 @@ describe("LoadingSpinner", () => {
     expect(container.firstChild).toHaveClass('flex');
   });
 
+  it("overrides default min-height when custom class is provided", () => {
+    const { container } = render(<LoadingSpinner className="min-h-0" />);
+    expect(container.firstChild).toHaveClass("min-h-0");
   it('uses inline layout for small sizes', () => {
     const { container, rerender } = render(<LoadingSpinner size="sm" />);
     expect(container.firstChild).toHaveClass('inline-flex');

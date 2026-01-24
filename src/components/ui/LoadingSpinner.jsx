@@ -21,6 +21,7 @@ import { twMerge } from "tailwind-merge";
 const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading...", className }) => {
   // Size controls dimensions
   const dimensions = {
+    sm: "w-4 h-4",
     xs: "w-3 h-3",
     sm: "w-5 h-5",
     md: "w-8 h-8",
@@ -109,6 +110,9 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
     current: "border-current opacity-30",
   };
 
+  // For 'sm', we usually want inline or small container.
+  // For other sizes, default to the original min-height, but allow override via className
+  const containerClass = size === "sm" ? "h-auto min-h-0 inline-flex" : "h-full min-h-[200px] flex";
   const containerClass = size === 'sm' ? 'h-auto min-h-0' : 'h-full min-h-[200px]';
   // For 'xs'/'sm', we usually want inline or small container.
   const containerClass = (size === 'xs' || size === 'sm')
@@ -119,6 +123,10 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
     <div
       className={twMerge(
         clsx(
+          "items-center justify-center w-full",
+          containerClass,
+          className
+        )
           "flex items-center justify-center w-full",
           "inline-flex items-center justify-center",
           'items-center justify-center',
@@ -139,12 +147,15 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
       aria-label={label}
     >
       <div
+        className={clsx("relative", dimensions[size] || dimensions.md)}
         className={twMerge(clsx("relative rounded-full", dimensions[size] || dimensions.md))}
         className={twMerge(clsx('relative', dimensions[size] || dimensions.md))}
       >
         {/* Track circle */}
         <div
           className={clsx(
+            "absolute top-0 left-0 w-full h-full rounded-full border-current opacity-20",
+            borderThickness[size] || borderThickness.md
             "absolute top-0 left-0 w-full h-full rounded-full",
             borderThickness[size] || borderThickness.md,
             selectedVariant.track
@@ -161,6 +172,8 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
         {/* Spinning segment */}
         <div
           className={clsx(
+            "absolute top-0 left-0 w-full h-full border-t-current border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
+            borderThickness[size] || borderThickness.md
             "absolute top-0 left-0 w-full h-full border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
             borderThickness[size] || borderThickness.md,
             selectedVariant.segment
