@@ -43,6 +43,11 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const HISTORY_FRAMES = 2500;
     const historyBufferRef = useRef(null); // Float32Array
     const historyMetaRef = useRef(null); // Metadata per frame
+
+    if (!historyMetaRef.current) {
+        historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
+    }
+
     if (!historyMetaRef.current) {
         historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
     }

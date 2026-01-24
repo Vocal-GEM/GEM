@@ -259,6 +259,8 @@ const PracticeMode = ({
     // Coaching State
     const [coachingPrompt, setCoachingPrompt] = useState(null);
     const coachingEngineRef = useRef(null);
+
+    // Lazy initialization
     if (!coachingEngineRef.current) {
         coachingEngineRef.current = new CoachingEngine();
     }

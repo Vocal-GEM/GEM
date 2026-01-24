@@ -82,6 +82,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
     if (!serviceRef.current) {
         serviceRef.current = new QuadCoreAnalysisService();
     }
+
     const [analysis, setAnalysis] = useState(null);
 
     // Generate unique component ID for RenderCoordinator

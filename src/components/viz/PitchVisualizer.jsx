@@ -24,6 +24,13 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const birdRef = useRef(null);
 
     // Lazy initialization
+    if (!balloonRef.current) {
+        balloonRef.current = new Image();
+    }
+    if (!birdRef.current) {
+        birdRef.current = new Image();
+    }
+
     if (!balloonRef.current) balloonRef.current = new Image();
     if (!birdRef.current) birdRef.current = new Image();
 
