@@ -277,17 +277,6 @@ def submit_success_story():
         if isinstance(techniques, list):
             clean_techniques = [sanitize_html(str(t)) for t in techniques]
 
-        # Sanitize input
-        title = sanitize_html(data.get('title', ''))
-        story_text = sanitize_html(data.get('story', ''))
-
-        # Sanitize techniques_used (list of strings)
-        techniques = data.get('techniques_used', [])
-        if isinstance(techniques, list):
-            techniques = [sanitize_html(str(t)) for t in techniques]
-        else:
-            techniques = []
-
         # Moderation check
         is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
 
