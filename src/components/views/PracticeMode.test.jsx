@@ -22,6 +22,15 @@ global.navigator.mediaDevices = {
 /* eslint-enable no-undef */
 
 // Mock dependencies
+vi.mock('../../context/NavigationContext', () => ({
+    NavigationProvider: ({ children }) => <div>{children}</div>,
+    useNavigation: () => ({
+        practiceTab: 'overview',
+        switchPracticeTab: vi.fn(),
+        openModal: vi.fn(),
+        navigationParams: {}
+    })
+}));
 vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
 vi.mock('../ui/ResizablePanel', () => ({
@@ -80,6 +89,6 @@ describe('PracticeMode', () => {
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
         // Check for visualization area
-        expect(screen.getByTestId('dynamic-orb')).toBeInTheDocument();
+        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
     });
 });
