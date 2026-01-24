@@ -6,6 +6,16 @@ describe("Toast Component", () => {
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Toast from './Toast';
+import React from 'react';
+
+// Mock lucide-react icons to avoid rendering issues
+vi.mock('lucide-react', () => ({
+  CheckCircle: (props) => <div data-testid="icon-check" {...props} />,
+  XCircle: (props) => <div data-testid="icon-error" {...props} />,
+  AlertTriangle: (props) => <div data-testid="icon-warning" {...props} />,
+  Info: (props) => <div data-testid="icon-info" {...props} />,
+  X: (props) => <div data-testid="icon-close" {...props} />,
+}));
 
 describe('Toast Component', () => {
   beforeEach(() => {
@@ -37,6 +47,8 @@ describe('Toast Component', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('calls onClose when close button is clicked', () => {
+    const onClose = vi.fn();
   it('has correct accessibility attributes for success', () => {
     render(<Toast message="Success" type="success" onClose={() => {}} />);
     const toast = screen.getByRole('status');
@@ -114,6 +126,14 @@ describe('Toast Component', () => {
     const status = screen.getByRole('status');
     expect(status).toBeInTheDocument();
     expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText('Success:')).toHaveClass('sr-only');
+  });
+
+  it('icons are hidden from screen readers', () => {
+    render(<Toast message="Test" type="success" onClose={() => {}} />);
+    const icon = screen.getByTestId('icon-check');
+    expect(icon).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByText('Information:')).toHaveClass('sr-only');
   });
 
