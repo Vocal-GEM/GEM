@@ -183,22 +183,42 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
         if (exercise) gameRef.current = { score: 0, lastUpdate: Date.now(), lastPitch: 0 };
 
+        // Pre-calculate profile ranges outside the loop
+        const fem = voiceProfiles.find(p => p.id === 'fem');
+        const masc = voiceProfiles.find(p => p.id === 'masc');
+        const femRange = fem?.genderRange || fem?.targetRange;
+        const mascRange = masc?.genderRange || masc?.targetRange;
+        const isFem = activeProfile === 'fem';
+        const mode = settings?.genderFeedbackMode || 'neutral';
+
+        // Pre-calculate game logic functions if exercise is active
+        let getExerciseFreq = null;
+        if (exercise) {
+            if (exercise.gameId === 'glide') {
+                const freqRange = exercise.range;
+                const center = (targetRange.min + targetRange.max) / 2;
+                getExerciseFreq = (t, now) => {
+                    const phase = (now / 2000) * Math.PI * 2;
+                    return center + (freqRange / 2) * Math.sin((t * Math.PI * 4) + phase);
+                };
+            } else if (exercise.gameId === 'step') {
+                const steps = 4;
+                const stepHeight = exercise.range / steps;
+                getExerciseFreq = (t, now) => {
+                    const phase = (now / 4000) % 1;
+                    const adjustedT = (t + phase) % 1;
+                    const currentStep = Math.floor(adjustedT * steps);
+                    return targetRange.min + (currentStep * stepHeight);
+                };
+            }
+        }
+
         const getPitchColor = (freq, clarity = 1.0) => {
             if (clarity < 0.8) {
                 return colorBlindMode ? '#9333ea' : '#ef4444';
             }
 
-            // Check Settings Mode
-            const mode = settings?.genderFeedbackMode || 'neutral'; // Default to neutral if undefined
-
-            const fem = voiceProfiles.find(p => p.id === 'fem');
-            const masc = voiceProfiles.find(p => p.id === 'masc');
-
-            const femRange = fem?.genderRange || fem?.targetRange;
-            const mascRange = masc?.genderRange || masc?.targetRange;
-
             // Target Zone (Always Winning Color)
-            const isFem = activeProfile === 'fem';
             if (targetRange && freq >= targetRange.min && (isFem || freq <= targetRange.max)) {
                 if (colorBlindMode) return '#0d9488';
                 return '#22c55e'; // Green
@@ -380,15 +400,14 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 ctx.fillText('Crossover ~157 Hz', width - 10, crossY - 3);
             }
 
-            if (exercise) {
+            if (exercise && getExerciseFreq) {
                 const now = Date.now();
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.setLineDash([10, 15]); ctx.beginPath();
                 let targetFreqAtCurrent = 0;
 
                 for (let i = 30; i < width; i += 5) {
-                    const t = (i - 30) / (width - 30); let freq = 0;
-                    if (exercise.gameId === 'glide') { const freqRange = exercise.range; const center = (targetRange.min + targetRange.max) / 2; const phase = (Date.now() / 2000) * Math.PI * 2; freq = center + (freqRange / 2) * Math.sin((t * Math.PI * 4) + phase); }
-                    else if (exercise.gameId === 'step') { const steps = 4; const stepHeight = exercise.range / steps; const phase = (Date.now() / 4000) % 1; const adjustedT = (t + phase) % 1; const currentStep = Math.floor(adjustedT * steps); freq = targetRange.min + (currentStep * stepHeight); }
+                    const t = (i - 30) / (width - 30);
+                    const freq = getExerciseFreq(t, now);
 
                     const y = mapY(freq);
                     if (i === 30) ctx.moveTo(i, y); else ctx.lineTo(i, y);
