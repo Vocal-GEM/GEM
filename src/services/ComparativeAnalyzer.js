@@ -64,7 +64,7 @@ export class ComparativeAnalyzer {
 
     getAnalysisText(metric, diff) {
         if (Math.abs(diff) < 10) return "You are right around average for this metric.";
-        if (diff > 0) return `You are ${diff.toFixed(0)}% higher than the community average.`;
-        return `You are ${Math.abs(diff).toFixed(0)}% lower than the community average.`;
+        if (diff > 0) return `You are ${diff.toFixed(0)}% higher than the baseline average.`;
+        return `You are ${Math.abs(diff).toFixed(0)}% lower than the baseline average.`;
     }
 }

@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 
+const DEFAULT_TARGET = { min: 170, max: 220 };
+
 export const useFeedback = (audioEngineRef, dataRef, config = {}) => {
     const {
         metric = 'pitch', // 'pitch' | 'resonance' | 'weight'
-        target = { min: 170, max: 220 }, // Range
+        target = DEFAULT_TARGET, // Range
         targetFreq = 190, // Default target for tone
     } = config;
 
@@ -15,9 +17,18 @@ export const useFeedback = (audioEngineRef, dataRef, config = {}) => {
 
     const lastTriggerRef = useRef(0);
 
+    // Store latest configuration in a ref to avoid restarting the interval on every render
+    const configRef = useRef({ metric, target, targetFreq, settings });
+
+    // Update refs on every render
+    configRef.current = { metric, target, targetFreq, settings };
+
     useEffect(() => {
         const checkFeedback = () => {
             if (!dataRef.current || !audioEngineRef.current) return;
+
+            // Read from ref to get latest values without closure staleness or dependency churn
+            const { metric, target, targetFreq, settings } = configRef.current;
 
             // Get current value
             const val = dataRef.current[metric];
@@ -53,11 +64,12 @@ export const useFeedback = (audioEngineRef, dataRef, config = {}) => {
         };
 
         // Only run if feedback is enabled
+        // This effect ONLY restarts if haptic/tone enablement changes, NOT when target/metric changes
         if (settings.haptic || settings.tone) {
             const interval = setInterval(checkFeedback, 100); // Check every 100ms
             return () => clearInterval(interval);
         }
-    }, [settings, metric, target, targetFreq, dataRef, audioEngineRef]);
+    }, [settings.haptic, settings.tone, dataRef, audioEngineRef]);
 
     return { settings, setSettings };
 };

@@ -146,7 +146,7 @@ def upload_file():
         return jsonify({"error": "No selected file"}), 400
     
     # Security: Validate file type
-    is_valid, error = validate_file_upload(file.filename)
+    is_valid, error = validate_file_upload(file.filename, file_stream=file)
     if not is_valid:
         return jsonify({"error": error}), 400
 

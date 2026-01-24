@@ -77,6 +77,14 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
     useProfile();
 
     const serviceRef = useRef(new QuadCoreAnalysisService());
+    const serviceRef = useRef(null);
+    useEffect(() => {
+        serviceRef.current = new QuadCoreAnalysisService();
+    }, []);
+    if (!serviceRef.current) {
+        serviceRef.current = new QuadCoreAnalysisService();
+    }
+
     const [analysis, setAnalysis] = useState(null);
 
     // Generate unique component ID for RenderCoordinator
@@ -84,7 +92,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
     const componentId = `voice-quality-${uniqueId}`;
 
     const analyze = useCallback(() => {
-        if (dataRef.current) {
+        if (dataRef.current && isAudioActive && serviceRef.current) {
             const results = serviceRef.current.analyze(dataRef.current, {
                 targetF2: 2000 // Default to neutral/chem until calibration is fuller
             });
@@ -93,7 +101,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                 setAnalysis(results);
             }
         }
-    }, [dataRef]);
+    }, [dataRef, isAudioActive]);
 
     useEffect(() => {
         let unsubscribe;

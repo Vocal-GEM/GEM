@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useId, useCallback } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { useAudio } from '../../context/AudioContext';
 import { useFeedback } from '../../hooks/useFeedback';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import FeedbackControls from '../ui/FeedbackControls';
 import { AlertTriangle, Activity, Info } from 'lucide-react';
 
@@ -12,86 +13,74 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
     const metricsRef = useRef({ h1: null, h2: null, diff: null, centroid: null });
+    const componentId = useId();
 
-    useEffect(() => {
-        const loop = () => {
-            if (indicatorRef.current && valueRef.current) {
-                const { weight, isSilent } = dataRef.current;
-                const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
+    const loop = useCallback(() => {
+        if (indicatorRef.current && valueRef.current && dataRef.current) {
+            const { weight, isSilent } = dataRef.current;
+            const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
 
-                // If silent, freeze the indicator (or drift very slowly to neutral if desired)
-                // Here we just freeze it to prevent spikes
-                if (isSilent) {
-                    // Optional: Drift slowly to 50% if silence persists? 
-                    // For now, just freeze to avoid "drop to zero" artifacts
-                    requestAnimationFrame(loop);
-                    return;
-                }
+            if (isSilent) {
+                return;
+            }
 
-                // Map Weight: DSP returns 100 (Light) -> 0 (Heavy). 
-                // UI expects: Left (0%) = Light, Right (100%) = Heavy.
-                // So we need to invert the DSP value: 100 - weight.
-                let rawWeight = weight || 50; // Default to balanced if missing
-                let target = 100 - rawWeight;
-                target = Math.max(0, Math.min(100, target));
+            // Map Weight: DSP returns 100 (Light) -> 0 (Heavy).
+            // UI expects: Left (0%) = Light, Right (100%) = Heavy.
+            let rawWeight = weight || 50;
+            let target = 100 - rawWeight;
+            target = Math.max(0, Math.min(100, target));
 
-                // Smoother interpolation (0.05 instead of 0.1)
-                const nextLeft = curLeft + (target - curLeft) * 0.05;
-                indicatorRef.current.style.left = `${nextLeft}%`;
+            const nextLeft = curLeft + (target - curLeft) * 0.05;
+            indicatorRef.current.style.left = `${nextLeft}%`;
 
-                // Color based on position
-                if (colorBlindMode) {
-                    if (nextLeft > 70) {
-                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.8)] transition-colors duration-75 bg-orange-500";
-                    } else if (nextLeft < 30) {
-                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.8)] transition-colors duration-75 bg-teal-400";
-                    } else {
-                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)] transition-colors duration-75 bg-purple-500";
-                    }
+            // Color based on position
+            if (colorBlindMode) {
+                if (nextLeft > 70) {
+                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.8)] transition-colors duration-75 bg-orange-500";
+                } else if (nextLeft < 30) {
+                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.8)] transition-colors duration-75 bg-teal-400";
                 } else {
-                    if (nextLeft > 70) {
-                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(255,100,100,0.8)] transition-colors duration-75 bg-red-500";
-                    } else if (nextLeft < 30) {
-                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-blue-400";
-                    } else {
-                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 bg-emerald-500";
-                    }
+                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)] transition-colors duration-75 bg-purple-500";
                 }
-
-                // Update value display (Show "Heaviness", not "Lightness")
-                valueRef.current.innerText = Math.round(target);
-
-                // Update metrics display
-                // Update metrics display
-                if (dataRef.current.debug) {
-                    const { h1, h2, centroid } = dataRef.current.debug;
-                    if (metricsRef.current.h1) metricsRef.current.h1.innerText = h1 ? h1.toFixed(1) : '-';
-                    if (metricsRef.current.h2) metricsRef.current.h2.innerText = h2 ? h2.toFixed(1) : '-';
-                    if (metricsRef.current.diff) metricsRef.current.diff.innerText = (h1 && h2) ? (h1 - h2).toFixed(1) : '-';
-                    if (metricsRef.current.centroid) metricsRef.current.centroid.innerText = centroid || '-';
+            } else {
+                if (nextLeft > 70) {
+                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(255,100,100,0.8)] transition-colors duration-75 bg-red-500";
+                } else if (nextLeft < 30) {
+                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-blue-400";
+                } else {
+                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 bg-emerald-500";
                 }
             }
-            requestAnimationFrame(loop);
-        };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'voice-quality-meter',
-                loop,
-                renderCoordinator.PRIORITY.CRITICAL
-            );
-        });
+            valueRef.current.innerText = Math.round(target);
+
+            // Update metrics display
+            if (dataRef.current.debug) {
+                const { h1, h2, centroid } = dataRef.current.debug;
+                if (metricsRef.current.h1) metricsRef.current.h1.innerText = h1 ? h1.toFixed(1) : '-';
+                if (metricsRef.current.h2) metricsRef.current.h2.innerText = h2 ? h2.toFixed(1) : '-';
+                if (metricsRef.current.diff) metricsRef.current.diff.innerText = (h1 && h2) ? (h1 - h2).toFixed(1) : '-';
+                if (metricsRef.current.centroid) metricsRef.current.centroid.innerText = (centroid !== undefined && centroid !== null) ? centroid : '-';
+            }
+        }, [dataRef, colorBlindMode]);
+        }
+    }, [dataRef, colorBlindMode]);
+
+    useEffect(() => {
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            loop,
+            renderCoordinator.PRIORITY.CRITICAL
+        );
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
-    }, [dataRef, colorBlindMode]);
+    }, [loop, componentId]);
 
     const labels = userMode === 'slp' ? ['Low Energy', 'Vocal Weight', 'High Energy'] : ['Light / Airy', 'Vocal Weight', 'Heavy / Pressed'];
 
-    // Strain Check
-    const isStrained = dataRef.current?.weight > 80;
+    const isStrained = dataRef.current?.weight < 20; // weight is 100 (light) to 0 (heavy)
     const isSilent = dataRef.current?.isSilent;
 
     return (
@@ -190,4 +179,3 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
 };
 
 export default VoiceQualityMeter;
-

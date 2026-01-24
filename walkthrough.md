@@ -30,6 +30,15 @@ We have successfully implemented the core components of Tier 3, focusing on low-
 
 ## Verification Checklist
 
+### Build & Syntax Fixes
+
+I fixed several files that were corrupted (likely due to merge conflicts or the reserved filename issue):
+- [button.jsx](file:///c:/Users/riley/Desktop/GEM/src/components/ui/button.jsx): Removed duplicate component definitions and fixed syntax.
+- [VoiceQualityMeter.jsx](file:///c:/Users/riley/Desktop/GEM/src/components/viz/VoiceQualityMeter.jsx): Reconstructed mangled `loop` and `useEffect` logic.
+- [ContourVisualizer.jsx](file:///c:/Users/riley/Desktop/GEM/src/components/viz/ContourVisualizer.jsx): Removed duplicate lines and fixed IIFE syntax.
+
+The project now passes `npm run build` successfully.
+
 1. **Audio Latency**:
    - Start the app and enable the microphone.
    - Sing a note. The pitch graph should respond instantly.
