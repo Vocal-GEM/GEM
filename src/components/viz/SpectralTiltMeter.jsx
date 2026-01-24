@@ -39,6 +39,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 // Update value display
                 valueRef.current.innerText = tilt.toFixed(1);
             }
+            // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
         const unsubscribe = renderCoordinator.subscribe(

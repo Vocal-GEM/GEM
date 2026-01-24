@@ -53,18 +53,9 @@ const MOCK_COMMUNITY_PROFILES = [
  * @param {Object} userProfile - Current user's profile
  * @returns {Array} List of matches with similarity scores
  */
+// Community features disabled
 export const findMatches = (userProfile) => {
-    const { baseline, goals } = userProfile;
-    const startPitch = baseline?.pitchRange?.habitual || 140;
-
-    // Return mock matches sorted by similarity
-    return MOCK_COMMUNITY_PROFILES
-        .map(bgUser => ({
-            ...bgUser,
-            matchScore: calculateSimilarity(startPitch, goals, bgUser)
-        }))
-        .filter(m => m.matchScore > 0.6) // Only good matches
-        .sort((a, b) => b.matchScore - a.matchScore);
+    return [];
 };
 
 /**
