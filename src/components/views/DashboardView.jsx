@@ -234,6 +234,13 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
             <h2 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">{t('dashboard.quickStart')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
                 <ActionCard
+                    title="Record Voice Log"
+                    description="Record a quick session to track your progress"
+                    icon={<Mic size={24} />}
+                    color="text-pink-400"
+                    onClick={() => onViewChange('journal')}
+                />
+                <ActionCard
                     title={t('dashboard.actions.training.title')}
                     description={t('dashboard.actions.training.description')}
                     icon={<Dumbbell size={24} />}

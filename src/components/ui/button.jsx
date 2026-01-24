@@ -1,5 +1,5 @@
 import React from 'react';
-import { clsx } from 'clsx';
+import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -19,6 +19,7 @@ const Button = React.forwardRef(
   ) => {
     const Comp = asChild ? 'span' : 'button';
     const isDisabled = isLoading || disabled;
+    const isIcon = size === 'icon';
 
     return (
       <Comp
@@ -49,11 +50,12 @@ const Button = React.forwardRef(
         )}
         disabled={isDisabled}
         aria-disabled={isDisabled}
+        aria-busy={isLoading}
         ref={ref}
         {...props}
       >
         {isLoading ? (
-          size === 'icon' ? (
+          isIcon ? (
             <LoadingSpinner size="sm" variant="current" />
           ) : (
             <>
