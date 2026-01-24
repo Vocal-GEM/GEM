@@ -11,8 +11,14 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     const { settings } = useSettings();
     const [alert, setAlert] = useState(null);
     const [celebration, setCelebration] = useState(null);
-    const flowDetector = useRef(new FlowStateDetector());
-    const adaptiveController = useRef(getAdaptiveFeedbackController());
+    const flowDetector = useRef(null);
+    if (!flowDetector.current) {
+        flowDetector.current = new FlowStateDetector();
+    }
+    const adaptiveController = useRef(null);
+    if (!adaptiveController.current) {
+        adaptiveController.current = getAdaptiveFeedbackController();
+    }
 
     // State for visual updates
     const [currentPitch, setCurrentPitch] = useState(0);
