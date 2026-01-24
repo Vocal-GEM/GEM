@@ -10,27 +10,74 @@ vi.mock('../../context/NavigationContext', () => ({
 
 describe('Breadcrumbs', () => {
     const mockNavigate = vi.fn();
+    const mockSwitchPracticeTab = vi.fn();
 
     beforeEach(() => {
         vi.clearAllMocks();
+    });
+
+    it('should NOT render on dashboard view', () => {
+        useNavigation.mockReturnValue({
+            history: [],
+            navigate: mockNavigate,
+            activeView: 'dashboard'
+        });
+
+        const { container } = render(<Breadcrumbs />);
+        expect(container).toBeEmptyDOMElement();
     });
 
     it('should render default breadcrumbs when history is empty', () => {
         useNavigation.mockReturnValue({
             history: [],
             navigate: mockNavigate,
-            activeView: 'practice'
+            activeView: 'practice',
+            practiceTab: 'overview',
+            switchPracticeTab: mockSwitchPracticeTab
         });
 
         render(<Breadcrumbs />);
 
-        expect(screen.getByText('Home')).toBeInTheDocument();
+        expect(screen.getByText('Dashboard')).toBeInTheDocument();
         expect(screen.getByText('Practice')).toBeInTheDocument();
     });
 
-    it('should render history items', () => {
+    it('should render practice tab breadcrumbs', () => {
+        useNavigation.mockReturnValue({
+            history: [],
+            navigate: mockNavigate,
+            activeView: 'practice',
+            practiceTab: 'pitch',
+            switchPracticeTab: mockSwitchPracticeTab
+        });
+
+        render(<Breadcrumbs />);
+
+        expect(screen.getByText('Dashboard')).toBeInTheDocument();
+        expect(screen.getByText('Practice')).toBeInTheDocument();
+        expect(screen.getByText('Pitch')).toBeInTheDocument();
+    });
+
+    it('should call switchPracticeTab when clicking Practice in tab view', () => {
+        useNavigation.mockReturnValue({
+            history: [],
+            navigate: mockNavigate,
+            activeView: 'practice',
+            practiceTab: 'pitch',
+            switchPracticeTab: mockSwitchPracticeTab
+        });
+
+        render(<Breadcrumbs />);
+
+        const practiceLink = screen.getByText('Practice');
+        fireEvent.click(practiceLink);
+
+        expect(mockSwitchPracticeTab).toHaveBeenCalledWith('overview');
+    });
+
+    it('should render history items override', () => {
         const history = [
-            { label: 'Home', action: vi.fn() },
+            { label: 'Dashboard', action: vi.fn() },
             { label: 'Practice', action: vi.fn() },
             { label: 'Pitch Tool', action: null }
         ];
@@ -38,34 +85,14 @@ describe('Breadcrumbs', () => {
         useNavigation.mockReturnValue({
             history,
             navigate: mockNavigate,
-            activeView: 'practice'
+            activeView: 'practice',
+            switchPracticeTab: mockSwitchPracticeTab
         });
 
         render(<Breadcrumbs />);
 
-        expect(screen.getByText('Home')).toBeInTheDocument();
+        expect(screen.getByText('Dashboard')).toBeInTheDocument();
         expect(screen.getByText('Practice')).toBeInTheDocument();
         expect(screen.getByText('Pitch Tool')).toBeInTheDocument();
-    });
-
-    it('should call action when clicking a breadcrumb', () => {
-        const mockAction = vi.fn();
-        const history = [
-            { label: 'Home', action: mockAction },
-            { label: 'Practice', action: null }
-        ];
-
-        useNavigation.mockReturnValue({
-            history,
-            navigate: mockNavigate,
-            activeView: 'practice'
-        });
-
-        render(<Breadcrumbs />);
-
-        const homeLink = screen.getByText('Home');
-        fireEvent.click(homeLink);
-
-        expect(mockAction).toHaveBeenCalled();
     });
 });

@@ -1,14 +1,16 @@
 
-import { Home, Activity, Waves, BarChart2, Settings } from 'lucide-react';
+import { Home, Activity, Waves, BarChart2, Settings, Mic } from 'lucide-react';
+import { FEATURES } from '../../config/featureFlags';
 
 const BottomNav = ({ activeTab, onNavigate }) => {
   const navItems = [
     { id: 'dashboard', label: 'Home', icon: Home },
     { id: 'practice', label: 'Practice', icon: Activity },
+    { id: 'journal', label: 'Voice Log', icon: Mic },
     { id: 'analysis', label: 'Analysis', icon: Waves },
     { id: 'history', label: 'History', icon: BarChart2 },
     { id: 'settings', label: 'Settings', icon: Settings },
-  ];
+  ].filter(item => FEATURES[item.id] !== false);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/80 backdrop-blur-lg border-t border-white/10 pb-safe">

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Suspense, useCallback } from 'react';
+import { useState, useEffect, useRef, Suspense, lazy, useCallback } from 'react';
 import { Play, Square, Mic, Volume2, Activity, BarChart2, RefreshCw, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer, Sparkles, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '../../context/NavigationContext';
@@ -258,7 +258,15 @@ const PracticeMode = ({
 
     // Coaching State
     const [coachingPrompt, setCoachingPrompt] = useState(null);
-    const coachingEngineRef = useRef(new CoachingEngine());
+    const coachingEngineRef = useRef(null);
+
+    useEffect(() => {
+        coachingEngineRef.current = new CoachingEngine();
+    }, []);
+    // Lazy initialization
+    if (!coachingEngineRef.current) {
+        coachingEngineRef.current = new CoachingEngine();
+    }
 
     useEffect(() => {
         if (!isAudioActive) {
@@ -267,7 +275,7 @@ const PracticeMode = ({
         }
 
         const interval = setInterval(() => {
-            if (dataRef.current) {
+            if (dataRef.current && coachingEngineRef.current) {
                 const prompt = coachingEngineRef.current.process(dataRef.current);
                 if (prompt) {
                     setCoachingPrompt(prompt);
