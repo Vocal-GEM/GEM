@@ -1,4 +1,3 @@
-import React from 'react';
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -21,6 +20,27 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
     xl: "border-8",
   };
 
+  // Variants control colors
+  const variants = {
+    default: {
+      track: "border-slate-700 opacity-20",
+      spin: "border-t-blue-500 border-r-transparent border-b-transparent border-l-transparent"
+    },
+    current: {
+      track: "border-current opacity-20",
+      spin: "border-t-current border-r-transparent border-b-transparent border-l-transparent"
+    },
+    white: {
+      track: "border-white opacity-20",
+      spin: "border-t-white border-r-transparent border-b-transparent border-l-transparent"
+    }
+  };
+
+  const selectedVariant = variants[variant] || variants.default;
+
+  // Inline sizes (xs, sm) shouldn't impose a large minimum height
+  const isInline = size === 'xs' || size === 'sm';
+  const containerClass = isInline ? 'h-auto min-h-0 inline-flex' : 'h-full min-h-[200px] flex';
   // Colors for the spinning segment
   const colors = {
     default: "border-t-blue-500",
@@ -59,6 +79,7 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
         <div
           className={clsx(
             "absolute top-0 left-0 w-full h-full rounded-full",
+            selectedVariant.track,
             borderThickness[size] || borderThickness.md,
             trackColors[variant] || trackColors.default
           )}
@@ -66,6 +87,8 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
         {/* Spinning segment */}
         <div
           className={clsx(
+            "absolute top-0 left-0 w-full h-full rounded-full animate-spin",
+            selectedVariant.spin,
             "absolute top-0 left-0 w-full h-full border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
             borderThickness[size] || borderThickness.md,
             colors[variant] || colors.default

@@ -1,3 +1,18 @@
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import LoadingSpinner from './LoadingSpinner';
+
+describe('LoadingSpinner', () => {
+  it('renders with accessibility attributes', () => {
+    render(<LoadingSpinner />);
+
+    // It should have role="status"
+    const spinner = screen.getByRole('status');
+    expect(spinner).toBeInTheDocument();
+    expect(spinner).toHaveAttribute('aria-live', 'polite');
+
+    // It should have a visually hidden label "Loading..." by default
+    const srText = screen.getByText('Loading...');
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import LoadingSpinner from "./LoadingSpinner";
@@ -15,7 +30,7 @@ describe("LoadingSpinner", () => {
     // Check for hidden label
     const srText = screen.getByText("Loading...");
     expect(srText).toBeInTheDocument();
-    expect(srText).toHaveClass("sr-only");
+    expect(srText).toHaveClass('sr-only');
   });
 
   it("renders with custom label", () => {
@@ -23,6 +38,20 @@ describe("LoadingSpinner", () => {
     expect(screen.getByText("Processing data...")).toBeInTheDocument();
   });
 
+  it('applies custom className', () => {
+    const { container } = render(<LoadingSpinner className="my-custom-class" />);
+    expect(container.firstChild).toHaveClass('my-custom-class');
+  });
+
+  it('overrides default min-height when custom class is provided', () => {
+    const { container } = render(<LoadingSpinner className="min-h-0" />);
+    expect(container.firstChild).toHaveClass('min-h-0');
+  });
+
+  it('renders with different sizes including xs', () => {
+    const { rerender, container } = render(<LoadingSpinner size="xs" />);
+    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(container.querySelector('.w-4.h-4')).toBeInTheDocument();
   it("applies custom className", () => {
     const { container } = render(<LoadingSpinner className="my-custom-class" />);
     expect(container.firstChild).toHaveClass("my-custom-class");
@@ -42,6 +71,14 @@ describe("LoadingSpinner", () => {
     rerender(<LoadingSpinner size="xl" />);
     // xl should be flex (default)
     expect(container.firstChild).toHaveClass('flex');
+  });
+
+  it('uses inline layout for small sizes', () => {
+    const { container, rerender } = render(<LoadingSpinner size="sm" />);
+    expect(container.firstChild).toHaveClass('inline-flex');
+
+    rerender(<LoadingSpinner size="xs" />);
+    expect(container.firstChild).toHaveClass('inline-flex');
   });
 
   it("renders with current color variant", () => {
