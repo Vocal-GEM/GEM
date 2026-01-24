@@ -17,18 +17,12 @@ const ContourVisualizer = ({ dataRef }) => {
     const lastUiUpdateRef = useRef(0);
 
     useEffect(() => {
-        // NOTE: This loop is driven by RenderCoordinator, not a local requestAnimationFrame.
-        // RenderCoordinator handles the recursion and passes (delta, currentTime).
         const loop = (delta, currentTime) => {
             if (!dataRef.current) return;
 
-            // Fallback if currentTime is not passed (though RenderCoordinator should pass it)
             const now = currentTime || performance.now();
-
             const { prosody, isSilent, clarity } = dataRef.current;
 
-            // Only update history if speaking and confident
-            // This prevents "monotone" penalties during silence
             const shouldUpdate = !isSilent && (clarity === undefined || clarity > 0.5);
 
             if (prosody && shouldUpdate) {
@@ -49,7 +43,7 @@ const ContourVisualizer = ({ dataRef }) => {
                 }
             }
 
-            // Draw Graph (Always draw, even if paused, to maintain visual)
+            // Draw Graph
             const canvas = canvasRef.current;
             if (canvas) {
                 const ctx = canvas.getContext('2d');
@@ -63,21 +57,20 @@ const ContourVisualizer = ({ dataRef }) => {
                 const yBottom = height - (0.25 * height);
                 const bandHeight = yBottom - yTop;
 
-                ctx.fillStyle = 'rgba(45, 212, 191, 0.05)'; // Very faint teal
+                ctx.fillStyle = 'rgba(45, 212, 191, 0.05)';
                 ctx.fillRect(0, yTop, width, bandHeight);
 
                 // Draw Grid Lines & Labels
                 ctx.lineWidth = 1;
-
-                // 0.6 Line (Upper Natural Limit)
                 ctx.strokeStyle = 'rgba(45, 212, 191, 0.3)';
                 ctx.setLineDash([5, 5]);
+
+                // 0.6 Line
                 ctx.beginPath();
                 ctx.moveTo(0, yTop); ctx.lineTo(width, yTop);
                 ctx.stroke();
 
-                // 0.25 Line (Lower Natural Limit)
-                ctx.strokeStyle = 'rgba(45, 212, 191, 0.3)';
+                // 0.25 Line
                 ctx.beginPath();
                 ctx.moveTo(0, yBottom); ctx.lineTo(width, yBottom);
                 ctx.stroke();
@@ -95,24 +88,22 @@ const ContourVisualizer = ({ dataRef }) => {
                     ctx.lineCap = 'round';
                     ctx.lineJoin = 'round';
 
-                    // Gradient stroke based on current intensity
                     const gradient = ctx.createLinearGradient(0, height, 0, 0);
-                    gradient.addColorStop(0, '#94a3b8'); // slate-400 (low)
-                    gradient.addColorStop(0.5, '#2dd4bf'); // teal-400 (med)
-                    gradient.addColorStop(1, '#a855f7'); // purple-500 (high)
+                    gradient.addColorStop(0, '#94a3b8');
+                    gradient.addColorStop(0.5, '#2dd4bf');
+                    gradient.addColorStop(1, '#a855f7');
                     ctx.strokeStyle = gradient;
 
                     for (let i = 0; i < historyRef.current.length; i++) {
                         const val = historyRef.current[i];
                         const x = (i / (maxHistory - 1)) * width;
-                        const y = height - (val * height); // Invert Y
+                        const y = height - (val * height);
                         if (i === 0) ctx.moveTo(x, y);
                         else ctx.lineTo(x, y);
                     }
                     ctx.stroke();
                 }
             }
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
         let unsubscribe;
@@ -129,7 +120,6 @@ const ContourVisualizer = ({ dataRef }) => {
         };
     }, [dataRef]);
 
-    // Helper for slope icon
     const getSlopeIcon = () => {
         switch (metrics.slopeDirection) {
             case 'rising': return <TrendingUp className="w-8 h-8 text-emerald-400" />;
@@ -138,14 +128,11 @@ const ContourVisualizer = ({ dataRef }) => {
         }
     };
 
-    // Helper for labels
-    const getContourLabel = (val) => {
+    const label = ((val) => {
         if (val < 0.25) return { text: 'Monotone', color: 'text-slate-400' };
         if (val > 0.6) return { text: 'Expressive', color: 'text-purple-400' };
         return { text: 'Natural', color: 'text-teal-400' };
-    };
-
-    const label = getContourLabel(metrics.contour);
+    })(metrics.contour);
 
     return (
         <div className="h-full flex flex-col p-6">
@@ -169,10 +156,7 @@ const ContourVisualizer = ({ dataRef }) => {
                 </div>
             </div>
 
-            {/* Main Visualization Area */}
             <div className="flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                {/* Graph */}
                 <div className="lg:col-span-2 bg-slate-900/50 rounded-2xl border border-white/5 p-4 relative overflow-hidden">
                     <canvas
                         ref={canvasRef}
@@ -180,15 +164,12 @@ const ContourVisualizer = ({ dataRef }) => {
                         height={400}
                         className="w-full h-full object-contain"
                     />
-                    {/* Overlay Labels */}
                     <div className="absolute top-4 right-4 text-xs font-bold text-purple-500/50 uppercase">Expressive</div>
                     <div className="absolute top-1/2 right-4 -translate-y-1/2 text-xs font-bold text-teal-500/50 uppercase">Natural</div>
                     <div className="absolute bottom-4 right-4 text-xs font-bold text-slate-500/50 uppercase">Monotone</div>
                 </div>
 
-                {/* Metrics Panel */}
                 <div className="space-y-4">
-                    {/* Current State Card */}
                     <div className="bg-slate-900/50 rounded-2xl border border-white/5 p-6 flex flex-col items-center justify-center text-center h-[180px]">
                         <div className="mb-2">
                             {getSlopeIcon()}
@@ -201,7 +182,6 @@ const ContourVisualizer = ({ dataRef }) => {
                         </div>
                     </div>
 
-                    {/* Range Card */}
                     <div className="bg-slate-900/50 rounded-2xl border border-white/5 p-6 flex flex-col items-center justify-center text-center h-[180px]">
                         <div className="text-3xl font-bold text-white mb-1 font-mono">
                             {metrics.semitoneRange.toFixed(1)}
