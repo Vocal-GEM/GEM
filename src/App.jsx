@@ -69,6 +69,8 @@ import QuickSettings from './components/ui/QuickSettings';
 import { analyticsService } from './services/AnalyticsService';
 import { useVoiceProfile } from './context/VoiceProfileContext';
 import IntakeQuestionnaire from './components/ui/IntakeQuestionnaire';
+import Breadcrumbs from './components/ui/Breadcrumbs';
+
 // VoiceTwinDiscovery is not used in App directly, it's a widget in Dashboard
 // But if we want it accessible elsewhere we can import it. 
 // For now removing the unused import line causing confusion.
@@ -204,6 +206,10 @@ const App = () => {
                     />
 
                     <main id="main-content" className="flex-1 w-full lg:ml-64 p-0 pb-20 lg:pb-0">
+                        <div className="px-4 pt-4 lg:px-8 lg:pt-8">
+                            <Breadcrumbs />
+                        </div>
+
                         {activeTab === 'dashboard' && (
                             <Suspense fallback={<LoadingSpinner />}>
                                 <DashboardView
