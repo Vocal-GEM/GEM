@@ -12,6 +12,11 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     const [alert, setAlert] = useState(null);
     const [celebration, setCelebration] = useState(null);
     const flowDetector = useRef(null);
+    const adaptiveController = useRef(null);
+
+    // Lazy initialization
+    if (!flowDetector.current) flowDetector.current = new FlowStateDetector();
+    if (!adaptiveController.current) adaptiveController.current = getAdaptiveFeedbackController();
     if (!flowDetector.current) {
         flowDetector.current = new FlowStateDetector();
     }
