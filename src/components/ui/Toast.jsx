@@ -28,6 +28,16 @@ const Toast = ({ message, type = 'success', onClose, duration = 3000 }) => {
   const style = styles[type] || styles.success;
   const Icon = style.icon;
 
+  // Determine roles and live region settings based on type
+  const role = type === 'error' || type === 'warning' ? 'alert' : 'status';
+  const ariaLive = role === 'alert' ? 'assertive' : 'polite';
+
+  return (
+    <div
+      className={`fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[100] flex items-center gap-3 px-6 py-4 rounded-xl border backdrop-blur-md shadow-xl animate-in fade-in slide-in-from-bottom-4 ${style.bg}`}
+      role={role}
+      aria-live={ariaLive}
+      aria-atomic="true"
   const isAlert = type === 'error' || type === 'warning';
 
   return (
