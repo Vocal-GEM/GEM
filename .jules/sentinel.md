@@ -60,6 +60,10 @@
 **Learning:** Relying on frontend validation or assuming "trusted users" (authenticated) is insufficient. Filenames must always be sanitized and validated against a strict allowlist on the backend before any filesystem operations.
 **Prevention:** Always use `secure_filename` and explicit content-type/extension validation (e.g. `validate_file_upload`) for every file upload endpoint.
 
+## 2024-05-22 - Stored XSS in Community Features
+**Vulnerability:** User input in `submit_success_story` (title, story), `share_voice` (context), and `request_connection` (message) was stored directly in the database without sanitization. An attacker could inject malicious scripts (e.g., `<script>`) that would execute when other users viewed these stories or messages.
+**Learning:** Even with backend API validation (like checking file types or bad words), explicit HTML sanitization is required for any text field that might be rendered or stored. `check_moderation` only flagged keywords but didn't prevent code injection.
+**Prevention:** Apply `sanitize_html` (using `bleach`) to all user-submitted text fields before saving to the database. Ensure this pattern is followed for all new endpoints accepting text input.
 ## 2026-02-14 - Information Leakage & Logic Error in Finally Block
 **Vulnerability:** A `return` statement in a `finally` block in `backend/app/routes/voice_quality.py` was suppressing all exceptions (causing `UnboundLocalError` when no exception occurred) and leaking raw exception strings when an error did occur.
 **Learning:** `return` in `finally` discards any active exception and overrides return values from `try`/`except`. This is a dangerous anti-pattern in Python. Also, using `print()` for error logging is insufficient for production monitoring.

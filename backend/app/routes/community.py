@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
+from ..extensions import db
+from ..extensions import db, limiter
 from ..validators import validate_file_upload, sanitize_html
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
@@ -92,6 +94,10 @@ def share_voice():
             audio_file.filename, allowed_types=['audio'], file_stream=audio_file)
         if not is_valid:
             return jsonify({'error': error}), 400
+
+        context = request.form.get('context', '')
+        # Security: Sanitize context
+        context = sanitize_html(context)
 
         context = sanitize_html(request.form.get('context', ''))
         expiration_days = int(request.form.get('expiration_days', 7))
@@ -284,6 +290,10 @@ def submit_success_story():
         techniques = data.get('techniques_used', [])
         if isinstance(techniques, list):
             techniques = [sanitize_html(t) for t in techniques]
+
+        # Security: Sanitize inputs
+        title = sanitize_html(data.get('title', ''))
+        story_content = sanitize_html(data.get('story', ''))
 
         # Moderation check
         is_safe, flagged = check_moderation(
@@ -478,6 +488,9 @@ def request_connection():
         connection_id = data.get('connection_id')
         connection_type = data.get('connection_type', 'pen_pal')
         message = sanitize_html(data.get('message', ''))
+
+        # Security: Sanitize message
+        message = sanitize_html(message)
 
         if not connection_id:
             return jsonify({'error': 'Connection ID required'}), 400
