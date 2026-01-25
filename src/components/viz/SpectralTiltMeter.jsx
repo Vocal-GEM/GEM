@@ -1,12 +1,13 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { Info, TrendingDown } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -6 } }) => {
     const { colorBlindMode } = useSettings();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
-    const canvasRef = useRef(null);
+    const componentId = useId();
 
     useEffect(() => {
         const loop = () => {
@@ -14,22 +15,11 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 const tilt = dataRef.current.tilt || 0;
 
                 // Map Tilt: Typically -20dB/oct (Masc/Steep?) to 0dB/oct (Flat/Bright?)
-                // Wait, spectral tilt:
-                // Steep tilt (more negative) = Feminine (breathy/fluty) or just less high freq energy?
-                // Actually:
-                // Masculine voices often have MORE high frequency energy (brassier) -> Flatter tilt (closer to 0 or -6dB/oct)
-                // Feminine voices often have STEEPER tilt (less high freq energy, softer) -> Steeper tilt (closer to -12dB/oct)
-                // BUT, "Bright" resonance usually means MORE high freq energy.
-                // Let's stick to the user request: "Feminine voices typically have steeper tilt (faster energy falloff)"
-                // So Fem target: -6 to -12 dB/octave? Wait, -12 is steeper than -6.
-                // Let's assume the range passed in is correct.
-
                 // Visualization Range: -24 dB/oct to 0 dB/oct
                 const minDisp = -24;
                 const maxDisp = 0;
 
                 // Normalize to 0-100%
-                // -24 -> 0%, 0 -> 100%
                 let percent = ((tilt - minDisp) / (maxDisp - minDisp)) * 100;
                 percent = Math.max(0, Math.min(100, percent));
 
@@ -38,7 +28,6 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 indicatorRef.current.style.left = `${nextLeft}%`;
 
                 // Color based on target range
-                // targetRange e.g. { min: -12, max: -6 }
                 const isWithinTarget = tilt >= targetRange.min && tilt <= targetRange.max;
 
                 if (isWithinTarget) {
@@ -53,19 +42,16 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
             // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'spectral-tilt-meter',
-                loop,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
+        const unsubscribe = renderCoordinator.subscribe(
+            `spectral-tilt-meter-${componentId}`,
+            loop,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
-    }, [dataRef, targetRange, colorBlindMode]);
+    }, [dataRef, targetRange, colorBlindMode, componentId]);
 
     return (
         <div className="glass-panel rounded-2xl p-6 h-full flex flex-col justify-center">
@@ -88,7 +74,6 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 <div className={`absolute inset-0 bg-gradient-to-r ${colorBlindMode ? 'from-purple-900/40 to-teal-500/10' : 'from-indigo-900/40 to-blue-500/10'}`}></div>
 
                 {/* Target Range Zone */}
-                {/* Map target range to percentage */}
                 {(() => {
                     const minDisp = -24;
                     const maxDisp = 0;

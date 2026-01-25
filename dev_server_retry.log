@@ -1,0 +1,31 @@
+
+> vocal-gem@0.1.0 dev /app
+> vite --port 3001
+
+Port 3001 is in use, trying another one...
+
+  VITE v5.4.21  ready in 384 ms
+
+  ➜  Local:   http://localhost:3002/
+  ➜  Network: use --host to expose
+7:11:30 AM [vite] Pre-transform error: Failed to resolve import "../../contexts/ProfileContext" from "src/components/viz/VoiceQualityAnalysis.jsx". Does the file exist?
+7:11:30 AM [vite] Internal server error: Failed to resolve import "../../contexts/ProfileContext" from "src/components/viz/VoiceQualityAnalysis.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/components/viz/VoiceQualityAnalysis.jsx:5:27
+  5  |  import { QuadCoreAnalysisService } from "../../services/QuadCoreAnalysisService";
+  6  |  import { renderCoordinator } from "../../services/RenderCoordinator";
+  7  |  import { useProfile } from "../../contexts/ProfileContext";
+     |                              ^
+  8  |  const QuadCoreCard = ({ icon: Icon, title, score, label, value, color, unit }) => /* @__PURE__ */ jsxDEV("div", { className: "bg-slate-800/50 rounded-xl p-3 border border-white/5 relative overflow-hidden group hover:bg-slate-800/80 transition-colors", children: [
+  9  |    /* @__PURE__ */ jsxDEV("div", { className: "flex items-center gap-2 mb-2 text-xs font-bold text-slate-400 uppercase tracking-widest", children: [
+      at TransformPluginContext._formatError (file:///app/node_modules/.pnpm/vite@5.4.21_@types+node@25.0.3_terser@5.44.1/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///app/node_modules/.pnpm/vite@5.4.21_@types+node@25.0.3_terser@5.44.1/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///app/node_modules/.pnpm/vite@5.4.21_@types+node@25.0.3_terser@5.44.1/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///app/node_modules/.pnpm/vite@5.4.21_@types+node@25.0.3_terser@5.44.1/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 5)
+      at async TransformPluginContext.transform (file:///app/node_modules/.pnpm/vite@5.4.21_@types+node@25.0.3_terser@5.44.1/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///app/node_modules/.pnpm/vite@5.4.21_@types+node@25.0.3_terser@5.44.1/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///app/node_modules/.pnpm/vite@5.4.21_@types+node@25.0.3_terser@5.44.1/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///app/node_modules/.pnpm/vite@5.4.21_@types+node@25.0.3_terser@5.44.1/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+7:12:02 AM [vite] page reload src/components/viz/QualityVisualizer.test.jsx
