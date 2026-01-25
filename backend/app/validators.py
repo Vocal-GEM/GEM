@@ -46,7 +46,7 @@ def validate_password(password):
 
 def sanitize_html(content):
     """
-    Sanitize HTML content using bleach
+    Sanitize HTML content using bleach.
     """
     if not content:
         return ""
@@ -69,11 +69,6 @@ def validate_email_address(email):
     except EmailNotValidError as e:
         return False, str(e)
 
-def validate_file_upload(filename, allowed_types=None, file_stream=None):
-    """
-    Validates file extension and content (magic numbers) against allowed types.
-    allowed_types: list of categories ('audio', 'image', 'document') or None for all.
-    file_stream: (optional) file object/stream to check magic numbers
 def validate_magic_number(file_stream, ext):
     """
     Validate file content using magic numbers for common types.

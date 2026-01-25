@@ -603,6 +603,349 @@ export class VoiceAnalyzer {
         const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
         return slope; // dB per decade (roughly)
     }
+
+    /**
+     * Get VVD-compatible metrics from analysis results
+     * Combines pitch, formants, and HNR into VVD format for L1 distance calculation
+     * @param {Float32Array} samples - Audio samples
+     * @param {number} sampleRate - Sample rate
+     * @returns {Object} VVD-compatible metrics
+     */
+    getVVDMetrics(samples, sampleRate) {
+        const frameResults = this.analyzeFrame(samples, sampleRate);
+
+        // Calculate average formant from F1-F3
+        const avgFormant = this.calculateAverageFormantFreq(frameResults.formants);
+
+        // Get weight classification from HNR
+        const hnr = frameResults.hnr;
+        let weightLevel = 'medium';
+        let weightDescription = 'Balanced';
+
+        if (hnr !== null) {
+            if (hnr >= 17) {
+                weightLevel = 'low';
+                weightDescription = 'Light/Breathy';
+            } else if (hnr < 13) {
+                weightLevel = 'high';
+                weightDescription = 'Heavy/Pressed';
+            }
+        }
+
+        return {
+            pitch: frameResults.pitch?.mean || null,
+            avgFormant: avgFormant || null,
+            hnr: hnr,
+            formants: frameResults.formants,
+            weightLevel: weightLevel,
+            weightDescription: weightDescription,
+            // Include raw metrics for reference
+            jitter: frameResults.jitter,
+            shimmer: frameResults.shimmer,
+            cpps: frameResults.cpps,
+            intensity: frameResults.intensity
+        };
+    }
+
+    /**
+     * Calculate ABI (Acoustic Breathiness Index)
+     * Based on da Cruz Martinho et al. (2024) / Barsties v. Latoszek et al. (2017)
+     * Higher ABI = more breathiness
+     * 
+     * @param {Float32Array} samples - Audio samples
+     * @param {number} sampleRate - Sample rate
+     * @returns {Object} { score, level, isBreathy }
+     */
+    calculateABI(samples, sampleRate) {
+        // Get component measures
+        const cpps = this.calculateCPPS(samples, sampleRate);
+        const jitter = this.estimateJitter(samples, sampleRate) || 0;
+        const shimmer = this.estimateShimmer(samples, sampleRate) || 0;
+        const hnr = this.estimateHNR(samples, sampleRate) || 0;
+
+        // Simplified ABI formula based on available measures
+        // Original uses GNE, H1-H2, PSD which require additional analysis
+        // This approximation uses the key available components
+        const abiScore = 4.786
+            - (0.194 * cpps)
+            + (0.265 * jitter)
+            + (0.035 * shimmer)
+            - (0.05 * hnr);
+
+        // Clamp to 0-10 range
+        const clampedScore = Math.max(0, Math.min(10, abiScore));
+
+        // Cutoff from literature: ABI > 3.51 indicates significant breathiness
+        const cutoff = 3.51;
+
+        return {
+            score: Math.round(clampedScore * 100) / 100,
+            level: clampedScore < 2 ? 'minimal' : clampedScore < cutoff ? 'mild' : clampedScore < 5 ? 'moderate' : 'significant',
+            isBreathy: clampedScore >= cutoff,
+            percentile: Math.round((clampedScore / 10) * 100)
+        };
+    }
+
+    /**
+     * Calculate AVQI (Acoustic Voice Quality Index)
+     * Based on Barsties & Maryn (2016) AVQI v03.01
+     * Higher AVQI = more voice quality deviation
+     * 
+     * @param {Float32Array} samples - Audio samples
+     * @param {number} sampleRate - Sample rate
+     * @returns {Object} { score, level, hasDeviation }
+     */
+    calculateAVQI(samples, sampleRate) {
+        // Get component measures
+        const cpps = this.calculateCPPS(samples, sampleRate);
+        const hnr = this.estimateHNR(samples, sampleRate) || 0;
+        const shimmer = this.estimateShimmer(samples, sampleRate) || 0;
+        const spectral = this.calculateSpectralFeatures(samples, sampleRate);
+
+        // Calculate spectral slope and tilt from LTAS
+        const slope = this.calculateSpectralSlope(spectral.spectrum, sampleRate);
+
+        // AVQI formula (simplified - original uses SL, SLdB, Slope, Tilt)
+        // Using available measures as approximation
+        const avqiScore = 4.152
+            - (0.177 * cpps)
+            - (0.006 * hnr)
+            + (0.044 * shimmer)
+            - (0.009 * slope);
+
+        // Clamp to 0-10 range
+        const clampedScore = Math.max(0, Math.min(10, avqiScore));
+
+        // Cutoff: AVQI > 2.95 indicates voice quality deviation
+        const cutoff = 2.95;
+
+        return {
+            score: Math.round(clampedScore * 100) / 100,
+            level: clampedScore < 2 ? 'normal' : clampedScore < cutoff ? 'mild' : clampedScore < 5 ? 'moderate' : 'significant',
+            hasDeviation: clampedScore >= cutoff,
+            percentile: Math.round((clampedScore / 10) * 100)
+        };
+    }
+
+    /**
+     * Calculate Coefficient of Variation of Intensity (cvint)
+     * Measures prosodic expressiveness - higher values = more dynamic speech
+     * 
+     * @param {Float32Array} samples - Audio samples
+     * @param {number} sampleRate - Sample rate
+     * @returns {Object} { cvint, level, description }
+     */
+    calculateCvint(samples, sampleRate) {
+        const windowSize = Math.floor(sampleRate * 0.05); // 50ms windows
+        const intensities = [];
+
+        for (let i = 0; i < samples.length - windowSize; i += windowSize) {
+            const window = samples.slice(i, i + windowSize);
+            let sum = 0;
+            for (let j = 0; j < window.length; j++) {
+                sum += window[j] * window[j];
+            }
+            const rms = Math.sqrt(sum / window.length);
+            if (rms > 0.001) { // Exclude silence
+                intensities.push(20 * Math.log10(rms + 1e-10));
+            }
+        }
+
+        if (intensities.length < 3) {
+            return { cvint: null, level: 'unknown', description: 'Insufficient data' };
+        }
+
+        // Calculate coefficient of variation
+        const mean = intensities.reduce((a, b) => a + b, 0) / intensities.length;
+        const variance = intensities.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / intensities.length;
+        const std = Math.sqrt(variance);
+        const cvint = (std / Math.abs(mean)) * 100; // As percentage
+
+        // Classify expressiveness
+        let level, description;
+        if (cvint < 5) {
+            level = 'monotone';
+            description = 'Very flat/monotone';
+        } else if (cvint < 10) {
+            level = 'low';
+            description = 'Limited variation';
+        } else if (cvint < 20) {
+            level = 'moderate';
+            description = 'Natural variation';
+        } else {
+            level = 'high';
+            description = 'Very expressive';
+        }
+
+        return {
+            cvint: Math.round(cvint * 100) / 100,
+            level,
+            description
+        };
+    }
+
+    /**
+     * Calculate F0 Peakwidth
+     * Measures the width of the pitch distribution (range used during speech)
+     * 
+     * @param {Float32Array} samples - Audio samples
+     * @param {number} sampleRate - Sample rate
+     * @returns {Object} { peakwidth, semitones, level }
+     */
+    calculateF0Peakwidth(samples, sampleRate) {
+        const pitchSeries = this.extractPitchSeries(samples, sampleRate);
+        const validPitches = pitchSeries
+            .filter(p => p.frequency !== null && p.confidence > 0.5)
+            .map(p => p.frequency);
+
+        if (validPitches.length < 5) {
+            return { peakwidth: null, semitones: null, level: 'unknown' };
+        }
+
+        // Calculate percentiles for robust width estimate
+        const sorted = [...validPitches].sort((a, b) => a - b);
+        const p10 = sorted[Math.floor(sorted.length * 0.1)];
+        const p90 = sorted[Math.floor(sorted.length * 0.9)];
+
+        const peakwidth = p90 - p10;
+        const semitones = 12 * Math.log2(p90 / p10);
+
+        // Classify pitch range
+        let level;
+        if (semitones < 3) {
+            level = 'narrow';
+        } else if (semitones < 6) {
+            level = 'moderate';
+        } else if (semitones < 12) {
+            level = 'wide';
+        } else {
+            level = 'very_wide';
+        }
+
+        return {
+            peakwidth: Math.round(peakwidth * 10) / 10,
+            semitones: Math.round(semitones * 10) / 10,
+            level,
+            p10,
+            p90
+        };
+    }
+
+    /**
+     * Get comprehensive metrics for multi-dimensional visualization
+     * Returns all measures needed for VoiceRadarChart and perception analysis
+     * Based on da Cruz Martinho et al. (2024) findings
+     * 
+     * @param {Float32Array} samples - Audio samples
+     * @param {number} sampleRate - Sample rate
+     * @returns {Object} Comprehensive metrics object
+     */
+    getComprehensiveMetrics(samples, sampleRate) {
+        const frameResults = this.analyzeFrame(samples, sampleRate);
+        const vvdMetrics = this.getVVDMetrics(samples, sampleRate);
+        const abi = this.calculateABI(samples, sampleRate);
+        const avqi = this.calculateAVQI(samples, sampleRate);
+        const cvint = this.calculateCvint(samples, sampleRate);
+        const f0Peakwidth = this.calculateF0Peakwidth(samples, sampleRate);
+        const speechRate = this.calculateSpeechRate(samples, sampleRate, samples.length / sampleRate);
+
+        // Normalize values to 0-100 for radar chart
+        const normalized = {
+            pitch: frameResults.pitch ? Math.min(100, Math.max(0, ((frameResults.pitch.mean - 80) / 220) * 100)) : 50,
+            breathiness: abi.percentile,
+            voiceQuality: 100 - avqi.percentile, // Invert so higher = better quality
+            expressiveness: cvint.cvint ? Math.min(100, cvint.cvint * 5) : 50,
+            stability: frameResults.jitter ? Math.max(0, 100 - frameResults.jitter * 20) : 50,
+            resonance: vvdMetrics.avgFormant ? Math.min(100, ((vvdMetrics.avgFormant - 1500) / 500) * 100) : 50
+        };
+
+        return {
+            // Raw metrics
+            raw: {
+                pitch: frameResults.pitch,
+                formants: frameResults.formants,
+                avgFormant: vvdMetrics.avgFormant,
+                hnr: frameResults.hnr,
+                jitter: frameResults.jitter,
+                shimmer: frameResults.shimmer,
+                cpps: frameResults.cpps,
+                intensity: frameResults.intensity,
+                speechRate
+            },
+            // Multivariate indices
+            indices: {
+                abi,
+                avqi,
+                l1Distance: vvdMetrics
+            },
+            // Prosodic features
+            prosody: {
+                cvint,
+                f0Peakwidth,
+                speechRate
+            },
+            // Normalized for radar chart (0-100)
+            normalized,
+            // Classification summary
+            summary: {
+                pitchLevel: vvdMetrics.pitchLevel || 'medium',
+                breathinessLevel: abi.level,
+                voiceQualityLevel: avqi.level,
+                expressivenessLevel: cvint.level,
+                weightLevel: vvdMetrics.weightLevel
+            }
+        };
+    }
+
+    /**
+     * Calculate statistical metrics for pitch series
+     * Standard deviation is a key marker for gender perception (high variance ~ feminine)
+     * @param {Array} pitchSeries - Array of pitch objects { frequency, confidence, time }
+     * @returns {Object} { mean, median, stdev, range }
+     */
+    calculatePitchStatistics(pitchSeries) {
+        // Filter valid pitch points
+        const validPitches = pitchSeries
+            .filter(p => p.frequency !== null && p.confidence > 0.5)
+            .map(p => p.frequency)
+            .sort((a, b) => a - b);
+
+        if (validPitches.length === 0) {
+            return {
+                mean: 0,
+                median: 0,
+                stdev: 0,
+                min: 0,
+                max: 0
+            };
+        }
+
+        // Mean
+        const sum = validPitches.reduce((a, b) => a + b, 0);
+        const mean = sum / validPitches.length;
+
+        // Median
+        const mid = Math.floor(validPitches.length / 2);
+        const median = validPitches.length % 2 !== 0
+            ? validPitches[mid]
+            : (validPitches[mid - 1] + validPitches[mid]) / 2;
+
+        // Standard Deviation
+        const squareDiffs = validPitches.map(value => {
+            const diff = value - mean;
+            return diff * diff;
+        });
+        const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / validPitches.length;
+        const stdev = Math.sqrt(avgSquareDiff);
+
+        return {
+            mean: Math.round(mean),
+            median: Math.round(median),
+            stdev: Math.round(stdev),
+            min: Math.round(validPitches[0]),
+            max: Math.round(validPitches[validPitches.length - 1])
+        };
+    }
 }
 
 
