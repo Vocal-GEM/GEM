@@ -13,6 +13,11 @@ describe('LoadingSpinner', () => {
     // It should have role="status"
     const spinner = screen.getByRole('status');
     expect(spinner).toBeInTheDocument();
+    expect(spinner).toHaveAttribute('aria-live', 'polite');
+
+    // It should have a visually hidden label "Loading..." by default
+    const srText = screen.getByText('Loading...');
+    expect(spinner).toBeInTheDocument();
 
     // It should have aria-live="polite"
     expect(spinner).toHaveAttribute('aria-live', 'polite');

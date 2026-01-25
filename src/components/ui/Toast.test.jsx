@@ -27,13 +27,17 @@ describe('Toast Component', () => {
     vi.useRealTimers();
   });
 
+  it('renders with correct message', () => {
+    render(<Toast message="Test Message" onClose={() => {}} />);
+    expect(screen.getByText("Test Message")).toBeInTheDocument();
   it("renders message correctly", () => {
     render(<Toast message="Test message" onClose={() => {}} />);
     expect(screen.getByText("Test message")).toBeInTheDocument();
   });
 
-  it("calls onClose after duration", () => {
+  it('calls onClose after duration', () => {
     const onClose = vi.fn();
+    render(<Toast message="Test Message" onClose={onClose} duration={3000} />);
     render(<Toast message="Test message" onClose={onClose} duration={3000} />);
     render(<Toast message="Test" onClose={onClose} duration={3000} />);
 
@@ -44,6 +48,11 @@ describe('Toast Component', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('calls onClose when close button is clicked', () => {
+    const onClose = vi.fn();
+    render(<Toast message="Test Message" onClose={onClose} />);
+
+    const closeButton = screen.getByRole('button', { name: /close notification/i });
   it('has accessible role for error', () => {
     render(<Toast message="Error" type="error" onClose={() => {}} />);
     const alert = screen.getByRole('alert');
@@ -124,14 +133,22 @@ describe('Toast Component', () => {
 
   it('has correct accessibility attributes for warning type', () => {
     render(<Toast message="Warning!" type="warning" onClose={() => {}} />);
-  it("has correct accessibility attributes for error type", () => {
-    render(<Toast message="Error occurred" type="error" onClose={() => {}} />);
-  it('has correct accessibility attributes for error type', () => {
-    render(<Toast message="Error occurred" type="error" onClose={() => {}} />);
 
     const alert = screen.getByRole('alert');
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveAttribute('aria-live', 'assertive');
+    expect(alert).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText('Warning:')).toHaveClass('sr-only');
+  });
+
+  it('has correct accessibility attributes for info type', () => {
+    render(<Toast message="Info!" type="info" onClose={() => {}} />);
+
+    const status = screen.getByRole('status');
+    expect(status).toBeInTheDocument();
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText('Information:')).toHaveClass('sr-only');
     expect(screen.getByText('Warning:')).toHaveClass('sr-only');
   });
 
@@ -191,6 +208,8 @@ describe('Toast Component', () => {
 
   it("applies custom className", () => {
     render(<Toast message="Test" className="custom-class" onClose={() => {}} />);
+    const toast = screen.getByRole('status');
+    expect(toast).toHaveClass('custom-class');
     const toast = screen.getByRole("status");
     expect(toast).toHaveClass("custom-class");
   });

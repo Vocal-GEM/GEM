@@ -1,5 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -190,6 +191,23 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
     current: "border-current opacity-30",
   };
 
+  // Determine container classes based on size
+  // 'sm' and 'xs' are treated as "inline/compact" mode by default
+  const isSmall = size === 'sm' || size === 'xs';
+
+  const containerBase = 'flex items-center justify-center';
+  const containerSize = isSmall
+    ? 'inline-flex w-auto h-auto min-h-0'
+    : 'w-full h-full min-h-[200px]';
+
+  // Define color styles based on variant
+  // 'default' matches original hardcoded colors (slate track, blue spinner)
+  // 'current' uses currentColor for flexible styling (e.g. inside buttons)
+  const isCurrent = variant === 'current';
+  const trackColor = isCurrent
+    ? 'border-current opacity-20'
+    : 'border-slate-700 opacity-20';
+  const spinnerColor = isCurrent ? 'border-t-current' : 'border-t-blue-500';
   // For 'sm', we usually want inline or small container.
   // For other sizes, default to the original min-height, but allow override via className
   const containerClass = size === "sm" ? "h-auto min-h-0 inline-flex" : "h-full min-h-[200px] flex";
@@ -243,6 +261,9 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
               trackColor,
               borderThickness[size] || borderThickness.md
             )
+          )}
+        ></div>
+        {/* Spinning segment - matches text color */}
           className={clsx(
             "absolute top-0 left-0 w-full h-full rounded-full border-slate-700 opacity-20",
             borderThickness[size] || borderThickness.md,

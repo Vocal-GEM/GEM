@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { X, CheckCircle, AlertTriangle, Info, XCircle } from 'lucide-react';
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 const Toast = ({ message, type = 'success', onClose, duration = 3000 }) => {
   useEffect(() => {
@@ -92,6 +94,8 @@ const Toast = ({ message, type = 'success', onClose, duration = 3000 }) => {
       <button
         onClick={onClose}
         className={clsx(
+          'ml-2 hover:opacity-70 p-1 rounded-full transition-opacity',
+          'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-current',
           'ml-2 hover:opacity-70 p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-current',
           style.text
         )}

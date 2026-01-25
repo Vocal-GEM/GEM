@@ -59,6 +59,7 @@ const QuickActions = ({ onAction }) => {
                         className="flex items-center justify-end gap-3 group focus-visible:outline-none"
                         style={{ transitionDelay: `${index * 50}ms` }}
                         aria-label={action.label}
+                        aria-hidden={!isOpen}
                     >
                         <span
                             className="bg-slate-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg border border-slate-700 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity"
@@ -83,6 +84,7 @@ const QuickActions = ({ onAction }) => {
             {/* Main FAB */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
+                className={`w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-white transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-teal-500/50 ${isOpen ? 'bg-slate-700 rotate-45' : 'bg-gradient-to-r from-teal-500 to-violet-500 hover:shadow-teal-500/30'}`}
                 className={`w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal-500/50 ${isOpen ? 'bg-slate-700 rotate-45' : 'bg-gradient-to-r from-teal-500 to-violet-500 hover:shadow-teal-500/30'}`}
                 className={twMerge(
                     "w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal-500/50",
@@ -93,6 +95,7 @@ const QuickActions = ({ onAction }) => {
                 aria-expanded={isOpen}
                 aria-controls="quick-actions-menu"
                 aria-haspopup="true"
+                aria-controls="quick-actions-menu"
             >
                 <Plus size={28} />
             </button>

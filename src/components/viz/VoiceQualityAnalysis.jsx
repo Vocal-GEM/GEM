@@ -1,3 +1,4 @@
+import React, { useEffect, useRef, useState, useId, useCallback } from 'react';
 import { useEffect, useRef, useState, useId, useCallback } from 'react';
 import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
 import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
@@ -130,6 +131,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
         return () => {
             if (unsubscribe) unsubscribe();
         };
+    }, [isAudioActive, componentId, updateAnalysis]);
     }, [isAudioActive, componentId, dataRef]);
     }, [isAudioActive, componentId, analyze]);
 
