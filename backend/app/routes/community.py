@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 import os
 import secrets
 import hashlib
+from ..validators import validate_file_upload
 from werkzeug.utils import secure_filename
 from ..validators import validate_file_upload, sanitize_html
 
@@ -94,6 +95,7 @@ def share_voice():
         audio_file = request.files['audio']
 
         # Security: Validate file type
+        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
         is_valid, error = validate_file_upload(
             audio_file.filename, allowed_types=['audio'], file_stream=audio_file)
         if not is_valid:
