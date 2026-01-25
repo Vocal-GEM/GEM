@@ -18,6 +18,11 @@ describe('LoadingSpinner', () => {
     // It should have a visually hidden label "Loading..." by default
     const srText = screen.getByText('Loading...');
     expect(spinner).toBeInTheDocument();
+    expect(spinner).toHaveAttribute('aria-live', 'polite');
+
+    // It should have a visually hidden label "Loading..." by default
+    const srText = screen.getByText('Loading...');
+    expect(spinner).toBeInTheDocument();
 
     // It should have aria-live="polite"
     expect(spinner).toHaveAttribute('aria-live', 'polite');
@@ -146,6 +151,9 @@ describe("LoadingSpinner", () => {
   it('uses inline layout for small sizes', () => {
     const { container, rerender } = render(<LoadingSpinner size="sm" />);
     expect(container.firstChild).toHaveClass('inline-flex');
+  });
+
+  it('renders with current color variant', () => {
 
     rerender(<LoadingSpinner size="xs" />);
     expect(container.firstChild).toHaveClass('inline-flex');
