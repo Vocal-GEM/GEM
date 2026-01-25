@@ -16,34 +16,13 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { voiceProfiles, activeProfile } = useProfile();
     const { colorBlindMode } = useSettings();
     const canvasRef = useRef(null);
-    const balloonRef = useRef(null);
-    const birdRef = useRef(null);
+
     // Cached dimensions to avoid getBoundingClientRect in loop
     const dimensionsRef = useRef({ width: 0, height: 0 });
-    const balloonRef = useRef(new Image());
-    const birdRef = useRef(new Image());
+
     const balloonRef = useRef(null);
     const birdRef = useRef(null);
 
-    // Lazy initialization
-    if (!balloonRef.current) {
-        balloonRef.current = new Image();
-    }
-    if (!birdRef.current) {
-        birdRef.current = new Image();
-    }
-
-    if (!balloonRef.current) balloonRef.current = new Image();
-    if (!birdRef.current) birdRef.current = new Image();
-
-    if (!balloonRef.current) {
-        balloonRef.current = new Image();
-    }
-    const birdRef = useRef(null);
-    if (!birdRef.current) {
-        birdRef.current = new Image();
-    }
-    const birdRef = useRef(null);
     const gameRef = useRef({ score: 0, lastUpdate: Date.now(), lastPitch: 0 });
 
     const [zoomRange, setZoomRange] = useState({ min: 50, max: 350 });
@@ -57,11 +36,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { settings: feedbackSettings, setSettings: setFeedbackSettings } = useFeedback(audioEngineRef, dataRef);
 
     useEffect(() => {
-        // Optimized: Lazy initialization of Image objects to avoid creating them on every render
-        if (!balloonRef.current) balloonRef.current = new Image();
-        if (!birdRef.current) birdRef.current = new Image();
-        balloonRef.current.src = '/assets/balloon.png';
-        birdRef.current.src = '/assets/bird.png';
+        // Lazy initialization of Image objects
         if (!balloonRef.current) {
             balloonRef.current = new Image();
             balloonRef.current.src = '/assets/balloon.png';
@@ -260,7 +235,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
         };
 
         const loop = () => {
-            // ... (context init omitted, assumes mostly unchanged logic till drawing) ...
             if (!canvas) return;
 
             // Use cached dimensions - huge performance win
@@ -270,7 +244,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             // Clear using cached logical dimensions
             ctx.clearRect(0, 0, width, height);
 
-            // ... (grid drawing lines 114-133 omitted) ...
             const yMin = zoomRange.min;
             const yMax = zoomRange.max;
             const mapY = (freq) => height - ((freq - yMin) / (yMax - yMin)) * height;
@@ -293,7 +266,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             ctx.stroke();
 
             const showNorms = settings?.showNorms !== false;
-            const mode = settings?.genderFeedbackMode || 'neutral';
 
             if (showNorms && mode !== 'off') {
                 let genderId = null;
@@ -417,7 +389,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     if (i % 150 === 0) {
                         const birdY = y + (Math.sin(i + now / 100) * 20);
                         if (birdRef.current && birdRef.current.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
-                        if (birdRef.current?.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
                     }
                 }
                 ctx.stroke(); ctx.setLineDash([]);
@@ -426,7 +397,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 if (currentPitch > 0) {
                     const playerY = mapY(currentPitch);
                     if (balloonRef.current && balloonRef.current.complete) {
-                    if (balloonRef.current?.complete) {
                         ctx.drawImage(balloonRef.current, width - 60, playerY - 25, 50, 50);
                     } else {
                         ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(width - 40, playerY, 15, 0, Math.PI * 2); ctx.fill();
@@ -503,8 +473,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 }
             }
             flush();
-            // Optimized: Removed the dot-drawing loop (history.forEach) which caused O(N) arc/fill calls.
-            // The line itself provides sufficient visual feedback.
 
             ctx.shadowBlur = 0;
             const currentP = history[history.length - 1];
@@ -566,8 +534,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             }
 
             // IN-FORMANT UPGRADE: Draw Formants if visible
-            // Formants F1 (300-1000) and F2 (800-2500) might be above the pitch view (defaults 50-350), 
-            // but if user zooms out, we should see them.
             if (dataRef.current.formants) {
                 const { f1, f2 } = dataRef.current.formants;
                 if (f1 > 0 && f1 > yMin && f1 < yMax) {
