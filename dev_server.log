@@ -3,10 +3,13 @@
 > vite --port 3001
 
 
+  VITE v5.4.21  ready in 400 ms
   VITE v5.4.21  ready in 383 ms
 
   ➜  Local:   http://localhost:3001/
   ➜  Network: use --host to expose
+7:24:40 AM [vite] page reload src/main.jsx
+7:24:58 AM [vite] hmr update /src/verification/ComponentsVerification.jsx, /src/index.css
 7:08:58 AM [vite] Pre-transform error: /app/src/components/ui/LoadingSpinner.jsx: 'import' and 'export' may only appear at the top level. (56:0)
 
   54 |     </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { clsx } from 'clsx';
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -79,6 +80,9 @@ const LoadingSpinner = ({
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
+  // For 'sm' and 'xs', we usually want inline or small container.
+  // For other sizes, default to the original min-height, but allow override via className
+  const isSmall = size === 'sm' || size === 'xs';
 const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading...", className }) => {
   // Size controls dimensions
   const dimensions = {
@@ -143,6 +147,13 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
     },
   };
 
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className={twMerge(clsx(containerBase, containerSize, className))}
+    >
+      <div
   const selectedVariant = variants[variant] || variants.default;
   // Variants control colors
   const variants = {
@@ -226,6 +237,12 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
       >
         {/* Track circle */}
         <div
+          className={twMerge(
+            clsx(
+              'absolute top-0 left-0 w-full h-full rounded-full',
+              trackColor,
+              borderThickness[size] || borderThickness.md
+            )
           className={clsx(
             "absolute top-0 left-0 w-full h-full rounded-full border-slate-700 opacity-20",
             borderThickness[size] || borderThickness.md,
@@ -246,6 +263,12 @@ const LoadingSpinner = ({ size = "md", variant = "default", label = "Loading..."
         ></div>
         {/* Spinning segment */}
         <div
+          className={twMerge(
+            clsx(
+              'absolute top-0 left-0 w-full h-full border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin',
+              spinnerColor,
+              borderThickness[size] || borderThickness.md
+            )
           className={clsx(
             "absolute top-0 left-0 w-full h-full border-t-blue-500 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin",
             borderThickness[size] || borderThickness.md,

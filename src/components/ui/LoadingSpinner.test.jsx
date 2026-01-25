@@ -1,3 +1,7 @@
+import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
+import LoadingSpinner from "./LoadingSpinner";
+import React from "react";
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import LoadingSpinner from './LoadingSpinner';
@@ -35,6 +39,9 @@ describe("LoadingSpinner", () => {
     render(<LoadingSpinner />);
     const spinner = screen.getByRole("status");
     expect(spinner).toBeInTheDocument();
+    expect(spinner).toHaveAttribute("aria-live", "polite");
+
+    // It should have a visually hidden label "Loading..." by default
 
     // Check for aria-live="polite" (default)
     expect(spinner).toHaveAttribute('aria-live', 'polite');
@@ -47,6 +54,9 @@ describe("LoadingSpinner", () => {
 
   it("renders with custom label", () => {
     render(<LoadingSpinner label="Processing data..." />);
+    expect(screen.getByText("Processing data...")).toBeInTheDocument();
+  });
+
     // The label is what gives the region its accessible name or description
     expect(screen.getByLabelText('Processing data...')).toBeInTheDocument();
     expect(screen.getByText('Processing data...')).toBeInTheDocument();
@@ -103,6 +113,18 @@ describe("LoadingSpinner", () => {
   });
 
   it("renders with different sizes", () => {
+    const { rerender } = render(<LoadingSpinner size="sm" />);
+    expect(screen.getByRole("status")).toBeInTheDocument();
+
+    rerender(<LoadingSpinner size="xl" />);
+    expect(screen.getByRole("status")).toBeInTheDocument();
+  });
+
+  it("uses inline layout for small size", () => {
+    const { container } = render(<LoadingSpinner size="sm" />);
+    expect(container.firstChild).toHaveClass("inline-flex");
+  });
+
     const { rerender, container } = render(<LoadingSpinner size="xs" />);
     expect(screen.getByRole("status")).toBeInTheDocument();
     // xs should be inline-flex
@@ -127,7 +149,7 @@ describe("LoadingSpinner", () => {
   it("renders with current color variant", () => {
     const { container } = render(<LoadingSpinner variant="current" />);
     // Check if the spinner segment uses border-t-current
-    const spinnerSegment = container.querySelector('.border-t-current');
+    const spinnerSegment = container.querySelector(".border-t-current");
     expect(spinnerSegment).toBeInTheDocument();
 
     // Check if the track uses border-current
