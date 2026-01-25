@@ -1,74 +1,116 @@
-import { render, screen, act } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent, act } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import Toast from "./Toast";
+import React from "react";
 
 describe("Toast Component", () => {
-  it("renders the message", () => {
+import { render, screen, fireEvent, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import Toast from './Toast';
+import React from 'react';
+
+// Mock lucide-react icons to avoid rendering issues
+vi.mock('lucide-react', () => ({
+  CheckCircle: (props) => <div data-testid="icon-check" {...props} />,
+  XCircle: (props) => <div data-testid="icon-error" {...props} />,
+  AlertTriangle: (props) => <div data-testid="icon-warning" {...props} />,
+  Info: (props) => <div data-testid="icon-info" {...props} />,
+  X: (props) => <div data-testid="icon-close" {...props} />,
+}));
+
+describe('Toast Component', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('renders with correct message', () => {
+    render(<Toast message="Test Message" onClose={() => {}} />);
+    expect(screen.getByText("Test Message")).toBeInTheDocument();
+  it("renders message correctly", () => {
     render(<Toast message="Test message" onClose={() => {}} />);
     expect(screen.getByText("Test message")).toBeInTheDocument();
   });
 
-  it("has appropriate role for error", () => {
-    render(<Toast message="Error message" type="error" onClose={() => {}} />);
-    const toast = screen.getByRole("alert");
-    expect(toast).toBeInTheDocument();
-    expect(toast).toHaveTextContent("Error message");
-  });
-
-  it("has appropriate role for success", () => {
-    render(
-      <Toast message="Success message" type="success" onClose={() => {}} />,
-    );
-    const toast = screen.getByRole("status");
-    expect(toast).toBeInTheDocument();
-    expect(toast).toHaveTextContent("Success message");
-  });
-
-  it("close button has aria-label", () => {
-    render(<Toast message="Test" onClose={() => {}} />);
-    const closeButton = screen.getByRole("button", { name: /close/i });
-    expect(closeButton).toBeInTheDocument();
-  });
-
-  it("calls onClose after duration", () => {
-    vi.useFakeTimers();
-    const onClose = vi.fn();
-    render(<Toast message="Test" onClose={onClose} duration={3000} />);
-import { render, screen, fireEvent, act } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import Toast from './Toast';
-
-describe('Toast Component', () => {
-  it('renders with correct message', () => {
-    render(<Toast message="Test Message" onClose={() => {}} />);
-    expect(screen.getByText('Test Message')).toBeInTheDocument();
-  });
-
   it('calls onClose after duration', () => {
-    vi.useFakeTimers();
     const onClose = vi.fn();
     render(<Toast message="Test Message" onClose={onClose} duration={3000} />);
+    render(<Toast message="Test message" onClose={onClose} duration={3000} />);
+    render(<Toast message="Test" onClose={onClose} duration={3000} />);
 
     act(() => {
       vi.advanceTimersByTime(3000);
     });
 
     expect(onClose).toHaveBeenCalled();
-    vi.useRealTimers();
   });
 
   it('calls onClose when close button is clicked', () => {
     const onClose = vi.fn();
     render(<Toast message="Test Message" onClose={onClose} />);
 
-    // Currently targeting by finding the button inside the toast
-    // Since we don't have aria-label yet, we might need to find by role 'button'
-    const closeButton = screen.getByRole('button');
+    const closeButton = screen.getByRole('button', { name: /close notification/i });
+  it('has accessible role for error', () => {
+    render(<Toast message="Error" type="error" onClose={() => {}} />);
+    const alert = screen.getByRole('alert');
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute('aria-live', 'assertive');
+    expect(alert).toHaveAttribute('aria-atomic', 'true');
+  });
+
+  it('has accessible role for success', () => {
+    render(<Toast message="Success" type="success" onClose={() => {}} />);
+    const status = screen.getByRole('status');
+    expect(status).toBeInTheDocument();
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).toHaveAttribute('aria-atomic', 'true');
+  });
+
+  it('close button has accessible label', () => {
+    const onClose = vi.fn();
+    render(<Toast message="Test" onClose={onClose} />);
+
+    const button = screen.getByRole('button', { name: /close notification/i });
+    expect(button).toBeInTheDocument();
+  it('calls onClose when close button is clicked', () => {
+    const onClose = vi.fn();
+  it('has correct accessibility attributes for success', () => {
+    render(<Toast message="Success" type="success" onClose={() => {}} />);
+    const toast = screen.getByRole('status');
+    expect(toast).toBeInTheDocument();
+    expect(toast).toHaveAttribute('aria-live', 'polite');
+    expect(toast).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText('Success:')).toHaveClass('sr-only');
+  });
+
+  it('has correct accessibility attributes for error', () => {
+    render(<Toast message="Error" type="error" onClose={() => {}} />);
+    const toast = screen.getByRole('alert');
+    expect(toast).toBeInTheDocument();
+    expect(toast).toHaveAttribute('aria-live', 'assertive');
+    expect(toast).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText('Error:')).toHaveClass('sr-only');
+  it("calls onClose when close button is clicked", () => {
+    const onClose = vi.fn();
+    render(<Toast message="Test Message" onClose={onClose} />);
+
+    const closeButton = screen.getByRole("button", {
+      name: /close notification/i,
+    });
     fireEvent.click(closeButton);
     expect(onClose).toHaveBeenCalled();
   });
 
-  // Accessibility tests - These are expected to fail currently
+  it("has correct accessibility attributes for success", () => {
+    render(<Toast message="Success" type="success" onClose={() => {}} />);
+    const toast = screen.getByRole("status");
+    expect(toast).toBeInTheDocument();
+    expect(toast).toHaveAttribute("aria-live", "polite");
+    expect(toast).toHaveAttribute("aria-atomic", "true");
+    expect(screen.getByText("Success:")).toHaveClass("sr-only");
   it('has correct accessibility attributes for error type', () => {
     render(<Toast message="Error occurred" type="error" onClose={() => {}} />);
 
@@ -76,6 +118,7 @@ describe('Toast Component', () => {
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveAttribute('aria-live', 'assertive');
     expect(alert).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText('Error:')).toHaveClass('sr-only');
   });
 
   it('has correct accessibility attributes for success type', () => {
@@ -85,45 +128,89 @@ describe('Toast Component', () => {
     expect(status).toBeInTheDocument();
     expect(status).toHaveAttribute('aria-live', 'polite');
     expect(status).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText('Success:')).toHaveClass('sr-only');
   });
 
-  it('close button has accessible label', () => {
-    render(<Toast message="Test" onClose={() => {}} />);
+  it('has correct accessibility attributes for warning type', () => {
+    render(<Toast message="Warning!" type="warning" onClose={() => {}} />);
 
-    // This should fail if aria-label is missing
-    expect(screen.getByLabelText('Close')).toBeInTheDocument();
+    const alert = screen.getByRole('alert');
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute('aria-live', 'assertive');
+    expect(alert).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText('Warning:')).toHaveClass('sr-only');
   });
-/* eslint-env jest */
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import Toast from './Toast';
 
-describe('Toast', () => {
-    it('should render the message', () => {
-        render(<Toast message="Hello World" onClose={() => {}} />);
-        expect(screen.getByText('Hello World')).toBeInTheDocument();
-    });
+  it('has correct accessibility attributes for info type', () => {
+    render(<Toast message="Info!" type="info" onClose={() => {}} />);
 
-    it('should have role="status" for info type by default', () => {
-        render(<Toast message="Info" type="info" onClose={() => {}} />);
-        expect(screen.getByRole('status')).toBeInTheDocument();
-    });
+    const status = screen.getByRole('status');
+    expect(status).toBeInTheDocument();
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText('Information:')).toHaveClass('sr-only');
+    expect(screen.getByText('Warning:')).toHaveClass('sr-only');
+  });
 
-    it('should have role="alert" for error type', () => {
-        render(<Toast message="Error" type="error" onClose={() => {}} />);
-        expect(screen.getByRole('alert')).toBeInTheDocument();
-    });
+  it('has correct accessibility attributes for info type', () => {
+    render(<Toast message="Info!" type="info" onClose={() => {}} />);
+    expect(alert).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText('Error:')).toHaveClass('sr-only');
+  });
 
-    it('should have a close button with aria-label', () => {
-        render(<Toast message="Close me" onClose={() => {}} />);
-        const button = screen.getByRole('button');
-        expect(button).toHaveAttribute('aria-label', 'Close notification');
-    });
+  it('has correct accessibility attributes for success type', () => {
+    render(<Toast message="Success!" type="success" onClose={() => {}} />);
 
-    it('should call onClose when close button is clicked', () => {
-        const onClose = vi.fn();
-        render(<Toast message="Close me" onClose={onClose} />);
-        fireEvent.click(screen.getByRole('button'));
-        expect(onClose).toHaveBeenCalled();
-    });
+    const status = screen.getByRole('status');
+    expect(status).toBeInTheDocument();
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText('Success:')).toHaveClass('sr-only');
+  });
+
+  it('icons are hidden from screen readers', () => {
+    render(<Toast message="Test" type="success" onClose={() => {}} />);
+    const icon = screen.getByTestId('icon-check');
+    expect(icon).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByText('Information:')).toHaveClass('sr-only');
+  });
+
+    expect(status).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText('Success:')).toHaveClass('sr-only');
+  });
+
+  it("has correct accessibility attributes for error", () => {
+    render(<Toast message="Error" type="error" onClose={() => {}} />);
+    const toast = screen.getByRole("alert");
+    expect(toast).toBeInTheDocument();
+    expect(toast).toHaveAttribute("aria-live", "assertive");
+    expect(toast).toHaveAttribute("aria-atomic", "true");
+    expect(screen.getByText("Error:")).toHaveClass("sr-only");
+  });
+
+  it("has correct accessibility attributes for warning", () => {
+    render(<Toast message="Warning" type="warning" onClose={() => {}} />);
+    const toast = screen.getByRole("alert");
+    expect(toast).toBeInTheDocument();
+    expect(toast).toHaveAttribute("aria-live", "assertive");
+    expect(toast).toHaveAttribute("aria-atomic", "true");
+    expect(screen.getByText("Warning:")).toHaveClass("sr-only");
+  });
+
+  it("has correct accessibility attributes for info", () => {
+    render(<Toast message="Info" type="info" onClose={() => {}} />);
+    const toast = screen.getByRole("status");
+    expect(toast).toBeInTheDocument();
+    expect(toast).toHaveAttribute("aria-live", "polite");
+    expect(toast).toHaveAttribute("aria-atomic", "true");
+    expect(screen.getByText("Information:")).toHaveClass("sr-only");
+  });
+
+  it("applies custom className", () => {
+    render(<Toast message="Test" className="custom-class" onClose={() => {}} />);
+    const toast = screen.getByRole('status');
+    expect(toast).toHaveClass('custom-class');
+    const toast = screen.getByRole("status");
+    expect(toast).toHaveClass("custom-class");
+  });
 });
