@@ -1,68 +1,79 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { useAudio } from './context/AudioContext';
 import { useSettings } from './context/SettingsContext';
-import { useAuth } from './context/AuthContext';
 import { useProfile } from './context/ProfileContext';
 import { useStats } from './context/StatsContext';
 import { useJournal } from './context/JournalContext';
 import { useNavigation } from './context/NavigationContext';
 import { LanguageProvider } from './context/LanguageContext';
-import { TourProvider } from './context/TourContext';
-import { useVoiceProfile } from './context/VoiceProfileContext';
-import { useOnboarding } from './hooks/useOnboarding';
-import { useAchievements } from './hooks/useAchievements';
-import { analyticsService } from './services/AnalyticsService';
-
+import { FEATURES } from './config/featureFlags';
 import MigrationModal from './components/ui/MigrationModal';
 import { AnalyticsDashboardV2 } from './components/analytics/AnalyticsDashboardV2';
 import JournalForm from './components/ui/JournalForm';
-import Login from './components/ui/Login';
-import Signup from './components/ui/Signup';
-import UserProfile from './components/ui/UserProfile';
 import VocalHealthTips from './components/ui/VocalHealthTips';
 import AssessmentModule from './components/ui/AssessmentModule';
 import WarmUpModule from './components/ui/WarmUpModule';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 import FloatingCamera from './components/ui/FloatingCamera';
 import OfflineIndicator from './components/ui/OfflineIndicator';
+
+// Lazy Loaded Components - UI
+const Sidebar = lazy(() => import('./components/layout/Sidebar'));
+const DashboardView = lazy(() => import('./components/views/DashboardView'));
+
+const ClinicalAssessmentView = lazy(() => import('./components/views/ClinicalAssessmentView'));
+
+
+const CAPEVAssessment = lazy(() => import('./components/professional/CAPEVAssessment'));
+const ClientDashboard = lazy(() => import('./components/professional/ClientDashboard'));
+const SpectrogramComparison = lazy(() => import('./components/professional/SpectrogramComparison'));
+
+const SettingsView = lazy(() => import('./components/views/SettingsView'));
+const AnalysisHub = lazy(() => import('./components/views/AnalysisHub'));
+const LearnView = lazy(() => import('./components/views/LearnView'));
+
+const TutorialWizard = lazy(() => import('./components/ui/TutorialWizard'));
+const CompassWizard = lazy(() => import('./components/ui/CompassWizard'));
+const CalibrationWizard = lazy(() => import('./components/ui/CalibrationWizard'));
+const HistoryView = lazy(() => import('./components/ui/HistoryView'));
+const GlossaryView = lazy(() => import('./components/views/GlossaryView'));
+const VoiceJournalView = lazy(() => import('./components/views/VoiceJournalView'));
+const ProgressDashboard = lazy(() => import('./components/views/ProgressDashboard'));
+const PracticeMode = lazy(() => import('./components/views/PracticeMode'));
+const ExerciseLibraryView = lazy(() => import('./components/views/ExerciseLibraryView'));
+
+const AdaptivePracticeSession = lazy(() => import('./components/views/AdaptivePracticeSession'));
+const GuidedJourney = lazy(() => import('./components/ui/GuidedJourney'));
+const PracticeCardsPanel = lazy(() => import('./components/ui/PracticeCardsPanel'));
+const ProgramView = lazy(() => import('./components/views/ProgramView'));
+
+// Lazy Loaded Components - Visualizations
+// Lazy Loaded Components - Visualizations
+
 import FeedbackSettings from './components/ui/FeedbackSettings';
 import FeedbackModal from './components/ui/FeedbackModal';
 import BottomNav from './components/ui/BottomNav';
 import CelebrationModal from './components/ui/CelebrationModal';
 import ErrorRecovery from './components/ui/ErrorRecovery';
+import { useOnboarding } from './hooks/useOnboarding';
+import { useAchievements } from './hooks/useAchievements';
+
+
+
+import { TourProvider } from './context/TourContext';
 import TourOverlay from './components/ui/TourOverlay';
+
 import CommandPalette from './components/ui/CommandPalette';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
 import QuickSettings from './components/ui/QuickSettings';
+import { analyticsService } from './services/AnalyticsService';
+import { useVoiceProfile } from './context/VoiceProfileContext';
 import IntakeQuestionnaire from './components/ui/IntakeQuestionnaire';
+import Breadcrumbs from './components/ui/Breadcrumbs';
 
-// Lazy Loaded Components - UI
-const Sidebar = lazy(() => import('./components/layout/Sidebar'));
-const DashboardView = lazy(() => import('./components/views/DashboardView'));
-const ClinicalAssessmentView = lazy(() => import('./components/views/ClinicalAssessmentView'));
-const CAPEVAssessment = lazy(() => import('./components/professional/CAPEVAssessment'));
-const ClientDashboard = lazy(() => import('./components/professional/ClientDashboard'));
-const SpectrogramComparison = lazy(() => import('./components/professional/SpectrogramComparison'));
-const SettingsView = lazy(() => import('./components/views/SettingsView'));
-const AnalysisHub = lazy(() => import('./components/views/AnalysisHub'));
-const LearnView = lazy(() => import('./components/views/LearnView'));
-const TutorialWizard = lazy(() => import('./components/ui/TutorialWizard'));
-const CompassWizard = lazy(() => import('./components/ui/CompassWizard'));
-const CalibrationWizard = lazy(() => import('./components/ui/CalibrationWizard'));
-const HistoryView = lazy(() => import('./components/ui/HistoryView'));
-const CoachView = lazy(() => import('./components/views/CoachView'));
-const GlossaryView = lazy(() => import('./components/views/GlossaryView'));
-const VoiceJournalView = lazy(() => import('./components/views/VoiceJournalView'));
-const ProgressDashboard = lazy(() => import('./components/views/ProgressDashboard'));
-const CommunityHub = lazy(() => import('./components/views/CommunityHub'));
-const ResearchView = lazy(() => import('./components/views/ResearchView'));
-const PracticeMode = lazy(() => import('./components/views/PracticeMode'));
-const ExerciseLibraryView = lazy(() => import('./components/views/ExerciseLibraryView'));
-const AdaptivePracticeSession = lazy(() => import('./components/views/AdaptivePracticeSession'));
-const GuidedJourney = lazy(() => import('./components/ui/GuidedJourney'));
-const PracticeCardsPanel = lazy(() => import('./components/ui/PracticeCardsPanel'));
-const ProgramView = lazy(() => import('./components/views/ProgramView'));
-const MarketplaceView = lazy(() => import('./components/views/MarketplaceView'));
+// VoiceTwinDiscovery is not used in App directly, it's a widget in Dashboard
+// But if we want it accessible elsewhere we can import it. 
+// For now removing the unused import line causing confusion.
 
 const App = () => {
     const { profile, loading: voiceLoading } = useVoiceProfile();
@@ -75,13 +86,49 @@ const App = () => {
         }
     }, [voiceLoading, profile]);
 
-    const { audioEngineRef, dataRef, audioError } = useAudio();
-    const { settings, updateSettings, showSettings, setShowSettings } = useSettings();
-    const { user, logout } = useAuth();
-    const { calibration, updateCalibration, targetRange, updateTargetRange, switchProfile, showCalibration, setShowCalibration } = useProfile();
-    const { stats, goals } = useStats();
-    const { journals, addJournalEntry, showJournalForm, setShowJournalForm } = useJournal();
-    const { activeView: activeTab, navigate: setActiveTab, modals, openModal, closeModal } = useNavigation();
+    const {
+        audioEngineRef,
+        dataRef,
+        audioError
+    } = useAudio();
+
+    const {
+        settings,
+        updateSettings,
+        showSettings,
+        setShowSettings
+    } = useSettings();
+
+
+    const {
+        calibration,
+        updateCalibration,
+        targetRange,
+        updateTargetRange,
+        switchProfile,
+        showCalibration,
+        setShowCalibration
+    } = useProfile();
+
+    const {
+        stats,
+        goals
+    } = useStats();
+
+    const {
+        journals,
+        addJournalEntry,
+        showJournalForm,
+        setShowJournalForm
+    } = useJournal();
+
+    const {
+        activeView: activeTab,
+        navigate: setActiveTab,
+        modals,
+        openModal,
+        closeModal
+    } = useNavigation();
 
     const [dismissedError, setDismissedError] = useState(false);
 
@@ -90,26 +137,32 @@ const App = () => {
         analyticsService.init(settings.analyticsEnabled);
     }, [settings.analyticsEnabled]);
 
-    const showLogin = modals.login;
-    const setShowLogin = (v) => v ? openModal('login') : closeModal('login');
-    const showSignup = modals.signup;
-    const setShowSignup = (v) => v ? openModal('signup') : closeModal('signup');
-    const showProfile = modals.profile;
-    const setShowProfile = (v) => v ? openModal('profile') : closeModal('profile');
+
+
+
     const showCamera = modals.camera;
     const setShowCamera = (v) => v ? openModal('camera') : closeModal('camera');
+
+
+
     const showMigration = modals.migration;
     const setShowMigration = (v) => v ? openModal('migration') : closeModal('migration');
+
     const showVocalHealthTips = modals.vocalHealth;
     const setShowVocalHealthTips = (v) => v ? openModal('vocalHealth') : closeModal('vocalHealth');
+
     const showAssessment = modals.assessment;
     const setShowAssessment = (v) => v ? openModal('assessment') : closeModal('assessment');
+
     const showTutorial = modals.tutorial;
     const setShowTutorial = (v) => v ? openModal('tutorial') : closeModal('tutorial');
+
     const showCompass = modals.compass;
     const setShowCompass = (v) => v ? openModal('compass') : closeModal('compass');
+
     const showWarmUp = modals.warmup;
     const setShowWarmUp = (v) => v ? openModal('warmup') : closeModal('warmup');
+
 
     // Onboarding hooks
     const { unlockedAchievement, closeAchievement } = useAchievements();
@@ -141,7 +194,7 @@ const App = () => {
                 </a>
 
                 <div className="flex min-h-screen bg-black text-white font-sans selection:bg-blue-500/30">
-                    <Suspense fallback={<LoadingSpinner />}>
+                    <Suspense fallback={null}>
                         <Sidebar activeView={activeTab} onViewChange={setActiveTab} />
                     </Suspense>
 
@@ -153,6 +206,10 @@ const App = () => {
                     />
 
                     <main id="main-content" className="flex-1 w-full lg:ml-64 p-0 pb-20 lg:pb-0">
+                        <div className="px-4 pt-4 lg:px-8 lg:pt-8">
+                            <Breadcrumbs />
+                        </div>
+
                         {activeTab === 'dashboard' && (
                             <Suspense fallback={<LoadingSpinner />}>
                                 <DashboardView
@@ -183,7 +240,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'analysis' && (
+                        {FEATURES.analysis && activeTab === 'analysis' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <AnalysisHub dataRef={dataRef} targetRange={targetRange} />
@@ -191,7 +248,9 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'learn' && (
+
+
+                        {FEATURES.learn && activeTab === 'learn' && (
                             <Suspense fallback={<LoadingSpinner />}>
                                 <LearnView />
                             </Suspense>
@@ -203,7 +262,7 @@ const App = () => {
                             </Suspense>
                         )}
 
-                        {activeTab === 'program' && (
+                        {FEATURES.program && activeTab === 'program' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <ProgramView onNavigate={setActiveTab} />
@@ -211,7 +270,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'history' && (
+                        {FEATURES.history && activeTab === 'history' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <HistoryView stats={stats} journals={journals} onLogClick={() => setShowJournalForm(true)} />
@@ -219,15 +278,8 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'coach' && (
-                            <div className="p-4 lg:p-8">
-                                <Suspense fallback={<LoadingSpinner />}>
-                                    <CoachView />
-                                </Suspense>
-                            </div>
-                        )}
 
-                        {activeTab === 'library' && (
+                        {FEATURES.library && activeTab === 'library' && (
                             <div className="h-full">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <ExerciseLibraryView />
@@ -235,7 +287,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'glossary' && (
+                        {FEATURES.glossary && activeTab === 'glossary' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <GlossaryView />
@@ -243,7 +295,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'journal' && (
+                        {FEATURES.journal && activeTab === 'journal' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <VoiceJournalView />
@@ -251,7 +303,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'progress' && (
+                        {FEATURES.progress && activeTab === 'progress' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <ProgressDashboard />
@@ -259,39 +311,19 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'community' && (
-                            <div className="p-4 lg:p-8">
-                                <Suspense fallback={<LoadingSpinner />}>
-                                    <CommunityHub />
-                                </Suspense>
-                            </div>
-                        )}
 
-                        {activeTab === 'analytics' && (
+                        {FEATURES.analytics && activeTab === 'analytics' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
+                                    {/* Tier 7: Advanced Analytics */}
                                     <AnalyticsDashboardV2 />
                                 </Suspense>
                             </div>
                         )}
 
-                        {activeTab === 'research' && (
-                            <div className="p-4 lg:p-8">
-                                <Suspense fallback={<LoadingSpinner />}>
-                                    <ResearchView />
-                                </Suspense>
-                            </div>
-                        )}
 
-                        {activeTab === 'marketplace' && (
-                            <div className="h-full">
-                                <Suspense fallback={<LoadingSpinner />}>
-                                    <MarketplaceView />
-                                </Suspense>
-                            </div>
-                        )}
 
-                        {activeTab === 'assessment' && (
+                        {FEATURES.assessment && activeTab === 'assessment' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <ClinicalAssessmentView />
@@ -299,7 +331,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'capev' && (
+                        {FEATURES.capev && activeTab === 'capev' && (
                             <div className="p-4 lg:p-8">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <CAPEVAssessment />
@@ -307,7 +339,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'client-dashboard' && (
+                        {FEATURES['client-dashboard'] && activeTab === 'client-dashboard' && (
                             <div className="h-full">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <ClientDashboard />
@@ -315,7 +347,7 @@ const App = () => {
                             </div>
                         )}
 
-                        {activeTab === 'spectrogram' && (
+                        {FEATURES.spectrogram && activeTab === 'spectrogram' && (
                             <div className="h-full">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <SpectrogramComparison />
@@ -350,7 +382,6 @@ const App = () => {
                                 const url = URL.createObjectURL(blob);
                                 const a = document.createElement('a'); a.href = url; a.download = 'vocal-gem-data.json'; a.click();
                             }}
-                            user={user}
                         />
 
                         <FeedbackModal
@@ -360,6 +391,7 @@ const App = () => {
 
                         {showMigration && <MigrationModal onComplete={() => setShowMigration(false)} />}
 
+                        {/* Onboarding Wizards */}
                         {
                             (showTutorial || showCompass || showCalibration) && (
                                 <button
@@ -410,14 +442,12 @@ const App = () => {
                             )
                         }
 
-                        {showLogin && <Login onSwitchToSignup={() => { setShowLogin(false); setShowSignup(true); }} onClose={() => setShowLogin(false)} />}
-                        {showSignup && <Signup onSwitchToLogin={() => { setShowSignup(false); setShowLogin(true); }} onClose={() => setShowSignup(false)} />}
-                        {showProfile && <UserProfile user={user} onClose={() => setShowProfile(false)} onLogout={() => { logout(); setShowProfile(false); }} />}
                         {showVocalHealthTips && <VocalHealthTips onClose={() => setShowVocalHealthTips(false)} />}
                         {showAssessment && <AssessmentModule onClose={() => setShowAssessment(false)} />}
                         {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}
 
                         <TourOverlay />
+                        <CommandPalette />
                         <CommandPalette />
                         <QuickSettings isOpen={false} onClose={() => { }} />
                         {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
@@ -433,8 +463,7 @@ const App = () => {
                             <Suspense fallback={<LoadingSpinner />}>
                                 <GuidedJourney onClose={() => closeModal('guidedJourney')} />
                             </Suspense>
-                        )}
-                        {modals.practiceCards && (
+                        )}                        {modals.practiceCards && (
                             <Suspense fallback={<LoadingSpinner />}>
                                 <PracticeCardsPanel onClose={() => closeModal('practiceCards')} />
                             </Suspense>
@@ -447,13 +476,14 @@ const App = () => {
                     </div>
                 </div>
             </LanguageProvider>
-
             {/* Global Overlays */}
             <OfflineIndicator />
             <CelebrationModal
                 achievement={unlockedAchievement}
                 onClose={closeAchievement}
             />
+            <TourOverlay />
+            <ErrorRecovery />
             {showIntake && (
                 <IntakeQuestionnaire
                     onComplete={() => {
@@ -463,7 +493,7 @@ const App = () => {
                     onClose={() => setShowIntake(false)}
                 />
             )}
-        </TourProvider>
+        </TourProvider >
     );
 };
 

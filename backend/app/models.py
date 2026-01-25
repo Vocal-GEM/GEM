@@ -73,105 +73,83 @@ class KnowledgeDocument(db.Model):
     embedding = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Community Models (Tier 6)
-
+# Shared Voice Sample (Tier 10 - Community)
 class SharedVoiceSample(db.Model):
-    """Anonymized voice samples shared with the community"""
     id = db.Column(db.Integer, primary_key=True)
-    share_id = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    share_id = db.Column(db.String(64), unique=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     audio_path = db.Column(db.String(255), nullable=False)
-    context = db.Column(db.String(255))  # e.g., "3 months progress"
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    expires_at = db.Column(db.DateTime, nullable=False)
+    context = db.Column(db.String(255))
     view_count = db.Column(db.Integer, default=0)
     is_active = db.Column(db.Boolean, default=True)
+    expires_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+# Success Story (Tier 10 - Community)
 class SuccessStory(db.Model):
-    """User success stories with before/after samples"""
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     title = db.Column(db.String(255), nullable=False)
     story = db.Column(db.Text, nullable=False)
     timeline_months = db.Column(db.Integer)
-    voice_goal = db.Column(db.String(50))  # 'feminine', 'masculine', 'androgynous'
+    voice_goal = db.Column(db.String(50))
     before_audio = db.Column(db.String(255))
     after_audio = db.Column(db.String(255))
-    consent_public = db.Column(db.Boolean, default=False)
-    approved = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     upvotes = db.Column(db.Integer, default=0)
-    techniques_used = db.Column(db.JSON)  # List of techniques
+    techniques_used = db.Column(db.JSON)
+    approved = db.Column(db.Boolean, default=False)
+    consent_public = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+# User Connection (Tier 10 - Community)
 class UserConnection(db.Model):
-    """Mentor and pen pal connections between users"""
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    connection_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    connection_type = db.Column(db.String(50), nullable=False)  # 'mentor', 'pen_pal'
-    status = db.Column(db.String(50), default='pending')  # 'pending', 'accepted', 'declined', 'blocked'
-    message = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) # Requester
+    connection_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) # Recipient
+    connection_type = db.Column(db.String(20)) # 'mentor', 'pen_pal'
+    message = db.Column(db.String(500))
+    status = db.Column(db.String(20), default='pending') # pending, accepted, declined
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     accepted_at = db.Column(db.DateTime)
-    
-    # Ensure unique connections
-    __table_args__ = (
-        db.UniqueConstraint('user_id', 'connection_id', 'connection_type', name='unique_connection'),
-    )
 
+# Group Challenge (Tier 10 - Community)
 class GroupChallenge(db.Model):
-    """Weekly group challenges with aggregate progress"""
     id = db.Column(db.Integer, primary_key=True)
-    challenge_id = db.Column(db.String(50), nullable=False)
-    week_number = db.Column(db.Integer, nullable=False)
-    participant_count = db.Column(db.Integer, default=0)
+    challenge_id = db.Column(db.String(50), unique=True, nullable=False) # e.g. 'week_42_pitch'
+    week_number = db.Column(db.Integer)
+    goal = db.Column(db.Integer) # Target total
     total_progress = db.Column(db.Integer, default=0)
-    goal = db.Column(db.Integer, nullable=False)
+    participant_count = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    __table_args__ = (
-        db.UniqueConstraint('challenge_id', 'week_number', name='unique_weekly_challenge'),
-    )
 
 class GroupChallengeParticipant(db.Model):
-    """Track individual participation in group challenges"""
     id = db.Column(db.Integer, primary_key=True)
     challenge_id = db.Column(db.Integer, db.ForeignKey('group_challenge.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     progress = db.Column(db.Integer, default=0)
-    joined_at = db.Column(db.DateTime, default=datetime.utcnow)
     completed = db.Column(db.Boolean, default=False)
-    
-    __table_args__ = (
-        db.UniqueConstraint('challenge_id', 'user_id', name='unique_participant'),
-    )
+    joined_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+# Moderation (Tier 10 - Community)
 class ModerationFlag(db.Model):
-    """Track flagged content for moderation"""
     id = db.Column(db.Integer, primary_key=True)
-    content_type = db.Column(db.String(50), nullable=False)  # 'story', 'post', 'comment'
-    content_id = db.Column(db.Integer, nullable=False)
-    flagged_by = db.Column(db.Integer, db.ForeignKey('user.id'))
-    reason = db.Column(db.String(255), nullable=False)
-    status = db.Column(db.String(50), default='pending')  # 'pending', 'reviewed', 'removed', 'approved'
+    content_type = db.Column(db.String(20)) # 'story', 'comment'
+    content_id = db.Column(db.Integer)
+    flagged_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # System or User
+    reason = db.Column(db.String(255))
+    status = db.Column(db.String(20), default='pending') # pending, resolved, dismissed
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    reviewed_at = db.Column(db.DateTime)
-    reviewed_by = db.Column(db.Integer, db.ForeignKey('user.id'))
-    notes = db.Column(db.Text)
 
+# Benchmarks (Tier 10 - Community)
 class CommunityBenchmark(db.Model):
-    """Aggregate statistics for community benchmarks"""
     id = db.Column(db.Integer, primary_key=True)
-    voice_goal = db.Column(db.String(50), nullable=False)  # 'feminine', 'masculine', 'androgynous'
-    experience_level = db.Column(db.String(50), nullable=False)  # 'beginner', 'intermediate', 'advanced'
-    metric_name = db.Column(db.String(100), nullable=False)  # 'avg_pitch', 'avg_resonance', etc.
-    metric_value = db.Column(db.Float, nullable=False)
-    sample_size = db.Column(db.Integer, default=0)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    __table_args__ = (
-        db.UniqueConstraint('voice_goal', 'experience_level', 'metric_name', name='unique_benchmark'),
-    )
+    voice_goal = db.Column(db.String(50))
+    experience_level = db.Column(db.String(20))
+    metric_name = db.Column(db.String(50)) # e.g. 'avg_pitch_hz'
+    metric_value = db.Column(db.Float)
+    sample_size = db.Column(db.Integer)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 # Voice Training Marketplace Models (Tier 10)
 
@@ -286,4 +264,3 @@ class NormativeVoiceData(db.Model):
     sample_size = db.Column(db.Integer, default=0)
     source_study = db.Column(db.String(100))  # Reference to source
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-

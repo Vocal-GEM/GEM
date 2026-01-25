@@ -5,6 +5,8 @@
  * voice characteristics, tracking progress, and personalizing the user experience.
  */
 
+import { calculateL1Distance, calculateProgressToGoal } from '../data/vvdReferenceData';
+
 /**
  * Creates a new voice profile with default values
  * @param {Object} options - Initial profile options
@@ -60,12 +62,19 @@ export const createVoiceProfile = (options = {}) => ({
         currentAverages: {
             pitch: options.progress?.currentAverages?.pitch || null,
             resonance: options.progress?.currentAverages?.resonance || null,
-            weight: options.progress?.currentAverages?.weight || null
+            weight: options.progress?.currentAverages?.weight || null,
+            hnr: options.progress?.currentAverages?.hnr || null // VVD-added
         },
         weeklyTrend: {
             pitch: options.progress?.weeklyTrend?.pitch || 0,
             resonance: options.progress?.weeklyTrend?.resonance || 0,
             weight: options.progress?.weeklyTrend?.weight || 0
+        },
+        // VVD L1 Distance tracking (0=feminine, 6=masculine)
+        l1Distance: {
+            current: options.progress?.l1Distance?.current || null,
+            target: options.progress?.l1Distance?.target || null,
+            progress: options.progress?.l1Distance?.progress || 0
         },
         estimatedTimeToGoal: {
             weeks: options.progress?.estimatedTimeToGoal?.weeks || null,
@@ -337,6 +346,64 @@ export const detectLearningStyle = (interactions) => {
     return { style, confidence };
 };
 
+/**
+ * Updates L1 distance progress based on current voice metrics
+ * Uses VVD reference data for calculation
+ * @param {Object} profile - Current voice profile
+ * @param {Object} metrics - Current voice metrics { pitch, avgFormant, hnr }
+ * @returns {Object} Updated progress with L1 distance
+ */
+export const updateL1Progress = (profile, metrics) => {
+    if (!metrics || (!metrics.pitch && !metrics.avgFormant && !metrics.hnr)) {
+        return profile.progress;
+    }
+
+    // Calculate current L1 distance
+    const l1Result = calculateL1Distance(
+        metrics.pitch || profile.progress.currentAverages.pitch || 150,
+        metrics.avgFormant || profile.progress.currentAverages.resonance || 1800,
+        metrics.hnr || profile.progress.currentAverages.hnr || 15
+    );
+
+    // Calculate target L1 based on voice goal
+    const targetL1 = profile.goals.voiceType === 'feminine' ? 0
+        : profile.goals.voiceType === 'masculine' ? 6 : 3;
+
+    // Calculate progress percentage (0-100)
+    const maxDistance = 6;
+    const distanceFromGoal = Math.abs(l1Result.l1Distance - targetL1);
+    const progressPercent = Math.round((1 - distanceFromGoal / maxDistance) * 100);
+
+    // Calculate overall progress using VVD reference
+    const vvdProgress = calculateProgressToGoal(
+        {
+            pitch: metrics.pitch || profile.progress.currentAverages.pitch || 150,
+            avgFormant: metrics.avgFormant || profile.progress.currentAverages.resonance || 1800,
+            hnr: metrics.hnr || profile.progress.currentAverages.hnr || 15
+        },
+        { voiceType: profile.goals.voiceType }
+    );
+
+    return {
+        ...profile.progress,
+        currentAverages: {
+            ...profile.progress.currentAverages,
+            hnr: metrics.hnr || profile.progress.currentAverages.hnr
+        },
+        l1Distance: {
+            current: l1Result.l1Distance,
+            target: targetL1,
+            progress: progressPercent,
+            label: l1Result.label,
+            pitchLevel: l1Result.pitchLevel,
+            resonanceLevel: l1Result.resonanceLevel,
+            weightLevel: l1Result.weightLevel,
+            isAboveFeminineThreshold: l1Result.isAboveFeminineThreshold,
+            vvdProgress: vvdProgress
+        }
+    };
+};
+
 // Utility functions
 const generateProfileId = () => {
     return `profile_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -372,6 +439,8 @@ export default {
     createVoiceProfile,
     analyzeBaseline,
     updateProgress,
+    updateL1Progress,
     assessSkillLevel,
     detectLearningStyle
 };
+
