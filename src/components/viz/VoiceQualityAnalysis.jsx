@@ -1,10 +1,4 @@
 import React, { useEffect, useRef, useState, useId, useCallback } from 'react';
-import { useEffect, useRef, useState, useId, useCallback } from 'react';
-import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
-import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
-import { renderCoordinator } from '../../services/RenderCoordinator';
-import { useProfile } from '../../contexts/ProfileContext';
-import { useEffect, useRef, useState, useId, useCallback } from 'react';
 import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
 import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -80,12 +74,7 @@ const FeedbackBanner = ({ feedback }) => {
 };
 
 const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioActive }) => {
-    const serviceRef = useRef(new QuadCoreAnalysisService());
     useProfile();
-
-    const serviceRef = useRef(new QuadCoreAnalysisService());
-    const [analysis, setAnalysis] = useState(null);
-    const componentId = useId();
 
     const serviceRef = useRef(null);
     useEffect(() => {
@@ -120,8 +109,6 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
             // Subscribe to RenderCoordinator instead of using internal RAF loop
             // Use LOW priority as this is UI analysis updates, not 60fps animation
             unsubscribe = renderCoordinator.subscribe(
-                `VoiceQualityAnalysis-${componentId}`,
-                updateAnalysis,
                 componentId,
                 analyze,
                 renderCoordinator.PRIORITY.LOW
@@ -131,8 +118,6 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
         return () => {
             if (unsubscribe) unsubscribe();
         };
-    }, [isAudioActive, componentId, updateAnalysis]);
-    }, [isAudioActive, componentId, dataRef]);
     }, [isAudioActive, componentId, analyze]);
 
     return (

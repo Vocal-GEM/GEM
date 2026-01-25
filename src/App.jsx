@@ -65,6 +65,7 @@ import TourOverlay from './components/ui/TourOverlay';
 
 import CommandPalette from './components/ui/CommandPalette';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
+import QuickActions from './components/ui/QuickActions';
 import QuickSettings from './components/ui/QuickSettings';
 import { analyticsService } from './services/AnalyticsService';
 import { useVoiceProfile } from './context/VoiceProfileContext';
@@ -448,7 +449,11 @@ const App = () => {
 
                         <TourOverlay />
                         <CommandPalette />
-                        <CommandPalette />
+                        <QuickActions onAction={(action) => {
+                            if (action === 'practice') setActiveTab('practice');
+                            if (action === 'journal') setShowJournalForm(true);
+                            if (action === 'warmup') openModal('warmup');
+                        }} />
                         <QuickSettings isOpen={false} onClose={() => { }} />
                         {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
                         {modals.analytics && <AnalyticsDashboard onClose={() => closeModal('analytics')} />}
