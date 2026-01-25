@@ -26,6 +26,10 @@ def sync_data():
     
     data = request.json
     queue = data.get('queue', [])
+
+    # Security: Limit queue size to prevent DoS
+    if len(queue) > 100:
+        return jsonify({"error": "Queue too large (max 100 items)"}), 400
     
     # Legacy support / Direct sync
     if not queue:
@@ -34,6 +38,11 @@ def sync_data():
         if 'journals' in data:
             for j in data['journals']:
                 queue.append({'type': 'JOURNAL_ADD', 'payload': j})
+
+    # Security: Limit queue size to prevent DoS
+    MAX_QUEUE_SIZE = 100
+    if len(queue) > MAX_QUEUE_SIZE:
+        return jsonify({"error": f"Queue size exceeds maximum limit of {MAX_QUEUE_SIZE}"}), 400
 
     processed_count = 0
     
@@ -128,6 +137,7 @@ def get_data():
 
 @data_bp.route('/upload', methods=['POST'])
 @login_required
+@limiter.limit("10 per minute")
 def upload_file():
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
@@ -136,7 +146,7 @@ def upload_file():
         return jsonify({"error": "No selected file"}), 400
     
     # Security: Validate file type
-    is_valid, error = validate_file_upload(file.filename)
+    is_valid, error = validate_file_upload(file.filename, file_stream=file)
     if not is_valid:
         return jsonify({"error": error}), 400
 

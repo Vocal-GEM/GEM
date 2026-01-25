@@ -21,3 +21,19 @@
 ## 2024-05-24 - Flexible Loading Component
 **Learning:** Hardcoding dimensions (like `min-h-[200px]`) in generic loading components restricts their reuse in smaller contexts (like buttons), leading to code duplication or hacky overrides.
 **Action:** Use `tailwind-merge` to provide sensible defaults but allow full overrides via `className`, enabling a single component to serve both full-page and inline loading needs.
+## 2026-01-03 - Component Corruption
+**Learning:** Multiple conflicting definitions within a single component file (likely from bad merges) can go unnoticed if the file exports the last definition, but it creates a maintainability nightmare and breaks tools.
+**Action:** Always check the entire file content when fixing a component, not just the function you are editing, to spot and clean up duplicate/conflicting code blocks.
+## 2024-05-24 - File Integrity and Accessibility
+**Learning:** Merge conflicts or copy-paste errors in foundational components (like `LoadingSpinner`) can lead to malformed code that might technically render but fail silently or be completely inaccessible.
+**Action:** When fixing "broken" components, treat it as an opportunity to audit and enforce accessibility standards (roles, labels) during the reconstruction, rather than just restoring the previous (potentially flawed) state.
+## 2024-05-22 - QuickActions Accessibility & Build Stabilization
+**Learning:** Invisible elements (opacity: 0) remain in the accessibility tree, confusing screen reader users. `pointer-events: none` does not prevent keyboard focus in all contexts.
+**Action:** Use `aria-hidden="true"` and `tabIndex={-1}` for visually hidden interactive elements, or `visibility: hidden` if layout allows.
+## 2025-05-20 - Loading Spinner Variants
+**Learning:** Button components often pass props like `variant` to their children (like `LoadingSpinner`), but if the child doesn't explicitly handle them, it breaks the visual consistency (e.g., blue spinner on blue button).
+**Action:** Ensure utility components like `LoadingSpinner` accept and handle context-aware props (like `variant="current"`) to inherit parent styles (e.g., using `currentColor`).
+
+## 2026-01-18 - Replacing Native Alerts
+**Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
+**Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.

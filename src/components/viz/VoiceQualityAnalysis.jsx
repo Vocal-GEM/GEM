@@ -1,7 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useId, useCallback } from 'react';
+import { useEffect, useRef, useState, useId, useCallback } from 'react';
 import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
-import { useProfile } from '../../context/ProfileContext';
 import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
+import { renderCoordinator } from '../../services/RenderCoordinator';
+import { useProfile } from '../../contexts/ProfileContext';
+import { useEffect, useRef, useState, useId, useCallback } from 'react';
+import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
+import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
+import { renderCoordinator } from '../../services/RenderCoordinator';
+import { useProfile } from '../../context/ProfileContext';
 
 const QuadCoreCard = ({ icon: Icon, title, score, label, value, color, unit }) => (
     <div className="bg-slate-800/50 rounded-xl p-3 border border-white/5 relative overflow-hidden group hover:bg-slate-800/80 transition-colors">
@@ -73,32 +80,60 @@ const FeedbackBanner = ({ feedback }) => {
 };
 
 const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioActive }) => {
-    const { targetRange } = useProfile();
+    const serviceRef = useRef(new QuadCoreAnalysisService());
+    useProfile();
+
     const serviceRef = useRef(new QuadCoreAnalysisService());
     const [analysis, setAnalysis] = useState(null);
-    const frameRef = useRef(null);
+    const componentId = useId();
+
+    const serviceRef = useRef(null);
+    useEffect(() => {
+        serviceRef.current = new QuadCoreAnalysisService();
+    }, []);
+    if (!serviceRef.current) {
+        serviceRef.current = new QuadCoreAnalysisService();
+    }
+
+    const [analysis, setAnalysis] = useState(null);
+
+    // Generate unique component ID for RenderCoordinator
+    const uniqueId = useId();
+    const componentId = `voice-quality-${uniqueId}`;
+
+    const analyze = useCallback(() => {
+        if (dataRef.current && isAudioActive && serviceRef.current) {
+            const results = serviceRef.current.analyze(dataRef.current, {
+                targetF2: 2000 // Default to neutral/chem until calibration is fuller
+            });
+
+            if (results) {
+                setAnalysis(results);
+            }
+        }
+    }, [dataRef, isAudioActive]);
 
     useEffect(() => {
-        const loop = () => {
-            if (dataRef.current && isAudioActive) {
-                const results = serviceRef.current.analyze(dataRef.current, {
-                    targetF2: 2000 // Default to neutral/chem until calibration is fuller
-                    // TODO: pull from calibration context if available
-                });
+        let unsubscribe;
 
-                if (results) {
-                    setAnalysis(results);
-                }
-            }
-            frameRef.current = requestAnimationFrame(loop);
-        };
-
-        if (isAudioActive) loop();
+        if (isAudioActive) {
+            // Subscribe to RenderCoordinator instead of using internal RAF loop
+            // Use LOW priority as this is UI analysis updates, not 60fps animation
+            unsubscribe = renderCoordinator.subscribe(
+                `VoiceQualityAnalysis-${componentId}`,
+                updateAnalysis,
+                componentId,
+                analyze,
+                renderCoordinator.PRIORITY.LOW
+            );
+        }
 
         return () => {
-            if (frameRef.current) cancelAnimationFrame(frameRef.current);
+            if (unsubscribe) unsubscribe();
         };
-    }, [isAudioActive, dataRef]);
+    }, [isAudioActive, componentId, updateAnalysis]);
+    }, [isAudioActive, componentId, dataRef]);
+    }, [isAudioActive, componentId, analyze]);
 
     return (
         <div className="bg-slate-900/50 rounded-2xl p-4 sm:p-6 border border-white/5 h-full flex flex-col">
