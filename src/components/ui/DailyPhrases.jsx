@@ -43,11 +43,13 @@ const DailyPhrases = ({ onComplete }) => {
                     placeholder="Type a phrase (e.g. 'One latte please')..."
                     className="flex-1 bg-slate-800 border border-slate-700 rounded-xl p-4 text-white focus:ring-2 focus:ring-purple-500 outline-none"
                     onKeyDown={(e) => e.key === 'Enter' && addPhrase(inputValue)}
+                    aria-label="New phrase"
                 />
                 <button
                     onClick={() => addPhrase(inputValue)}
                     disabled={!inputValue}
                     className="bg-purple-600 hover:bg-purple-500 text-white p-4 rounded-xl disabled:opacity-50"
+                    aria-label="Add phrase"
                 >
                     <Plus size={24} />
                 </button>
@@ -83,6 +85,7 @@ const DailyPhrases = ({ onComplete }) => {
                         <button
                             onClick={() => removePhrase(phrase)}
                             className="text-slate-500 hover:text-red-400 transition-colors"
+                            aria-label={`Remove phrase "${phrase}"`}
                         >
                             <Trash2 size={20} />
                         </button>

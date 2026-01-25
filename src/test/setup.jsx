@@ -222,6 +222,7 @@ vi.mock('lucide-react', () => {
         ThumbsDown: createIcon('thumbs-down'),
         ThumbsUp: createIcon('thumbs-up'),
         Timer: createIcon('timer'),
+        Trash2: createIcon('trash-2'),
         TrendingDown: createIcon('trending-down'),
         TrendingUp: createIcon('trending-up'),
         Trophy: createIcon('trophy'),
