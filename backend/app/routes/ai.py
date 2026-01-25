@@ -58,8 +58,8 @@ def train_coach():
         # Cleanup
         try:
             os.remove(temp_path)
-        except:
-            pass
+        except Exception as e:
+            print(f"Warning: Failed to cleanup temp file {temp_path}: {e}")
             
         return jsonify({"message": f"Successfully trained on {count} chunks from {filename}"})
 

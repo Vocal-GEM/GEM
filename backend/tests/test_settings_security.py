@@ -22,6 +22,7 @@ class TestSettingsSecurity(unittest.TestCase):
         # Setup a real Flask app for context
         self.app = Flask(__name__)
         self.app.config['SECRET_KEY'] = 'test'
+        self.app.register_blueprint(settings.settings_bp, url_prefix='/api/settings')
         self.app.register_blueprint(settings.settings_bp)
 
         self.login_manager = LoginManager()
@@ -43,6 +44,25 @@ class TestSettingsSecurity(unittest.TestCase):
     def tearDown(self):
         self.patcher_db.stop()
 
+    def test_update_settings_error_leakage(self):
+        """
+        Test that update_settings does NOT leak internal exception details.
+        """
+        payload = {"theme": "dark"}
+
+        # Setup login
+        mock_user = MagicMock()
+        mock_user.id = '123'
+        mock_user.is_authenticated = True
+        # Ensure user has settings
+        mock_settings = MagicMock()
+        mock_settings.preferences = {}
+        mock_user.settings = mock_settings
+
+        with patch('flask_login.utils._get_user', return_value=mock_user):
+            # Mock db.session.commit to raise an exception with sensitive info
+            sensitive_info = "Connection failed to database at 192.168.1.5:5432"
+            self.mock_db.session.commit.side_effect = Exception(sensitive_info)
     def test_update_settings_generic_error(self):
         """
         Test that update_settings returns a GENERIC error message on failure
@@ -62,6 +82,11 @@ class TestSettingsSecurity(unittest.TestCase):
                                     content_type='application/json')
 
             self.assertEqual(response.status_code, 500)
+
+            # Security Check: The sensitive info should NOT be in the response
+            # Currently this assertion is expected to FAIL until we fix the code
+            self.assertNotIn(sensitive_info, response.get_json()['error'])
+            self.assertEqual(response.get_json()['error'], "An error occurred while saving settings")
             data = json.loads(response.data)
 
             # SECURITY VERIFICATION:

@@ -296,6 +296,7 @@ def submit_success_story():
         if isinstance(techniques, list):
             clean_techniques = [sanitize_html(str(t)) for t in techniques]
 
+        # Moderation check
         title = sanitize_html(data.get('title', ''))
         story_content = sanitize_html(data.get('story', ''))
 
@@ -326,7 +327,6 @@ def submit_success_story():
             voice_goal=voice_goal,
             consent_public=data.get('consent_public', False),
             approved=is_safe,  # Auto-approve if passes moderation
-            techniques_used=techniques
             techniques_used=clean_techniques
         )
 
