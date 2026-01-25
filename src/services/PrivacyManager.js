@@ -6,12 +6,8 @@ const PRIVACY_KEY = 'gem_privacy_settings';
 
 const DEFAULT_SETTINGS = {
     shareProgress: false,
-    shareMilestones: false,
-    allowMentorMatch: false,
-    allowPenPals: false,
-    showInLeaderboards: true,
-    allowFeedback: false,
-    profileVisibility: 'private', // 'private', 'connections', 'public'
+    shareProgress: false,
+    showInLeaderboards: false,
     dataRetentionDays: 90
 };
 
@@ -79,23 +75,9 @@ class PrivacyManager {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        return true;
-    }
-
-    /**
-     * Request deletion of all shared content
-     */
-    async revokeAllSharedContent() {
-        // This would call backend to delete all SharedVoiceSample records
-        try {
-            // Mock backend call
-            // await fetch('/api/community/revoke-all', { method: 'POST' });
-            console.log('Revocation request sent');
-            return true;
-        } catch (e) {
-            return false;
-        }
     }
 }
+
+
 
 export default new PrivacyManager();

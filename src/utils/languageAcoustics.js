@@ -10,14 +10,26 @@ export const LANGUAGE_CONFIGS = {
         isTonal: false,
         stressTimed: true,
         pitchRange: {
-            feminine: { min: 165, max: 255, mean: 210 },
+            // Updated with VVD-validated thresholds (2024 Berkeley VVD study)
+            feminine: { min: 170, max: 290, mean: 260, threshold: 170 },
             masculine: { min: 85, max: 155, mean: 120 },
-            androgynous: { min: 145, max: 185, mean: 165 }
+            androgynous: { min: 145, max: 205, mean: 175 }
+        },
+        // VVD-validated HNR ranges for weight classification
+        hnrRange: {
+            light: { min: 17, max: 20, mean: 18.5 },     // Low weight (feminine)
+            balanced: { min: 13, max: 18, mean: 15.5 },  // Medium weight
+            heavy: { min: 10, max: 14, mean: 12 }        // High weight (masculine)
         },
         formants: {
             // General formant scaling factors relative to standard tube model
             scaleFactor: 1.0,
-            vowelSpace: 'central' // English vowels are relatively centralized
+            vowelSpace: 'central', // English vowels are relatively centralized
+            // VVD-validated formant ranges
+            f1: { min: 480, max: 740, mean: 600 },
+            f2: { min: 1695, max: 2100, mean: 1850 },
+            f3: { min: 2727, max: 3145, mean: 2920 },
+            avgFormant: { feminine: 1850, androgynous: 1800, masculine: 1750 }
         },
         phonemes: {
             // Key phonemes for analysis
