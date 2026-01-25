@@ -1,128 +1,299 @@
 
 > vocal-gem@0.1.0 dev /app
-> vite --port 3001
+> vite
 
 
-  VITE v5.4.21  ready in 400 ms
-  VITE v5.4.21  ready in 383 ms
+  VITE v5.4.21  ready in 817 ms
 
-  ➜  Local:   http://localhost:3001/
+  ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
-7:24:40 AM [vite] page reload src/main.jsx
-7:24:58 AM [vite] hmr update /src/verification/ComponentsVerification.jsx, /src/index.css
-7:08:58 AM [vite] Pre-transform error: /app/src/components/ui/LoadingSpinner.jsx: 'import' and 'export' may only appear at the top level. (56:0)
+7:40:10 AM [vite] Pre-transform error: /app/src/components/ui/LoadingSpinner.jsx: Identifier 'clsx' has already been declared. (4:9)
 
-  54 |     </div>
-  55 |   );
-> 56 | import { twMerge } from 'tailwind-merge';
-     | ^
-  57 | import clsx from 'clsx';
-  58 |
-  59 | const LoadingSpinner = ({
-7:08:58 AM [vite] Pre-transform error: /app/src/components/ui/Toast.jsx: JSX value should be either an expression or a quoted JSX text. (41:15)
+  2 | import { twMerge } from 'tailwind-merge';
+  3 | import { clsx } from 'clsx';
+> 4 | import { clsx } from 'clsx';
+    |          ^
+  5 | import { twMerge } from 'tailwind-merge';
+  6 | import clsx from "clsx";
+  7 | import { twMerge } from "tailwind-merge";
+7:40:10 AM [vite] Pre-transform error: /app/src/components/ui/Toast.jsx: Unexpected token, expected "," (23:6)
 
-  39 |       aria-live={ariaLive}
-  40 |   // UX/A11y Logic: Determine role and aria-live based on toast type
-> 41 |   const role = type === 'error' || type === 'warning' ? 'alert' : 'status';
-     |                ^
-  42 |   const ariaLive = role === 'alert' ? 'assertive' : 'polite';
-  43 |
-  44 |   return (
-7:09:00 AM [vite] Pre-transform error: /app/src/components/ui/LoadingSpinner.jsx: 'import' and 'export' may only appear at the top level. (56:0)
-
-  54 |     </div>
-  55 |   );
-> 56 | import { twMerge } from 'tailwind-merge';
-     | ^
-  57 | import clsx from 'clsx';
-  58 |
-  59 | const LoadingSpinner = ({
-7:09:00 AM [vite] Pre-transform error: /app/src/components/ui/LoadingSpinner.jsx: 'import' and 'export' may only appear at the top level. (56:0)
-
-  54 |     </div>
-  55 |   );
-> 56 | import { twMerge } from 'tailwind-merge';
-     | ^
-  57 | import clsx from 'clsx';
-  58 |
-  59 | const LoadingSpinner = ({
+  21 |       label: 'Success',
+  22 |       live: 'polite'
+> 23 |       live: 'polite',
+     |       ^
+  24 |       label: 'Success'
+  25 |     },
+  26 |     error: {
 Error:   Failed to scan for dependencies from entries:
   /app/index.html
 /app/ios/App/App/public/index.html
 
-  [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mUnexpected "{"[0m
+  [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "clsx" has already been declared[0m
 
-    src/components/ui/LoadingSpinner.jsx:56:7:
-[37m      56 │ import [32m{[37m twMerge } from 'tailwind-merge';
-         ╵        [32m^[0m
+    src/components/ui/LoadingSpinner.jsx:4:9:
+[37m      4 │ import { [32mclsx[37m } from 'clsx';
+        ╵          [32m~~~~[0m
 
+  The symbol "clsx" was originally declared here:
 
-[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected "{" but found "type"[0m
-
-    src/components/ui/Toast.jsx:41:15:
-[37m      41 │   const role = [32mtype[37m === 'error' || type === 'warning' ? 'alert' : ...
-         │                [32m~~~~[37m
-         ╵                [32m{[0m
+    src/components/ui/LoadingSpinner.jsx:3:9:
+[37m      3 │ import { [32mclsx[37m } from 'clsx';
+        ╵          [32m~~~~[0m
 
 
-[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useEffect" has already been declared[0m
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "twMerge" has already been declared[0m
 
-    src/components/viz/VoiceQualityAnalysis.jsx:2:9:
-[37m      2 │ import { [32museEffect[37m, useRef, useState, useId } from 'react';
-        ╵          [32m~~~~~~~~~[0m
+    src/components/ui/LoadingSpinner.jsx:5:9:
+[37m      5 │ import { [32mtwMerge[37m } from 'tailwind-merge';
+        ╵          [32m~~~~~~~[0m
 
-  The symbol "useEffect" was originally declared here:
+  The symbol "twMerge" was originally declared here:
 
-    src/components/viz/VoiceQualityAnalysis.jsx:1:9:
-[37m      1 │ import { [32museEffect[37m, useRef, useState, useId, useCallback } from 're...
-        ╵          [32m~~~~~~~~~[0m
+    src/components/ui/LoadingSpinner.jsx:2:9:
+[37m      2 │ import { [32mtwMerge[37m } from 'tailwind-merge';
+        ╵          [32m~~~~~~~[0m
 
 
-[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useRef" has already been declared[0m
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "clsx" has already been declared[0m
 
-    src/components/viz/VoiceQualityAnalysis.jsx:2:20:
-[37m      2 │ import { useEffect, [32museRef[37m, useState, useId } from 'react';
-        ╵                     [32m~~~~~~[0m
+    src/components/ui/LoadingSpinner.jsx:6:7:
+[37m      6 │ import [32mclsx[37m from "clsx";
+        ╵        [32m~~~~[0m
 
-  The symbol "useRef" was originally declared here:
+  The symbol "clsx" was originally declared here:
 
-    src/components/viz/VoiceQualityAnalysis.jsx:1:20:
-[37m      1 │ import { useEffect, [32museRef[37m, useState, useId, useCallback } from 're...
-        ╵                     [32m~~~~~~[0m
+    src/components/ui/LoadingSpinner.jsx:3:9:
+[37m      3 │ import { [32mclsx[37m } from 'clsx';
+        ╵          [32m~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "twMerge" has already been declared[0m
+
+    src/components/ui/LoadingSpinner.jsx:7:9:
+[37m      7 │ import { [32mtwMerge[37m } from "tailwind-merge";
+        ╵          [32m~~~~~~~[0m
+
+  The symbol "twMerge" was originally declared here:
+
+    src/components/ui/LoadingSpinner.jsx:2:9:
+[37m      2 │ import { [32mtwMerge[37m } from 'tailwind-merge';
+        ╵          [32m~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected ":" but found "{"[0m
+
+    src/components/ui/LoadingSpinner.jsx:12:7:
+[37m      12 │ import [32m{[37m twMerge } from 'tailwind-merge';
+         │        [32m^[37m
+         ╵        [32m:[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected "}" but found "live"[0m
+
+    src/components/ui/Toast.jsx:23:6:
+[37m      23 │       [32mlive[37m: 'polite',
+         │       [32m~~~~[37m
+         ╵       [32m}[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "React" has already been declared[0m
+
+    src/components/ui/button.jsx:45:7:
+[37m      45 │ import [32mReact[37m from 'react';
+         ╵        [32m~~~~~[0m
+
+  The symbol "React" was originally declared here:
+
+    src/components/ui/button.jsx:1:7:
+[37m      1 │ import [32mReact[37m from "react";
+        ╵        [32m~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "clsx" has already been declared[0m
+
+    src/components/ui/button.jsx:46:7:
+[37m      46 │ import [32mclsx[37m from 'clsx';
+         ╵        [32m~~~~[0m
+
+  The symbol "clsx" was originally declared here:
+
+    src/components/ui/button.jsx:2:7:
+[37m      2 │ import [32mclsx[37m from "clsx";
+        ╵        [32m~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "twMerge" has already been declared[0m
+
+    src/components/ui/button.jsx:47:9:
+[37m      47 │ import { [32mtwMerge[37m } from 'tailwind-merge';
+         ╵          [32m~~~~~~~[0m
+
+  The symbol "twMerge" was originally declared here:
+
+    src/components/ui/button.jsx:3:9:
+[37m      3 │ import { [32mtwMerge[37m } from "tailwind-merge";
+        ╵          [32m~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "LoadingSpinner" has already been declared[0m
+
+    src/components/ui/button.jsx:48:7:
+[37m      48 │ import [32mLoadingSpinner[37m from './LoadingSpinner';
+         ╵        [32m~~~~~~~~~~~~~~[0m
+
+  The symbol "LoadingSpinner" was originally declared here:
+
+    src/components/ui/button.jsx:4:7:
+[37m      4 │ import [32mLoadingSpinner[37m from "./LoadingSpinner";
+        ╵        [32m~~~~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "Button" has already been declared[0m
+
+    src/components/ui/button.jsx:50:6:
+[37m      50 │ const [32mButton[37m = React.forwardRef(
+         ╵       [32m~~~~~~[0m
+
+  The symbol "Button" was originally declared here:
+
+    src/components/ui/button.jsx:6:6:
+[37m      6 │ const [32mButton[37m = React.forwardRef(({ className, variant, size, asChil...
+        ╵       [32m~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mUnexpected closing "Comp" tag does not match opening fragment tag[0m
+
+    src/components/ui/button.jsx:143:8:
+[37m      143 │       </[32mComp[37m>
+          ╵         [32m~~~~[0m
+
+  The opening fragment tag is here:
+
+    src/components/ui/button.jsx:128:13:
+[37m      128 │             <[32m[37m>
+          ╵              [32m^[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected ")" but found ";"[0m
+
+    src/components/ui/button.jsx:144:5:
+[37m      144 │     )[32m;[37m
+          │      [32m^[37m
+          ╵      [32m)[0m
 
 
 [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useState" has already been declared[0m
 
-    src/components/viz/VoiceQualityAnalysis.jsx:2:28:
-[37m      2 │ import { useEffect, useRef, [32museState[37m, useId } from 'react';
-        ╵                             [32m~~~~~~~~[0m
+    src/components/viz/BrightnessMeter.jsx:2:9:
+[37m      2 │ import { [32museState[37m, useEffect, useId } from 'react';
+        ╵          [32m~~~~~~~~[0m
 
   The symbol "useState" was originally declared here:
 
-    src/components/viz/VoiceQualityAnalysis.jsx:1:28:
-[37m      1 │ import { useEffect, useRef, [32museState[37m, useId, useCallback } from 're...
-        ╵                             [32m~~~~~~~~[0m
+    src/components/viz/BrightnessMeter.jsx:1:9:
+[37m      1 │ import { [32museState[37m, useEffect, useRef, useId } from 'react';
+        ╵          [32m~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useEffect" has already been declared[0m
+
+    src/components/viz/BrightnessMeter.jsx:2:19:
+[37m      2 │ import { useState, [32museEffect[37m, useId } from 'react';
+        ╵                    [32m~~~~~~~~~[0m
+
+  The symbol "useEffect" was originally declared here:
+
+    src/components/viz/BrightnessMeter.jsx:1:19:
+[37m      1 │ import { useState, [32museEffect[37m, useRef, useId } from 'react';
+        ╵                    [32m~~~~~~~~~[0m
 
 
 [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useId" has already been declared[0m
 
-    src/components/viz/VoiceQualityAnalysis.jsx:2:38:
-[37m      2 │ import { useEffect, useRef, useState, [32museId[37m } from 'react';
-        ╵                                       [32m~~~~~[0m
+    src/components/viz/BrightnessMeter.jsx:2:30:
+[37m      2 │ import { useState, useEffect, [32museId[37m } from 'react';
+        ╵                               [32m~~~~~[0m
 
   The symbol "useId" was originally declared here:
 
-    src/components/viz/VoiceQualityAnalysis.jsx:1:38:
-[37m      1 │ ...t { useEffect, useRef, useState, [32museId[37m, useCallback } from 'react';
-        ╵                                     [32m~~~~~[0m
+    src/components/viz/BrightnessMeter.jsx:1:38:
+[37m      1 │ import { useState, useEffect, useRef, [32museId[37m } from 'react';
+        ╵                                       [32m~~~~~[0m
 
 
-[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected ")" but found "const"[0m
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected ";" but found ")"[0m
 
-    src/components/viz/VoiceQualityAnalysis.jsx:110:4:
-[37m      110 │     [32mconst[37m serviceRef = useRef(new QuadCoreAnalysisService());
-          │     [32m~~~~~[37m
-          ╵     [32m)[0m
+    src/components/viz/BrightnessMeter.jsx:75:29:
+[37m      75 │     }, [dataRef, componentId][32m)[37m;
+         │                              [32m^[37m
+         ╵                              [32m;[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "adaptiveController" has already been declared[0m
+
+    src/components/viz/FeedbackManager.jsx:26:10:
+[37m      26 │     const [32madaptiveController[37m = useRef(null);
+         ╵           [32m~~~~~~~~~~~~~~~~~~[0m
+
+  The symbol "adaptiveController" was originally declared here:
+
+    src/components/viz/FeedbackManager.jsx:15:10:
+[37m      15 │     const [32madaptiveController[37m = useRef(null);
+         ╵           [32m~~~~~~~~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "adaptiveController" has already been declared[0m
+
+    src/components/viz/FeedbackManager.jsx:28:10:
+[37m      28 │     const [32madaptiveController[37m = useRef(null);
+         ╵           [32m~~~~~~~~~~~~~~~~~~[0m
+
+  The symbol "adaptiveController" was originally declared here:
+
+    src/components/viz/FeedbackManager.jsx:15:10:
+[37m      15 │     const [32madaptiveController[37m = useRef(null);
+         ╵           [32m~~~~~~~~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "adaptiveController" has already been declared[0m
+
+    src/components/viz/FeedbackManager.jsx:36:10:
+[37m      36 │     const [32madaptiveController[37m = useRef(null);
+         ╵           [32m~~~~~~~~~~~~~~~~~~[0m
+
+  The symbol "adaptiveController" was originally declared here:
+
+    src/components/viz/FeedbackManager.jsx:15:10:
+[37m      15 │     const [32madaptiveController[37m = useRef(null);
+         ╵           [32m~~~~~~~~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "accumulatorRef" has already been declared[0m
+
+    src/components/viz/LTASPlot.jsx:9:10:
+[37m      9 │     const [32maccumulatorRef[37m = useRef(null);
+        ╵           [32m~~~~~~~~~~~~~~[0m
+
+  The symbol "accumulatorRef" was originally declared here:
+
+    src/components/viz/LTASPlot.jsx:8:10:
+[37m      8 │     const [32maccumulatorRef[37m = useRef(null); // Assuming 1024 bins from...
+        ╵           [32m~~~~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mUnexpected "export"[0m
+
+    src/components/viz/LTASPlot.jsx:144:0:
+[37m      144 │ [32mexport[37m default LTASPlot;
+          ╵ [32m~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mUnexpected ","[0m
+
+    src/components/viz/VoiceQualityMeter.jsx:65:9:
+[37m      65 │         }[32m,[37m [dataRef, colorBlindMode]);
+         ╵          [32m^[0m
 
 
     at failureErrorWithLog (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:1472:15)
@@ -140,15 +311,199 @@ Error:   Failed to scan for dependencies from entries:
     at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
     at Readable.push (node:internal/streams/readable:392:5)
     at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
-7:10:12 AM [vite] page reload src/components/viz/VoiceQualityAnalysis.jsx
-7:12:02 AM [vite] page reload src/components/viz/QualityVisualizer.test.jsx
-> vite
+7:40:13 AM [vite] Pre-transform error: /app/src/components/ui/button.jsx: Identifier 'React' has already been declared. (45:7)
 
-Port 3000 is in use, trying another one...
+  43 |   );
+  44 | });
+> 45 | import React from 'react';
+     |        ^
+  46 | import clsx from 'clsx';
+  47 | import { twMerge } from 'tailwind-merge';
+  48 | import LoadingSpinner from './LoadingSpinner';
+7:40:13 AM [vite] Pre-transform error: /app/src/components/ui/button.jsx: Identifier 'React' has already been declared. (45:7)
 
-  VITE v5.4.21  ready in 356 ms
+  43 |   );
+  44 | });
+> 45 | import React from 'react';
+     |        ^
+  46 | import clsx from 'clsx';
+  47 | import { twMerge } from 'tailwind-merge';
+  48 | import LoadingSpinner from './LoadingSpinner';
+7:40:53 AM [vite] Internal server error: /app/src/components/ui/LoadingSpinner.jsx: Identifier 'clsx' has already been declared. (4:9)
 
-  ➜  Local:   http://localhost:3001/
-  ➜  Network: use --host to expose
-7:17:35 AM [vite] ✨ new dependencies optimized: @react-three/fiber, three, @react-three/drei
-7:17:35 AM [vite] ✨ optimized dependencies changed. reloading
+  2 | import { twMerge } from 'tailwind-merge';
+  3 | import { clsx } from 'clsx';
+> 4 | import { clsx } from 'clsx';
+    |          ^
+  5 | import { twMerge } from 'tailwind-merge';
+  6 | import clsx from "clsx";
+  7 | import { twMerge } from "tailwind-merge";
+  Plugin: vite:react-babel
+  File: /app/src/components/ui/LoadingSpinner.jsx:4:9
+  2  |  import { twMerge } from 'tailwind-merge';
+  3  |  import { clsx } from 'clsx';
+  4  |  import { clsx } from 'clsx';
+     |           ^
+  5  |  import { twMerge } from 'tailwind-merge';
+  6  |  import clsx from "clsx";
+      at constructor (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:367:19)
+      at JSXParserMixin.raise (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:6624:19)
+      at ScopeHandler.checkRedeclarationInScope (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:1646:19)
+      at ScopeHandler.declareName (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:1612:12)
+      at JSXParserMixin.declareNameFromIdentifier (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:7594:16)
+      at JSXParserMixin.checkIdentifier (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:7590:12)
+      at JSXParserMixin.checkLVal (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:7527:12)
+      at JSXParserMixin.finishImportSpecifier (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14342:10)
+      at JSXParserMixin.parseImportSpecifier (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14499:17)
+      at JSXParserMixin.parseNamedImportSpecifiers (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14478:36)
+      at JSXParserMixin.parseImportSpecifiersAndAfter (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14318:37)
+      at JSXParserMixin.parseImport (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14311:17)
+      at JSXParserMixin.parseStatementContent (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12952:27)
+      at JSXParserMixin.parseStatementLike (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12843:17)
+      at JSXParserMixin.parseModuleItem (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12820:17)
+      at JSXParserMixin.parseBlockOrModuleBlockBody (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:13392:36)
+      at JSXParserMixin.parseBlockBody (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:13385:10)
+      at JSXParserMixin.parseProgram (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12698:10)
+      at JSXParserMixin.parseTopLevel (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12688:25)
+      at JSXParserMixin.parse (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14568:25)
+      at parse (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14602:38)
+      at parser (/app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/parser/index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (/app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
+      at normalizeFile.next (<anonymous>)
+      at run (/app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/transformation/index.js:22:50)
+      at run.next (<anonymous>)
+      at transform (/app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (/app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:261:32)
+      at /app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:223:11)
+      at /app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:189:28
+      at /app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/gensync-utils/async.js:67:7
+      at /app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:113:33
+      at step (/app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:287:14)
+      at /app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:223:11)
+7:40:53 AM [vite] Internal server error: /app/src/components/ui/Toast.jsx: Unexpected token, expected "," (23:6)
+
+  21 |       label: 'Success',
+  22 |       live: 'polite'
+> 23 |       live: 'polite',
+     |       ^
+  24 |       label: 'Success'
+  25 |     },
+  26 |     error: {
+  Plugin: vite:react-babel
+  File: /app/src/components/ui/Toast.jsx:23:6
+  21 |        label: 'Success',
+  22 |        live: 'polite'
+  23 |        live: 'polite',
+     |        ^
+  24 |        label: 'Success'
+  25 |      },
+      at constructor (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:367:19)
+      at JSXParserMixin.raise (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:6624:19)
+      at JSXParserMixin.unexpected (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:6644:16)
+      at JSXParserMixin.expect (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:6924:12)
+      at JSXParserMixin.parseObjectLike (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11894:14)
+      at JSXParserMixin.parseExprAtom (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11403:23)
+      at JSXParserMixin.parseExprAtom (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:4793:20)
+      at JSXParserMixin.parseExprSubscripts (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11145:23)
+      at JSXParserMixin.parseUpdate (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11130:21)
+      at JSXParserMixin.parseMaybeUnary (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11110:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:10963:61)
+      at JSXParserMixin.parseExprOps (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:10968:23)
+      at JSXParserMixin.parseMaybeConditional (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:10945:23)
+      at JSXParserMixin.parseMaybeAssign (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:10895:21)
+      at /app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:10864:39
+      at JSXParserMixin.allowInAnd (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12500:12)
+      at JSXParserMixin.parseMaybeAssignAllowIn (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:10864:17)
+      at JSXParserMixin.parseMaybeAssignAllowInOrVoidPattern (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12567:17)
+      at JSXParserMixin.parseObjectProperty (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12024:83)
+      at JSXParserMixin.parseObjPropValue (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12052:100)
+      at JSXParserMixin.parsePropertyDefinition (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11989:17)
+      at JSXParserMixin.parseObjectLike (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11904:21)
+      at JSXParserMixin.parseExprAtom (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11403:23)
+      at JSXParserMixin.parseExprAtom (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:4793:20)
+      at JSXParserMixin.parseExprSubscripts (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11145:23)
+      at JSXParserMixin.parseUpdate (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11130:21)
+      at JSXParserMixin.parseMaybeUnary (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11110:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:10963:61)
+      at JSXParserMixin.parseExprOps (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:10968:23)
+      at JSXParserMixin.parseMaybeConditional (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:10945:23)
+      at JSXParserMixin.parseMaybeAssign (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:10895:21)
+      at /app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:10864:39
+      at JSXParserMixin.allowInAnd (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12495:16)
+      at JSXParserMixin.parseMaybeAssignAllowIn (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:10864:17)
+      at JSXParserMixin.parseVar (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:13460:91)
+      at JSXParserMixin.parseVarStatement (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:13306:10)
+      at JSXParserMixin.parseStatementContent (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12927:23)
+      at JSXParserMixin.parseStatementLike (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12843:17)
+      at JSXParserMixin.parseStatementListItem (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12823:17)
+      at JSXParserMixin.parseBlockOrModuleBlockBody (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:13392:61)
+      at JSXParserMixin.parseBlockBody (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:13385:10)
+      at JSXParserMixin.parseBlock (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:13373:10)
+      at JSXParserMixin.parseFunctionBody (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12174:24)
+      at JSXParserMixin.parseArrowExpression (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12149:10)
+      at JSXParserMixin.parseParenAndDistinguishExpression (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11759:12)
+      at JSXParserMixin.parseExprAtom (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11395:23)
+      at JSXParserMixin.parseExprAtom (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:4793:20)
+      at JSXParserMixin.parseExprSubscripts (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11145:23)
+      at JSXParserMixin.parseUpdate (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11130:21)
+      at JSXParserMixin.parseMaybeUnary (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:11110:23)
+7:40:53 AM [vite] Internal server error: /app/src/components/ui/button.jsx: Identifier 'React' has already been declared. (45:7)
+
+  43 |   );
+  44 | });
+> 45 | import React from 'react';
+     |        ^
+  46 | import clsx from 'clsx';
+  47 | import { twMerge } from 'tailwind-merge';
+  48 | import LoadingSpinner from './LoadingSpinner';
+  Plugin: vite:react-babel
+  File: /app/src/components/ui/button.jsx:45:7
+  43 |    );
+  44 |  });
+  45 |  import React from 'react';
+     |         ^
+  46 |  import clsx from 'clsx';
+  47 |  import { twMerge } from 'tailwind-merge';
+      at constructor (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:367:19)
+      at JSXParserMixin.raise (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:6624:19)
+      at ScopeHandler.checkRedeclarationInScope (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:1646:19)
+      at ScopeHandler.declareName (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:1612:12)
+      at JSXParserMixin.declareNameFromIdentifier (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:7594:16)
+      at JSXParserMixin.checkIdentifier (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:7590:12)
+      at JSXParserMixin.checkLVal (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:7527:12)
+      at JSXParserMixin.finishImportSpecifier (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14342:10)
+      at JSXParserMixin.parseImportSpecifierLocal (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14339:31)
+      at JSXParserMixin.maybeParseDefaultImportSpecifier (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14446:12)
+      at JSXParserMixin.parseImportSpecifiersAndAfter (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14315:29)
+      at JSXParserMixin.parseImport (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14311:17)
+      at JSXParserMixin.parseStatementContent (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12952:27)
+      at JSXParserMixin.parseStatementLike (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12843:17)
+      at JSXParserMixin.parseModuleItem (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12820:17)
+      at JSXParserMixin.parseBlockOrModuleBlockBody (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:13392:36)
+      at JSXParserMixin.parseBlockBody (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:13385:10)
+      at JSXParserMixin.parseProgram (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12698:10)
+      at JSXParserMixin.parseTopLevel (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:12688:25)
+      at JSXParserMixin.parse (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14568:25)
+      at parse (/app/node_modules/.pnpm/@babel+parser@7.28.5/node_modules/@babel/parser/lib/index.js:14602:38)
+      at parser (/app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/parser/index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (/app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
+      at normalizeFile.next (<anonymous>)
+      at run (/app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/transformation/index.js:22:50)
+      at run.next (<anonymous>)
+      at transform (/app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (/app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:261:32)
+      at /app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:223:11)
+      at /app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:189:28
+      at /app/node_modules/.pnpm/@babel+core@7.28.5/node_modules/@babel/core/lib/gensync-utils/async.js:67:7
+      at /app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:113:33
+      at step (/app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:287:14)
+      at /app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/app/node_modules/.pnpm/gensync@1.0.0-beta.2/node_modules/gensync/index.js:223:11)
+7:42:06 AM [vite] hmr update /src/index.css, /src/components/analytics/AnalyticsDashboardV2.jsx, /src/components/analytics/InsightCard.jsx

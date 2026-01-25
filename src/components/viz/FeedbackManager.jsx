@@ -4,39 +4,20 @@ import CelebrationAnimations from '../ui/CelebrationAnimations';
 import DriftAlert from '../ui/DriftAlert';
 import { getAdaptiveFeedbackController } from '../../services/AdaptiveFeedback';
 import FlowStateDetector from '../../utils/FlowStateDetector';
-import { useFeedback } from '../../hooks/useFeedback'; // We might piggyback or ignore
 import HapticFeedback from '../../services/HapticFeedback';
 
 const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     const { settings } = useSettings();
-    const [alert, setAlert] = useState(null);
     const [celebration, setCelebration] = useState(null);
+
+    // Lazy init via refs
     const flowDetector = useRef(null);
     const adaptiveController = useRef(null);
 
     useEffect(() => {
-        flowDetector.current = new FlowStateDetector();
-        adaptiveController.current = getAdaptiveFeedbackController();
+        if (!flowDetector.current) flowDetector.current = new FlowStateDetector();
+        if (!adaptiveController.current) adaptiveController.current = getAdaptiveFeedbackController();
     }, []);
-
-    if (!flowDetector.current) {
-        flowDetector.current = new FlowStateDetector();
-    }
-
-    const adaptiveController = useRef(null);
-
-    const adaptiveController = useRef(null);
-
-    // Lazy initialization
-    if (!flowDetector.current) flowDetector.current = new FlowStateDetector();
-    if (!adaptiveController.current) adaptiveController.current = getAdaptiveFeedbackController();
-    if (!flowDetector.current) {
-        flowDetector.current = new FlowStateDetector();
-    }
-    const adaptiveController = useRef(null);
-    if (!adaptiveController.current) {
-        adaptiveController.current = getAdaptiveFeedbackController();
-    }
 
     // State for visual updates
     const [currentPitch, setCurrentPitch] = useState(0);
@@ -64,27 +45,14 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
                 const flowStats = flowDetector.current.getStats();
                 if (flowStats.isFlowState !== inFlow) {
                     setInFlow(flowStats.isFlowState);
-                    if (flowStats.isFlowState) {
-                        // Maybe small celebration for entering flow?
-                        // setCelebration('streak');
-                        // But don't interrupt flow with big animations
-                    }
                 }
             }
-
-            // 3. Adaptive Feedback & Celebrations
-            // Ideally we'd have a more robust event system, but polling dataRef is okay for visual feedback triggers
-            // We check for "Target Hit" logic roughly
-            // Real logic might be better in the AudioEngine callback, but this is a UI layer component
-
-            // Check for massive success (holding note for 5s?) - Implementation Dependent
-
         }, 100);
 
         return () => clearInterval(interval);
     }, [active, dataRef, targetRange, inFlow]);
 
-    // Listen for custom events dispatched by services (if any)
+    // Listen for custom events dispatched by services
     useEffect(() => {
         const handleAchievement = (e) => {
             setCelebration(e.detail?.type || 'milestone');
@@ -99,7 +67,7 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     if (!active) return null;
 
     const sensitivity = settings.feedback?.sensitivity || 0.5;
-    const tolerance = targetRange ? (targetRange.max - targetRange.min) * (1.5 - sensitivity) : 10; // Dynamic tolerance
+    const tolerance = targetRange ? (targetRange.max - targetRange.min) * (1.5 - sensitivity) : 10;
 
     return (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -109,8 +77,7 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
                 onComplete={clearCelebration}
             />
 
-            {/* Drift Alert (Only if not in Flow State to reduce nagging?) */}
-            {/* Or Adaptive Feedback decides if we allow nagging */}
+            {/* Drift Alert (Only if not in Flow State to reduce nagging) */}
             {!inFlow && targetRange && (
                 <DriftAlert
                     currentValue={currentPitch}

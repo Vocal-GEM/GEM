@@ -5,23 +5,15 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
     const { dataRef } = useAudio();
     const canvasRef = useRef(null);
     const [isRecording, setIsRecording] = useState(false);
-    const accumulatorRef = useRef(null); // Assuming 1024 bins from AudioEngine
+
+    // Lazy init via useEffect
     const accumulatorRef = useRef(null);
-
-    if (!accumulatorRef.current) {
-        accumulatorRef.current = new Float32Array(1024).fill(0); // Assuming 1024 bins from AudioEngine
-    }
-
-    if (!accumulatorRef.current) {
-        accumulatorRef.current = new Float32Array(1024).fill(0); // Assuming 1024 bins from AudioEngine
-    const accumulatorRef = useRef(null); // Assuming 1024 bins from AudioEngine
-    if (!accumulatorRef.current) {
-        accumulatorRef.current = new Float32Array(1024).fill(0);
-    }
     const frameCountRef = useRef(0);
 
     useEffect(() => {
-        accumulatorRef.current = new Float32Array(1024).fill(0);
+        if (!accumulatorRef.current) {
+            accumulatorRef.current = new Float32Array(1024).fill(0);
+        }
     }, []);
 
     useEffect(() => {
@@ -61,7 +53,7 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
             ctx.stroke();
 
             // Draw LTAS Curve
-            if (frameCountRef.current > 0) {
+            if (frameCountRef.current > 0 && accumulatorRef.current) {
                 ctx.beginPath();
                 ctx.strokeStyle = '#fbbf24'; // Amber 400
                 ctx.lineWidth = 2;
@@ -106,7 +98,7 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
 
         draw();
         return () => cancelAnimationFrame(animationId);
-    }, [isRecording]);
+    }, [isRecording, dataRef]);
 
     const reset = () => {
         if (accumulatorRef.current) {
