@@ -14,26 +14,10 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     const flowDetector = useRef(null);
     const adaptiveController = useRef(null);
 
-    useEffect(() => {
-        flowDetector.current = new FlowStateDetector();
-        adaptiveController.current = getAdaptiveFeedbackController();
-    }, []);
-
-    if (!flowDetector.current) {
-        flowDetector.current = new FlowStateDetector();
-    }
-
-    const adaptiveController = useRef(null);
-
-    const adaptiveController = useRef(null);
-
     // Lazy initialization
-    if (!flowDetector.current) flowDetector.current = new FlowStateDetector();
-    if (!adaptiveController.current) adaptiveController.current = getAdaptiveFeedbackController();
     if (!flowDetector.current) {
         flowDetector.current = new FlowStateDetector();
     }
-    const adaptiveController = useRef(null);
     if (!adaptiveController.current) {
         adaptiveController.current = getAdaptiveFeedbackController();
     }
