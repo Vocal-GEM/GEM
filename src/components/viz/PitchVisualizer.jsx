@@ -57,6 +57,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { settings: feedbackSettings, setSettings: setFeedbackSettings } = useFeedback(audioEngineRef, dataRef);
 
     useEffect(() => {
+        // Optimized: Lazy initialization of Image objects to avoid creating them on every render
         if (!balloonRef.current) balloonRef.current = new Image();
         if (!birdRef.current) birdRef.current = new Image();
         balloonRef.current.src = '/assets/balloon.png';
