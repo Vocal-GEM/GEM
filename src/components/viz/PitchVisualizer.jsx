@@ -16,8 +16,34 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { voiceProfiles, activeProfile } = useProfile();
     const { colorBlindMode } = useSettings();
     const canvasRef = useRef(null);
+    const balloonRef = useRef(null);
+    const birdRef = useRef(null);
+    // Cached dimensions to avoid getBoundingClientRect in loop
+    const dimensionsRef = useRef({ width: 0, height: 0 });
     const balloonRef = useRef(new Image());
     const birdRef = useRef(new Image());
+    const balloonRef = useRef(null);
+    const birdRef = useRef(null);
+
+    // Lazy initialization
+    if (!balloonRef.current) {
+        balloonRef.current = new Image();
+    }
+    if (!birdRef.current) {
+        birdRef.current = new Image();
+    }
+
+    if (!balloonRef.current) balloonRef.current = new Image();
+    if (!birdRef.current) birdRef.current = new Image();
+
+    if (!balloonRef.current) {
+        balloonRef.current = new Image();
+    }
+    const birdRef = useRef(null);
+    if (!birdRef.current) {
+        birdRef.current = new Image();
+    }
+    const birdRef = useRef(null);
     const gameRef = useRef({ score: 0, lastUpdate: Date.now(), lastPitch: 0 });
 
     const [zoomRange, setZoomRange] = useState({ min: 50, max: 350 });
@@ -31,8 +57,19 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { settings: feedbackSettings, setSettings: setFeedbackSettings } = useFeedback(audioEngineRef, dataRef);
 
     useEffect(() => {
+        // Optimized: Lazy initialization of Image objects to avoid creating them on every render
+        if (!balloonRef.current) balloonRef.current = new Image();
+        if (!birdRef.current) birdRef.current = new Image();
         balloonRef.current.src = '/assets/balloon.png';
         birdRef.current.src = '/assets/bird.png';
+        if (!balloonRef.current) {
+            balloonRef.current = new Image();
+            balloonRef.current.src = '/assets/balloon.png';
+        }
+        if (!birdRef.current) {
+            birdRef.current = new Image();
+            birdRef.current.src = '/assets/bird.png';
+        }
     }, []);
 
     const handleZoomIn = () => {
@@ -106,30 +143,83 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
     const handlePointerCancel = handlePointerUp;
 
+    // Monitor canvas size with ResizeObserver
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const updateDimensions = () => {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+
+            // Update physical dimensions
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+
+            // Update ref for the loop
+            dimensionsRef.current = {
+                width: rect.width,
+                height: rect.height
+            };
+
+            // Restore scale after resize clears canvas
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+        };
+
+        const observer = new ResizeObserver(updateDimensions);
+        observer.observe(canvas);
+
+        // Initial setup
+        updateDimensions();
+
+        return () => observer.disconnect();
+    }, []);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
+        // Initial scale is handled by the ResizeObserver effect
 
         if (exercise) gameRef.current = { score: 0, lastUpdate: Date.now(), lastPitch: 0 };
+
+        // Pre-calculate profile ranges outside the loop
+        const fem = voiceProfiles.find(p => p.id === 'fem');
+        const masc = voiceProfiles.find(p => p.id === 'masc');
+        const femRange = fem?.genderRange || fem?.targetRange;
+        const mascRange = masc?.genderRange || masc?.targetRange;
+        const isFem = activeProfile === 'fem';
+        const mode = settings?.genderFeedbackMode || 'neutral';
+
+        // Pre-calculate game logic functions if exercise is active
+        let getExerciseFreq = null;
+        if (exercise) {
+            if (exercise.gameId === 'glide') {
+                const freqRange = exercise.range;
+                const center = (targetRange.min + targetRange.max) / 2;
+                getExerciseFreq = (t, now) => {
+                    const phase = (now / 2000) * Math.PI * 2;
+                    return center + (freqRange / 2) * Math.sin((t * Math.PI * 4) + phase);
+                };
+            } else if (exercise.gameId === 'step') {
+                const steps = 4;
+                const stepHeight = exercise.range / steps;
+                getExerciseFreq = (t, now) => {
+                    const phase = (now / 4000) % 1;
+                    const adjustedT = (t + phase) % 1;
+                    const currentStep = Math.floor(adjustedT * steps);
+                    return targetRange.min + (currentStep * stepHeight);
+                };
+            }
+        }
 
         const getPitchColor = (freq, clarity = 1.0) => {
             if (clarity < 0.8) {
                 return colorBlindMode ? '#9333ea' : '#ef4444';
             }
 
-            // Check Settings Mode
-            const mode = settings?.genderFeedbackMode || 'neutral'; // Default to neutral if undefined
-
-            const fem = voiceProfiles.find(p => p.id === 'fem');
-            const masc = voiceProfiles.find(p => p.id === 'masc');
-
-            const femRange = fem?.genderRange || fem?.targetRange;
-            const mascRange = masc?.genderRange || masc?.targetRange;
-
             // Target Zone (Always Winning Color)
-            const isFem = activeProfile === 'fem';
             if (targetRange && freq >= targetRange.min && (isFem || freq <= targetRange.max)) {
                 if (colorBlindMode) return '#0d9488';
                 return '#22c55e'; // Green
@@ -172,13 +262,12 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
         const loop = () => {
             // ... (context init omitted, assumes mostly unchanged logic till drawing) ...
             if (!canvas) return;
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
 
-            const width = rect.width;
-            const height = rect.height;
+            // Use cached dimensions - huge performance win
+            // avoiding getBoundingClientRect() in the loop
+            const { width, height } = dimensionsRef.current;
+
+            // Clear using cached logical dimensions
             ctx.clearRect(0, 0, width, height);
 
             // ... (grid drawing lines 114-133 omitted) ...
@@ -312,15 +401,14 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 ctx.fillText('Crossover ~157 Hz', width - 10, crossY - 3);
             }
 
-            if (exercise) {
+            if (exercise && getExerciseFreq) {
                 const now = Date.now();
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.setLineDash([10, 15]); ctx.beginPath();
                 let targetFreqAtCurrent = 0;
 
                 for (let i = 30; i < width; i += 5) {
-                    const t = (i - 30) / (width - 30); let freq = 0;
-                    if (exercise.gameId === 'glide') { const freqRange = exercise.range; const center = (targetRange.min + targetRange.max) / 2; const phase = (Date.now() / 2000) * Math.PI * 2; freq = center + (freqRange / 2) * Math.sin((t * Math.PI * 4) + phase); }
-                    else if (exercise.gameId === 'step') { const steps = 4; const stepHeight = exercise.range / steps; const phase = (Date.now() / 4000) % 1; const adjustedT = (t + phase) % 1; const currentStep = Math.floor(adjustedT * steps); freq = targetRange.min + (currentStep * stepHeight); }
+                    const t = (i - 30) / (width - 30);
+                    const freq = getExerciseFreq(t, now);
 
                     const y = mapY(freq);
                     if (i === 30) ctx.moveTo(i, y); else ctx.lineTo(i, y);
@@ -328,7 +416,8 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
                     if (i % 150 === 0) {
                         const birdY = y + (Math.sin(i + now / 100) * 20);
-                        if (birdRef.current.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
+                        if (birdRef.current && birdRef.current.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
+                        if (birdRef.current?.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
                     }
                 }
                 ctx.stroke(); ctx.setLineDash([]);
@@ -336,7 +425,8 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 const currentPitch = dataRef.current.history[dataRef.current.history.length - 1];
                 if (currentPitch > 0) {
                     const playerY = mapY(currentPitch);
-                    if (balloonRef.current.complete) {
+                    if (balloonRef.current && balloonRef.current.complete) {
+                    if (balloonRef.current?.complete) {
                         ctx.drawImage(balloonRef.current, width - 60, playerY - 25, 50, 50);
                     } else {
                         ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(width - 40, playerY, 15, 0, Math.PI * 2); ctx.fill();
@@ -362,6 +452,17 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
 
+            // Optimized: Batch segments by color to reduce draw calls
+            let currentColor = null;
+            let batchActive = false;
+
+            const flush = () => {
+                if (batchActive) {
+                    ctx.stroke();
+                    batchActive = false;
+                }
+            };
+
             for (let i = 1; i < history.length; i++) {
                 const p1 = history[i - 1];
                 const p2 = history[i];
@@ -372,28 +473,38 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     const x2 = 30 + (i / (history.length - 1)) * (width - 30);
                     const y2 = mapY(p2);
 
-                    const grad = ctx.createLinearGradient(x1, y1, x2, y2);
-                    grad.addColorStop(0, getPitchColor(p1));
-                    grad.addColorStop(1, getPitchColor(p2));
+                    // Use p1 color for the segment (simplification for performance)
+                    const color = getPitchColor(p1);
 
-                    ctx.strokeStyle = grad;
-                    ctx.beginPath();
-                    ctx.moveTo(x1, y1);
-                    ctx.lineTo(x2, y2);
-                    ctx.stroke();
+                    if (color !== currentColor) {
+                        flush();
+                        currentColor = color;
+                        ctx.strokeStyle = color;
+                        ctx.beginPath();
+                        ctx.moveTo(x1, y1);
+                        ctx.lineTo(x2, y2);
+                        batchActive = true;
+                    } else {
+                        if (!batchActive) {
+                            // Start new batch after silence
+                            ctx.strokeStyle = color;
+                            ctx.beginPath();
+                            ctx.moveTo(x1, y1);
+                            ctx.lineTo(x2, y2);
+                            batchActive = true;
+                        } else {
+                            // Continue existing path
+                            ctx.lineTo(x2, y2);
+                        }
+                    }
+                } else {
+                    // Gap/Silence detected
+                    flush();
                 }
             }
-
-            history.forEach((p, i) => {
-                if (p > 0) {
-                    const x = 30 + (i / (history.length - 1)) * (width - 30);
-                    const y = mapY(p);
-                    ctx.fillStyle = getPitchColor(p);
-                    ctx.beginPath();
-                    ctx.arc(x, y, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            });
+            flush();
+            // Optimized: Removed the dot-drawing loop (history.forEach) which caused O(N) arc/fill calls.
+            // The line itself provides sufficient visual feedback.
 
             ctx.shadowBlur = 0;
             const currentP = history[history.length - 1];
@@ -535,28 +646,30 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 </div>
             )}
 
-            <div className="absolute top-3 right-48 z-20">
-                <FeedbackControls settings={feedbackSettings} setSettings={setFeedbackSettings} />
-            </div>
-
-            <div className="absolute top-3 right-3 flex items-center gap-2 bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2">
-                <div className="flex flex-col items-end">
-                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Average Pitch</div>
-                    {averagePitchRange.lowest !== null && averagePitchRange.highest !== null ? (
-                        <div className="text-sm font-mono font-bold text-emerald-400">
-                            {Math.round(averagePitchRange.lowest)} - {Math.round(averagePitchRange.highest)} Hz
-                        </div>
-                    ) : (
-                        <div className="text-sm font-mono text-slate-500">-- Hz</div>
-                    )}
+            <div className="absolute top-3 right-3 z-20 flex items-start gap-3 pointer-events-none">
+                <div className="pointer-events-auto">
+                    <FeedbackControls settings={feedbackSettings} setSettings={setFeedbackSettings} />
                 </div>
-                <button
-                    onClick={handleResetAverage}
-                    className="w-7 h-7 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-slate-700/50"
-                    title="Reset Average"
-                >
-                    <RotateCcw size={14} />
-                </button>
+
+                <div className="flex items-center gap-2 bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2 pointer-events-auto shadow-lg">
+                    <div className="flex flex-col items-end">
+                        <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Average Pitch</div>
+                        {averagePitchRange.lowest !== null && averagePitchRange.highest !== null ? (
+                            <div className="text-sm font-mono font-bold text-emerald-400">
+                                {Math.round(averagePitchRange.lowest)} - {Math.round(averagePitchRange.highest)} Hz
+                            </div>
+                        ) : (
+                            <div className="text-sm font-mono text-slate-500">-- Hz</div>
+                        )}
+                    </div>
+                    <button
+                        onClick={handleResetAverage}
+                        className="w-7 h-7 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-slate-700/50"
+                        title="Reset Average"
+                    >
+                        <RotateCcw size={14} />
+                    </button>
+                </div>
             </div>
 
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import EmptyState from './EmptyState';
+import React from 'react';
 
 describe('EmptyState Component', () => {
     it('renders title and description', () => {
@@ -13,6 +14,18 @@ describe('EmptyState Component', () => {
 
         expect(screen.getByText('No items found')).toBeInTheDocument();
         expect(screen.getByText('Try adjusting your search.')).toBeInTheDocument();
+    });
+
+    it('has accessible role and label', () => {
+        render(
+            <EmptyState
+                title="No items found"
+                description="Try adjusting your search."
+            />
+        );
+
+        const region = screen.getByRole('region', { name: "No items found" });
+        expect(region).toBeInTheDocument();
     });
 
     it('renders action button when onAction and actionLabel are provided', () => {

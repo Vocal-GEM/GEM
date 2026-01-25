@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, send_file, after_this_request
+from flask import Blueprint, request, jsonify, send_file, after_this_request, current_app
 import os
 import tempfile
 import soundfile as sf
@@ -21,7 +22,7 @@ def analyze():
         return jsonify({"error": "Empty filename."}), 400
 
     # Security: Validate file type (only audio allowed)
-    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'])
+    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'], file_stream=file)
     if not is_valid:
         return jsonify({"error": error}), 400
 
@@ -47,7 +48,9 @@ def analyze():
         else:
             result = analyze_file(tmp_path, goal_name=goal_name)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        # Security: Do not expose internal error details to client
+        print(f"Voice quality analysis error: {e}")
+        return jsonify({"error": "An internal error occurred during voice quality analysis."}), 500
     finally:
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
@@ -65,7 +68,7 @@ def clean_audio():
         return jsonify({'error': 'No selected file'}), 400
 
     # Security: Validate file type (only audio allowed)
-    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'])
+    is_valid, error = validate_file_upload(file.filename, allowed_types=['audio'], file_stream=file)
     if not is_valid:
         return jsonify({"error": error}), 400
 
@@ -102,21 +105,27 @@ def clean_audio():
 
     except Exception as e:
         print(f"Cleaning error: {e}")
+        # Cleanup on error since after_request might not run or file might exist
+        if 'tmp_path' in locals() and os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        return jsonify({'error': str(e)}), 500
         # If we failed before send_file, clean up manually
-        if tmp_path and os.path.exists(tmp_path):
         # Manual cleanup on error since after_request might not run if we crash before return
-        if os.path.exists(tmp_path):
+        if tmp_path and os.path.exists(tmp_path):
             try:
                 os.remove(tmp_path)
             except:
                 pass
-        return jsonify({'error': str(e)}), 500
+        # Security: Do not expose internal error details to client
+        print(f"Voice cleaning error: {e}")
+        return jsonify({'error': 'An internal error occurred during audio cleaning.'}), 500
 
 # ----------------------
 # Voice Manipulation (Voice Lab / PSOLA)
 # ----------------------
 
 @voice_quality_bp.route('/api/voice-quality/manipulate', methods=['POST'])
+@limiter.limit("5 per minute")
 def manipulate_file():
     """
     Endpoint to shift pitch and formants of an uploaded file.
@@ -130,7 +139,7 @@ def manipulate_file():
         return jsonify({'error': 'No selected file'}), 400
 
     # Security check
-    is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'])
+    is_valid, error_msg = validate_file_upload(file.filename, allowed_types=['audio'], file_stream=file)
     if not is_valid:
         return jsonify({"error": error_msg}), 400
         
@@ -190,26 +199,33 @@ def manipulate_file():
                 os.remove(processed_path)
              except:
                 pass
+        if tmp_path and os.path.exists(tmp_path):
+             try:
+                os.remove(tmp_path)
+             except:
+                pass
         return jsonify({'error': str(e)}), 500
+        # Cleanup original temp file
+        # Security: Do not expose internal error details to client
+        current_app.logger.error(f"Voice manipulation error: {e}")
+        return jsonify({'error': 'An internal error occurred during voice manipulation.'}), 500
     finally:
+        # Cleanup original temp file immediately
+        if tmp_path and os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
+        # Cleanup processed file on error
+        if processed_path and os.path.exists(processed_path):
+            # Only if we're not sending it (which we aren't if we're in the except block)
+             try:
+                os.remove(processed_path)
+             except:
         # Cleanup original temp file immediately (always safe as it's not the one being sent)
         if tmp_path and os.path.exists(tmp_path):
             try:
                 os.remove(tmp_path)
             except:
                 pass
-        # Manual cleanup on error
-        if tmp_path and os.path.exists(tmp_path):
-             try:
-                os.remove(tmp_path)
-             except:
-                pass
-        if processed_path and os.path.exists(processed_path):
-             try:
-                os.remove(processed_path)
-             except:
-                pass
-        return jsonify({'error': str(e)}), 500
 
 @voice_quality_bp.route('/api/voice-quality/goals', methods=['GET'])
 def get_goals():
