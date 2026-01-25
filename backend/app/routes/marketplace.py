@@ -75,6 +75,13 @@ def create_pack():
     # Security: Sanitize inputs to prevent Stored XSS
     title = sanitize_html(data.get('title', ''))
     description = sanitize_html(data.get('description', ''))
+    category = sanitize_html(data.get('category', ''))
+    target_audience = sanitize_html(data.get('target_audience', ''))
+    voice_goal = sanitize_html(data.get('voice_goal', ''))
+
+    price_cents = data.get('price_cents', 0)
+    if price_cents < 0:
+        return jsonify({'error': 'Price cannot be negative'}), 400
 
     pack_id = str(uuid.uuid4())
     pack = ExercisePack(
@@ -82,10 +89,10 @@ def create_pack():
         creator_id=current_user.id,
         title=title,
         description=description,
-        category=data.get('category'),
-        target_audience=data.get('target_audience'),
-        voice_goal=data.get('voice_goal'),
-        price_cents=data.get('price_cents', 0)
+        category=category,
+        target_audience=target_audience,
+        voice_goal=voice_goal,
+        price_cents=price_cents
     )
     
     db.session.add(pack)
