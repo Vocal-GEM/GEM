@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, send_file, after_this_request
+from flask import Blueprint, request, jsonify, send_file, after_this_request, current_app
 import os
 import tempfile
 import soundfile as sf
@@ -84,14 +84,6 @@ def clean_audio():
         # Save back to temp
         sf.write(tmp_path, y_clean, sr)
         
-        @after_this_request
-        def remove_file(response):
-            try:
-                if os.path.exists(tmp_path):
-                    os.remove(tmp_path)
-            except Exception as e:
-                print(f"Error removing temp file: {e}")
-            return response
         # Schedule cleanup after response
         cleanup_file_after_request(tmp_path)
 
@@ -168,14 +160,6 @@ def manipulate_file():
         processed_path = tmp_path.replace(".wav", "_manipulated.wav")
         manipulated.save(processed_path, "WAV")
         
-        @after_this_request
-        def remove_processed_file(response):
-            try:
-                if processed_path and os.path.exists(processed_path):
-                    os.remove(processed_path)
-            except Exception as e:
-                print(f"Error removing processed file: {e}")
-            return response
         # Schedule cleanup for both files
         cleanup_file_after_request(tmp_path)
         cleanup_file_after_request(processed_path)
@@ -194,9 +178,15 @@ def manipulate_file():
                 os.remove(processed_path)
              except:
                 pass
+        if tmp_path and os.path.exists(tmp_path):
+             try:
+                os.remove(tmp_path)
+             except:
+                pass
+        return jsonify({'error': str(e)}), 500
         # Cleanup original temp file
         # Security: Do not expose internal error details to client
-        print(f"Voice manipulation error: {e}")
+        current_app.logger.error(f"Voice manipulation error: {e}")
         return jsonify({'error': 'An internal error occurred during voice manipulation.'}), 500
     finally:
         # Cleanup original temp file immediately (always safe as it's not the one being sent)
@@ -205,7 +195,6 @@ def manipulate_file():
                 os.remove(tmp_path)
             except:
                 pass
-        return jsonify({'error': str(e)}), 500
 
 @voice_quality_bp.route('/api/voice-quality/goals', methods=['GET'])
 def get_goals():

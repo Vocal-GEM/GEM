@@ -8,8 +8,7 @@ const BACKUP_VERSION = '1.0';
 const STORAGE_KEYS = [
     'gem_streak',
     'gem_xp_data',
-    'gem_community',
-    'gem_public_profile',
+
     'gem_accessibility',
     'gem_notification_settings',
     'gem_theme',
