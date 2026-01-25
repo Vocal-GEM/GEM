@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useId } from 'react';
-import { useState, useEffect, useId } from 'react';
 import { Sun, Moon, Info, Smile } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
@@ -70,8 +69,6 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
         return () => {
             unsubscribe();
         };
-    }, [dataRef, componentId]); // Minimal dependencies
-        return unsubscribe;
     }, [dataRef, componentId]);
 
     const getZoneColor = () => {
@@ -111,7 +108,7 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
                         )}
                     </div>
                     <div>
-                        <h3 className="text-sm font-bold text-white">Brightness Meter</h3>
+                        <h3 className="text-sm font-bold text-white">BrightnessMeter</h3>
                         <p className="text-xs text-slate-400">F2 → /i/ Target</p>
                     </div>
                 </div>

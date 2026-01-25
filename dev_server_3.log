@@ -1,0 +1,15 @@
+
+> vocal-gem@0.1.0 dev /app
+> vite
+
+
+  VITE v5.4.21  ready in 350 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+7:44:02 AM [vite] ✨ new dependencies optimized: @react-three/fiber, three, @react-three/drei
+7:44:02 AM [vite] ✨ optimized dependencies changed. reloading
+7:48:37 AM [vite] page reload src/components/viz/BrightnessMeter.jsx
+7:48:49 AM [vite] page reload src/components/viz/FeedbackManager.jsx
+7:49:09 AM [vite] page reload src/components/viz/LTASPlot.jsx
+7:49:34 AM [vite] hmr update /src/index.css, /src/components/views/PracticeMode.jsx

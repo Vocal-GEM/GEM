@@ -2,10 +2,17 @@
 > vocal-gem@0.1.0 dev /app
 > vite
 
-Port 3000 is in use, trying another one...
-Port 3001 is in use, trying another one...
 
-  VITE v5.4.21  ready in 388 ms
+  VITE v5.4.21  ready in 364 ms
 
-  ➜  Local:   http://localhost:3002/
+  ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
+7:42:17 AM [vite] Pre-transform error: /app/src/components/ui/Toast.jsx: Unexpected token, expected "," (23:6)
+
+  21 |       label: 'Success',
+  22 |       live: 'polite'
+> 23 |       live: 'polite',
+     |       ^
+  24 |       label: 'Success'
+  25 |     },
+  26 |     error: {
