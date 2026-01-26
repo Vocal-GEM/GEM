@@ -65,6 +65,7 @@ import TourOverlay from './components/ui/TourOverlay';
 
 import CommandPalette from './components/ui/CommandPalette';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
+import QuickActions from './components/ui/QuickActions';
 import QuickSettings from './components/ui/QuickSettings';
 import { analyticsService } from './services/AnalyticsService';
 import { useVoiceProfile } from './context/VoiceProfileContext';
@@ -163,6 +164,12 @@ const App = () => {
     const showWarmUp = modals.warmup;
     const setShowWarmUp = (v) => v ? openModal('warmup') : closeModal('warmup');
 
+    const handleQuickAction = (actionId) => {
+        if (actionId === 'practice') setActiveTab('practice');
+        if (actionId === 'journal') setShowJournalForm(true);
+        if (actionId === 'coach') setShowTutorial(true); // Placeholder for Coach
+        if (actionId === 'warmup') setShowWarmUp(true);
+    };
 
     // Onboarding hooks
     const { unlockedAchievement, closeAchievement } = useAchievements();
@@ -446,9 +453,8 @@ const App = () => {
                         {showAssessment && <AssessmentModule onClose={() => setShowAssessment(false)} />}
                         {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}
 
-                        <TourOverlay />
                         <CommandPalette />
-                        <CommandPalette />
+                        <QuickActions onAction={handleQuickAction} />
                         <QuickSettings isOpen={false} onClose={() => { }} />
                         {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
                         {modals.analytics && <AnalyticsDashboard onClose={() => closeModal('analytics')} />}
