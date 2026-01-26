@@ -85,6 +85,8 @@ const BreathVisualizer = ({ type = 'square' }) => {
                         transform: `scale(${isActive ? currentPhase.scale : 1})`,
                         transitionDuration: `${isActive ? currentPhase.duration : 500}ms`
                     }}
+                    aria-live="assertive"
+                    aria-atomic="true"
                 >
                     <span className="font-bold text-white drop-shadow-md text-lg">
                         {isActive ? currentPhase.label : 'Ready?'}
@@ -105,6 +107,7 @@ const BreathVisualizer = ({ type = 'square' }) => {
                 <button
                     onClick={handleReset}
                     className="p-2 text-slate-500 hover:text-white rounded-full hover:bg-slate-800"
+                    aria-label="Reset breathing exercise"
                 >
                     <RefreshCw size={18} />
                 </button>
