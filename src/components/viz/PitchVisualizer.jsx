@@ -16,34 +16,14 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { voiceProfiles, activeProfile } = useProfile();
     const { colorBlindMode } = useSettings();
     const canvasRef = useRef(null);
-    const balloonRef = useRef(null);
-    const birdRef = useRef(null);
+
     // Cached dimensions to avoid getBoundingClientRect in loop
     const dimensionsRef = useRef({ width: 0, height: 0 });
-    const balloonRef = useRef(new Image());
-    const birdRef = useRef(new Image());
+
+    // Assets refs
     const balloonRef = useRef(null);
     const birdRef = useRef(null);
 
-    // Lazy initialization
-    if (!balloonRef.current) {
-        balloonRef.current = new Image();
-    }
-    if (!birdRef.current) {
-        birdRef.current = new Image();
-    }
-
-    if (!balloonRef.current) balloonRef.current = new Image();
-    if (!birdRef.current) birdRef.current = new Image();
-
-    if (!balloonRef.current) {
-        balloonRef.current = new Image();
-    }
-    const birdRef = useRef(null);
-    if (!birdRef.current) {
-        birdRef.current = new Image();
-    }
-    const birdRef = useRef(null);
     const gameRef = useRef({ score: 0, lastUpdate: Date.now(), lastPitch: 0 });
 
     const [zoomRange, setZoomRange] = useState({ min: 50, max: 350 });
@@ -57,18 +37,14 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { settings: feedbackSettings, setSettings: setFeedbackSettings } = useFeedback(audioEngineRef, dataRef);
 
     useEffect(() => {
-        // Optimized: Lazy initialization of Image objects to avoid creating them on every render
-        if (!balloonRef.current) balloonRef.current = new Image();
-        if (!birdRef.current) birdRef.current = new Image();
-        balloonRef.current.src = '/assets/balloon.png';
-        birdRef.current.src = '/assets/bird.png';
+        // Optimized: Lazy initialization of Image objects
         if (!balloonRef.current) {
-            balloonRef.current = new Image();
-            balloonRef.current.src = '/assets/balloon.png';
+             balloonRef.current = new Image();
+             balloonRef.current.src = '/assets/balloon.png';
         }
         if (!birdRef.current) {
-            birdRef.current = new Image();
-            birdRef.current.src = '/assets/bird.png';
+             birdRef.current = new Image();
+             birdRef.current.src = '/assets/bird.png';
         }
     }, []);
 
@@ -260,17 +236,14 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
         };
 
         const loop = () => {
-            // ... (context init omitted, assumes mostly unchanged logic till drawing) ...
             if (!canvas) return;
 
             // Use cached dimensions - huge performance win
-            // avoiding getBoundingClientRect() in the loop
             const { width, height } = dimensionsRef.current;
 
             // Clear using cached logical dimensions
             ctx.clearRect(0, 0, width, height);
 
-            // ... (grid drawing lines 114-133 omitted) ...
             const yMin = zoomRange.min;
             const yMax = zoomRange.max;
             const mapY = (freq) => height - ((freq - yMin) / (yMax - yMin)) * height;
@@ -383,7 +356,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 ctx.fillText(`Home: ${Math.round(settings.homeNote)} Hz`, 35, homeY - 5);
             }
 
-            // Crossover point marker at 157 Hz (gender-neutral point based on research)
+            // Crossover point marker at 157 Hz
             const crossoverFreq = 157;
             if (crossoverFreq > yMin && crossoverFreq < yMax && mode !== 'off') {
                 const crossY = mapY(crossoverFreq);
@@ -417,7 +390,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     if (i % 150 === 0) {
                         const birdY = y + (Math.sin(i + now / 100) * 20);
                         if (birdRef.current && birdRef.current.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
-                        if (birdRef.current?.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
                     }
                 }
                 ctx.stroke(); ctx.setLineDash([]);
@@ -426,7 +398,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 if (currentPitch > 0) {
                     const playerY = mapY(currentPitch);
                     if (balloonRef.current && balloonRef.current.complete) {
-                    if (balloonRef.current?.complete) {
                         ctx.drawImage(balloonRef.current, width - 60, playerY - 25, 50, 50);
                     } else {
                         ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(width - 40, playerY, 15, 0, Math.PI * 2); ctx.fill();
@@ -452,7 +423,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
 
-            // Optimized: Batch segments by color to reduce draw calls
+            // Optimized: Batch segments by color
             let currentColor = null;
             let batchActive = false;
 
@@ -473,7 +444,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     const x2 = 30 + (i / (history.length - 1)) * (width - 30);
                     const y2 = mapY(p2);
 
-                    // Use p1 color for the segment (simplification for performance)
                     const color = getPitchColor(p1);
 
                     if (color !== currentColor) {
@@ -486,25 +456,20 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                         batchActive = true;
                     } else {
                         if (!batchActive) {
-                            // Start new batch after silence
                             ctx.strokeStyle = color;
                             ctx.beginPath();
                             ctx.moveTo(x1, y1);
                             ctx.lineTo(x2, y2);
                             batchActive = true;
                         } else {
-                            // Continue existing path
                             ctx.lineTo(x2, y2);
                         }
                     }
                 } else {
-                    // Gap/Silence detected
                     flush();
                 }
             }
             flush();
-            // Optimized: Removed the dot-drawing loop (history.forEach) which caused O(N) arc/fill calls.
-            // The line itself provides sufficient visual feedback.
 
             ctx.shadowBlur = 0;
             const currentP = history[history.length - 1];
@@ -516,7 +481,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     highest: prev.highest === null ? currentP : Math.max(prev.highest, currentP)
                 }));
 
-                // Check if in ambiguity zone and update state
+                // Check if in ambiguity zone
                 const f1 = dataRef.current.f1 || 0;
                 const rbi = dataRef.current.resonanceScore;
                 if (currentP >= AMBIGUITY_ZONE.min && currentP <= AMBIGUITY_ZONE.max) {
@@ -565,9 +530,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 }
             }
 
-            // IN-FORMANT UPGRADE: Draw Formants if visible
-            // Formants F1 (300-1000) and F2 (800-2500) might be above the pitch view (defaults 50-350), 
-            // but if user zooms out, we should see them.
+            // Draw Formants
             if (dataRef.current.formants) {
                 const { f1, f2 } = dataRef.current.formants;
                 if (f1 > 0 && f1 > yMin && f1 < yMax) {
@@ -630,7 +593,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                             </span>
                         )}
                     </div>
-                    {/* IN-FORMANT UPGRADE: Formant Display */}
                     {dataRef.current.formants && dataRef.current.formants.f1 > 0 && (
                         <div className="mt-2 pt-2 border-t border-slate-700/50">
                             <div className="flex gap-3 text-[9px] font-mono text-slate-400">
