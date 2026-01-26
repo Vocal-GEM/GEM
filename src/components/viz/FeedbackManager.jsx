@@ -4,7 +4,7 @@ import CelebrationAnimations from '../ui/CelebrationAnimations';
 import DriftAlert from '../ui/DriftAlert';
 import { getAdaptiveFeedbackController } from '../../services/AdaptiveFeedback';
 import FlowStateDetector from '../../utils/FlowStateDetector';
-import { useFeedback } from '../../hooks/useFeedback'; // We might piggyback or ignore
+import { useFeedback } from '../../hooks/useFeedback';
 import HapticFeedback from '../../services/HapticFeedback';
 
 const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
@@ -15,28 +15,13 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     const adaptiveController = useRef(null);
 
     useEffect(() => {
-        flowDetector.current = new FlowStateDetector();
-        adaptiveController.current = getAdaptiveFeedbackController();
+        if (!flowDetector.current) {
+            flowDetector.current = new FlowStateDetector();
+        }
+        if (!adaptiveController.current) {
+            adaptiveController.current = getAdaptiveFeedbackController();
+        }
     }, []);
-
-    if (!flowDetector.current) {
-        flowDetector.current = new FlowStateDetector();
-    }
-
-    const adaptiveController = useRef(null);
-
-    const adaptiveController = useRef(null);
-
-    // Lazy initialization
-    if (!flowDetector.current) flowDetector.current = new FlowStateDetector();
-    if (!adaptiveController.current) adaptiveController.current = getAdaptiveFeedbackController();
-    if (!flowDetector.current) {
-        flowDetector.current = new FlowStateDetector();
-    }
-    const adaptiveController = useRef(null);
-    if (!adaptiveController.current) {
-        adaptiveController.current = getAdaptiveFeedbackController();
-    }
 
     // State for visual updates
     const [currentPitch, setCurrentPitch] = useState(0);

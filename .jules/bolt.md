@@ -10,3 +10,7 @@
 ## 2025-05-21 - Widespread Lazy Initialization Anti-Pattern
 **Learning:** The `useRef(new Class())` anti-pattern was found in 7+ components, involving `Float32Array` buffers (up to 16KB per render in `Spectrogram3D`), `Image` objects, and service classes. This creates invisible memory pressure that doesn't break functionality but triggers frequent GC pauses.
 **Action:** Audit all `useRef` calls during code reviews. Any `new` keyword inside `useRef(...)` is a red flag. Use `if (!ref.current) ref.current = new Class()` for strict lazy loading.
+
+## 2025-05-21 - Duplicate Refs and Corrupted Files
+**Learning:** Found critical corruption in `PitchVisualizer.jsx` and `FeedbackManager.jsx` where `useRef` declarations were duplicated multiple times, likely due to bad merge conflict resolution. This caused syntax errors and potential performance issues (multiple unnecessary ref objects).
+**Action:** When seeing `useRef` at the top of a component, check for duplicates immediately below. Fix by consolidating into single declarations.
