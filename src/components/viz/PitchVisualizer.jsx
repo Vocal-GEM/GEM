@@ -16,34 +16,13 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { voiceProfiles, activeProfile } = useProfile();
     const { colorBlindMode } = useSettings();
     const canvasRef = useRef(null);
-    const balloonRef = useRef(null);
-    const birdRef = useRef(null);
+
     // Cached dimensions to avoid getBoundingClientRect in loop
     const dimensionsRef = useRef({ width: 0, height: 0 });
-    const balloonRef = useRef(new Image());
-    const birdRef = useRef(new Image());
+
     const balloonRef = useRef(null);
     const birdRef = useRef(null);
 
-    // Lazy initialization
-    if (!balloonRef.current) {
-        balloonRef.current = new Image();
-    }
-    if (!birdRef.current) {
-        birdRef.current = new Image();
-    }
-
-    if (!balloonRef.current) balloonRef.current = new Image();
-    if (!birdRef.current) birdRef.current = new Image();
-
-    if (!balloonRef.current) {
-        balloonRef.current = new Image();
-    }
-    const birdRef = useRef(null);
-    if (!birdRef.current) {
-        birdRef.current = new Image();
-    }
-    const birdRef = useRef(null);
     const gameRef = useRef({ score: 0, lastUpdate: Date.now(), lastPitch: 0 });
 
     const [zoomRange, setZoomRange] = useState({ min: 50, max: 350 });
@@ -58,10 +37,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
     useEffect(() => {
         // Optimized: Lazy initialization of Image objects to avoid creating them on every render
-        if (!balloonRef.current) balloonRef.current = new Image();
-        if (!birdRef.current) birdRef.current = new Image();
-        balloonRef.current.src = '/assets/balloon.png';
-        birdRef.current.src = '/assets/bird.png';
         if (!balloonRef.current) {
             balloonRef.current = new Image();
             balloonRef.current.src = '/assets/balloon.png';
@@ -417,7 +392,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     if (i % 150 === 0) {
                         const birdY = y + (Math.sin(i + now / 100) * 20);
                         if (birdRef.current && birdRef.current.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
-                        if (birdRef.current?.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
                     }
                 }
                 ctx.stroke(); ctx.setLineDash([]);
@@ -426,7 +400,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 if (currentPitch > 0) {
                     const playerY = mapY(currentPitch);
                     if (balloonRef.current && balloonRef.current.complete) {
-                    if (balloonRef.current?.complete) {
                         ctx.drawImage(balloonRef.current, width - 60, playerY - 25, 50, 50);
                     } else {
                         ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(width - 40, playerY, 15, 0, Math.PI * 2); ctx.fill();
