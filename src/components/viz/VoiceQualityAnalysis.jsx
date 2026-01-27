@@ -1,10 +1,4 @@
 import React, { useEffect, useRef, useState, useId, useCallback } from 'react';
-import { useEffect, useRef, useState, useId, useCallback } from 'react';
-import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
-import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
-import { renderCoordinator } from '../../services/RenderCoordinator';
-import { useProfile } from '../../contexts/ProfileContext';
-import { useEffect, useRef, useState, useId, useCallback } from 'react';
 import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
 import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -80,20 +74,13 @@ const FeedbackBanner = ({ feedback }) => {
 };
 
 const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioActive }) => {
-    const serviceRef = useRef(new QuadCoreAnalysisService());
-    useProfile();
-
-    const serviceRef = useRef(new QuadCoreAnalysisService());
-    const [analysis, setAnalysis] = useState(null);
-    const componentId = useId();
-
+    // Optimized: Lazy initialization of service to avoid instantiation on every render
     const serviceRef = useRef(null);
-    useEffect(() => {
-        serviceRef.current = new QuadCoreAnalysisService();
-    }, []);
-    if (!serviceRef.current) {
+    if (serviceRef.current === null) {
         serviceRef.current = new QuadCoreAnalysisService();
     }
+
+    useProfile(); // Kept as it was in original, though might be unused?
 
     const [analysis, setAnalysis] = useState(null);
 
@@ -113,6 +100,10 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
         }
     }, [dataRef, isAudioActive]);
 
+    const updateAnalysis = useCallback(() => {
+        analyze();
+    }, [analyze]);
+
     useEffect(() => {
         let unsubscribe;
 
@@ -120,10 +111,8 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
             // Subscribe to RenderCoordinator instead of using internal RAF loop
             // Use LOW priority as this is UI analysis updates, not 60fps animation
             unsubscribe = renderCoordinator.subscribe(
-                `VoiceQualityAnalysis-${componentId}`,
-                updateAnalysis,
                 componentId,
-                analyze,
+                updateAnalysis,
                 renderCoordinator.PRIORITY.LOW
             );
         }
@@ -132,8 +121,6 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
             if (unsubscribe) unsubscribe();
         };
     }, [isAudioActive, componentId, updateAnalysis]);
-    }, [isAudioActive, componentId, dataRef]);
-    }, [isAudioActive, componentId, analyze]);
 
     return (
         <div className="bg-slate-900/50 rounded-2xl p-4 sm:p-6 border border-white/5 h-full flex flex-col">
