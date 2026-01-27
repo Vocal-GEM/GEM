@@ -65,6 +65,7 @@ import TourOverlay from './components/ui/TourOverlay';
 
 import CommandPalette from './components/ui/CommandPalette';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
+import QuickActions from './components/ui/QuickActions';
 import QuickSettings from './components/ui/QuickSettings';
 import { analyticsService } from './services/AnalyticsService';
 import { useVoiceProfile } from './context/VoiceProfileContext';
@@ -468,6 +469,12 @@ const App = () => {
                                 <PracticeCardsPanel onClose={() => closeModal('practiceCards')} />
                             </Suspense>
                         )}
+                        <QuickActions onAction={(action) => {
+                            if (action === 'practice') setActiveTab('practice');
+                            if (action === 'journal') setShowJournalForm(true);
+                            if (action === 'coach') openModal('adaptiveSession'); // or coach view
+                            if (action === 'warmup') setShowWarmUp(true);
+                        }} />
                     </main>
 
                     {/* Mobile Bottom Navigation */}
