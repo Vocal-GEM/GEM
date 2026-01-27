@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useId } from 'react';
-import { useState, useEffect, useId } from 'react';
 import { Sun, Moon, Info, Smile } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
@@ -71,8 +70,6 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
             unsubscribe();
         };
     }, [dataRef, componentId]); // Minimal dependencies
-        return unsubscribe;
-    }, [dataRef, componentId]);
 
     const getZoneColor = () => {
         switch (zone) {
