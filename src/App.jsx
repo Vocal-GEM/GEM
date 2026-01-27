@@ -66,6 +66,7 @@ import TourOverlay from './components/ui/TourOverlay';
 import CommandPalette from './components/ui/CommandPalette';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
 import QuickSettings from './components/ui/QuickSettings';
+import QuickActions from './components/ui/QuickActions';
 import { analyticsService } from './services/AnalyticsService';
 import { useVoiceProfile } from './context/VoiceProfileContext';
 import IntakeQuestionnaire from './components/ui/IntakeQuestionnaire';
@@ -167,6 +168,13 @@ const App = () => {
     // Onboarding hooks
     const { unlockedAchievement, closeAchievement } = useAchievements();
     const { handleTutorialComplete, handleCompassComplete, handleCalibrationComplete } = useOnboarding();
+
+    const handleQuickAction = (action) => {
+        if (action === 'practice') setActiveTab('practice');
+        if (action === 'journal') setShowJournalForm(true);
+        if (action === 'warmup') setShowWarmUp(true);
+        if (action === 'coach') openModal('tutorial');
+    };
 
     // Sync Listen Mode
     useEffect(() => {
@@ -449,6 +457,7 @@ const App = () => {
                         <TourOverlay />
                         <CommandPalette />
                         <CommandPalette />
+                        <QuickActions onAction={handleQuickAction} />
                         <QuickSettings isOpen={false} onClose={() => { }} />
                         {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
                         {modals.analytics && <AnalyticsDashboard onClose={() => closeModal('analytics')} />}
