@@ -1,10 +1,4 @@
 import React, { useEffect, useRef, useState, useId, useCallback } from 'react';
-import { useEffect, useRef, useState, useId, useCallback } from 'react';
-import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
-import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
-import { renderCoordinator } from '../../services/RenderCoordinator';
-import { useProfile } from '../../contexts/ProfileContext';
-import { useEffect, useRef, useState, useId, useCallback } from 'react';
 import { Activity, Info, Mic, MicOff, Wind, Heart, Sun, Layers, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react';
 import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -80,26 +74,18 @@ const FeedbackBanner = ({ feedback }) => {
 };
 
 const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioActive }) => {
-    const serviceRef = useRef(new QuadCoreAnalysisService());
-    useProfile();
-
-    const serviceRef = useRef(new QuadCoreAnalysisService());
-    const [analysis, setAnalysis] = useState(null);
-    const componentId = useId();
+    useProfile(); // Consuming context but not using values directly here? Keeping it as it was in original.
 
     const serviceRef = useRef(null);
-    useEffect(() => {
-        serviceRef.current = new QuadCoreAnalysisService();
-    }, []);
-    if (!serviceRef.current) {
-        serviceRef.current = new QuadCoreAnalysisService();
-    }
-
     const [analysis, setAnalysis] = useState(null);
 
     // Generate unique component ID for RenderCoordinator
     const uniqueId = useId();
     const componentId = `voice-quality-${uniqueId}`;
+
+    useEffect(() => {
+        serviceRef.current = new QuadCoreAnalysisService();
+    }, []);
 
     const analyze = useCallback(() => {
         if (dataRef.current && isAudioActive && serviceRef.current) {
@@ -113,6 +99,11 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
         }
     }, [dataRef, isAudioActive]);
 
+    // Note: 'updateAnalysis' was referenced in the original file but not defined.
+    // It seems 'analyze' IS the function intended to be called.
+    // However, RenderCoordinator expects a callback.
+    // Assuming 'analyze' is what we want to run.
+
     useEffect(() => {
         let unsubscribe;
 
@@ -120,10 +111,12 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
             // Subscribe to RenderCoordinator instead of using internal RAF loop
             // Use LOW priority as this is UI analysis updates, not 60fps animation
             unsubscribe = renderCoordinator.subscribe(
-                `VoiceQualityAnalysis-${componentId}`,
-                updateAnalysis,
                 componentId,
                 analyze,
+                // The original code passed `updateAnalysis` as the 2nd arg (the callback)
+                // and `componentId` as the 3rd arg.
+                // But `analyze` seems to be the actual logic.
+                // I will assume `analyze` is the callback.
                 renderCoordinator.PRIORITY.LOW
             );
         }
@@ -131,8 +124,6 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
         return () => {
             if (unsubscribe) unsubscribe();
         };
-    }, [isAudioActive, componentId, updateAnalysis]);
-    }, [isAudioActive, componentId, dataRef]);
     }, [isAudioActive, componentId, analyze]);
 
     return (
