@@ -83,7 +83,7 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
     return (
         <div className="w-full min-h-screen bg-black p-4 sm:p-6 lg:p-12 text-white">
             {/* Guided Journey Entry - Featured prominently for first-time users */}
-            <div className="mb-8">
+            {/* <div className="mb-8">
                 <JourneyEntryCard
                     onStart={handleStartJourney}
                     onResume={handleResumeJourney}
@@ -92,7 +92,7 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                     currentStepTitle={currentStep?.title || ''}
                     isComplete={isJourneyComplete}
                 />
-            </div>
+            </div> */}
 
             {/* Mood Check In */}
             <div className="mb-8">
@@ -100,12 +100,12 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
             </div>
 
             {/* Smart Coach Widget */}
-            <SmartCoachWidget onStartSession={onOpenAdaptiveSession} />
+            {/* <SmartCoachWidget onStartSession={onOpenAdaptiveSession} /> */}
 
             {/* Recommended Tools */}
-            <div className="mb-8">
+            {/* <div className="mb-8">
                 <RecommendedToolsWidget />
-            </div>
+            </div> */}
 
             {/* Quick Action Buttons */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -129,7 +129,7 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                 </button>
 
                 {/* Smart Practice Button */}
-                <button
+                {/* <button
                     onClick={() => setShowSmartPractice(true)}
                     className="p-6 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 rounded-2xl text-left transition-all group"
                 >
@@ -145,7 +145,7 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                         </div>
                         <ArrowRight className="text-white group-hover:translate-x-1 transition-transform" size={24} />
                     </div>
-                </button>
+                </button> */}
 
                 {/* Quick Voice Check Button */}
                 <button
@@ -188,33 +188,33 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
             {/* Session Summary */}
             <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <SessionSummaryCard />
-                <PersonalMilestonesDisplay />
+                {/* <PersonalMilestonesDisplay /> */}
             </div>
 
             {/* Recommended Exercises */}
-            <RecommendedExercises onViewCategory={(cat) => onViewChange('training', { category: cat })} />
+            {/* <RecommendedExercises onViewCategory={(cat) => onViewChange('training', { category: cat })} /> */}
 
             {/* Daily Challenges */}
-            <div className="mb-8">
+            {/* <div className="mb-8">
                 <DailyChallengeCard />
-            </div>
+            </div> */}
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
-                <StatCard
+                {/* <StatCard
                     label={t('dashboard.stats.dsi.label')}
                     value="1.2"
                     subtext={t('dashboard.stats.dsi.subtext')}
                     icon={<Activity size={24} />}
                     color="text-teal-400"
-                />
-                <StatCard
+                /> */}
+                {/* <StatCard
                     label={t('dashboard.stats.streak.label')}
                     value={streakData.currentStreak}
                     subtext={streakData.needsPracticeToday ? "Practice today!" : "✓ Done"}
                     icon={<Flame size={24} />}
                     color="text-orange-400"
-                />
+                /> */}
                 <StatCard
                     label={t('dashboard.stats.practice.label')}
                     value="45m"
@@ -222,12 +222,12 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                     icon={<Play size={24} />}
                     color="text-blue-400"
                 />
-                <StatCard
+                {/* <StatCard
                     label={t('dashboard.stats.exercises.label')}
                     value="12"
                     icon={<Trophy size={24} />}
                     color="text-amber-400"
-                />
+                /> */}
             </div>
 
             {/* Quick Actions */}

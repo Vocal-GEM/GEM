@@ -130,7 +130,7 @@ export const AudioProvider = ({ children }) => {
             }
         } catch (err) {
             console.error("[AudioContext] Failed to initialize AudioEngine:", err);
-            setAudioError("Audio initialization failed. Your browser may not support required features.");
+            setAudioError(`Audio initialization failed: ${err.message}. Your browser may not support required features.`);
         }
 
         // ... (audio unlock logic)

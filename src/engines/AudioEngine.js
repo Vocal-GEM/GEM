@@ -93,8 +93,21 @@ export class AudioEngine {
             bufferSize: 0,
             connectionLog: []
         };
-        this.audioContext = new AudioContext({ latencyHint: 'interactive' });
-        this.debugInfo.contextState = this.audioContext.state;
+        // POLYFILL: Handle Safari/Old browsers
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) {
+            this.debugInfo.error = 'AudioContext not supported';
+            this.debugInfo.state = 'error';
+            throw new Error('AudioContext not supported in this browser');
+        }
+
+        try {
+            this.audioContext = new AudioContextClass({ latencyHint: 'interactive' });
+            this.debugInfo.contextState = this.audioContext.state;
+        } catch (e) {
+            this.debugInfo.error = e.message;
+            throw new Error(`Failed to create AudioContext: ${e.message}`);
+        }
 
         // Unlock AudioContext logic moved to start()
 
