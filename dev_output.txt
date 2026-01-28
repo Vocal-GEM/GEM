@@ -1,30 +1,270 @@
 
-> vocal-gem@0.1.0 dev
+> vocal-gem@0.1.0 dev /app
 > vite
 
 
-  VITE v5.4.21  ready in 488 ms
+  VITE v5.4.21  ready in 367 ms
 
   ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
-7:34:52 AM [vite] Pre-transform error: /app/src/components/ui/Toast.jsx: 'import' and 'export' may only appear at the top level. (13:0)
+7:10:28 AM [vite] Pre-transform error: /app/src/components/ui/Toast.jsx: Unexpected token, expected "," (23:6)
 
-  11 |   className
-  12 | }) => {
-> 13 | import { twMerge } from 'tailwind-merge';
-     | ^
-  14 | import clsx from 'clsx';
-  15 |
-  16 | const Toast = ({ message, type = 'success', onClose, duration = 3000, className }) => {
+  21 |       label: 'Success',
+  22 |       live: 'polite'
+> 23 |       live: 'polite',
+     |       ^
+  24 |       label: 'Success'
+  25 |     },
+  26 |     error: {
 Error:   Failed to scan for dependencies from entries:
   /app/index.html
 /app/ios/App/App/public/index.html
 
-  [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mUnexpected "{"[0m
+  [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected "}" but found "live"[0m
 
-    src/components/ui/Toast.jsx:13:7:
-[37m      13 │ import [32m{[37m twMerge } from 'tailwind-merge';
-         ╵        [32m^[0m
+    src/components/ui/Toast.jsx:23:6:
+[37m      23 │       [32mlive[37m: 'polite',
+         │       [32m~~~~[37m
+         ╵       [32m}[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "React" has already been declared[0m
+
+    src/components/ui/button.jsx:45:7:
+[37m      45 │ import [32mReact[37m from 'react';
+         ╵        [32m~~~~~[0m
+
+  The symbol "React" was originally declared here:
+
+    src/components/ui/button.jsx:1:7:
+[37m      1 │ import [32mReact[37m from "react";
+        ╵        [32m~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "clsx" has already been declared[0m
+
+    src/components/ui/button.jsx:46:7:
+[37m      46 │ import [32mclsx[37m from 'clsx';
+         ╵        [32m~~~~[0m
+
+  The symbol "clsx" was originally declared here:
+
+    src/components/ui/button.jsx:2:7:
+[37m      2 │ import [32mclsx[37m from "clsx";
+        ╵        [32m~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "twMerge" has already been declared[0m
+
+    src/components/ui/button.jsx:47:9:
+[37m      47 │ import { [32mtwMerge[37m } from 'tailwind-merge';
+         ╵          [32m~~~~~~~[0m
+
+  The symbol "twMerge" was originally declared here:
+
+    src/components/ui/button.jsx:3:9:
+[37m      3 │ import { [32mtwMerge[37m } from "tailwind-merge";
+        ╵          [32m~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "LoadingSpinner" has already been declared[0m
+
+    src/components/ui/button.jsx:48:7:
+[37m      48 │ import [32mLoadingSpinner[37m from './LoadingSpinner';
+         ╵        [32m~~~~~~~~~~~~~~[0m
+
+  The symbol "LoadingSpinner" was originally declared here:
+
+    src/components/ui/button.jsx:4:7:
+[37m      4 │ import [32mLoadingSpinner[37m from "./LoadingSpinner";
+        ╵        [32m~~~~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "Button" has already been declared[0m
+
+    src/components/ui/button.jsx:50:6:
+[37m      50 │ const [32mButton[37m = React.forwardRef(
+         ╵       [32m~~~~~~[0m
+
+  The symbol "Button" was originally declared here:
+
+    src/components/ui/button.jsx:6:6:
+[37m      6 │ const [32mButton[37m = React.forwardRef(({ className, variant, size, asChil...
+        ╵       [32m~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mUnexpected closing "Comp" tag does not match opening fragment tag[0m
+
+    src/components/ui/button.jsx:143:8:
+[37m      143 │       </[32mComp[37m>
+          ╵         [32m~~~~[0m
+
+  The opening fragment tag is here:
+
+    src/components/ui/button.jsx:128:13:
+[37m      128 │             <[32m[37m>
+          ╵              [32m^[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected ")" but found ";"[0m
+
+    src/components/ui/button.jsx:144:5:
+[37m      144 │     )[32m;[37m
+          │      [32m^[37m
+          ╵      [32m)[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useState" has already been declared[0m
+
+    src/components/viz/BrightnessMeter.jsx:2:9:
+[37m      2 │ import { [32museState[37m, useEffect, useId } from 'react';
+        ╵          [32m~~~~~~~~[0m
+
+  The symbol "useState" was originally declared here:
+
+    src/components/viz/BrightnessMeter.jsx:1:9:
+[37m      1 │ import { [32museState[37m, useEffect, useRef, useId } from 'react';
+        ╵          [32m~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useEffect" has already been declared[0m
+
+    src/components/viz/BrightnessMeter.jsx:2:19:
+[37m      2 │ import { useState, [32museEffect[37m, useId } from 'react';
+        ╵                    [32m~~~~~~~~~[0m
+
+  The symbol "useEffect" was originally declared here:
+
+    src/components/viz/BrightnessMeter.jsx:1:19:
+[37m      1 │ import { useState, [32museEffect[37m, useRef, useId } from 'react';
+        ╵                    [32m~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useId" has already been declared[0m
+
+    src/components/viz/BrightnessMeter.jsx:2:30:
+[37m      2 │ import { useState, useEffect, [32museId[37m } from 'react';
+        ╵                               [32m~~~~~[0m
+
+  The symbol "useId" was originally declared here:
+
+    src/components/viz/BrightnessMeter.jsx:1:38:
+[37m      1 │ import { useState, useEffect, useRef, [32museId[37m } from 'react';
+        ╵                                       [32m~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected ";" but found ")"[0m
+
+    src/components/viz/BrightnessMeter.jsx:75:29:
+[37m      75 │     }, [dataRef, componentId][32m)[37m;
+         │                              [32m^[37m
+         ╵                              [32m;[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "accumulatorRef" has already been declared[0m
+
+    src/components/viz/LTASPlot.jsx:9:10:
+[37m      9 │     const [32maccumulatorRef[37m = useRef(null);
+        ╵           [32m~~~~~~~~~~~~~~[0m
+
+  The symbol "accumulatorRef" was originally declared here:
+
+    src/components/viz/LTASPlot.jsx:8:10:
+[37m      8 │     const [32maccumulatorRef[37m = useRef(null); // Assuming 1024 bins from...
+        ╵           [32m~~~~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mUnexpected "export"[0m
+
+    src/components/viz/LTASPlot.jsx:144:0:
+[37m      144 │ [32mexport[37m default LTASPlot;
+          ╵ [32m~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "balloonRef" has already been declared[0m
+
+    src/components/viz/PitchVisualizer.jsx:23:10:
+[37m      23 │     const [32mballoonRef[37m = useRef(new Image());
+         ╵           [32m~~~~~~~~~~[0m
+
+  The symbol "balloonRef" was originally declared here:
+
+    src/components/viz/PitchVisualizer.jsx:19:10:
+[37m      19 │     const [32mballoonRef[37m = useRef(null);
+         ╵           [32m~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "birdRef" has already been declared[0m
+
+    src/components/viz/PitchVisualizer.jsx:24:10:
+[37m      24 │     const [32mbirdRef[37m = useRef(new Image());
+         ╵           [32m~~~~~~~[0m
+
+  The symbol "birdRef" was originally declared here:
+
+    src/components/viz/PitchVisualizer.jsx:20:10:
+[37m      20 │     const [32mbirdRef[37m = useRef(null);
+         ╵           [32m~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "balloonRef" has already been declared[0m
+
+    src/components/viz/PitchVisualizer.jsx:25:10:
+[37m      25 │     const [32mballoonRef[37m = useRef(null);
+         ╵           [32m~~~~~~~~~~[0m
+
+  The symbol "balloonRef" was originally declared here:
+
+    src/components/viz/PitchVisualizer.jsx:19:10:
+[37m      19 │     const [32mballoonRef[37m = useRef(null);
+         ╵           [32m~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "birdRef" has already been declared[0m
+
+    src/components/viz/PitchVisualizer.jsx:26:10:
+[37m      26 │     const [32mbirdRef[37m = useRef(null);
+         ╵           [32m~~~~~~~[0m
+
+  The symbol "birdRef" was originally declared here:
+
+    src/components/viz/PitchVisualizer.jsx:20:10:
+[37m      20 │     const [32mbirdRef[37m = useRef(null);
+         ╵           [32m~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "birdRef" has already been declared[0m
+
+    src/components/viz/PitchVisualizer.jsx:42:10:
+[37m      42 │     const [32mbirdRef[37m = useRef(null);
+         ╵           [32m~~~~~~~[0m
+
+  The symbol "birdRef" was originally declared here:
+
+    src/components/viz/PitchVisualizer.jsx:20:10:
+[37m      20 │     const [32mbirdRef[37m = useRef(null);
+         ╵           [32m~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "birdRef" has already been declared[0m
+
+    src/components/viz/PitchVisualizer.jsx:46:10:
+[37m      46 │     const [32mbirdRef[37m = useRef(null);
+         ╵           [32m~~~~~~~[0m
+
+  The symbol "birdRef" was originally declared here:
+
+    src/components/viz/PitchVisualizer.jsx:20:10:
+[37m      20 │     const [32mbirdRef[37m = useRef(null);
+         ╵           [32m~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected ";" but found ")"[0m
+
+    src/components/viz/PitchVisualizer.jsx:613:82:
+[37m      613 │ ..., exercise, zoomRange, voiceProfiles, settings, colorBlindMode][32m)[37m;
+          │                                                                   [32m^[37m
+          ╵                                                                   [32m;[0m
 
 
 [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useEffect" has already been declared[0m
@@ -35,9 +275,9 @@ Error:   Failed to scan for dependencies from entries:
 
   The symbol "useEffect" was originally declared here:
 
-    src/components/viz/VoiceQualityAnalysis.jsx:1:9:
-[37m      1 │ import { [32museEffect[37m, useRef, useState, useId } from 'react';
-        ╵          [32m~~~~~~~~~[0m
+    src/components/viz/VoiceQualityAnalysis.jsx:1:16:
+[37m      1 │ import React, { [32museEffect[37m, useRef, useState, useId, useCallback } f...
+        ╵                 [32m~~~~~~~~~[0m
 
 
 [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useRef" has already been declared[0m
@@ -48,9 +288,9 @@ Error:   Failed to scan for dependencies from entries:
 
   The symbol "useRef" was originally declared here:
 
-    src/components/viz/VoiceQualityAnalysis.jsx:1:20:
-[37m      1 │ import { useEffect, [32museRef[37m, useState, useId } from 'react';
-        ╵                     [32m~~~~~~[0m
+    src/components/viz/VoiceQualityAnalysis.jsx:1:27:
+[37m      1 │ import React, { useEffect, [32museRef[37m, useState, useId, useCallback } f...
+        ╵                            [32m~~~~~~[0m
 
 
 [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useState" has already been declared[0m
@@ -61,9 +301,9 @@ Error:   Failed to scan for dependencies from entries:
 
   The symbol "useState" was originally declared here:
 
-    src/components/viz/VoiceQualityAnalysis.jsx:1:28:
-[37m      1 │ import { useEffect, useRef, [32museState[37m, useId } from 'react';
-        ╵                             [32m~~~~~~~~[0m
+    src/components/viz/VoiceQualityAnalysis.jsx:1:35:
+[37m      1 │ ...React, { useEffect, useRef, [32museState[37m, useId, useCallback } from ...
+        ╵                                [32m~~~~~~~~[0m
 
 
 [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useId" has already been declared[0m
@@ -74,17 +314,349 @@ Error:   Failed to scan for dependencies from entries:
 
   The symbol "useId" was originally declared here:
 
-    src/components/viz/VoiceQualityAnalysis.jsx:1:38:
-[37m      1 │ import { useEffect, useRef, useState, [32museId[37m } from 'react';
-        ╵                                       [32m~~~~~[0m
+    src/components/viz/VoiceQualityAnalysis.jsx:1:45:
+[37m      1 │ ..., { useEffect, useRef, useState, [32museId[37m, useCallback } from 'react';
+        ╵                                     [32m~~~~~[0m
 
 
-[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected ")" but found ";"[0m
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useCallback" has already been declared[0m
 
-    src/components/viz/VoiceQualityAnalysis.jsx:144:13:
-[37m      144 │             )[32m;[37m
-          │              [32m^[37m
-          ╵              [32m)[0m
+    src/components/viz/VoiceQualityAnalysis.jsx:2:45:
+[37m      2 │ ...t { useEffect, useRef, useState, useId, [32museCallback[37m } from 'react';
+        ╵                                            [32m~~~~~~~~~~~[0m
+
+  The symbol "useCallback" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:1:52:
+[37m      1 │ ..., { useEffect, useRef, useState, useId, [32museCallback[37m } from 'react';
+        ╵                                            [32m~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useEffect" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:7:9:
+[37m      7 │ import { [32museEffect[37m, useRef, useState, useId, useCallback } from 're...
+        ╵          [32m~~~~~~~~~[0m
+
+  The symbol "useEffect" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:1:16:
+[37m      1 │ import React, { [32museEffect[37m, useRef, useState, useId, useCallback } f...
+        ╵                 [32m~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useRef" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:7:20:
+[37m      7 │ import { useEffect, [32museRef[37m, useState, useId, useCallback } from 're...
+        ╵                     [32m~~~~~~[0m
+
+  The symbol "useRef" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:1:27:
+[37m      1 │ import React, { useEffect, [32museRef[37m, useState, useId, useCallback } f...
+        ╵                            [32m~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useState" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:7:28:
+[37m      7 │ import { useEffect, useRef, [32museState[37m, useId, useCallback } from 're...
+        ╵                             [32m~~~~~~~~[0m
+
+  The symbol "useState" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:1:35:
+[37m      1 │ ...React, { useEffect, useRef, [32museState[37m, useId, useCallback } from ...
+        ╵                                [32m~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useId" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:7:38:
+[37m      7 │ ...t { useEffect, useRef, useState, [32museId[37m, useCallback } from 'react';
+        ╵                                     [32m~~~~~[0m
+
+  The symbol "useId" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:1:45:
+[37m      1 │ ..., { useEffect, useRef, useState, [32museId[37m, useCallback } from 'react';
+        ╵                                     [32m~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useCallback" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:7:45:
+[37m      7 │ ...t { useEffect, useRef, useState, useId, [32museCallback[37m } from 'react';
+        ╵                                            [32m~~~~~~~~~~~[0m
+
+  The symbol "useCallback" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:1:52:
+[37m      1 │ ..., { useEffect, useRef, useState, useId, [32museCallback[37m } from 'react';
+        ╵                                            [32m~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "Activity" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:8:9:
+[37m      8 │ import { [32mActivity[37m, Info, Mic, MicOff, Wind, Heart, Sun, Layers, Ale...
+        ╵          [32m~~~~~~~~[0m
+
+  The symbol "Activity" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:3:9:
+[37m      3 │ import { [32mActivity[37m, Info, Mic, MicOff, Wind, Heart, Sun, Layers, Ale...
+        ╵          [32m~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "Info" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:8:19:
+[37m      8 │ import { Activity, [32mInfo[37m, Mic, MicOff, Wind, Heart, Sun, Layers, Ale...
+        ╵                    [32m~~~~[0m
+
+  The symbol "Info" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:3:19:
+[37m      3 │ import { Activity, [32mInfo[37m, Mic, MicOff, Wind, Heart, Sun, Layers, Ale...
+        ╵                    [32m~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "Mic" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:8:25:
+[37m      8 │ import { Activity, Info, [32mMic[37m, MicOff, Wind, Heart, Sun, Layers, Ale...
+        ╵                          [32m~~~[0m
+
+  The symbol "Mic" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:3:25:
+[37m      3 │ import { Activity, Info, [32mMic[37m, MicOff, Wind, Heart, Sun, Layers, Ale...
+        ╵                          [32m~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "MicOff" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:8:30:
+[37m      8 │ import { Activity, Info, Mic, [32mMicOff[37m, Wind, Heart, Sun, Layers, Ale...
+        ╵                               [32m~~~~~~[0m
+
+  The symbol "MicOff" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:3:30:
+[37m      3 │ import { Activity, Info, Mic, [32mMicOff[37m, Wind, Heart, Sun, Layers, Ale...
+        ╵                               [32m~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "Wind" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:8:38:
+[37m      8 │ ... Activity, Info, Mic, MicOff, [32mWind[37m, Heart, Sun, Layers, AlertTri...
+        ╵                                  [32m~~~~[0m
+
+  The symbol "Wind" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:3:38:
+[37m      3 │ ... Activity, Info, Mic, MicOff, [32mWind[37m, Heart, Sun, Layers, AlertTri...
+        ╵                                  [32m~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "Heart" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:8:44:
+[37m      8 │ ...ity, Info, Mic, MicOff, Wind, [32mHeart[37m, Sun, Layers, AlertTriangle,...
+        ╵                                  [32m~~~~~[0m
+
+  The symbol "Heart" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:3:44:
+[37m      3 │ ...ity, Info, Mic, MicOff, Wind, [32mHeart[37m, Sun, Layers, AlertTriangle,...
+        ╵                                  [32m~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "Sun" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:8:51:
+[37m      8 │ ...nfo, Mic, MicOff, Wind, Heart, [32mSun[37m, Layers, AlertTriangle, Check...
+        ╵                                   [32m~~~[0m
+
+  The symbol "Sun" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:3:51:
+[37m      3 │ ...nfo, Mic, MicOff, Wind, Heart, [32mSun[37m, Layers, AlertTriangle, Check...
+        ╵                                   [32m~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "Layers" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:8:56:
+[37m      8 │ ...c, MicOff, Wind, Heart, Sun, [32mLayers[37m, AlertTriangle, CheckCircle,...
+        ╵                                 [32m~~~~~~[0m
+
+  The symbol "Layers" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:3:56:
+[37m      3 │ ...c, MicOff, Wind, Heart, Sun, [32mLayers[37m, AlertTriangle, CheckCircle,...
+        ╵                                 [32m~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "AlertTriangle" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:8:64:
+[37m      8 │ ...Wind, Heart, Sun, Layers, [32mAlertTriangle[37m, CheckCircle, HelpCircle...
+        ╵                              [32m~~~~~~~~~~~~~[0m
+
+  The symbol "AlertTriangle" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:3:64:
+[37m      3 │ ...Wind, Heart, Sun, Layers, [32mAlertTriangle[37m, CheckCircle, HelpCircle...
+        ╵                              [32m~~~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "CheckCircle" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:8:79:
+[37m      8 │ ...un, Layers, AlertTriangle, [32mCheckCircle[37m, HelpCircle } from 'lucid...
+        ╵                               [32m~~~~~~~~~~~[0m
+
+  The symbol "CheckCircle" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:3:79:
+[37m      3 │ ...un, Layers, AlertTriangle, [32mCheckCircle[37m, HelpCircle } from 'lucid...
+        ╵                               [32m~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "HelpCircle" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:8:92:
+[37m      8 │ ...yers, AlertTriangle, CheckCircle, [32mHelpCircle[37m } from 'lucide-react';
+        ╵                                      [32m~~~~~~~~~~[0m
+
+  The symbol "HelpCircle" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:3:92:
+[37m      3 │ ...yers, AlertTriangle, CheckCircle, [32mHelpCircle[37m } from 'lucide-react';
+        ╵                                      [32m~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "QuadCoreAnalysisService" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:9:9:
+[37m      9 │ import { [32mQuadCoreAnalysisService[37m } from '../../services/QuadCoreAna...
+        ╵          [32m~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  The symbol "QuadCoreAnalysisService" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:4:9:
+[37m      4 │ import { [32mQuadCoreAnalysisService[37m } from '../../services/QuadCoreAna...
+        ╵          [32m~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "renderCoordinator" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:10:9:
+[37m      10 │ import { [32mrenderCoordinator[37m } from '../../services/RenderCoordinator';
+         ╵          [32m~~~~~~~~~~~~~~~~~[0m
+
+  The symbol "renderCoordinator" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:5:9:
+[37m      5 │ import { [32mrenderCoordinator[37m } from '../../services/RenderCoordinator';
+        ╵          [32m~~~~~~~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "useProfile" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:11:9:
+[37m      11 │ import { [32museProfile[37m } from '../../context/ProfileContext';
+         ╵          [32m~~~~~~~~~~[0m
+
+  The symbol "useProfile" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:6:9:
+[37m      6 │ import { [32museProfile[37m } from '../../contexts/ProfileContext';
+        ╵          [32m~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "serviceRef" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:86:10:
+[37m      86 │     const [32mserviceRef[37m = useRef(new QuadCoreAnalysisService());
+         ╵           [32m~~~~~~~~~~[0m
+
+  The symbol "serviceRef" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:83:10:
+[37m      83 │     const [32mserviceRef[37m = useRef(new QuadCoreAnalysisService());
+         ╵           [32m~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "serviceRef" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:90:10:
+[37m      90 │     const [32mserviceRef[37m = useRef(null);
+         ╵           [32m~~~~~~~~~~[0m
+
+  The symbol "serviceRef" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:83:10:
+[37m      83 │     const [32mserviceRef[37m = useRef(new QuadCoreAnalysisService());
+         ╵           [32m~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "analysis" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:98:10:
+[37m      98 │     const [32m[37m[analysis, setAnalysis] = useState(null);
+         ╵           [32m^[0m
+
+  The symbol "analysis" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:87:10:
+[37m      87 │     const [32m[37m[analysis, setAnalysis] = useState(null);
+         ╵           [32m^[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "setAnalysis" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:98:10:
+[37m      98 │     const [32m[37m[analysis, setAnalysis] = useState(null);
+         ╵           [32m^[0m
+
+  The symbol "setAnalysis" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:87:10:
+[37m      87 │     const [32m[37m[analysis, setAnalysis] = useState(null);
+         ╵           [32m^[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe symbol "componentId" has already been declared[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:102:10:
+[37m      102 │     const [32mcomponentId[37m = `voice-quality-${uniqueId}`;
+          ╵           [32m~~~~~~~~~~~[0m
+
+  The symbol "componentId" was originally declared here:
+
+    src/components/viz/VoiceQualityAnalysis.jsx:88:10:
+[37m      88 │     const [32mcomponentId[37m = useId();
+         ╵           [32m~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mExpected ";" but found ")"[0m
+
+    src/components/viz/VoiceQualityAnalysis.jsx:135:44:
+[37m      135 │     }, [isAudioActive, componentId, dataRef][32m)[37m;
+          │                                             [32m^[37m
+          ╵                                             [32m;[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mUnexpected ","[0m
+
+    src/components/viz/VoiceQualityMeter.jsx:65:9:
+[37m      65 │         }[32m,[37m [dataRef, colorBlindMode]);
+         ╵          [32m^[0m
 
 
     at failureErrorWithLog (/app/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/lib/main.js:1472:15)
@@ -102,9 +674,24 @@ Error:   Failed to scan for dependencies from entries:
     at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
     at Readable.push (node:internal/streams/readable:392:5)
     at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
-7:36:23 AM [vite] page reload src/components/viz/VoiceQualityAnalysis.jsx
-npm notice
-npm notice New minor version of npm available! 11.6.2 -> 11.7.0
-npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.7.0
-npm notice To update run: npm install -g npm@11.7.0
-npm notice
+7:10:30 AM [vite] Pre-transform error: /app/src/components/ui/button.jsx: Identifier 'React' has already been declared. (45:7)
+
+  43 |   );
+  44 | });
+> 45 | import React from 'react';
+     |        ^
+  46 | import clsx from 'clsx';
+  47 | import { twMerge } from 'tailwind-merge';
+  48 | import LoadingSpinner from './LoadingSpinner';
+7:10:30 AM [vite] Pre-transform error: /app/src/components/ui/button.jsx: Identifier 'React' has already been declared. (45:7)
+
+  43 |   );
+  44 | });
+> 45 | import React from 'react';
+     |        ^
+  46 | import clsx from 'clsx';
+  47 | import { twMerge } from 'tailwind-merge';
+  48 | import LoadingSpinner from './LoadingSpinner';
+7:10:53 AM [vite] hmr update /src/index.css, /src/components/analytics/AnalyticsDashboardV2.jsx, /src/components/analytics/InsightCard.jsx
+7:11:24 AM [vite] page reload src/components/viz/VoiceQualityAnalysis.jsx
+ ELIFECYCLE  Command failed.

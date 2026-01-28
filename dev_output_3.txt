@@ -1,0 +1,12 @@
+
+> vocal-gem@0.1.0 dev /app
+> vite
+
+
+  VITE v5.4.21  ready in 395 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+7:12:57 AM [vite] page reload src/components/ui/LoadingSpinnerVerification.jsx
+7:13:10 AM [vite] hmr update /src/App.jsx, /src/index.css
+7:14:40 AM [vite] hmr update /src/App.jsx, /src/index.css

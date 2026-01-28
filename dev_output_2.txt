@@ -1,10 +1,19 @@
 
-> vocal-gem@0.1.0 dev
+> vocal-gem@0.1.0 dev /app
 > vite
 
 
-  VITE v5.4.21  ready in 451 ms
+  VITE v5.4.21  ready in 361 ms
 
   ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
-7:38:50 AM [vite] page reload src/main.jsx
+7:11:43 AM [vite] Pre-transform error: /app/src/components/ui/Toast.jsx: Unexpected token, expected "," (23:6)
+
+  21 |       label: 'Success',
+  22 |       live: 'polite'
+> 23 |       live: 'polite',
+     |       ^
+  24 |       label: 'Success'
+  25 |     },
+  26 |     error: {
+ ELIFECYCLE  Command failed.
