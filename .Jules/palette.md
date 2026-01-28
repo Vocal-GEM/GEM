@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2025-05-23 - Corrupted Component Restoration
+**Learning:** Found widespread file corruption in `Toast.jsx` (duplicate code blocks). This completely breaks functionality and accessibility.
+**Action:** When encountering corrupted files, do not just patch the syntax. Rewrite the component cleanly, enforcing accessibility standards (ARIA roles, live regions) during the reconstruction.
