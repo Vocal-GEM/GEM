@@ -4,39 +4,24 @@ import CelebrationAnimations from '../ui/CelebrationAnimations';
 import DriftAlert from '../ui/DriftAlert';
 import { getAdaptiveFeedbackController } from '../../services/AdaptiveFeedback';
 import FlowStateDetector from '../../utils/FlowStateDetector';
-import { useFeedback } from '../../hooks/useFeedback'; // We might piggyback or ignore
-import HapticFeedback from '../../services/HapticFeedback';
 
 const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     const { settings } = useSettings();
-    const [alert, setAlert] = useState(null);
     const [celebration, setCelebration] = useState(null);
+
+    // Lazy initialization refs
     const flowDetector = useRef(null);
     const adaptiveController = useRef(null);
 
+    // Initial setup
     useEffect(() => {
-        flowDetector.current = new FlowStateDetector();
-        adaptiveController.current = getAdaptiveFeedbackController();
+        if (!flowDetector.current) flowDetector.current = new FlowStateDetector();
+        if (!adaptiveController.current) adaptiveController.current = getAdaptiveFeedbackController();
     }, []);
 
-    if (!flowDetector.current) {
-        flowDetector.current = new FlowStateDetector();
-    }
-
-    const adaptiveController = useRef(null);
-
-    const adaptiveController = useRef(null);
-
-    // Lazy initialization
+    // Also lazy init if needed synchronously for rendering usage (though these are used in effects mostly)
     if (!flowDetector.current) flowDetector.current = new FlowStateDetector();
     if (!adaptiveController.current) adaptiveController.current = getAdaptiveFeedbackController();
-    if (!flowDetector.current) {
-        flowDetector.current = new FlowStateDetector();
-    }
-    const adaptiveController = useRef(null);
-    if (!adaptiveController.current) {
-        adaptiveController.current = getAdaptiveFeedbackController();
-    }
 
     // State for visual updates
     const [currentPitch, setCurrentPitch] = useState(0);
@@ -71,14 +56,6 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
                     }
                 }
             }
-
-            // 3. Adaptive Feedback & Celebrations
-            // Ideally we'd have a more robust event system, but polling dataRef is okay for visual feedback triggers
-            // We check for "Target Hit" logic roughly
-            // Real logic might be better in the AudioEngine callback, but this is a UI layer component
-
-            // Check for massive success (holding note for 5s?) - Implementation Dependent
-
         }, 100);
 
         return () => clearInterval(interval);

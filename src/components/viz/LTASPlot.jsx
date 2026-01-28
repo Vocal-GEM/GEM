@@ -5,23 +5,20 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
     const { dataRef } = useAudio();
     const canvasRef = useRef(null);
     const [isRecording, setIsRecording] = useState(false);
-    const accumulatorRef = useRef(null); // Assuming 1024 bins from AudioEngine
+
+    // Lazy init accumulator
     const accumulatorRef = useRef(null);
-
-    if (!accumulatorRef.current) {
-        accumulatorRef.current = new Float32Array(1024).fill(0); // Assuming 1024 bins from AudioEngine
-    }
-
-    if (!accumulatorRef.current) {
-        accumulatorRef.current = new Float32Array(1024).fill(0); // Assuming 1024 bins from AudioEngine
-    const accumulatorRef = useRef(null); // Assuming 1024 bins from AudioEngine
     if (!accumulatorRef.current) {
         accumulatorRef.current = new Float32Array(1024).fill(0);
     }
+
     const frameCountRef = useRef(0);
 
+    // Initial fill if needed, though lazy init above handles it
     useEffect(() => {
-        accumulatorRef.current = new Float32Array(1024).fill(0);
+        if (!accumulatorRef.current) {
+            accumulatorRef.current = new Float32Array(1024).fill(0);
+        }
     }, []);
 
     useEffect(() => {
@@ -106,7 +103,7 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
 
         draw();
         return () => cancelAnimationFrame(animationId);
-    }, [isRecording]);
+    }, [isRecording, dataRef]);
 
     const reset = () => {
         if (accumulatorRef.current) {
