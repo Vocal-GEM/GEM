@@ -46,6 +46,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
         { id: 'client-dashboard', label: 'Pro Dashboard', icon: <Briefcase size={20} /> },
         { id: 'capev', label: 'CAPE-V', icon: <ClipboardCheck size={20} /> },
         { id: 'spectrogram', label: 'Signal Lab', icon: <Waves size={20} /> },
+        { id: 'pitch-tool', label: 'Haptic Tool', icon: <Activity size={20} /> },
         { id: 'camera', label: 'Mirror', icon: <Camera size={20} />, isModal: true },
         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
     ].filter(item => FEATURES[item.id] !== false);

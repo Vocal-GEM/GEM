@@ -27,6 +27,7 @@ const ClinicalAssessmentView = lazy(() => import('./components/views/ClinicalAss
 const CAPEVAssessment = lazy(() => import('./components/professional/CAPEVAssessment'));
 const ClientDashboard = lazy(() => import('./components/professional/ClientDashboard'));
 const SpectrogramComparison = lazy(() => import('./components/professional/SpectrogramComparison'));
+const PitchFeedbackTool = lazy(() => import('./components/tools/PitchFeedbackTool/PitchFeedbackTool'));
 
 const SettingsView = lazy(() => import('./components/views/SettingsView'));
 const AnalysisHub = lazy(() => import('./components/views/AnalysisHub'));
@@ -351,6 +352,14 @@ const App = () => {
                             <div className="h-full">
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <SpectrogramComparison />
+                                </Suspense>
+                            </div>
+                        )}
+
+                        {activeTab === 'pitch-tool' && (
+                            <div className="h-full">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                    <PitchFeedbackTool />
                                 </Suspense>
                             </div>
                         )}

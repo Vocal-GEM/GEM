@@ -613,7 +613,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 </div>
             )}
 
-            <div className="absolute top-3 right-3 z-20 flex items-start gap-3 pointer-events-none">
+            <div className="absolute top-3 right-3 z-20 flex flex-col items-end gap-2 pointer-events-none">
                 <div className="pointer-events-auto">
                     <FeedbackControls settings={feedbackSettings} setSettings={setFeedbackSettings} />
                 </div>
