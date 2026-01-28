@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2024-05-22 - Marketplace Validation Gap
+**Vulnerability:** The marketplace `create_pack` endpoint accepted negative prices and arbitrary strings for restricted fields (category, audience), allowing potential financial logic bypass and database pollution.
+**Learning:** The app relies on `sanitize_html` for XSS but lacks domain-specific validation (allowed values, numeric ranges) for business logic fields.
+**Prevention:** Always validate inputs against allowlists (enums) and numeric ranges, not just sanitizing for XSS.
