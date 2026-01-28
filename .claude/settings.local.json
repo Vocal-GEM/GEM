@@ -10,7 +10,14 @@
       "Bash(timeout:*)",
       "Bash(ping:*)",
       "WebFetch(domain:localhost)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git -C /c/Users/riley/Desktop/GEM log --oneline -15)",
+      "Bash(git -C /c/Users/riley/Desktop/GEM status --short)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(npm test:*)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

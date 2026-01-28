@@ -10,3 +10,34 @@
 ## 2025-05-21 - Widespread Lazy Initialization Anti-Pattern
 **Learning:** The `useRef(new Class())` anti-pattern was found in 7+ components, involving `Float32Array` buffers (up to 16KB per render in `Spectrogram3D`), `Image` objects, and service classes. This creates invisible memory pressure that doesn't break functionality but triggers frequent GC pauses.
 **Action:** Audit all `useRef` calls during code reviews. Any `new` keyword inside `useRef(...)` is a red flag. Use `if (!ref.current) ref.current = new Class()` for strict lazy loading.
+
+## 2026-01-24 - Fixed Merge Conflict Artifacts Across Codebase
+**Learning:** Multiple files had unresolved merge conflict artifacts causing duplicate imports, duplicate variable declarations, and broken JSX. These went undetected until build time because ESLint doesn't catch duplicate `const` declarations at runtime.
+**Files Fixed:**
+- `VoiceQualityAnalysis.jsx` - duplicate imports and service refs
+- `PitchVisualizer.jsx` - duplicate Image refs and balloonRef/birdRef declarations
+- `Toast.jsx` - duplicate style definitions and JSX elements
+- `LoadingSpinner.jsx` - multiple conflicting implementations
+- `button.jsx` - duplicate component definitions
+- `VoiceQualityMeter.jsx` - duplicate useCallback closing
+- `BrightnessMeter.jsx` - duplicate imports and useEffect closings
+- `FeedbackManager.jsx` - duplicate adaptiveController refs
+- `LTASPlot.jsx` - duplicate accumulatorRef declarations
+**Action:** Run `npm run build` before committing to catch syntax errors. Consider adding a pre-commit hook to prevent broken code from being merged.
+
+## 2026-01-24 - Implemented Onset Quality Analysis
+**Learning:** The QuadCoreAnalysisService had a TODO for analyzing onset quality (hard vs soft attacks). Hard onsets (glottal attacks) can strain vocal cords over time.
+**Implementation:** Added `analyzeOnsetQuality()` method that tracks volume history and calculates the maximum slope during phonation onset. Thresholds: >0.15 = hard, <0.03 = soft, otherwise balanced.
+**Feedback:** Added warning feedback for hard onsets detected within 500ms: "Try starting with a gentle 'h' sound before the vowel."
+
+## 2026-01-24 - Fixed Test Infrastructure
+**Learning:** Test files also had merge conflict artifacts, plus the lucide-react mock was missing many icons (Briefcase, Brain, Award, etc.) causing test failures.
+**Files Fixed:**
+- `BreathinessMeter.test.jsx` - duplicate imports and mocks
+- `Toast.test.jsx` - duplicate describe blocks
+- `HighResSpectrogram.test.jsx` - duplicate imports
+- `QualityVisualizer.test.jsx` - duplicate mocks
+- `ResonanceMetrics.test.jsx` - duplicate test blocks
+- `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
+- `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
+**Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).

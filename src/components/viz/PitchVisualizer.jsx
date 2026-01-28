@@ -16,34 +16,13 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { voiceProfiles, activeProfile } = useProfile();
     const { colorBlindMode } = useSettings();
     const canvasRef = useRef(null);
+
+    // Lazy initialization for Image objects - avoid creating on every render
     const balloonRef = useRef(null);
     const birdRef = useRef(null);
+
     // Cached dimensions to avoid getBoundingClientRect in loop
     const dimensionsRef = useRef({ width: 0, height: 0 });
-    const balloonRef = useRef(new Image());
-    const birdRef = useRef(new Image());
-    const balloonRef = useRef(null);
-    const birdRef = useRef(null);
-
-    // Lazy initialization
-    if (!balloonRef.current) {
-        balloonRef.current = new Image();
-    }
-    if (!birdRef.current) {
-        birdRef.current = new Image();
-    }
-
-    if (!balloonRef.current) balloonRef.current = new Image();
-    if (!birdRef.current) birdRef.current = new Image();
-
-    if (!balloonRef.current) {
-        balloonRef.current = new Image();
-    }
-    const birdRef = useRef(null);
-    if (!birdRef.current) {
-        birdRef.current = new Image();
-    }
-    const birdRef = useRef(null);
     const gameRef = useRef({ score: 0, lastUpdate: Date.now(), lastPitch: 0 });
 
     const [zoomRange, setZoomRange] = useState({ min: 50, max: 350 });
@@ -57,11 +36,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { settings: feedbackSettings, setSettings: setFeedbackSettings } = useFeedback(audioEngineRef, dataRef);
 
     useEffect(() => {
-        // Optimized: Lazy initialization of Image objects to avoid creating them on every render
-        if (!balloonRef.current) balloonRef.current = new Image();
-        if (!birdRef.current) birdRef.current = new Image();
-        balloonRef.current.src = '/assets/balloon.png';
-        birdRef.current.src = '/assets/bird.png';
+        // Lazy initialization of Image objects
         if (!balloonRef.current) {
             balloonRef.current = new Image();
             balloonRef.current.src = '/assets/balloon.png';
@@ -260,7 +235,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
         };
 
         const loop = () => {
-            // ... (context init omitted, assumes mostly unchanged logic till drawing) ...
             if (!canvas) return;
 
             // Use cached dimensions - huge performance win
@@ -270,7 +244,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             // Clear using cached logical dimensions
             ctx.clearRect(0, 0, width, height);
 
-            // ... (grid drawing lines 114-133 omitted) ...
             const yMin = zoomRange.min;
             const yMax = zoomRange.max;
             const mapY = (freq) => height - ((freq - yMin) / (yMax - yMin)) * height;
@@ -293,9 +266,9 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             ctx.stroke();
 
             const showNorms = settings?.showNorms !== false;
-            const mode = settings?.genderFeedbackMode || 'neutral';
+            const currentMode = settings?.genderFeedbackMode || 'neutral';
 
-            if (showNorms && mode !== 'off') {
+            if (showNorms && currentMode !== 'off') {
                 let genderId = null;
                 const targetCenter = (targetRange.min + targetRange.max) / 2;
                 if (targetCenter < 160) genderId = 'masculine';
@@ -310,11 +283,11 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     const normH = Math.abs(normBotY - normTopY);
 
                     // Override label for neutral mode
-                    let label = norms.pitch.label;
-                    if (mode === 'neutral') {
-                        if (genderId === 'masculine') label = 'Typical Low Range';
-                        else if (genderId === 'feminine') label = 'Typical High Range';
-                        else label = 'Mid Range';
+                    let normLabel = norms.pitch.label;
+                    if (currentMode === 'neutral') {
+                        if (genderId === 'masculine') normLabel = 'Typical Low Range';
+                        else if (genderId === 'feminine') normLabel = 'Typical High Range';
+                        else normLabel = 'Mid Range';
                     }
 
                     if (normTopY < height && normBotY > 0) {
@@ -324,14 +297,14 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                         ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
                         ctx.font = 'italic 10px sans-serif';
                         ctx.textAlign = 'right';
-                        ctx.fillText(label, width - 10, normTopY + 12);
+                        ctx.fillText(normLabel, width - 10, normTopY + 12);
                     }
                 }
             }
 
             if (targetRange && !exercise) {
-                const isFem = activeProfile === 'fem';
-                const topY = isFem ? 0 : mapY(targetRange.max);
+                const isFemProfile = activeProfile === 'fem';
+                const topY = isFemProfile ? 0 : mapY(targetRange.max);
                 const botY = mapY(targetRange.min);
                 const h = Math.abs(botY - topY);
 
@@ -342,7 +315,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     ctx.strokeStyle = colorBlindMode ? 'rgba(13, 148, 136, 0.5)' : 'rgba(34, 197, 94, 0.5)';
                     ctx.lineWidth = 2;
                     ctx.beginPath();
-                    if (!isFem) {
+                    if (!isFemProfile) {
                         ctx.moveTo(30, topY);
                         ctx.lineTo(width, topY);
                     }
@@ -353,7 +326,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     ctx.fillStyle = colorBlindMode ? '#0d9488' : '#22c55e';
                     ctx.font = 'bold 10px sans-serif';
                     ctx.textAlign = 'left';
-                    ctx.fillText('TARGET ZONE', 35, isFem ? mapY(targetRange.min + 20) : topY - 5);
+                    ctx.fillText('TARGET ZONE', 35, isFemProfile ? mapY(targetRange.min + 20) : topY - 5);
                 }
             }
 
@@ -385,7 +358,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
             // Crossover point marker at 157 Hz (gender-neutral point based on research)
             const crossoverFreq = 157;
-            if (crossoverFreq > yMin && crossoverFreq < yMax && mode !== 'off') {
+            if (crossoverFreq > yMin && crossoverFreq < yMax && currentMode !== 'off') {
                 const crossY = mapY(crossoverFreq);
                 ctx.strokeStyle = 'rgba(168, 85, 247, 0.5)'; // Purple
                 ctx.lineWidth = 1;
@@ -416,7 +389,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
                     if (i % 150 === 0) {
                         const birdY = y + (Math.sin(i + now / 100) * 20);
-                        if (birdRef.current && birdRef.current.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
                         if (birdRef.current?.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
                     }
                 }
@@ -425,7 +397,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 const currentPitch = dataRef.current.history[dataRef.current.history.length - 1];
                 if (currentPitch > 0) {
                     const playerY = mapY(currentPitch);
-                    if (balloonRef.current && balloonRef.current.complete) {
                     if (balloonRef.current?.complete) {
                         ctx.drawImage(balloonRef.current, width - 60, playerY - 25, 50, 50);
                     } else {
@@ -503,8 +474,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 }
             }
             flush();
-            // Optimized: Removed the dot-drawing loop (history.forEach) which caused O(N) arc/fill calls.
-            // The line itself provides sufficient visual feedback.
 
             ctx.shadowBlur = 0;
             const currentP = history[history.length - 1];
@@ -566,8 +535,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             }
 
             // IN-FORMANT UPGRADE: Draw Formants if visible
-            // Formants F1 (300-1000) and F2 (800-2500) might be above the pitch view (defaults 50-350), 
-            // but if user zooms out, we should see them.
             if (dataRef.current.formants) {
                 const { f1, f2 } = dataRef.current.formants;
                 if (f1 > 0 && f1 > yMin && f1 < yMax) {
@@ -610,7 +577,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
         return () => {
             unsubscribe();
         };
-    }, [targetRange, exercise, zoomRange, voiceProfiles, settings, colorBlindMode]);
+    }, [targetRange, exercise, zoomRange, voiceProfiles, settings, colorBlindMode, activeProfile, dataRef, onScore]);
 
     return (
         <div className="w-full h-full relative overflow-hidden group">

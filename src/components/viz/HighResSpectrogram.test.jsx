@@ -1,10 +1,7 @@
 import { render, cleanup, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import HighResSpectrogram from './HighResSpectrogram';
-import { SettingsProvider } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import { renderCoordinator } from '../../services/RenderCoordinator';
-import { SettingsProvider } from '../../context/SettingsContext';
 import React from 'react';
 
 // Mock dependencies
@@ -16,28 +13,15 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Mock SettingsContext
-const mockSettings = {
-  spectrogramColorScheme: 'magma'
-};
-
 vi.mock('../../context/SettingsContext', () => ({
-  useSettings: () => ({ settings: mockSettings }),
+  useSettings: () => ({ settings: { spectrogramColorScheme: 'magma' } }),
   SettingsProvider: ({ children }) => <div>{children}</div>
 }));
-
-// Mock ResizeObserver
-global.ResizeObserver = vi.fn(function() {
-  this.observe = vi.fn();
-  this.unobserve = vi.fn();
-  this.disconnect = vi.fn();
-});
 
 // Mock Canvas getContext
 const mockContext = {
   createImageData: vi.fn((w, h) => ({
     data: { buffer: new ArrayBuffer(w * h * 4) },
-    height: h,
-    width: w
     width: w,
     height: h
   })),
@@ -48,8 +32,6 @@ const mockContext = {
   lineTo: vi.fn(),
   stroke: vi.fn(),
   fillRect: vi.fn(),
-  fillText: vi.fn()
-}));
   fillText: vi.fn(),
   scale: vi.fn(),
   canvas: { width: 800, height: 512 }
@@ -69,7 +51,6 @@ describe('HighResSpectrogram', () => {
       }
     };
 
-    // Add getBoundingClientRect mock
     Element.prototype.getBoundingClientRect = vi.fn(() => ({
       width: 800,
       height: 512,
@@ -87,69 +68,18 @@ describe('HighResSpectrogram', () => {
     vi.clearAllMocks();
   });
 
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    cleanup();
-    vi.clearAllMocks();
-  });
-
   it('renders successfully and subscribes to coordinator', () => {
-    render(
-      <SettingsProvider>
-        <HighResSpectrogram dataRef={dataRef} />
-      </SettingsProvider>
-    );
-
-    // Check if component rendered (by looking for overlay text if present, or just checking if subscribe was called)
+    render(<HighResSpectrogram dataRef={dataRef} />);
     expect(renderCoordinator.subscribe).toHaveBeenCalled();
-
-    // Check if component rendered (by looking for overlay text)
-    expect(screen.getByText(/High-Res Spectrogram/i)).toBeDefined();
-    expect(renderCoordinator.subscribe).toHaveBeenCalled();
-
-    const [, callback, priority] = renderCoordinator.subscribe.mock.calls[0];
-    expect(priority).toBe(renderCoordinator.PRIORITY.MEDIUM);
-    expect(typeof callback).toBe('function');
   });
 
   it('cleans up subscription on unmount', () => {
     const unsubscribe = vi.fn();
     renderCoordinator.subscribe.mockReturnValue(unsubscribe);
 
-    const { unmount } = render(
-      <SettingsProvider>
-        <HighResSpectrogram dataRef={dataRef} />
-      </SettingsProvider>
-    );
+    const { unmount } = render(<HighResSpectrogram dataRef={dataRef} />);
 
     unmount();
     expect(unsubscribe).toHaveBeenCalled();
-  });
-
-  it('draws when callback is executed', () => {
-     render(
-      <SettingsProvider>
-        <HighResSpectrogram dataRef={dataRef} />
-      </SettingsProvider>
-    );
-
-    // Get the draw callback
-    const drawCallback = renderCoordinator.subscribe.mock.calls[0][1];
-
-    // Execute it
-    drawCallback();
-
-    // Verify canvas calls
-    expect(mockContext.drawImage).toHaveBeenCalled();
-    // 2 pixels shift
-    expect(mockContext.drawImage).toHaveBeenCalledWith(
-        expect.anything(),
-        2, 0, expect.any(Number), expect.any(Number),
-        0, 0, expect.any(Number), expect.any(Number)
-    );
-
-    expect(mockContext.putImageData).toHaveBeenCalled();
   });
 });

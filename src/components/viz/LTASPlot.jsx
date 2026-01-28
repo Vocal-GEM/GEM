@@ -5,24 +5,13 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
     const { dataRef } = useAudio();
     const canvasRef = useRef(null);
     const [isRecording, setIsRecording] = useState(false);
-    const accumulatorRef = useRef(null); // Assuming 1024 bins from AudioEngine
     const accumulatorRef = useRef(null);
-
-    if (!accumulatorRef.current) {
-        accumulatorRef.current = new Float32Array(1024).fill(0); // Assuming 1024 bins from AudioEngine
-    }
-
-    if (!accumulatorRef.current) {
-        accumulatorRef.current = new Float32Array(1024).fill(0); // Assuming 1024 bins from AudioEngine
-    const accumulatorRef = useRef(null); // Assuming 1024 bins from AudioEngine
-    if (!accumulatorRef.current) {
-        accumulatorRef.current = new Float32Array(1024).fill(0);
-    }
     const frameCountRef = useRef(0);
 
-    useEffect(() => {
+    // Lazy initialization
+    if (!accumulatorRef.current) {
         accumulatorRef.current = new Float32Array(1024).fill(0);
-    }, []);
+    }
 
     useEffect(() => {
         let animationId;
@@ -67,16 +56,10 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
                 ctx.lineWidth = 2;
 
                 const len = accumulatorRef.current.length;
-                // Only plot up to Nyquist/2 or relevant range (e.g. 0-8kHz)
-                // Assuming spectrum is 0-Nyquist.
 
                 for (let i = 0; i < len; i++) {
                     const avgMag = accumulatorRef.current[i] / frameCountRef.current;
-                    // Convert to dB for display: 20 * log10(mag)
-                    // Normalize to fit canvas height (approx -100dB to 0dB)
                     const db = 20 * Math.log10(avgMag + 0.00001);
-
-                    // Map dB to Y (0dB = top, -100dB = bottom)
                     const y = h - ((db + 100) / 100) * h;
                     const x = (i / len) * w;
 
@@ -106,7 +89,7 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
 
         draw();
         return () => cancelAnimationFrame(animationId);
-    }, [isRecording]);
+    }, [isRecording, dataRef]);
 
     const reset = () => {
         if (accumulatorRef.current) {

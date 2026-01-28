@@ -1,4 +1,4 @@
-import { useEffect, useState, useId } from 'react';
+import { useEffect, useState, useId, useRef } from 'react';
 import { Info } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 

@@ -11,6 +11,8 @@ export class QuadCoreAnalysisService {
         this.history = [];
         this.lastOnset = 0;
         this.isSpeaking = false;
+        this.volumeHistory = []; // Track recent volume for onset analysis
+        this.lastOnsetQuality = null; // 'soft', 'balanced', 'hard'
     }
 
     /**
@@ -25,18 +27,25 @@ export class QuadCoreAnalysisService {
             return null;
         }
 
+        // Track volume history for onset analysis (keep last 10 frames ~166ms at 60fps)
+        this.volumeHistory.push(data.volume);
+        if (this.volumeHistory.length > 10) {
+            this.volumeHistory.shift();
+        }
+
         // Detect Onset (start of phonation)
         if (!this.isSpeaking && data.volume > 0.02) {
             this.isSpeaking = true;
             this.lastOnset = Date.now();
-            // TODO: Analyze onset quality (hard vs soft) based on volume slope
+            this.lastOnsetQuality = this.analyzeOnsetQuality();
         }
 
         const scores = {
             texture: this.evaluateTexture(data.f3Noise),
             health: this.evaluateHealth(data.tilt, data.volume),
             color: this.evaluateColor(data.f2, targets.targetF2),
-            mix: this.evaluateMix(data.harmonicRatio)
+            mix: this.evaluateMix(data.harmonicRatio),
+            onset: this.lastOnsetQuality ? { quality: this.lastOnsetQuality } : null
         };
 
         const feedback = this.generateFeedback(scores);
@@ -46,6 +55,39 @@ export class QuadCoreAnalysisService {
             scores,
             feedback
         };
+    }
+
+    /**
+     * Analyze onset quality based on volume slope
+     * Hard onset: Sudden jump in volume (glottal attack)
+     * Soft onset: Gradual increase (aspirate/breathy onset)
+     * Balanced: Moderate attack (coordinated onset)
+     * @returns {'soft'|'balanced'|'hard'} Onset quality
+     */
+    analyzeOnsetQuality() {
+        if (this.volumeHistory.length < 3) return 'balanced';
+
+        // Calculate the rate of volume increase over the last few frames
+        const recent = this.volumeHistory.slice(-5);
+
+        // Find the maximum slope between consecutive frames
+        let maxSlope = 0;
+        for (let i = 1; i < recent.length; i++) {
+            const slope = recent[i] - recent[i - 1];
+            if (slope > maxSlope) {
+                maxSlope = slope;
+            }
+        }
+
+        // Thresholds based on typical volume ranges (0-1 normalized)
+        // Hard onset: Volume jumps more than 0.15 in one frame
+        // Soft onset: Volume increases less than 0.03 per frame
+        if (maxSlope > 0.15) {
+            return 'hard';
+        } else if (maxSlope < 0.03) {
+            return 'soft';
+        }
+        return 'balanced';
     }
 
     /**
@@ -166,6 +208,16 @@ export class QuadCoreAnalysisService {
      * Generates actionable advice based on the combination of modules.
      */
     generateFeedback(scores) {
+        // Scenario 0: Hard Onset Warning (prioritize vocal health)
+        // Only show this feedback right after a hard onset is detected
+        if (scores.onset && scores.onset.quality === 'hard' && Date.now() - this.lastOnset < 500) {
+            return {
+                type: 'warning',
+                title: 'Hard Attack',
+                message: "Try starting with a gentle 'h' sound before the vowel. This protects your vocal cords from strain."
+            };
+        }
+
         // Scenario 1: The "Strain" Trap
         // Pressed (Health=Pressed) + High Brightness (Color > 80%) + Chest Dominant (Mix > 80%)
         if (scores.health.status === 'Pressed' && scores.mix.percentage > 70) {
