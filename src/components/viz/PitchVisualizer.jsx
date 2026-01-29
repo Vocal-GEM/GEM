@@ -12,6 +12,9 @@ import { predictGenderPerception, getPerceptionColor, AMBIGUITY_ZONE } from '../
 import GenderTimeline from './GenderTimeline';
 import FeedbackManager from './FeedbackManager';
 
+const NEAR_MISS_MIN_FACTOR = Math.pow(2, -50 / 1200);
+const NEAR_MISS_MAX_FACTOR = Math.pow(2, 50 / 1200);
+
 const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScore, settings }) => {
     const { voiceProfiles, activeProfile } = useProfile();
     const { colorBlindMode } = useSettings();
@@ -167,6 +170,10 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
         const isFem = activeProfile === 'fem';
         const mode = settings?.genderFeedbackMode || 'neutral';
 
+        // Performance Optimization: Pre-calculate near-miss thresholds to avoid Math.log2 in render loop
+        const nearMissMin = targetRange ? targetRange.min * NEAR_MISS_MIN_FACTOR : 0;
+        const nearMissMax = targetRange ? targetRange.max * NEAR_MISS_MAX_FACTOR : 0;
+
         // Pre-calculate game logic functions if exercise is active
         let getExerciseFreq = null;
         if (exercise) {
@@ -202,10 +209,11 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
             // Near Miss Zone
             if (targetRange) {
-                const distMin = 1200 * Math.log2(freq / targetRange.min);
-                const distMax = 1200 * Math.log2(freq / targetRange.max);
+                // Optimized: Use pre-calculated thresholds instead of Math.log2
+                const isNearMin = freq >= nearMissMin && freq < targetRange.min;
+                const isNearMax = freq > targetRange.max && freq <= nearMissMax;
 
-                if ((distMin > -50 && distMin < 0) || (distMax > 0 && distMax < 50)) {
+                if (isNearMin || isNearMax) {
                     if (colorBlindMode) return '#f59e0b';
                     return '#eab308'; // Yellow
                 }
