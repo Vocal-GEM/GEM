@@ -5,12 +5,11 @@
  * Includes trend arrows, insights, and key metrics.
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import {
-    TrendingUp, TrendingDown, Minus, Calendar, Clock,
-    Target, Flame, ChevronRight, BarChart3, Award
+    TrendingUp, TrendingDown, Minus, Calendar, BarChart3
 } from 'lucide-react';
-import { getReports, getActivitySummary } from '../../services/SessionReportService';
+import { getReports } from '../../services/SessionReportService';
 import { getStreakData } from '../../services/StreakService';
 import { getXPData } from '../../services/XPService';
 import SpacedRepetitionService from '../../services/SpacedRepetitionService';
@@ -22,39 +21,126 @@ const WeeklyProgressSummary = ({ embedded = false }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        const calculateWeekStats = (reports) => {
+            const uniqueDays = new Set(reports.map(r => r.timestamp.split('T')[0])).size;
+            const totalMinutes = reports.reduce((sum, r) => sum + (r.durationMinutes || 0), 0);
+            const totalSessions = reports.length;
+            const exercisesCompleted = reports.reduce((sum, r) => sum + (r.exercises?.length || 0), 0);
+
+            // Calculate average pitches from reports that have them
+            const pitchReports = reports.filter(r => r.avgPitch > 0);
+            const avgPitch = pitchReports.length > 0
+                ? Math.round(pitchReports.reduce((sum, r) => sum + r.avgPitch, 0) / pitchReports.length)
+                : null;
+
+            return {
+                sessions: totalSessions,
+                minutes: totalMinutes,
+                days: uniqueDays,
+                exercises: exercisesCompleted,
+                avgPitch
+            };
+        };
+
+        const generateInsights = (current, previous) => {
+            const insights = [];
+            const streak = getStreakData();
+            const xp = getXPData();
+            const srStats = SpacedRepetitionService.getStats();
+
+            // Session comparison
+            if (current.sessions > previous.sessions) {
+                insights.push({
+                    type: 'positive',
+                    text: `${current.sessions - previous.sessions} more sessions than last week!`,
+                    icon: '📈'
+                });
+            } else if (current.sessions < previous.sessions && previous.sessions > 0) {
+                insights.push({
+                    type: 'neutral',
+                    text: `${previous.sessions - current.sessions} fewer sessions than last week`,
+                    icon: '📊'
+                });
+            }
+
+            // Time comparison
+            if (current.minutes > previous.minutes + 10) {
+                insights.push({
+                    type: 'positive',
+                    text: `${current.minutes - previous.minutes} more minutes of practice!`,
+                    icon: '⏱️'
+                });
+            }
+
+            // Streak insight
+            if (streak.currentStreak >= 7) {
+                insights.push({
+                    type: 'positive',
+                    text: `Amazing ${streak.currentStreak} day streak! 🔥`,
+                    icon: '🔥'
+                });
+            } else if (streak.currentStreak >= 3) {
+                insights.push({
+                    type: 'positive',
+                    text: `${streak.currentStreak} day streak - keep it going!`,
+                    icon: '✨'
+                });
+            }
+
+            // Mastery insight
+            if (srStats.masteredCount > 0) {
+                insights.push({
+                    type: 'positive',
+                    text: `${srStats.masteredCount} exercises mastered`,
+                    icon: '🏆'
+                });
+            }
+
+            // Level up insight
+            if (xp.level >= 5) {
+                insights.push({
+                    type: 'positive',
+                    text: `Level ${xp.level} - You're making great progress!`,
+                    icon: '⭐'
+                });
+            }
+
+            return insights.slice(0, 3); // Max 3 insights
+        };
+
+        const loadData = () => {
+            const reports = getReports();
+            const now = new Date();
+
+            // Current week (last 7 days)
+            const weekAgo = new Date(now);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+
+            // Previous week (8-14 days ago)
+            const twoWeeksAgo = new Date(now);
+            twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+            const currentWeekReports = reports.filter(r => {
+                const d = new Date(r.timestamp);
+                return d >= weekAgo;
+            });
+
+            const previousWeekReports = reports.filter(r => {
+                const d = new Date(r.timestamp);
+                return d >= twoWeeksAgo && d < weekAgo;
+            });
+
+            const current = calculateWeekStats(currentWeekReports);
+            const previous = calculateWeekStats(previousWeekReports);
+
+            setCurrentWeek(current);
+            setPreviousWeek(previous);
+            setInsights(generateInsights(current, previous));
+            setIsLoading(false);
+        };
+
         loadData();
     }, []);
-
-    const loadData = () => {
-        const reports = getReports();
-        const now = new Date();
-
-        // Current week (last 7 days)
-        const weekAgo = new Date(now);
-        weekAgo.setDate(weekAgo.getDate() - 7);
-
-        // Previous week (8-14 days ago)
-        const twoWeeksAgo = new Date(now);
-        twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-
-        const currentWeekReports = reports.filter(r => {
-            const d = new Date(r.timestamp);
-            return d >= weekAgo;
-        });
-
-        const previousWeekReports = reports.filter(r => {
-            const d = new Date(r.timestamp);
-            return d >= twoWeeksAgo && d < weekAgo;
-        });
-
-        const current = calculateWeekStats(currentWeekReports);
-        const previous = calculateWeekStats(previousWeekReports);
-
-        setCurrentWeek(current);
-        setPreviousWeek(previous);
-        setInsights(generateInsights(current, previous));
-        setIsLoading(false);
-    };
 
     const calculateWeekStats = (reports) => {
         const uniqueDays = new Set(reports.map(r => r.timestamp.split('T')[0])).size;
