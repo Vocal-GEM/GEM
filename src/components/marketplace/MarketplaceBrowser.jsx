@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Star, Download, ShoppingBag, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
