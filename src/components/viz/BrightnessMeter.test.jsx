@@ -18,7 +18,11 @@ vi.mock('lucide-react', async () => {
     const actual = await vi.importActual('lucide-react');
     const React = await import('react');
 
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+    const createIcon = (name) => {
+        const Icon = (props) => React.createElement('div', { ...props, 'data-testid': name });
+        Icon.displayName = name;
+        return Icon;
+    };
 
     return {
         ...actual,
