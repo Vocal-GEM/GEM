@@ -76,16 +76,33 @@ def create_pack():
     title = sanitize_html(data.get('title', ''))
     description = sanitize_html(data.get('description', ''))
 
+    # Validation
+    price_cents = data.get('price_cents', 0)
+    if not isinstance(price_cents, int) or price_cents < 0:
+        return jsonify({'error': 'Price must be a non-negative integer'}), 400
+
+    category = data.get('category')
+    if category not in ['pitch', 'resonance', 'prosody', 'full_course']:
+        return jsonify({'error': 'Invalid category'}), 400
+
+    target_audience = data.get('target_audience')
+    if target_audience not in ['beginner', 'intermediate', 'advanced']:
+        return jsonify({'error': 'Invalid target audience'}), 400
+
+    voice_goal = data.get('voice_goal')
+    if voice_goal not in ['feminine', 'masculine', 'androgynous']:
+        return jsonify({'error': 'Invalid voice goal'}), 400
+
     pack_id = str(uuid.uuid4())
     pack = ExercisePack(
         id=pack_id,
         creator_id=current_user.id,
         title=title,
         description=description,
-        category=data.get('category'),
-        target_audience=data.get('target_audience'),
-        voice_goal=data.get('voice_goal'),
-        price_cents=data.get('price_cents', 0)
+        category=category,
+        target_audience=target_audience,
+        voice_goal=voice_goal,
+        price_cents=price_cents
     )
     
     db.session.add(pack)
