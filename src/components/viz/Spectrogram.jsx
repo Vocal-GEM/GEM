@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -48,14 +48,15 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
     }
 
-    if (!historyMetaRef.current) {
-        historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
-    }
     const historyHeadRef = useRef(0); // Points to the next write position (frame index)
 
-    useEffect(() => {
-        historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
-    }, []);
+    // Optimization: Cache ImageData and Uint32Array view to avoid per-frame allocations
+    const visualizerDataRef = useRef({
+        imageData: null,
+        data32: null,
+        width: 0,
+        height: 0
+    });
 
     // Spectrogram State
     const speed = 2; // Pixels per frame
@@ -118,18 +119,18 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             // Instead of thousands of ctx.fillRect calls, we generate the column pixels
             // directly into an ImageData buffer and put it onto the canvas.
 
-            // Reuse ImageData object
             // Reusable objects to reduce GC
-            if (!canvas.imageDataRef) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
-            }
-            // Ensure size match
-            if (canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
+            const vizData = visualizerDataRef.current;
+
+            // Ensure size match or create new buffers
+            if (!vizData.imageData || vizData.width !== speed || vizData.height !== h) {
+                vizData.imageData = ctx.createImageData(speed, h);
+                vizData.data32 = new Uint32Array(vizData.imageData.data.buffer);
+                vizData.width = speed;
+                vizData.height = h;
             }
 
-            const imageData = canvas.imageDataRef;
-            const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
+            const { imageData, data32 } = vizData;
 
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
             // We map pixels (y) to frequency bins.
@@ -178,7 +179,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             ctx.fillStyle = '#000';
             ctx.fillRect(width - speed, 0, speed, h);
         }
-    }, [isAudioActive, audioContext, colormap]);
+    }, [audioContext, colormap, dataRef]);
 
     useEffect(() => {
         let unsubscribe;
