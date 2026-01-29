@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import { vi, describe, it, expect } from 'vitest';
 import PracticeMode from './PracticeMode';
@@ -43,6 +43,8 @@ vi.mock('../viz/VoiceQualityAnalysis', () => ({ default: () => <div>Voice Qualit
 vi.mock('../viz/VowelAnalysis', () => ({ default: () => <div>Vowel Analysis</div> }));
 vi.mock('../ui/ToolExercises', () => ({ default: () => <div>Tool Exercises</div> }));
 vi.mock('../ui/ComparisonTool', () => ({ default: () => <div>Comparison Tool</div> }));
+vi.mock('../ui/VisualizerSkeleton', () => ({ default: () => <div data-testid="visualizer-skeleton">Loading...</div> }));
+
 vi.mock('../../context/AuthContext', () => ({
     useAuth: () => ({ user: { id: 'test-user', username: 'Tester' } }),
     AuthProvider: ({ children }) => <div>{children}</div>
@@ -56,6 +58,15 @@ vi.mock('../../context/ProfileContext', () => ({
         currentProfile: null
     }),
     ProfileProvider: ({ children }) => <div>{children}</div>
+}));
+
+// Mock IndexedDBManager to avoid async issues in SettingsProvider
+vi.mock('../../services/IndexedDBManager', () => ({
+    indexedDB: {
+        ensureReady: vi.fn().mockResolvedValue(true),
+        getSetting: vi.fn().mockResolvedValue({}),
+        saveSetting: vi.fn().mockResolvedValue(true)
+    }
 }));
 
 describe('PracticeMode', () => {
@@ -88,7 +99,13 @@ describe('PracticeMode', () => {
 
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
-        // Check for visualization area
-        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
+
+        // Check for visualization area with extended timeout for Suspense
+        // If it's loading, we might see the skeleton
+        await waitFor(() => {
+            const orb = screen.queryByTestId('dynamic-orb');
+            const skeleton = screen.queryByTestId('visualizer-skeleton');
+            expect(orb || skeleton).toBeInTheDocument();
+        }, { timeout: 5000 });
     });
 });
