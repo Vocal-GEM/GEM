@@ -1,60 +1,50 @@
-import { useEffect, useRef, useId } from 'react';
+import { useEffect, useRef, useId, useCallback } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { Info, TrendingDown } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -6 } }) => {
     const { colorBlindMode } = useSettings();
-    const id = useId();
+    const componentId = useId();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
-    const componentId = useId();
+
+    const loop = useCallback(() => {
+        if (!dataRef.current) return;
+
+        if (indicatorRef.current && valueRef.current) {
+            const tilt = dataRef.current.tilt || 0;
+
+            // Map Tilt: Typically -20dB/oct (Masc/Steep?) to 0dB/oct (Flat/Bright?)
+            // Visualization Range: -24 dB/oct to 0 dB/oct
+            const minDisp = -24;
+            const maxDisp = 0;
+
+            // Normalize to 0-100%
+            let percent = ((tilt - minDisp) / (maxDisp - minDisp)) * 100;
+            percent = Math.max(0, Math.min(100, percent));
+
+            const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
+            const nextLeft = curLeft + (percent - curLeft) * 0.1;
+            indicatorRef.current.style.left = `${nextLeft}%`;
+
+            // Color based on target range
+            const isWithinTarget = tilt >= targetRange.min && tilt <= targetRange.max;
+
+            if (isWithinTarget) {
+                indicatorRef.current.className = `absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`;
+            } else {
+                indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-slate-400";
+            }
+
+            // Update value display
+            valueRef.current.innerText = tilt.toFixed(1);
+        }
+    }, [dataRef, targetRange, colorBlindMode]);
 
     useEffect(() => {
-        const loop = () => {
-            if (indicatorRef.current && valueRef.current) {
-                const tilt = dataRef.current.tilt || 0;
-
-                // Map Tilt: Typically -20dB/oct (Masc/Steep?) to 0dB/oct (Flat/Bright?)
-                // Visualization Range: -24 dB/oct to 0 dB/oct
-                const minDisp = -24;
-                const maxDisp = 0;
-
-                // Normalize to 0-100%
-                let percent = ((tilt - minDisp) / (maxDisp - minDisp)) * 100;
-                percent = Math.max(0, Math.min(100, percent));
-
-                const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
-                const nextLeft = curLeft + (percent - curLeft) * 0.1;
-                indicatorRef.current.style.left = `${nextLeft}%`;
-
-                // Color based on target range
-                const isWithinTarget = tilt >= targetRange.min && tilt <= targetRange.max;
-
-                if (isWithinTarget) {
-                    indicatorRef.current.className = `absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`;
-                } else {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-slate-400";
-                }
-
-                // Update value display
-                valueRef.current.innerText = tilt.toFixed(1);
-            }
-        };
-
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                `spectral-tilt-meter-${id}`,
-                loop,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
-
         const unsubscribe = renderCoordinator.subscribe(
-            `spectral-tilt-meter-${componentId}`,
+            componentId,
             loop,
             renderCoordinator.PRIORITY.MEDIUM
         );
@@ -62,8 +52,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
         return () => {
             unsubscribe();
         };
-    }, [dataRef, targetRange, colorBlindMode, id]);
-    }, [dataRef, targetRange, colorBlindMode, componentId]);
+    }, [componentId, loop]);
 
     return (
         <div className="glass-panel rounded-2xl p-6 h-full flex flex-col justify-center">
