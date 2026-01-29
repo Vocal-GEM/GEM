@@ -15,7 +15,7 @@ class McLeodPitchDetector {
         this.bufferSize = config.bufferSize || 1024;
 
         // Initialize the detector from pitchfinder
-        this.detector = Pitchfinder.McLeod({
+        this.detector = Pitchfinder.Macleod({
             sampleRate: this.sampleRate,
             bufferSize: this.bufferSize,
             cutoff: 0.9 // Probability threshold
@@ -32,7 +32,7 @@ class McLeodPitchDetector {
 
         // pitchfinder returns just the frequency (float) or null/0
         // We might want to construct a standard object.
-        // Pitchfinder's McLeod implementation might return an object depending on version, 
+        // Pitchfinder's Macleod implementation might return an object depending on version,
         // usually it's just frequency. Let's check or assume standard usage.
         // Standard Pitchfinder usage: const detectPitch = Pitchfinder.YIN(); const pitch = detectPitch(float32Array);
 
