@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Star, Download, Filter, ShoppingBag } from 'lucide-react';
+import { Search, Star, Download, ShoppingBag, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export const MarketplaceBrowser = () => {
@@ -9,6 +9,23 @@ export const MarketplaceBrowser = () => {
     const [filter, setFilter] = useState('all');
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(true);
+    const inputRef = useRef(null);
+
+    // Keyboard shortcut to focus search
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            // Ignore if user is already typing in an input
+            const isInput = ['input', 'textarea'].includes(document.activeElement?.tagName?.toLowerCase()) || document.activeElement?.isContentEditable;
+
+            if (e.key === '/' && !isInput) {
+                e.preventDefault();
+                inputRef.current?.focus();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     // Mock data for initial dev
     useEffect(() => {
@@ -84,15 +101,36 @@ export const MarketplaceBrowser = () => {
 
             {/* Controls */}
             <div className="flex flex-col md:flex-row gap-4 mb-8">
-                <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <div className="relative flex-1 group">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-purple-400 transition-colors" aria-hidden="true" />
                     <input
+                        ref={inputRef}
                         type="text"
                         placeholder={t('marketplace.search', 'Search packs...')}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all"
+                        aria-label={t('marketplace.search', 'Search packs')}
+                        className="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-10 pr-12 focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all placeholder:text-slate-500"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
+
+                    {search ? (
+                        <button
+                            onClick={() => {
+                                setSearch('');
+                                inputRef.current?.focus();
+                            }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white rounded-full hover:bg-slate-700 transition-all"
+                            aria-label={t('common.clearSearch', 'Clear search')}
+                        >
+                            <X className="w-4 h-4" aria-hidden="true" />
+                        </button>
+                    ) : (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:block">
+                            <kbd className="px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs text-slate-400 font-mono shadow-sm">
+                                /
+                            </kbd>
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
