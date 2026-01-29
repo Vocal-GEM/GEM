@@ -83,19 +83,27 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
     }
 
     const [analysis, setAnalysis] = useState(null);
+    const lastUiUpdateRef = useRef(0);
 
     // Generate unique component ID for RenderCoordinator
     const uniqueId = useId();
     const componentId = `voice-quality-${uniqueId}`;
 
-    const analyze = useCallback(() => {
+    const analyze = useCallback((delta, time) => {
         if (dataRef.current && isAudioActive && serviceRef.current) {
-            const results = serviceRef.current.analyze(dataRef.current, {
-                targetF2: 2000 // Default to neutral/chem until calibration is fuller
-            });
+            // Optimization: Update history every frame (for onset detection),
+            // but only compute expensive results/update UI at 10fps
+            const shouldUpdateUi = time - lastUiUpdateRef.current > 100;
 
-            if (results) {
+            const results = serviceRef.current.analyze(
+                dataRef.current,
+                { targetF2: 2000 },
+                shouldUpdateUi // computeScores param
+            );
+
+            if (results && shouldUpdateUi) {
                 setAnalysis(results);
+                lastUiUpdateRef.current = time;
             }
         }
     }, [dataRef, isAudioActive]);
@@ -105,11 +113,11 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
 
         if (isAudioActive) {
             // Subscribe to RenderCoordinator instead of using internal RAF loop
-            // Use LOW priority as this is UI analysis updates, not 60fps animation
+            // Use HIGH priority to ensure we track onsets accurately at 60fps
             unsubscribe = renderCoordinator.subscribe(
                 `VoiceQualityAnalysis-${componentId}`,
                 analyze,
-                renderCoordinator.PRIORITY.LOW
+                renderCoordinator.PRIORITY.HIGH
             );
         }
 
