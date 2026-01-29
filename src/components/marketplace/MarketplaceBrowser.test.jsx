@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { MarketplaceBrowser } from './MarketplaceBrowser';
-import React from 'react';
 
 // Mock translations
 vi.mock('react-i18next', () => ({
@@ -72,7 +71,7 @@ describe('MarketplaceBrowser', () => {
         <input type="text" placeholder="Other input" />
       </div>
     );
-    const searchInput = screen.getByPlaceholderText(/search packs/i);
+    // const searchInput = screen.getByPlaceholderText(/search packs/i);
     const otherInput = screen.getByPlaceholderText("Other input");
 
     // Focus other input
