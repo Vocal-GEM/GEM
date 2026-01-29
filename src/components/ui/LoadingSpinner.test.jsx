@@ -34,9 +34,8 @@ describe("LoadingSpinner", () => {
     rerender(<LoadingSpinner size="xl" />);
     expect(screen.getByRole("status")).toBeInTheDocument();
 
-    // xl should likely be flex based on other components
-    // checking container class presence roughly
-    expect(container.querySelector('.w-16')).toBeInTheDocument();
+    // xl uses .w-24 .h-24 in the component definition
+    expect(container.querySelector('.w-24')).toBeInTheDocument();
   });
 
   it("renders with current color variant", () => {
