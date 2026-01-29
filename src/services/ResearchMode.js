@@ -3,6 +3,8 @@
  * Manages clinical trials, research studies, and participant data collection
  */
 
+/* eslint-disable no-undef */
+
 import { v4 as uuidv4 } from 'uuid';
 import CryptoJS from 'crypto-js';
 
@@ -59,7 +61,10 @@ export class ResearchModeController {
      */
     generateParticipantId(userId) {
         // Use cryptographic hash with study-specific salt
-        const salt = this.studyId + process.env.REACT_APP_RESEARCH_SALT;
+        // Use import.meta.env for Vite or process.env for Node/Test environment
+        // eslint-disable-next-line no-undef
+        const saltKey = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env.VITE_RESEARCH_SALT : (typeof process !== 'undefined' ? process.env.REACT_APP_RESEARCH_SALT : 'default_salt');
+        const salt = this.studyId + saltKey;
         const hash = CryptoJS.SHA256(userId + salt).toString();
 
         // Take first 16 characters for readability
