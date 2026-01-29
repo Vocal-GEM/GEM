@@ -36,18 +36,21 @@ const DailyPhrases = ({ onComplete }) => {
             </div>
 
             <div className="flex gap-4">
+                <label htmlFor="new-phrase-input" className="sr-only">New Phrase</label>
                 <input
+                    id="new-phrase-input"
                     type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     placeholder="Type a phrase (e.g. 'One latte please')..."
-                    className="flex-1 bg-slate-800 border border-slate-700 rounded-xl p-4 text-white focus:ring-2 focus:ring-purple-500 outline-none"
+                    className="flex-1 bg-slate-800 border border-slate-700 rounded-xl p-4 text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus:ring-2 focus:ring-purple-500"
                     onKeyDown={(e) => e.key === 'Enter' && addPhrase(inputValue)}
                 />
                 <button
                     onClick={() => addPhrase(inputValue)}
                     disabled={!inputValue}
-                    className="bg-purple-600 hover:bg-purple-500 text-white p-4 rounded-xl disabled:opacity-50"
+                    aria-label="Add phrase"
+                    className="bg-purple-600 hover:bg-purple-500 text-white p-4 rounded-xl disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500 focus-visible:ring-offset-slate-900"
                 >
                     <Plus size={24} />
                 </button>
@@ -82,7 +85,8 @@ const DailyPhrases = ({ onComplete }) => {
                         </div>
                         <button
                             onClick={() => removePhrase(phrase)}
-                            className="text-slate-500 hover:text-red-400 transition-colors"
+                            aria-label={`Remove phrase ${phrase}`}
+                            className="text-slate-500 hover:text-red-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 rounded-lg p-1"
                         >
                             <Trash2 size={20} />
                         </button>
