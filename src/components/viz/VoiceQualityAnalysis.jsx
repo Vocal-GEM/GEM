@@ -83,6 +83,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
     }
 
     const [analysis, setAnalysis] = useState(null);
+    const lastUpdateRef = useRef(0);
 
     // Generate unique component ID for RenderCoordinator
     const uniqueId = useId();
@@ -90,12 +91,20 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
 
     const analyze = useCallback(() => {
         if (dataRef.current && isAudioActive && serviceRef.current) {
-            const results = serviceRef.current.analyze(dataRef.current, {
-                targetF2: 2000 // Default to neutral/chem until calibration is fuller
-            });
+            const now = Date.now();
+            // Throttle UI updates to 10fps (100ms) to reduce re-renders
+            // Pass !shouldUpdateUI as true to skip expensive object creation in service
+            const shouldUpdateUI = now - lastUpdateRef.current >= 100;
 
-            if (results) {
+            const results = serviceRef.current.analyze(
+                dataRef.current,
+                { targetF2: 2000 },
+                !shouldUpdateUI // onlyUpdateHistory if we're not updating UI
+            );
+
+            if (shouldUpdateUI && results) {
                 setAnalysis(results);
+                lastUpdateRef.current = now;
             }
         }
     }, [dataRef, isAudioActive]);
