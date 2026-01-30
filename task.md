@@ -20,3 +20,7 @@
 - [x] Hide Current DSI Score
 - [x] Hide Day Streak
 - [x] Hide Exercises
+
+# Bug Fixes
+- [x] Fix "Audio initialization failed: Pitchfinder.McLeod is not a function" error
+- [x] Fix "Start Microphone" button in Haptic Tool not working

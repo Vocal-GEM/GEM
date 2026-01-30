@@ -209,6 +209,7 @@ export class AudioEngine {
             console.error('AudioEngine start error:', error);
             this.debugInfo.error = error.message;
             this.debugInfo.state = 'error';
+            throw error; // Rethrow to allow caller to handle UI updates
         }
     }
 

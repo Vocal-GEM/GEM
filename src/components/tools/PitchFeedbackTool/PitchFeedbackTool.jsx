@@ -5,7 +5,7 @@ import { useReferenceTone } from '../../../hooks/useReferenceTone';
 import { Volume2, Smartphone, TrendingUp, Mic, AlertCircle } from 'lucide-react';
 
 const PitchFeedbackTool = () => {
-    const { dataRef, isAudioActive, toggleAudio } = useAudio();
+    const { dataRef, isAudioActive, toggleAudio, audioError } = useAudio();
     const [currentPitch, setCurrentPitch] = useState(0);
     const [targetPitch, setTargetPitch] = useState(200); // Default target 200Hz
     const [isVibrateEnabled, setIsVibrateEnabled] = useState(false);
@@ -91,6 +91,13 @@ const PitchFeedbackTool = () => {
                 )}
             </div>
 
+            {audioError && (
+                <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-xl flex items-start gap-3">
+                    <AlertCircle className="text-red-400 shrink-0 mt-0.5" size={18} />
+                    <p className="text-sm text-red-200">{audioError}</p>
+                </div>
+            )}
+
             {/* Main Visualizer */}
             <div className="flex-1 flex flex-col items-center justify-center relative min-h-[300px]">
 
@@ -149,8 +156,8 @@ const PitchFeedbackTool = () => {
                     <button
                         onClick={() => setIsVibrateEnabled(!isVibrateEnabled)}
                         className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all ${isVibrateEnabled
-                                ? 'bg-emerald-900/20 border-emerald-500/50 text-emerald-400'
-                                : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-750'
+                            ? 'bg-emerald-900/20 border-emerald-500/50 text-emerald-400'
+                            : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-750'
                             }`}
                     >
                         <Smartphone size={24} className={isVibrateEnabled ? 'animate-pulse' : ''} />
@@ -161,8 +168,8 @@ const PitchFeedbackTool = () => {
                     <button
                         onClick={() => setIsToneEnabled(!isToneEnabled)}
                         className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all ${isToneEnabled
-                                ? 'bg-blue-900/20 border-blue-500/50 text-blue-400'
-                                : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-750'
+                            ? 'bg-blue-900/20 border-blue-500/50 text-blue-400'
+                            : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-750'
                             }`}
                     >
                         <Volume2 size={24} />

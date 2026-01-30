@@ -15,11 +15,37 @@ class McLeodPitchDetector {
         this.bufferSize = config.bufferSize || 1024;
 
         // Initialize the detector from pitchfinder
-        this.detector = Pitchfinder.McLeod({
+        // Note: The library exports it as 'Macleod' (with an 'a'), despite the algorithm being McLeod
+        // We handle both potential spellings to be safe across versions/environments
+        const configParams = {
             sampleRate: this.sampleRate,
             bufferSize: this.bufferSize,
             cutoff: 0.9 // Probability threshold
-        });
+        };
+
+        // Aggressive search for the constructor
+        let detectorConstructor = null;
+
+        // Check direct named export
+        if (Pitchfinder.Macleod) detectorConstructor = Pitchfinder.Macleod;
+        else if (Pitchfinder.McLeod) detectorConstructor = Pitchfinder.McLeod;
+        // Check default export (ESM interop)
+        else if (Pitchfinder.default) {
+            if (Pitchfinder.default.Macleod) detectorConstructor = Pitchfinder.default.Macleod;
+            else if (Pitchfinder.default.McLeod) detectorConstructor = Pitchfinder.default.McLeod;
+        }
+
+        if (detectorConstructor) {
+            this.detector = detectorConstructor(configParams);
+            console.log("McLeodPitchDetector: Successfully initialized.");
+        } else {
+            const keys = Object.keys(Pitchfinder);
+            let defaultKeys = [];
+            if (Pitchfinder.default) defaultKeys = Object.keys(Pitchfinder.default);
+
+            console.error('CRITICAL: Pitchfinder.Macleod not found. Keys:', keys, 'Default keys:', defaultKeys);
+            throw new Error(`Top-level Pitchfinder export issue. Available keys: ${keys.join(', ')}`);
+        }
     }
 
     /**
