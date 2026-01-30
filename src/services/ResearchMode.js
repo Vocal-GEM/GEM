@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * Research Mode Controller
  * Manages clinical trials, research studies, and participant data collection
@@ -62,9 +63,7 @@ export class ResearchModeController {
         // Safe access to environment variables
         let saltKey = 'default-salt';
         try {
-            // eslint-disable-next-line no-undef
             if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_RESEARCH_SALT) {
-                // eslint-disable-next-line no-undef
                 saltKey = process.env.REACT_APP_RESEARCH_SALT;
             } else if (import.meta.env && import.meta.env.VITE_RESEARCH_SALT) {
                 saltKey = import.meta.env.VITE_RESEARCH_SALT;
