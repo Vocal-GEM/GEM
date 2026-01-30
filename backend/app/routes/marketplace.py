@@ -76,6 +76,23 @@ def create_pack():
     title = sanitize_html(data.get('title', ''))
     description = sanitize_html(data.get('description', ''))
 
+    # Validation
+    category = data.get('category')
+    if category not in ExercisePack.ALLOWED_CATEGORIES:
+        return jsonify({'error': f'Invalid category. Must be one of {list(ExercisePack.ALLOWED_CATEGORIES)}'}), 400
+
+    target_audience = data.get('target_audience')
+    if target_audience and target_audience not in ExercisePack.ALLOWED_AUDIENCES:
+         return jsonify({'error': f'Invalid target audience. Must be one of {list(ExercisePack.ALLOWED_AUDIENCES)}'}), 400
+
+    voice_goal = data.get('voice_goal')
+    if voice_goal and voice_goal not in ExercisePack.ALLOWED_GOALS:
+         return jsonify({'error': f'Invalid voice goal. Must be one of {list(ExercisePack.ALLOWED_GOALS)}'}), 400
+
+    price_cents = data.get('price_cents', 0)
+    if not isinstance(price_cents, int) or price_cents < 0:
+        return jsonify({'error': 'Invalid price_cents. Must be a non-negative integer'}), 400
+
     pack_id = str(uuid.uuid4())
     pack = ExercisePack(
         id=pack_id,

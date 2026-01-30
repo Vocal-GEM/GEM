@@ -154,6 +154,10 @@ class CommunityBenchmark(db.Model):
 # Voice Training Marketplace Models (Tier 10)
 
 class ExercisePack(db.Model):
+    ALLOWED_CATEGORIES = {'pitch', 'resonance', 'prosody', 'full_course'}
+    ALLOWED_AUDIENCES = {'beginner', 'intermediate', 'advanced'}
+    ALLOWED_GOALS = {'feminine', 'masculine', 'androgynous'}
+
     id = db.Column(db.String(36), primary_key=True) # UUID string
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     title = db.Column(db.String(200), nullable=False)
