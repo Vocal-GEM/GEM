@@ -59,7 +59,17 @@ export class ResearchModeController {
      */
     generateParticipantId(userId) {
         // Use cryptographic hash with study-specific salt
-        const salt = this.studyId + process.env.REACT_APP_RESEARCH_SALT;
+        // Use import.meta.env for Vite, fallback to safe access for other envs
+        let saltKey = 'default_salt_key';
+        try {
+            if (import.meta && import.meta.env && import.meta.env.VITE_RESEARCH_SALT) {
+                saltKey = import.meta.env.VITE_RESEARCH_SALT;
+            }
+        } catch (e) {
+            // Ignore
+        }
+
+        const salt = this.studyId + saltKey;
         const hash = CryptoJS.SHA256(userId + salt).toString();
 
         // Take first 16 characters for readability

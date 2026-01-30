@@ -2,12 +2,15 @@ from flask import Blueprint, jsonify, request
 from app.models import db, ExercisePack, PackExercise, PackDownload, PackReview, User
 from app.extensions import limiter
 from flask_login import login_required, current_user
-from ..extensions import limiter
 from ..validators import sanitize_html
 import uuid
 from datetime import datetime
 
 marketplace_bp = Blueprint('marketplace', __name__)
+
+ALLOWED_CATEGORIES = {'pitch', 'resonance', 'prosody', 'full_course'}
+ALLOWED_AUDIENCES = {'beginner', 'intermediate', 'advanced'}
+ALLOWED_GOALS = {'feminine', 'masculine', 'androgynous'}
 
 @marketplace_bp.route('/packs', methods=['GET'])
 def get_packs():
@@ -72,6 +75,23 @@ def get_pack_details(pack_id):
 def create_pack():
     data = request.get_json()
     
+    # Security: Validate inputs
+    price_cents = data.get('price_cents', 0)
+    if not isinstance(price_cents, int) or price_cents < 0:
+        return jsonify({'error': 'Price must be a non-negative integer'}), 400
+
+    category = data.get('category')
+    if category and category not in ALLOWED_CATEGORIES:
+        return jsonify({'error': f'Invalid category. Allowed: {", ".join(ALLOWED_CATEGORIES)}'}), 400
+
+    target_audience = data.get('target_audience')
+    if target_audience and target_audience not in ALLOWED_AUDIENCES:
+        return jsonify({'error': f'Invalid target audience. Allowed: {", ".join(ALLOWED_AUDIENCES)}'}), 400
+
+    voice_goal = data.get('voice_goal')
+    if voice_goal and voice_goal not in ALLOWED_GOALS:
+        return jsonify({'error': f'Invalid voice goal. Allowed: {", ".join(ALLOWED_GOALS)}'}), 400
+
     # Security: Sanitize inputs to prevent Stored XSS
     title = sanitize_html(data.get('title', ''))
     description = sanitize_html(data.get('description', ''))
@@ -82,10 +102,10 @@ def create_pack():
         creator_id=current_user.id,
         title=title,
         description=description,
-        category=data.get('category'),
-        target_audience=data.get('target_audience'),
-        voice_goal=data.get('voice_goal'),
-        price_cents=data.get('price_cents', 0)
+        category=category,
+        target_audience=target_audience,
+        voice_goal=voice_goal,
+        price_cents=price_cents
     )
     
     db.session.add(pack)
