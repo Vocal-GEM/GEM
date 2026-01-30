@@ -10,3 +10,10 @@
 7:33:16 AM [vite] hmr update /src/App.jsx, /src/index.css
 7:33:23 AM [vite] hmr update /src/components/viz/VoiceQualityVerification.jsx, /src/index.css
 7:34:50 AM [vite] page reload src/services/QuadCoreAnalysisService.test.js
+7:39:37 AM [vite] page reload src/audio/PitchWorklet.js
+7:39:37 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:39:37 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:39:37 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:40:26 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:40:26 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:40:26 AM [vite] page reload src/components/professional/TaskRecorder.jsx
