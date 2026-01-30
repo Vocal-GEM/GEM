@@ -1,0 +1,11 @@
+
+> vocal-gem@0.1.0 dev /app
+> vite
+
+
+  VITE v5.4.21  ready in 372 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+7:26:47 AM [vite] hmr update /src/App.jsx, /src/index.css
+7:27:40 AM [vite] hmr update /src/App.jsx, /src/index.css
