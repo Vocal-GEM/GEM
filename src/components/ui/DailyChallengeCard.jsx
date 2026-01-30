@@ -70,10 +70,17 @@ const DailyChallengeCard = () => {
             {/* XP Progress Bar */}
             <div className="mb-6">
                 <div className="flex justify-between text-xs text-slate-400 mb-1">
-                    <span>Progress to Level {xpData.level + 1}</span>
+                    <span id="xp-progress-label">Progress to Level {xpData.level + 1}</span>
                     <span>{Math.round(xpData.current)} / {xpData.needed} XP</span>
                 </div>
-                <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div
+                    className="h-2 bg-slate-800 rounded-full overflow-hidden"
+                    role="progressbar"
+                    aria-valuenow={Math.round(progressPercent)}
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-labelledby="xp-progress-label"
+                >
                     <div
                         className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-500"
                         style={{ width: `${Math.min(progressPercent, 100)}%` }}
@@ -96,13 +103,15 @@ const DailyChallengeCard = () => {
                     const isComplete = completed.includes(challenge.id);
 
                     return (
-                        <div
+                        <button
                             key={challenge.id}
-                            className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${isComplete
-                                ? 'bg-emerald-500/10 border-emerald-500/30'
-                                : 'bg-slate-800/50 border-slate-700 hover:border-slate-600 cursor-pointer'
+                            className={`w-full text-left flex items-center gap-4 p-4 rounded-xl border transition-all ${isComplete
+                                ? 'bg-emerald-500/10 border-emerald-500/30 cursor-default'
+                                : 'bg-slate-800/50 border-slate-700 hover:border-slate-600 cursor-pointer hover:bg-slate-800/80 focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none'
                                 }`}
                             onClick={() => !isComplete && handleComplete(challenge.id)}
+                            disabled={isComplete}
+                            aria-label={isComplete ? `${challenge.title} completed` : `Complete ${challenge.title} for ${challenge.xp} XP`}
                         >
                             <div className={`p-2 rounded-lg bg-gradient-to-br ${getCategoryColor(challenge.category)}`}>
                                 {isComplete ? (
@@ -122,7 +131,7 @@ const DailyChallengeCard = () => {
                             <div className={`text-sm font-bold ${isComplete ? 'text-emerald-400' : 'text-amber-400'}`}>
                                 {isComplete ? '✓ Done' : `+${challenge.xp} XP`}
                             </div>
-                        </div>
+                        </button>
                     );
                 })}
             </div>
