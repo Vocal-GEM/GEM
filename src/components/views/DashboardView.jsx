@@ -16,6 +16,8 @@ import { checkStreakStatus, getStreakMessage } from '../../services/StreakServic
 import RecommendedToolsWidget from '../ui/RecommendedToolsWidget';
 import MoodCheckIn from '../ui/MoodCheckIn';
 import PersonalMilestonesDisplay from '../ui/PersonalMilestonesDisplay';
+import WelcomeBanner from '../ui/WelcomeBanner';
+import ContextualTips from '../ui/ContextualTips';
 
 
 const StatCard = ({ label, value, subtext, icon, color }) => (
@@ -82,6 +84,16 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
 
     return (
         <div className="w-full min-h-screen bg-black p-4 sm:p-6 lg:p-12 text-white">
+            {/* Welcome Banner for new users */}
+            <WelcomeBanner
+                onStartTutorial={() => openModal('tutorial')}
+            />
+
+            {/* Contextual Tips */}
+            <div className="mb-6">
+                <ContextualTips context="dashboard" />
+            </div>
+
             {/* Guided Journey Entry - Featured prominently for first-time users */}
             {/* <div className="mb-8">
                 <JourneyEntryCard

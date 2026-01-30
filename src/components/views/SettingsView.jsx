@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Download, Upload, Trash2, AlertTriangle, Check, FileJson, Eye, Globe, TrendingUp, Heart, Edit3 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Download, Upload, Trash2, AlertTriangle, Check, FileJson, Eye, Globe, TrendingUp, Heart, Edit3, Bell, Moon, Sun, Volume2, Activity, Vibrate, Clock } from 'lucide-react';
 import { indexedDB } from '../../services/IndexedDBManager';
 import { useSettings } from '../../context/SettingsContext';
 import { useTranslation } from 'react-i18next';
@@ -464,6 +464,239 @@ const SettingsView = () => {
                                     </button>
                                 ))}
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Theme Settings */}
+                <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden mb-8">
+                    <div className="p-6 border-b border-slate-800">
+                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                            <Moon className="text-indigo-400" size={24} />
+                            Appearance
+                        </h2>
+                        <p className="text-slate-400 mt-1">Customize the look and feel of the app.</p>
+                    </div>
+
+                    <div className="p-6 space-y-6">
+                        {/* Theme Selection */}
+                        <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                            <div className="mb-3">
+                                <h3 className="font-bold text-white">Theme</h3>
+                                <p className="text-sm text-slate-400">Choose your preferred color scheme.</p>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2">
+                                {[
+                                    { id: 'dark', label: 'Dark', icon: Moon, desc: 'Easy on the eyes' },
+                                    { id: 'light', label: 'Light', icon: Sun, desc: 'Bright and clean' },
+                                    { id: 'system', label: 'System', icon: Eye, desc: 'Match device' },
+                                ].map(theme => (
+                                    <button
+                                        key={theme.id}
+                                        onClick={() => updateSettings({ ...settings, theme: theme.id })}
+                                        className={`p-4 rounded-lg border transition-all flex flex-col items-center gap-2 ${settings.theme === theme.id
+                                            ? 'bg-indigo-500/20 border-indigo-500 text-indigo-400'
+                                            : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                                            }`}
+                                    >
+                                        <theme.icon size={24} />
+                                        <span className="font-medium">{theme.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Reduced Motion */}
+                        <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                            <div>
+                                <h3 className="font-bold text-white">Reduce Motion</h3>
+                                <p className="text-sm text-slate-400">Minimize animations throughout the app.</p>
+                            </div>
+                            <button
+                                onClick={() => updateSettings({
+                                    ...settings,
+                                    accessibility: { ...settings.accessibility, reduceMotion: !settings.accessibility?.reduceMotion }
+                                })}
+                                className={`w-14 h-8 rounded-full transition-colors relative ${settings.accessibility?.reduceMotion ? 'bg-indigo-500' : 'bg-slate-700'}`}
+                            >
+                                <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.accessibility?.reduceMotion ? 'left-7' : 'left-1'}`} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Notification & Reminder Settings */}
+                <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden mb-8">
+                    <div className="p-6 border-b border-slate-800">
+                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                            <Bell className="text-amber-400" size={24} />
+                            Notifications & Reminders
+                        </h2>
+                        <p className="text-slate-400 mt-1">Configure practice reminders and notifications.</p>
+                    </div>
+
+                    <div className="p-6 space-y-6">
+                        {/* Practice Reminders */}
+                        <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                            <div>
+                                <h3 className="font-bold text-white">Daily Practice Reminder</h3>
+                                <p className="text-sm text-slate-400">Get a notification to practice each day.</p>
+                            </div>
+                            <button
+                                onClick={() => updateSettings({
+                                    ...settings,
+                                    notifications: { ...settings.notifications, dailyReminder: !settings.notifications?.dailyReminder }
+                                })}
+                                className={`w-14 h-8 rounded-full transition-colors relative ${settings.notifications?.dailyReminder ? 'bg-amber-500' : 'bg-slate-700'}`}
+                            >
+                                <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.notifications?.dailyReminder ? 'left-7' : 'left-1'}`} />
+                            </button>
+                        </div>
+
+                        {/* Reminder Time */}
+                        {settings.notifications?.dailyReminder && (
+                            <div className="flex items-center justify-between p-4 bg-amber-500/5 rounded-xl border border-amber-500/20 animate-in slide-in-from-top-2 duration-200">
+                                <div className="flex items-center gap-3">
+                                    <Clock size={20} className="text-amber-400" />
+                                    <div>
+                                        <h3 className="font-bold text-white">Reminder Time</h3>
+                                        <p className="text-sm text-slate-400">When should we remind you?</p>
+                                    </div>
+                                </div>
+                                <input
+                                    type="time"
+                                    value={settings.notifications?.reminderTime || '09:00'}
+                                    onChange={(e) => updateSettings({
+                                        ...settings,
+                                        notifications: { ...settings.notifications, reminderTime: e.target.value }
+                                    })}
+                                    className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                                />
+                            </div>
+                        )}
+
+                        {/* Streak Alerts */}
+                        <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                            <div>
+                                <h3 className="font-bold text-white">Streak Alerts</h3>
+                                <p className="text-sm text-slate-400">Alert when your practice streak is at risk.</p>
+                            </div>
+                            <button
+                                onClick={() => updateSettings({
+                                    ...settings,
+                                    notifications: { ...settings.notifications, streakAlerts: !settings.notifications?.streakAlerts }
+                                })}
+                                className={`w-14 h-8 rounded-full transition-colors relative ${settings.notifications?.streakAlerts ? 'bg-amber-500' : 'bg-slate-700'}`}
+                            >
+                                <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.notifications?.streakAlerts ? 'left-7' : 'left-1'}`} />
+                            </button>
+                        </div>
+
+                        {/* Milestone Celebrations */}
+                        <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                            <div>
+                                <h3 className="font-bold text-white">Milestone Celebrations</h3>
+                                <p className="text-sm text-slate-400">Show celebration when you hit milestones.</p>
+                            </div>
+                            <button
+                                onClick={() => updateSettings({
+                                    ...settings,
+                                    notifications: { ...settings.notifications, milestoneCelebrations: settings.notifications?.milestoneCelebrations !== false }
+                                })}
+                                className={`w-14 h-8 rounded-full transition-colors relative ${settings.notifications?.milestoneCelebrations !== false ? 'bg-amber-500' : 'bg-slate-700'}`}
+                            >
+                                <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.notifications?.milestoneCelebrations !== false ? 'left-7' : 'left-1'}`} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Audio Feedback Settings */}
+                <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden mb-8">
+                    <div className="p-6 border-b border-slate-800">
+                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                            <Volume2 className="text-cyan-400" size={24} />
+                            Audio Feedback
+                        </h2>
+                        <p className="text-slate-400 mt-1">Control sound cues and feedback during practice.</p>
+                    </div>
+
+                    <div className="p-6 space-y-6">
+                        {/* Coaching Sound Cues */}
+                        <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                            <div>
+                                <h3 className="font-bold text-white">Coaching Sound Cues</h3>
+                                <p className="text-sm text-slate-400">Play sounds for coaching feedback.</p>
+                            </div>
+                            <button
+                                onClick={() => updateSettings({
+                                    ...settings,
+                                    audio: { ...settings.audio, coachingSounds: !settings.audio?.coachingSounds }
+                                })}
+                                className={`w-14 h-8 rounded-full transition-colors relative ${settings.audio?.coachingSounds ? 'bg-cyan-500' : 'bg-slate-700'}`}
+                            >
+                                <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.audio?.coachingSounds ? 'left-7' : 'left-1'}`} />
+                            </button>
+                        </div>
+
+                        {/* Target Hit Sounds */}
+                        <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                            <div>
+                                <h3 className="font-bold text-white">Target Hit Sounds</h3>
+                                <p className="text-sm text-slate-400">Play a tone when you hit your pitch target.</p>
+                            </div>
+                            <button
+                                onClick={() => updateSettings({
+                                    ...settings,
+                                    audio: { ...settings.audio, targetHitSounds: !settings.audio?.targetHitSounds }
+                                })}
+                                className={`w-14 h-8 rounded-full transition-colors relative ${settings.audio?.targetHitSounds ? 'bg-cyan-500' : 'bg-slate-700'}`}
+                            >
+                                <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.audio?.targetHitSounds ? 'left-7' : 'left-1'}`} />
+                            </button>
+                        </div>
+
+                        {/* Haptic Feedback */}
+                        <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                            <div className="flex items-center gap-3">
+                                <Vibrate size={20} className="text-cyan-400" />
+                                <div>
+                                    <h3 className="font-bold text-white">Haptic Feedback</h3>
+                                    <p className="text-sm text-slate-400">Vibration feedback on mobile devices.</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => updateSettings({
+                                    ...settings,
+                                    audio: { ...settings.audio, hapticFeedback: !settings.audio?.hapticFeedback }
+                                })}
+                                className={`w-14 h-8 rounded-full transition-colors relative ${settings.audio?.hapticFeedback ? 'bg-cyan-500' : 'bg-slate-700'}`}
+                            >
+                                <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.audio?.hapticFeedback ? 'left-7' : 'left-1'}`} />
+                            </button>
+                        </div>
+
+                        {/* Feedback Volume */}
+                        <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                            <div className="flex items-center justify-between mb-3">
+                                <div>
+                                    <h3 className="font-bold text-white">Feedback Volume</h3>
+                                    <p className="text-sm text-slate-400">Volume level for sound cues.</p>
+                                </div>
+                                <span className="text-cyan-400 font-mono">{Math.round((settings.audio?.feedbackVolume || 0.5) * 100)}%</span>
+                            </div>
+                            <input
+                                type="range"
+                                min="0"
+                                max="1"
+                                step="0.1"
+                                value={settings.audio?.feedbackVolume || 0.5}
+                                onChange={(e) => updateSettings({
+                                    ...settings,
+                                    audio: { ...settings.audio, feedbackVolume: parseFloat(e.target.value) }
+                                })}
+                                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                            />
                         </div>
                     </div>
                 </div>

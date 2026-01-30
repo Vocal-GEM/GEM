@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, Suspense, lazy, useCallback } from 'react';
-import { Play, Square, Mic, Volume2, Activity, BarChart2, RefreshCw, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer, Sparkles, MessageCircle } from 'lucide-react';
+import { Play, Square, Mic, Volume2, Activity, BarChart2, RefreshCw, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer, Sparkles, MessageCircle, Target, Radio } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAudio } from '../../context/AudioContext';
@@ -49,7 +49,7 @@ import EnvironmentCheck from '../ui/EnvironmentCheck';
 import ToolExercises from '../ui/ToolExercises';
 import PracticeWellnessCheck from '../ui/PracticeWellnessCheck';
 import ConversationPractice from '../ui/ConversationPractice';
-
+import ContextualTips from '../ui/ContextualTips';
 
 import { CoachingEngine } from '../../utils/CoachingEngine';
 
@@ -106,6 +106,8 @@ const PracticeMode = ({
     const [showConversationPractice, setShowConversationPractice] = useState(false);
     const [lastSessionDuration, setLastSessionDuration] = useState(0);
     const [isFocusMode, setIsFocusMode] = useState(false);
+    const [sessionGoal, setSessionGoal] = useState(null);
+    const [showGoalSetter, setShowGoalSetter] = useState(false);
 
     // Tour for DAF mode - placed after showDAF is declared
     useEffect(() => {
@@ -318,6 +320,11 @@ const PracticeMode = ({
                 </div>
             )}
 
+            {/* Contextual Tips */}
+            <div className="mb-4">
+                <ContextualTips context={practiceTab === 'overview' ? 'practice' : practiceTab} compact />
+            </div>
+
             {/* Header / Tabs - simplified */}
             <div className="flex flex-col mb-4 gap-4 py-2">
                 <div id="practice-tabs" className="flex items-center justify-center gap-1 p-1 bg-slate-900/50 rounded-full border border-white/5 w-fit mx-auto">
@@ -408,44 +415,110 @@ const PracticeMode = ({
                     </div>
 
                     {/* Primary Control - Centralized */}
-                    <div className="flex justify-center -mt-2">
-                        <button
-                            id="mic-button"
-                            onClick={toggleAudio}
-                            className={`px-8 py-4 rounded-full text-lg font-bold flex items-center gap-3 transition-all shadow-xl hover:scale-105 active:scale-95 ${isAudioActive
-                                ? 'bg-red-500/10 text-red-500 border border-red-500/50 hover:bg-red-500/20'
-                                : 'bg-gradient-to-r from-teal-500 to-violet-600 text-white hover:shadow-teal-500/40 ring-4 ring-slate-900 border border-white/20'
-                                }`}
-                        >
-                            {isAudioActive ? (
-                                <><Square size={20} fill="currentColor" /> {t('practiceMode.session.stop', 'Stop Microphone')}</>
-                            ) : (
-                                <><Mic size={24} /> {t('practiceMode.session.start', 'Enable Microphone')}</>
+                    <div className="flex flex-col items-center gap-3 -mt-2">
+                        {/* Recording Indicator */}
+                        {isAudioActive && (
+                            <div className="flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/30 rounded-full animate-in fade-in slide-in-from-top-2 duration-300">
+                                <Radio size={16} className="text-red-500 animate-pulse" />
+                                <span className="text-red-400 text-sm font-medium">Recording Active</span>
+                                <div className="flex gap-0.5">
+                                    <div className="w-1 h-3 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0ms' }} />
+                                    <div className="w-1 h-4 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
+                                    <div className="w-1 h-2 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
+                                    <div className="w-1 h-5 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '450ms' }} />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Session Goal Display */}
+                        {sessionGoal && !isAudioActive && (
+                            <div className="flex items-center gap-2 px-4 py-2 bg-teal-500/10 border border-teal-500/30 rounded-full">
+                                <Target size={16} className="text-teal-400" />
+                                <span className="text-teal-300 text-sm">Goal: {sessionGoal.label}</span>
+                                <button
+                                    onClick={() => setSessionGoal(null)}
+                                    className="text-teal-500 hover:text-teal-300 ml-1"
+                                >
+                                    <X size={14} />
+                                </button>
+                            </div>
+                        )}
+
+                        <div className="flex items-center gap-3">
+                            {/* Goal Setter Button */}
+                            {!isAudioActive && (
+                                <button
+                                    onClick={() => setShowGoalSetter(true)}
+                                    className="px-4 py-4 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-all border border-slate-700"
+                                    title="Set a practice goal"
+                                >
+                                    <Target size={20} />
+                                </button>
                             )}
-                        </button>
+
+                            <button
+                                id="mic-button"
+                                onClick={toggleAudio}
+                                className={`px-8 py-4 rounded-full text-lg font-bold flex items-center gap-3 transition-all shadow-xl hover:scale-105 active:scale-95 ${isAudioActive
+                                    ? 'bg-red-500/10 text-red-500 border border-red-500/50 hover:bg-red-500/20'
+                                    : 'bg-gradient-to-r from-teal-500 to-violet-600 text-white hover:shadow-teal-500/40 ring-4 ring-slate-900 border border-white/20'
+                                    }`}
+                            >
+                                {isAudioActive ? (
+                                    <><Square size={20} fill="currentColor" /> {t('practiceMode.session.stop', 'Stop Microphone')}</>
+                                ) : (
+                                    <><Mic size={24} /> {t('practiceMode.session.start', 'Enable Microphone')}</>
+                                )}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Quick Access Tools (Horizontal Strip) */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900/30 p-4 rounded-2xl border border-white/5">
-                        <button onClick={() => openModal('warmup')} className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 bg-slate-900/30 p-4 rounded-2xl border border-white/5">
+                        <button
+                            onClick={() => openModal('warmup')}
+                            className="group flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white relative"
+                            title="Vocal warm-up exercises to prepare your voice"
+                        >
                             <Play size={20} className="text-orange-400" />
                             <span className="text-xs font-bold">Warm-Up</span>
+                            <span className="hidden group-hover:block absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 whitespace-nowrap bg-slate-800 px-2 py-1 rounded z-10">Prepare your voice</span>
                         </button>
-                        <button onClick={() => setShowDAF(true)} className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
+                        <button
+                            onClick={() => setShowDAF(true)}
+                            className="group flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white relative"
+                            title="Delayed Auditory Feedback - hear yourself with delay"
+                        >
                             <Mic size={20} className="text-purple-400" />
                             <span className="text-xs font-bold">DAF Loop</span>
+                            <span className="hidden group-hover:block absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 whitespace-nowrap bg-slate-800 px-2 py-1 rounded z-10">Delayed feedback</span>
                         </button>
-                        <button onClick={() => setShowProgressiveStacking(true)} className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
+                        <button
+                            onClick={() => setShowProgressiveStacking(true)}
+                            className="group flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white relative"
+                            title="Progressive stacking technique for voice building"
+                        >
                             <Sparkles size={20} className="text-pink-400" />
                             <span className="text-xs font-bold">Stacking</span>
+                            <span className="hidden group-hover:block absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 whitespace-nowrap bg-slate-800 px-2 py-1 rounded z-10">Build voice layers</span>
                         </button>
-                        <button onClick={() => openModal('calibration')} className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
+                        <button
+                            onClick={() => openModal('calibration')}
+                            className="group flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white relative"
+                            title="Recalibrate your voice baseline for accurate tracking"
+                        >
                             <RefreshCw size={20} className="text-green-400" />
                             <span className="text-xs font-bold">Recalibrate</span>
+                            <span className="hidden group-hover:block absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 whitespace-nowrap bg-slate-800 px-2 py-1 rounded z-10">Reset baseline</span>
                         </button>
-                        <button onClick={() => setShowConversationPractice(true)} className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
+                        <button
+                            onClick={() => setShowConversationPractice(true)}
+                            className="group flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-400 hover:text-white relative"
+                            title="Practice conversations with AI feedback"
+                        >
                             <MessageCircle size={20} className="text-violet-400" />
                             <span className="text-xs font-bold">AI Convo</span>
+                            <span className="hidden group-hover:block absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 whitespace-nowrap bg-slate-800 px-2 py-1 rounded z-10">Practice speaking</span>
                         </button>
                     </div>
 
@@ -610,6 +683,54 @@ const PracticeMode = ({
             {/* Conversation Practice Modal */}
             {showConversationPractice && (
                 <ConversationPractice onClose={() => setShowConversationPractice(false)} />
+            )}
+
+            {/* Session Goal Setter Modal */}
+            {showGoalSetter && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-slate-900 rounded-2xl p-6 border border-slate-700 w-full max-w-md">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                                <Target className="text-teal-400" size={24} />
+                                Set Practice Goal
+                            </h3>
+                            <button
+                                onClick={() => setShowGoalSetter(false)}
+                                className="text-slate-400 hover:text-white"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <p className="text-slate-400 text-sm mb-4">What would you like to focus on this session?</p>
+                        <div className="space-y-2">
+                            {[
+                                { id: 'pitch', label: 'Pitch Control', desc: 'Focus on maintaining target pitch range', icon: '🎵' },
+                                { id: 'resonance', label: 'Resonance', desc: 'Work on voice brightness and placement', icon: '✨' },
+                                { id: 'stability', label: 'Stability', desc: 'Practice holding steady tones', icon: '📊' },
+                                { id: 'intonation', label: 'Intonation', desc: 'Improve speech melody patterns', icon: '🎭' },
+                                { id: 'endurance', label: 'Endurance', desc: 'Build vocal stamina over longer sessions', icon: '💪' },
+                                { id: 'exploration', label: 'Free Exploration', desc: 'No specific goal, just practice', icon: '🔬' },
+                            ].map(goal => (
+                                <button
+                                    key={goal.id}
+                                    onClick={() => {
+                                        setSessionGoal(goal);
+                                        setShowGoalSetter(false);
+                                    }}
+                                    className="w-full p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-teal-500/50 rounded-xl text-left transition-all group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-2xl">{goal.icon}</span>
+                                        <div>
+                                            <div className="font-bold text-white group-hover:text-teal-300 transition-colors">{goal.label}</div>
+                                            <div className="text-sm text-slate-400">{goal.desc}</div>
+                                        </div>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
