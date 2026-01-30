@@ -57,6 +57,7 @@ const MockAudio = vi.fn(function(src) {
 });
 
 globalThis.Audio = MockAudio;
+window.Audio = MockAudio;
 
 describe('SuccessStories', () => {
     beforeEach(() => {
