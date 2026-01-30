@@ -65,6 +65,6 @@ describe('JournalForm Accessibility', () => {
 
   it('has accessible name for Prompt Refresh button', () => {
      render(<JournalForm />);
-     expect(screen.getByRole('button', { name: /need a writing prompt/i })).toBeInTheDocument();
+     expect(screen.getByRole('button', { name: /get a writing prompt/i })).toBeInTheDocument();
   });
 });
