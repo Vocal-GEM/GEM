@@ -15,7 +15,7 @@ class McLeodPitchDetector {
         this.bufferSize = config.bufferSize || 1024;
 
         // Initialize the detector from pitchfinder
-        this.detector = Pitchfinder.McLeod({
+        this.detector = Pitchfinder.Macleod({
             sampleRate: this.sampleRate,
             bufferSize: this.bufferSize,
             cutoff: 0.9 // Probability threshold
