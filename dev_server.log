@@ -38,3 +38,10 @@
 7:36:41 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
 7:37:30 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
 7:39:19 AM [vite] hmr update /src/components/ui/JournalForm.jsx, /src/index.css
+7:53:43 AM [vite] page reload src/test/validation/algorithmValidation.test.js
+7:53:44 AM [vite] page reload src/components/layout/Sidebar.test.jsx
+7:53:44 AM [vite] page reload src/components/views/PracticeMode.test.jsx
+7:59:19 AM [vite] hmr update /src/index.css, /src/context/AudioContext.jsx
+8:04:00 AM [vite] page reload src/test/validation/algorithmValidation.test.js
+8:05:19 AM [vite] page reload src/test/validation/algorithmValidation.test.js
+8:06:25 AM [vite] page reload src/test/validation/algorithmValidation.test.js
