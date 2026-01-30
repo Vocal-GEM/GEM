@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -9,7 +9,7 @@ const SpectrogramMesh = ({ dataRef }) => {
     const numRows = 64; // Frequency bins
 
     // Create geometry and initial positions
-    const { positions, indices, uvs } = useMemo(() => {
+    const { positions, indices, uvs, colors } = useMemo(() => {
         const pos = [];
         const ind = [];
         const uv = [];
@@ -39,15 +39,13 @@ const SpectrogramMesh = ({ dataRef }) => {
         return {
             positions: new Float32Array(pos),
             indices: new Uint16Array(ind),
-            uvs: new Float32Array(uv)
+            uvs: new Float32Array(uv),
+            colors: new Float32Array(numCols * numRows * 3)
         };
     }, []);
 
     // Buffer for historical data
     const historyRef = useRef(null);
-    useEffect(() => {
-        historyRef.current = new Float32Array(numCols * numRows);
-    }, []);
     if (!historyRef.current) {
         historyRef.current = new Float32Array(numCols * numRows);
     }
@@ -92,28 +90,27 @@ const SpectrogramMesh = ({ dataRef }) => {
 
         // Update geometry
         const positionsAttribute = meshRef.current.geometry.attributes.position;
-        if (positionsAttribute) {
+        // Optimization: Access the array directly to avoid function call overhead
+        const positionsArray = positionsAttribute?.array;
+
+        if (positionsArray) {
             for (let i = 0; i < numCols; i++) {
                 for (let j = 0; j < numRows; j++) {
                     const index = i * numRows + j;
                     const val = history[index];
-                    // Update Y coordinate
-                    positionsAttribute.setY(index, val);
+                    // Update Y coordinate directly (index * 3 + 1)
+                    positionsArray[index * 3 + 1] = val;
                 }
             }
             positionsAttribute.needsUpdate = true;
         }
 
         // Update colors based on height
-        let colorsAttribute = meshRef.current.geometry.attributes.color;
-        if (!colorsAttribute) {
-            const colors = new Float32Array(numCols * numRows * 3);
-            meshRef.current.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            colorsAttribute = meshRef.current.geometry.attributes.color;
-        }
+        const colorsAttribute = meshRef.current.geometry.attributes.color;
+        // Optimization: Access the array directly
+        const colorsArray = colorsAttribute?.array;
 
-        if (colorsAttribute) {
-            const colors = colorsAttribute;
+        if (colorsArray) {
             for (let i = 0; i < numCols; i++) {
                 for (let j = 0; j < numRows; j++) {
                     const index = i * numRows + j;
@@ -125,10 +122,13 @@ const SpectrogramMesh = ({ dataRef }) => {
                     // Optimization: Reuse tempColor object to avoid creating 4096 objects per frame
                     tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
 
-                    colors.setXYZ(index, tempColor.r, tempColor.g, tempColor.b);
+                    // Optimization: Set RGB values directly to avoid function call overhead
+                    colorsArray[index * 3] = tempColor.r;
+                    colorsArray[index * 3 + 1] = tempColor.g;
+                    colorsArray[index * 3 + 2] = tempColor.b;
                 }
             }
-            colors.needsUpdate = true;
+            colorsAttribute.needsUpdate = true;
         }
     });
 
@@ -153,6 +153,12 @@ const SpectrogramMesh = ({ dataRef }) => {
                     count={uvs.length / 2}
                     array={uvs}
                     itemSize={2}
+                />
+                <bufferAttribute
+                    attach="attributes-color"
+                    count={colors.length / 3}
+                    array={colors}
+                    itemSize={3}
                 />
             </bufferGeometry>
             <meshStandardMaterial
