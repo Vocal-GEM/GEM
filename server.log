@@ -1,0 +1,12 @@
+
+> vocal-gem@0.1.0 dev
+> vite
+
+
+  VITE v5.4.21  ready in 373 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+7:33:16 AM [vite] hmr update /src/App.jsx, /src/index.css
+7:33:23 AM [vite] hmr update /src/components/viz/VoiceQualityVerification.jsx, /src/index.css
+7:34:50 AM [vite] page reload src/services/QuadCoreAnalysisService.test.js

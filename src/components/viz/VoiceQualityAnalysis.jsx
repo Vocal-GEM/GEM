@@ -88,14 +88,21 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
     const uniqueId = useId();
     const componentId = `voice-quality-${uniqueId}`;
 
+    const lastUiUpdateRef = useRef(0);
+
     const analyze = useCallback(() => {
         if (dataRef.current && isAudioActive && serviceRef.current) {
+            const now = Date.now();
+            // Throttle UI updates to 10fps (100ms) to prevent Main Thread blocking
+            const shouldUpdateUI = now - lastUiUpdateRef.current >= 100;
+
             const results = serviceRef.current.analyze(dataRef.current, {
                 targetF2: 2000 // Default to neutral/chem until calibration is fuller
-            });
+            }, { onlyUpdateHistory: !shouldUpdateUI });
 
             if (results) {
                 setAnalysis(results);
+                lastUiUpdateRef.current = now;
             }
         }
     }, [dataRef, isAudioActive]);
