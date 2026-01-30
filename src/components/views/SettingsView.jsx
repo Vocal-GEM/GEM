@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, Upload, Trash2, AlertTriangle, Check, FileJson, Eye, Globe, TrendingUp, Heart, Edit3 } from 'lucide-react';
+import { Download, Upload, Trash2, AlertTriangle, Check, FileJson, Eye, Globe, TrendingUp, Heart, Edit3, Activity } from 'lucide-react';
 import { indexedDB } from '../../services/IndexedDBManager';
 import { useSettings } from '../../context/SettingsContext';
 import { useTranslation } from 'react-i18next';
