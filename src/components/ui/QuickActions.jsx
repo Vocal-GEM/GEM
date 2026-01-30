@@ -53,6 +53,7 @@ const QuickActions = ({ onAction }) => {
                         key={action.id}
                         onClick={() => handleAction(action)}
                         tabIndex={isOpen ? 0 : -1}
+                        aria-hidden={!isOpen}
                         className="flex items-center justify-end gap-3 group focus-visible:outline-none"
                         style={{ transitionDelay: `${index * 50}ms` }}
                         aria-label={action.label}

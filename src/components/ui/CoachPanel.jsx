@@ -19,20 +19,33 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
 
     // Subscribe to Data Stream
     useEffect(() => {
+        let handle;
         const updateLoop = () => {
             if (dataRef?.current) {
                 const { pitch, resonance, weight, tilt, register } = dataRef.current;
-                setMetrics({
-                    pitch: pitch || 0,
-                    resonance: resonance || 0,
-                    weight: weight !== undefined ? weight : 50,
-                    tilt: tilt || 0,
-                    register: register
+                setMetrics(prev => {
+                    // Optimization: Only update if values significantly changed to avoid re-renders
+                    if (
+                        Math.abs(prev.pitch - (pitch || 0)) < 1 &&
+                        Math.abs(prev.resonance - (resonance || 0)) < 5 &&
+                        Math.abs(prev.weight - (weight || 50)) < 2 &&
+                        prev.register === register
+                    ) {
+                        return prev;
+                    }
+
+                    return {
+                        pitch: pitch || 0,
+                        resonance: resonance || 0,
+                        weight: weight !== undefined ? weight : 50,
+                        tilt: tilt || 0,
+                        register: register
+                    };
                 });
             }
-            requestAnimationFrame(updateLoop);
+            handle = requestAnimationFrame(updateLoop);
         };
-        const handle = requestAnimationFrame(updateLoop);
+        handle = requestAnimationFrame(updateLoop);
         return () => cancelAnimationFrame(handle);
     }, [dataRef]);
 

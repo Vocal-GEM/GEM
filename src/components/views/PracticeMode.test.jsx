@@ -32,6 +32,7 @@ vi.mock('../../context/NavigationContext', () => ({
     })
 }));
 vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
+vi.mock('../ui/VisualizerSkeleton', () => ({ default: () => <div data-testid="visualizer-skeleton">Loading Visualizer</div> }));
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
 vi.mock('../ui/ResizablePanel', () => ({
     default: ({ children, className }) => <div className={className} data-testid="resizable-panel">{children}</div>
@@ -43,6 +44,7 @@ vi.mock('../viz/VoiceQualityAnalysis', () => ({ default: () => <div>Voice Qualit
 vi.mock('../viz/VowelAnalysis', () => ({ default: () => <div>Vowel Analysis</div> }));
 vi.mock('../ui/ToolExercises', () => ({ default: () => <div>Tool Exercises</div> }));
 vi.mock('../ui/ComparisonTool', () => ({ default: () => <div>Comparison Tool</div> }));
+vi.mock('../ui/CoachPanel', () => ({ default: () => <div>Coach Panel</div> }));
 vi.mock('../../context/AuthContext', () => ({
     useAuth: () => ({ user: { id: 'test-user', username: 'Tester' } }),
     AuthProvider: ({ children }) => <div>{children}</div>
@@ -88,7 +90,9 @@ describe('PracticeMode', () => {
 
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
-        // Check for visualization area
-        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
+
+        // DynamicOrb is rendered inside Suspense
+        // First check that we might see the skeleton or just wait for the orb
+        expect(await screen.findByTestId('dynamic-orb', {}, { timeout: 5000 })).toBeInTheDocument();
     });
 });

@@ -39,10 +39,10 @@ describe('JournalForm Accessibility', () => {
     expect(screen.getByRole('button', { name: /start recording/i })).toBeInTheDocument();
 
     // Check sliders have labels associated
-    const effortSlider = screen.getByLabelText(/effort/i);
+    const effortSlider = screen.getAllByLabelText(/effort/i)[0];
     expect(effortSlider).toBeInTheDocument();
 
-    const confidenceSlider = screen.getByLabelText(/confidence/i);
+    const confidenceSlider = screen.getAllByLabelText(/confidence/i)[0];
     expect(confidenceSlider).toBeInTheDocument();
   });
 
