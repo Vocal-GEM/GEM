@@ -43,13 +43,15 @@ const DailyPhrases = ({ onComplete }) => {
                     placeholder="Type a phrase (e.g. 'One latte please')..."
                     className="flex-1 bg-slate-800 border border-slate-700 rounded-xl p-4 text-white focus:ring-2 focus:ring-purple-500 outline-none"
                     onKeyDown={(e) => e.key === 'Enter' && addPhrase(inputValue)}
+                    aria-label="New phrase"
                 />
                 <button
                     onClick={() => addPhrase(inputValue)}
                     disabled={!inputValue}
                     className="bg-purple-600 hover:bg-purple-500 text-white p-4 rounded-xl disabled:opacity-50"
+                    aria-label="Add phrase"
                 >
-                    <Plus size={24} />
+                    <Plus size={24} aria-hidden="true" />
                 </button>
             </div>
 
@@ -64,7 +66,7 @@ const DailyPhrases = ({ onComplete }) => {
                                 onClick={() => addPhrase(s)}
                                 className="px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-slate-400 hover:text-white hover:border-slate-500 text-sm transition-colors"
                             >
-                                + {s}
+                                <span aria-hidden="true">+ </span>{s}
                             </button>
                         ))}
                     </div>
@@ -74,20 +76,23 @@ const DailyPhrases = ({ onComplete }) => {
             {/* List */}
             <div className="space-y-3">
                 {phrases.length > 0 && <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Your List</h4>}
-                {phrases.map((phrase, i) => (
-                    <div key={i} className="flex justify-between items-center p-4 bg-slate-800 rounded-xl border border-slate-700 animate-in slide-in-from-bottom-2">
-                        <div className="flex items-center gap-3">
-                            <MessageSquare className="text-purple-400" size={20} />
-                            <span className="text-lg text-white font-medium">{phrase}</span>
-                        </div>
-                        <button
-                            onClick={() => removePhrase(phrase)}
-                            className="text-slate-500 hover:text-red-400 transition-colors"
-                        >
-                            <Trash2 size={20} />
-                        </button>
-                    </div>
-                ))}
+                <ul className="space-y-3 list-none p-0 m-0">
+                    {phrases.map((phrase, i) => (
+                        <li key={i} className="flex justify-between items-center p-4 bg-slate-800 rounded-xl border border-slate-700 animate-in slide-in-from-bottom-2">
+                            <div className="flex items-center gap-3">
+                                <MessageSquare className="text-purple-400" size={20} aria-hidden="true" />
+                                <span className="text-lg text-white font-medium">{phrase}</span>
+                            </div>
+                            <button
+                                onClick={() => removePhrase(phrase)}
+                                className="text-slate-500 hover:text-red-400 transition-colors"
+                                aria-label={`Remove phrase: ${phrase}`}
+                            >
+                                <Trash2 size={20} aria-hidden="true" />
+                            </button>
+                        </li>
+                    ))}
+                </ul>
             </div>
 
             {phrases.length === 0 && (
