@@ -137,9 +137,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
     }, [dataRef, colormap]);
 
-    // Initial canvas setup & ResizeObserver
-    }, [dataRef, colormap]);
-
     // Handle Resize with ResizeObserver
     useEffect(() => {
         const container = containerRef.current;

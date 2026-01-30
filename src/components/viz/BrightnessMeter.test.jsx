@@ -16,6 +16,7 @@ vi.mock('../../services/RenderCoordinator', () => ({
 vi.mock('lucide-react', async () => {
     const React = await import('react');
     const createIcon = (name) => {
+        // eslint-disable-next-line react/display-name
         const Icon = (props) => React.createElement('div', { ...props, 'data-testid': name });
         Icon.displayName = name;
         return Icon;
