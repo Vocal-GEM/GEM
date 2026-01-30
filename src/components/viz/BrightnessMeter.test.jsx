@@ -7,17 +7,24 @@ import { renderCoordinator } from '../../services/RenderCoordinator';
 // Mock RenderCoordinator
 vi.mock('../../services/RenderCoordinator', () => ({
     renderCoordinator: {
-        subscribe: vi.fn(() => vi.fn()), // Returns unsubscribe fn
+        subscribe: vi.fn().mockReturnValue(vi.fn()), // Returns unsubscribe fn
         PRIORITY: { MEDIUM: 2 }
     }
 }));
 
 // Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+vi.mock('lucide-react', async (importOriginal) => {
+    const actual = await importOriginal();
+    const React = await import('react');
+
+    const createIcon = (name) => {
+        const Icon = (props) => React.createElement('div', { ...props, 'data-testid': name });
+        Icon.displayName = name;
+        return Icon;
+    };
 
     return {
+        ...actual,
         Sun: createIcon('Sun'),
         Moon: createIcon('Moon'),
         Info: createIcon('Info'),
@@ -30,11 +37,12 @@ describe('BrightnessMeter', () => {
 
     beforeEach(() => {
         dataRef = { current: { f2: 0 } };
+        // Reset mocks
+        vi.clearAllMocks();
     });
 
     afterEach(() => {
         cleanup();
-        vi.clearAllMocks();
     });
 
     it('renders successfully', () => {
@@ -44,24 +52,37 @@ describe('BrightnessMeter', () => {
 
     it('subscribes to RenderCoordinator', () => {
         render(<BrightnessMeter dataRef={dataRef} />);
+
+        // Check if subscribe was called
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
-        const [, , priority] = renderCoordinator.subscribe.mock.calls[0];
-        expect(priority).toBe(renderCoordinator.PRIORITY.MEDIUM);
+
+        // subscribe(id, callback, priority)
+        // Verify priority argument (3rd arg) matches MEDIUM
+        const calls = renderCoordinator.subscribe.mock.calls;
+        expect(calls.length).toBeGreaterThan(0);
+
+        const priorityArg = calls[0][2];
+        expect(priorityArg).toBe(renderCoordinator.PRIORITY.MEDIUM);
     });
 
     it('updates based on dataRef via coordinator callback', () => {
         render(<BrightnessMeter dataRef={dataRef} />);
 
         // Get the callback passed to subscribe
-        // Signature: subscribe(id, callback, priority)
-        const callback = renderCoordinator.subscribe.mock.calls[0][1];
+        const calls = renderCoordinator.subscribe.mock.calls;
+        // Assuming calls[0] is the subscription we care about.
+        // If subscribe is called multiple times (e.g. strict mode or other hooks),
+        // we might need to find the right one, but typically it's the first one here.
+        const callback = calls[0][1];
 
         // Update data
         dataRef.current.f2 = 2300; // Bright target
 
         // Manually trigger callback (simulate render loop)
         act(() => {
-            callback();
+            if (typeof callback === 'function') {
+                callback();
+            }
         });
 
         // The status label becomes "Bright ✓"

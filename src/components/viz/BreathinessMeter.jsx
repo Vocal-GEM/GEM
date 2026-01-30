@@ -2,24 +2,12 @@ import { useEffect, useRef, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Wind, CheckCircle2, AlertTriangle, Info, Sparkles, Activity, HelpCircle } from 'lucide-react';
-import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * BreathinessMeter Component
  * 
  * A zone-based visualization for breathiness feedback, aligned with the GRBAS scale.
  * Based on research: "Breathiness as a Feminine Voice Characteristic: A Perceptual Approach"
- * 
- * Key Features:
- * - 4-zone visual meter (Modal → Slight → Moderate → Severe)
- * - "Sweet Spot" indicator for Score 1 (slight breathiness)
- * - Pitch-independent feedback
- * - Warnings for excessive breathiness
- * - NEW: Estimated Open Quotient display
- * - NEW: Ventricular (false vocal fold) engagement warning
- *
- * Performance Optimization:
- * - Uses RenderCoordinator for centralized animation loop control
  */
 
 // Zone configuration based on research
@@ -30,39 +18,30 @@ const ZONES = [
     { id: 3, label: 'Severe', color: 'red', range: [75, 100], feedback: 'Excessive ⚠', icon: 'warning' }
 ];
 
-
-
 const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const { colorBlindMode } = useSettings();
     const componentId = useId();
+
+    // UI Refs
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
     const zoneRef = useRef(null);
     const feedbackRef = useRef(null);
-    const lastValueRef = useRef(50);
-    const componentId = useId();
-    const id = useId();
 
-    // NEW: Refs for OQ and ventricular displays
+    // OQ / Ventricular Refs
     const oqValueRef = useRef(null);
     const oqZoneRef = useRef(null);
     const oqIndicatorRef = useRef(null);
-    const lastOqRef = useRef(50);
     const ventricularRef = useRef(null);
-    const componentId = useId();
+
+    // State tracking for smoothing
+    const lastValueRef = useRef(50);
+    const lastOqRef = useRef(50);
 
     // Optimized: Use RenderCoordinator to manage animation loop
     useEffect(() => {
-        const update = () => {
+        const update = (delta, currentTime) => {
             if (!dataRef.current) return;
-        const updateMeter = () => {
-            if (!dataRef.current) return;
-        const loop = () => {
-            if (!dataRef.current) return;
-        const loop = (delta, currentTime) => {
-            if (!dataRef.current) {
-                return;
-            }
 
             const { breathinessGrbas, oq_percent, oq_zone, ventricular_detected, ventricular_severity, ventricular_feedback } = dataRef.current;
 
@@ -119,7 +98,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
                 valueRef.current.innerText = Math.round(smoothedScore);
             }
 
-            // NEW: Update Open Quotient display
+            // Update Open Quotient display
             if (oq_percent !== undefined) {
                 const smoothedOq = lastOqRef.current + (oq_percent - lastOqRef.current) * alpha;
                 lastOqRef.current = smoothedOq;
@@ -152,11 +131,14 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
                 }
             }
 
-            // NEW: Update ventricular warning
+            // Update ventricular warning
             if (ventricularRef.current) {
                 if (ventricular_detected && ventricular_severity !== 'none') {
                     ventricularRef.current.style.display = 'flex';
-                    ventricularRef.current.querySelector('.ventricular-feedback').innerText = ventricular_feedback || 'Strain detected';
+                    const feedbackEl = ventricularRef.current.querySelector('.ventricular-feedback');
+                    if (feedbackEl) {
+                         feedbackEl.innerText = ventricular_feedback || 'Strain detected';
+                    }
                 } else {
                     ventricularRef.current.style.display = 'none';
                 }
@@ -164,45 +146,17 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
         };
 
         const unsubscribe = renderCoordinator.subscribe(
-            componentId,
+            `BreathinessMeter-${componentId}`,
             update,
             renderCoordinator.PRIORITY.MEDIUM
         );
 
-        return unsubscribe;
-    }, [dataRef, colorBlindMode, componentId]);
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            componentId,
-            updateMeter,
-
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `BreathinessMeter-${componentId}`,
-            loop,
-            renderCoordinator.PRIORITY.MEDIUM
-        );
-
-        return () => unsubscribe();
-    }, [dataRef, colorBlindMode, componentId]);
-            `breathiness-meter-${componentId}`,
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `breathiness-meter-${id}`,
-            loop,
-            renderCoordinator.PRIORITY.CRITICAL
-        );
-
         return () => {
-            unsubscribe();
+            if (unsubscribe) unsubscribe();
         };
     }, [dataRef, colorBlindMode, componentId]);
-    }, [dataRef, colorBlindMode, id]);
 
-    // Determine if in sweet spot for static rendering
+    // Determine if in sweet spot for static rendering (initial/SSR state)
     const breathinessGrbas = dataRef.current?.breathinessGrbas;
     const isSweetSpot = breathinessGrbas?.is_sweet_spot ?? false;
     const isExcessive = breathinessGrbas?.is_excessive ?? false;
