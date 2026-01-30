@@ -472,7 +472,7 @@ const DynamicOrb = memo(({ dataRef, calibration, externalDataRef, audioEngine, t
   }, []);
 
   return (
-    <div ref={containerRef} className="w-full h-full relative group flex flex-col items-center justify-center">
+    <div ref={containerRef} className="w-full h-full relative group flex flex-col items-center justify-center" data-testid="dynamic-orb">
 
       <div className="absolute top-2 text-xs font-bold text-slate-300 uppercase tracking-widest z-10 w-full text-center">
         Dynamic Orb - Pitch, Resonance, Weight, & Volume

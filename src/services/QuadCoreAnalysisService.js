@@ -19,9 +19,10 @@ export class QuadCoreAnalysisService {
      * Analyze a single frame of audio data
      * @param {Object} data - Audio data from AudioEngine (pitch, tilt, f2, f3Noise, harmonicRatio)
      * @param {Object} targets - User targets (targetPitch, targetF2, etc.)
+     * @param {boolean} onlyUpdateHistory - If true, only updates internal state (volume, onset) and returns null
      * @returns {Object} Analysis results { scores, feedback }
      */
-    analyze(data, targets) {
+    analyze(data, targets, onlyUpdateHistory = false) {
         if (!data || data.volume < 0.01) {
             this.isSpeaking = false;
             return null;
@@ -38,6 +39,10 @@ export class QuadCoreAnalysisService {
             this.isSpeaking = true;
             this.lastOnset = Date.now();
             this.lastOnsetQuality = this.analyzeOnsetQuality();
+        }
+
+        if (onlyUpdateHistory) {
+            return null;
         }
 
         const scores = {
