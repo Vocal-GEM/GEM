@@ -1,0 +1,29 @@
+
+> vocal-gem@0.1.0 dev
+> vite
+
+
+  VITE v5.4.21  ready in 373 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+7:33:16 AM [vite] hmr update /src/App.jsx, /src/index.css
+7:33:23 AM [vite] hmr update /src/components/viz/VoiceQualityVerification.jsx, /src/index.css
+7:34:50 AM [vite] page reload src/services/QuadCoreAnalysisService.test.js
+7:39:37 AM [vite] page reload src/audio/PitchWorklet.js
+7:39:37 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:39:37 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:39:37 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:40:26 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:40:26 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:40:26 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:43:13 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:43:14 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+7:43:41 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:43:59 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
+7:44:31 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
+7:49:40 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
+7:50:15 AM [vite] page reload src/services/ResearchMode.js
+7:50:47 AM [vite] page reload src/services/PrivacyManager.js
+7:52:05 AM [vite] page reload src/services/ResearchMode.js
+7:52:05 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx

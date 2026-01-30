@@ -13,9 +13,16 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+vi.mock('lucide-react', async () => {
+    // Dynamically import React to avoid using 'require' in ESM environment
+    const React = await import('react');
+
+    // Named component function to satisfy ESLint display-name rule
+    const createIcon = (name) => {
+        const IconComponent = (props) => React.createElement('div', { ...props, 'data-testid': name });
+        IconComponent.displayName = name;
+        return IconComponent;
+    };
 
     return {
         Sun: createIcon('Sun'),
