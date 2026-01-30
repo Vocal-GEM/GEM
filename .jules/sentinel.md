@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2026-02-14 - Marketplace Business Logic Bypass
+**Vulnerability:** The create_pack endpoint accepted negative prices and invalid enum values (category, etc.).
+**Learning:** Model comments (e.g. # 'pitch', 'resonance') are not constraints. Flask routes must explicitly validate inputs against allowed lists.
+**Prevention:** Define ALLOWED_CONSTANTS in the model and validate payload against them in the route.
