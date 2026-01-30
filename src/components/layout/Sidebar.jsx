@@ -49,6 +49,8 @@ const Sidebar = ({ activeView, onViewChange }) => {
         { id: 'pitch-tool', label: 'Haptic Tool', icon: <Activity size={20} /> },
         { id: 'camera', label: 'Mirror', icon: <Camera size={20} />, isModal: true },
         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
+        { id: 'sign-in', label: 'Sign In', icon: <Briefcase size={20} /> },
+        { id: 'sign-out', label: 'Sign Out', icon: <Briefcase size={20} /> },
     ].filter(item => FEATURES[item.id] !== false);
 
     // Search handler with debouncing
