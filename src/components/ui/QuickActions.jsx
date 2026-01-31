@@ -52,6 +52,7 @@ const QuickActions = ({ onAction }) => {
                         className="flex items-center justify-end gap-3 group focus-visible:outline-none"
                         style={{ transitionDelay: `${index * 50}ms` }}
                         aria-label={action.label}
+                        aria-hidden={!isOpen}
                     >
                         <span
                             className="bg-slate-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg border border-slate-700 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity"

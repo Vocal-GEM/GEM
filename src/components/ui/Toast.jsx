@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
 import { X, CheckCircle, AlertTriangle, Info, XCircle } from 'lucide-react';
 
+/**
+ * Toast component for displaying temporary notifications.
+ */
 const Toast = ({ message, type = 'success', onClose, duration = 3000 }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
