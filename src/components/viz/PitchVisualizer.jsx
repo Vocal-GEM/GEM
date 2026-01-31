@@ -189,6 +189,22 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             }
         }
 
+        // Optimization: Pre-calculate near-miss thresholds to avoid Math.log2 in the loop
+        let nearMissLow_min, nearMissLow_max;
+        let nearMissHigh_min, nearMissHigh_max;
+
+        if (targetRange) {
+            // dist > -50 means 1200 * log2(freq/min) > -50 => freq > min * 2^(-50/1200)
+            const factor = Math.pow(2, 50/1200); // approx 1.0293
+            // Near miss below min: [min/factor, min)
+            nearMissLow_min = targetRange.min / factor;
+            nearMissLow_max = targetRange.min;
+
+            // Near miss above max: (max, max*factor]
+            nearMissHigh_min = targetRange.max;
+            nearMissHigh_max = targetRange.max * factor;
+        }
+
         const getPitchColor = (freq, clarity = 1.0) => {
             if (clarity < 0.8) {
                 return colorBlindMode ? '#9333ea' : '#ef4444';
@@ -202,10 +218,9 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
             // Near Miss Zone
             if (targetRange) {
-                const distMin = 1200 * Math.log2(freq / targetRange.min);
-                const distMax = 1200 * Math.log2(freq / targetRange.max);
-
-                if ((distMin > -50 && distMin < 0) || (distMax > 0 && distMax < 50)) {
+                // Optimization: Use pre-calculated thresholds instead of expensive Math.log2
+                if ((freq > nearMissLow_min && freq < nearMissLow_max) ||
+                    (freq > nearMissHigh_min && freq < nearMissHigh_max)) {
                     if (colorBlindMode) return '#f59e0b';
                     return '#eab308'; // Yellow
                 }
@@ -246,7 +261,17 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
             const yMin = zoomRange.min;
             const yMax = zoomRange.max;
-            const mapY = (freq) => height - ((freq - yMin) / (yMax - yMin)) * height;
+
+            // Optimization: Calculate loop invariants outside the loop
+            const range = yMax - yMin;
+            const scaleY = height / range;
+            // Refactored mapY to use multiplication (faster)
+            const mapY = (freq) => height - (freq - yMin) * scaleY;
+
+            // Pre-calculate xStep for history loop
+            // history.length is variable, so we check it
+            const historyLen = dataRef.current?.history?.length || 0;
+            const xStep = historyLen > 1 ? (width - 30) / (historyLen - 1) : 0;
 
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
             ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
@@ -439,9 +464,10 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 const p2 = history[i];
 
                 if (p1 > 0 && p2 > 0) {
-                    const x1 = 30 + ((i - 1) / (history.length - 1)) * (width - 30);
+                    // Optimization: Use pre-calculated xStep
+                    const x1 = 30 + (i - 1) * xStep;
                     const y1 = mapY(p1);
-                    const x2 = 30 + (i / (history.length - 1)) * (width - 30);
+                    const x2 = 30 + i * xStep;
                     const y2 = mapY(p2);
 
                     // Use p1 color for the segment (simplification for performance)
