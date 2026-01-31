@@ -31,7 +31,12 @@ vi.mock('../../context/NavigationContext', () => ({
         navigationParams: {}
     })
 }));
-vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
+// Explicitly mock the module, including the default export
+vi.mock('../viz/DynamicOrb', () => {
+    return {
+        default: () => <div data-testid="dynamic-orb">Dynamic Orb</div>
+    };
+});
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
 vi.mock('../ui/ResizablePanel', () => ({
     default: ({ children, className }) => <div className={className} data-testid="resizable-panel">{children}</div>
@@ -64,6 +69,9 @@ describe('PracticeMode', () => {
 
     it('renders without crashing', async () => {
 
+        // Mock lazy loaded component DynamicOrb
+        vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
+
         render(
             <SettingsProvider>
                 <ProfileProvider>
@@ -88,7 +96,12 @@ describe('PracticeMode', () => {
 
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
-        // Check for visualization area
+        // Check for visualization area - dynamic-orb is loaded via Suspense, so wait for it
+        // Or if mocked above, it should appear.
+        // NOTE: If PracticeMode uses lazy(), the mock needs to be at top level or handle lazy logic.
+        // Since we mocked DynamicOrb globally at top of file, findByTestId should find it.
+        // If it's failing, it might be due to Suspense boundary not resolving in test environment?
+        // Let's rely on findByTestId to wait.
         expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
     });
 });

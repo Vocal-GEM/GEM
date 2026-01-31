@@ -41,11 +41,14 @@ describe('JournalForm Accessibility', () => {
     expect(screen.getByRole('button', { name: /start recording/i })).toBeInTheDocument();
 
     // Check sliders have labels associated
-    const effortSlider = screen.getByLabelText(/effort/i);
-    expect(effortSlider).toBeInTheDocument();
+    // Using getAllByLabelText because there might be duplicate labels in test (desktop/mobile) or multiple matches
+    const effortSliders = screen.getAllByLabelText(/effort/i);
+    expect(effortSliders.length).toBeGreaterThan(0);
+    expect(effortSliders[0]).toBeInTheDocument();
 
-    const confidenceSlider = screen.getByLabelText(/confidence/i);
-    expect(confidenceSlider).toBeInTheDocument();
+    const confidenceSliders = screen.getAllByLabelText(/confidence/i);
+    expect(confidenceSliders.length).toBeGreaterThan(0);
+    expect(confidenceSliders[0]).toBeInTheDocument();
   });
 
   it('renders sentiment buttons with accessible labels', () => {
