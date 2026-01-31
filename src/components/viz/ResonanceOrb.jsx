@@ -20,6 +20,7 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
     const { activeProfile } = useProfile();
     const orbRef = useRef(null);
     const labelRef = useRef(null);
+    const gaugeNeedleRef = useRef(null);
     const componentId = useId();
 
     // Debug state
@@ -63,11 +64,11 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                 // Use backend RBI score (0-100) mapped to 0-1
                 let calculatedScore = (resonanceScore !== undefined ? resonanceScore : 50) / 100.0;
 
-                // Extract tilt (if available) - typically -30 (steep) to 0 (flat)
+                // Extract tilt (if available) - typically -24 dB (breathy/soft) to -6 dB (pressed/bright)
                 // Map tilt to a 0-1 brightness scale
-                // -24 (Soft) -> 0.0
-                // -6 (Bright) -> 1.0
-                const tiltVal = tilt !== undefined ? tilt : -12;
+                // -24 dB (Breathy) -> 0.0
+                // -6 dB (Pressed) -> 1.0
+                const tiltVal = tilt !== undefined ? tilt : -15; // Default to midpoint
                 const tiltNorm = Math.max(0, Math.min(1, (tiltVal + 24) / 18)); // Map -24..-6 to 0..1
 
                 if (calibration) {
@@ -175,23 +176,23 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                     orbRef.current.style.backgroundColor = color;
 
                     // Modify shadow based on Tilt
-                    // High Tilt (Pressed) -> Harder shadow
-                    // Low Tilt (Breathy) -> Softer shadow
+                    // High Tilt (Pressed) -> Harder, more opaque shadow
+                    // Low Tilt (Breathy) -> Softer, larger bloom shadow
                     const shadowSize = size * (0.35 + (1 - tiltNorm) * 0.2); // Breathy = Larger bloom
                     const shadowOpacity = 0.5 + (tiltNorm * 0.5); // Pressed = More opaque
 
-                    orbRef.current.style.boxShadow = `0 0 ${shadowSize}px ${color}, 0 0 ${size * 0.2}px ${glowColor}`;
+                    // Apply shadow with opacity based on tilt
+                    const shadowColorWithOpacity = color.replace('rgb', 'rgba').replace(')', `, ${shadowOpacity})`);
+                    orbRef.current.style.boxShadow = `0 0 ${shadowSize}px ${shadowColorWithOpacity}, 0 0 ${size * 0.2}px ${glowColor}`;
                     orbRef.current.style.opacity = isVoiceActive ? "1" : "0.3";
                     orbRef.current.style.border = tiltNorm > 0.85 ? "2px solid rgba(255,200,0,0.8)" : "none"; // Warning border if too pressed
+                }
 
-
-                    // Update Gauge Rotation
-                    const gaugeNeedle = document.getElementById('resonance-gauge-needle');
-                    if (gaugeNeedle) {
-                        // Map 0-1 to -90 to 90 degrees
-                        const deg = (score * 180) - 90;
-                        gaugeNeedle.style.transform = `rotate(${deg}deg)`;
-                    }
+                // Update Gauge Rotation using ref instead of getElementById
+                if (gaugeNeedleRef.current) {
+                    // Map 0-1 to -90 to 90 degrees
+                    const deg = (score * 180) - 90;
+                    gaugeNeedleRef.current.style.transform = `rotate(${deg}deg)`;
                 }
 
                 // Label Logic
@@ -329,7 +330,7 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
 
                     {/* Needle/Indicator */}
                     <div
-                        id="resonance-gauge-needle"
+                        ref={gaugeNeedleRef}
                         className="absolute top-0 left-0 w-full h-full transition-transform duration-100 ease-out origin-center"
                         style={{ transform: 'rotate(-90deg)' }}
                     >

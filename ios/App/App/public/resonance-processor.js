@@ -119,16 +119,18 @@ class DSP {
     }
 
     static estimateVowel(f1, f2) {
-        // Simple Vowel Space Mapping (Average Female Values)
-        // i (beet): F1 300, F2 2500
-        // a (bat): F1 800, F2 1700
-        // u (boot): F1 350, F2 800
-        // o (boat): F1 500, F2 1000
-
-        if (f1 < 500 && f2 > 2000) return 'i'; // ee
-        if (f1 > 600 && f2 < 1800 && f2 > 1200) return 'a'; // ah/ae
-        if (f1 < 500 && f2 < 1200) return 'u'; // oo
-        if (f1 > 500 && f1 < 800 && f2 < 1200) return 'o'; // oh
+        if (!f1 || !f2 || f1 === 0 || f2 === 0) return '';
+        // Cardinal vowels based on typical formant ranges
+        // /i/ (heed): low F1, high F2
+        if (f1 < 550 && f2 > 1900) return 'i';
+        // /e/ (head): mid-low F1, high F2
+        if (f1 >= 400 && f1 < 700 && f2 > 1600 && f2 <= 2200) return 'e';
+        // /a/ (hod): high F1, mid F2
+        if (f1 > 600 && f2 < 1800 && f2 > 1000) return 'a';
+        // /u/ (who'd): low F1, low F2
+        if (f1 < 500 && f2 < 1200) return 'u';
+        // /o/ (hoed): mid F1, low F2
+        if (f1 > 400 && f1 < 800 && f2 < 1200) return 'o';
         return '';
     }
 }

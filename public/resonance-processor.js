@@ -188,10 +188,17 @@ class DSP {
 
     static estimateVowel(f1, f2) {
         if (!f1 || !f2 || f1 === 0 || f2 === 0) return '';
+        // Cardinal vowels based on typical formant ranges
+        // /i/ (heed): low F1, high F2
         if (f1 < 550 && f2 > 1900) return 'i';
-        if (f1 > 600 && f2 < 1800 && f2 > 1200) return 'a';
+        // /e/ (head): mid-low F1, high F2
+        if (f1 >= 400 && f1 < 700 && f2 > 1600 && f2 <= 2200) return 'e';
+        // /a/ (hod): high F1, mid F2
+        if (f1 > 600 && f2 < 1800 && f2 > 1000) return 'a';
+        // /u/ (who'd): low F1, low F2
         if (f1 < 500 && f2 < 1200) return 'u';
-        if (f1 > 500 && f1 < 800 && f2 < 1200) return 'o';
+        // /o/ (hoed): mid F1, low F2
+        if (f1 > 400 && f1 < 800 && f2 < 1200) return 'o';
         return '';
     }
 }
