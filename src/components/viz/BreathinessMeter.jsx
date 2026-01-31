@@ -8,17 +8,6 @@ import { Wind, CheckCircle2, AlertTriangle, Info, Sparkles, Activity, HelpCircle
  * 
  * A zone-based visualization for breathiness feedback, aligned with the GRBAS scale.
  * Based on research: "Breathiness as a Feminine Voice Characteristic: A Perceptual Approach"
- * 
- * Key Features:
- * - 4-zone visual meter (Modal → Slight → Moderate → Severe)
- * - "Sweet Spot" indicator for Score 1 (slight breathiness)
- * - Pitch-independent feedback
- * - Warnings for excessive breathiness
- * - NEW: Estimated Open Quotient display
- * - NEW: Ventricular (false vocal fold) engagement warning
- *
- * Performance Optimization:
- * - Uses RenderCoordinator for centralized animation loop control
  */
 
 // Zone configuration based on research
@@ -29,17 +18,13 @@ const ZONES = [
     { id: 3, label: 'Severe', color: 'red', range: [75, 100], feedback: 'Excessive ⚠', icon: 'warning' }
 ];
 
-
-
 const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const { colorBlindMode } = useSettings();
-    const componentId = useId();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
     const zoneRef = useRef(null);
     const feedbackRef = useRef(null);
     const lastValueRef = useRef(50);
-    const componentId = useId();
     const id = useId();
 
     // NEW: Refs for OQ and ventricular displays
@@ -48,20 +33,11 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const oqIndicatorRef = useRef(null);
     const lastOqRef = useRef(50);
     const ventricularRef = useRef(null);
-    const componentId = useId();
 
     // Optimized: Use RenderCoordinator to manage animation loop
     useEffect(() => {
-        const update = () => {
-            if (!dataRef.current) return;
-        const updateMeter = () => {
-            if (!dataRef.current) return;
         const loop = () => {
             if (!dataRef.current) return;
-        const loop = (delta, currentTime) => {
-            if (!dataRef.current) {
-                return;
-            }
 
             const { breathinessGrbas, oq_percent, oq_zone, ventricular_detected, ventricular_severity, ventricular_feedback } = dataRef.current;
 
@@ -163,42 +139,12 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
         };
 
         const unsubscribe = renderCoordinator.subscribe(
-            componentId,
-            update,
-            renderCoordinator.PRIORITY.MEDIUM
-        );
-
-        return unsubscribe;
-    }, [dataRef, colorBlindMode, componentId]);
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            componentId,
-            updateMeter,
-
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `BreathinessMeter-${componentId}`,
+            `breathiness-meter-${id}`,
             loop,
             renderCoordinator.PRIORITY.MEDIUM
         );
 
         return () => unsubscribe();
-    }, [dataRef, colorBlindMode, componentId]);
-            `breathiness-meter-${componentId}`,
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `breathiness-meter-${id}`,
-            loop,
-            renderCoordinator.PRIORITY.CRITICAL
-        );
-
-        return () => {
-            unsubscribe();
-        };
-    }, [dataRef, colorBlindMode, componentId]);
     }, [dataRef, colorBlindMode, id]);
 
     // Determine if in sweet spot for static rendering
