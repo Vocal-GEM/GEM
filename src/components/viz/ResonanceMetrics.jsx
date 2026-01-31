@@ -101,7 +101,7 @@ const ResonanceMetrics = ({ dataRef }) => {
                 value={metrics.resonanceScore}
                 unit="%"
                 color="text-purple-400"
-                tooltip="Resonance Brightness Index (RBI). A composite score (0-100) indicating how bright and forward your resonance is. Target: 60-80."
+                tooltip="Resonance Brightness Index (RBI). A composite score (0-100) indicating how bright and forward your resonance is. Target varies by profile: Bright (65-100), Balanced (35-65), or Dark (0-35)."
             />
         </div>
     );

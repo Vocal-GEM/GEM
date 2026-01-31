@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import {
     predictGenderPerception,
@@ -24,6 +24,7 @@ const PitchResonanceQuadrant = ({ dataRef, size = 300 }) => {
     const canvasRef = useRef(null);
     const trailRef = useRef([]);
     const [prediction, setPrediction] = useState(null);
+    const componentId = useId();
 
     // Axis ranges
     const PITCH_MIN = 80;
@@ -203,13 +204,13 @@ const PitchResonanceQuadrant = ({ dataRef, size = 300 }) => {
         };
 
         const unsubscribe = renderCoordinator.subscribe(
-            'pitch-resonance-quadrant',
+            `pitch-resonance-quadrant-${componentId}`,
             loop,
             renderCoordinator.PRIORITY.NORMAL
         );
 
         return () => unsubscribe();
-    }, [size, colorBlindMode, dataRef]);
+    }, [size, colorBlindMode, dataRef, componentId]);
 
     return (
         <div className="relative">
