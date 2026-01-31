@@ -12,6 +12,10 @@ import { predictGenderPerception, getPerceptionColor, AMBIGUITY_ZONE } from '../
 import GenderTimeline from './GenderTimeline';
 import FeedbackManager from './FeedbackManager';
 
+// Optimization: Pre-calculate near-miss factors to avoid expensive Math.log2 calls in the render loop
+const NEAR_MISS_MIN_FACTOR = Math.pow(2, -50 / 1200);
+const NEAR_MISS_MAX_FACTOR = Math.pow(2, 50 / 1200);
+
 const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScore, settings }) => {
     const { voiceProfiles, activeProfile } = useProfile();
     const { colorBlindMode } = useSettings();
@@ -162,6 +166,10 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
         // Pre-calculate profile ranges outside the loop
         const fem = voiceProfiles.find(p => p.id === 'fem');
         const masc = voiceProfiles.find(p => p.id === 'masc');
+
+        // Optimization: Pre-calculate thresholds
+        const nearMissMinThreshold = targetRange ? targetRange.min * NEAR_MISS_MIN_FACTOR : 0;
+        const nearMissMaxThreshold = targetRange ? targetRange.max * NEAR_MISS_MAX_FACTOR : 0;
         const femRange = fem?.genderRange || fem?.targetRange;
         const mascRange = masc?.genderRange || masc?.targetRange;
         const isFem = activeProfile === 'fem';
@@ -202,10 +210,12 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
             // Near Miss Zone
             if (targetRange) {
-                const distMin = 1200 * Math.log2(freq / targetRange.min);
-                const distMax = 1200 * Math.log2(freq / targetRange.max);
+                // Optimization: Use pre-calculated thresholds instead of log2
+                // This saves ~2 log2 calls per history point per frame
+                const isNearMissLow = freq > nearMissMinThreshold && freq < targetRange.min;
+                const isNearMissHigh = freq > targetRange.max && freq < nearMissMaxThreshold;
 
-                if ((distMin > -50 && distMin < 0) || (distMax > 0 && distMax < 50)) {
+                if (isNearMissLow || isNearMissHigh) {
                     if (colorBlindMode) return '#f59e0b';
                     return '#eab308'; // Yellow
                 }
