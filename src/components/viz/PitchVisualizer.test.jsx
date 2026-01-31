@@ -96,7 +96,7 @@ describe('PitchVisualizer', () => {
     };
 
     // ResizeObserver mock
-    global.ResizeObserver = class ResizeObserver {
+    globalThis.ResizeObserver = class ResizeObserver {
         observe() {}
         unobserve() {}
         disconnect() {}
