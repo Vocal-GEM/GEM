@@ -57,7 +57,7 @@ const MockAudio = vi.fn(function(src) {
     return new MockAudioImplementation(src);
 });
 
-global.Audio = MockAudio;
+globalThis.Audio = MockAudio;
 
 describe('SuccessStories', () => {
     beforeEach(() => {
@@ -116,7 +116,7 @@ describe('SuccessStories', () => {
         });
 
         // Mock validation failure
-        ModerationService.default.preCheckContent.mockReturnValue({ safe: false });
+        ModerationService.preCheckContent.mockReturnValue({ safe: false });
 
         const submitButton = screen.getByText('Submit Story');
         fireEvent.click(submitButton);
