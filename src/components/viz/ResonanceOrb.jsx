@@ -298,7 +298,11 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
     };
 
     return (
-        <div className="relative flex flex-col items-center justify-center w-full h-full overflow-hidden py-8">
+        <div
+            className="relative flex flex-col items-center justify-center w-full h-full overflow-hidden py-8"
+            role="region"
+            aria-label="Resonance visualization"
+        >
             <div className="absolute top-4 right-4 z-20">
                 <FeedbackControls settings={feedbackSettings} setSettings={setFeedbackSettings} />
             </div>
@@ -306,6 +310,8 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
             <div
                 className="relative flex items-center justify-center shrink-0"
                 style={{ width: size, height: size }}
+                role="img"
+                aria-label={`Resonance gauge showing current level. Target zone: ${targetZone.label}`}
             >
                 {/* Gauge Background */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ width: svgSize, height: svgSize, left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
@@ -345,6 +351,12 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                 <div
                     ref={orbRef}
                     className="rounded-full transition-all duration-150 z-10 relative"
+                    role="meter"
+                    aria-label="Resonance brightness level"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={Math.round((debugInfo?.score || 0) * 100)}
+                    aria-valuetext={debugInfo?.label || 'Listening'}
                     style={{
                         width: size * 0.7, // Slightly smaller to fit inside gauge
                         height: size * 0.7,

@@ -188,17 +188,39 @@ class DSP {
 
     static estimateVowel(f1, f2) {
         if (!f1 || !f2 || f1 === 0 || f2 === 0) return '';
-        // Cardinal vowels based on typical formant ranges
-        // /i/ (heed): low F1, high F2
-        if (f1 < 550 && f2 > 1900) return 'i';
-        // /e/ (head): mid-low F1, high F2
-        if (f1 >= 400 && f1 < 700 && f2 > 1600 && f2 <= 2200) return 'e';
-        // /a/ (hod): high F1, mid F2
-        if (f1 > 600 && f2 < 1800 && f2 > 1000) return 'a';
-        // /u/ (who'd): low F1, low F2
-        if (f1 < 500 && f2 < 1200) return 'u';
-        // /o/ (hoed): mid F1, low F2
-        if (f1 > 400 && f1 < 800 && f2 < 1200) return 'o';
+        // Complete vowel space coverage based on typical formant ranges (IPA symbols)
+        // Values based on acoustic phonetics research for adult speakers
+
+        // Front vowels (high F2)
+        // /i/ (heed): low F1, very high F2
+        if (f1 < 450 && f2 > 2000) return 'i';
+        // /ɪ/ (hid): low-mid F1, high F2
+        if (f1 >= 350 && f1 < 550 && f2 > 1700 && f2 <= 2200) return 'ɪ';
+        // /e/ (hey): mid-low F1, high F2
+        if (f1 >= 400 && f1 < 600 && f2 > 1800 && f2 <= 2300) return 'e';
+        // /ɛ/ (bed): mid F1, mid-high F2
+        if (f1 >= 500 && f1 < 750 && f2 > 1400 && f2 <= 1900) return 'ɛ';
+        // /æ/ (bat): high F1, mid F2
+        if (f1 >= 650 && f1 < 900 && f2 > 1400 && f2 <= 1800) return 'æ';
+
+        // Central vowels
+        // /ʌ/ (but): mid-high F1, mid F2
+        if (f1 >= 550 && f1 < 800 && f2 > 1000 && f2 <= 1400) return 'ʌ';
+        // /ə/ (about): mid F1, mid F2 (schwa)
+        if (f1 >= 400 && f1 < 600 && f2 > 1200 && f2 <= 1600) return 'ə';
+
+        // Back vowels (low F2)
+        // /ɑ/ or /a/ (father): high F1, mid-low F2
+        if (f1 > 650 && f2 < 1400 && f2 > 900) return 'a';
+        // /ɔ/ (caught): mid-high F1, low F2
+        if (f1 >= 500 && f1 < 750 && f2 > 700 && f2 <= 1100) return 'ɔ';
+        // /o/ (go): mid F1, low F2
+        if (f1 >= 400 && f1 < 600 && f2 >= 700 && f2 < 1200) return 'o';
+        // /ʊ/ (hood): low-mid F1, low-mid F2
+        if (f1 >= 350 && f1 < 500 && f2 > 900 && f2 <= 1400) return 'ʊ';
+        // /u/ (who): low F1, very low F2
+        if (f1 < 450 && f2 < 1000) return 'u';
+
         return '';
     }
 }

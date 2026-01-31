@@ -46,23 +46,41 @@ const ResonanceMetrics = ({ dataRef }) => {
     }, [dataRef, componentId]);
 
     const MetricCard = ({ label, value, unit, color, tooltip, id }) => (
-        <div className="bg-slate-800/50 rounded-xl p-4 border border-white/5 relative group">
+        <div
+            className="bg-slate-800/50 rounded-xl p-4 border border-white/5 relative group"
+            role="group"
+            aria-labelledby={`metric-label-${id}`}
+        >
             <div className="flex justify-between items-start mb-2">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{label}</span>
+                <span id={`metric-label-${id}`} className="text-xs font-bold text-slate-400 uppercase tracking-wider">{label}</span>
                 <button
                     className="text-slate-600 hover:text-slate-300 transition-colors"
                     onMouseEnter={() => setShowTooltip(id)}
                     onMouseLeave={() => setShowTooltip(null)}
+                    onFocus={() => setShowTooltip(id)}
+                    onBlur={() => setShowTooltip(null)}
+                    aria-label={`Information about ${label}`}
+                    aria-describedby={showTooltip === id ? `tooltip-${id}` : undefined}
                 >
-                    <Info size={14} />
+                    <Info size={14} aria-hidden="true" />
                 </button>
             </div>
-            <div className={`text-2xl font-bold ${color}`}>
-                {value} <span className="text-sm text-slate-500 font-normal">{unit}</span>
+            <div
+                className={`text-2xl font-bold ${color}`}
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+            >
+                <span aria-label={`${label}: ${value} ${unit}`}>{value}</span>
+                <span className="text-sm text-slate-500 font-normal" aria-hidden="true"> {unit}</span>
             </div>
 
             {showTooltip === id && (
-                <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg z-50 text-xs text-slate-300 shadow-xl">
+                <div
+                    id={`tooltip-${id}`}
+                    role="tooltip"
+                    className="absolute top-full left-0 right-0 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg z-50 text-xs text-slate-300 shadow-xl"
+                >
                     {tooltip}
                 </div>
             )}
@@ -70,7 +88,11 @@ const ResonanceMetrics = ({ dataRef }) => {
     );
 
     return (
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div
+            className="grid grid-cols-2 gap-4 mb-6"
+            role="region"
+            aria-label="Resonance metrics display"
+        >
             <MetricCard
                 id="f1"
                 label="R1 (F1)"
