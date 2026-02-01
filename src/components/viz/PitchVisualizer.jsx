@@ -189,6 +189,17 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             }
         }
 
+        // Pre-calculate Near Miss Thresholds (50 cents) to avoid Math.log2 in the loop
+        // 50 cents = 2^(50/1200) ≈ 1.0293
+        const CENTS_50_FACTOR = 1.02930223664;
+        let nearMissMinLimit = 0;
+        let nearMissMaxLimit = 0;
+
+        if (targetRange) {
+            nearMissMinLimit = targetRange.min / CENTS_50_FACTOR;
+            nearMissMaxLimit = targetRange.max * CENTS_50_FACTOR;
+        }
+
         const getPitchColor = (freq, clarity = 1.0) => {
             if (clarity < 0.8) {
                 return colorBlindMode ? '#9333ea' : '#ef4444';
@@ -202,10 +213,9 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
             // Near Miss Zone
             if (targetRange) {
-                const distMin = 1200 * Math.log2(freq / targetRange.min);
-                const distMax = 1200 * Math.log2(freq / targetRange.max);
-
-                if ((distMin > -50 && distMin < 0) || (distMax > 0 && distMax < 50)) {
+                // Optimization: Use pre-calculated thresholds instead of expensive Math.log2 in the loop
+                if ((freq > nearMissMinLimit && freq < targetRange.min) ||
+                    (freq > targetRange.max && freq < nearMissMaxLimit)) {
                     if (colorBlindMode) return '#f59e0b';
                     return '#eab308'; // Yellow
                 }
