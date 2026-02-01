@@ -60,12 +60,12 @@ const MockAudio = vi.fn(function(src) {
     return new MockAudioImplementation(src);
 });
 
-global.Audio = MockAudio;
-
 describe('SuccessStories', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockAudioInstances.length = 0;
+
+        vi.stubGlobal('Audio', MockAudio);
 
         CommunityService.getSuccessStories.mockResolvedValue({
             stories: [
