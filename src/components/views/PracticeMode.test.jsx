@@ -12,7 +12,6 @@ import { TourProvider } from '../../context/TourContext';
 import { PracticeCardsProvider } from '../../context/PracticeCardsContext';
 import React from 'react';
 
-/* eslint-disable no-undef */
 // Mock navigator.mediaDevices
 globalThis.navigator = {
     mediaDevices: {
@@ -22,7 +21,6 @@ globalThis.navigator = {
         removeEventListener: vi.fn()
     }
 };
-/* eslint-enable no-undef */
 
 // Mock dependencies
 vi.mock('../../context/NavigationContext', () => ({

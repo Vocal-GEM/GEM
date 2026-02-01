@@ -52,7 +52,7 @@ vi.mock('../../services/SearchService', () => ({
     groupResultsByType: vi.fn(() => []),
 }));
 
-// Mock FeatureFlags - Must export default features or FEATURES constant
+// Mock FeatureFlags
 vi.mock('../../config/featureFlags', () => ({
     FEATURES: {
         camera: true // Enable camera feature for Mirror test
@@ -75,10 +75,11 @@ describe('Sidebar Auth Integration', () => {
         });
     });
 
+    // Auth features removed in favor of Frontend Demo Mode
+    /*
     it('shows Sign In button when not logged in', () => {
         mockUseAuth.mockReturnValue({ user: null });
         render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        // Use getAllByText because sometimes duplicated in mobile/desktop views
         expect(screen.getAllByText('Sign In')[0]).toBeInTheDocument();
     });
 
@@ -106,6 +107,7 @@ describe('Sidebar Auth Integration', () => {
         fireEvent.click(signOutButtons[0]);
         expect(mockLogout).toHaveBeenCalled();
     });
+    */
 
     it('opens Camera modal when Mirror button is clicked', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'TestUser' } });
