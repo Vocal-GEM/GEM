@@ -65,6 +65,24 @@ describe('JournalForm Accessibility', () => {
 
   it('has accessible name for Prompt Refresh button', () => {
      render(<JournalForm />);
-     expect(screen.getByRole('button', { name: /need a writing prompt/i })).toBeInTheDocument();
+     // Based on the code, if currentPrompt is null, it shows "Need a writing prompt?"
+     // The error says "Unable to find an accessible element with the role "button" and name /need a writing prompt/i"
+     // But the DOM output shows: <button ...>Need a writing prompt?</button>
+     // Ah, the button has a span/icon inside too? No, it has SVG then text.
+     // Wait, it says:
+     /*
+     <button
+       aria-label="Get a writing prompt"
+       class="..."
+       type="button"
+     >
+       <svg ... />
+       Need a writing prompt?
+     </button>
+     */
+     // It has aria-label="Get a writing prompt". Accessible name computation prioritizes aria-label.
+     // So name is "Get a writing prompt", NOT "Need a writing prompt?".
+
+     expect(screen.getByRole('button', { name: /get a writing prompt/i })).toBeInTheDocument();
   });
 });
