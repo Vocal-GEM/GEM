@@ -21,3 +21,5 @@
 7:23:36 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
 7:23:41 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
 7:23:48 AM [vite] page reload src/audio/PitchWorklet.js
+7:30:13 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
+7:30:26 AM [vite] page reload src/components/ui/button.test.jsx
