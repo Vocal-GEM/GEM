@@ -7,3 +7,17 @@
 
   ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
+7:20:27 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+7:20:55 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+7:21:18 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
+7:21:38 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:21:46 AM [vite] page reload src/services/PrivacyManager.js
+7:21:59 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:22:10 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:22:23 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:22:45 AM [vite] page reload src/services/ResearchMode.js
+7:22:59 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:23:26 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+7:23:36 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:23:41 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
+7:23:48 AM [vite] page reload src/audio/PitchWorklet.js
