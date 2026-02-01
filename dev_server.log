@@ -7,3 +7,24 @@
 
   ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
+7:27:07 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+7:27:33 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
+7:27:55 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:28:08 AM [vite] page reload src/services/PrivacyManager.js
+7:28:17 AM [vite] page reload src/components/ui/button.test.jsx
+7:28:17 AM [vite] page reload src/components/ui/button.test.jsx
+7:29:04 AM [vite] page reload src/audio/PitchWorklet.js
+7:29:13 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:29:26 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:29:39 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
+7:29:52 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+7:30:19 AM [vite] page reload src/services/ResearchMode.js
+7:31:00 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:31:43 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:32:01 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:34:08 AM [vite] page reload src/components/community/SuccessStories.test.jsx
+7:34:28 AM [vite] page reload src/components/ui/JournalForm.test.jsx
+7:34:42 AM [vite] page reload src/components/ui/LoadingSpinner.test.jsx
+7:35:49 AM [vite] page reload src/components/ui/LoadingSpinnerVerification.jsx
+7:36:04 AM [vite] page reload src/components/ui/QuickActions.jsx
+7:36:20 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
