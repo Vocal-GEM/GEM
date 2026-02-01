@@ -16,9 +16,13 @@ vi.mock('../../services/RenderCoordinator', () => ({
 vi.mock('lucide-react', async () => {
     // eslint-disable-next-line
     const React = await import('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
-    const Component = createIcon('Icon');
-    Component.displayName = 'Icon';
+
+    // Explicitly define component function to support displayName
+    const createIcon = (name) => {
+        const Icon = (props) => React.createElement('div', { ...props, 'data-testid': name });
+        Icon.displayName = name;
+        return Icon;
+    };
 
     const icons = {
         Sun: createIcon('Sun'),
@@ -26,11 +30,6 @@ vi.mock('lucide-react', async () => {
         Info: createIcon('Info'),
         Smile: createIcon('Smile')
     };
-
-    // Add display names
-    Object.keys(icons).forEach(key => {
-        icons[key].displayName = key;
-    });
 
     return icons;
 });
