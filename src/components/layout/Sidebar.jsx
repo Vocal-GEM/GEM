@@ -49,7 +49,11 @@ const Sidebar = ({ activeView, onViewChange }) => {
         { id: 'pitch-tool', label: 'Haptic Tool', icon: <Activity size={20} /> },
         { id: 'camera', label: 'Mirror', icon: <Camera size={20} />, isModal: true },
         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
-    ].filter(item => FEATURES[item.id] !== false);
+    ].filter(item => {
+        // Handle both simple boolean and nested config
+        const config = FEATURES[item.id];
+        return config !== false && (typeof config !== 'object' || config.enabled !== false);
+    });
 
     // Search handler with debouncing
     useEffect(() => {

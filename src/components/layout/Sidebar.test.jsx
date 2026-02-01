@@ -1,6 +1,7 @@
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Sidebar from './Sidebar';
+import React from 'react';
 
 // Mock contexts
 const mockLogout = vi.fn();
@@ -51,6 +52,16 @@ vi.mock('../../services/SearchService', () => ({
     groupResultsByType: vi.fn(() => []),
 }));
 
+// Mock FeatureFlags - Must export default features or FEATURES constant
+vi.mock('../../config/featureFlags', () => ({
+    FEATURES: {
+        camera: true // Enable camera feature for Mirror test
+    },
+    default: {
+        camera: true
+    }
+}));
+
 const MockNavigationProvider = ({ children }) => <div>{children}</div>;
 
 describe('Sidebar Auth Integration', () => {
@@ -66,30 +77,33 @@ describe('Sidebar Auth Integration', () => {
 
     it('shows Sign In button when not logged in', () => {
         mockUseAuth.mockReturnValue({ user: null });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('Sign In')).toBeInTheDocument();
+        render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+        // Use getAllByText because sometimes duplicated in mobile/desktop views
+        expect(screen.getAllByText('Sign In')[0]).toBeInTheDocument();
     });
 
     it('shows user info and Sign Out when logged in', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('CloudUser')).toBeInTheDocument();
-        expect(getByText('Sign Out')).toBeInTheDocument();
+        render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+        expect(screen.getAllByText('CloudUser')[0]).toBeInTheDocument();
+        expect(screen.getAllByText('Sign Out')[0]).toBeInTheDocument();
     });
 
     it('opens Login modal on Sign In click', () => {
         mockUseAuth.mockReturnValue({ user: null });
-        const { getByText, getByTestId } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+        render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
-        fireEvent.click(getByText('Sign In'));
-        expect(getByTestId('login-modal')).toBeInTheDocument();
+        const signInButtons = screen.getAllByText('Sign In');
+        fireEvent.click(signInButtons[0]);
+        expect(screen.getByTestId('login-modal')).toBeInTheDocument();
     });
 
     it('calls logout on Sign Out click', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+        render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
-        fireEvent.click(getByText('Sign Out'));
+        const signOutButtons = screen.getAllByText('Sign Out');
+        fireEvent.click(signOutButtons[0]);
         expect(mockLogout).toHaveBeenCalled();
     });
 
@@ -101,10 +115,10 @@ describe('Sidebar Auth Integration', () => {
             openModal: openModalSpy
         });
 
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+        render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
-        const mirrorBtn = getByText('Mirror');
-        fireEvent.click(mirrorBtn);
+        const mirrorBtns = screen.getAllByText('Mirror');
+        fireEvent.click(mirrorBtns[0]);
 
         expect(openModalSpy).toHaveBeenCalledWith('camera');
     });
