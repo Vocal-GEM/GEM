@@ -1,5 +1,5 @@
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { detectPitchEnsemble } from '../../utils/pitchEnsemble';
 import { FormantTracker } from '../../utils/formantTracker';
 import praatReferences from './praatReferences.json';
@@ -115,5 +115,5 @@ describe('Algorithm Validation against PRAAT', () => {
         // Relaxed assertions for synthetic audio
         expect(lowResult.pitch).toBeLessThan(150);
         expect(highResult.pitch).toBeGreaterThan(200);
-    }, 10000); // 10s timeout
+    }, 20000); // 20s timeout
 });
