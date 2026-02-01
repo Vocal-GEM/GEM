@@ -13,11 +13,14 @@ vi.mock('../../services/CommunityService', () => ({
     }
 }));
 
-vi.mock('../../services/ModerationService', () => ({
-    default: {
-        preCheckContent: vi.fn().mockReturnValue({ safe: true })
-    }
-}));
+// Mock ModerationService to properly support default export usage
+vi.mock('../../services/ModerationService', () => {
+    return {
+        default: {
+            preCheckContent: vi.fn().mockReturnValue({ safe: true })
+        }
+    };
+});
 
 // Mock Lucide icons
 vi.mock('lucide-react', () => ({
@@ -88,6 +91,7 @@ describe('SuccessStories', () => {
         expect(screen.getByText('"This is a test story."')).toBeInTheDocument();
 
         // Audio should be instantiated for before/after clips
+        // Note: Component uses lazy init via ref, so useEffect runs after render.
         await waitFor(() => {
              expect(globalThis.Audio).toHaveBeenCalledTimes(2);
         });
@@ -100,13 +104,11 @@ describe('SuccessStories', () => {
         CommunityService.getSuccessStories.mockResolvedValue({ stories: [] });
         render(<SuccessStories />);
 
-        // Wait for loading to finish
         await waitFor(() => expect(screen.queryByText('Loading...')).not.toBeInTheDocument());
 
         const shareButton = screen.getByText('Share Your Story');
         fireEvent.click(shareButton);
 
-        // Fill form
         fireEvent.change(screen.getByPlaceholderText(/e.g., My 6-month progress update/i), {
             target: { value: 'Bad Title' },
         });
@@ -114,7 +116,12 @@ describe('SuccessStories', () => {
             target: { value: 'Bad Story' },
         });
 
-        // Mock validation failure - Correctly accessing the mock directly
+        // Use the mock. Since we mocked the default export, we access it here.
+        // If imported as ModerationService, it IS the object { preCheckContent ... }
+        // BUT due to how vi.mock works with ES modules and default exports, sometimes it's tricky.
+        // We defined mock as returning { default: ... }
+        // So require('../../services/ModerationService').default should be the object.
+        // Let's rely on the import.
         ModerationService.preCheckContent.mockReturnValue({ safe: false });
 
         const submitButton = screen.getByText('Submit Story');
