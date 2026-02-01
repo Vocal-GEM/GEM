@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2026-02-18 - Restoring Accessibility in Corrupted Components
+**Learning:** Components with duplicate attributes (due to merge conflicts) can result in unpredictable accessibility trees (e.g., multiple `aria-hidden` states), making them completely unusable for screen readers despite looking "fine" visually.
+**Action:** When refactoring corrupted components, explicitly map out the accessibility tree (roles, labels, focus states) before rewriting to ensure the fixed component is not just syntactically correct but semantically robust.
