@@ -28,48 +28,62 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     canvas: { width: 300, height: 300 }
 }));
 
-// Mock requestAnimationFrame to detect recursion
-const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+// Mock ResizeObserver
+let resizeCallback = null;
+globalThis.ResizeObserver = class ResizeObserver {
+    constructor(cb) {
+        resizeCallback = cb;
+    }
+    observe() {
+        // Trigger immediately for initial size logic if needed
+        if (resizeCallback) {
+             resizeCallback([{ contentRect: { width: 300, height: 300 } }]);
+        }
+    }
+    unobserve() {}
+    disconnect() {}
+};
 
 describe('PitchOrb', () => {
     let dataRef;
+    let getBoundingClientRectSpy;
 
     beforeEach(() => {
         dataRef = { current: { pitch: 200 } };
-        // Add getBoundingClientRect mock
-        Element.prototype.getBoundingClientRect = vi.fn(() => ({
+        // Spy on getBoundingClientRect
+        getBoundingClientRectSpy = vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({
             width: 300,
             height: 300,
             top: 0,
             left: 0,
             right: 300,
             bottom: 300,
-        }));
+        });
         vi.clearAllMocks();
     });
 
     afterEach(() => {
         cleanup();
-        vi.clearAllMocks();
+        vi.restoreAllMocks();
     });
 
-    it('should not call requestAnimationFrame recursively in the draw loop', async () => {
+    it('should NOT trigger layout thrashing (getBoundingClientRect) inside the animation loop', async () => {
         render(<PitchOrb dataRef={dataRef} />);
 
-        // Wait for potential dynamic import resolution
+        // Wait for effects
         await new Promise(resolve => setTimeout(resolve, 0));
 
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
         const [id, callback] = renderCoordinator.subscribe.mock.calls[0];
 
-        // Execute the callback
+        // Reset spy counts from initial render/setup
+        getBoundingClientRectSpy.mockClear();
+
+        // Run the animation loop once
         callback();
 
-        // With the bug, requestAnimationFrame is called.
-        // We assert it IS called to confirm the bug exists in the current code,
-        // OR we assert it is NOT called if we want to write the test for the desired state.
-        // Let's write the test for the DESIRED state (fail now, pass later).
-        expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+        // Expectation: getBoundingClientRect should NOT be called in the loop
+        // (This fails if the optimization is missing)
+        expect(getBoundingClientRectSpy).not.toHaveBeenCalled();
     });
 });
