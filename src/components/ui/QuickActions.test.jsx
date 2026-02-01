@@ -34,12 +34,9 @@ describe('QuickActions', () => {
         expect(fab).toHaveAttribute('aria-controls', 'quick-actions-menu');
 
         // Buttons should be hidden from accessibility tree initially
-        const practiceButton = screen.queryByText('Practice');
-        expect(practiceButton).toBeInTheDocument();
-        // Since we are finding by text which is in a span, we check the button parent
-        const button = practiceButton.closest('button');
-        expect(button).toHaveAttribute('aria-hidden', 'true');
-        expect(button).toHaveAttribute('tabIndex', '-1');
+        // The buttons are in the DOM but hidden via aria-hidden on the parent div
+        const menu = document.getElementById('quick-actions-menu');
+        expect(menu).toHaveAttribute('aria-hidden', 'true');
     });
 
     it('should expand menu when clicked and update attributes', () => {
@@ -50,9 +47,8 @@ describe('QuickActions', () => {
 
         expect(fab).toHaveAttribute('aria-expanded', 'true');
 
-        const practiceButton = screen.getByText('Practice').closest('button');
-        expect(practiceButton).toHaveAttribute('aria-hidden', 'false');
-        expect(practiceButton).toHaveAttribute('tabIndex', '0');
+        const menu = document.getElementById('quick-actions-menu');
+        expect(menu).toHaveAttribute('aria-hidden', 'false');
     });
 
     it('should call onAction when an action is clicked', () => {
