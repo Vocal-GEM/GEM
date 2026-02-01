@@ -24,7 +24,7 @@ vi.mock('../../utils/lpcAnalysis', () => ({
 }));
 
 // Mock ResizeObserver
-global.ResizeObserver = vi.fn(function() {
+globalThis.ResizeObserver = vi.fn(function() {
   this.observe = vi.fn();
   this.unobserve = vi.fn();
   this.disconnect = vi.fn();
@@ -50,7 +50,9 @@ const mockContext = {
   canvas: { width: 600, height: 200 }
 };
 
-HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext);
+if (typeof window !== 'undefined') {
+    HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext);
+}
 
 describe('SpectrumAnalyzer', () => {
   let dataRef;
