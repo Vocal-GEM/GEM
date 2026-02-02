@@ -366,7 +366,7 @@
   214:8   warning  React Hook useEffect has a missing dependency: 'stopLiveAnalysis'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 /app/src/components/viz/BreathinessMeter.jsx
-  5:10  error  Parsing error: Identifier 'renderCoordinator' has already been declared
+  156:10  error  Parsing error: Unexpected token ;
 
 /app/src/components/viz/BreathinessMeter.test.jsx
   1:27  warning  'waitFor' is defined but never used  no-unused-vars
@@ -387,7 +387,7 @@
   189:8  warning  React Hook useCallback has a missing dependency: 'renderPlayhead'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
 
 /app/src/components/viz/HighResSpectrogram.jsx
-  67:15  error  Parsing error: Identifier 'width' has already been declared
+  150:6  error  Parsing error: Unexpected token ,
 
 /app/src/components/viz/HighResSpectrogram.test.jsx
   1:27  warning  'screen' is defined but never used  no-unused-vars
