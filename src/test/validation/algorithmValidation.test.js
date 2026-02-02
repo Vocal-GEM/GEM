@@ -1,8 +1,11 @@
 
 import { describe, it, expect, beforeAll } from 'vitest';
-import { PitchEnsemble } from '../../utils/pitchEnsemble';
+import * as PitchEnsembleModule from '../../utils/pitchEnsemble'; // Import as namespace to check exports
 import { FormantTracker } from '../../utils/formantTracker';
 import praatReferences from './praatReferences.json';
+
+// Handle potential default vs named export mismatch
+const PitchEnsemble = PitchEnsembleModule.PitchEnsemble || PitchEnsembleModule.default;
 
 // Helper to synthesize audio for testing (since we don't have the actual WAV files in repo)
 const synthesizeAudio = (praatValues, duration = 1.0, sampleRate = 44100) => {
