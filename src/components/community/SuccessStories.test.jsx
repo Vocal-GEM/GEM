@@ -132,7 +132,7 @@ describe('SuccessStories', () => {
         });
 
         // Mock validation failure
-        ModerationService.default.preCheckContent.mockReturnValue({ safe: false });
+        ModerationService.preCheckContent.mockReturnValue({ safe: false });
 
         const submitButton = screen.getByText('Submit Story');
         fireEvent.click(submitButton);
