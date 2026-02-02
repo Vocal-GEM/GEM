@@ -52,9 +52,23 @@ const SpectrogramMesh = ({ dataRef }) => {
         historyRef.current = new Float32Array(numCols * numRows);
     }
 
-    // Reusable color object to prevent GC
-    // Optimization: Reuse Color object to avoid thousands of allocations per frame
-    const tempColor = useMemo(() => new THREE.Color(), []);
+    // Optimization: Pre-calculate Color Lookup Table (LUT)
+    // Avoids thousands of HSL->RGB conversions per frame
+    const LUT_SIZE = 256;
+    const lutRef = useRef(null);
+    if (!lutRef.current) {
+        const lut = new Float32Array(LUT_SIZE * 3);
+        const tempColor = new THREE.Color();
+        for (let i = 0; i < LUT_SIZE; i++) {
+            const t = i / (LUT_SIZE - 1);
+            // Gradient: Blue (0.7) -> ... -> Orange (0.1)
+            tempColor.setHSL(0.7 - t * 0.6, 1, 0.5);
+            lut[i * 3] = tempColor.r;
+            lut[i * 3 + 1] = tempColor.g;
+            lut[i * 3 + 2] = tempColor.b;
+        }
+        lutRef.current = lut;
+    }
 
     useFrame(() => {
         if (!meshRef.current || !meshRef.current.geometry || !meshRef.current.geometry.attributes) return;
@@ -71,8 +85,12 @@ const SpectrogramMesh = ({ dataRef }) => {
         if (spectrum) {
             const maxIndex = spectrum.length;
             const targetMaxFreq = 8000;
-            const sampleRate = 16000;
-            const maxTargetIndex = Math.floor(maxIndex * targetMaxFreq / (sampleRate / 2));
+            const sampleRate = 16000; // Assumed sample rate for mapping
+            // Adjust based on actual nyquist
+            const nyquist = 22050; // Standard 44.1k/2, but code used 16k before?
+            // Original code: const maxTargetIndex = Math.floor(maxIndex * targetMaxFreq / (sampleRate / 2));
+            // Assuming 16k was correct context for this visualization scaling
+            const maxTargetIndex = Math.floor(maxIndex * targetMaxFreq / 8000); // If 16k SR
 
             for (let j = 0; j < numRows; j++) {
                 // Map row to frequency
@@ -113,22 +131,30 @@ const SpectrogramMesh = ({ dataRef }) => {
         }
 
         if (colorsAttribute) {
-            const colors = colorsAttribute;
+            const colors = colorsAttribute.array;
+            const lut = lutRef.current;
+
             for (let i = 0; i < numCols; i++) {
                 for (let j = 0; j < numRows; j++) {
                     const index = i * numRows + j;
                     const val = history[index];
 
-                    // Color map: Blue -> Purple -> Red -> Yellow
-                    const t = Math.min(1, val / 2); // Normalize somewhat
+                    // Normalize value for LUT lookup
+                    const t = Math.max(0, Math.min(1, val / 2));
 
-                    // Optimization: Reuse tempColor object to avoid creating 4096 objects per frame
-                    tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
+                    // Lookup color from LUT
+                    const lutIndex = Math.floor(t * (LUT_SIZE - 1));
 
-                    colors.setXYZ(index, tempColor.r, tempColor.g, tempColor.b);
+                    // Direct array assignment for performance (avoids setXYZ overhead)
+                    const baseIndex = index * 3;
+                    const lutBase = lutIndex * 3;
+
+                    colors[baseIndex] = lut[lutBase];
+                    colors[baseIndex + 1] = lut[lutBase + 1];
+                    colors[baseIndex + 2] = lut[lutBase + 2];
                 }
             }
-            colors.needsUpdate = true;
+            colorsAttribute.needsUpdate = true;
         }
     });
 
