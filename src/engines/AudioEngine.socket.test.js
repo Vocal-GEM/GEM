@@ -8,22 +8,32 @@ vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));
 
-// Mock pitchfinder
-vi.mock('pitchfinder', () => ({
-    McLeod: vi.fn(() => vi.fn((buffer) => 440)),
-    YIN: vi.fn(() => vi.fn((buffer) => 440))
+// Mock Audio Services directly to avoid external library dependencies (pitchfinder, etc.)
+vi.mock('../services/audio/McLeodPitchDetector', () => ({
+    default: class MockMcLeodPitchDetector {
+        constructor() { this.detect = vi.fn(() => ({ frequency: 440, clarity: 1.0 })); }
+        detect() { return { frequency: 440, clarity: 1.0 }; }
+    }
+}));
+
+vi.mock('../services/audio/LPCFormantTracker', () => ({
+    default: class MockLPCFormantTracker {
+        constructor() { this.track = vi.fn(() => []); }
+        track() { return []; }
+    }
 }));
 
 // Mock AudioContext and browser APIs
 const mockAudioContext = {
     createAnalyser: () => ({
         fftSize: 2048,
+        frequencyBinCount: 1024, // Important for buffer creation
         smoothingTimeConstant: 0.8,
         connect: vi.fn(),
         disconnect: vi.fn(),
-        getFloatTimeDomainData: vi.fn(),
-        getByteFrequencyData: vi.fn(),
-        getFloatFrequencyData: vi.fn()
+        getFloatTimeDomainData: vi.fn(array => array.fill(0)),
+        getByteFrequencyData: vi.fn(array => array.fill(0)),
+        getFloatFrequencyData: vi.fn(array => array.fill(-100))
     }),
     createOscillator: () => ({
         connect: vi.fn(),
@@ -33,7 +43,7 @@ const mockAudioContext = {
     }),
     createGain: () => ({
         connect: vi.fn(),
-        gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), setTargetAtTime: vi.fn() }
+        gain: { value: 0, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), setTargetAtTime: vi.fn(), cancelScheduledValues: vi.fn() }
     }),
     createBiquadFilter: () => ({
         connect: vi.fn(),
@@ -43,23 +53,41 @@ const mockAudioContext = {
     createBuffer: () => ({}),
     createBufferSource: () => ({
         connect: vi.fn(),
-        start: vi.fn()
+        start: vi.fn(),
+        buffer: null
     }),
     createMediaStreamSource: () => ({
         connect: vi.fn(),
         disconnect: vi.fn()
     }),
+    audioWorklet: {
+        addModule: vi.fn().mockResolvedValue()
+    },
     resume: vi.fn().mockResolvedValue(),
     suspend: vi.fn().mockResolvedValue(),
     close: vi.fn().mockResolvedValue(),
     destination: {},
     state: 'suspended',
-    sampleRate: 44100
+    sampleRate: 44100,
+    currentTime: 0
 };
+
+// Mock AudioWorkletNode
+class MockAudioWorkletNode {
+    constructor() {
+        this.port = {
+            postMessage: vi.fn(),
+            onmessage: null
+        };
+        this.connect = vi.fn();
+        this.disconnect = vi.fn();
+    }
+}
+window.AudioWorkletNode = MockAudioWorkletNode;
 
 window.AudioContext = vi.fn().mockImplementation(function () { return mockAudioContext; });
 window.webkitAudioContext = window.AudioContext;
-window.alert = vi.fn(); // Mock alert to prevent JSDOM error
+window.alert = vi.fn();
 
 // Mock MediaRecorder
 window.MediaRecorder = vi.fn().mockImplementation(() => ({
