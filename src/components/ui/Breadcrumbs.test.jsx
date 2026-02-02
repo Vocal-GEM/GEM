@@ -95,4 +95,25 @@ describe('Breadcrumbs', () => {
         expect(screen.getByText('Practice')).toBeInTheDocument();
         expect(screen.getByText('Pitch Tool')).toBeInTheDocument();
     });
+
+    it('should prioritize customBreadcrumbs over history and default', () => {
+        const customBreadcrumbs = [
+            { label: 'Custom Root', action: vi.fn() },
+            { label: 'Custom Leaf', action: null }
+        ];
+
+        useNavigation.mockReturnValue({
+            history: [{ label: 'Ignored History', action: null }],
+            customBreadcrumbs,
+            navigate: mockNavigate,
+            activeView: 'practice'
+        });
+
+        render(<Breadcrumbs />);
+
+        expect(screen.getByText('Custom Root')).toBeInTheDocument();
+        expect(screen.getByText('Custom Leaf')).toBeInTheDocument();
+        expect(screen.queryByText('Ignored History')).not.toBeInTheDocument();
+        expect(screen.queryByText('Practice')).not.toBeInTheDocument();
+    });
 });

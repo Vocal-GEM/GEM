@@ -20,6 +20,7 @@ export const NavigationProvider = ({ children }) => {
 
     // History State for Breadcrumbs
     const [history, setHistory] = useState([]);
+    const [customBreadcrumbs, setCustomBreadcrumbs] = useState(null);
 
     // Modals & Overlays State
     const [modals, setModals] = useState({
@@ -81,6 +82,7 @@ export const NavigationProvider = ({ children }) => {
         if (view !== activeView || Object.keys(params).length > 0) {
             setNavigationParams(params);
             setActiveView(view);
+            setCustomBreadcrumbs(null);
             analyticsService.trackView(view, params);
         }
     };
@@ -134,7 +136,9 @@ export const NavigationProvider = ({ children }) => {
         openModal,
         closeModal,
         closeAllModals,
-        addToHistory
+        addToHistory,
+        customBreadcrumbs,
+        setCustomBreadcrumbs
     };
 
     return <NavigationContext.Provider value={value}>{children}</NavigationContext.Provider>;

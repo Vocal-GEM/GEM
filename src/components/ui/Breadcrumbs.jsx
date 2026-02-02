@@ -2,14 +2,14 @@ import { ChevronRight, Home } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
 
 const Breadcrumbs = () => {
-    const { history, navigate, activeView, practiceTab, switchPracticeTab } = useNavigation();
+    const { history, navigate, activeView, practiceTab, switchPracticeTab, customBreadcrumbs } = useNavigation();
 
-    // Don't show on Dashboard
-    if (activeView === 'dashboard') return null;
+    // Don't show on Dashboard (unless overridden)
+    if (activeView === 'dashboard' && !customBreadcrumbs) return null;
 
-    let displayHistory = history;
+    let displayHistory = customBreadcrumbs || history;
 
-    if (displayHistory.length === 0) {
+    if (!displayHistory || displayHistory.length === 0) {
         // Default Breadcrumb Logic
         displayHistory = [{ label: 'Dashboard', action: () => navigate('dashboard') }];
 
