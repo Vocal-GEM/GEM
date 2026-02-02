@@ -232,13 +232,6 @@ const JournalForm = ({ onSubmit, onCancel }) => {
             {/* Sliders */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <label htmlFor="journal-effort" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Effort (1-10)</label>
-                    <input id="journal-effort" type="range" min="1" max="10" value={effort} onChange={(e) => setEffort(parseInt(e.target.value))} className="w-full accent-blue-500" />
-                    <div className="text-center text-blue-400 font-bold">{effort}</div>
-                </div>
-                <div>
-                    <label htmlFor="journal-confidence" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Confidence (1-10)</label>
-                    <input id="journal-confidence" type="range" min="1" max="10" value={confidence} onChange={(e) => setConfidence(parseInt(e.target.value))} className="w-full accent-emerald-500" />
                     <label htmlFor="effort-slider" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Effort (1-10)</label>
                     <input id="effort-slider" type="range" min="1" max="10" value={effort} onChange={(e) => setEffort(parseInt(e.target.value))} className="w-full accent-blue-500" />
                     <div className="text-center text-blue-400 font-bold">{effort}</div>
