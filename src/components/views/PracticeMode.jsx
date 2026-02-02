@@ -5,6 +5,7 @@ import { useNavigation } from '../../context/NavigationContext';
 import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
 import { useTour } from '../../context/TourContext';
+import { recordPractice } from '../../services/StreakService';
 
 import VisualizerSkeleton from '../ui/VisualizerSkeleton';
 
@@ -149,6 +150,7 @@ const PracticeMode = ({
                 stability: avgStability,
                 notes: 'Practice Session'
             });
+            recordPractice();
         } catch (e) {
             console.error("Failed to save session:", e);
         }

@@ -220,13 +220,13 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                     icon={<Activity size={24} />}
                     color="text-teal-400"
                 /> */}
-                {/* <StatCard
+                <StatCard
                     label={t('dashboard.stats.streak.label')}
                     value={streakData.currentStreak}
                     subtext={streakData.needsPracticeToday ? "Practice today!" : "✓ Done"}
                     icon={<Flame size={24} />}
                     color="text-orange-400"
-                /> */}
+                />
                 <StatCard
                     label={t('dashboard.stats.practice.label')}
                     value="45m"
