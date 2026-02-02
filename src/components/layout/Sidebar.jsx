@@ -149,8 +149,20 @@ const Sidebar = ({ activeView, onViewChange }) => {
             }
         };
 
+        const handleGlobalKeyDown = (e) => {
+            // Cmd+K or Ctrl+K to focus search
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInputRef.current?.focus();
+            }
+        };
+
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleGlobalKeyDown);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleGlobalKeyDown);
+        };
     }, []);
 
     // Group results by type for display
@@ -162,12 +174,18 @@ const Sidebar = ({ activeView, onViewChange }) => {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"
+                aria-label="Toggle navigation menu"
+                aria-expanded={isOpen}
+                aria-controls="sidebar-navigation"
             >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
 
             {/* Sidebar Container */}
-            <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div
+                id="sidebar-navigation"
+                className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+            >
                 <div className="flex flex-col h-full">
                     {/* Header */}
                     <div className="p-6 border-b border-slate-800">
@@ -289,6 +307,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
                                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
                                         : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                                     }`}
+                                aria-current={activeView === item.id ? 'page' : undefined}
                             >
                                 {item.icon}
                                 <span className="font-medium">{item.label}</span>
