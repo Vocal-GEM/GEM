@@ -95,27 +95,30 @@ export const AudioProvider = ({ children }) => {
         try {
             audioEngineRef.current = new AudioEngine((data) => {
                 // ... (data handler)
-                const currentHistory = dataRef.current.history;
+                const current = dataRef.current;
+                const currentHistory = current.history;
                 let pitchToStore = data.pitch;
 
                 if (data.pitch > 0) {
-                    dataRef.current.silenceCounter = 0;
-                    dataRef.current.lastValidPitch = data.pitch;
+                    current.silenceCounter = 0;
+                    current.lastValidPitch = data.pitch;
                 } else {
-                    dataRef.current.silenceCounter++;
-                    if (dataRef.current.silenceCounter < 15 && dataRef.current.lastValidPitch > 0) {
-                        pitchToStore = dataRef.current.lastValidPitch;
+                    current.silenceCounter++;
+                    if (current.silenceCounter < 15 && current.lastValidPitch > 0) {
+                        pitchToStore = current.lastValidPitch;
                     } else {
                         pitchToStore = 0;
                     }
                 }
 
-                dataRef.current = {
-                    ...data,
-                    history: [...currentHistory.slice(1), pitchToStore],
-                    silenceCounter: dataRef.current.silenceCounter,
-                    lastValidPitch: dataRef.current.lastValidPitch
-                };
+                // Optimization: Mutate ref in-place instead of creating new objects every frame
+                // to reduce garbage collection overhead.
+                // In-place history update (Circular buffer logic using shift/push)
+                currentHistory.shift();
+                currentHistory.push(pitchToStore);
+
+                // Update properties in-place using Object.assign
+                Object.assign(current, data);
 
                 // Log audio data periodically for debugging
                 const now = Date.now();

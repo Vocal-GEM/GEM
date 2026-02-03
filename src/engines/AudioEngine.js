@@ -580,6 +580,7 @@ export class AudioEngine {
             if (this.onAudioUpdate) {
                 const metricData = {
                     ...this.latestBackendAnalysis, // Include backend/socket metrics (RBI, etc.)
+                    spectrum: freqData, // Pass frequency data for visualizations (Zero-allocation reuse)
                     volume: maxAmp,
                     pitch: pitch || 0,
                     clarity: confidence || 0,
