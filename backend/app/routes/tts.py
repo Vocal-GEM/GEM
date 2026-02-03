@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 import os
 import requests
+import re
+from flask_login import login_required
 from ..extensions import limiter
 
 tts_bp = Blueprint('tts', __name__, url_prefix='/api/tts')
@@ -8,6 +10,7 @@ tts_bp = Blueprint('tts', __name__, url_prefix='/api/tts')
 ELEVENLABS_API_KEY = os.environ.get('ELEVENLABS_API_KEY')
 
 @tts_bp.route('/synthesize', methods=['POST'])
+@login_required
 @limiter.limit("5 per minute")
 def synthesize_speech():
     """
@@ -26,6 +29,14 @@ def synthesize_speech():
     
     if not text:
         return jsonify({"error": "No text provided"}), 400
+
+    # Security: Validate voice_id to prevent path traversal or injection
+    if not re.match(r'^[a-zA-Z0-9_-]+$', str(voice_id)):
+        return jsonify({"error": "Invalid voice ID format"}), 400
+
+    # Security: Validate model_id
+    if not re.match(r'^[a-zA-Z0-9_.-]+$', str(model_id)):
+        return jsonify({"error": "Invalid model ID format"}), 400
 
     try:
         # Forward request to ElevenLabs API
@@ -67,6 +78,7 @@ def synthesize_speech():
 
 
 @tts_bp.route('/voices', methods=['GET'])
+@login_required
 @limiter.limit("20 per minute")
 def get_voices():
     """

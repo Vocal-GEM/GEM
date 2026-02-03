@@ -56,7 +56,7 @@
 **Prevention:** Use type hints and strict validation in utility functions. If a function expects specific keys, raise an error immediately if invalid keys are passed during development (e.g., `ValueError` if `allowed_types` contains unknown categories).
 
 ## 2026-01-09 - Unrestricted File Upload in Community Module
-**Vulnerability:** The `share_voice` endpoint accepted any file type and saved it to disk with an insecure filename construction, allowing potential Remote Code Execution (RCE) via malicious uploads (e.g., .html, .php) or path traversal.
+**Vulnerability:** The `share_voice` endpoint in `backend/app/routes/community.py` accepted any file type and saved it to disk with an insecure filename construction, allowing potential RCE via malicious uploads (e.g., .html, .php) or path traversal.
 **Learning:** Relying on frontend validation or assuming "trusted users" (authenticated) is insufficient. Filenames must always be sanitized and validated against a strict allowlist on the backend before any filesystem operations.
 **Prevention:** Always use `secure_filename` and explicit content-type/extension validation (e.g. `validate_file_upload`) for every file upload endpoint.
 
@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-02-14 - TTS API Denial of Wallet Vulnerability
+**Vulnerability:** The `/api/tts/synthesize` and `/api/tts/voices` endpoints were publicly accessible, allowing unauthenticated users to trigger paid ElevenLabs API calls. This created a significant financial risk (Denial of Wallet).
+**Learning:** Third-party API proxies that incur costs must always be behind authentication and strict rate limiting.
+**Prevention:** Added `@login_required` to both endpoints in `backend/app/routes/tts.py` and implemented regex validation for `voice_id` and `model_id` to prevent potential injection or path traversal.
