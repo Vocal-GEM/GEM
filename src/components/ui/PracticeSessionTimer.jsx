@@ -149,15 +149,22 @@ const ReminderPopup = ({
     secondaryAction,
     urgent = false
 }) => (
-    <div className="fixed bottom-24 right-6 z-40 max-w-sm animate-in slide-in-from-right duration-300">
+    <div
+        role="dialog"
+        aria-modal="false"
+        aria-labelledby="reminder-title"
+        aria-describedby="reminder-message"
+        aria-live={urgent ? "assertive" : "polite"}
+        className="fixed bottom-24 right-6 z-40 max-w-sm animate-in slide-in-from-right duration-300"
+    >
         <div className={`bg-gradient-to-br ${bgColor} backdrop-blur-xl rounded-2xl p-5 border ${borderColor} shadow-2xl`}>
             <div className="flex items-start gap-4">
                 <div className={`p-3 rounded-xl bg-white/10 ${urgent ? 'animate-pulse' : ''}`}>
-                    <Icon size={24} className={iconColor} />
+                    <Icon size={24} className={iconColor} aria-hidden="true" />
                 </div>
                 <div className="flex-1">
-                    <h3 className="font-bold text-white mb-1">{title}</h3>
-                    <p className="text-sm text-slate-300 leading-relaxed mb-4">{message}</p>
+                    <h3 id="reminder-title" className="font-bold text-white mb-1">{title}</h3>
+                    <p id="reminder-message" className="text-sm text-slate-300 leading-relaxed mb-4">{message}</p>
                     <div className="flex gap-2">
                         <button
                             onClick={primaryAction.onClick}

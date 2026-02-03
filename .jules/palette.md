@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2025-05-23 - Accessibility of Custom Timers
+**Learning:** Wellness reminders in `PracticeSessionTimer` were implemented as plain `div` overlays, making critical health prompts (hydration, rest) completely invisible to screen reader users.
+**Action:** When creating custom notification or timer overlays, always enforce `role="dialog"` (for interactive) or `role="alert"` (for passive), and ensure `aria-live` regions are used to announce appearance.
