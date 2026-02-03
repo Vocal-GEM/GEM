@@ -24,7 +24,8 @@ vi.mock('../../utils/lpcAnalysis', () => ({
 }));
 
 // Mock ResizeObserver
-global.ResizeObserver = vi.fn(function() {
+// eslint-disable-next-line no-undef
+globalThis.ResizeObserver = vi.fn(function() {
   this.observe = vi.fn();
   this.unobserve = vi.fn();
   this.disconnect = vi.fn();
