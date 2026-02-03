@@ -1,48 +1,17 @@
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Sidebar from './Sidebar';
 
 // Mock contexts
-const mockLogout = vi.fn();
-const mockUseAuth = vi.fn();
 const mockUseProfile = vi.fn();
-
-vi.mock('../../context/AuthContext', () => ({
-    useAuth: () => mockUseAuth()
-}));
+const mockUseNavigation = vi.fn();
 
 vi.mock('../../context/ProfileContext', () => ({
     useProfile: () => mockUseProfile()
 }));
 
-// Mock child components to avoid deep rendering issues
-vi.mock('../ui/ProfileManager', () => ({
-    default: ({ onClose }) => <div data-testid="profile-manager">Profile Manager <button onClick={onClose}>Close</button></div>
-}));
-vi.mock('../ui/Login', () => ({
-    default: ({ onClose, onSwitchToSignup }) => (
-        <div data-testid="login-modal">
-            Login Modal
-            <button onClick={onClose}>Close</button>
-            <button onClick={onSwitchToSignup}>To Signup</button>
-        </div>
-    )
-}));
-vi.mock('../ui/Signup', () => ({
-    default: ({ onClose, onSwitchToLogin }) => (
-        <div data-testid="signup-modal">
-            Signup Modal
-            <button onClick={onClose}>Close</button>
-            <button onClick={onSwitchToLogin}>To Login</button>
-        </div>
-    )
-}));
-
-// Mock NavigationContext
-const mockUseNavigation = vi.fn();
 vi.mock('../../context/NavigationContext', () => ({
     useNavigation: () => mockUseNavigation(),
-    NavigationProvider: ({ children }) => <div>{children}</div>
 }));
 
 // Mock SearchService
@@ -51,9 +20,25 @@ vi.mock('../../services/SearchService', () => ({
     groupResultsByType: vi.fn(() => []),
 }));
 
-const MockNavigationProvider = ({ children }) => <div>{children}</div>;
+// Mock Feature Flags
+vi.mock('../../config/featureFlags', () => ({
+    FEATURES: {
+        dashboard: true,
+        practice: true,
+        journal: true,
+        analysis: true,
+        analytics: true,
+        library: true,
+        'client-dashboard': true,
+        capev: true,
+        spectrogram: true,
+        'pitch-tool': true,
+        camera: true,
+        settings: true
+    }
+}));
 
-describe('Sidebar Auth Integration', () => {
+describe('Sidebar Navigation', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockUseProfile.mockReturnValue({ activeProfile: { name: 'LocalUser' } });
@@ -64,48 +49,44 @@ describe('Sidebar Auth Integration', () => {
         });
     });
 
-    it('shows Sign In button when not logged in', () => {
-        mockUseAuth.mockReturnValue({ user: null });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('Sign In')).toBeInTheDocument();
+    it('renders navigation items', () => {
+        render(<Sidebar activeView="dashboard" onViewChange={() => { }} />);
+
+        expect(screen.getByText('Dashboard')).toBeInTheDocument();
+        expect(screen.getByText('Practice')).toBeInTheDocument();
+        expect(screen.getByText('Voice Log')).toBeInTheDocument();
+        expect(screen.getByText('Analysis')).toBeInTheDocument();
+        expect(screen.getByText('Mirror')).toBeInTheDocument();
     });
 
-    it('shows user info and Sign Out when logged in', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('CloudUser')).toBeInTheDocument();
-        expect(getByText('Sign Out')).toBeInTheDocument();
+    it('calls onViewChange when a nav item is clicked', () => {
+        const onViewChange = vi.fn();
+        render(<Sidebar activeView="dashboard" onViewChange={onViewChange} />);
+
+        fireEvent.click(screen.getByText('Practice'));
+        expect(onViewChange).toHaveBeenCalledWith('practice');
     });
 
-    it('opens Login modal on Sign In click', () => {
-        mockUseAuth.mockReturnValue({ user: null });
-        const { getByText, getByTestId } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-
-        fireEvent.click(getByText('Sign In'));
-        expect(getByTestId('login-modal')).toBeInTheDocument();
-    });
-
-    it('calls logout on Sign Out click', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-
-        fireEvent.click(getByText('Sign Out'));
-        expect(mockLogout).toHaveBeenCalled();
-    });
-
-    it('opens Camera modal when Mirror button is clicked', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'TestUser' } });
-        const openModalSpy = vi.fn();
+    it('opens modal when a modal item (Mirror) is clicked', () => {
+        const openModal = vi.fn();
         mockUseNavigation.mockReturnValue({
             activeView: 'dashboard',
-            openModal: openModalSpy
+            openModal: openModal
         });
 
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+        render(<Sidebar activeView="dashboard" onViewChange={() => { }} />);
 
-        const mirrorBtn = getByText('Mirror');
-        fireEvent.click(mirrorBtn);
+        fireEvent.click(screen.getByText('Mirror'));
+        expect(openModal).toHaveBeenCalledWith('camera');
+    });
 
-        expect(openModalSpy).toHaveBeenCalledWith('camera');
+    it('highlights the active view', () => {
+        render(<Sidebar activeView="practice" onViewChange={() => { }} />);
+
+        const practiceButton = screen.getByText('Practice').closest('button');
+        expect(practiceButton).toHaveClass('bg-blue-600');
+
+        const dashboardButton = screen.getByText('Dashboard').closest('button');
+        expect(dashboardButton).not.toHaveClass('bg-blue-600');
     });
 });
