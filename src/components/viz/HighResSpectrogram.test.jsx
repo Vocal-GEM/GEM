@@ -82,4 +82,20 @@ describe('HighResSpectrogram', () => {
     unmount();
     expect(unsubscribe).toHaveBeenCalled();
   });
+
+  it('calls drawImage exactly once per frame (performance check)', () => {
+    render(<HighResSpectrogram dataRef={dataRef} />);
+
+    // Get the draw callback registered with the coordinator
+    const drawCallback = renderCoordinator.subscribe.mock.calls[0][1];
+
+    // Execute one frame
+    drawCallback();
+
+    // Should call drawImage once for the shift (not height times!)
+    expect(mockContext.drawImage).toHaveBeenCalledTimes(1);
+
+    // Should call putImageData once for the new column
+    expect(mockContext.putImageData).toHaveBeenCalledTimes(1);
+  });
 });
