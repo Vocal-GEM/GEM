@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Mic, Square, Play, Pause, Trash2, Calendar, Clock, Music, Plus, X, Tag, FileText, Search, Filter, TrendingUp, ChevronDown } from 'lucide-react';
 import LoadingSpinner from '../ui/LoadingSpinner';
+import { getSharedAudioContext } from '../../utils/sharedAudioContext';
 import { getRecordings, saveRecording, deleteRecording, updateRecording } from '../../services/VoiceJournalService';
 import { recordPractice } from '../../services/StreakService';
 import { JOURNAL_TEMPLATES, getTemplateById, formatTemplateAsEntry } from '../../data/journalTemplates';
@@ -13,12 +14,17 @@ const WaveformVisualizer = ({ audioBlob, isPlaying, onSeek }) => {
 
     useEffect(() => {
         if (!audioBlob) return;
+        let isMounted = true;
 
         const analyzeAudio = async () => {
             try {
                 const arrayBuffer = await audioBlob.arrayBuffer();
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                // ⚡ Bolt: Use shared context to prevent hitting browser limits
+                const audioContext = getSharedAudioContext();
                 const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+                if (!isMounted) return;
+
                 const channelData = audioBuffer.getChannelData(0);
 
                 // Downsample to ~100 points for visualization
@@ -37,14 +43,17 @@ const WaveformVisualizer = ({ audioBlob, isPlaying, onSeek }) => {
                 // Normalize
                 const max = Math.max(...dataPoints);
                 const normalized = dataPoints.map(d => d / max);
-                setWaveformData(normalized);
-                audioContext.close();
+
+                if (isMounted) {
+                    setWaveformData(normalized);
+                }
             } catch (err) {
-                console.error('Failed to analyze audio:', err);
+                if (isMounted) console.error('Failed to analyze audio:', err);
             }
         };
 
         analyzeAudio();
+        return () => { isMounted = false; };
     }, [audioBlob]);
 
     useEffect(() => {
