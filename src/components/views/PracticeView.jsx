@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mic, Activity, Anchor, Aperture, Maximize2, Waves, Stethoscope } from 'lucide-react';
+import { Mic, Activity, Anchor, Aperture, Maximize2, Waves, Stethoscope, ChevronUp, ChevronDown } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
 
@@ -83,10 +83,11 @@ const PracticeView = () => {
                 {/* Secondary Actions: Tools Drawer Toggle */}
                 <button
                     onClick={() => setShowTools(!showTools)}
+                    aria-expanded={showTools}
                     className="w-full py-3 bg-slate-800 rounded-xl text-slate-400 text-sm font-medium border border-white/5 hover:bg-slate-700 transition-colors flex items-center justify-center gap-2"
                 >
                     {showTools ? t('practice.tools.hide') : t('practice.tools.show')}
-                    <i data-lucide={showTools ? "chevron-down" : "chevron-up"} className="w-4 h-4"></i>
+                    {showTools ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                 </button>
             </div>
 
@@ -95,7 +96,11 @@ const PracticeView = () => {
                 <div className="animate-in slide-in-from-bottom-10 fade-in duration-300 pt-4 pb-4 bg-slate-900 rounded-t-3xl border-t border-white/10 shadow-2xl absolute bottom-0 left-0 right-0 h-[75vh] flex flex-col z-40">
 
                     {/* Drawer Handle */}
-                    <div className="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-4 shrink-0 cursor-pointer hover:bg-slate-600 transition-colors" onClick={() => setShowTools(false)}></div>
+                    <button
+                        className="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-4 shrink-0 cursor-pointer hover:bg-slate-600 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                        onClick={() => setShowTools(false)}
+                        aria-label="Close tools"
+                    ></button>
 
                     {/* Toolbar */}
                     <div className="flex items-center justify-between px-4 mb-4 shrink-0 gap-4">
@@ -117,6 +122,7 @@ const PracticeView = () => {
                                 <button
                                     key={tool.id}
                                     onClick={() => toggleTool(tool.id)}
+                                    aria-pressed={activeTools.includes(tool.id)}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTools.includes(tool.id)
                                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
                                         : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
