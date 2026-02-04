@@ -5,6 +5,7 @@
  */
 
 /* global currentTime */
+/* eslint-disable no-undef */
 
 class PitchProcessor extends AudioWorkletProcessor {
     constructor() {
