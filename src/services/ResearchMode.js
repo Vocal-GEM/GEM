@@ -62,6 +62,7 @@ export class ResearchModeController {
     generateParticipantId(userId) {
         // Use cryptographic hash with study-specific salt
         // Fix: check process.env existence
+        // eslint-disable-next-line no-undef
         const salt = this.studyId + (typeof process !== 'undefined' && process.env.REACT_APP_RESEARCH_SALT ? process.env.REACT_APP_RESEARCH_SALT : 'default-salt');
         const hash = CryptoJS.SHA256(userId + salt).toString();
 
