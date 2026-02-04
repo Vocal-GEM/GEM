@@ -52,9 +52,8 @@ const SpectrogramMesh = ({ dataRef }) => {
         historyRef.current = new Float32Array(numCols * numRows);
     }
 
-    // Reusable color object to prevent GC
-    // Optimization: Reuse Color object to avoid thousands of allocations per frame
-    const tempColor = useMemo(() => new THREE.Color(), []);
+    // Optimization: Pre-calculated LUT for frequency mapping
+    const lutRef = useRef(null);
 
     useFrame(() => {
         if (!meshRef.current || !meshRef.current.geometry || !meshRef.current.geometry.attributes) return;
@@ -68,19 +67,27 @@ const SpectrogramMesh = ({ dataRef }) => {
 
         // Add new data at the end
         const spectrum = dataRef.current?.spectrum;
-        if (spectrum) {
-            const maxIndex = spectrum.length;
-            const targetMaxFreq = 8000;
-            const sampleRate = 16000;
-            const maxTargetIndex = Math.floor(maxIndex * targetMaxFreq / (sampleRate / 2));
+        if (spectrum && spectrum.length > 0) {
+            // Build LUT if needed (runs once)
+            if (!lutRef.current) {
+                const maxIndex = spectrum.length;
+                const targetMaxFreq = 8000;
+                const sampleRate = 16000;
+                const maxTargetIndex = Math.floor(maxIndex * targetMaxFreq / (sampleRate / 2));
+
+                lutRef.current = new Uint16Array(numRows);
+                for (let j = 0; j < numRows; j++) {
+                    lutRef.current[j] = Math.floor((j / numRows) * maxTargetIndex);
+                }
+            }
+
+            const lut = lutRef.current;
+            const log10inv = 0.4342944819 * 0.5; // (1 / ln(10)) * 0.5
 
             for (let j = 0; j < numRows; j++) {
-                // Map row to frequency
-                const mappedIndex = Math.floor((j / numRows) * maxTargetIndex);
-                const val = spectrum[mappedIndex] || 0;
-                // Log scale intensity
-                const intensity = Math.log10(val + 1) * 0.5;
-                // Store in last column of history
+                const val = spectrum[lut[j]] || 0;
+                // Fast log approximation: Math.log is faster than Math.log10
+                const intensity = Math.log(val + 1) * log10inv;
                 history[(numCols - 1) * numRows + j] = intensity;
             }
         } else {
@@ -90,16 +97,15 @@ const SpectrogramMesh = ({ dataRef }) => {
             }
         }
 
-        // Update geometry
+        // Update geometry positions directly in the buffer
         const positionsAttribute = meshRef.current.geometry.attributes.position;
         if (positionsAttribute) {
-            for (let i = 0; i < numCols; i++) {
-                for (let j = 0; j < numRows; j++) {
-                    const index = i * numRows + j;
-                    const val = history[index];
-                    // Update Y coordinate
-                    positionsAttribute.setY(index, val);
-                }
+            const posArray = positionsAttribute.array;
+            const count = numCols * numRows;
+
+            for (let i = 0; i < count; i++) {
+                // Y is at index * 3 + 1
+                posArray[i * 3 + 1] = history[i];
             }
             positionsAttribute.needsUpdate = true;
         }
@@ -113,22 +119,59 @@ const SpectrogramMesh = ({ dataRef }) => {
         }
 
         if (colorsAttribute) {
-            const colors = colorsAttribute;
-            for (let i = 0; i < numCols; i++) {
-                for (let j = 0; j < numRows; j++) {
-                    const index = i * numRows + j;
-                    const val = history[index];
+            const colorArray = colorsAttribute.array;
+            const count = numCols * numRows;
 
-                    // Color map: Blue -> Purple -> Red -> Yellow
-                    const t = Math.min(1, val / 2); // Normalize somewhat
+            for (let i = 0; i < count; i++) {
+                const val = history[i];
+                // Color map: Blue -> Purple -> Red -> Yellow
+                // HSL: H = 0.7 - t * 0.6, S = 1, L = 0.5
 
-                    // Optimization: Reuse tempColor object to avoid creating 4096 objects per frame
-                    tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
+                const t = val < 2 ? val * 0.5 : 1; // Math.min(1, val / 2)
+                const h = 0.7 - t * 0.6;
 
-                    colors.setXYZ(index, tempColor.r, tempColor.g, tempColor.b);
-                }
+                // Fast HSL to RGB (S=1, L=0.5)
+                // When L=0.5, S=1: R,G,B = (1 - |H' - 1|), etc.
+                // Simplified:
+                // q = 1
+                // p = 0
+                // r = hue2rgb(0, 1, h + 1/3)
+
+                // Helper inline hue2rgb for S=1, L=0.5:
+                // t < 0: t+=1; t > 1: t-=1
+                // if t < 1/6 return 6 * t
+                // if t < 1/2 return 1
+                // if t < 2/3 return 4 - 6 * t
+                // return 0
+
+                let r = 0, g = 0, b = 0;
+
+                // R
+                let th = h + 0.33333;
+                if (th > 1) th -= 1;
+                if (th < 0.16666) r = 6 * th;
+                else if (th < 0.5) r = 1;
+                else if (th < 0.66666) r = 4 - 6 * th; // (2/3 - t) * 6
+
+                // G
+                th = h;
+                if (th < 0.16666) g = 6 * th;
+                else if (th < 0.5) g = 1;
+                else if (th < 0.66666) g = 4 - 6 * th;
+
+                // B
+                th = h - 0.33333;
+                if (th < 0) th += 1;
+                if (th < 0.16666) b = 6 * th;
+                else if (th < 0.5) b = 1;
+                else if (th < 0.66666) b = 4 - 6 * th;
+
+                const idx = i * 3;
+                colorArray[idx] = r;
+                colorArray[idx + 1] = g;
+                colorArray[idx + 2] = b;
             }
-            colors.needsUpdate = true;
+            colorsAttribute.needsUpdate = true;
         }
     });
 
