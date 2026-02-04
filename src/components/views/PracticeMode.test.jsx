@@ -31,7 +31,11 @@ vi.mock('../../context/NavigationContext', () => ({
         navigationParams: {}
     })
 }));
-vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
+
+// Ensure the mock component has a display name or is a simple function
+const MockDynamicOrb = () => <div data-testid="dynamic-orb">Dynamic Orb</div>;
+vi.mock('../viz/DynamicOrb', () => ({ default: MockDynamicOrb }));
+
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
 vi.mock('../ui/ResizablePanel', () => ({
     default: ({ children, className }) => <div className={className} data-testid="resizable-panel">{children}</div>
@@ -88,7 +92,10 @@ describe('PracticeMode', () => {
 
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
-        // Check for visualization area
-        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
+
+        // Wait for lazy components or effects
+        // Using findByTestId handles potential async rendering
+        const orb = await screen.findByTestId('dynamic-orb');
+        expect(orb).toBeInTheDocument();
     });
 });
