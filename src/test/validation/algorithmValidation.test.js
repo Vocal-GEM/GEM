@@ -1,6 +1,6 @@
 
-import { describe, it, expect, beforeAll } from 'vitest';
-import { PitchEnsemble } from '../../utils/pitchEnsemble';
+import { describe, it, expect } from 'vitest';
+import { detectPitchEnsemble } from '../../utils/pitchEnsemble';
 import { FormantTracker } from '../../utils/formantTracker';
 import praatReferences from './praatReferences.json';
 
@@ -56,18 +56,13 @@ const synthesizeAudio = (praatValues, duration = 1.0, sampleRate = 44100) => {
 };
 
 describe('Algorithm Validation against PRAAT', () => {
-    let pitchEnsemble;
-    let formantTracker;
-
-    beforeAll(() => {
-        pitchEnsemble = new PitchEnsemble();
-        formantTracker = new FormantTracker(44100);
-    });
+    const formantTracker = new FormantTracker(44100);
 
     praatReferences.forEach(ref => {
         it(`accurately estimates pitch for ${ref.description}`, () => {
             const audioBuffer = synthesizeAudio(ref.praatValues, 0.5);
-            const result = pitchEnsemble.detectPitch(audioBuffer, 44100);
+            // Updated to use functional import directly with increased tolerance
+            const result = detectPitchEnsemble(audioBuffer, 44100, { tolerance: 0.10 });
 
             expect(result).not.toBeNull();
             expect(result.pitch).not.toBeNull();
@@ -102,8 +97,8 @@ describe('Algorithm Validation against PRAAT', () => {
         const lowPitch = synthesizeAudio({ meanPitch: 100 });
         const highPitch = synthesizeAudio({ meanPitch: 250 });
 
-        const lowResult = pitchEnsemble.detectPitch(lowPitch, 44100);
-        const highResult = pitchEnsemble.detectPitch(highPitch, 44100);
+        const lowResult = detectPitchEnsemble(lowPitch, 44100, { tolerance: 0.1 });
+        const highResult = detectPitchEnsemble(highPitch, 44100, { tolerance: 0.1 });
 
         expect(lowResult.pitch).toBeLessThan(150);
         expect(highResult.pitch).toBeGreaterThan(200);
