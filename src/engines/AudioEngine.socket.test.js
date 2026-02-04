@@ -9,10 +9,17 @@ vi.mock('socket.io-client', () => ({
 }));
 
 // Mock pitchfinder
-vi.mock('pitchfinder', () => ({
-    McLeod: vi.fn(() => vi.fn((buffer) => 440)),
-    YIN: vi.fn(() => vi.fn((buffer) => 440))
-}));
+vi.mock('pitchfinder', () => {
+    const mockDetector = vi.fn((buffer) => 440);
+    return {
+        Macleod: vi.fn(() => mockDetector),
+        YIN: vi.fn(() => mockDetector),
+        default: {
+            Macleod: vi.fn(() => mockDetector),
+            YIN: vi.fn(() => mockDetector)
+        }
+    };
+});
 
 // Mock AudioContext and browser APIs
 const mockAudioContext = {
@@ -57,12 +64,13 @@ const mockAudioContext = {
     sampleRate: 44100
 };
 
-window.AudioContext = vi.fn().mockImplementation(function () { return mockAudioContext; });
-window.webkitAudioContext = window.AudioContext;
-window.alert = vi.fn(); // Mock alert to prevent JSDOM error
+// Use globalThis for window mocks
+globalThis.AudioContext = vi.fn().mockImplementation(function () { return mockAudioContext; });
+globalThis.webkitAudioContext = globalThis.AudioContext;
+globalThis.alert = vi.fn(); // Mock alert to prevent JSDOM error
 
 // Mock MediaRecorder
-window.MediaRecorder = vi.fn().mockImplementation(() => ({
+globalThis.MediaRecorder = vi.fn().mockImplementation(() => ({
     start: vi.fn(),
     stop: vi.fn(),
     ondataavailable: null,
@@ -71,7 +79,7 @@ window.MediaRecorder = vi.fn().mockImplementation(() => ({
 }));
 
 // Mock navigator.mediaDevices
-Object.defineProperty(global.navigator, 'mediaDevices', {
+Object.defineProperty(globalThis.navigator, 'mediaDevices', {
     value: {
         getUserMedia: vi.fn().mockResolvedValue({
             getTracks: () => [{ stop: vi.fn() }]
