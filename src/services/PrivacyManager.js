@@ -6,7 +6,7 @@ const PRIVACY_KEY = 'gem_privacy_settings';
 
 const DEFAULT_SETTINGS = {
     shareProgress: false,
-    shareProgress: false,
+    shareMilestones: false, // Fixed typo: was duplicate shareProgress
     showInLeaderboards: false,
     dataRetentionDays: 90
 };
