@@ -46,7 +46,7 @@ const MockAudio = vi.fn(function(src) {
     return new MockAudioImplementation(src);
 });
 
-global.Audio = MockAudio;
+vi.stubGlobal('Audio', MockAudio);
 
 // Mock Toast and Button to avoid issues with their internal dependencies or animations
 vi.mock('../ui/Toast', () => ({
@@ -65,6 +65,7 @@ describe('SuccessStories Optimization Verification', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockAudioInstances.length = 0;
+        vi.stubGlobal('Audio', MockAudio);
 
         CommunityService.getSuccessStories.mockResolvedValue({
             stories: [
