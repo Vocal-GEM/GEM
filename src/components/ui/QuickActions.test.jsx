@@ -78,4 +78,18 @@ describe('QuickActions', () => {
 
         expect(mockUpdateSettings).toHaveBeenCalledWith({ ...mockSettings, listenMode: true });
     });
+
+    it('should close when Escape key is pressed', () => {
+        render(<QuickActions />);
+        const fab = screen.getByRole('button', { name: /quick actions/i });
+
+        // Open menu
+        fireEvent.click(fab);
+        expect(fab).toHaveAttribute('aria-expanded', 'true');
+
+        // Press Escape
+        fireEvent.keyDown(window, { key: 'Escape' });
+
+        expect(fab).toHaveAttribute('aria-expanded', 'false');
+    });
 });
