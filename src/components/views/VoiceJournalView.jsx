@@ -4,48 +4,37 @@ import LoadingSpinner from '../ui/LoadingSpinner';
 import { getRecordings, saveRecording, deleteRecording, updateRecording } from '../../services/VoiceJournalService';
 import { recordPractice } from '../../services/StreakService';
 import { JOURNAL_TEMPLATES, getTemplateById, formatTemplateAsEntry } from '../../data/journalTemplates';
+import { getWaveform } from '../../services/WaveformService';
 
 // Waveform Visualization Component
-const WaveformVisualizer = ({ audioBlob, isPlaying, onSeek }) => {
+const WaveformVisualizer = ({ audioBlob, waveform, recordingId, isPlaying, onSeek }) => {
     const canvasRef = useRef(null);
-    const [waveformData, setWaveformData] = useState([]);
+    const [waveformData, setWaveformData] = useState(waveform || []);
     const [progress, setProgress] = useState(0);
 
+    // ⚡ Bolt: Use shared WaveformService to avoid creating N AudioContexts
     useEffect(() => {
+        if (waveform && waveform.length > 0) {
+            setWaveformData(waveform);
+            return;
+        }
+
         if (!audioBlob) return;
 
-        const analyzeAudio = async () => {
+        let isMounted = true;
+
+        const loadWaveform = async () => {
             try {
-                const arrayBuffer = await audioBlob.arrayBuffer();
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-                const channelData = audioBuffer.getChannelData(0);
-
-                // Downsample to ~100 points for visualization
-                const samples = 100;
-                const blockSize = Math.floor(channelData.length / samples);
-                const dataPoints = [];
-
-                for (let i = 0; i < samples; i++) {
-                    let sum = 0;
-                    for (let j = 0; j < blockSize; j++) {
-                        sum += Math.abs(channelData[i * blockSize + j]);
-                    }
-                    dataPoints.push(sum / blockSize);
-                }
-
-                // Normalize
-                const max = Math.max(...dataPoints);
-                const normalized = dataPoints.map(d => d / max);
-                setWaveformData(normalized);
-                audioContext.close();
+                const data = await getWaveform(audioBlob, recordingId);
+                if (isMounted) setWaveformData(data);
             } catch (err) {
-                console.error('Failed to analyze audio:', err);
+                console.error('Failed to load waveform:', err);
             }
         };
 
-        analyzeAudio();
-    }, [audioBlob]);
+        loadWaveform();
+        return () => { isMounted = false; };
+    }, [audioBlob, waveform, recordingId]);
 
     useEffect(() => {
         if (!canvasRef.current || waveformData.length === 0) return;
@@ -586,6 +575,8 @@ const VoiceJournalView = () => {
                                         <div className="mb-3">
                                             <WaveformVisualizer
                                                 audioBlob={recording.audioBlob}
+                                                waveform={recording.waveform}
+                                                recordingId={recording.id}
                                                 isPlaying={playingId === recording.id}
                                             />
                                         </div>
