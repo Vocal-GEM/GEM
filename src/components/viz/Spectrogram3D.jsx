@@ -9,7 +9,7 @@ const SpectrogramMesh = ({ dataRef }) => {
     const numRows = 64; // Frequency bins
 
     // Create geometry and initial positions
-    const { positions, indices, uvs } = useMemo(() => {
+    const { positions, indices, uvs, colors } = useMemo(() => {
         const pos = [];
         const ind = [];
         const uv = [];
@@ -39,15 +39,13 @@ const SpectrogramMesh = ({ dataRef }) => {
         return {
             positions: new Float32Array(pos),
             indices: new Uint16Array(ind),
-            uvs: new Float32Array(uv)
+            uvs: new Float32Array(uv),
+            colors: new Float32Array(numCols * numRows * 3)
         };
     }, []);
 
     // Buffer for historical data
     const historyRef = useRef(null);
-    useEffect(() => {
-        historyRef.current = new Float32Array(numCols * numRows);
-    }, []);
     if (!historyRef.current) {
         historyRef.current = new Float32Array(numCols * numRows);
     }
@@ -93,42 +91,35 @@ const SpectrogramMesh = ({ dataRef }) => {
         // Update geometry
         const positionsAttribute = meshRef.current.geometry.attributes.position;
         if (positionsAttribute) {
-            for (let i = 0; i < numCols; i++) {
-                for (let j = 0; j < numRows; j++) {
-                    const index = i * numRows + j;
-                    const val = history[index];
-                    // Update Y coordinate
-                    positionsAttribute.setY(index, val);
-                }
+            const array = positionsAttribute.array;
+            for (let i = 0; i < numCols * numRows; i++) {
+                // Update Y coordinate (y is index 1 in stride of 3)
+                array[i * 3 + 1] = history[i];
             }
             positionsAttribute.needsUpdate = true;
         }
 
         // Update colors based on height
-        let colorsAttribute = meshRef.current.geometry.attributes.color;
-        if (!colorsAttribute) {
-            const colors = new Float32Array(numCols * numRows * 3);
-            meshRef.current.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            colorsAttribute = meshRef.current.geometry.attributes.color;
-        }
+        const colorsAttribute = meshRef.current.geometry.attributes.color;
 
         if (colorsAttribute) {
-            const colors = colorsAttribute;
-            for (let i = 0; i < numCols; i++) {
-                for (let j = 0; j < numRows; j++) {
-                    const index = i * numRows + j;
-                    const val = history[index];
+            const array = colorsAttribute.array;
+            for (let i = 0; i < numCols * numRows; i++) {
+                const val = history[i];
 
-                    // Color map: Blue -> Purple -> Red -> Yellow
-                    const t = Math.min(1, val / 2); // Normalize somewhat
+                // Color map: Blue -> Purple -> Red -> Yellow
+                const t = Math.min(1, val / 2); // Normalize somewhat
 
-                    // Optimization: Reuse tempColor object to avoid creating 4096 objects per frame
-                    tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
+                // Optimization: Reuse tempColor object to avoid creating 4096 objects per frame
+                tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
 
-                    colors.setXYZ(index, tempColor.r, tempColor.g, tempColor.b);
-                }
+                // Direct array access optimization
+                const idx = i * 3;
+                array[idx] = tempColor.r;
+                array[idx + 1] = tempColor.g;
+                array[idx + 2] = tempColor.b;
             }
-            colors.needsUpdate = true;
+            colorsAttribute.needsUpdate = true;
         }
     });
 
@@ -140,6 +131,12 @@ const SpectrogramMesh = ({ dataRef }) => {
                     attach="attributes-position"
                     count={positions.length / 3}
                     array={positions}
+                    itemSize={3}
+                />
+                <bufferAttribute
+                    attach="attributes-color"
+                    count={colors.length / 3}
+                    array={colors}
                     itemSize={3}
                 />
                 <bufferAttribute
