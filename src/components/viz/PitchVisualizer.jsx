@@ -22,8 +22,11 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const birdRef = useRef(null);
 
     // Cached dimensions to avoid getBoundingClientRect in loop
-    const dimensionsRef = useRef({ width: 0, height: 0 });
-    const gameRef = useRef({ score: 0, lastUpdate: Date.now(), lastPitch: 0 });
+    const dimensionsRef = useRef(null);
+    if (!dimensionsRef.current) dimensionsRef.current = { width: 0, height: 0 };
+
+    const gameRef = useRef(null);
+    if (!gameRef.current) gameRef.current = { score: 0, lastUpdate: Date.now(), lastPitch: 0 };
 
     const [zoomRange, setZoomRange] = useState({ min: 50, max: 350 });
     const [averagePitchRange, setAveragePitchRange] = useState({ lowest: null, highest: null });
