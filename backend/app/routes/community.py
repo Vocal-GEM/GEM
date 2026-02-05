@@ -93,6 +93,9 @@ def share_voice():
         if not is_valid:
             return jsonify({'error': error}), 400
 
+        # Reset file pointer after reading for validation
+        audio_file.seek(0)
+
         # Security: Sanitize context
         context = sanitize_html(request.form.get('context', ''))
         expiration_days = int(request.form.get('expiration_days', 7))
