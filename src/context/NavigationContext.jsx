@@ -45,7 +45,8 @@ export const NavigationProvider = ({ children }) => {
         feedback: false,
         commandPalette: false, // New Command Palette
         adaptiveSession: false,
-        practiceCards: false // Practice Cards feature
+        practiceCards: false, // Practice Cards feature
+        streak: false // Streak Calendar
     });
 
     // Initialize Analytics

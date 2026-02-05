@@ -52,6 +52,8 @@ import ConversationPractice from '../ui/ConversationPractice';
 import ContextualTips from '../ui/ContextualTips';
 
 import { CoachingEngine } from '../../utils/CoachingEngine';
+import { recordPractice } from '../../services/StreakService';
+import { generatePracticeReport } from '../../services/SessionReportService';
 
 
 const PracticeMode = ({
@@ -149,6 +151,18 @@ const PracticeMode = ({
                 stability: avgStability,
                 notes: 'Practice Session'
             });
+
+            // Update streak
+            recordPractice();
+
+            // Generate report for calendar
+            generatePracticeReport({
+                toolsUsed: practiceTab === 'overview' ? ['orb'] : [practiceTab],
+                durationMinutes: duration / 60,
+                pitchData: session.sampleCount > 0 ? { min: session.pitchMin, max: session.pitchMax, avg: avgPitch } : null,
+                resonanceData: session.sampleCount > 0 ? { avg: avgResonance } : null
+            });
+
         } catch (e) {
             console.error("Failed to save session:", e);
         }
@@ -166,7 +180,7 @@ const PracticeMode = ({
             volumeMin: Infinity,
             volumeMax: -Infinity
         };
-    }, [saveSession]);
+    }, [saveSession, practiceTab]);
 
     // Handle Audio Toggle (Start/Stop Session)
     useEffect(() => {
