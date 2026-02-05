@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -8,8 +8,24 @@ const SpectrogramMesh = ({ dataRef }) => {
     const numCols = 64; // Time steps
     const numRows = 64; // Frequency bins
 
+    // Optimization: Pre-calculate Color Look-Up Table (LUT)
+    // Avoids expensive THREE.Color.setHSL() calls and object creation in the render loop.
+    const colorLUT = useMemo(() => {
+        const lut = new Float32Array(1001 * 3);
+        const color = new THREE.Color();
+        for (let i = 0; i <= 1000; i++) {
+            const t = i / 1000;
+            // Blue (0.7) to Orange (0.1)
+            color.setHSL(0.7 - t * 0.6, 1, 0.5);
+            lut[i * 3] = color.r;
+            lut[i * 3 + 1] = color.g;
+            lut[i * 3 + 2] = color.b;
+        }
+        return lut;
+    }, []);
+
     // Create geometry and initial positions
-    const { positions, indices, uvs } = useMemo(() => {
+    const { positions, indices, uvs, colors } = useMemo(() => {
         const pos = [];
         const ind = [];
         const uv = [];
@@ -39,35 +55,34 @@ const SpectrogramMesh = ({ dataRef }) => {
         return {
             positions: new Float32Array(pos),
             indices: new Uint16Array(ind),
-            uvs: new Float32Array(uv)
+            uvs: new Float32Array(uv),
+            colors: new Float32Array(pos.length) // Pre-allocate colors buffer
         };
     }, []);
 
     // Buffer for historical data
     const historyRef = useRef(null);
-    useEffect(() => {
-        historyRef.current = new Float32Array(numCols * numRows);
-    }, []);
     if (!historyRef.current) {
         historyRef.current = new Float32Array(numCols * numRows);
     }
 
-    // Reusable color object to prevent GC
-    // Optimization: Reuse Color object to avoid thousands of allocations per frame
-    const tempColor = useMemo(() => new THREE.Color(), []);
-
     useFrame(() => {
-        if (!meshRef.current || !meshRef.current.geometry || !meshRef.current.geometry.attributes) return;
+        if (!meshRef.current || !meshRef.current.geometry) return;
 
-        // Shift history
+        const geometry = meshRef.current.geometry;
+        // Optimization: Direct array access avoids function call overhead
+        const positions = geometry.attributes.position.array;
+        const colors = geometry.attributes.color.array;
         const history = historyRef.current;
-        if (!history) return;
 
-        // Move everything back one column
+        // Shift history: Move everything back one column
+        // copyWithin is highly optimized in V8
         history.copyWithin(0, numRows);
 
         // Add new data at the end
         const spectrum = dataRef.current?.spectrum;
+        const lastColOffset = (numCols - 1) * numRows;
+
         if (spectrum) {
             const maxIndex = spectrum.length;
             const targetMaxFreq = 8000;
@@ -80,56 +95,37 @@ const SpectrogramMesh = ({ dataRef }) => {
                 const val = spectrum[mappedIndex] || 0;
                 // Log scale intensity
                 const intensity = Math.log10(val + 1) * 0.5;
-                // Store in last column of history
-                history[(numCols - 1) * numRows + j] = intensity;
+                history[lastColOffset + j] = intensity;
             }
         } else {
             // Silence
             for (let j = 0; j < numRows; j++) {
-                history[(numCols - 1) * numRows + j] = 0;
+                history[lastColOffset + j] = 0;
             }
         }
 
-        // Update geometry
-        const positionsAttribute = meshRef.current.geometry.attributes.position;
-        if (positionsAttribute) {
-            for (let i = 0; i < numCols; i++) {
-                for (let j = 0; j < numRows; j++) {
-                    const index = i * numRows + j;
-                    const val = history[index];
-                    // Update Y coordinate
-                    positionsAttribute.setY(index, val);
-                }
-            }
-            positionsAttribute.needsUpdate = true;
+        // Optimization: Single loop to update both position and color
+        // Removes O(N) loop overhead and uses LUT for O(1) color lookup
+        const total = numCols * numRows;
+        for (let i = 0; i < total; i++) {
+            const val = history[i];
+
+            // Update Y coordinate (index * 3 + 1 is Y)
+            positions[i * 3 + 1] = val;
+
+            // Update Color using LUT
+            // Map value to LUT index (0-1000)
+            const t = val > 2 ? 1 : val * 0.5; // Optimized clamp: Math.min(1, val/2)
+            const lutIndex = (t * 1000 | 0) * 3; // | 0 is fast floor
+
+            const i3 = i * 3;
+            colors[i3] = colorLUT[lutIndex];
+            colors[i3 + 1] = colorLUT[lutIndex + 1];
+            colors[i3 + 2] = colorLUT[lutIndex + 2];
         }
 
-        // Update colors based on height
-        let colorsAttribute = meshRef.current.geometry.attributes.color;
-        if (!colorsAttribute) {
-            const colors = new Float32Array(numCols * numRows * 3);
-            meshRef.current.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            colorsAttribute = meshRef.current.geometry.attributes.color;
-        }
-
-        if (colorsAttribute) {
-            const colors = colorsAttribute;
-            for (let i = 0; i < numCols; i++) {
-                for (let j = 0; j < numRows; j++) {
-                    const index = i * numRows + j;
-                    const val = history[index];
-
-                    // Color map: Blue -> Purple -> Red -> Yellow
-                    const t = Math.min(1, val / 2); // Normalize somewhat
-
-                    // Optimization: Reuse tempColor object to avoid creating 4096 objects per frame
-                    tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
-
-                    colors.setXYZ(index, tempColor.r, tempColor.g, tempColor.b);
-                }
-            }
-            colors.needsUpdate = true;
-        }
+        geometry.attributes.position.needsUpdate = true;
+        geometry.attributes.color.needsUpdate = true;
     });
 
     return (
@@ -140,6 +136,12 @@ const SpectrogramMesh = ({ dataRef }) => {
                     attach="attributes-position"
                     count={positions.length / 3}
                     array={positions}
+                    itemSize={3}
+                />
+                <bufferAttribute
+                    attach="attributes-color"
+                    count={colors.length / 3}
+                    array={colors}
                     itemSize={3}
                 />
                 <bufferAttribute
