@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import AudioWaveform from '../ui/AudioWaveform';
 import { Upload, Play, ZoomIn, ZoomOut } from 'lucide-react';
 import AudioSourceManager from './AudioSourceManager';
@@ -10,7 +10,6 @@ const SpectrogramComparison = () => {
     const [audioUrl2, setAudioUrl2] = useState(null);
 
     const [zoomLevel, setZoomLevel] = useState(1);
-    const [deviceId, setDeviceId] = useState('');
 
     const handleFileUpload = (e, index) => {
         const file = e.target.files[0];
@@ -42,7 +41,7 @@ const SpectrogramComparison = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left Panel: Configuration */}
                 <div className="space-y-6">
-                    <AudioSourceManager onSourceChange={setDeviceId} />
+                    <AudioSourceManager />
 
                     <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
                         <h3 className="font-semibold mb-4 text-slate-200">Recording A (Reference)</h3>
