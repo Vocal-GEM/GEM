@@ -6,6 +6,23 @@ const AudioSourceManager = ({ onSourceChange }) => {
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [permissionGranted, setPermissionGranted] = useState(false);
 
+    const enumerateDevices = useCallback(async () => {
+        try {
+            const allDevices = await navigator.mediaDevices.enumerateDevices();
+            const audioInputs = allDevices.filter(device => device.kind === 'audioinput');
+            setDevices(audioInputs);
+
+            // Auto-select first if none selected
+            if (audioInputs.length > 0 && !selectedDeviceId) {
+                const firstId = audioInputs[0].deviceId;
+                setSelectedDeviceId(firstId);
+                onSourceChange?.(firstId);
+            }
+        } catch (err) {
+            console.error("Error enumerating devices:", err);
+        }
+    }, [selectedDeviceId, onSourceChange]);
+
     const checkPermissionAndEnumerate = useCallback(async () => {
         try {
             // Must request permission first to get labels
@@ -23,23 +40,7 @@ const AudioSourceManager = ({ onSourceChange }) => {
             console.error("Microphone permission denied:", err);
             setPermissionGranted(false);
         }
-    }, [selectedDeviceId, onSourceChange]);
-
-    const enumerateDevices = async () => {
-        try {
-            const allDevices = await navigator.mediaDevices.enumerateDevices();
-            const audioInputs = allDevices.filter(device => device.kind === 'audioinput');
-            setDevices(audioInputs);
-
-            // Auto-select first if none selected
-            if (audioInputs.length > 0 && !selectedDeviceId) {
-                setSelectedDeviceId(audioInputs[0].deviceId);
-                onSourceChange?.(audioInputs[0].deviceId);
-            }
-        } catch (err) {
-            console.error("Error enumerating devices:", err);
-        }
-    };
+    }, [enumerateDevices]);
 
     useEffect(() => {
         checkPermissionAndEnumerate();
