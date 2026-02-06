@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, Waves, Search, FileText, HelpCircle, Layers, BookMarked, Camera, Briefcase, ClipboardCheck, Mic } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useNavigation } from '../../context/NavigationContext';
+import { useAuth } from '../../context/AuthContext';
 import ProfileManager from '../ui/ProfileManager';
 import { search, groupResultsByType } from '../../services/SearchService';
 import { FEATURES } from '../../config/featureFlags';
@@ -50,6 +51,8 @@ const Sidebar = ({ activeView, onViewChange }) => {
         { id: 'camera', label: 'Mirror', icon: <Camera size={20} />, isModal: true },
         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
     ].filter(item => FEATURES[item.id] !== false);
+
+    const { user, logout } = useAuth();
 
     // Search handler with debouncing
     useEffect(() => {
