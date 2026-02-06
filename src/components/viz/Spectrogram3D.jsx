@@ -3,16 +3,31 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 
+// Generate LUT once outside component
+// This avoids creating temporary Color objects and performing HSL->RGB math 4096 times per frame
+const COLOR_LUT = new Float32Array(256 * 3);
+const _tempColor = new THREE.Color();
+for (let i = 0; i < 256; i++) {
+    const t = i / 255;
+    // Match original logic: tempColor.setHSL(0.7 - t * 0.6, 1, 0.5);
+    _tempColor.setHSL(0.7 - t * 0.6, 1, 0.5);
+    COLOR_LUT[i * 3] = _tempColor.r;
+    COLOR_LUT[i * 3 + 1] = _tempColor.g;
+    COLOR_LUT[i * 3 + 2] = _tempColor.b;
+}
+
 const SpectrogramMesh = ({ dataRef }) => {
     const meshRef = useRef();
     const numCols = 64; // Time steps
     const numRows = 64; // Frequency bins
 
     // Create geometry and initial positions
-    const { positions, indices, uvs } = useMemo(() => {
+    const { positions, indices, uvs, colors } = useMemo(() => {
         const pos = [];
         const ind = [];
         const uv = [];
+        // Pre-allocate colors buffer (Float32Array for r,g,b)
+        const col = new Float32Array(numCols * numRows * 3);
 
         for (let i = 0; i < numCols; i++) {
             for (let j = 0; j < numRows; j++) {
@@ -21,6 +36,12 @@ const SpectrogramMesh = ({ dataRef }) => {
                 const y = 0;
                 pos.push(x, y, z);
                 uv.push(i / (numCols - 1), j / (numRows - 1));
+
+                // Initialize color to base color (first entry of LUT)
+                const idx = (i * numRows + j) * 3;
+                col[idx] = COLOR_LUT[0];
+                col[idx + 1] = COLOR_LUT[1];
+                col[idx + 2] = COLOR_LUT[2];
             }
         }
 
@@ -39,7 +60,8 @@ const SpectrogramMesh = ({ dataRef }) => {
         return {
             positions: new Float32Array(pos),
             indices: new Uint16Array(ind),
-            uvs: new Float32Array(uv)
+            uvs: new Float32Array(uv),
+            colors: col
         };
     }, []);
 
@@ -51,10 +73,6 @@ const SpectrogramMesh = ({ dataRef }) => {
     if (!historyRef.current) {
         historyRef.current = new Float32Array(numCols * numRows);
     }
-
-    // Reusable color object to prevent GC
-    // Optimization: Reuse Color object to avoid thousands of allocations per frame
-    const tempColor = useMemo(() => new THREE.Color(), []);
 
     useFrame(() => {
         if (!meshRef.current || !meshRef.current.geometry || !meshRef.current.geometry.attributes) return;
@@ -91,44 +109,40 @@ const SpectrogramMesh = ({ dataRef }) => {
         }
 
         // Update geometry
-        const positionsAttribute = meshRef.current.geometry.attributes.position;
-        if (positionsAttribute) {
+        const geometry = meshRef.current.geometry;
+        const positionsAttribute = geometry.attributes.position;
+        const colorsAttribute = geometry.attributes.color;
+
+        if (positionsAttribute && colorsAttribute) {
+            const posArray = positionsAttribute.array;
+            const colArray = colorsAttribute.array;
+
             for (let i = 0; i < numCols; i++) {
                 for (let j = 0; j < numRows; j++) {
                     const index = i * numRows + j;
                     const val = history[index];
-                    // Update Y coordinate
-                    positionsAttribute.setY(index, val);
+
+                    // Update Y coordinate directly in the typed array
+                    // Position is [x, y, z], so y is at index * 3 + 1
+                    posArray[index * 3 + 1] = val;
+
+                    // Update colors based on height using LUT
+                    // Normalize val (roughly 0-2) to 0-255 index
+                    let lutIndex = Math.floor(val * 127.5); // val/2 * 255
+                    if (lutIndex > 255) lutIndex = 255;
+                    if (lutIndex < 0) lutIndex = 0;
+
+                    const lutOffset = lutIndex * 3;
+                    const colOffset = index * 3;
+
+                    // Direct copy from LUT to attribute buffer
+                    colArray[colOffset] = COLOR_LUT[lutOffset];
+                    colArray[colOffset + 1] = COLOR_LUT[lutOffset + 1];
+                    colArray[colOffset + 2] = COLOR_LUT[lutOffset + 2];
                 }
             }
             positionsAttribute.needsUpdate = true;
-        }
-
-        // Update colors based on height
-        let colorsAttribute = meshRef.current.geometry.attributes.color;
-        if (!colorsAttribute) {
-            const colors = new Float32Array(numCols * numRows * 3);
-            meshRef.current.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            colorsAttribute = meshRef.current.geometry.attributes.color;
-        }
-
-        if (colorsAttribute) {
-            const colors = colorsAttribute;
-            for (let i = 0; i < numCols; i++) {
-                for (let j = 0; j < numRows; j++) {
-                    const index = i * numRows + j;
-                    const val = history[index];
-
-                    // Color map: Blue -> Purple -> Red -> Yellow
-                    const t = Math.min(1, val / 2); // Normalize somewhat
-
-                    // Optimization: Reuse tempColor object to avoid creating 4096 objects per frame
-                    tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
-
-                    colors.setXYZ(index, tempColor.r, tempColor.g, tempColor.b);
-                }
-            }
-            colors.needsUpdate = true;
+            colorsAttribute.needsUpdate = true;
         }
     });
 
@@ -140,6 +154,12 @@ const SpectrogramMesh = ({ dataRef }) => {
                     attach="attributes-position"
                     count={positions.length / 3}
                     array={positions}
+                    itemSize={3}
+                />
+                <bufferAttribute
+                    attach="attributes-color"
+                    count={colors.length / 3}
+                    array={colors}
                     itemSize={3}
                 />
                 <bufferAttribute
