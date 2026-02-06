@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, Waves, Search, FileText, HelpCircle, Layers, BookMarked, Camera, Briefcase, ClipboardCheck, Mic } from 'lucide-react';
+import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, Waves, Search, FileText, HelpCircle, Layers, BookMarked, Camera, Briefcase, ClipboardCheck, Mic, Flame } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useNavigation } from '../../context/NavigationContext';
 import ProfileManager from '../ui/ProfileManager';
 import { search, groupResultsByType } from '../../services/SearchService';
 import { FEATURES } from '../../config/featureFlags';
+import { checkStreakStatus } from '../../services/StreakService';
 
 // Import version from package.json
 const APP_VERSION = import.meta.env.VITE_APP_VERSION || '0.1.0';
@@ -29,11 +30,16 @@ const Sidebar = ({ activeView, onViewChange }) => {
     const [searchResults, setSearchResults] = useState([]);
     const [showResults, setShowResults] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [streak, setStreak] = useState({ currentStreak: 0, isActive: false });
     const searchInputRef = useRef(null);
     const resultsRef = useRef(null);
 
     useProfile(); // Context initialization
     const { openModal } = useNavigation();
+
+    useEffect(() => {
+        setStreak(checkStreakStatus());
+    }, []);
 
     // Consolidated navigation: Frontend-only features
     const navItems = [
@@ -171,7 +177,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
                 <div className="flex flex-col h-full">
                     {/* Header */}
                     <div className="p-6 border-b border-slate-800">
-                        <div className="flex items-start justify-between">
+                        <div className="flex items-start justify-between mb-2">
                             <div>
                                 <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
                                     Vocal GEM
@@ -181,6 +187,14 @@ const Sidebar = ({ activeView, onViewChange }) => {
                             <span className="text-[10px] text-slate-600 font-mono bg-slate-800 px-2 py-1 rounded" title="App Version">
                                 v{APP_VERSION}
                             </span>
+                        </div>
+
+                        {/* Streak Counter */}
+                        <div className="flex items-center gap-2 text-xs font-medium text-slate-400 bg-slate-800/50 rounded-lg p-2 border border-slate-800/50">
+                             <Flame size={14} className={streak.currentStreak > 0 ? "text-orange-500 fill-orange-500" : "text-slate-600"} />
+                             <span className={streak.currentStreak > 0 ? "text-slate-200" : "text-slate-500"}>
+                                {streak.currentStreak > 0 ? `${streak.currentStreak} Day Streak` : "Start Streak"}
+                             </span>
                         </div>
                     </div>
 
