@@ -33,6 +33,10 @@ class McLeodPitchDetector {
         else if (Pitchfinder.default) {
             if (Pitchfinder.default.Macleod) detectorConstructor = Pitchfinder.default.Macleod;
             else if (Pitchfinder.default.McLeod) detectorConstructor = Pitchfinder.default.McLeod;
+            else if (typeof Pitchfinder.default === 'object') {
+                // Sometimes default is an object containing the detectors
+                if (Pitchfinder.default.Macleod) detectorConstructor = Pitchfinder.default.Macleod;
+            }
         }
 
         if (detectorConstructor) {

@@ -50,3 +50,12 @@
 7:34:26 AM [vite] page reload src/components/ui/JournalForm.test.jsx
 7:34:43 AM [vite] page reload src/components/ui/button.test.jsx
 7:37:26 AM [vite] page reload src/components/ui/JournalForm.test.jsx
+7:46:02 AM [vite] page reload src/test/validation/algorithmValidation.test.js
+7:46:03 AM [vite] hmr update /src/index.css, /src/context/AudioContext.jsx
+7:46:03 AM [vite] page reload src/components/views/PracticeMode.test.jsx
+7:46:51 AM [vite] hmr update /src/components/analytics/WeeklyDigest.jsx, /src/index.css
+7:46:52 AM [vite] hmr update /src/components/analytics/TrendLineChart.jsx, /src/index.css
+7:46:53 AM [vite] hmr update /src/components/analytics/AnalyticsDashboardV2.jsx, /src/index.css
+7:46:54 AM [vite] page reload src/audio/PitchWorklet.js
+7:49:15 AM [vite] page reload src/test/validation/algorithmValidation.test.js
+7:51:48 AM [vite] page reload src/components/views/PracticeMode.test.jsx

@@ -88,7 +88,8 @@ describe('PracticeMode', () => {
 
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
-        // Check for visualization area
+        // Check for visualization area - use findByTestId since it's lazy loaded
+        // Note: DynamicOrb is mocked to return <div data-testid="dynamic-orb">
         expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
     });
 });
