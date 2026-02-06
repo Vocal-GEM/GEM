@@ -7,3 +7,46 @@
 
   ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
+7:15:03 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:15:03 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:15:05 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:15:27 AM [vite] page reload src/audio/PitchWorklet.js
+7:15:28 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+7:16:00 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:16:02 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+7:16:03 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:16:04 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
+7:16:36 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
+7:16:37 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:16:38 AM [vite] page reload src/services/PrivacyManager.js
+7:16:38 AM [vite] page reload src/services/ResearchMode.js
+7:18:49 AM [vite] page reload src/components/community/SuccessStories.test.jsx
+7:18:50 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+7:18:51 AM [vite] page reload src/components/ui/LoadingSpinner.test.jsx
+7:19:00 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+7:19:57 AM [vite] page reload src/components/ui/JournalForm.test.jsx
+7:19:57 AM [vite] page reload src/components/ui/LoadingSpinnerVerification.jsx
+7:19:58 AM [vite] page reload src/components/ui/QuickActions.jsx
+7:20:05 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:20:06 AM [vite] page reload src/components/ui/button.test.jsx
+7:20:41 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
+7:20:42 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:22:18 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+7:23:52 AM [vite] page reload src/components/community/SuccessStories.test.jsx
+7:23:52 AM [vite] page reload src/components/ui/LoadingSpinner.test.jsx
+7:23:53 AM [vite] page reload src/components/ui/QuickActions.jsx
+7:23:53 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+7:24:52 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+7:24:53 AM [vite] page reload src/components/ui/JournalForm.test.jsx
+7:24:53 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:24:54 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:24:54 AM [vite] page reload src/components/ui/LoadingSpinnerVerification.jsx
+7:26:50 AM [vite] page reload src/components/community/SuccessStories.test.jsx
+7:26:51 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:26:51 AM [vite] page reload src/components/marketplace/MarketplaceBrowser.jsx
+7:28:41 AM [vite] page reload src/components/marketplace/MarketplaceBrowser.jsx
+7:31:57 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:31:57 AM [vite] page reload src/components/marketplace/MarketplaceBrowser.jsx
+7:34:26 AM [vite] page reload src/components/ui/JournalForm.test.jsx
+7:34:43 AM [vite] page reload src/components/ui/button.test.jsx
+7:37:26 AM [vite] page reload src/components/ui/JournalForm.test.jsx
