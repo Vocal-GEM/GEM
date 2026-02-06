@@ -121,7 +121,7 @@ const RecommendedToolsWidget = () => {
 
             {recommendations?.rationale && (
                 <div className="mt-4 text-xs text-gray-500 italic border-t border-gray-700 pt-2">
-                    &quot;{recommendations.rationale.split('.')[0]}.&quot;
+                    &quot;{recommendations.rationale.split(&apos;.&apos;)[0]}.&quot;
                 </div>
             )}
         </div>
