@@ -2,8 +2,6 @@ from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
-from ..extensions import db
-from ..extensions import db, limiter
 from ..validators import validate_file_upload, sanitize_html
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
@@ -14,9 +12,6 @@ from datetime import datetime, timedelta
 import os
 import secrets
 import hashlib
-from ..validators import validate_file_upload
-from werkzeug.utils import secure_filename
-from ..validators import validate_file_upload, sanitize_html
 
 community_bp = Blueprint('community', __name__)
 
@@ -120,21 +115,13 @@ def share_voice():
         filepath = os.path.join(upload_folder, filename)
 
         try:
-            # Anonymize audio
-            anon_filepath = anonymize_audio(filepath)
-        finally:
-            # Security: Always remove the original raw file to prevent PII retention
-            if os.path.exists(filepath):
-                try:
-                    os.remove(filepath)
-                except OSError:
-                    pass
+            # Save original file temporarily
             audio_file.save(filepath)
 
             # Anonymize audio
             anon_filepath = anonymize_audio(filepath)
         finally:
-            # Security: Always remove the original raw audio file
+            # Security: Always remove the original raw audio file to prevent PII retention
             if os.path.exists(filepath):
                 try:
                     os.remove(filepath)
@@ -298,27 +285,18 @@ def submit_success_story():
         if isinstance(techniques, list):
             clean_techniques = [sanitize_html(str(t)) for t in techniques]
 
-        # Moderation check
-        title = sanitize_html(data.get('title', ''))
-        story_content = sanitize_html(data.get('story', ''))
+        # Security: Sanitize inputs
+        clean_title = sanitize_html(data.get('title', ''))
+        clean_story = sanitize_html(data.get('story', ''))
+        voice_goal = sanitize_html(data.get('voice_goal', ''))
 
         # Sanitize list of strings
+        clean_techniques = []
         techniques = data.get('techniques_used', [])
         if isinstance(techniques, list):
-            techniques = [sanitize_html(t) for t in techniques]
-
-        # Security: Sanitize inputs
-        title = sanitize_html(data.get('title', ''))
-        story_content = sanitize_html(data.get('story', ''))
+            clean_techniques = [sanitize_html(str(t)) for t in techniques]
 
         # Moderation check
-        is_safe, flagged = check_moderation(
-            title + ' ' + story_content)
-
-        story = SuccessStory(
-            user_id=current_user.id,
-            title=title,
-            story=story_content,
         is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
 
         story = SuccessStory(

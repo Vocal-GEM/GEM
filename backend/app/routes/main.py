@@ -1,4 +1,5 @@
 from flask import Blueprint, send_from_directory, jsonify, current_app
+from flask_login import login_required
 import os
 
 main_bp = Blueprint('main', __name__)
@@ -25,5 +26,6 @@ def health():
     return jsonify({"status": "ok", "message": "Vocal GEM Backend Running"})
 
 @main_bp.route('/uploads/<path:filename>')
+@login_required
 def serve_uploads(filename):
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
