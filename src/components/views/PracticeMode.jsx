@@ -398,6 +398,7 @@ const PracticeMode = ({
                                     onClick={() => setShowTimer(true)}
                                     className="p-2.5 rounded-full bg-black/50 hover:bg-slate-800 text-slate-400 hover:text-white transition-all backdrop-blur-sm border border-white/10"
                                     title="Practice Timer"
+                                    aria-label="Open practice timer"
                                 >
                                     <Timer size={18} />
                                 </button>
@@ -408,6 +409,7 @@ const PracticeMode = ({
                                 onClick={() => setIsFocusMode(!isFocusMode)}
                                 className={`p-2.5 rounded-full transition-all backdrop-blur-sm border border-white/10 ${isFocusMode ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'bg-black/50 text-slate-400 hover:bg-slate-800 hover:text-white'}`}
                                 title={isFocusMode ? "Exit Focus Mode" : "Enter Focus Mode"}
+                                aria-label={isFocusMode ? "Exit Focus Mode" : "Enter Focus Mode"}
                             >
                                 {isFocusMode ? <Layers size={18} /> : <Square size={18} />}
                             </button>
@@ -438,6 +440,7 @@ const PracticeMode = ({
                                 <button
                                     onClick={() => setSessionGoal(null)}
                                     className="text-teal-500 hover:text-teal-300 ml-1"
+                                    aria-label="Clear session goal"
                                 >
                                     <X size={14} />
                                 </button>
@@ -643,6 +646,7 @@ const PracticeMode = ({
                         <button
                             onClick={() => setShowDAF(false)}
                             className="absolute -top-10 right-0 p-2 text-white/50 hover:text-white"
+                            aria-label="Close DAF mode"
                         >
                             <X size={24} />
                         </button>
@@ -697,6 +701,7 @@ const PracticeMode = ({
                             <button
                                 onClick={() => setShowGoalSetter(false)}
                                 className="text-slate-400 hover:text-white"
+                                aria-label="Close goal setter"
                             >
                                 <X size={20} />
                             </button>

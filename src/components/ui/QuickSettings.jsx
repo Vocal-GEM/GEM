@@ -19,7 +19,7 @@ const QuickSettings = ({ isOpen, onClose }) => {
             <div className="relative w-80 h-full bg-slate-900 border-l border-white/10 shadow-2xl p-6 animate-in slide-in-from-right duration-300 flex flex-col">
                 <div className="flex justify-between items-center mb-8">
                     <h2 className="text-xl font-bold text-white">Quick Settings</h2>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                    <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors" aria-label="Close quick settings">
                         <X size={20} />
                     </button>
                 </div>
