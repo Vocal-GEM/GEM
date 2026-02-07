@@ -63,6 +63,7 @@ const ExerciseLibraryView = () => {
                                     : 'text-slate-400 hover:text-white'
                                 }`}
                             title="Grid view"
+                            aria-label="Grid view"
                         >
                             <Grid className="w-4 h-4" />
                         </button>
@@ -73,6 +74,7 @@ const ExerciseLibraryView = () => {
                                     : 'text-slate-400 hover:text-white'
                                 }`}
                             title="List view"
+                            aria-label="List view"
                         >
                             <List className="w-4 h-4" />
                         </button>
@@ -87,6 +89,7 @@ const ExerciseLibraryView = () => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search exercises by name, category, or instructions..."
+                        aria-label="Search exercises"
                         className="w-full pl-12 pr-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all"
                     />
                 </div>
@@ -264,6 +267,7 @@ const ExerciseLibraryView = () => {
                                                     onClick={() => handleViewDetails(exercise)}
                                                     className="p-2 bg-slate-700 rounded-lg text-white hover:bg-slate-600 transition-colors"
                                                     title="View details"
+                                                    aria-label="View details"
                                                 >
                                                     <Info className="w-5 h-5" />
                                                 </button>
@@ -271,6 +275,7 @@ const ExerciseLibraryView = () => {
                                                     onClick={() => navigate('practice')}
                                                     className="p-2 bg-blue-600 rounded-lg text-white hover:bg-blue-500 transition-colors"
                                                     title="Start exercise"
+                                                    aria-label="Start exercise"
                                                 >
                                                     <PlayCircle className="w-5 h-5" />
                                                 </button>
@@ -303,6 +308,7 @@ const ExerciseLibraryView = () => {
                             <button
                                 onClick={() => setSelectedExercise(null)}
                                 className="p-2 text-slate-500 hover:text-white transition-colors"
+                                aria-label="Close details"
                             >
                                 <X className="w-6 h-6" />
                             </button>

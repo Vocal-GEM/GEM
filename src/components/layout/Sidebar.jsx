@@ -162,6 +162,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"
+                aria-label="Toggle navigation menu"
             >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -192,6 +193,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
                                 ref={searchInputRef}
                                 type="text"
                                 placeholder="Search..."
+                                aria-label="Search application"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyDown={handleSearchKeyDown}
