@@ -57,15 +57,9 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const scrollSpeed = 2; // px per frame
 
         // Optimization: Use alpha: false for better performance
-        const ctx = canvas.getContext('2d', { alpha: false });
-
-        // Optimization: Use alpha: false for better performance
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
 
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
         const spectrum = dataRef.current.spectrum;
 
         // Ensure buffers are ready and match height
@@ -150,9 +144,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         lastFormantsRef.current = { f1, f2 };
 
-    }, [dataRef, colormap]);
-
-    // Initial canvas setup & ResizeObserver
     }, [dataRef, colormap, componentId]);
 
     // Initial canvas setup
@@ -214,7 +205,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             unsubscribe();
         };
     }, [draw, componentId]);
-    }, [componentId, draw]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position

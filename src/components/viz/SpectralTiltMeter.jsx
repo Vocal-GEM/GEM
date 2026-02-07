@@ -54,7 +54,6 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
             unsubscribe();
         };
     }, [dataRef, targetRange, colorBlindMode, componentId]);
-    }, [dataRef, targetRange, colorBlindMode, componentId]);
 
     return (
         <div className="glass-panel rounded-2xl p-6 h-full flex flex-col justify-center">
