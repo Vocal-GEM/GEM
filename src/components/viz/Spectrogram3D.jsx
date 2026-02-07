@@ -52,9 +52,21 @@ const SpectrogramMesh = ({ dataRef }) => {
         historyRef.current = new Float32Array(numCols * numRows);
     }
 
-    // Reusable color object to prevent GC
-    // Optimization: Reuse Color object to avoid thousands of allocations per frame
-    const tempColor = useMemo(() => new THREE.Color(), []);
+    // Optimization: Pre-compute color lookup table (LUT) to avoid 4096 HSL conversions per frame
+    // We map 't' (0..1) to 256 discrete colors
+    const colorLUT = useMemo(() => {
+        const lut = new Float32Array(256 * 3);
+        const color = new THREE.Color();
+        for (let i = 0; i < 256; i++) {
+            const t = i / 255;
+            // Same logic: 0.7 (Blue) -> 0.1 (Orange)
+            color.setHSL(0.7 - t * 0.6, 1, 0.5);
+            lut[i * 3] = color.r;
+            lut[i * 3 + 1] = color.g;
+            lut[i * 3 + 2] = color.b;
+        }
+        return lut;
+    }, []);
 
     useFrame(() => {
         if (!meshRef.current || !meshRef.current.geometry || !meshRef.current.geometry.attributes) return;
@@ -93,12 +105,14 @@ const SpectrogramMesh = ({ dataRef }) => {
         // Update geometry
         const positionsAttribute = meshRef.current.geometry.attributes.position;
         if (positionsAttribute) {
+            const positionsArray = positionsAttribute.array;
             for (let i = 0; i < numCols; i++) {
                 for (let j = 0; j < numRows; j++) {
                     const index = i * numRows + j;
                     const val = history[index];
-                    // Update Y coordinate
-                    positionsAttribute.setY(index, val);
+                    // Update Y coordinate directly in the buffer
+                    // positions are stored as [x, y, z, x, y, z, ...]
+                    positionsArray[index * 3 + 1] = val;
                 }
             }
             positionsAttribute.needsUpdate = true;
@@ -113,7 +127,7 @@ const SpectrogramMesh = ({ dataRef }) => {
         }
 
         if (colorsAttribute) {
-            const colors = colorsAttribute;
+            const colorsArray = colorsAttribute.array;
             for (let i = 0; i < numCols; i++) {
                 for (let j = 0; j < numRows; j++) {
                     const index = i * numRows + j;
@@ -122,13 +136,20 @@ const SpectrogramMesh = ({ dataRef }) => {
                     // Color map: Blue -> Purple -> Red -> Yellow
                     const t = Math.min(1, val / 2); // Normalize somewhat
 
-                    // Optimization: Reuse tempColor object to avoid creating 4096 objects per frame
-                    tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
+                    // Map t (0..1) to LUT index (0..255)
+                    const lutIndex = Math.floor(t * 255);
 
-                    colors.setXYZ(index, tempColor.r, tempColor.g, tempColor.b);
+                    // Direct buffer write from LUT
+                    const r = colorLUT[lutIndex * 3];
+                    const g = colorLUT[lutIndex * 3 + 1];
+                    const b = colorLUT[lutIndex * 3 + 2];
+
+                    colorsArray[index * 3] = r;
+                    colorsArray[index * 3 + 1] = g;
+                    colorsArray[index * 3 + 2] = b;
                 }
             }
-            colors.needsUpdate = true;
+            colorsAttribute.needsUpdate = true;
         }
     });
 
