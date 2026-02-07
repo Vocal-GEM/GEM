@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -60,6 +60,13 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     // Spectrogram State
     const speed = 2; // Pixels per frame
     const MAX_FREQ = 8000;
+
+    // --- OPTIMIZATION: Pre-calculate Bin Index LUT ---
+    // Avoids floating point division per pixel in the render loop.
+    const binIndexLUTRef = useRef(null);
+    const lastHeightRef = useRef(0);
+    const lastMaxBinRef = useRef(0);
+    // -------------------------------------------------
 
     // Pre-calculate colormap as Uint32Array (ABGR) for fast pixel manipulation
     const colormap = useMemo(
@@ -131,6 +138,21 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             const imageData = canvas.imageDataRef;
             const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
 
+            // --- OPTIMIZATION: Generate/Update Look-Up Table (LUT) ---
+            // If height or maxBin changed, regenerate the Y -> Bin mapping
+            if (!binIndexLUTRef.current || lastHeightRef.current !== h || lastMaxBinRef.current !== maxBin) {
+                binIndexLUTRef.current = new Int32Array(h);
+                for (let y = 0; y < h; y++) {
+                    const freqRatio = 1 - (y / h);
+                    binIndexLUTRef.current[y] = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                }
+                lastHeightRef.current = h;
+                lastMaxBinRef.current = maxBin;
+            }
+
+            const binIndexLUT = binIndexLUTRef.current;
+            // ---------------------------------------------------------
+
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
             // We map pixels (y) to frequency bins.
             for (let y = 0; y < h; y++) {
@@ -140,9 +162,8 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
 
                 // Linear mapping matches the original code: y = h - (i / maxBin) * h
                 // So i / maxBin = (h - y) / h = 1 - y/h
-
-                const freqRatio = 1 - (y / h);
-                const binIndex = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                // Optimized: Use pre-calculated LUT
+                const binIndex = binIndexLUT[y];
 
                 // Get intensity from spectrum
                 const value = spectrum[binIndex] || 0;
@@ -178,7 +199,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             ctx.fillStyle = '#000';
             ctx.fillRect(width - speed, 0, speed, h);
         }
-    }, [isAudioActive, audioContext, colormap]);
+    }, [isAudioActive, audioContext, colormap, dataRef]);
 
     useEffect(() => {
         let unsubscribe;
