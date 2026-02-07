@@ -88,14 +88,8 @@ def clean_audio():
         # Save back to temp
         sf.write(tmp_path, y_clean, sr)
         
-        @after_this_request
-        def remove_file(response):
-            try:
-                if os.path.exists(tmp_path):
-                    os.remove(tmp_path)
-            except Exception as e:
-                current_app.logger.error(f"Error removing temp file: {e}")
-            return response
+        # Schedule cleanup after response
+        cleanup_file_after_request(tmp_path)
 
         return send_file(
             tmp_path, 
@@ -173,18 +167,9 @@ def manipulate_file():
         processed_path = tmp_path.replace(".wav", "_manipulated.wav")
         manipulated.save(processed_path, "WAV")
         
-        @after_this_request
-        def remove_processed_file(response):
-            try:
-                if processed_path and os.path.exists(processed_path):
-                    os.remove(processed_path)
-            except Exception as e:
-                current_app.logger.error(f"Error removing processed file: {e}")
-            return response
-
-        # We can remove the input temp file now
-        if tmp_path and os.path.exists(tmp_path):
-            os.remove(tmp_path)
+        # Schedule cleanup for both files
+        cleanup_file_after_request(tmp_path)
+        cleanup_file_after_request(processed_path)
 
         return send_file(
             processed_path,
