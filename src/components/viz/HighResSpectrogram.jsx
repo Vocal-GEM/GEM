@@ -159,8 +159,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             const rect = container.getBoundingClientRect();
 
             // Only update if dimensions actually changed
-            const newWidth = Math.floor(rect.width * dpr);
-            const newHeight = 512; // Fixed high vertical resolution
             const newWidth = Math.round(rect.width * dpr);
             const newHeight = 512; // Fixed internal height for vertical resolution
 
@@ -176,17 +174,11 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         updateSize();
 
         const resizeObserver = new ResizeObserver(() => {
-            // Use RAF to debounce
-
-        const resizeObserver = new ResizeObserver(() => {
             // Run in animation frame to avoid resize loops/tearing
             requestAnimationFrame(updateSize);
         });
 
         resizeObserver.observe(container);
-
-        // Initial sizing
-        updateSize();
 
         return () => {
             resizeObserver.disconnect();
