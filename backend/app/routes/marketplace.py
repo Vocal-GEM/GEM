@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
-from app.models import db, ExercisePack, PackExercise, PackDownload, PackReview, User
-from app.extensions import limiter
+from ..models import db, ExercisePack, PackExercise, PackDownload, PackReview, User
+from ..extensions import limiter
 from flask_login import login_required, current_user
 from ..extensions import limiter
 from ..validators import sanitize_html

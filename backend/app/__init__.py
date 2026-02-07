@@ -34,10 +34,12 @@ def create_app():
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = 'uploads'
+    app.config['SECURE_UPLOAD_FOLDER'] = 'secure_uploads'
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16MB limit
 
     # Ensure upload folder exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(app.config['SECURE_UPLOAD_FOLDER'], exist_ok=True)
 
     # CORS Configuration
     # Wildcard (*) doesn't work with credentials, so we need explicit origins
