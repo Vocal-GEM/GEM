@@ -235,8 +235,15 @@ export function getEnsembleStats(batchResults) {
     return stats;
 }
 
+export class PitchEnsemble {
+    detectPitch(buffer, sampleRate, options) {
+        return detectPitchEnsemble(buffer, sampleRate, options);
+    }
+}
+
 export default {
     detectPitchEnsemble,
     detectPitchEnsembleBatch,
-    getEnsembleStats
+    getEnsembleStats,
+    PitchEnsemble
 };
