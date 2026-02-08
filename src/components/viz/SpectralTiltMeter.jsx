@@ -3,12 +3,11 @@ import { useSettings } from '../../context/SettingsContext';
 import { Info, TrendingDown } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
-const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -6 } }) => {
+const SpectralTiltMeter = ({ dataRef, _userMode, targetRange = { min: -12, max: -6 } }) => {
     const { colorBlindMode } = useSettings();
     const id = useId();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
-    const componentId = useId();
 
     useEffect(() => {
         const loop = () => {
@@ -37,24 +36,14 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                     indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-slate-400";
                 }
 
-                // Update value display
-                valueRef.current.innerText = tilt.toFixed(1);
+                if (valueRef.current) {
+                    valueRef.current.innerText = tilt.toFixed(1);
+                }
             }
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                `spectral-tilt-meter-${id}`,
-                loop,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
-
         const unsubscribe = renderCoordinator.subscribe(
-            `spectral-tilt-meter-${componentId}`,
+            `spectral-tilt-meter-${id}`,
             loop,
             renderCoordinator.PRIORITY.MEDIUM
         );
@@ -63,7 +52,6 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
             unsubscribe();
         };
     }, [dataRef, targetRange, colorBlindMode, id]);
-    }, [dataRef, targetRange, colorBlindMode, componentId]);
 
     return (
         <div className="glass-panel rounded-2xl p-6 h-full flex flex-col justify-center">

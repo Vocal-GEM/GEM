@@ -1,7 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Spectrogram from './Spectrogram';
-import React from 'react';
 
 // Mock Dependencies
 vi.mock('../../context/AudioContext', () => ({
@@ -16,7 +15,7 @@ vi.mock('../../services/RenderCoordinator', () => ({
     renderCoordinator: {
         subscribe: vi.fn((id, callback) => {
             // Store callback to manually trigger it
-            global.mockDrawCallback = callback;
+            globalThis.mockDrawCallback = callback;
             return vi.fn(); // unsubscribe mock
         }),
         PRIORITY: { MEDIUM: 1 }
@@ -70,7 +69,7 @@ describe('Spectrogram', () => {
 
     afterEach(() => {
         vi.clearAllMocks();
-        delete global.mockDrawCallback;
+        delete globalThis.mockDrawCallback;
     });
 
     it('renders without crashing', () => {
@@ -81,7 +80,7 @@ describe('Spectrogram', () => {
 
     it('subscribes to renderCoordinator when audio is active', () => {
         render(<Spectrogram height={100} />);
-        expect(global.mockDrawCallback).toBeDefined();
+        expect(globalThis.mockDrawCallback).toBeDefined();
     });
 
     it('executes draw function safely', () => {
@@ -103,8 +102,8 @@ describe('Spectrogram', () => {
         render(<Spectrogram height={100} />);
 
         // Execute the draw callback
-        if (global.mockDrawCallback) {
-            global.mockDrawCallback();
+        if (globalThis.mockDrawCallback) {
+            globalThis.mockDrawCallback();
         }
 
         expect(mockContext.drawImage).toHaveBeenCalled();
