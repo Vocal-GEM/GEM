@@ -31,8 +31,15 @@ vi.mock('../../context/NavigationContext', () => ({
         navigationParams: {}
     })
 }));
+
+// IMPORTANT: Mock lazy loaded components to prevent Suspense fallback
 vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
+vi.mock('../viz/ResonanceOrb', () => ({ default: () => <div data-testid="resonance-orb">Resonance Orb</div> }));
+vi.mock('../viz/VoiceQualityMeter', () => ({ default: () => <div data-testid="voice-quality-meter">Voice Quality Meter</div> }));
+vi.mock('../viz/VowelSpacePlot', () => ({ default: () => <div data-testid="vowel-space-plot">Vowel Space Plot</div> }));
+vi.mock('../viz/Spectrogram', () => ({ default: () => <div data-testid="spectrogram">Spectrogram</div> }));
+
 vi.mock('../ui/ResizablePanel', () => ({
     default: ({ children, className }) => <div className={className} data-testid="resizable-panel">{children}</div>
 }));
