@@ -14,7 +14,6 @@ vi.mock('../../services/RenderCoordinator', () => ({
 
 // Override global mock for this test to include Smile
 vi.mock('lucide-react', async () => {
-    // eslint-disable-next-line
     const actual = await vi.importActual('lucide-react');
     const createIcon = (name) => {
         const Icon = (props) => <div data-testid={name} {...props} />;
