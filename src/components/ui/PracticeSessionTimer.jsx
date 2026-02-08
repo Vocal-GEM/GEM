@@ -56,6 +56,13 @@ const PracticeSessionTimer = ({ isActive = true, onPause }) => {
         }
     }, [elapsedSeconds, isActive, showReminder, dismissedReminders]);
 
+    // Haptic feedback when reminder shows
+    useEffect(() => {
+        if (showReminder && typeof navigator !== 'undefined' && navigator.vibrate) {
+            navigator.vibrate(200);
+        }
+    }, [showReminder]);
+
     const handleDismiss = (type) => {
         if (type === 'hydration') {
             lastHydrationRef.current = Date.now();
@@ -81,19 +88,30 @@ const PracticeSessionTimer = ({ isActive = true, onPause }) => {
     return (
         <>
             {/* Compact Timer Display */}
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 rounded-lg border border-slate-700">
-                <Timer size={14} className="text-slate-400" />
+            <div
+                className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 rounded-lg border border-slate-700"
+                role="timer"
+                aria-label="Practice session duration"
+            >
+                <Timer size={14} className="text-slate-400" aria-hidden="true" />
                 <span className={`font-mono text-sm font-bold ${getTimerColor()}`}>
                     {formatTime(elapsedSeconds)}
                 </span>
                 {elapsedSeconds >= REST_WARNING && (
-                    <span className="text-xs text-amber-400 animate-pulse">⚡</span>
+                    <span
+                        className="text-xs text-amber-400 animate-pulse"
+                        aria-label="Warning: Extended session"
+                        title="Extended session"
+                    >
+                        ⚡
+                    </span>
                 )}
             </div>
 
             {/* Reminder Popups */}
             {showReminder === 'hydration' && (
                 <ReminderPopup
+                    role="status"
                     icon={Droplets}
                     iconColor="text-blue-400"
                     bgColor="from-blue-600/20 to-cyan-600/20"
@@ -107,6 +125,7 @@ const PracticeSessionTimer = ({ isActive = true, onPause }) => {
 
             {showReminder === 'rest' && (
                 <ReminderPopup
+                    role="status"
                     icon={Coffee}
                     iconColor="text-amber-400"
                     bgColor="from-amber-600/20 to-orange-600/20"
@@ -120,6 +139,7 @@ const PracticeSessionTimer = ({ isActive = true, onPause }) => {
 
             {showReminder === 'break' && (
                 <ReminderPopup
+                    role="alert"
                     icon={AlertTriangle}
                     iconColor="text-red-400"
                     bgColor="from-red-600/20 to-pink-600/20"
@@ -147,13 +167,18 @@ const ReminderPopup = ({
     message,
     primaryAction,
     secondaryAction,
-    urgent = false
+    urgent = false,
+    role = 'status'
 }) => (
-    <div className="fixed bottom-24 right-6 z-40 max-w-sm animate-in slide-in-from-right duration-300">
+    <div
+        className="fixed bottom-24 right-6 z-40 max-w-sm animate-in slide-in-from-right duration-300"
+        role={role}
+        aria-live={role === 'alert' ? 'assertive' : 'polite'}
+    >
         <div className={`bg-gradient-to-br ${bgColor} backdrop-blur-xl rounded-2xl p-5 border ${borderColor} shadow-2xl`}>
             <div className="flex items-start gap-4">
                 <div className={`p-3 rounded-xl bg-white/10 ${urgent ? 'animate-pulse' : ''}`}>
-                    <Icon size={24} className={iconColor} />
+                    <Icon size={24} className={iconColor} aria-hidden="true" />
                 </div>
                 <div className="flex-1">
                     <h3 className="font-bold text-white mb-1">{title}</h3>
