@@ -163,6 +163,37 @@ export class AudioEngine {
         this.passthroughGain = this.audioContext.createGain();
         this.passthroughGain.gain.value = 0; // Muted by default
         this.passthroughGain.connect(this.audioContext.destination);
+
+        // OPTIMIZATION: Reusable objects to prevent GC in audio loop
+        this.formantData = { f1: 0, f2: 0, raw: [] };
+        this.debugData = { h1: 0, h2: 0, centroid: 0 };
+        this.metricData = {
+            rbi_score: 50,
+            breathiness_score: 0,
+            roughness_score: 0,
+            strain_score: 0,
+            timestamp: 0,
+            volume: 0,
+            pitch: 0,
+            clarity: 0,
+            intensity: 0,
+            jitter: 0,
+            shimmer: 0,
+            hnr: 0,
+            tilt: 0,
+            weight: 0,
+            h1h2: 0,
+            weightLabel: '',
+            f3Noise: 0,
+            harmonicRatio: 0,
+            debug: this.debugData,
+            formants: this.formantData,
+            isSilent: false,
+            hasIssues: false,
+            warning: '',
+            signalQuality: '',
+            confidence: 0
+        };
     }
 
     async start(deviceId = null) {
@@ -400,20 +431,29 @@ export class AudioEngine {
             // Noise Gate check
             if (maxAmp < (this.noiseGateThreshold || 0.01)) {
                 if (this.onAudioUpdate) {
-                    this.onAudioUpdate({
-                        volume: 0,
-                        pitch: 0,
-                        clarity: 0,
-                        intensity: -100,
-                        jitter: 0,
-                        shimmer: 0,
-                        hnr: 0,
-                        tilt: -20, // Default steep tilt for silence
-                        weight: this.smoothedWeight || 50, // Preserve last weight value
-                        h1h2: this.smoothedH1H2 || 0, // Preserve last H1-H2 value
-                        weightLabel: 'Unknown', // No voice detected
-                        isSilent: true // Flag for UI to handle silence
-                    });
+                    // Optimization: Reuse metricData object
+                    const m = this.metricData;
+                    m.volume = 0;
+                    m.pitch = 0;
+                    m.clarity = 0;
+                    m.intensity = -100;
+                    m.jitter = 0;
+                    m.shimmer = 0;
+                    m.hnr = 0;
+                    m.tilt = -20;
+                    m.weight = this.smoothedWeight || 50;
+                    m.h1h2 = this.smoothedH1H2 || 0;
+                    m.weightLabel = 'Unknown';
+                    m.isSilent = true;
+                    m.hasIssues = false;
+                    m.warning = '';
+                    m.signalQuality = '';
+                    m.confidence = 0;
+
+                    // Reset sub-objects if needed, or keep last valid? Keeping last valid is usually safer for UI flickering.
+                    // But for silence, maybe zero them? Let's leave them as is or reset if critical.
+
+                    this.onAudioUpdate(m);
                 }
                 return; // Skip further processing for this frame
             }
@@ -425,17 +465,19 @@ export class AudioEngine {
                 // If signal has critical issues, show warning and skip analysis
                 if (!validation.isValid) {
                     if (this.onAudioUpdate) {
-                        this.onAudioUpdate({
-                            volume: maxAmp,
-                            pitch: 0,
-                            clarity: 0,
-                            intensity: intensity,
-                            warning: validation.issues[0].message,
-                            signalQuality: getSignalQualityMessage(validation),
-                            confidence: validation.confidence,
-                            isSilent: false,
-                            hasIssues: true
-                        });
+                        // Optimization: Reuse metricData object
+                        const m = this.metricData;
+                        m.volume = maxAmp;
+                        m.pitch = 0;
+                        m.clarity = 0;
+                        m.intensity = intensity;
+                        m.warning = validation.issues[0].message;
+                        m.signalQuality = getSignalQualityMessage(validation);
+                        m.confidence = validation.confidence;
+                        m.isSilent = false;
+                        m.hasIssues = true;
+
+                        this.onAudioUpdate(m);
                     }
                     return; // Skip pitch detection for bad signal
                 }
@@ -578,42 +620,53 @@ export class AudioEngine {
 
             // For now, just call the update handler with some dummy data or processed data
             if (this.onAudioUpdate) {
-                const metricData = {
-                    ...this.latestBackendAnalysis, // Include backend/socket metrics (RBI, etc.)
-                    volume: maxAmp,
-                    pitch: pitch || 0,
-                    clarity: confidence || 0,
-                    intensity: intensity,
-                    jitter: jitter,
-                    shimmer: shimmer,
-                    hnr: hnr,
-                    tilt: tilt || -20,
-                    weight: weight,
-                    h1h2: h1h2,
-                    weightLabel: weightLabel,
-                    f3Noise: f3Noise,
-                    harmonicRatio: harmonicRatio,
-                    debug: {
-                        h1: weightAnalysis.h1,
-                        h2: weightAnalysis.h2,
-                        centroid: weightAnalysis.centroid
-                    },
-                    formants: {
-                        f1: this.smoothedF1 || 0,
-                        f2: this.smoothedF2 || 0,
-                        raw: formants
-                    }
-                };
+                // Optimization: Reuse objects
+                const m = this.metricData;
+
+                // Copy backend analysis properties
+                Object.assign(m, this.latestBackendAnalysis);
+
+                m.volume = maxAmp;
+                m.pitch = pitch || 0;
+                m.clarity = confidence || 0;
+                m.intensity = intensity;
+                m.jitter = jitter;
+                m.shimmer = shimmer;
+                m.hnr = hnr;
+                m.tilt = tilt || -20;
+                m.weight = weight;
+                m.h1h2 = h1h2;
+                m.weightLabel = weightLabel;
+                m.f3Noise = f3Noise;
+                m.harmonicRatio = harmonicRatio;
+                m.isSilent = false;
+                m.hasIssues = false;
+                m.warning = '';
+                m.signalQuality = '';
+
+                // Update sub-objects
+                this.debugData.h1 = weightAnalysis.h1;
+                this.debugData.h2 = weightAnalysis.h2;
+                this.debugData.centroid = weightAnalysis.centroid;
+
+                this.formantData.f1 = this.smoothedF1 || 0;
+                this.formantData.f2 = this.smoothedF2 || 0;
+                this.formantData.raw = formants;
 
                 // Store metrics if recording
                 if (this.isRecording && this.recordingMetrics) {
+                    // For recording, we MUST clone the object because we need a snapshot in time
                     this.recordingMetrics.push({
                         timestamp: Date.now() - (this.recordingStartTime || Date.now()),
-                        metrics: metricData
+                        metrics: {
+                            ...m,
+                            debug: { ...m.debug }, // Deep copy mutable sub-objects
+                            formants: { ...m.formants }
+                        }
                     });
                 }
 
-                this.onAudioUpdate(metricData);
+                this.onAudioUpdate(m);
             }
         };
 
