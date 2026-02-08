@@ -29,15 +29,8 @@ describe("Button", () => {
 
     // Original text/icon should NOT be present (implementation detail: we conditionally render)
     expect(screen.queryByText("Icon")).not.toBeInTheDocument();
-import React from "react";
-
-describe("Button", () => {
-  it("renders children correctly", () => {
-    render(<Button>Click me</Button>);
-    expect(screen.getByRole("button", { name: /click me/i })).toBeInTheDocument();
   });
-
-  it("shows loading spinner when isLoading is true", () => {
+});
     render(<Button isLoading>Click me</Button>);
     expect(screen.getByRole("status")).toBeInTheDocument(); // LoadingSpinner role
     expect(screen.getByText("Loading")).toBeInTheDocument(); // SR text (modified to match Button implementation)
