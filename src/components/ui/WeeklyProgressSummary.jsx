@@ -20,38 +20,38 @@ const WeeklyProgressSummary = ({ embedded = false }) => {
     const [insights, setInsights] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    const loadData = () => {
-        const reports = getReports();
-        const now = new Date();
-
-        // Current week (last 7 days)
-        const weekAgo = new Date(now);
-        weekAgo.setDate(weekAgo.getDate() - 7);
-
-        // Previous week (8-14 days ago)
-        const twoWeeksAgo = new Date(now);
-        twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-
-        const currentWeekReports = reports.filter(r => {
-            const d = new Date(r.timestamp);
-            return d >= weekAgo;
-        });
-
-        const previousWeekReports = reports.filter(r => {
-            const d = new Date(r.timestamp);
-            return d >= twoWeeksAgo && d < weekAgo;
-        });
-
-        const current = calculateWeekStats(currentWeekReports);
-        const previous = calculateWeekStats(previousWeekReports);
-
-        setCurrentWeek(current);
-        setPreviousWeek(previous);
-        setInsights(generateInsights(current, previous));
-        setIsLoading(false);
-    };
-
     useEffect(() => {
+        const loadData = () => {
+            const reports = getReports();
+            const now = new Date();
+
+            // Current week (last 7 days)
+            const weekAgo = new Date(now);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+
+            // Previous week (8-14 days ago)
+            const twoWeeksAgo = new Date(now);
+            twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+            const currentWeekReports = reports.filter(r => {
+                const d = new Date(r.timestamp);
+                return d >= weekAgo;
+            });
+
+            const previousWeekReports = reports.filter(r => {
+                const d = new Date(r.timestamp);
+                return d >= twoWeeksAgo && d < weekAgo;
+            });
+
+            const current = calculateWeekStats(currentWeekReports);
+            const previous = calculateWeekStats(previousWeekReports);
+
+            setCurrentWeek(current);
+            setPreviousWeek(previous);
+            setInsights(generateInsights(current, previous));
+            setIsLoading(false);
+        };
+
         loadData();
     }, []);
 

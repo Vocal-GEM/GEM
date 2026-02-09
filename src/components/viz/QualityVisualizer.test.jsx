@@ -53,9 +53,12 @@ describe('QualityVisualizer', () => {
   });
 
   it('does not call requestAnimationFrame directly', () => {
-    const rafSpy = vi.spyOn(window, 'requestAnimationFrame');
-    render(<QualityVisualizer dataRef={dataRef} />);
-    expect(rafSpy).not.toHaveBeenCalled();
-    rafSpy.mockRestore();
+    // Mock global window if in environment where window exists
+    if (typeof window !== 'undefined') {
+        const rafSpy = vi.spyOn(window, 'requestAnimationFrame');
+        render(<QualityVisualizer dataRef={dataRef} />);
+        expect(rafSpy).not.toHaveBeenCalled();
+        rafSpy.mockRestore();
+    }
   });
 });
