@@ -5,12 +5,11 @@
  * Includes trend arrows, insights, and key metrics.
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import {
-    TrendingUp, TrendingDown, Minus, Calendar, Clock,
-    Target, Flame, ChevronRight, BarChart3, Award
+    TrendingUp, TrendingDown, Minus, Calendar, BarChart3
 } from 'lucide-react';
-import { getReports, getActivitySummary } from '../../services/SessionReportService';
+import { getReports } from '../../services/SessionReportService';
 import { getStreakData } from '../../services/StreakService';
 import { getXPData } from '../../services/XPService';
 import SpacedRepetitionService from '../../services/SpacedRepetitionService';
@@ -20,10 +19,6 @@ const WeeklyProgressSummary = ({ embedded = false }) => {
     const [previousWeek, setPreviousWeek] = useState(null);
     const [insights, setInsights] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        loadData();
-    }, []);
 
     const loadData = () => {
         const reports = getReports();
@@ -55,6 +50,10 @@ const WeeklyProgressSummary = ({ embedded = false }) => {
         setInsights(generateInsights(current, previous));
         setIsLoading(false);
     };
+
+    useEffect(() => {
+        loadData();
+    }, []);
 
     const calculateWeekStats = (reports) => {
         const uniqueDays = new Set(reports.map(r => r.timestamp.split('T')[0])).size;
