@@ -9,3 +9,15 @@
   ➜  Network: use --host to expose
 7:14:52 AM [vite] hmr update /src/context/JournalContext.jsx, /src/index.css
 7:16:14 AM [vite] hmr update /src/context/JournalContext.jsx, /src/index.css
+7:23:07 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:23:21 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:23:29 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:24:25 AM [vite] page reload src/audio/PitchWorklet.js
+7:25:18 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+7:25:29 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:26:19 AM [vite] page reload src/services/ResearchMode.js
+7:27:14 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
+7:27:29 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:28:32 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:28:45 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
+7:28:58 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
