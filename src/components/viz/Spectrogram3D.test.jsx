@@ -91,12 +91,12 @@ describe('Spectrogram3D', () => {
         render(<Spectrogram3D dataRef={dataRef} />);
 
         // Ensure useFrame callback was captured
-        expect(global.mockUseFrameCallback).toBeDefined();
+        expect(globalThis.mockUseFrameCallback).toBeDefined();
 
         // Execute the frame callback (simulation)
         // This should not throw even if meshRef is undefined (thanks to our safety checks)
-        if (global.mockUseFrameCallback) {
-            expect(() => global.mockUseFrameCallback()).not.toThrow();
+        if (globalThis.mockUseFrameCallback) {
+            expect(() => globalThis.mockUseFrameCallback()).not.toThrow();
         }
     });
 });

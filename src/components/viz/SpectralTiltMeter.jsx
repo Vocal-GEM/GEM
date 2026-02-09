@@ -3,9 +3,8 @@ import { useSettings } from '../../context/SettingsContext';
 import { Info, TrendingDown } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
-const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -6 } }) => {
+const SpectralTiltMeter = ({ dataRef, targetRange = { min: -12, max: -6 } }) => {
     const { colorBlindMode } = useSettings();
-    const id = useId();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
     const componentId = useId();
