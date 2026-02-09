@@ -1,9 +1,6 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { vi, describe, test, expect, beforeEach } from 'vitest';
-import React from 'react';
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, test, it, expect, vi, beforeEach } from 'vitest';
+import React from 'react';
 import SuccessStories from './SuccessStories';
 import CommunityService from '../../services/CommunityService';
 import ModerationService from '../../services/ModerationService';
@@ -23,19 +20,41 @@ vi.mock('../../services/ModerationService', () => ({
 }));
 
 // Mock Lucide icons
-vi.mock('lucide-react', () => ({
-    Play: () => <div data-testid="play-icon" />,
-    Pause: () => <div data-testid="pause-icon" />,
-    Heart: () => <div data-testid="heart-icon" />,
-    MessageCircle: () => <div data-testid="msg-icon" />,
-    Mic: () => <div data-testid="mic-icon" />,
-    Star: () => <div data-testid="star-icon" />
+vi.mock('lucide-react', async (importOriginal) => {
+    const React = await vi.importActual('react');
+    const createIcon = (name) => {
+        const Icon = (props) => React.createElement('div', { ...props, 'data-testid': `${name}-icon` });
+        Icon.displayName = name;
+        return Icon;
+    };
+
+    return {
+        Play: createIcon('play'),
+        Pause: createIcon('pause'),
+        Heart: createIcon('heart'),
+        MessageCircle: createIcon('msg'),
+        Mic: createIcon('mic'),
+        Star: createIcon('star')
+    };
+});
+
+// Mock Toast
+vi.mock('../ui/Toast', () => ({
+    default: ({ message, type }) => <div data-testid="toast" data-type={type}>{message}</div>,
+}));
+
+// Mock Button
+vi.mock('../ui/button', () => ({
+    Button: ({ children, onClick, isLoading, ...props }) => (
+        <button onClick={onClick} disabled={isLoading} {...props}>
+            {isLoading ? 'Loading...' : children}
+        </button>
+    ),
 }));
 
 // Mock Audio
 const mockAudioInstances = [];
 
-// We need a proper constructor function for the mock to work with 'new'
 const MockAudioImplementation = function(src) {
     this.src = src;
     this.pause = vi.fn();
@@ -44,12 +63,11 @@ const MockAudioImplementation = function(src) {
     mockAudioInstances.push(this);
 };
 
-// We wrap it in vi.fn() to track calls to the constructor
 const MockAudio = vi.fn(function(src) {
     return new MockAudioImplementation(src);
 });
 
-global.Audio = MockAudio;
+globalThis.Audio = MockAudio;
 
 describe('SuccessStories Optimization Verification', () => {
     beforeEach(() => {
@@ -107,82 +125,57 @@ describe('SuccessStories Optimization Verification', () => {
         // Audio constructor should NOT be called again
         expect(MockAudio.mock.calls.length).toBe(initialCallCount);
     });
-  default: {
-    getSuccessStories: vi.fn(),
-    submitSuccessStory: vi.fn(),
-  },
-}));
-
-vi.mock('../../services/ModerationService', () => ({
-  default: {
-    preCheckContent: vi.fn(),
-  },
-}));
-
-// Mock Toast and Button to avoid issues with their internal dependencies or animations
-vi.mock('../ui/Toast', () => ({
-  default: ({ message, type }) => <div data-testid="toast" data-type={type}>{message}</div>,
-}));
-
-// We can use the real Button if it's simple, but mocking ensures isolation
-// However, the real Button is imported as { Button }
-vi.mock('../ui/button', () => ({
-  Button: ({ children, onClick, isLoading, ...props }) => (
-    <button onClick={onClick} disabled={isLoading} {...props}>
-      {isLoading ? 'Loading...' : children}
-    </button>
-  ),
-}));
+});
 
 describe('SuccessStories', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('renders success stories', async () => {
-    CommunityService.getSuccessStories.mockResolvedValue({
-      stories: [
-        {
-          id: 1,
-          title: 'Test Story',
-          story: 'This is a test story.',
-          timeline_months: 6,
-          voice_goal: 'feminine',
-          upvotes: 10,
-        },
-      ],
+    beforeEach(() => {
+        vi.clearAllMocks();
     });
 
-    render(<SuccessStories />);
+    it('renders success stories', async () => {
+        CommunityService.getSuccessStories.mockResolvedValue({
+            stories: [
+                {
+                    id: 1,
+                    title: 'Test Story',
+                    story: 'This is a test story.',
+                    timeline_months: 6,
+                    voice_goal: 'feminine',
+                    upvotes: 10,
+                },
+            ],
+        });
 
-    expect(await screen.findByText('Test Story')).toBeInTheDocument();
-    expect(screen.getByText('"This is a test story."')).toBeInTheDocument();
-  });
+        render(<SuccessStories />);
 
-  it('shows toast on validation error', async () => {
-    CommunityService.getSuccessStories.mockResolvedValue({ stories: [] });
-    render(<SuccessStories />);
-
-    // Wait for loading to finish
-    await waitFor(() => expect(screen.queryByText('Loading...')).not.toBeInTheDocument());
-
-    const shareButton = screen.getByText('Share Your Story');
-    fireEvent.click(shareButton);
-
-    // Fill form
-    fireEvent.change(screen.getByPlaceholderText(/e.g., My 6-month progress update/i), {
-      target: { value: 'Bad Title' },
-    });
-    fireEvent.change(screen.getByPlaceholderText(/Share your experience/i), {
-      target: { value: 'Bad Story' },
+        expect(await screen.findByText('Test Story')).toBeInTheDocument();
+        expect(screen.getByText('"This is a test story."')).toBeInTheDocument();
     });
 
-    // Mock validation failure
-    ModerationService.preCheckContent.mockReturnValue({ safe: false });
+    it('shows toast on validation error', async () => {
+        CommunityService.getSuccessStories.mockResolvedValue({ stories: [] });
+        render(<SuccessStories />);
 
-    const submitButton = screen.getByText('Submit Story');
-    fireEvent.click(submitButton);
+        // Wait for loading to finish
+        await waitFor(() => expect(screen.queryByText('Loading...')).not.toBeInTheDocument());
 
-    expect(await screen.findByTestId('toast')).toHaveTextContent('Your story contains flagged words. Please revise.');
-  });
+        const shareButton = screen.getByText('Share Your Story');
+        fireEvent.click(shareButton);
+
+        // Fill form
+        fireEvent.change(screen.getByPlaceholderText(/e.g., My 6-month progress update/i), {
+            target: { value: 'Bad Title' },
+        });
+        fireEvent.change(screen.getByPlaceholderText(/Share your experience/i), {
+            target: { value: 'Bad Story' },
+        });
+
+        // Mock validation failure
+        ModerationService.default.preCheckContent.mockReturnValue({ safe: false });
+
+        const submitButton = screen.getByText('Submit Story');
+        fireEvent.click(submitButton);
+
+        expect(await screen.findByTestId('toast')).toHaveTextContent('Your story contains flagged words. Please revise.');
+    });
 });
