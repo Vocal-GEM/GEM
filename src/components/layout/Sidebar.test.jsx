@@ -51,6 +51,16 @@ vi.mock('../../services/SearchService', () => ({
     groupResultsByType: vi.fn(() => []),
 }));
 
+// Mock feature flags to enable camera for testing
+vi.mock('../../config/featureFlags', () => ({
+    FEATURES: {
+        camera: true,
+        dashboard: true,
+        practice: true
+    },
+    isFeatureEnabled: (feature) => true
+}));
+
 const MockNavigationProvider = ({ children }) => <div>{children}</div>;
 
 describe('Sidebar Auth Integration', () => {
@@ -79,10 +89,17 @@ describe('Sidebar Auth Integration', () => {
 
     it('opens Login modal on Sign In click', () => {
         mockUseAuth.mockReturnValue({ user: null });
-        const { getByText, getByTestId } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+        const openModalSpy = vi.fn();
+        mockUseNavigation.mockReturnValue({
+            activeView: 'dashboard',
+            navigateTo: vi.fn(),
+            openModal: openModalSpy
+        });
+
+        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
         fireEvent.click(getByText('Sign In'));
-        expect(getByTestId('login-modal')).toBeInTheDocument();
+        expect(openModalSpy).toHaveBeenCalledWith('login');
     });
 
     it('calls logout on Sign Out click', () => {
