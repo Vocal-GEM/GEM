@@ -86,4 +86,42 @@ describe('CommandPalette', () => {
 
         expect(mockToggleAudio).toHaveBeenCalled();
     });
+
+    it('should open modal when Cmd+K is pressed', () => {
+        const mockOpenModal = vi.fn();
+        useNavigation.mockReturnValue({
+            modals: { commandPalette: false },
+            closeModal: mockCloseModal,
+            openModal: mockOpenModal,
+            navigate: mockNavigate,
+            switchPracticeTab: vi.fn(),
+            addToHistory: mockAddToHistory
+        });
+
+        render(<CommandPalette />);
+
+        // Simulate Cmd+K
+        fireEvent.keyDown(window, { key: 'k', metaKey: true });
+        expect(mockOpenModal).toHaveBeenCalledWith('commandPalette');
+
+        // Simulate Ctrl+K
+        fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
+        expect(mockOpenModal).toHaveBeenCalledTimes(2); // Called twice
+    });
+
+    it('should close modal when Cmd+K is pressed if already open', () => {
+        useNavigation.mockReturnValue({
+            modals: { commandPalette: true },
+            closeModal: mockCloseModal,
+            openModal: vi.fn(),
+            navigate: mockNavigate,
+            switchPracticeTab: vi.fn(),
+            addToHistory: mockAddToHistory
+        });
+
+        render(<CommandPalette />);
+
+        fireEvent.keyDown(window, { key: 'k', metaKey: true });
+        expect(mockCloseModal).toHaveBeenCalledWith('commandPalette');
+    });
 });
