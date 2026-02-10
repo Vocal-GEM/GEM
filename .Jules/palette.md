@@ -1,0 +1,3 @@
+## 2024-05-23 - Button vs Link Confusion
+**Learning:** The 'link' variant of the Button component is visually a link but semantically a button. The 'asChild' prop is not implemented correctly to support polymorphism (e.g., rendering as an anchor tag). This leads to dead 'Learn more' buttons that don't navigate or support standard link behaviors (ctrl+click).
+**Action:** When implementing navigation, use native <a> tags with button classes instead of relying on the Button component unless it fully supports polymorphic rendering. Ensure all interactive elements have appropriate ARIA labels, especially icon-only buttons.
