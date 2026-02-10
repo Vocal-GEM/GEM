@@ -107,6 +107,20 @@ const CommandPalette = () => {
         closeModal('commandPalette');
     }, [closeModal]);
 
+    // Global Toggle Shortcut
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                if (isOpen) closeModal('commandPalette');
+                else openModal('commandPalette');
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, openModal, closeModal]);
+
     // Handle Keyboard Navigation
     useEffect(() => {
         const handleKeyDown = (e) => {
