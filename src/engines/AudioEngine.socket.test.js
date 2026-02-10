@@ -10,6 +10,10 @@ vi.mock('socket.io-client', () => ({
 
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
+    // The library exports 'Macleod' (with 'a'), but often people type 'McLeod'.
+    // The error says "No 'Macleod' export", so we must export 'Macleod'.
+    // We export both just in case.
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)),
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
     YIN: vi.fn(() => vi.fn((buffer) => 440))
 }));
