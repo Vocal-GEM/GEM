@@ -182,13 +182,13 @@ def manipulate_file():
         current_app.logger.error(f"Voice manipulation error: {e}")
 
         # Cleanup on error
-        if processed_path and os.path.exists(processed_path):
+        if 'processed_path' in locals() and processed_path and os.path.exists(processed_path):
              try:
                 os.remove(processed_path)
              except Exception as cleanup_error:
                 current_app.logger.error(f"Error cleaning up processed file: {cleanup_error}")
 
-        if tmp_path and os.path.exists(tmp_path):
+        if 'tmp_path' in locals() and tmp_path and os.path.exists(tmp_path):
              try:
                 os.remove(tmp_path)
              except Exception as cleanup_error:
