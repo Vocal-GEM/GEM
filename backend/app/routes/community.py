@@ -89,7 +89,7 @@ def share_voice():
 
         audio_file = request.files['audio']
 
-        # Security: Validate file type
+        # Security: Validate file type and check content
         is_valid, error = validate_file_upload(
             audio_file.filename, allowed_types=['audio'], file_stream=audio_file)
         if not is_valid:
@@ -109,12 +109,14 @@ def share_voice():
 
         filepath = os.path.join(upload_folder, filename)
 
+        anon_filepath = None
         try:
+            # Save original
             audio_file.save(filepath)
             # Anonymize audio
             anon_filepath = anonymize_audio(filepath)
         finally:
-            # Security: Always remove the original raw audio file
+            # Security: Always remove the original raw audio file to prevent PII retention
             if os.path.exists(filepath):
                 try:
                     os.remove(filepath)
