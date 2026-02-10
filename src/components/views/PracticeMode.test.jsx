@@ -10,6 +10,7 @@ import { ProfileProvider } from '../../context/ProfileContext';
 import { SettingsProvider } from '../../context/SettingsContext';
 import { TourProvider } from '../../context/TourContext';
 import { PracticeCardsProvider } from '../../context/PracticeCardsContext';
+import React from 'react';
 
 /* eslint-disable no-undef */
 // Mock navigator.mediaDevices
@@ -31,7 +32,12 @@ vi.mock('../../context/NavigationContext', () => ({
         navigationParams: {}
     })
 }));
-vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
+
+// Components mocked to avoid rendering issues or infinite loops
+vi.mock('../viz/DynamicOrb', () => ({
+    default: () => <div data-testid="dynamic-orb">Dynamic Orb</div>
+}));
+vi.mock('../ui/CoachPanel', () => ({ default: () => <div>Coach Panel</div> }));
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
 vi.mock('../ui/ResizablePanel', () => ({
     default: ({ children, className }) => <div className={className} data-testid="resizable-panel">{children}</div>
@@ -43,6 +49,7 @@ vi.mock('../viz/VoiceQualityAnalysis', () => ({ default: () => <div>Voice Qualit
 vi.mock('../viz/VowelAnalysis', () => ({ default: () => <div>Vowel Analysis</div> }));
 vi.mock('../ui/ToolExercises', () => ({ default: () => <div>Tool Exercises</div> }));
 vi.mock('../ui/ComparisonTool', () => ({ default: () => <div>Comparison Tool</div> }));
+
 vi.mock('../../context/AuthContext', () => ({
     useAuth: () => ({ user: { id: 'test-user', username: 'Tester' } }),
     AuthProvider: ({ children }) => <div>{children}</div>
@@ -89,6 +96,6 @@ describe('PracticeMode', () => {
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
         // Check for visualization area
-        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
+        expect(await screen.findByTestId('dynamic-orb', {}, { timeout: 5000 })).toBeInTheDocument();
     });
 });

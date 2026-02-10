@@ -30,7 +30,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+globalThis.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('PitchOrb', () => {
     let dataRef;
@@ -69,7 +69,7 @@ describe('PitchOrb', () => {
         // With the bug, requestAnimationFrame is called.
         // We assert it IS called to confirm the bug exists in the current code,
         // OR we assert it is NOT called if we want to write the test for the desired state.
-        // Let's write the test for the DESIRED state (fail now, pass later).
+        // Let's write the test for the desired state (fail now, pass later).
         expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
     });
 });

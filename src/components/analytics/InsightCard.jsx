@@ -31,8 +31,9 @@ export const InsightCard = ({ insight, onDismiss }) => {
                                     size="icon"
                                     className="h-6 w-6 -mr-2 -mt-2 text-blue-400 hover:text-blue-600 hover:bg-blue-100/50"
                                     onClick={onDismiss}
+                                    aria-label="Dismiss insight"
                                 >
-                                    <X size={16} />
+                                    <X size={16} aria-hidden="true" />
                                 </Button>
                             </div>
 
@@ -41,7 +42,13 @@ export const InsightCard = ({ insight, onDismiss }) => {
                             </p>
 
                             {insight.link && (
-                                <Button variant="link" className="p-0 h-auto text-xs mt-2 text-blue-600 dark:text-blue-300">
+                                <Button
+                                    variant="link"
+                                    className="p-0 h-auto text-xs mt-2 text-blue-600 dark:text-blue-300"
+                                    onClick={() => window.open(insight.link, '_blank')}
+                                    aria-label={`Learn more about ${insight.title}`}
+                                    title={insight.link}
+                                >
                                     Learn more &rarr;
                                 </Button>
                             )}
