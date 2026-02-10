@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -61,6 +61,14 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const speed = 2; // Pixels per frame
     const MAX_FREQ = 8000;
 
+    // LUT Cache for performance
+    const lutRef = useRef({
+        h: 0,
+        maxBin: 0,
+        binLut: null, // Uint16Array
+        offsetLut: null // Uint32Array
+    });
+
     // Pre-calculate colormap as Uint32Array (ABGR) for fast pixel manipulation
     const colormap = useMemo(
         () => generateColormap(settings.spectrogramColorScheme),
@@ -69,7 +77,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
 
     const draw = useCallback(() => {
         const canvas = canvasRef.current;
-        if (!canvas || !dataRef.current) return;
+        if (!isAudioActive || !canvas || !dataRef.current) return;
 
         const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: false });
         const width = canvas.width;
@@ -131,18 +139,28 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             const imageData = canvas.imageDataRef;
             const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
 
+            // --- OPTIMIZATION: Pre-calculated LUTs ---
+            // If height or frequency range changed, rebuild look-up tables
+            // This avoids thousands of divisions and floor operations per frame
+            if (lutRef.current.h !== h || lutRef.current.maxBin !== maxBin) {
+                const binLut = new Uint16Array(h);
+                const offsetLut = new Uint32Array(h);
+
+                for (let y = 0; y < h; y++) {
+                    const freqRatio = 1 - (y / h);
+                    binLut[y] = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                    offsetLut[y] = y * speed;
+                }
+                lutRef.current = { h, maxBin, binLut, offsetLut };
+            }
+
+            const { binLut, offsetLut } = lutRef.current;
+
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
-            // We map pixels (y) to frequency bins.
+            // We map pixels (y) to frequency bins using the LUT.
             for (let y = 0; y < h; y++) {
-                // Invert y because canvas 0 is top, but we want low freq at bottom
-                // y=0 is top (high freq), y=h is bottom (low freq)
-                // Bin mapping: 0 -> maxBin (low -> high)
-
-                // Linear mapping matches the original code: y = h - (i / maxBin) * h
-                // So i / maxBin = (h - y) / h = 1 - y/h
-
-                const freqRatio = 1 - (y / h);
-                const binIndex = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                // Get pre-calculated bin index
+                const binIndex = binLut[y];
 
                 // Get intensity from spectrum
                 const value = spectrum[binIndex] || 0;
@@ -164,8 +182,8 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                 }
 
                 // Write to all columns in the 'speed' strip
-                // Row y has 'speed' pixels
-                const rowOffset = y * speed;
+                // Row y has 'speed' pixels. Using pre-calculated offset.
+                const rowOffset = offsetLut[y];
                 for (let x = 0; x < speed; x++) {
                     data32[rowOffset + x] = color;
                 }
@@ -178,7 +196,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             ctx.fillStyle = '#000';
             ctx.fillRect(width - speed, 0, speed, h);
         }
-    }, [isAudioActive, audioContext, colormap]);
+    }, [audioContext, colormap, dataRef, isAudioActive]);
 
     useEffect(() => {
         let unsubscribe;
