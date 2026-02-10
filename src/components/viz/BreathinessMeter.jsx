@@ -33,7 +33,6 @@ const ZONES = [
 
 const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const { colorBlindMode } = useSettings();
-    const componentId = useId();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
     const zoneRef = useRef(null);
@@ -48,7 +47,6 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const oqIndicatorRef = useRef(null);
     const lastOqRef = useRef(50);
     const ventricularRef = useRef(null);
-    const componentId = useId();
 
     // Optimized: Use RenderCoordinator to manage animation loop
     useEffect(() => {
