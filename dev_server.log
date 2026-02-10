@@ -25,3 +25,5 @@
 7:35:56 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
 7:36:08 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
 7:36:13 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:43:54 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:44:25 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
