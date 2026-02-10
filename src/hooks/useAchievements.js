@@ -23,7 +23,7 @@ export const useAchievements = (stats) => {
                 break; // Only show one at a time
             }
         }
-    }, [stats]);
+    }, [stats, achievements]);
 
     const closeAchievement = () => {
         setUnlockedAchievement(null);
