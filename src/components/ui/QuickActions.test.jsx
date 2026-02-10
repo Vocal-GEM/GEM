@@ -34,12 +34,25 @@ describe('QuickActions', () => {
         expect(fab).toHaveAttribute('aria-controls', 'quick-actions-menu');
 
         // Buttons should be hidden from accessibility tree initially
-        const practiceButton = screen.queryByText('Practice');
-        expect(practiceButton).toBeInTheDocument();
-        // Since we are finding by text which is in a span, we check the button parent
-        const button = practiceButton.closest('button');
-        expect(button).toHaveAttribute('aria-hidden', 'true');
-        expect(button).toHaveAttribute('tabIndex', '-1');
+        // Note: The aria-hidden attribute is on the parent container (quick-actions-menu), not the individual buttons in the current implementation.
+        // Or if it IS on buttons, verify implementation.
+        // Looking at source: aria-hidden={!isOpen} is on the container AND potentially passed to buttons?
+        // Actually, the source shows:
+        // <div id="quick-actions-menu" aria-hidden={!isOpen}>
+        //   {actions.map(... <button ... /> ...)}
+        // </div>
+        // AND the individual buttons do NOT seem to have aria-hidden explicitly set in the map,
+        // unless it's implicit or I missed it.
+        // Wait, the previous failing test said `Received: null`, meaning the attribute is missing on the button.
+        // So we should check the container instead OR fix the implementation if buttons should be hidden.
+        // Accessibility-wise, if the container is aria-hidden, children are hidden.
+
+        const menu = document.getElementById('quick-actions-menu');
+        expect(menu).toHaveAttribute('aria-hidden', 'true');
+
+        // Check tabIndex on buttons
+        const practiceButton = screen.queryByText('Practice').closest('button');
+        expect(practiceButton).toHaveAttribute('tabIndex', '-1');
     });
 
     it('should expand menu when clicked and update attributes', () => {
@@ -50,8 +63,10 @@ describe('QuickActions', () => {
 
         expect(fab).toHaveAttribute('aria-expanded', 'true');
 
+        const menu = document.getElementById('quick-actions-menu');
+        expect(menu).toHaveAttribute('aria-hidden', 'false');
+
         const practiceButton = screen.getByText('Practice').closest('button');
-        expect(practiceButton).toHaveAttribute('aria-hidden', 'false');
         expect(practiceButton).toHaveAttribute('tabIndex', '0');
     });
 

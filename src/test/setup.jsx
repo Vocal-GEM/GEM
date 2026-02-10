@@ -240,6 +240,7 @@ vi.mock('lucide-react', () => {
         Loader: createIcon('loader'),
         Loader2: createIcon('loader-2'),
         Lock: createIcon('lock'),
+        LogIn: createIcon('log-in'),
         LogOut: createIcon('log-out'),
         Map: createIcon('map'),
         MapPin: createIcon('map-pin'),
