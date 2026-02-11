@@ -151,8 +151,6 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
             }
         };
 
-        };
-
         const unsubscribe = renderCoordinator.subscribe(
             `breathiness-meter-${componentId}`,
             update,
