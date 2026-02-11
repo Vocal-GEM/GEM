@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -48,9 +48,6 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
     }
 
-    if (!historyMetaRef.current) {
-        historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
-    }
     const historyHeadRef = useRef(0); // Points to the next write position (frame index)
 
     useEffect(() => {
@@ -120,16 +117,26 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
 
             // Reuse ImageData object
             // Reusable objects to reduce GC
-            if (!canvas.imageDataRef) {
+            if (!canvas.imageDataRef || canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
                 canvas.imageDataRef = ctx.createImageData(speed, h);
-            }
-            // Ensure size match
-            if (canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
+                // Cache the Uint32Array view to avoid allocation per frame
+                canvas.data32Ref = new Uint32Array(canvas.imageDataRef.data.buffer);
             }
 
             const imageData = canvas.imageDataRef;
-            const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
+            const data32 = canvas.data32Ref;
+
+            // --- OPTIMIZATION: Lookup Table for Bin Mapping ---
+            // Pre-calculate frequency bin indices to avoid math in the inner loop
+            if (!canvas.lutRef || canvas.lutRef.length !== h || canvas.lutMaxBin !== maxBin) {
+                canvas.lutRef = new Uint16Array(h);
+                canvas.lutMaxBin = maxBin;
+                for (let y = 0; y < h; y++) {
+                    const freqRatio = 1 - (y / h);
+                    canvas.lutRef[y] = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                }
+            }
+            const lut = canvas.lutRef;
 
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
             // We map pixels (y) to frequency bins.
@@ -141,8 +148,8 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                 // Linear mapping matches the original code: y = h - (i / maxBin) * h
                 // So i / maxBin = (h - y) / h = 1 - y/h
 
-                const freqRatio = 1 - (y / h);
-                const binIndex = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                // Optimized: Use pre-calculated lookup table
+                const binIndex = lut[y];
 
                 // Get intensity from spectrum
                 const value = spectrum[binIndex] || 0;
@@ -178,7 +185,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             ctx.fillStyle = '#000';
             ctx.fillRect(width - speed, 0, speed, h);
         }
-    }, [isAudioActive, audioContext, colormap]);
+    }, [audioContext, colormap, dataRef]);
 
     useEffect(() => {
         let unsubscribe;
