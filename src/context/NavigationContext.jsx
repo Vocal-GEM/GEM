@@ -21,6 +21,9 @@ export const NavigationProvider = ({ children }) => {
     // History State for Breadcrumbs
     const [history, setHistory] = useState([]);
 
+    // Explicit Breadcrumbs Override (for nested views like Learn)
+    const [breadcrumbs, setBreadcrumbs] = useState(null);
+
     // Modals & Overlays State
     const [modals, setModals] = useState({
         settings: false,
@@ -81,6 +84,7 @@ export const NavigationProvider = ({ children }) => {
         if (view !== activeView || Object.keys(params).length > 0) {
             setNavigationParams(params);
             setActiveView(view);
+            setBreadcrumbs(null); // Reset custom breadcrumbs on navigation
             analyticsService.trackView(view, params);
         }
     };
@@ -127,6 +131,7 @@ export const NavigationProvider = ({ children }) => {
         practiceTab,
         modals,
         history,
+        breadcrumbs,
         navigationParams,
         modalParams,
         navigate,
@@ -134,7 +139,8 @@ export const NavigationProvider = ({ children }) => {
         openModal,
         closeModal,
         closeAllModals,
-        addToHistory
+        addToHistory,
+        setBreadcrumbs
     };
 
     return <NavigationContext.Provider value={value}>{children}</NavigationContext.Provider>;

@@ -30,7 +30,145 @@ const GenderPerceptionInfoView = lazy(() => import('./learn/GenderPerceptionInfo
 import ModuleNotes from '../ui/ModuleNotes';
 import QuizView from '../ui/QuizView';
 import { quizService } from '../../services/QuizService';
+import { useNavigation } from '../../context/NavigationContext';
 
+
+const modules = [
+    {
+        id: 'pitch',
+        title: 'Pitch & Fundamental Frequency',
+        icon: Music2,
+        description: 'Understanding F0, gender-typical pitch ranges, and how to safely develop your target pitch.',
+        color: 'cyan',
+        readTime: '8 min',
+        component: PitchInfoView
+    },
+    {
+        id: 'formants',
+        title: 'Vocal Formants',
+        icon: Waves,
+        description: 'Learn about F1, F2, and F3 frequencies, how they\'re measured, and their impact on voice perception.',
+        color: 'purple',
+        readTime: '10 min',
+        component: FormantsInfoView
+    },
+    {
+        id: 'resonance',
+        title: 'Resonance & Brightness',
+        icon: Speaker,
+        description: 'Explore vocal tract resonance, larynx position, and techniques for forward resonance.',
+        color: 'blue',
+        readTime: '8 min',
+        component: ResonanceInfoView
+    },
+    {
+        id: 'voice-quality',
+        title: 'Voice Quality & Timbre',
+        icon: Waves,
+        description: 'Understand breathiness vs clarity, spectral tilt, and indicators of vocal health.',
+        color: 'emerald',
+        readTime: '7 min',
+        component: VoiceQualityInfoView
+    },
+    {
+        id: 'intonation',
+        title: 'Intonation & Prosody',
+        icon: MessageSquare,
+        description: 'Discover pitch variability, melodic speech patterns, and expressive communication.',
+        color: 'pink',
+        readTime: '6 min',
+        component: IntonationInfoView
+    },
+    {
+        id: 'articulation',
+        title: 'Articulation & Speech',
+        icon: Languages,
+        description: 'Vowel space, consonant clarity, and how articulation patterns affect perception.',
+        color: 'amber',
+        readTime: '6 min',
+        component: ArticulationInfoView
+    },
+    {
+        id: 'anatomy',
+        title: 'Vocal Anatomy',
+        icon: Heart,
+        description: 'The vocal folds, larynx, and vocal tract - understanding your instrument.',
+        color: 'rose',
+        readTime: '9 min',
+        component: VocalAnatomyInfoView
+    },
+    {
+        id: 'perception',
+        title: 'Gender Perception',
+        icon: Users,
+        description: 'How listeners perceive voice gender, the role of multiple cues, and setting realistic goals.',
+        color: 'violet',
+        readTime: '8 min',
+        component: GenderPerceptionInfoView
+    }
+];
+
+// Color classes - must be explicit for Tailwind's JIT compiler to detect them
+const colorClassMap = {
+    cyan: {
+        bg: 'bg-cyan-500/20',
+        border: 'border-cyan-500/30',
+        hoverBorder: 'hover:border-cyan-500/60',
+        text: 'text-cyan-400',
+        gradient: 'from-cyan-900/40 to-transparent'
+    },
+    purple: {
+        bg: 'bg-purple-500/20',
+        border: 'border-purple-500/30',
+        hoverBorder: 'hover:border-purple-500/60',
+        text: 'text-purple-400',
+        gradient: 'from-purple-900/40 to-transparent'
+    },
+    blue: {
+        bg: 'bg-blue-500/20',
+        border: 'border-blue-500/30',
+        hoverBorder: 'hover:border-blue-500/60',
+        text: 'text-blue-400',
+        gradient: 'from-blue-900/40 to-transparent'
+    },
+    emerald: {
+        bg: 'bg-emerald-500/20',
+        border: 'border-emerald-500/30',
+        hoverBorder: 'hover:border-emerald-500/60',
+        text: 'text-emerald-400',
+        gradient: 'from-emerald-900/40 to-transparent'
+    },
+    pink: {
+        bg: 'bg-pink-500/20',
+        border: 'border-pink-500/30',
+        hoverBorder: 'hover:border-pink-500/60',
+        text: 'text-pink-400',
+        gradient: 'from-pink-900/40 to-transparent'
+    },
+    amber: {
+        bg: 'bg-amber-500/20',
+        border: 'border-amber-500/30',
+        hoverBorder: 'hover:border-amber-500/60',
+        text: 'text-amber-400',
+        gradient: 'from-amber-900/40 to-transparent'
+    },
+    rose: {
+        bg: 'bg-rose-500/20',
+        border: 'border-rose-500/30',
+        hoverBorder: 'hover:border-rose-500/60',
+        text: 'text-rose-400',
+        gradient: 'from-rose-900/40 to-transparent'
+    },
+    violet: {
+        bg: 'bg-violet-500/20',
+        border: 'border-violet-500/30',
+        hoverBorder: 'hover:border-violet-500/60',
+        text: 'text-violet-400',
+        gradient: 'from-violet-900/40 to-transparent'
+    }
+};
+
+const getColorClasses = (color) => colorClassMap[color] || colorClassMap.purple;
 
 /**
  * LearnView - Educational hub for Gender Affirming Voice Training
@@ -39,152 +177,30 @@ import { quizService } from '../../services/QuizService';
  * articles about each voice training concept.
  */
 const LearnView = () => {
+    const { navigate, setBreadcrumbs } = useNavigation();
     const [activeModule, setActiveModule] = useState(null);
     const [showQuiz, setShowQuiz] = useState(false);
     const [quizProgress, setQuizProgress] = useState(null);
+
+    // Update breadcrumbs when entering/leaving a module
+    useEffect(() => {
+        if (activeModule) {
+            const module = modules.find(m => m.id === activeModule);
+            setBreadcrumbs([
+                { label: 'Dashboard', action: () => navigate('dashboard') },
+                { label: 'Learn', action: () => setActiveModule(null) },
+                { label: module.title, action: null }
+            ]);
+        } else {
+            setBreadcrumbs(null);
+        }
+    }, [activeModule, navigate, setBreadcrumbs]);
 
     // Load quiz progress on mount
     useEffect(() => {
         const summary = quizService.getProgressSummary();
         setQuizProgress(summary);
     }, [showQuiz]);
-
-    const modules = [
-        {
-            id: 'pitch',
-            title: 'Pitch & Fundamental Frequency',
-            icon: Music2,
-            description: 'Understanding F0, gender-typical pitch ranges, and how to safely develop your target pitch.',
-            color: 'cyan',
-            readTime: '8 min',
-            component: PitchInfoView
-        },
-        {
-            id: 'formants',
-            title: 'Vocal Formants',
-            icon: Waves,
-            description: 'Learn about F1, F2, and F3 frequencies, how they\'re measured, and their impact on voice perception.',
-            color: 'purple',
-            readTime: '10 min',
-            component: FormantsInfoView
-        },
-        {
-            id: 'resonance',
-            title: 'Resonance & Brightness',
-            icon: Speaker,
-            description: 'Explore vocal tract resonance, larynx position, and techniques for forward resonance.',
-            color: 'blue',
-            readTime: '8 min',
-            component: ResonanceInfoView
-        },
-        {
-            id: 'voice-quality',
-            title: 'Voice Quality & Timbre',
-            icon: Waves,
-            description: 'Understand breathiness vs clarity, spectral tilt, and indicators of vocal health.',
-            color: 'emerald',
-            readTime: '7 min',
-            component: VoiceQualityInfoView
-        },
-        {
-            id: 'intonation',
-            title: 'Intonation & Prosody',
-            icon: MessageSquare,
-            description: 'Discover pitch variability, melodic speech patterns, and expressive communication.',
-            color: 'pink',
-            readTime: '6 min',
-            component: IntonationInfoView
-        },
-        {
-            id: 'articulation',
-            title: 'Articulation & Speech',
-            icon: Languages,
-            description: 'Vowel space, consonant clarity, and how articulation patterns affect perception.',
-            color: 'amber',
-            readTime: '6 min',
-            component: ArticulationInfoView
-        },
-        {
-            id: 'anatomy',
-            title: 'Vocal Anatomy',
-            icon: Heart,
-            description: 'The vocal folds, larynx, and vocal tract - understanding your instrument.',
-            color: 'rose',
-            readTime: '9 min',
-            component: VocalAnatomyInfoView
-        },
-        {
-            id: 'perception',
-            title: 'Gender Perception',
-            icon: Users,
-            description: 'How listeners perceive voice gender, the role of multiple cues, and setting realistic goals.',
-            color: 'violet',
-            readTime: '8 min',
-            component: GenderPerceptionInfoView
-        }
-    ];
-
-    // Color classes - must be explicit for Tailwind's JIT compiler to detect them
-    const colorClassMap = {
-        cyan: {
-            bg: 'bg-cyan-500/20',
-            border: 'border-cyan-500/30',
-            hoverBorder: 'hover:border-cyan-500/60',
-            text: 'text-cyan-400',
-            gradient: 'from-cyan-900/40 to-transparent'
-        },
-        purple: {
-            bg: 'bg-purple-500/20',
-            border: 'border-purple-500/30',
-            hoverBorder: 'hover:border-purple-500/60',
-            text: 'text-purple-400',
-            gradient: 'from-purple-900/40 to-transparent'
-        },
-        blue: {
-            bg: 'bg-blue-500/20',
-            border: 'border-blue-500/30',
-            hoverBorder: 'hover:border-blue-500/60',
-            text: 'text-blue-400',
-            gradient: 'from-blue-900/40 to-transparent'
-        },
-        emerald: {
-            bg: 'bg-emerald-500/20',
-            border: 'border-emerald-500/30',
-            hoverBorder: 'hover:border-emerald-500/60',
-            text: 'text-emerald-400',
-            gradient: 'from-emerald-900/40 to-transparent'
-        },
-        pink: {
-            bg: 'bg-pink-500/20',
-            border: 'border-pink-500/30',
-            hoverBorder: 'hover:border-pink-500/60',
-            text: 'text-pink-400',
-            gradient: 'from-pink-900/40 to-transparent'
-        },
-        amber: {
-            bg: 'bg-amber-500/20',
-            border: 'border-amber-500/30',
-            hoverBorder: 'hover:border-amber-500/60',
-            text: 'text-amber-400',
-            gradient: 'from-amber-900/40 to-transparent'
-        },
-        rose: {
-            bg: 'bg-rose-500/20',
-            border: 'border-rose-500/30',
-            hoverBorder: 'hover:border-rose-500/60',
-            text: 'text-rose-400',
-            gradient: 'from-rose-900/40 to-transparent'
-        },
-        violet: {
-            bg: 'bg-violet-500/20',
-            border: 'border-violet-500/30',
-            hoverBorder: 'hover:border-violet-500/60',
-            text: 'text-violet-400',
-            gradient: 'from-violet-900/40 to-transparent'
-        }
-    };
-
-    const getColorClasses = (color) => colorClassMap[color] || colorClassMap.purple;
 
     // Loading spinner for lazy loaded modules
     const LoadingSpinner = () => (
