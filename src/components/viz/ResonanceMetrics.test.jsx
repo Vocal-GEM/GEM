@@ -12,6 +12,15 @@ vi.mock('../../services/RenderCoordinator', () => ({
   }
 }));
 
+vi.mock('../../context/SettingsContext', () => ({
+  useSettings: () => ({
+    settings: {
+      showAdvancedMetrics: false
+    },
+    updateSettings: vi.fn()
+  })
+}));
+
 describe('ResonanceMetrics', () => {
   let dataRef;
 

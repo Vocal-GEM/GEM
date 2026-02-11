@@ -58,6 +58,7 @@ export const SettingsProvider = ({ children }) => {
         disable3D: false, // Safe Mode (2D Fallback)
         beginnerMode: true, // Default to true for new users
         analyticsEnabled: false, // Privacy by default
+        showAdvancedMetrics: false, // Toggle clinical metrics panel
 
         // Dashboard Configuration
         dashboardConfig: {
