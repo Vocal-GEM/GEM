@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useId } from 'react';
-import { Info } from 'lucide-react';
+import { Info, AlertTriangle } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useAudio } from '../../context/AudioContext';
 import { useFeedback } from '../../hooks/useFeedback';
@@ -17,10 +17,12 @@ import { renderCoordinator } from '../../services/RenderCoordinator';
  * Includes debug display for calibration (toggle with showDebug prop)
  */
 const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, colorBlindMode = false }) => {
-    const { activeProfile } = useProfile();
+    const { activeProfile, calibrationMetadata } = useProfile();
     const orbRef = useRef(null);
     const labelRef = useRef(null);
     const gaugeNeedleRef = useRef(null);
+    const confidenceRef = useRef(null);
+    const f1LabelRef = useRef(null);
     const componentId = useId();
 
     // Debug state
@@ -29,6 +31,7 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
 
     // Smoothing ref
     const currentScore = useRef(0.5);
+    const currentConfidence = useRef(0);
 
     // Hold timer
     const silenceTimer = useRef(0);
@@ -38,6 +41,13 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
 
     // History for sparklines
     const historyRef = useRef([]);
+
+    // Check if calibration is stale (older than 7 days) or missing
+    const isCalibrationStale = () => {
+        if (!calibrationMetadata?.lastCalibrated) return true;
+        const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+        return calibrationMetadata.lastCalibrated < sevenDaysAgo;
+    };
 
     // Determine target zone based on profile
     const getTargetZone = () => {
@@ -105,6 +115,41 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                 }
 
                 const isVoiceActive = !isSilent && (pitch > 0 || (volume > 0.01 && resonance > 0)) && (resonanceConfidence === undefined || resonanceConfidence > 0.2);
+
+                // Calculate and smooth confidence
+                const rawConfidence = resonanceConfidence !== undefined ? resonanceConfidence : (f1 > 0 ? 0.7 : 0.3);
+                currentConfidence.current = currentConfidence.current * 0.9 + rawConfidence * 0.1;
+
+                // Update confidence indicator
+                if (confidenceRef.current) {
+                    const conf = currentConfidence.current;
+                    if (conf > 0.7) {
+                        confidenceRef.current.style.backgroundColor = 'rgb(34, 197, 94)'; // Green - high confidence
+                        confidenceRef.current.title = 'High confidence measurement';
+                    } else if (conf > 0.4) {
+                        confidenceRef.current.style.backgroundColor = 'rgb(234, 179, 8)'; // Yellow - medium
+                        confidenceRef.current.title = 'Medium confidence - try speaking louder or clearer';
+                    } else {
+                        confidenceRef.current.style.backgroundColor = 'rgb(239, 68, 68)'; // Red - low
+                        confidenceRef.current.title = 'Low confidence - check microphone or speak louder';
+                    }
+                    confidenceRef.current.style.opacity = isVoiceActive ? '1' : '0.3';
+                }
+
+                // Update F1 label with context
+                if (f1LabelRef.current && isVoiceActive && f1 > 0) {
+                    const f1Rounded = Math.round(f1);
+                    let f1Context = '';
+                    if (f1 < 450) f1Context = '(very dark)';
+                    else if (f1 < 550) f1Context = '(dark)';
+                    else if (f1 < 650) f1Context = '(neutral)';
+                    else if (f1 < 750) f1Context = '(bright)';
+                    else f1Context = '(very bright)';
+                    f1LabelRef.current.innerText = `F1: ${f1Rounded} Hz ${f1Context}`;
+                    f1LabelRef.current.style.opacity = '1';
+                } else if (f1LabelRef.current) {
+                    f1LabelRef.current.style.opacity = '0.3';
+                }
 
                 if (isVoiceActive) {
                     silenceTimer.current = 0;
@@ -378,6 +423,35 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                     Target: <span className={colorBlindMode ? "text-teal-400" : "text-emerald-400"}>{targetZone.label}</span>
                 </div>
             </div>
+
+            {/* F1 Label with context */}
+            <div
+                ref={f1LabelRef}
+                className="mt-2 text-xs text-slate-400 font-mono transition-opacity duration-200"
+                style={{ opacity: 0.3 }}
+            >
+                F1: --- Hz
+            </div>
+
+            {/* Confidence Indicator */}
+            <div className="flex items-center gap-2 mt-3">
+                <span className="text-[10px] text-slate-500 uppercase">Confidence:</span>
+                <div
+                    ref={confidenceRef}
+                    className="w-3 h-3 rounded-full transition-all duration-300"
+                    style={{ backgroundColor: 'rgb(100, 100, 100)', opacity: 0.3 }}
+                    role="status"
+                    aria-label="Measurement confidence indicator"
+                />
+            </div>
+
+            {/* Calibration Warning */}
+            {isCalibrationStale() && (
+                <div className="mt-3 flex items-center gap-2 text-amber-400 text-[10px] bg-amber-400/10 px-3 py-1.5 rounded-full">
+                    <AlertTriangle size={12} />
+                    <span>Calibration recommended for accuracy</span>
+                </div>
+            )}
 
             {/* Values Panel (formerly Debug Panel) */}
             {showDebug && debugInfo && (
