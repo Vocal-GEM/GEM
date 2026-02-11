@@ -14,19 +14,22 @@ export const useProfile = () => {
 
 export const ProfileProvider = ({ children }) => {
     // --- State ---
+    // Default calibration values are for F1 formant (Hz):
+    // - Dark/Masculine resonance: ~350-500 Hz (lower larynx, larger pharynx)
+    // - Bright/Feminine resonance: ~600-900 Hz (raised larynx, smaller pharynx)
     const [voiceProfiles, setVoiceProfiles] = useState([
         {
             id: 'fem',
             name: 'Feminization',
             targetRange: { min: 170, max: 220 },
-            calibration: { dark: 500, bright: 2500 },
+            calibration: { dark: 400, bright: 800 }, // F1-based calibration
             skillLevel: 'beginner',
             goals: ['control', 'flexibility']
         }
     ]);
     const [activeProfile, setActiveProfile] = useState('fem');
     const [targetRange, setTargetRange] = useState({ min: 170, max: 220 });
-    const [calibration, setCalibration] = useState({ dark: 500, bright: 2500 });
+    const [calibration, setCalibration] = useState({ dark: 400, bright: 800 }); // F1-based calibration
     const [calibrationMetadata, setCalibrationMetadata] = useState({
         lastCalibrated: null,
         noiseFloor: -100,

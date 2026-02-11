@@ -94,6 +94,33 @@ export const AudioProvider = ({ children }) => {
 
         try {
             audioEngineRef.current = new AudioEngine((data) => {
+                // Calculate resonanceScore from calibration if not provided by backend
+                let resonanceScore = data.rbi_score; // Backend RBI score (0-100)
+
+                // If no backend score, calculate locally from calibration + formants
+                if (resonanceScore === undefined || resonanceScore === 50) {
+                    const calDark = calibration?.dark || 400;
+                    const calBright = calibration?.bright || 800;
+                    const range = calBright - calDark;
+
+                    if (range > 0 && data.formants?.f1 > 0) {
+                        // Use F1 formant as primary indicator (more accurate for vocal resonance)
+                        // Higher F1 = brighter/more open vocal tract
+                        const f1 = data.formants.f1;
+                        resonanceScore = ((f1 - calDark) / range) * 100;
+                        resonanceScore = Math.max(0, Math.min(100, resonanceScore));
+                    } else if (range > 0 && data.resonance > 0) {
+                        // Fallback to spectral centroid if F1 not available
+                        // But use a more reasonable mapping (centroid is usually 800-2500Hz)
+                        const centroidMin = 800;
+                        const centroidMax = 2200;
+                        const centroidNorm = (data.resonance - centroidMin) / (centroidMax - centroidMin);
+                        resonanceScore = Math.max(0, Math.min(100, centroidNorm * 100));
+                    } else {
+                        resonanceScore = 50; // Default to middle
+                    }
+                }
+
                 // ... (data handler)
                 const currentHistory = dataRef.current.history;
                 let pitchToStore = data.pitch;
@@ -112,6 +139,9 @@ export const AudioProvider = ({ children }) => {
 
                 dataRef.current = {
                     ...data,
+                    resonanceScore, // Include calculated resonance score
+                    f1: data.formants?.f1 || data.f1 || 0,
+                    f2: data.formants?.f2 || data.f2 || 0,
                     history: [...currentHistory.slice(1), pitchToStore],
                     silenceCounter: dataRef.current.silenceCounter,
                     lastValidPitch: dataRef.current.lastValidPitch
