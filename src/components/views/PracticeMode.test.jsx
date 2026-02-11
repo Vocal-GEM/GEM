@@ -31,6 +31,10 @@ vi.mock('../../context/NavigationContext', () => ({
         navigationParams: {}
     })
 }));
+
+// Important: When mocking components used in React.lazy, we usually mock the module import.
+// However, since we are mocking at the top level for a file that uses import() inside,
+// standard vi.mock works because it intercepts the import() call too.
 vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
 vi.mock('../ui/ResizablePanel', () => ({
@@ -88,8 +92,10 @@ describe('PracticeMode', () => {
             </SettingsProvider>
         );
 
+        // Check if skeleton is rendered first (verifies Suspense is working)
+        expect(screen.getByTestId('visualizer-skeleton')).toBeInTheDocument();
+
         expect(screen.getByText('Overview')).toBeInTheDocument();
-        // expect(screen.getByText('Pitch')).toBeInTheDocument(); // Removing this as it might be an icon now or text might be hidden
 
         // Wait for the Suspense boundary to resolve and show the DynamicOrb
         await waitFor(() => {

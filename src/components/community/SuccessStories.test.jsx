@@ -81,7 +81,10 @@ describe('SuccessStories', () => {
             expect(screen.getByText('Test Story')).toBeInTheDocument();
         });
 
-        expect(screen.getByText('Content')).toBeInTheDocument();
+        // The text matcher failed for "Content" likely due to it being inside quotes in the rendered output
+        // Based on the error log: <p ...>"Content"</p>
+        // We can search for the text or regex
+        expect(screen.getByText(/Content/)).toBeInTheDocument();
     });
 
     test('shows toast on validation error', async () => {
