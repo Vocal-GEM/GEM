@@ -1,6 +1,5 @@
 import { render, cleanup, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import React from 'react';
 import Spectrogram3D from './Spectrogram3D';
 import * as THREE from 'three';
 
