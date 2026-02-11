@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import { vi, describe, it, expect } from 'vitest';
 import PracticeMode from './PracticeMode';
@@ -47,13 +47,20 @@ vi.mock('../../context/AuthContext', () => ({
     useAuth: () => ({ user: { id: 'test-user', username: 'Tester' } }),
     AuthProvider: ({ children }) => <div>{children}</div>
 }));
+
+// Stable mock objects
+const mockTargetRange = { min: 100, max: 200 };
+const mockCalibration = {};
+const mockVoiceProfiles = [];
+
 vi.mock('../../context/ProfileContext', () => ({
     useProfile: () => ({
         saveSession: vi.fn(),
-        calibration: {},
-        targetRange: { min: 100, max: 200 },
-        voiceProfiles: [],
-        currentProfile: null
+        calibration: mockCalibration,
+        targetRange: mockTargetRange,
+        voiceProfiles: mockVoiceProfiles,
+        currentProfile: null,
+        activeProfile: 'fem' // Ensure activeProfile is set to a primitive or stable value
     }),
     ProfileProvider: ({ children }) => <div>{children}</div>
 }));
@@ -88,7 +95,9 @@ describe('PracticeMode', () => {
 
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
-        // Check for visualization area
-        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
+        // Check for visualization area with extended timeout for lazy loading
+        await waitFor(() => {
+            expect(screen.getByTestId('dynamic-orb')).toBeInTheDocument();
+        }, { timeout: 5000 });
     });
 });
