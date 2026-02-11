@@ -54,8 +54,6 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
 
             const { breathinessGrbas, oq_percent, oq_zone, ventricular_detected, ventricular_severity, ventricular_feedback } = dataRef.current;
 
-            const { breathinessGrbas, oq_percent, oq_zone, ventricular_detected, ventricular_severity, ventricular_feedback } = dataRef.current;
-
             // Get composite score (0-100)
             let score = 50; // Default neutral
             if (breathinessGrbas) {
