@@ -5,14 +5,13 @@ import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -6 } }) => {
     const { colorBlindMode } = useSettings();
-    const id = useId();
+    const componentId = useId();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
-    const componentId = useId();
 
     useEffect(() => {
         const loop = () => {
-            if (indicatorRef.current && valueRef.current) {
+            if (dataRef.current && indicatorRef.current && valueRef.current) {
                 const tilt = dataRef.current.tilt || 0;
 
                 // Map Tilt: Typically -20dB/oct (Masc/Steep?) to 0dB/oct (Flat/Bright?)
@@ -42,19 +41,8 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
             }
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                `spectral-tilt-meter-${id}`,
-                loop,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
-
         const unsubscribe = renderCoordinator.subscribe(
-            `spectral-tilt-meter-${componentId}`,
+            componentId,
             loop,
             renderCoordinator.PRIORITY.MEDIUM
         );
@@ -62,7 +50,6 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
         return () => {
             unsubscribe();
         };
-    }, [dataRef, targetRange, colorBlindMode, id]);
     }, [dataRef, targetRange, colorBlindMode, componentId]);
 
     return (
