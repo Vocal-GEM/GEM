@@ -133,9 +133,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         lastFormantsRef.current = { f1, f2 };
 
-    }, [dataRef, colormap]);
-
-    // Initial canvas setup & ResizeObserver
     }, [dataRef, colormap, componentId]);
 
     // Initial canvas setup
