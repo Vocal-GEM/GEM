@@ -131,7 +131,7 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                     <button
                         type="button"
                         onClick={toggleRecording}
-                        className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-red-600 hover:bg-red-500'}`}
+                        className={`w-16 h-16 rounded-full flex items-center justify-center transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-red-300 ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-red-600 hover:bg-red-500'}`}
                         aria-label={isRecording ? "Stop recording" : "Start recording"}
                     >
                         {isRecording ? <div className="w-6 h-6 bg-white rounded-sm"></div> : <div className="w-6 h-6 bg-white rounded-full"></div>}
@@ -142,12 +142,11 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                         <button
                             type="button"
                             onClick={() => setAudioBlobUrl(null)}
-                            className="p-2 text-red-400 hover:text-red-300"
+                            className="p-2 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
                             aria-label="Delete recording"
                         >
                             <Trash2 />
                         </button>
-                        <button type="button" onClick={() => setAudioBlobUrl(null)} className="p-2 text-red-400 hover:text-red-300" aria-label="Delete recording"><Trash2 /></button>
                     </div>
                 )}
                 <p className="text-xs text-slate-500">{isRecording ? 'Recording... Read your script!' : 'Tap to record your voice'}</p>
@@ -239,13 +238,6 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                 <div>
                     <label htmlFor="journal-confidence" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Confidence (1-10)</label>
                     <input id="journal-confidence" type="range" min="1" max="10" value={confidence} onChange={(e) => setConfidence(parseInt(e.target.value))} className="w-full accent-emerald-500" />
-                    <label htmlFor="effort-slider" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Effort (1-10)</label>
-                    <input id="effort-slider" type="range" min="1" max="10" value={effort} onChange={(e) => setEffort(parseInt(e.target.value))} className="w-full accent-blue-500" />
-                    <div className="text-center text-blue-400 font-bold">{effort}</div>
-                </div>
-                <div>
-                    <label htmlFor="confidence-slider" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Confidence (1-10)</label>
-                    <input id="confidence-slider" type="range" min="1" max="10" value={confidence} onChange={(e) => setConfidence(parseInt(e.target.value))} className="w-full accent-emerald-500" />
                     <div className="text-center text-emerald-400 font-bold">{confidence}</div>
                 </div>
             </div>
