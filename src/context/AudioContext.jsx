@@ -97,21 +97,35 @@ export const AudioProvider = ({ children }) => {
                 // Calculate resonanceScore from calibration if not provided by backend
                 let resonanceScore = data.rbi_score; // Backend RBI score (0-100)
 
-                // If no backend score, calculate locally from calibration + formants
+                // If no backend score, calculate locally using improved metrics
                 if (resonanceScore === undefined || resonanceScore === 50) {
                     const calDark = calibration?.dark || 400;
                     const calBright = calibration?.bright || 800;
                     const range = calBright - calDark;
 
-                    if (range > 0 && data.formants?.f1 > 0) {
-                        // Use F1 formant as primary indicator (more accurate for vocal resonance)
-                        // Higher F1 = brighter/more open vocal tract
+                    // Priority 1: Use pitch-normalized F1 (most accurate)
+                    // This removes the pitch-F1 correlation for fair comparison
+                    if (range > 0 && data.f1Normalized > 0) {
+                        const f1Norm = data.f1Normalized;
+                        resonanceScore = ((f1Norm - calDark) / range) * 100;
+                        resonanceScore = Math.max(0, Math.min(100, resonanceScore));
+                    }
+                    // Priority 2: Use F1/F0 ratio (vowel-independent)
+                    // Dark: ratio 2.0-3.5, Bright: ratio 3.5-6.0
+                    else if (data.resonanceRatio > 0) {
+                        const ratio = data.resonanceRatio;
+                        // Map ratio 2.0-6.0 to 0-100
+                        resonanceScore = ((ratio - 2.0) / 4.0) * 100;
+                        resonanceScore = Math.max(0, Math.min(100, resonanceScore));
+                    }
+                    // Priority 3: Use raw F1 formant
+                    else if (range > 0 && data.formants?.f1 > 0) {
                         const f1 = data.formants.f1;
                         resonanceScore = ((f1 - calDark) / range) * 100;
                         resonanceScore = Math.max(0, Math.min(100, resonanceScore));
-                    } else if (range > 0 && data.resonance > 0) {
-                        // Fallback to spectral centroid if F1 not available
-                        // But use a more reasonable mapping (centroid is usually 800-2500Hz)
+                    }
+                    // Priority 4: Fallback to spectral centroid
+                    else if (range > 0 && data.resonance > 0) {
                         const centroidMin = 800;
                         const centroidMax = 2200;
                         const centroidNorm = (data.resonance - centroidMin) / (centroidMax - centroidMin);
@@ -142,6 +156,8 @@ export const AudioProvider = ({ children }) => {
                     resonanceScore, // Include calculated resonance score
                     f1: data.formants?.f1 || data.f1 || 0,
                     f2: data.formants?.f2 || data.f2 || 0,
+                    f1Normalized: data.f1Normalized || 0, // Pitch-normalized F1
+                    resonanceRatio: data.resonanceRatio || 0, // F1/F0 ratio
                     history: [...currentHistory.slice(1), pitchToStore],
                     silenceCounter: dataRef.current.silenceCounter,
                     lastValidPitch: dataRef.current.lastValidPitch

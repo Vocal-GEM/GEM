@@ -186,6 +186,59 @@ class DSP {
         return peaks;
     }
 
+    /**
+     * Normalize F1 based on pitch to account for larynx height correlation
+     * Higher pitches naturally correlate with higher F1 due to raised larynx
+     * This correction allows fair comparison across different pitches
+     *
+     * Reference: Titze (1989), Sundberg (1987) - F1 shifts ~25Hz per semitone of pitch
+     */
+    static normalizeFoPitch(f1, pitch) {
+        if (!f1 || f1 === 0 || !pitch || pitch <= 0) return f1;
+
+        // Reference pitch (typical modal voice center)
+        const refPitch = 150; // Hz
+
+        // F1 shift per semitone is approximately 20-30 Hz
+        // Using 25 Hz as middle ground
+        const semitones = 12 * Math.log2(pitch / refPitch);
+        const f1Shift = semitones * 25;
+
+        // Subtract the pitch-induced shift to get "normalized" F1
+        // This represents what F1 would be at the reference pitch
+        const normalizedF1 = f1 - f1Shift;
+
+        // Clamp to reasonable range
+        return Math.max(200, Math.min(1200, normalizedF1));
+    }
+
+    /**
+     * Calculate vowel-independent resonance metric
+     * Uses F1/F0 ratio which is more stable across vowels than raw F1
+     * Typical ranges:
+     * - Dark/masculine: ratio 2.0-3.5
+     * - Bright/feminine: ratio 3.5-6.0
+     */
+    static calculateResonanceRatio(f1, pitch) {
+        if (!f1 || f1 === 0 || !pitch || pitch <= 0) return 0;
+        return f1 / pitch;
+    }
+
+    /**
+     * Validate formant estimate by checking if it's near a harmonic
+     * Formants near harmonics are often tracking errors
+     */
+    static isNearHarmonic(freq, pitch, tolerance = 30) {
+        if (!pitch || pitch <= 0) return false;
+        for (let h = 1; h <= 10; h++) {
+            const harmonic = pitch * h;
+            if (Math.abs(freq - harmonic) < tolerance) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     static estimateVowel(f1, f2) {
         if (!f1 || !f2 || f1 === 0 || f2 === 0) return '';
         // Complete vowel space coverage based on typical formant ranges (IPA symbols)
@@ -256,6 +309,13 @@ class ResonanceProcessor extends AudioWorkletProcessor {
         this.shimmerBuffer = [];
         this.lastAmp = 0;
         this.pitchConfidenceThreshold = 0.6;
+
+        // Enhanced formant tracking state
+        this.f1Buffer = []; // Multi-frame F1 buffer for median filtering
+        this.f2Buffer = []; // Multi-frame F2 buffer for median filtering
+        this.normalizedF1 = 0; // Pitch-normalized F1
+        this.resonanceRatio = 0; // F1/F0 ratio for vowel-independent measurement
+        this.formantConfidence = 0; // Confidence in formant estimates
 
         this.port.onmessage = (event) => {
             if (event.data.type === 'config') {
@@ -362,24 +422,79 @@ class ResonanceProcessor extends AudioWorkletProcessor {
             let p1 = { freq: 0, amp: -Infinity };
             let p2 = { freq: 0, amp: -Infinity };
             let vowel = '';
+            let formantConfidence = 0;
 
             if (rms > this.adaptiveThreshold * 2) {
-                const lpcOrder = 12;
+                // Adaptive LPC order: higher for cleaner signals
+                // Rule of thumb: 2 + sampleRate/1000, but at least 10, at most 16
+                const baseOrder = Math.round(2 + TARGET_RATE / 1000);
+                const lpcOrder = Math.max(10, Math.min(16, baseOrder));
+
                 const r = DSP.computeAutocorrelation(windowed, lpcOrder);
                 const { a, error } = DSP.levinsonDurbin(r, lpcOrder);
                 const lpcEnvelope = DSP.computeLPCSpectrum(a, error, 512);
                 const formantCandidates = DSP.findPeaks(lpcEnvelope, TARGET_RATE);
 
+                // Find best F1 candidate (200-1200 Hz), avoiding harmonics
+                let f1Candidates = [];
                 for (let candidate of formantCandidates) {
                     if (candidate.freq >= 200 && candidate.freq <= 1200) {
-                        if (candidate.amp > p1.amp) p1 = candidate;
+                        // Skip if too close to a pitch harmonic (tracking error)
+                        if (pitch > 0 && DSP.isNearHarmonic(candidate.freq, pitch, 25)) {
+                            continue;
+                        }
+                        f1Candidates.push(candidate);
                     }
                 }
+                // Sort by amplitude and take the strongest
+                f1Candidates.sort((a, b) => b.amp - a.amp);
+                if (f1Candidates.length > 0) {
+                    p1 = f1Candidates[0];
+                }
+
+                // Find best F2 candidate (1200-3500 Hz)
+                let f2Candidates = [];
                 for (let candidate of formantCandidates) {
                     if (candidate.freq >= 1200 && candidate.freq <= 3500) {
-                        if (candidate.amp > p2.amp) p2 = candidate;
+                        if (pitch > 0 && DSP.isNearHarmonic(candidate.freq, pitch, 25)) {
+                            continue;
+                        }
+                        f2Candidates.push(candidate);
                     }
                 }
+                f2Candidates.sort((a, b) => b.amp - a.amp);
+                if (f2Candidates.length > 0) {
+                    p2 = f2Candidates[0];
+                }
+
+                // Multi-frame median filtering for stability
+                if (p1.freq > 0) {
+                    this.f1Buffer.push(p1.freq);
+                    if (this.f1Buffer.length > 5) this.f1Buffer.shift();
+                }
+                if (p2.freq > 0) {
+                    this.f2Buffer.push(p2.freq);
+                    if (this.f2Buffer.length > 5) this.f2Buffer.shift();
+                }
+
+                // Use median of buffer for more stable estimate
+                if (this.f1Buffer.length >= 3) {
+                    const sorted = [...this.f1Buffer].sort((a, b) => a - b);
+                    p1.freq = sorted[Math.floor(sorted.length / 2)];
+                }
+                if (this.f2Buffer.length >= 3) {
+                    const sorted = [...this.f2Buffer].sort((a, b) => a - b);
+                    p2.freq = sorted[Math.floor(sorted.length / 2)];
+                }
+
+                // Calculate formant confidence based on:
+                // 1. Number of candidates found
+                // 2. Amplitude of selected formants
+                // 3. Pitch confidence
+                const candidateScore = Math.min(1, (f1Candidates.length + f2Candidates.length) / 4);
+                const ampScore = p1.amp > -30 && p2.amp > -30 ? 1 : 0.5;
+                const pitchScore = pitchConfidence > 0.7 ? 1 : 0.6;
+                formantConfidence = candidateScore * ampScore * pitchScore;
             }
 
             // Resonance (Spectral Centroid)
@@ -454,6 +569,18 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                 this.smoothedF2 = this.smoothedF2 * (1 - alpha) + p2.freq * alpha;
             }
 
+            // Calculate pitch-normalized F1 (removes pitch-F1 correlation)
+            // This gives a more accurate measure of vocal tract size/resonance
+            this.normalizedF1 = DSP.normalizeFoPitch(this.smoothedF1, pitch);
+
+            // Calculate F1/F0 ratio (vowel-independent resonance metric)
+            // Typical ranges: Dark 2.0-3.5, Bright 3.5-6.0
+            this.resonanceRatio = DSP.calculateResonanceRatio(this.smoothedF1, pitch);
+
+            // Combine formant confidence with pitch confidence for overall reliability score
+            const combinedConfidence = formantConfidence * 0.6 + (pitchConfidence * 0.4);
+            this.formantConfidence = this.formantConfidence * 0.8 + combinedConfidence * 0.2;
+
             vowel = DSP.estimateVowel(this.smoothedF1, this.smoothedF2);
 
             this.port.postMessage({
@@ -462,9 +589,11 @@ class ResonanceProcessor extends AudioWorkletProcessor {
                     pitch: pitch > 0 ? pitch : -1,
                     pitchConfidence,
                     resonance: this.smoothedCentroid,
-                    resonanceConfidence,
+                    resonanceConfidence: this.formantConfidence, // Use combined confidence
                     f1: this.smoothedF1,
                     f2: this.smoothedF2,
+                    f1Normalized: this.normalizedF1, // Pitch-corrected F1
+                    resonanceRatio: this.resonanceRatio, // F1/F0 ratio
                     weight,
                     volume: rms,
                     jitter,

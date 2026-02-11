@@ -118,6 +118,37 @@ class DSP {
         return Math.sqrt(real * real + imag * imag);
     }
 
+    /**
+     * Normalize F1 based on pitch to account for larynx height correlation
+     */
+    static normalizeFoPitch(f1, pitch) {
+        if (!f1 || f1 === 0 || !pitch || pitch <= 0) return f1;
+        const refPitch = 150;
+        const semitones = 12 * Math.log2(pitch / refPitch);
+        const f1Shift = semitones * 25;
+        const normalizedF1 = f1 - f1Shift;
+        return Math.max(200, Math.min(1200, normalizedF1));
+    }
+
+    /**
+     * Calculate vowel-independent resonance metric (F1/F0 ratio)
+     */
+    static calculateResonanceRatio(f1, pitch) {
+        if (!f1 || f1 === 0 || !pitch || pitch <= 0) return 0;
+        return f1 / pitch;
+    }
+
+    /**
+     * Check if frequency is near a pitch harmonic
+     */
+    static isNearHarmonic(freq, pitch, tolerance = 30) {
+        if (!pitch || pitch <= 0) return false;
+        for (let h = 1; h <= 10; h++) {
+            if (Math.abs(freq - pitch * h) < tolerance) return true;
+        }
+        return false;
+    }
+
     static estimateVowel(f1, f2) {
         if (!f1 || !f2 || f1 === 0 || f2 === 0) return '';
         // Complete vowel space coverage based on typical formant ranges (IPA symbols)
