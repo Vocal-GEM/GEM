@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -30,6 +30,10 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         idRef.current = `spectrogram-${Math.random().toString(36).substr(2, 9)}`;
     }
     const componentId = idRef.current;
+
+    // Reusable buffers to avoid garbage collection churn
+    const imageDataRef = useRef(null);
+    const data32Ref = useRef(null);
 
     // Tap cursor state
     const [cursorData, setCursorData] = useState(null);
@@ -118,18 +122,14 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             // Instead of thousands of ctx.fillRect calls, we generate the column pixels
             // directly into an ImageData buffer and put it onto the canvas.
 
-            // Reuse ImageData object
-            // Reusable objects to reduce GC
-            if (!canvas.imageDataRef) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
-            }
-            // Ensure size match
-            if (canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
+            // Reuse ImageData object and its 32-bit view to reduce GC
+            if (!imageDataRef.current || imageDataRef.current.height !== h || imageDataRef.current.width !== speed) {
+                imageDataRef.current = ctx.createImageData(speed, h);
+                data32Ref.current = new Uint32Array(imageDataRef.current.data.buffer);
             }
 
-            const imageData = canvas.imageDataRef;
-            const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
+            const imageData = imageDataRef.current;
+            const data32 = data32Ref.current; // Use cached view
 
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
             // We map pixels (y) to frequency bins.
@@ -178,7 +178,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             ctx.fillStyle = '#000';
             ctx.fillRect(width - speed, 0, speed, h);
         }
-    }, [isAudioActive, audioContext, colormap]);
+    }, [isAudioActive, audioContext, colormap, dataRef]);
 
     useEffect(() => {
         let unsubscribe;
