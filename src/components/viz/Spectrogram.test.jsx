@@ -1,6 +1,5 @@
 import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import React from 'react';
 import Spectrogram from './Spectrogram';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
@@ -33,12 +32,6 @@ vi.mock('../../context/AudioContext', () => ({
 }));
 
 // Mock Canvas getContext
-const mockImageData = {
-    data: new Uint8ClampedArray(800 * 500 * 4),
-    width: 2,
-    height: 500
-};
-
 const mockContext = {
   createImageData: vi.fn((w, h) => ({
     data: { buffer: new ArrayBuffer(w * h * 4) },
@@ -58,7 +51,7 @@ const mockContext = {
 };
 
 // Mock HTMLCanvasElement.getContext
-HTMLCanvasElement.prototype.getContext = vi.fn((type, options) => {
+HTMLCanvasElement.prototype.getContext = vi.fn((type, _options) => {
     if (type === '2d') return mockContext;
     return null;
 });
