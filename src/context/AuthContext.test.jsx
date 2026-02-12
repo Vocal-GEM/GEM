@@ -40,6 +40,7 @@ const TestComponent = () => {
 describe('AuthContext', () => {
     beforeEach(() => {
         vi.resetAllMocks();
+        // Setup fetch mock in beforeEach to survive resetAllMocks
         globalThis.fetch = vi.fn();
         vi.spyOn(console, 'error').mockImplementation(() => { });
         vi.spyOn(console, 'log').mockImplementation(() => { });
@@ -63,11 +64,14 @@ describe('AuthContext', () => {
     });
 
     it('logs in successfully', async () => {
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
+        fetch.mockImplementation((url) => {
+            if (url.includes('/me')) return Promise.resolve({ ok: false });
+            if (url.includes('/login')) return Promise.resolve({
+                ok: true,
+                json: async () => ({ user: { id: 1, username: 'testuser' } })
+            });
+            return Promise.resolve({ ok: false });
+        });
 
         let result;
         await act(async () => {
@@ -81,11 +85,14 @@ describe('AuthContext', () => {
         const loginBtn = result.getByText('Login');
         await act(async () => {
             loginBtn.click();
+            // Allow state updates to propagate
+            await new Promise(r => setTimeout(r, 100));
         });
 
         await waitFor(() => {
-            expect(result.getByTestId('user').textContent).toBe('testuser');
-        });
+            const userText = result.getByTestId('user').textContent;
+            expect(userText).toBe('testuser');
+        }, { timeout: 3000 });
     });
 
     it('handles login failure', async () => {
@@ -113,12 +120,15 @@ describe('AuthContext', () => {
 
     it('clears local data on logout', async () => {
         // Setup: login first
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
-        fetch.mockResolvedValueOnce({ ok: true }); // logout
+        fetch.mockImplementation((url) => {
+            if (url.includes('/me')) return Promise.resolve({ ok: false });
+            if (url.includes('/login')) return Promise.resolve({
+                ok: true,
+                json: async () => ({ user: { id: 1, username: 'testuser' } })
+            });
+            if (url.includes('/logout')) return Promise.resolve({ ok: true });
+            return Promise.resolve({ ok: false });
+        });
 
         let result;
         await act(async () => {
