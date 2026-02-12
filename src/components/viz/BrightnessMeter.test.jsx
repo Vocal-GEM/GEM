@@ -16,14 +16,19 @@ vi.mock('../../services/RenderCoordinator', () => ({
 vi.mock('lucide-react', async () => {
     // ESM mock
     const actual = await vi.importActual('lucide-react');
-    const createIcon = (name) => (props) => <div {...props} data-testid={name} />;
+    // Create a mock component with a display name
+    const MockIcon = (name) => {
+        const Icon = (props) => <div {...props} data-testid={name} />;
+        Icon.displayName = `Mock${name}`;
+        return Icon;
+    };
 
     return {
         ...actual,
-        Sun: createIcon('Sun'),
-        Moon: createIcon('Moon'),
-        Info: createIcon('Info'),
-        Smile: createIcon('Smile')
+        Sun: MockIcon('Sun'),
+        Moon: MockIcon('Moon'),
+        Info: MockIcon('Info'),
+        Smile: MockIcon('Smile')
     };
 });
 
