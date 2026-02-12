@@ -8,6 +8,7 @@ import FileSpectrogram from '../viz/FileSpectrogram';
 import RegisterGauge from '../viz/RegisterGauge';
 import MicQualityTips from '../ui/MicQualityTips';
 import { AudioEnhancer } from '../../utils/AudioEnhancer';
+import { isBackendEnabled, getBackendUrl } from '../../config/runtime';
 
 import { useAudio } from '../../context/AudioContext';
 
@@ -130,15 +131,16 @@ const VoiceQualityView = () => {
                 setIsEnhancing(false);
             }
 
+            if (!isBackendEnabled()) {
+                throw new Error('Detailed voice-quality analysis requires backend. Enable VITE_ENABLE_BACKEND=true to use this feature.');
+            }
+
             const formData = new FormData();
             formData.append('audio', audioToUpload);
             formData.append('goal', goal);
             formData.append('include_transcript', includeTranscript.toString());
 
-            // Assuming backend is on same host/port or proxied. 
-            // If dev, might need localhost:5000. 
-            // Using relative path assuming proxy or same origin.
-            const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const BACKEND_URL = getBackendUrl();
             const response = await fetch(`${BACKEND_URL}/api/voice-quality/analyze`, {
                 method: 'POST',
                 body: formData,
