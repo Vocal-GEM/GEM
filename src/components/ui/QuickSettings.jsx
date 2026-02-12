@@ -1,9 +1,19 @@
-
+import { useEffect } from 'react';
 import { X, Moon, Sun, Zap, Eye, EyeOff } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 
 const QuickSettings = ({ isOpen, onClose }) => {
     const { settings, updateSettings } = useSettings();
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape' && isOpen) {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
 
     if (!isOpen) return null;
 
@@ -19,7 +29,11 @@ const QuickSettings = ({ isOpen, onClose }) => {
             <div className="relative w-80 h-full bg-slate-900 border-l border-white/10 shadow-2xl p-6 animate-in slide-in-from-right duration-300 flex flex-col">
                 <div className="flex justify-between items-center mb-8">
                     <h2 className="text-xl font-bold text-white">Quick Settings</h2>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                    <button
+                        onClick={onClose}
+                        className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
+                        aria-label="Close settings"
+                    >
                         <X size={20} />
                     </button>
                 </div>
@@ -51,6 +65,9 @@ const QuickSettings = ({ isOpen, onClose }) => {
                             <button
                                 onClick={() => updateSettings({ ...settings, listenMode: !settings.listenMode })}
                                 className={`w-full p-3 rounded-xl border text-left flex items-center justify-between transition-all ${settings.listenMode ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'}`}
+                                role="switch"
+                                aria-checked={settings.listenMode}
+                                aria-label="Listen Mode"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className={`p-2 rounded-lg ${settings.listenMode ? 'bg-white/20' : 'bg-slate-700'}`}>
@@ -94,6 +111,9 @@ const QuickSettings = ({ isOpen, onClose }) => {
                         <button
                             onClick={() => updateSettings({ ...settings, analyticsEnabled: !settings.analyticsEnabled })}
                             className={`w-full p-3 rounded-xl border text-left flex items-center justify-between transition-all ${settings.analyticsEnabled ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'}`}
+                            role="switch"
+                            aria-checked={settings.analyticsEnabled}
+                            aria-label="Share Usage Data"
                         >
                             <span className="font-medium">Share Usage Data</span>
                             {settings.analyticsEnabled ? <Eye size={16} /> : <EyeOff size={16} />}
