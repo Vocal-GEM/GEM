@@ -189,6 +189,7 @@ vi.mock('lucide-react', () => {
         Coffee: createIcon('coffee'),
         Command: createIcon('command'),
         Copy: createIcon('copy'),
+        CornerDownLeft: createIcon('corner-down-left'),
         Cpu: createIcon('cpu'),
         Database: createIcon('database'),
         Diamond: createIcon('diamond'),
