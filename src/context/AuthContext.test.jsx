@@ -2,9 +2,6 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider, useAuth } from './AuthContext';
 
-// Mock Fetch
-globalThis.fetch = vi.fn();
-
 // Mock IndexedDBManager
 vi.mock('../services/IndexedDBManager', () => ({
     indexedDB: {
@@ -17,6 +14,12 @@ vi.mock('../services/IndexedDBManager', () => ({
 vi.mock('../services/DataSyncService', () => ({
     syncToServer: vi.fn().mockResolvedValue(true),
     syncFromServer: vi.fn().mockResolvedValue(true)
+}));
+
+// Mock runtime config
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: vi.fn().mockReturnValue(true),
+    getBackendUrl: vi.fn().mockReturnValue('http://localhost:5000')
 }));
 
 import { indexedDB } from '../services/IndexedDBManager';
@@ -37,6 +40,7 @@ const TestComponent = () => {
 describe('AuthContext', () => {
     beforeEach(() => {
         vi.resetAllMocks();
+        globalThis.fetch = vi.fn();
         vi.spyOn(console, 'error').mockImplementation(() => { });
         vi.spyOn(console, 'log').mockImplementation(() => { });
     });
