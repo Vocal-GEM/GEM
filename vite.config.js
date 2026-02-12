@@ -9,6 +9,7 @@ const __dirname = path.dirname(__filename)
 import { visualizer } from 'rollup-plugin-visualizer'
 import { execSync } from 'child_process'
 import { readFileSync } from 'fs'
+import { env } from 'process'
 
 // Get version from package.json
 const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'));
@@ -24,6 +25,7 @@ try {
 
 // Combine version with git hash
 const appVersion = `${packageVersion}-${gitHash}`;
+const isAnalyzeBuild = env.ANALYZE === 'true';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -106,12 +108,16 @@ export default defineConfig({
             }
         }),
 
-        visualizer({
-            open: true,
-            gzipSize: true,
-            brotliSize: true,
-            filename: 'dist/stats.html' // Save analysis to file
-        }),
+        ...(isAnalyzeBuild
+            ? [
+                visualizer({
+                    open: false,
+                    gzipSize: true,
+                    brotliSize: true,
+                    filename: 'dist/stats.html' // Save analysis to file
+                }),
+            ]
+            : []),
     ],
     resolve: {
         alias: {
