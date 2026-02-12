@@ -10,3 +10,17 @@
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
 7:31:57 AM [vite] hmr update /src/components/ui/CommandPalette.jsx, /src/index.css
 7:32:08 AM [vite] hmr update /src/App.jsx, /src/index.css
+7:39:15 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:39:23 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:39:32 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:40:04 AM [vite] page reload src/audio/PitchWorklet.js
+7:40:19 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+7:40:40 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+7:40:56 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
+7:41:13 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:41:31 AM [vite] page reload src/services/ResearchMode.js
+7:41:43 AM [vite] page reload src/services/PrivacyManager.js
+7:42:09 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:42:16 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+7:42:32 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:42:42 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
