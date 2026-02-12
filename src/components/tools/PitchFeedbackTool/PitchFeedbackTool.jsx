@@ -4,16 +4,27 @@ import { useHapticFeedback } from '../../../hooks/useHapticFeedback';
 import { useReferenceTone } from '../../../hooks/useReferenceTone';
 import { Volume2, Smartphone, Mic, MicOff, AlertCircle } from 'lucide-react';
 
+const PITCH_PRESETS = {
+    feminization: { label: 'Feminization', min: 165, max: 255 },
+    masculinization: { label: 'Masculinization', min: 95, max: 155 },
+    custom: { label: 'Custom', min: 140, max: 220 }
+};
+
+const ABSOLUTE_MIN = 80;
+const ABSOLUTE_MAX = 350;
+
 const PitchFeedbackTool = () => {
     const { dataRef, isAudioActive, toggleAudio, audioError } = useAudio();
     const [currentPitch, setCurrentPitch] = useState(0);
-    const [targetPitch, setTargetPitch] = useState(200); // Default target 200Hz
+    const [minThreshold, setMinThreshold] = useState(PITCH_PRESETS.feminization.min);
+    const [maxThreshold, setMaxThreshold] = useState(PITCH_PRESETS.feminization.max);
+    const [selectedPreset, setSelectedPreset] = useState('feminization');
     const [isVibrateEnabled, setIsVibrateEnabled] = useState(false);
     const [isToneEnabled, setIsToneEnabled] = useState(false);
 
     // Hooks
     const { triggerHaptic, isSupported: hapticSupported } = useHapticFeedback(isVibrateEnabled);
-    const { playTone, stopTone } = useReferenceTone(isToneEnabled, targetPitch);
+    const { playTone, stopTone } = useReferenceTone(isToneEnabled, minThreshold);
 
     // Animation loop for smooth updates
     const requestRef = useRef();
@@ -48,9 +59,10 @@ const PitchFeedbackTool = () => {
             return;
         }
 
-        const isBelowThreshold = currentPitch > 50 && currentPitch < targetPitch;
+        const hasValidPitch = currentPitch > 50;
+        const isOutsideRange = hasValidPitch && (currentPitch < minThreshold || currentPitch > maxThreshold);
 
-        if (isBelowThreshold) {
+        if (isOutsideRange) {
             // Haptic
             triggerHaptic(200);
 
@@ -63,7 +75,7 @@ const PitchFeedbackTool = () => {
         } else {
             stopTone();
         }
-    }, [currentPitch, targetPitch, isAudioActive, isToneEnabled, triggerHaptic, playTone, stopTone]);
+    }, [currentPitch, minThreshold, maxThreshold, isAudioActive, isToneEnabled, triggerHaptic, playTone, stopTone]);
 
 
 
@@ -76,9 +88,43 @@ const PitchFeedbackTool = () => {
     // Helper for circle color
     const getCircleColor = () => {
         if (currentPitch === 0) return 'border-slate-700 bg-slate-800';
-        if (currentPitch < targetPitch) return 'border-red-500 bg-red-900/20 shadow-[0_0_30px_rgba(239,68,68,0.4)]';
+        if (currentPitch < minThreshold || currentPitch > maxThreshold) return 'border-red-500 bg-red-900/20 shadow-[0_0_30px_rgba(239,68,68,0.4)]';
         return 'border-green-500 bg-green-900/20 shadow-[0_0_30px_rgba(34,197,94,0.4)]';
     };
+
+    const setPresetRange = (presetKey) => {
+        const preset = PITCH_PRESETS[presetKey];
+        setSelectedPreset(presetKey);
+        setMinThreshold(preset.min);
+        setMaxThreshold(preset.max);
+    };
+
+    const handleMinThresholdChange = (value) => {
+        setSelectedPreset('custom');
+        const nextMin = Number(value);
+        setMinThreshold(nextMin);
+        if (nextMin >= maxThreshold) {
+            setMaxThreshold(Math.min(ABSOLUTE_MAX, nextMin + 1));
+        }
+    };
+
+    const handleMaxThresholdChange = (value) => {
+        setSelectedPreset('custom');
+        const nextMax = Number(value);
+        setMaxThreshold(nextMax);
+        if (nextMax <= minThreshold) {
+            setMinThreshold(Math.max(ABSOLUTE_MIN, nextMax - 1));
+        }
+    };
+
+    const hasValidPitch = currentPitch > 0;
+    const pitchStatus = !hasValidPitch
+        ? 'no-signal'
+        : currentPitch < minThreshold
+            ? 'low'
+            : currentPitch > maxThreshold
+                ? 'high'
+                : 'in-range';
 
     return (
         <div className="flex flex-col h-full bg-black text-white p-4 lg:p-8 max-w-4xl mx-auto">
@@ -89,7 +135,7 @@ const PitchFeedbackTool = () => {
                         Haptic Pitch Feedback
                     </h1>
                     <p className="text-slate-400 text-sm mt-1">
-                        Real-time tactile feedback for pitch monitoring
+                        Real-time tactile feedback with configurable target ranges
                     </p>
                 </div>
                 <button
@@ -119,9 +165,9 @@ const PitchFeedbackTool = () => {
                 {/* Stats */}
                 <div className="absolute top-0 w-full flex justify-between px-8 text-sm font-mono">
                     <div className="text-slate-400">
-                        TARGET: <span className="text-white text-lg">{targetPitch} Hz</span>
+                        TARGET RANGE: <span className="text-white text-lg">{minThreshold}–{maxThreshold} Hz</span>
                     </div>
-                    <div className={`${currentPitch > 0 && currentPitch < targetPitch ? 'text-red-400' : 'text-green-400'}`}>
+                    <div className={`${pitchStatus === 'in-range' || pitchStatus === 'no-signal' ? 'text-green-400' : 'text-red-400'}`}>
                         CURRENT: <span className="text-2xl font-bold">{currentPitch > 0 ? currentPitch : '---'} Hz</span>
                     </div>
                 </div>
@@ -146,23 +192,66 @@ const PitchFeedbackTool = () => {
             {/* Controls */}
             <div className="mt-8 bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-sm">
 
-                {/* Threshold Slider */}
+                {/* Presets */}
+                <div className="mb-8">
+                    <div className="flex justify-between mb-2">
+                        <label className="text-sm font-medium text-slate-300">Target Profile</label>
+                        <span className="text-xs text-slate-500">Quick ranges for common goals</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                        {Object.entries(PITCH_PRESETS).map(([key, preset]) => (
+                            <button
+                                key={key}
+                                onClick={() => setPresetRange(key)}
+                                className={`p-3 rounded-lg border text-sm transition-all ${selectedPreset === key
+                                    ? 'border-emerald-500/60 bg-emerald-900/30 text-emerald-300'
+                                    : 'border-slate-700 bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+                                    }`}
+                            >
+                                <div className="font-semibold">{preset.label}</div>
+                                <div className="text-xs mt-1 opacity-80">{preset.min}–{preset.max} Hz</div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Minimum Threshold Slider */}
                 <div className="mb-8">
                     <div className="flex justify-between mb-2">
                         <label className="text-sm font-medium text-slate-300">Minimum Pitch Threshold</label>
-                        <span className="text-xs text-slate-500">Adjust the target pitch floor</span>
+                        <span className="text-xs text-slate-500">Adjust the lower bound</span>
                     </div>
                     <input
                         type="range"
-                        min="80"
-                        max="300"
-                        value={targetPitch}
-                        onChange={(e) => setTargetPitch(Number(e.target.value))}
+                        min={ABSOLUTE_MIN}
+                        max={maxThreshold - 1}
+                        value={minThreshold}
+                        onChange={(e) => handleMinThresholdChange(e.target.value)}
                         className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                     />
                     <div className="flex justify-between text-xs text-slate-500 mt-2 font-mono">
-                        <span>80 Hz</span>
-                        <span>300 Hz</span>
+                        <span>{ABSOLUTE_MIN} Hz</span>
+                        <span>{maxThreshold - 1} Hz</span>
+                    </div>
+                </div>
+
+                {/* Maximum Threshold Slider */}
+                <div className="mb-8">
+                    <div className="flex justify-between mb-2">
+                        <label className="text-sm font-medium text-slate-300">Maximum Pitch Threshold</label>
+                        <span className="text-xs text-slate-500">Adjust the upper bound</span>
+                    </div>
+                    <input
+                        type="range"
+                        min={minThreshold + 1}
+                        max={ABSOLUTE_MAX}
+                        value={maxThreshold}
+                        onChange={(e) => handleMaxThresholdChange(e.target.value)}
+                        className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-500"
+                    />
+                    <div className="flex justify-between text-xs text-slate-500 mt-2 font-mono">
+                        <span>{minThreshold + 1} Hz</span>
+                        <span>{ABSOLUTE_MAX} Hz</span>
                     </div>
                 </div>
 
