@@ -15,6 +15,16 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
     const metricsRef = useRef({ h1: null, h2: null, diff: null, centroid: null });
     const componentId = useId();
 
+    // Cache previous states to prevent DOM thrashing
+    const lastZoneRef = useRef(null);
+    const lastValueRef = useRef(null);
+    const lastMetricsValuesRef = useRef({ h1: null, h2: null, diff: null, centroid: null });
+
+    // Reset zone cache when color mode changes to force class update
+    useEffect(() => {
+        lastZoneRef.current = null;
+    }, [colorBlindMode]);
+
     const loop = useCallback(() => {
         if (indicatorRef.current && valueRef.current && dataRef.current) {
             const { weight, isSilent } = dataRef.current;
@@ -34,33 +44,68 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
             indicatorRef.current.style.left = `${nextLeft}%`;
 
             // Color based on position
-            if (colorBlindMode) {
-                if (nextLeft > 70) {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.8)] transition-colors duration-75 bg-orange-500";
-                } else if (nextLeft < 30) {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.8)] transition-colors duration-75 bg-teal-400";
+            let currentZone = 'neutral';
+            if (nextLeft > 70) currentZone = 'high';
+            else if (nextLeft < 30) currentZone = 'low';
+
+            if (currentZone !== lastZoneRef.current) {
+                lastZoneRef.current = currentZone;
+                if (colorBlindMode) {
+                    if (currentZone === 'high') {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.8)] transition-colors duration-75 bg-orange-500";
+                    } else if (currentZone === 'low') {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.8)] transition-colors duration-75 bg-teal-400";
+                    } else {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)] transition-colors duration-75 bg-purple-500";
+                    }
                 } else {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)] transition-colors duration-75 bg-purple-500";
-                }
-            } else {
-                if (nextLeft > 70) {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(255,100,100,0.8)] transition-colors duration-75 bg-red-500";
-                } else if (nextLeft < 30) {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-blue-400";
-                } else {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 bg-emerald-500";
+                    if (currentZone === 'high') {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(255,100,100,0.8)] transition-colors duration-75 bg-red-500";
+                    } else if (currentZone === 'low') {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-blue-400";
+                    } else {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 bg-emerald-500";
+                    }
                 }
             }
 
-            valueRef.current.innerText = Math.round(target);
+            const roundedTarget = Math.round(target);
+            if (roundedTarget !== lastValueRef.current) {
+                valueRef.current.innerText = roundedTarget;
+                lastValueRef.current = roundedTarget;
+            }
 
             // Update metrics display
             if (dataRef.current.debug) {
                 const { h1, h2, centroid } = dataRef.current.debug;
-                if (metricsRef.current.h1) metricsRef.current.h1.innerText = h1 ? h1.toFixed(1) : '-';
-                if (metricsRef.current.h2) metricsRef.current.h2.innerText = h2 ? h2.toFixed(1) : '-';
-                if (metricsRef.current.diff) metricsRef.current.diff.innerText = (h1 && h2) ? (h1 - h2).toFixed(1) : '-';
-                if (metricsRef.current.centroid) metricsRef.current.centroid.innerText = (centroid !== undefined && centroid !== null) ? centroid : '-';
+
+                // H1
+                const h1Val = h1 ? h1.toFixed(1) : '-';
+                if (metricsRef.current.h1 && h1Val !== lastMetricsValuesRef.current.h1) {
+                    metricsRef.current.h1.innerText = h1Val;
+                    lastMetricsValuesRef.current.h1 = h1Val;
+                }
+
+                // H2
+                const h2Val = h2 ? h2.toFixed(1) : '-';
+                if (metricsRef.current.h2 && h2Val !== lastMetricsValuesRef.current.h2) {
+                    metricsRef.current.h2.innerText = h2Val;
+                    lastMetricsValuesRef.current.h2 = h2Val;
+                }
+
+                // Diff
+                const diffVal = (h1 && h2) ? (h1 - h2).toFixed(1) : '-';
+                if (metricsRef.current.diff && diffVal !== lastMetricsValuesRef.current.diff) {
+                    metricsRef.current.diff.innerText = diffVal;
+                    lastMetricsValuesRef.current.diff = diffVal;
+                }
+
+                // Centroid
+                const centroidVal = (centroid !== undefined && centroid !== null) ? centroid : '-';
+                if (metricsRef.current.centroid && centroidVal !== lastMetricsValuesRef.current.centroid) {
+                    metricsRef.current.centroid.innerText = centroidVal;
+                    lastMetricsValuesRef.current.centroid = centroidVal;
+                }
             }
         }
     }, [dataRef, colorBlindMode]);
