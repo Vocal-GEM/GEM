@@ -1,6 +1,6 @@
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 
 const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRecording = false }) => {
     const { colorBlindMode } = useSettings();
@@ -30,9 +30,9 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
     const pointRef = useRef(null);
     const labelRef = useRef(null);
     const canvasRef = useRef(null);
-
-    const [currentVowel, setCurrentVowel] = useState('');
-    const [hitScore, setHitScore] = useState(0);
+    const progressBarRef = useRef(null);
+    // Optimization: Use ref for hitScore to avoid re-renders on every frame
+    const hitScoreRef = useRef(0);
 
     // Animation Loop
     useEffect(() => {
@@ -113,7 +113,10 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
 
                         // Hit threshold
                         if (distance < 50) {
-                            setHitScore(prev => Math.min(100, prev + 1));
+                            hitScoreRef.current = Math.min(100, hitScoreRef.current + 1);
+                            if (progressBarRef.current) {
+                                progressBarRef.current.style.width = `${hitScoreRef.current}%`;
+                            }
                         }
                     }
 
@@ -122,8 +125,6 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
                         // Move label with point
                         labelRef.current.style.transform = `translate(${x + 15}px, ${y}px)`;
                     }
-
-                    setCurrentVowel(vowel);
                 } else if (pointRef.current) {
                     pointRef.current.style.opacity = '0.1';
                 }
@@ -178,8 +179,9 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
                     <div className="text-xs uppercase tracking-widest text-slate-500 mb-1">Target Resonance</div>
                     <div className="h-2 w-32 bg-slate-800 rounded-full overflow-hidden">
                         <div
+                            ref={progressBarRef}
                             className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
-                            style={{ width: `${hitScore}%` }}
+                            style={{ width: `${hitScoreRef.current}%` }}
                         ></div>
                     </div>
                 </div>
