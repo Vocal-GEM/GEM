@@ -2,9 +2,6 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider, useAuth } from './AuthContext';
 
-// Mock Fetch
-globalThis.fetch = vi.fn();
-
 // Mock IndexedDBManager
 vi.mock('../services/IndexedDBManager', () => ({
     indexedDB: {
@@ -17,6 +14,12 @@ vi.mock('../services/IndexedDBManager', () => ({
 vi.mock('../services/DataSyncService', () => ({
     syncToServer: vi.fn().mockResolvedValue(true),
     syncFromServer: vi.fn().mockResolvedValue(true)
+}));
+
+// Mock runtime config
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: vi.fn().mockReturnValue(true),
+    getBackendUrl: vi.fn().mockReturnValue('http://localhost:5000')
 }));
 
 import { indexedDB } from '../services/IndexedDBManager';
@@ -37,6 +40,8 @@ const TestComponent = () => {
 describe('AuthContext', () => {
     beforeEach(() => {
         vi.resetAllMocks();
+        // Setup fetch mock in beforeEach to survive resetAllMocks
+        globalThis.fetch = vi.fn();
         vi.spyOn(console, 'error').mockImplementation(() => { });
         vi.spyOn(console, 'log').mockImplementation(() => { });
     });
@@ -59,11 +64,14 @@ describe('AuthContext', () => {
     });
 
     it('logs in successfully', async () => {
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
+        fetch.mockImplementation((url) => {
+            if (url.includes('/me')) return Promise.resolve({ ok: false });
+            if (url.includes('/login')) return Promise.resolve({
+                ok: true,
+                json: async () => ({ user: { id: 1, username: 'testuser' } })
+            });
+            return Promise.resolve({ ok: false });
+        });
 
         let result;
         await act(async () => {
@@ -77,11 +85,14 @@ describe('AuthContext', () => {
         const loginBtn = result.getByText('Login');
         await act(async () => {
             loginBtn.click();
+            // Allow state updates to propagate
+            await new Promise(r => setTimeout(r, 100));
         });
 
         await waitFor(() => {
-            expect(result.getByTestId('user').textContent).toBe('testuser');
-        });
+            const userText = result.getByTestId('user').textContent;
+            expect(userText).toBe('testuser');
+        }, { timeout: 3000 });
     });
 
     it('handles login failure', async () => {
@@ -109,12 +120,15 @@ describe('AuthContext', () => {
 
     it('clears local data on logout', async () => {
         // Setup: login first
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
-        fetch.mockResolvedValueOnce({ ok: true }); // logout
+        fetch.mockImplementation((url) => {
+            if (url.includes('/me')) return Promise.resolve({ ok: false });
+            if (url.includes('/login')) return Promise.resolve({
+                ok: true,
+                json: async () => ({ user: { id: 1, username: 'testuser' } })
+            });
+            if (url.includes('/logout')) return Promise.resolve({ ok: true });
+            return Promise.resolve({ ok: false });
+        });
 
         let result;
         await act(async () => {
