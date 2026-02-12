@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { indexedDB } from '../services/IndexedDBManager';
 import { syncToServer, syncFromServer } from '../services/DataSyncService';
+import { isBackendEnabled, getBackendUrl } from '../config/runtime';
 
 const AuthContext = createContext();
 
@@ -9,7 +10,7 @@ export const useAuth = () => useContext(AuthContext);
 // Determine API URL:
 // 1. Use VITE_API_URL if set
 // 2. Fallback to Render URL for easier local dev without running local backend
-const API_URL = import.meta.env.VITE_API_URL || 'https://vocalgem.onrender.com';
+const API_URL = getBackendUrl();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null); // { id, username }
@@ -18,15 +19,14 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const initAuth = async () => {
             try {
-                // Wake up the backend (Render cold-start can take 30-60s)
-                // This ping happens early so signup/login is faster when user reaches it
-                const res = await fetch(`${API_URL}/api/me`, { credentials: 'include' });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.user) {
-                        setUser(data.user);
-                        // Restore user data from server on app load if logged in
-                        await syncFromServer();
+                if (isBackendEnabled()) {
+                    const res = await fetch(`${API_URL}/api/me`, { credentials: 'include' });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.user) {
+                            setUser(data.user);
+                            await syncFromServer();
+                        }
                     }
                 }
             } catch (e) {
@@ -40,6 +40,9 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, password) => {
         try {
+            if (!isBackendEnabled()) {
+                return false;
+            }
             const res = await fetch(`${API_URL}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -62,6 +65,9 @@ export const AuthProvider = ({ children }) => {
 
     const signup = async (username, password) => {
         try {
+            if (!isBackendEnabled()) {
+                return { success: false, error: 'Account signup is unavailable in no-backend mode.' };
+            }
             const res = await fetch(`${API_URL}/api/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -104,14 +110,17 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            // Sync data to server BEFORE clearing (preserve user's progress)
-            console.log('[Auth] Syncing data to server before logout...');
-            await syncToServer();
+            if (isBackendEnabled()) {
+                console.log('[Auth] Syncing data to server before logout...');
+                await syncToServer();
+            }
 
             // Clear local data (so next user starts fresh)
             await clearLocalData();
 
-            await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+            if (isBackendEnabled()) {
+                await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+            }
             setUser(null);
         } catch (e) {
             console.error(e);

@@ -33,22 +33,26 @@ A personal voice coaching application for gender-affirming voice training. Vocal
     npm install
     pip install -r backend/requirements.txt
     ```
-3.  **Start Backend**:
+3.  **(Optional) Start Backend for advanced cloud features**:
     ```bash
     python backend/app.py
     ```
-4.  **Start Frontend**:
+4.  **Start Frontend (local-only by default)**:
     ```bash
     npm run dev
     ```
 5.  **Open App**: Go to `http://localhost:3000` and allow microphone access.
+
+6.  **Backend toggle (optional)**:
+    - Local-only mode (default): do nothing, backend stays disabled.
+    - Enable backend features: set `VITE_ENABLE_BACKEND=true` and optionally `VITE_API_URL=http://localhost:5000`.
 
 ## 🛠️ Tech Stack
 
 *   **Frontend**: React, Vite, Tailwind CSS, Framer Motion
 *   **Visualization**: Three.js (React Three Fiber), Chart.js
 *   **Audio Processing**: Web Audio API, AudioWorklets, Meyda
-*   **Backend**: Python, Flask (for AI and advanced analysis)
+*   **Backend (optional)**: Python, Flask (only for advanced/cloud analysis)
 *   **State Management**: React Context API, Zustand
 
 ## 🧩 Troubleshooting

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Mic, Globe, Activity, CheckCircle, AlertTriangle, XCircle, RefreshCw, Volume2 } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
+import { isBackendEnabled, getBackendUrl } from '../../config/runtime';
 
 const HealthItem = ({ icon: Icon, label, status, message, onFix, isFixing }) => {
     const statusColors = {
@@ -52,7 +53,10 @@ const ToolHealthCheck = () => {
 
     const checkBackend = async () => {
         try {
-            const API_URL = import.meta.env.VITE_API_URL || 'https://vocalgem.onrender.com';
+            if (!isBackendEnabled()) {
+                return { status: 'ok', message: 'Disabled (local mode)' };
+            }
+            const API_URL = getBackendUrl();
             const res = await fetch(`${API_URL}/`); // Root often returns 200 or 404, both mean 'connected' vs network error
             if (res.ok || res.status === 404) {
                 return { status: 'ok', message: 'Connected' };
@@ -167,7 +171,7 @@ const ToolHealthCheck = () => {
 
             <HealthItem
                 icon={Globe}
-                label="Backend API"
+                label="Backend API (optional)"
                 {...checks.backend}
                 onFix={checks.backend.status !== 'ok' ? () => window.location.reload() : undefined}
             />

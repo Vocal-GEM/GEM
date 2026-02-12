@@ -1,4 +1,5 @@
 import { io } from 'socket.io-client';
+import { isBackendEnabled, getBackendUrl } from '../config/runtime';
 import { DSP } from '../utils/DSP';
 import { PitchDetector } from '../utils/PitchDetector';
 import { ResonanceCalculator } from '../utils/ResonanceCalculator';
@@ -114,46 +115,50 @@ export class AudioEngine {
         this.toneEngine = new ToneEngine(this.audioContext);
         this.hapticEngine = new HapticEngine();
 
-        // Initialize Socket
-        const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        this.socket = io(BACKEND_URL, {
-            reconnection: true,
-            reconnectionDelay: 1000,
-            reconnectionDelayMax: 5000,
-            timeout: 20000
-        });
+        // Initialize Socket (optional: disabled by default in no-backend mode)
+        if (isBackendEnabled()) {
+            const BACKEND_URL = getBackendUrl();
+            this.socket = io(BACKEND_URL, {
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000,
+                timeout: 20000
+            });
 
-        this.socket.on('connect', () => {
-            this.debugInfo.socketConnected = true;
-            this.retryCount = 0; // Reset retry count on successful connection
-            this.logConnectionEvent('Connected');
-            this.flushSocketBuffer();
-        });
+            this.socket.on('connect', () => {
+                this.debugInfo.socketConnected = true;
+                this.retryCount = 0;
+                this.logConnectionEvent('Connected');
+                this.flushSocketBuffer();
+            });
 
-        this.socket.on('disconnect', (reason) => {
-            this.debugInfo.socketConnected = false;
-            this.logConnectionEvent(`Disconnected: ${reason}`);
-        });
+            this.socket.on('disconnect', (reason) => {
+                this.debugInfo.socketConnected = false;
+                this.logConnectionEvent(`Disconnected: ${reason}`);
+            });
 
-        this.socket.on('connect_error', (error) => {
-            this.debugInfo.socketConnected = false;
-            this.debugInfo.error = 'Connection failed. Retrying...';
-            this.logConnectionEvent(`Connection error: ${error.message}`);
+            this.socket.on('connect_error', (error) => {
+                this.debugInfo.socketConnected = false;
+                this.debugInfo.error = 'Connection failed. Retrying...';
+                this.logConnectionEvent(`Connection error: ${error.message}`);
 
-            // Exponential backoff retry (max 10 seconds)
-            const retryDelay = Math.min(1000 * Math.pow(2, this.retryCount), 10000);
-            this.retryCount = (this.retryCount || 0) + 1;
+                const retryDelay = Math.min(1000 * Math.pow(2, this.retryCount), 10000);
+                this.retryCount = (this.retryCount || 0) + 1;
 
-            setTimeout(() => {
-                if (!this.debugInfo.socketConnected && this.socket) {
-                    this.socket.connect();
-                }
-            }, retryDelay);
-        });
+                setTimeout(() => {
+                    if (!this.debugInfo.socketConnected && this.socket) {
+                        this.socket.connect();
+                    }
+                }, retryDelay);
+            });
 
-        this.socket.on('analysis_update', (data) => {
-            this.latestBackendAnalysis = { ...data, timestamp: Date.now() };
-        });
+            this.socket.on('analysis_update', (data) => {
+                this.latestBackendAnalysis = { ...data, timestamp: Date.now() };
+            });
+        } else {
+            this.socket = null;
+            this.logConnectionEvent('Backend disabled (local-only mode)');
+        }
 
         // Clinical Metrics
         this.calibrationOffset = 90;

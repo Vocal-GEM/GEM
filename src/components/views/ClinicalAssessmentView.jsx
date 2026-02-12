@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 import { useNavigation } from '../../context/NavigationContext';
+import { isBackendEnabled, getBackendUrl } from '../../config/runtime';
 
 // Rainbow Passage for consistent baseline assessment
 const RAINBOW_PASSAGE = `When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon.`;
@@ -29,7 +30,7 @@ const READING_PASSAGES = {
     }
 };
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE = getBackendUrl();
 
 // Goal presets for voice targets
 const GOAL_PRESETS = {
@@ -229,7 +230,7 @@ const VoiceAssessmentView = () => {
 
     // Backend analysis
     const analyzeWithBackend = async () => {
-        if (!audioBlob) return;
+        if (!audioBlob || !isBackendEnabled()) return;
 
         setIsAnalyzing(true);
         try {

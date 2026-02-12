@@ -13,6 +13,7 @@ import Toast from '../ui/Toast';
 import { CoachEngine } from '../../utils/coachEngine';
 import { getTargetNorms } from '../../data/VoiceNorms';
 import { transcriptionEngine } from '../../utils/transcriptionEngine';
+import { isBackendEnabled, getBackendUrl } from '../../config/runtime';
 
 import ClipCapture from '../ui/ClipCapture';
 
@@ -136,6 +137,10 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
 
             // Try backend analysis first
             try {
+                if (!isBackendEnabled()) {
+                    throw new Error('Backend disabled');
+                }
+
                 const formData = new FormData();
                 formData.append('audio', blob, 'recording.webm');
 
@@ -302,10 +307,15 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
 
         setIsCleaning(true);
         try {
+            if (!isBackendEnabled()) {
+                showToast('Audio cleaning is unavailable in no-backend mode.', 'info');
+                return;
+            }
+
             const formData = new FormData();
             formData.append('audio', currentBlobRef.current, 'audio.wav');
 
-            const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const BACKEND_URL = getBackendUrl();
             const response = await fetch(`${BACKEND_URL}/api/voice-quality/clean`, {
                 method: 'POST',
                 body: formData,
