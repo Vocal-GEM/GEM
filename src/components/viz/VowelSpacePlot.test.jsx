@@ -1,7 +1,6 @@
 import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import VowelSpacePlot from './VowelSpacePlot';
-import React from 'react';
 
 // Mock contexts
 vi.mock('../../context/ProfileContext', () => ({
@@ -18,8 +17,6 @@ vi.mock('../../context/SettingsContext', () => ({
 
 describe('VowelSpacePlot', () => {
   let dataRef;
-  let rafSpy;
-  let cafSpy;
 
   beforeEach(() => {
     dataRef = {
@@ -32,11 +29,11 @@ describe('VowelSpacePlot', () => {
     };
 
     // Mock requestAnimationFrame and cancelAnimationFrame
-    rafSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => {
       // Return an ID
       return 1;
     });
-    cafSpy = vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
 
     // Mock HTMLCanvasElement.prototype.getContext
     const mockContext = {
