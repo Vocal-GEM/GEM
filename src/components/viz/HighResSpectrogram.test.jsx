@@ -1,8 +1,7 @@
-import { render, cleanup, screen } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import HighResSpectrogram from './HighResSpectrogram';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import React from 'react';
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
@@ -71,6 +70,21 @@ describe('HighResSpectrogram', () => {
   it('renders successfully and subscribes to coordinator', () => {
     render(<HighResSpectrogram dataRef={dataRef} />);
     expect(renderCoordinator.subscribe).toHaveBeenCalled();
+  });
+
+  it('draws without error', () => {
+    let drawCallback;
+    renderCoordinator.subscribe.mockImplementation((id, callback) => {
+        drawCallback = callback;
+        return vi.fn();
+    });
+
+    render(<HighResSpectrogram dataRef={dataRef} />);
+
+    expect(drawCallback).toBeDefined();
+
+    // Execute the draw callback to check for runtime errors
+    expect(() => drawCallback()).not.toThrow();
   });
 
   it('cleans up subscription on unmount', () => {
