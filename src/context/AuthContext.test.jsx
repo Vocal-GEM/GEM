@@ -60,10 +60,6 @@ describe('AuthContext', () => {
 
     it('logs in successfully', async () => {
         fetch.mockResolvedValueOnce({ ok: false }); // initial /me
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
 
         let result;
         await act(async () => {
@@ -73,6 +69,11 @@ describe('AuthContext', () => {
                 </AuthProvider>
             );
         });
+
+        fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ user: { id: 1, username: 'testuser' } })
+        }); // login
 
         const loginBtn = result.getByText('Login');
         await act(async () => {
@@ -110,11 +111,6 @@ describe('AuthContext', () => {
     it('clears local data on logout', async () => {
         // Setup: login first
         fetch.mockResolvedValueOnce({ ok: false }); // initial /me
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
-        fetch.mockResolvedValueOnce({ ok: true }); // logout
 
         let result;
         await act(async () => {
@@ -125,6 +121,11 @@ describe('AuthContext', () => {
             );
         });
 
+        fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ user: { id: 1, username: 'testuser' } })
+        }); // login
+
         // Login
         const loginBtn = result.getByText('Login');
         await act(async () => {
@@ -134,6 +135,8 @@ describe('AuthContext', () => {
         await waitFor(() => {
             expect(result.getByTestId('user').textContent).toBe('testuser');
         });
+
+        fetch.mockResolvedValueOnce({ ok: true }); // logout
 
         // Logout
         const logoutBtn = result.getByText('Logout');

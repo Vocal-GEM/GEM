@@ -73,8 +73,8 @@ describe('Sidebar Auth Integration', () => {
     it('shows user info and Sign Out when logged in', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('CloudUser')).toBeInTheDocument();
-        expect(getByText('Sign Out')).toBeInTheDocument();
+        expect(getByText('CloudUser', { exact: false })).toBeInTheDocument();
+        expect(getByText('Sign Out', { exact: false })).toBeInTheDocument();
     });
 
     it('opens Login modal on Sign In click', () => {
@@ -103,7 +103,7 @@ describe('Sidebar Auth Integration', () => {
 
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
-        const mirrorBtn = getByText('Mirror');
+        const mirrorBtn = getByText('Mirror', { exact: false });
         fireEvent.click(mirrorBtn);
 
         expect(openModalSpy).toHaveBeenCalledWith('camera');

@@ -1,7 +1,7 @@
 
 import { describe, it, expect, beforeAll } from 'vitest';
-import { PitchEnsemble } from '../../utils/pitchEnsemble';
-import { FormantTracker } from '../../utils/formantTracker';
+import { PitchEnsemble } from '../../utils/PitchEnsemble';
+import { FormantTracker } from '../../utils/FormantTracker';
 import praatReferences from './praatReferences.json';
 
 // Helper to synthesize audio for testing (since we don't have the actual WAV files in repo)
