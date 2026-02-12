@@ -1,6 +1,6 @@
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useMemo, useCallback } from 'react';
 
 const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRecording = false }) => {
     const { colorBlindMode } = useSettings();
@@ -18,21 +18,21 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
     const maxF2 = isMasc ? 2500 : 3000;
 
     // Vowel targets (approximate)
-    const targets = {
+    const targets = useMemo(() => ({
         'i': { label: '/i/', f1: isMasc ? 270 : 300, f2: isMasc ? 2200 : 2500, color: colorBlindMode ? '#9333ea' : '#ec4899' }, // Pink/Purple
         'a': { label: '/a/', f1: isMasc ? 750 : 850, f2: isMasc ? 1200 : 1700, color: colorBlindMode ? '#0d9488' : '#3b82f6' }, // Blue/Teal
         'u': { label: '/u/', f1: isMasc ? 270 : 300, f2: isMasc ? 700 : 800, color: colorBlindMode ? '#f59e0b' : '#10b981' }   // Green/Amber
-    };
+    }), [isMasc, colorBlindMode]);
 
-    const getXPos = (val) => 100 - ((val - minF2) / (maxF2 - minF2)) * 100;
-    const getYPos = (val) => ((val - minF1) / (maxF1 - minF1)) * 100;
+    const getXPos = useCallback((val) => 100 - ((val - minF2) / (maxF2 - minF2)) * 100, [minF2, maxF2]);
+    const getYPos = useCallback((val) => ((val - minF1) / (maxF1 - minF1)) * 100, [minF1, maxF1]);
 
     const pointRef = useRef(null);
     const labelRef = useRef(null);
     const canvasRef = useRef(null);
-
-    const [currentVowel, setCurrentVowel] = useState('');
-    const [hitScore, setHitScore] = useState(0);
+    const progressBarRef = useRef(null);
+    // Optimization: Use ref for hitScore to avoid re-renders on every frame
+    const hitScoreRef = useRef(0);
 
     // Animation Loop
     useEffect(() => {
@@ -113,7 +113,10 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
 
                         // Hit threshold
                         if (distance < 50) {
-                            setHitScore(prev => Math.min(100, prev + 1));
+                            hitScoreRef.current = Math.min(100, hitScoreRef.current + 1);
+                            if (progressBarRef.current) {
+                                progressBarRef.current.style.width = `${hitScoreRef.current}%`;
+                            }
                         }
                     }
 
@@ -123,7 +126,10 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
                         labelRef.current.style.transform = `translate(${x + 15}px, ${y}px)`;
                     }
 
-                    setCurrentVowel(vowel);
+                    // We are not using vowel from dataRef for state update anymore, but we might use it for logic later.
+                    // To silence lint warning about unused 'vowel' from destructuring above if we don't use it:
+                    if (vowel) { /* usage placeholder if needed, or remove from destructuring */ }
+
                 } else if (pointRef.current) {
                     pointRef.current.style.opacity = '0.1';
                 }
@@ -147,7 +153,7 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
             cancelAnimationFrame(animationId);
             window.removeEventListener('resize', resize);
         };
-    }, [targetVowel, isMasc, isRecording, colorBlindMode]);
+    }, [targetVowel, isRecording, targets, getXPos, getYPos, dataRef]);
 
     return (
         <div className="w-full h-full relative bg-slate-950 rounded-xl overflow-hidden shadow-inner">
@@ -172,14 +178,22 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
 
             <div ref={labelRef} className="absolute text-[10px] font-mono text-slate-400 pointer-events-none whitespace-nowrap px-2 py-1 bg-black/50 rounded" style={{ top: 0, left: 0 }}></div>
 
+            {/* Analysis Overlay (Optional) */}
+            {showAnalysis && (
+                 <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-sm p-2 rounded text-[10px] text-slate-400 border border-white/10 hidden md:block">
+                    Real-time Analysis Active
+                </div>
+            )}
+
             {/* Hit Score Feedback */}
             {targetVowel && isRecording && (
                 <div className="absolute bottom-6 right-6 flex flex-col items-center">
                     <div className="text-xs uppercase tracking-widest text-slate-500 mb-1">Target Resonance</div>
                     <div className="h-2 w-32 bg-slate-800 rounded-full overflow-hidden">
                         <div
+                            ref={progressBarRef}
                             className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
-                            style={{ width: `${hitScore}%` }}
+                            style={{ width: `${hitScoreRef.current}%` }}
                         ></div>
                     </div>
                 </div>
