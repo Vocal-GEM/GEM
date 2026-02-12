@@ -13,15 +13,25 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+vi.mock('lucide-react', async () => {
+    // ESM mock
+    const actual = await vi.importActual('lucide-react');
+
+    // Create a named function for the mock component
+    const createMockIcon = (name) => {
+        function MockIcon(props) {
+            return <div {...props} data-testid={name} />;
+        }
+        MockIcon.displayName = `Mock${name}`;
+        return MockIcon;
+    };
 
     return {
-        Sun: createIcon('Sun'),
-        Moon: createIcon('Moon'),
-        Info: createIcon('Info'),
-        Smile: createIcon('Smile')
+        ...actual,
+        Sun: createMockIcon('Sun'),
+        Moon: createMockIcon('Moon'),
+        Info: createMockIcon('Info'),
+        Smile: createMockIcon('Smile')
     };
 });
 

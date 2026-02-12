@@ -1,8 +1,8 @@
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 
-const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRecording = false }) => {
+const VowelSpacePlot = ({ dataRef, targetVowel = null, isRecording = false }) => {
     const { colorBlindMode } = useSettings();
     const { profile } = useProfile();
 
@@ -10,35 +10,32 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
     const isMasc = profile?.gender === 'masc';
 
     // Scales - Adaptive
-    // Feminine: F1 200-1000, F2 500-3000
-    // Masculine: F1 150-850, F2 500-2500
     const minF1 = isMasc ? 150 : 200;
     const maxF1 = isMasc ? 850 : 1000;
     const minF2 = isMasc ? 500 : 500;
     const maxF2 = isMasc ? 2500 : 3000;
 
-    // Vowel targets (approximate)
-    const targets = {
-        'i': { label: '/i/', f1: isMasc ? 270 : 300, f2: isMasc ? 2200 : 2500, color: colorBlindMode ? '#9333ea' : '#ec4899' }, // Pink/Purple
-        'a': { label: '/a/', f1: isMasc ? 750 : 850, f2: isMasc ? 1200 : 1700, color: colorBlindMode ? '#0d9488' : '#3b82f6' }, // Blue/Teal
-        'u': { label: '/u/', f1: isMasc ? 270 : 300, f2: isMasc ? 700 : 800, color: colorBlindMode ? '#f59e0b' : '#10b981' }   // Green/Amber
-    };
-
-    const getXPos = (val) => 100 - ((val - minF2) / (maxF2 - minF2)) * 100;
-    const getYPos = (val) => ((val - minF1) / (maxF1 - minF1)) * 100;
-
     const pointRef = useRef(null);
     const labelRef = useRef(null);
     const canvasRef = useRef(null);
-
-    const [currentVowel, setCurrentVowel] = useState('');
-    const [hitScore, setHitScore] = useState(0);
+    const hitScoreRef = useRef(0);
+    const progressBarRef = useRef(null);
 
     // Animation Loop
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
+
+        // Vowel targets (approximate)
+        const targets = {
+            'i': { label: '/i/', f1: isMasc ? 270 : 300, f2: isMasc ? 2200 : 2500, color: colorBlindMode ? '#9333ea' : '#ec4899' }, // Pink/Purple
+            'a': { label: '/a/', f1: isMasc ? 750 : 850, f2: isMasc ? 1200 : 1700, color: colorBlindMode ? '#0d9488' : '#3b82f6' }, // Blue/Teal
+            'u': { label: '/u/', f1: isMasc ? 270 : 300, f2: isMasc ? 700 : 800, color: colorBlindMode ? '#f59e0b' : '#10b981' }   // Green/Amber
+        };
+
+        const getXPos = (val) => 100 - ((val - minF2) / (maxF2 - minF2)) * 100;
+        const getYPos = (val) => ((val - minF1) / (maxF1 - minF1)) * 100;
 
         let animationId;
 
@@ -92,7 +89,7 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
 
             // Update User Dot
             if (dataRef && dataRef.current && isRecording) {
-                const { f1, f2, vowel, clarity } = dataRef.current;
+                const { f1, f2, clarity } = dataRef.current;
 
                 if (f1 && f2 && clarity > 0.4) {
                     const x = (getXPos(f2) / 100) * canvas.width;
@@ -113,7 +110,10 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
 
                         // Hit threshold
                         if (distance < 50) {
-                            setHitScore(prev => Math.min(100, prev + 1));
+                            hitScoreRef.current = Math.min(100, hitScoreRef.current + 1);
+                            if (progressBarRef.current) {
+                                progressBarRef.current.style.width = `${hitScoreRef.current}%`;
+                            }
                         }
                     }
 
@@ -122,8 +122,6 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
                         // Move label with point
                         labelRef.current.style.transform = `translate(${x + 15}px, ${y}px)`;
                     }
-
-                    setCurrentVowel(vowel);
                 } else if (pointRef.current) {
                     pointRef.current.style.opacity = '0.1';
                 }
@@ -147,7 +145,7 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
             cancelAnimationFrame(animationId);
             window.removeEventListener('resize', resize);
         };
-    }, [targetVowel, isMasc, isRecording, colorBlindMode]);
+    }, [dataRef, targetVowel, isMasc, isRecording, colorBlindMode, minF1, maxF1, minF2, maxF2]);
 
     return (
         <div className="w-full h-full relative bg-slate-950 rounded-xl overflow-hidden shadow-inner">
@@ -178,8 +176,9 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
                     <div className="text-xs uppercase tracking-widest text-slate-500 mb-1">Target Resonance</div>
                     <div className="h-2 w-32 bg-slate-800 rounded-full overflow-hidden">
                         <div
+                            ref={progressBarRef}
                             className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
-                            style={{ width: `${hitScore}%` }}
+                            style={{ width: `${hitScoreRef.current}%` }}
                         ></div>
                     </div>
                 </div>
