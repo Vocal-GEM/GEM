@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAudio } from '../../../context/AudioContext';
 import { useHapticFeedback } from '../../../hooks/useHapticFeedback';
 import { useReferenceTone } from '../../../hooks/useReferenceTone';
-import { Volume2, Smartphone, TrendingUp, Mic, AlertCircle } from 'lucide-react';
+import { Volume2, Smartphone, Mic, MicOff, AlertCircle } from 'lucide-react';
 
 const PitchFeedbackTool = () => {
     const { dataRef, isAudioActive, toggleAudio, audioError } = useAudio();
@@ -43,6 +43,11 @@ const PitchFeedbackTool = () => {
 
     // Feedback Logic
     useEffect(() => {
+        if (!isAudioActive) {
+            stopTone();
+            return;
+        }
+
         const isBelowThreshold = currentPitch > 50 && currentPitch < targetPitch;
 
         if (isBelowThreshold) {
@@ -58,8 +63,15 @@ const PitchFeedbackTool = () => {
         } else {
             stopTone();
         }
-    }, [currentPitch, targetPitch, isVibrateEnabled, isToneEnabled, triggerHaptic, playTone, stopTone]);
+    }, [currentPitch, targetPitch, isAudioActive, isToneEnabled, triggerHaptic, playTone, stopTone]);
 
+
+
+    useEffect(() => {
+        if (!isAudioActive) {
+            setCurrentPitch(0);
+        }
+    }, [isAudioActive]);
 
     // Helper for circle color
     const getCircleColor = () => {
@@ -80,15 +92,18 @@ const PitchFeedbackTool = () => {
                         Real-time tactile feedback for pitch monitoring
                     </p>
                 </div>
-                {!isAudioActive && (
-                    <button
-                        onClick={toggleAudio}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all"
-                    >
-                        <Mic size={16} />
-                        Start Microphone
-                    </button>
-                )}
+                <button
+                    onClick={toggleAudio}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all ${isAudioActive
+                        ? 'bg-rose-600 hover:bg-rose-500'
+                        : 'bg-blue-600 hover:bg-blue-500'
+                        }`}
+                    aria-pressed={isAudioActive}
+                    aria-label={isAudioActive ? 'Stop listening' : 'Start listening'}
+                >
+                    {isAudioActive ? <MicOff size={16} /> : <Mic size={16} />}
+                    {isAudioActive ? 'Stop Listening' : 'Start Listening'}
+                </button>
             </div>
 
             {audioError && (
@@ -113,7 +128,7 @@ const PitchFeedbackTool = () => {
 
                 {/* Circle */}
                 <div
-                    className={`w-64 h-64 rounded-full border-8 transaction-all duration-200 flex items-center justify-center ${getCircleColor()}`}
+                    className={`w-64 h-64 rounded-full border-8 transition-all duration-200 flex items-center justify-center ${getCircleColor()}`}
                 >
                     <div className="text-center">
                         {currentPitch > 0 ? (
@@ -122,7 +137,7 @@ const PitchFeedbackTool = () => {
                                 <div className="text-xs text-slate-500 uppercase tracking-widest mt-1">Hz</div>
                             </>
                         ) : (
-                            <div className="text-slate-600 italic">Listening...</div>
+                            <div className="text-slate-600 italic">{isAudioActive ? 'Listening...' : 'Microphone paused'}</div>
                         )}
                     </div>
                 </div>
