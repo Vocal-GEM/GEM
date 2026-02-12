@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, Command, ArrowRight, Mic, Activity, Book, Settings, LayoutGrid } from 'lucide-react';
+import { Search, Command, ArrowRight, Mic, Activity, Book, Settings, LayoutGrid, ArrowUp, ArrowDown, CornerDownLeft } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAudio } from '../../context/AudioContext';
 
@@ -110,6 +110,17 @@ const CommandPalette = () => {
     // Handle Keyboard Navigation
     useEffect(() => {
         const handleKeyDown = (e) => {
+            // Toggle Command Palette with Cmd+K or Ctrl+K
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                if (isOpen) {
+                    closeModal('commandPalette');
+                } else {
+                    openModal('commandPalette');
+                }
+                return;
+            }
+
             if (!isOpen) return;
 
             if (e.key === 'ArrowDown') {
@@ -140,13 +151,19 @@ const CommandPalette = () => {
             <div
                 className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
                 onClick={() => closeModal('commandPalette')}
+                aria-hidden="true"
             />
 
             {/* Palette */}
-            <div className="w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden relative z-10 animate-in zoom-in-95 duration-200 flex flex-col max-h-[60vh]">
+            <div
+                className="w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden relative z-10 animate-in zoom-in-95 duration-200 flex flex-col max-h-[60vh]"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Command Palette"
+            >
                 {/* Search Input */}
                 <div className="flex items-center px-4 py-4 border-b border-slate-800 gap-3">
-                    <Search className="text-slate-400 w-5 h-5" />
+                    <Search className="text-slate-400 w-5 h-5" aria-hidden="true" />
                     <input
                         ref={inputRef}
                         type="text"
@@ -154,6 +171,11 @@ const CommandPalette = () => {
                         className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-slate-500 text-lg"
                         value={query}
                         onChange={(e) => { setQuery(e.target.value); setSelectedIndex(0); }}
+                        role="combobox"
+                        aria-autocomplete="list"
+                        aria-expanded="true"
+                        aria-controls="command-results"
+                        aria-activedescendant={filteredActions[selectedIndex] ? `cmd-${filteredActions[selectedIndex].id}` : undefined}
                     />
                     <div className="hidden sm:flex items-center gap-1">
                         <kbd className="px-2 py-1 bg-slate-800 rounded text-xs text-slate-400 font-mono">ESC</kbd>
@@ -161,9 +183,13 @@ const CommandPalette = () => {
                 </div>
 
                 {/* Results List */}
-                <div className="overflow-y-auto custom-scrollbar p-2">
+                <div
+                    id="command-results"
+                    role="listbox"
+                    className="overflow-y-auto custom-scrollbar p-2"
+                >
                     {filteredActions.length === 0 ? (
-                        <div className="p-8 text-center text-slate-500">
+                        <div className="p-8 text-center text-slate-500" role="status">
                             No results found.
                         </div>
                     ) : (
@@ -171,14 +197,18 @@ const CommandPalette = () => {
                             {filteredActions.map((action, index) => (
                                 <button
                                     key={action.id}
+                                    id={`cmd-${action.id}`}
                                     onClick={() => handleSelect(action)}
                                     className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-left group ${index === selectedIndex ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'
                                         }`}
                                     onMouseEnter={() => setSelectedIndex(index)}
+                                    role="option"
+                                    aria-selected={index === selectedIndex}
+                                    tabIndex={-1}
                                 >
                                     <div className="flex items-center gap-3">
                                         <div className={`p-2 rounded-lg ${index === selectedIndex ? 'bg-white/20' : 'bg-slate-800 group-hover:bg-slate-700'}`}>
-                                            <action.icon size={18} />
+                                            <action.icon size={18} aria-hidden="true" />
                                         </div>
                                         <div>
                                             <div className={`font-medium ${index === selectedIndex ? 'text-white' : 'text-slate-200'}`}>
@@ -190,7 +220,7 @@ const CommandPalette = () => {
                                         </div>
                                     </div>
                                     {index === selectedIndex && (
-                                        <ArrowRight size={16} className="animate-in slide-in-from-left-2 fade-in" />
+                                        <ArrowRight size={16} className="animate-in slide-in-from-left-2 fade-in" aria-hidden="true" />
                                     )}
                                 </button>
                             ))}
@@ -199,9 +229,9 @@ const CommandPalette = () => {
                 </div>
 
                 {/* Footer */}
-                <div className="px-4 py-2 bg-slate-950/50 border-t border-slate-800 text-xs text-slate-500 flex justify-between">
-                    <span>Use <kbd className="font-mono">Γåæ</kbd> to navigate</span>
-                    <span><kbd className="font-mono">Γå╡</kbd> to select</span>
+                <div className="px-4 py-2 bg-slate-950/50 border-t border-slate-800 text-xs text-slate-500 flex justify-between items-center">
+                    <span className="flex items-center gap-1">Use <kbd className="font-mono bg-slate-800 px-1 rounded flex items-center gap-0.5 border border-slate-700 text-slate-400"><ArrowUp size={10} /><ArrowDown size={10} /></kbd> to navigate</span>
+                    <span className="flex items-center gap-1"><kbd className="font-mono bg-slate-800 px-1 rounded flex items-center border border-slate-700 text-slate-400"><CornerDownLeft size={10} /></kbd> to select</span>
                 </div>
             </div>
         </div>,
