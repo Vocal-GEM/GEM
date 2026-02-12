@@ -1,102 +1,80 @@
-import { render, cleanup, screen } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Spectrogram3D from './Spectrogram3D';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import React from 'react';
-import * as THREE from 'three';
 
-// Mock Three.js to avoid WebGL context issues in tests
-vi.mock('three', async () => {
-    const actual = await vi.importActual('three');
-    return {
-        ...actual,
-        Color: class {
-            constructor() {
-                this.r = 0;
-                this.g = 0;
-                this.b = 0;
-            }
-            setHSL(h, s, l) {
-                // Mock implementation
-                this.r = h;
-                this.g = s;
-                this.b = l;
-            }
-        },
-        BufferAttribute: class {
-            constructor(array, itemSize) {
-                this.array = array;
-                this.itemSize = itemSize;
-                this.needsUpdate = false;
-            }
-            setY(index, val) {
-                this.array[index * 3 + 1] = val;
-            }
-            setXYZ(index, x, y, z) {
-                this.array[index * 3] = x;
-                this.array[index * 3 + 1] = y;
-                this.array[index * 3 + 2] = z;
-            }
-        },
-        Float32BufferAttribute: class {
-            constructor(array, itemSize) {
-                this.array = array;
-                this.itemSize = itemSize;
-            }
-        }
-    };
-});
-
-// Mock Canvas and useFrame
-// Also mock primitives to avoid console warnings about unknown elements
-vi.mock('@react-three/fiber', () => ({
-    Canvas: ({ children }) => <div>{children}</div>,
-    useFrame: (cb) => {
-        // Expose callback for testing
-        global.mockUseFrameCallback = cb;
+// Mock dependencies
+vi.mock('../../services/RenderCoordinator', () => ({
+    renderCoordinator: {
+        subscribe: vi.fn(() => vi.fn()),
+        PRIORITY: { LOW: 3 }
     }
 }));
 
-// Mock Drei
-vi.mock('@react-three/drei', () => ({
-    OrbitControls: () => null,
-    PerspectiveCamera: () => null
-}));
+// Mock Three.js
+vi.mock('three', () => {
+    return {
+        Scene: vi.fn(),
+        PerspectiveCamera: vi.fn(),
+        WebGLRenderer: vi.fn(() => ({
+            setSize: vi.fn(),
+            render: vi.fn(),
+            domElement: document.createElement('canvas'),
+            dispose: vi.fn()
+        })),
+        Color: vi.fn(),
+        FogExp2: vi.fn(),
+        BufferGeometry: vi.fn(() => ({
+            setAttribute: vi.fn(),
+            setIndex: vi.fn()
+        })),
+        Float32BufferAttribute: vi.fn(),
+        MeshStandardMaterial: vi.fn(),
+        Mesh: vi.fn(() => ({
+            rotation: { x: 0 },
+            position: { y: 0 }
+        })),
+        AmbientLight: vi.fn(),
+        DirectionalLight: vi.fn(() => ({
+            position: { set: vi.fn() }
+        })),
+        GridHelper: vi.fn()
+    };
+});
 
-// Setup global requestAnimationFrame mock
-global.requestAnimationFrame = (cb) => setTimeout(cb, 16);
+// Mock requestAnimationFrame
+const mockRequestAnimationFrame = vi.fn();
+globalThis.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('Spectrogram3D', () => {
     let dataRef;
 
     beforeEach(() => {
-        dataRef = {
-            current: {
-                spectrum: new Float32Array(1024).fill(0.5)
-            }
-        };
+        dataRef = { current: { spectrum: new Uint8Array(1024).fill(0) } };
+        // Mock container dimensions
+        Element.prototype.getBoundingClientRect = vi.fn(() => ({
+            width: 800,
+            height: 600,
+            top: 0,
+            left: 0
+        }));
+        vi.clearAllMocks();
     });
 
     afterEach(() => {
         cleanup();
         vi.clearAllMocks();
-        delete global.mockUseFrameCallback;
     });
 
     it('renders successfully', () => {
-        render(<Spectrogram3D dataRef={dataRef} />);
-        expect(screen.getByText(/3D Visualization/i)).toBeDefined();
+        const { container } = render(<Spectrogram3D dataRef={dataRef} />);
+        expect(container.querySelector('div')).toBeInTheDocument();
     });
 
-    it('runs the animation loop safely', () => {
+    it('subscribes to RenderCoordinator', async () => {
         render(<Spectrogram3D dataRef={dataRef} />);
-
-        // Ensure useFrame callback was captured
-        expect(global.mockUseFrameCallback).toBeDefined();
-
-        // Execute the frame callback (simulation)
-        // This should not throw even if meshRef is undefined (thanks to our safety checks)
-        if (global.mockUseFrameCallback) {
-            expect(() => global.mockUseFrameCallback()).not.toThrow();
-        }
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(renderCoordinator.subscribe).toHaveBeenCalled();
     });
 });
