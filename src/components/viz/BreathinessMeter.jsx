@@ -40,8 +40,6 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const zoneRef = useRef(null);
     const feedbackRef = useRef(null);
     const lastValueRef = useRef(50);
-    const componentId = useId();
-    const id = useId();
 
     // NEW: Refs for OQ and ventricular displays
     const oqValueRef = useRef(null);
@@ -49,17 +47,10 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const oqIndicatorRef = useRef(null);
     const lastOqRef = useRef(50);
     const ventricularRef = useRef(null);
-    const componentId = useId();
 
     // Optimized: Use RenderCoordinator to manage animation loop
     useEffect(() => {
-        const update = () => {
-            if (!dataRef.current) return;
-        const updateMeter = () => {
-            if (!dataRef.current) return;
         const loop = () => {
-            if (!dataRef.current) return;
-        const loop = (delta, currentTime) => {
             if (!dataRef.current) {
                 return;
             }
@@ -163,44 +154,18 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
             }
         };
 
-        const unsubscribe = renderCoordinator.subscribe(
-            componentId,
-            update,
-            renderCoordinator.PRIORITY.MEDIUM
-        );
-
-        return unsubscribe;
-    }, [dataRef, colorBlindMode, componentId]);
         };
 
         const unsubscribe = renderCoordinator.subscribe(
-            componentId,
-            updateMeter,
-
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `BreathinessMeter-${componentId}`,
-            loop,
-            renderCoordinator.PRIORITY.MEDIUM
-        );
-
-        return () => unsubscribe();
-    }, [dataRef, colorBlindMode, componentId]);
             `breathiness-meter-${componentId}`,
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `breathiness-meter-${id}`,
             loop,
-            renderCoordinator.PRIORITY.CRITICAL
+            renderCoordinator.PRIORITY.MEDIUM
         );
 
         return () => {
             unsubscribe();
         };
     }, [dataRef, colorBlindMode, componentId]);
-    }, [dataRef, colorBlindMode, id]);
 
     // Determine if in sweet spot for static rendering
     const breathinessGrbas = dataRef.current?.breathinessGrbas;
