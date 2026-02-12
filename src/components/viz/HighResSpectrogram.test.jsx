@@ -73,6 +73,21 @@ describe('HighResSpectrogram', () => {
     expect(renderCoordinator.subscribe).toHaveBeenCalled();
   });
 
+  it('draws without error', () => {
+    let drawCallback;
+    renderCoordinator.subscribe.mockImplementation((id, callback) => {
+        drawCallback = callback;
+        return vi.fn();
+    });
+
+    render(<HighResSpectrogram dataRef={dataRef} />);
+
+    expect(drawCallback).toBeDefined();
+
+    // Execute the draw callback to check for runtime errors
+    expect(() => drawCallback()).not.toThrow();
+  });
+
   it('cleans up subscription on unmount', () => {
     const unsubscribe = vi.fn();
     renderCoordinator.subscribe.mockReturnValue(unsubscribe);
