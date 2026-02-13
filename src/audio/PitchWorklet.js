@@ -1,3 +1,4 @@
+/* global currentTime */
 /**
  * PitchWorklet.js
  * AudioWorklet processor for ultra-low-latency pitch detection
@@ -48,12 +49,12 @@ class PitchProcessor extends AudioWorkletProcessor {
 
             // Process when buffer is full
             if (this.bufferIndex >= this.bufferSize) {
-                const startTime = globalThis.currentTime;
+                const startTime = currentTime;
 
                 // Detect pitch using YIN algorithm
                 const result = this.detectPitchYIN(this.buffer);
 
-                const processingTime = (globalThis.currentTime - startTime) * 1000; // Convert to ms
+                const processingTime = (currentTime - startTime) * 1000; // Convert to ms
                 this.totalProcessTime += processingTime;
                 this.processCount++;
 
@@ -62,7 +63,7 @@ class PitchProcessor extends AudioWorkletProcessor {
                     type: 'pitch',
                     pitch: result.pitch,
                     confidence: result.confidence,
-                    timestamp: globalThis.currentTime,
+                    timestamp: currentTime,
                     latency: processingTime,
                     avgLatency: this.totalProcessTime / this.processCount
                 });

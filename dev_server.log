@@ -130,3 +130,11 @@
 7:54:26 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
 7:56:05 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
 7:56:46 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+8:27:20 AM [vite] page reload src/components/ui/button.test.jsx
+8:28:05 AM [vite] page reload src/services/ResearchMode.js
+8:28:51 AM [vite] page reload src/services/PrivacyManager.js
+8:29:37 AM [vite] page reload src/services/PrivacyManager.js
+8:32:47 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+8:34:33 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+8:35:58 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+8:37:25 AM [vite] page reload src/audio/PitchWorklet.js
