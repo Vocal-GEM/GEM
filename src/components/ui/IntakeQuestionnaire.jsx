@@ -393,12 +393,12 @@ const SummaryStep = ({ data }) => (
                 data.onHRT ? 'HRT' : null,
                 data.hasHadVFS ? 'Surgery' : null,
                 data.singingExperience !== 'none' ? `Singer (${data.singingExperience})` : null
-            ].filter(Boolean).join(', ') || 'None'} />
+            ].filter(Boolean).join(', ') || &apos;None&apos;} />
             <SummaryRow label="Learning Style" value={data.selfReportedStyle} />
         </div>
 
         <p className="text-center text-gray-400 mt-4">
-            Click "Complete Profile" to generate your personalized roadmap.
+            Click &quot;Complete Profile&quot; to generate your personalized roadmap.
         </p>
     </div>
 );

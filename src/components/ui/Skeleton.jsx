@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 /**
  * Skeleton - Animated loading placeholder
