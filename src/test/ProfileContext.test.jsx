@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, act, renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { ProfileProvider, useProfile } from '../context/ProfileContext';
 import { indexedDB } from '../services/IndexedDBManager';
 
@@ -91,7 +91,6 @@ describe('ProfileContext Integration', () => {
                 expect(result.current.voiceProfiles.length).toBeGreaterThan(1);
             }, { timeout: 4000 });
 
-            // Create a new profile to switch to
             // Create a new profile to switch to
             act(() => {
                 result.current.switchProfile('p2');
