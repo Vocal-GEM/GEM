@@ -6,9 +6,10 @@ const PRIVACY_KEY = 'gem_privacy_settings';
 
 const DEFAULT_SETTINGS = {
     shareProgress: false,
-    shareProgress: false,
+    shareMilestones: false, // Assuming this was the intent of the duplicate
     showInLeaderboards: false,
-    dataRetentionDays: 90
+    dataRetentionDays: 90,
+    profileVisibility: 'private' // Default safety
 };
 
 class PrivacyManager {
@@ -77,7 +78,5 @@ class PrivacyManager {
 
     }
 }
-
-
 
 export default new PrivacyManager();
