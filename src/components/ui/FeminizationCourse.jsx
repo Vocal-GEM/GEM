@@ -3,6 +3,7 @@ import { ArrowLeft, BookOpen, PlayCircle, CheckCircle, Lock } from 'lucide-react
 import { COURSE_DATA } from '../../data/courseData';
 import LessonView from './LessonView';
 import FeedbackModal from './FeedbackModal';
+import Breadcrumbs from './Breadcrumbs';
 
 const FeminizationCourse = ({ onClose }) => {
     const [activeLesson, setActiveLesson] = useState(null);
@@ -114,6 +115,13 @@ const FeminizationCourse = ({ onClose }) => {
             currentLessonIndex > 0 ||
             currentModuleIndex > 0;
 
+        const currentModule = COURSE_DATA.find(m => m.lessons.some(l => l.id === activeLesson.id));
+        const breadcrumbItems = [
+            { label: 'Course', action: () => setActiveLesson(null) },
+            { label: currentModule?.title || 'Module', action: () => setActiveLesson(null) },
+            { label: activeLesson.title, action: null }
+        ];
+
         return (
             <div className="fixed inset-0 z-[60] bg-slate-950 flex flex-col animate-in slide-in-from-right duration-300">
                 <div className="p-4 border-b border-white/10 flex items-center gap-4 bg-slate-950/90 backdrop-blur-xl">
@@ -124,8 +132,7 @@ const FeminizationCourse = ({ onClose }) => {
                         <ArrowLeft className="w-6 h-6 text-slate-400" />
                     </button>
                     <div className="flex-1">
-                        <h1 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Course Mode</h1>
-                        <p className="text-white font-bold">{activeLesson.title}</p>
+                        <Breadcrumbs items={breadcrumbItems} className="mb-0" />
                     </div>
                     <div className="w-32 h-2 bg-slate-800 rounded-full overflow-hidden">
                         <div

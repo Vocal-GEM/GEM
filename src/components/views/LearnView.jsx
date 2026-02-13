@@ -30,6 +30,8 @@ const GenderPerceptionInfoView = lazy(() => import('./learn/GenderPerceptionInfo
 import ModuleNotes from '../ui/ModuleNotes';
 import QuizView from '../ui/QuizView';
 import { quizService } from '../../services/QuizService';
+import Breadcrumbs from '../ui/Breadcrumbs';
+import { useNavigation } from '../../context/NavigationContext';
 
 
 /**
@@ -39,6 +41,7 @@ import { quizService } from '../../services/QuizService';
  * articles about each voice training concept.
  */
 const LearnView = () => {
+    const { navigate } = useNavigation();
     const [activeModule, setActiveModule] = useState(null);
     const [showQuiz, setShowQuiz] = useState(false);
     const [quizProgress, setQuizProgress] = useState(null);
@@ -203,17 +206,17 @@ const LearnView = () => {
         const module = modules.find(m => m.id === activeModule);
         const ModuleComponent = module?.component;
 
+        const breadcrumbItems = [
+            { label: 'Dashboard', action: () => navigate('dashboard') },
+            { label: 'Learn', action: () => setActiveModule(null) },
+            { label: module?.title || 'Module', action: null }
+        ];
+
         return (
             <div className="min-h-screen pb-20">
                 {/* Back Navigation */}
                 <div className="sticky top-0 z-10 bg-slate-950/90 backdrop-blur-lg border-b border-slate-800/50 px-4 lg:px-8 py-4">
-                    <button
-                        onClick={() => setActiveModule(null)}
-                        className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group"
-                    >
-                        <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                        <span>Back to Learn</span>
-                    </button>
+                    <Breadcrumbs items={breadcrumbItems} className="mb-0" />
                 </div>
 
                 {/* Module Content */}
@@ -230,8 +233,14 @@ const LearnView = () => {
     }
 
     // Main hub view
+    const hubBreadcrumbs = [
+        { label: 'Dashboard', action: () => navigate('dashboard') },
+        { label: 'Learn', action: null }
+    ];
+
     return (
         <div className="p-4 lg:p-8 max-w-6xl mx-auto pb-20">
+            <Breadcrumbs items={hubBreadcrumbs} className="mb-4" />
             {/* Header */}
             <div className="mb-8">
                 <div className="flex items-center gap-3 mb-4">

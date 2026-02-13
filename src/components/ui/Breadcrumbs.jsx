@@ -1,13 +1,21 @@
 import { ChevronRight, Home } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
 
-const Breadcrumbs = () => {
+const Breadcrumbs = ({ items, className }) => {
     const { history, navigate, activeView, practiceTab, switchPracticeTab } = useNavigation();
 
-    // Don't show on Dashboard
-    if (activeView === 'dashboard') return null;
+    // If custom items are provided, use them
+    let displayHistory = items;
 
-    let displayHistory = history;
+    // If no custom items, use context history
+    if (!displayHistory) {
+        // Don't show on Dashboard (default behavior)
+        if (activeView === 'dashboard') return null;
+        // Don't show global breadcrumbs on Learn view (it manages its own)
+        if (activeView === 'learn') return null;
+
+        displayHistory = history;
+    }
 
     if (displayHistory.length === 0) {
         // Default Breadcrumb Logic
@@ -26,7 +34,7 @@ const Breadcrumbs = () => {
     }
 
     return (
-        <nav className="flex items-center text-sm text-slate-400 mb-4 animate-in fade-in slide-in-from-left-2" aria-label="Breadcrumb">
+        <nav className={`flex items-center text-sm text-slate-400 animate-in fade-in slide-in-from-left-2 ${className || 'mb-4'}`} aria-label="Breadcrumb">
             <ol className="flex items-center gap-2">
                 {displayHistory.map((item, index) => {
                     const isLast = index === displayHistory.length - 1;
