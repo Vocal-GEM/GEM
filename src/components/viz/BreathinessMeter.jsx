@@ -161,7 +161,6 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
             unsubscribe();
         };
     }, [dataRef, colorBlindMode, componentId]);
-    }, [dataRef, colorBlindMode, id]);
 
     // Determine if in sweet spot for static rendering
     const breathinessGrbas = dataRef.current?.breathinessGrbas;

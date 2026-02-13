@@ -4,8 +4,6 @@
  * Runs in dedicated audio thread for <50ms latency
  */
 
-/* global AudioWorkletProcessor, registerProcessor */
-
 class PitchProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
