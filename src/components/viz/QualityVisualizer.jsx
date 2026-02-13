@@ -35,10 +35,6 @@ const QualityVisualizer = ({ dataRef }) => {
         // Shimmer > 0.35 dB (or 3-4%) is often considered rough.
         // Assuming the engine returns raw values.
 
-    const loop = useCallback(() => {
-        if (!dataRef.current) return;
-        const data = dataRef.current;
-
         setMetrics({
             jitter: data.jitter || 0,
             shimmer: data.shimmer || 0,
