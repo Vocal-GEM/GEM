@@ -1,4 +1,4 @@
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider, useAuth } from './AuthContext';
 
@@ -19,8 +19,13 @@ vi.mock('../services/DataSyncService', () => ({
     syncFromServer: vi.fn().mockResolvedValue(true)
 }));
 
+// Mock runtime config to enable backend
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: () => true,
+    getBackendUrl: () => 'http://localhost:5000'
+}));
+
 import { indexedDB } from '../services/IndexedDBManager';
-import { syncToServer, syncFromServer } from '../services/DataSyncService';
 
 const TestComponent = () => {
     const { user, login, signup, logout } = useAuth();
@@ -39,6 +44,7 @@ describe('AuthContext', () => {
         vi.resetAllMocks();
         vi.spyOn(console, 'error').mockImplementation(() => { });
         vi.spyOn(console, 'log').mockImplementation(() => { });
+        vi.spyOn(console, 'warn').mockImplementation(() => { });
     });
 
     it('initializes with null user if /me fails', async () => {
@@ -149,4 +155,3 @@ describe('AuthContext', () => {
         });
     });
 });
-
