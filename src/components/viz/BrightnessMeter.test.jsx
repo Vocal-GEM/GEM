@@ -13,9 +13,15 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+vi.mock('lucide-react', async () => {
+    // Use importActual to get the real React if needed, but here we just need React for createElement
+    // In ESM/Vite, we avoid require().
+    // We can just return a simple object with mock components.
+    const createIcon = (name) => {
+        const IconMock = (props) => <div {...props} data-testid={name} />;
+        IconMock.displayName = name; // Satisfies react/display-name
+        return IconMock;
+    };
 
     return {
         Sun: createIcon('Sun'),
