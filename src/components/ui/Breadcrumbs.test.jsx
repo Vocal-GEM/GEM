@@ -95,4 +95,39 @@ describe('Breadcrumbs', () => {
         expect(screen.getByText('Practice')).toBeInTheDocument();
         expect(screen.getByText('Pitch Tool')).toBeInTheDocument();
     });
+
+    it('should render custom items when provided via props', () => {
+        const customItems = [
+            { label: 'Root', action: vi.fn() },
+            { label: 'Level 1', action: null }
+        ];
+
+        useNavigation.mockReturnValue({
+            history: [],
+            navigate: mockNavigate,
+            activeView: 'dashboard' // Normally hidden
+        });
+
+        render(<Breadcrumbs items={customItems} />);
+
+        expect(screen.getByText('Root')).toBeInTheDocument();
+        expect(screen.getByText('Level 1')).toBeInTheDocument();
+    });
+
+    it('should apply custom className', () => {
+        useNavigation.mockReturnValue({
+            history: [],
+            navigate: mockNavigate,
+            activeView: 'practice',
+            practiceTab: 'overview',
+            switchPracticeTab: mockSwitchPracticeTab
+        });
+
+        const { container } = render(<Breadcrumbs className="custom-class" />);
+        // Find the nav element
+        const nav = container.querySelector('nav');
+        expect(nav).toHaveClass('custom-class');
+        // Default class should be overridden
+        expect(nav.classList.contains('mb-4')).toBe(false);
+    });
 });

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Suspense, lazy, useCallback } from 'react';
+import { useState, useEffect, useRef, Suspense, lazy, useCallback, useMemo } from 'react';
 import { Play, Square, Mic, Volume2, Activity, BarChart2, RefreshCw, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer, Sparkles, MessageCircle, Target, Radio } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '../../context/NavigationContext';
@@ -64,7 +64,9 @@ const PracticeMode = ({
         practiceTab,
         switchPracticeTab,
         openModal,
-        navigationParams
+        navigationParams,
+        setBreadcrumbs,
+        navigate
     } = useNavigation();
     const { t } = useTranslation();
 
@@ -291,7 +293,7 @@ const PracticeMode = ({
     }, [isAudioActive, dataRef]);
 
     // Tabs Configuration
-    const TABS = [
+    const TABS = useMemo(() => [
         { id: 'overview', label: t('practiceMode.tabs.overview'), icon: Activity },
         { id: 'pitch', label: t('practiceMode.tabs.pitch'), icon: Mic2 },
         { id: 'resonance', label: t('practiceMode.tabs.resonance'), icon: Volume2 },
@@ -301,7 +303,26 @@ const PracticeMode = ({
         { id: 'spectrogram', label: t('practiceMode.tabs.spectrogram'), icon: Activity },
         { id: 'training', label: t('practiceMode.tabs.training', 'Training'), icon: Dumbbell },
         { id: 'assessment', label: t('practiceMode.actions.assessment', 'Assessment'), icon: ClipboardCheck },
-    ];
+    ], [t]);
+
+    // Update Breadcrumbs with localized labels
+    useEffect(() => {
+        const currentTab = TABS.find(t => t.id === practiceTab);
+        const tabLabel = currentTab ? currentTab.label : practiceTab;
+
+        const crumbs = [
+            { label: 'Dashboard', action: () => navigate('dashboard') },
+            { label: 'Practice', action: () => switchPracticeTab('overview') }
+        ];
+
+        if (practiceTab !== 'overview') {
+            crumbs.push({ label: tabLabel, action: null });
+        } else {
+            crumbs[1].action = null;
+        }
+
+        setBreadcrumbs(crumbs);
+    }, [practiceTab, navigate, switchPracticeTab, setBreadcrumbs, TABS]);
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 relative">

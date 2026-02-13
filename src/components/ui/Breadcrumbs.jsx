@@ -1,32 +1,38 @@
 import { ChevronRight, Home } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
 
-const Breadcrumbs = () => {
-    const { history, navigate, activeView, practiceTab, switchPracticeTab } = useNavigation();
+const Breadcrumbs = ({ items, className }) => {
+    const { history, breadcrumbs, navigate, activeView, practiceTab, switchPracticeTab } = useNavigation();
 
-    // Don't show on Dashboard
-    if (activeView === 'dashboard') return null;
+    // Priority: Props > Context > History (Default)
+    let displayHistory = items || breadcrumbs;
 
-    let displayHistory = history;
+    // Only run default logic if no items are provided
+    if (!displayHistory) {
+        // Don't show on Dashboard (default behavior)
+        if (activeView === 'dashboard') return null;
 
-    if (displayHistory.length === 0) {
-        // Default Breadcrumb Logic
-        displayHistory = [{ label: 'Dashboard', action: () => navigate('dashboard') }];
+        displayHistory = history;
 
-        if (activeView === 'practice') {
-            if (practiceTab && practiceTab !== 'overview') {
-                 displayHistory.push({ label: 'Practice', action: () => switchPracticeTab('overview') });
-                 displayHistory.push({ label: practiceTab.charAt(0).toUpperCase() + practiceTab.slice(1), action: null });
+        if (displayHistory.length === 0) {
+            // Default Breadcrumb Logic
+            displayHistory = [{ label: 'Dashboard', action: () => navigate('dashboard') }];
+
+            if (activeView === 'practice') {
+                if (practiceTab && practiceTab !== 'overview') {
+                    displayHistory.push({ label: 'Practice', action: () => switchPracticeTab('overview') });
+                    displayHistory.push({ label: practiceTab.charAt(0).toUpperCase() + practiceTab.slice(1), action: null });
+                } else {
+                    displayHistory.push({ label: 'Practice', action: null });
+                }
             } else {
-                 displayHistory.push({ label: 'Practice', action: null });
+                displayHistory.push({ label: activeView.charAt(0).toUpperCase() + activeView.slice(1), action: null });
             }
-        } else {
-             displayHistory.push({ label: activeView.charAt(0).toUpperCase() + activeView.slice(1), action: null });
         }
     }
 
     return (
-        <nav className="flex items-center text-sm text-slate-400 mb-4 animate-in fade-in slide-in-from-left-2" aria-label="Breadcrumb">
+        <nav className={`flex items-center text-sm text-slate-400 animate-in fade-in slide-in-from-left-2 ${className || 'mb-4'}`} aria-label="Breadcrumb">
             <ol className="flex items-center gap-2">
                 {displayHistory.map((item, index) => {
                     const isLast = index === displayHistory.length - 1;
