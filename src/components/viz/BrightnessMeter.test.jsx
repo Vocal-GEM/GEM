@@ -13,9 +13,17 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+vi.mock('lucide-react', async () => {
+    // We can't use require or await import safely here in all environments without issues.
+    // Instead, return a simple mock object. Since we're using React.createElement in the functional component,
+    // we can simulate it or just return a dummy component.
+    // However, to be safe and avoid React import issues inside mock factory:
+
+    const createIcon = (name) => {
+        const Icon = (props) => <div data-testid={name} {...props} />;
+        Icon.displayName = name;
+        return Icon;
+    };
 
     return {
         Sun: createIcon('Sun'),
