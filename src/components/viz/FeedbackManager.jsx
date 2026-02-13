@@ -1,16 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import CelebrationAnimations from '../ui/CelebrationAnimations';
 import DriftAlert from '../ui/DriftAlert';
 import { getAdaptiveFeedbackController } from '../../services/AdaptiveFeedback';
 import FlowStateDetector from '../../utils/FlowStateDetector';
+import HapticFeedback from '../../services/HapticFeedback';
 
 const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     const { settings } = useSettings();
-    const [alert, setAlert] = useState(null);
     const [celebration, setCelebration] = useState(null);
     const flowDetector = useRef(null);
     const adaptiveController = useRef(null);
+
+    // Performance Optimization: Track drift state here to avoid passing changing pitch every 100ms
+    const [driftState, setDriftState] = useState({ isDrifting: false, direction: null });
+    const driftStartTimeRef = useRef(null);
 
     // Lazy initialization
     if (!flowDetector.current) {
@@ -20,9 +24,12 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
         adaptiveController.current = getAdaptiveFeedbackController();
     }
 
-    // State for visual updates
-    const [currentPitch, setCurrentPitch] = useState(0);
     const [inFlow, setInFlow] = useState(false);
+
+    // Calculate tolerance
+    const sensitivity = settings.feedback?.sensitivity || 0.5;
+    const tolerance = targetRange ? (targetRange.max - targetRange.min) * (1.5 - sensitivity) : 10;
+    const targetValue = targetRange ? (targetRange.min + targetRange.max) / 2 : null;
 
     useEffect(() => {
         if (!active || !dataRef) return;
@@ -30,16 +37,52 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
         const interval = setInterval(() => {
             const data = dataRef.current;
             if (!data) return;
+            const currentPitch = data.pitch;
 
-            // 1. Update basic state for DriftAlert
-            if (data.pitch > 0) {
-                setCurrentPitch(data.pitch);
+            // 1. Drift Detection Logic
+            // Optimization: Logic moved here to prevent re-renders on every pitch update
+            if (currentPitch > 0 && targetValue && !inFlow) {
+                 const diff = currentPitch - targetValue;
+                 const isOutside = Math.abs(diff) > tolerance;
+
+                 if (isOutside) {
+                     if (!driftStartTimeRef.current) {
+                         driftStartTimeRef.current = Date.now();
+                     } else {
+                         const duration = adaptiveController.current ? (adaptiveController.current.getThresholds().feedbackDelay || 2000) : 2000;
+                         if (Date.now() - driftStartTimeRef.current > duration) {
+                             setDriftState(prev => {
+                                 if (!prev.isDrifting) {
+                                     HapticFeedback.play('driftAlert');
+                                     return { isDrifting: true, direction: diff > 0 ? 'high' : 'low' };
+                                 }
+                                 const newDirection = diff > 0 ? 'high' : 'low';
+                                 if (prev.direction !== newDirection) {
+                                     return { ...prev, direction: newDirection };
+                                 }
+                                 return prev;
+                             });
+                         }
+                     }
+                 } else {
+                     driftStartTimeRef.current = null;
+                     setDriftState(prev => {
+                         if (prev.isDrifting) return { isDrifting: false, direction: null };
+                         return prev;
+                     });
+                 }
+            } else {
+                driftStartTimeRef.current = null;
+                setDriftState(prev => {
+                     if (prev.isDrifting) return { isDrifting: false, direction: null };
+                     return prev;
+                 });
             }
 
             // 2. Flow State
             if (flowDetector.current) {
                 const metrics = {
-                    accuracy: (targetRange && data.pitch >= targetRange.min && data.pitch <= targetRange.max) ? 1 : 0,
+                    accuracy: (targetRange && currentPitch >= targetRange.min && currentPitch <= targetRange.max) ? 1 : 0,
                     timestamp: Date.now()
                 };
                 flowDetector.current.update(metrics);
@@ -51,7 +94,7 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
         }, 100);
 
         return () => clearInterval(interval);
-    }, [active, dataRef, targetRange, inFlow]);
+    }, [active, dataRef, targetRange, inFlow, tolerance, targetValue]);
 
     // Listen for custom events dispatched by services (if any)
     useEffect(() => {
@@ -67,9 +110,6 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
 
     if (!active) return null;
 
-    const sensitivity = settings.feedback?.sensitivity || 0.5;
-    const tolerance = targetRange ? (targetRange.max - targetRange.min) * (1.5 - sensitivity) : 10;
-
     return (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
             {/* Celebration Overlay */}
@@ -78,16 +118,12 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
                 onComplete={clearCelebration}
             />
 
-            {/* Drift Alert (Only if not in Flow State) */}
-            {!inFlow && targetRange && (
-                <DriftAlert
-                    currentValue={currentPitch}
-                    targetValue={targetRange ? (targetRange.min + targetRange.max) / 2 : null}
-                    tolerance={tolerance}
-                    metricName="Pitch"
-                    duration={adaptiveController.current ? (adaptiveController.current.getThresholds().feedbackDelay || 2000) : 2000}
-                />
-            )}
+            {/* Drift Alert (Controlled by internal logic) */}
+            <DriftAlert
+                forceActive={driftState.isDrifting}
+                forceDirection={driftState.direction}
+                metricName="Pitch"
+            />
 
             {/* Flow State Indicator (Subtle) */}
             {inFlow && (
