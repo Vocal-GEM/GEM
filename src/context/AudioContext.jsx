@@ -94,28 +94,28 @@ export const AudioProvider = ({ children }) => {
 
         try {
             audioEngineRef.current = new AudioEngine((data) => {
-                // ... (data handler)
-                const currentHistory = dataRef.current.history;
+                // Optimization: Zero-copy update to reduce GC pressure
+                const currentRef = dataRef.current;
                 let pitchToStore = data.pitch;
 
                 if (data.pitch > 0) {
-                    dataRef.current.silenceCounter = 0;
-                    dataRef.current.lastValidPitch = data.pitch;
+                    currentRef.silenceCounter = 0;
+                    currentRef.lastValidPitch = data.pitch;
                 } else {
-                    dataRef.current.silenceCounter++;
-                    if (dataRef.current.silenceCounter < 15 && dataRef.current.lastValidPitch > 0) {
-                        pitchToStore = dataRef.current.lastValidPitch;
+                    currentRef.silenceCounter++;
+                    if (currentRef.silenceCounter < 15 && currentRef.lastValidPitch > 0) {
+                        pitchToStore = currentRef.lastValidPitch;
                     } else {
                         pitchToStore = 0;
                     }
                 }
 
-                dataRef.current = {
-                    ...data,
-                    history: [...currentHistory.slice(1), pitchToStore],
-                    silenceCounter: dataRef.current.silenceCounter,
-                    lastValidPitch: dataRef.current.lastValidPitch
-                };
+                // Update history in-place
+                currentRef.history.shift();
+                currentRef.history.push(pitchToStore);
+
+                // Update properties in-place (includes spectrum reference)
+                Object.assign(currentRef, data);
 
                 // Log audio data periodically for debugging
                 const now = Date.now();
