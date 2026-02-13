@@ -92,7 +92,6 @@ describe('ProfileContext Integration', () => {
             }, { timeout: 4000 });
 
             // Create a new profile to switch to
-            // Create a new profile to switch to
             act(() => {
                 result.current.switchProfile('p2');
             });

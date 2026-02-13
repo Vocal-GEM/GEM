@@ -52,7 +52,7 @@ vi.mock('@react-three/fiber', () => ({
     Canvas: ({ children }) => <div>{children}</div>,
     useFrame: (cb) => {
         // Expose callback for testing
-        global.mockUseFrameCallback = cb;
+        globalThis.mockUseFrameCallback = cb;
     }
 }));
 
