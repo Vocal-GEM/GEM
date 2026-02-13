@@ -25,3 +25,7 @@
 7:27:48 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
 7:28:12 AM [vite] page reload src/services/PrivacyManager.js
 7:28:36 AM [vite] page reload src/services/ResearchMode.js
+7:36:46 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:37:06 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
+7:37:22 AM [vite] page reload src/components/ui/button.test.jsx
+7:37:53 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
