@@ -95,4 +95,36 @@ describe('Breadcrumbs', () => {
         expect(screen.getByText('Practice')).toBeInTheDocument();
         expect(screen.getByText('Pitch Tool')).toBeInTheDocument();
     });
+
+    it('should render custom items passed as prop', () => {
+        useNavigation.mockReturnValue({
+            history: [],
+            navigate: mockNavigate,
+            activeView: 'dashboard' // Normally would return null
+        });
+
+        const customItems = [
+            { label: 'Course', action: vi.fn() },
+            { label: 'Module 1', action: vi.fn() },
+            { label: 'Lesson 1', action: null }
+        ];
+
+        render(<Breadcrumbs items={customItems} />);
+
+        expect(screen.getByText('Course')).toBeInTheDocument();
+        expect(screen.getByText('Module 1')).toBeInTheDocument();
+        expect(screen.getByText('Lesson 1')).toBeInTheDocument();
+    });
+
+    it('should apply custom className', () => {
+        useNavigation.mockReturnValue({
+            history: [],
+            navigate: mockNavigate,
+            activeView: 'practice'
+        });
+
+        const { container } = render(<Breadcrumbs className="custom-class" />);
+        expect(container.firstChild).toHaveClass('custom-class');
+        expect(container.firstChild).not.toHaveClass('mb-4');
+    });
 });
