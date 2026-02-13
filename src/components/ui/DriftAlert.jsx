@@ -3,7 +3,7 @@
  * Gentle notification when user drifts from targets over time
  */
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, ArrowUp, ArrowDown, Activity } from 'lucide-react';
 import HapticFeedback from '../../services/HapticFeedback';
@@ -14,22 +14,13 @@ const DriftAlert = ({
     tolerance,
     metricName = 'Pitch',
     duration = 3000, // How long needed to trigger alert
-    type = 'pitch', // 'pitch', 'resonance', 'weight'
-    forceActive = undefined,
-    forceDirection = undefined
+    type = 'pitch' // 'pitch', 'resonance', 'weight'
 }) => {
     const [isDrifting, setIsDrifting] = useState(false);
     const [driftDirection, setDriftDirection] = useState(null); // 'high' or 'low'
     const [driftStartTime, setDriftStartTime] = useState(null);
 
-    // Determine effective state (controlled vs uncontrolled)
-    const active = forceActive !== undefined ? forceActive : isDrifting;
-    const direction = forceDirection !== undefined ? forceDirection : driftDirection;
-
     useEffect(() => {
-        // Skip internal logic if controlled
-        if (forceActive !== undefined) return;
-
         if (currentValue === null || targetValue === null) {
             setDriftStartTime(null);
             setIsDrifting(false);
@@ -54,20 +45,19 @@ const DriftAlert = ({
             setDriftStartTime(null);
             setIsDrifting(false);
         }
-    }, [currentValue, targetValue, tolerance, driftStartTime, duration, isDrifting, forceActive]);
+    }, [currentValue, targetValue, tolerance, driftStartTime, duration, isDrifting]);
 
     const getAlertContent = () => {
-        const dir = direction;
         if (type === 'pitch') {
             return {
-                icon: dir === 'high' ? <ArrowDown className="w-5 h-5" /> : <ArrowUp className="w-5 h-5" />,
-                message: dir === 'high' ? `${metricName} drifting high` : `${metricName} drifting low`,
-                subtext: dir === 'high' ? "Relax and lower slightly" : "Lift slightly"
+                icon: driftDirection === 'high' ? <ArrowDown className="w-5 h-5" /> : <ArrowUp className="w-5 h-5" />,
+                message: driftDirection === 'high' ? `${metricName} drifting high` : `${metricName} drifting low`,
+                subtext: driftDirection === 'high' ? "Relax and lower slightly" : "Lift slightly"
             };
         } else if (type === 'resonance') {
             return {
                 icon: <Activity className="w-5 h-5" />,
-                message: dir === 'high' ? "Getting too bright" : "Getting too dark",
+                message: driftDirection === 'high' ? "Getting too bright" : "Getting too dark",
                 subtext: "Check your mouth shape"
             };
         }
@@ -79,43 +69,38 @@ const DriftAlert = ({
         };
     };
 
-    const handleClose = () => {
-        setIsDrifting(false);
-    };
+    if (!isDrifting) return null;
 
-    // Prepare content only if active
-    const content = active ? getAlertContent() : null;
+    const content = getAlertContent();
 
     return (
         <AnimatePresence>
-            {active && content && (
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    className="absolute top-20 right-4 z-40 max-w-xs"
-                >
-                    <div className="bg-amber-50 dark:bg-amber-900/40 backdrop-blur-sm border-l-4 border-amber-500 rounded-r-lg p-4 shadow-lg flex items-start space-x-3">
-                        <div className="text-amber-500 mt-0.5 animate-pulse">
-                            {content.icon}
-                        </div>
-                        <div className="flex-1">
-                            <h4 className="text-sm font-semibold text-amber-800 dark:text-amber-200">
-                                {content.message}
-                            </h4>
-                            <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-                                {content.subtext}
-                            </p>
-                        </div>
-                        <button
-                            onClick={handleClose}
-                            className="text-amber-400 hover:text-amber-600 dark:hover:text-amber-100"
-                        >
-                            ×
-                        </button>
+            <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="absolute top-20 right-4 z-40 max-w-xs"
+            >
+                <div className="bg-amber-50 dark:bg-amber-900/40 backdrop-blur-sm border-l-4 border-amber-500 rounded-r-lg p-4 shadow-lg flex items-start space-x-3">
+                    <div className="text-amber-500 mt-0.5 animate-pulse">
+                        {content.icon}
                     </div>
-                </motion.div>
-            )}
+                    <div className="flex-1">
+                        <h4 className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                            {content.message}
+                        </h4>
+                        <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                            {content.subtext}
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => setIsDrifting(false)}
+                        className="text-amber-400 hover:text-amber-600 dark:hover:text-amber-100"
+                    >
+                        ×
+                    </button>
+                </div>
+            </motion.div>
         </AnimatePresence>
     );
 };

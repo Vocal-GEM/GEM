@@ -1,7 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { Button } from "./button";
-import React from "react";
 
 describe("Button", () => {
   it("renders with default props", () => {
@@ -30,7 +29,7 @@ describe("Button", () => {
 
     // Original text/icon should NOT be present (implementation detail: we conditionally render)
     expect(screen.queryByText("Icon")).not.toBeInTheDocument();
-});
+import React from "react";
 
 describe("Button", () => {
   it("renders children correctly", () => {
