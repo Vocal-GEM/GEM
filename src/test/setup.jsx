@@ -127,6 +127,24 @@ const indexedDBMock = {
 global.indexedDB = indexedDBMock;
 global.window.indexedDB = indexedDBMock;
 
+// Mock pitchfinder
+vi.mock('pitchfinder', () => {
+    return {
+        Macleod: class {
+            constructor() { }
+            process() { return { pitch: 440, probability: 0.9 }; }
+        },
+        YIN: class {
+            constructor() { }
+            process() { return { pitch: 440, probability: 0.9 }; }
+        },
+        AMDF: class {
+            constructor() { }
+            process() { return { pitch: 440, probability: 0.9 }; }
+        }
+    };
+});
+
 // Mock Lucide React
 vi.mock('lucide-react', () => {
     const React = require('react');
