@@ -10,3 +10,22 @@
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
 7:37:41 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
 7:38:29 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
+7:44:26 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:44:32 AM [vite] page reload src/services/PrivacyManager.js
+7:44:40 AM [vite] page reload src/components/ui/button.test.jsx
+7:45:34 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:46:03 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:46:16 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:47:33 AM [vite] page reload src/audio/PitchWorklet.js
+7:47:51 AM [vite] page reload src/services/ResearchMode.js
+7:47:58 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:48:06 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:48:14 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
+7:48:21 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+7:55:31 AM [vite] page reload src/components/community/SuccessStories.test.jsx
+7:55:42 AM [vite] page reload src/components/ui/JournalForm.test.jsx
+7:55:56 AM [vite] page reload src/components/ui/LoadingSpinner.test.jsx
+7:56:05 AM [vite] page reload src/components/ui/LoadingSpinnerVerification.jsx
+7:56:17 AM [vite] page reload src/components/ui/QuickActions.jsx
+7:56:28 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
+7:57:32 AM [vite] page reload src/components/community/SuccessStories.test.jsx
