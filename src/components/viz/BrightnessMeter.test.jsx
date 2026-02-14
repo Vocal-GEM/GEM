@@ -13,9 +13,14 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+vi.mock('lucide-react', async () => {
+    const React = await import('react');
+    // Using named function for display name inference
+    function createIcon(name) {
+        const IconComponent = (props) => React.createElement('div', { ...props, 'data-testid': name });
+        IconComponent.displayName = `Lucide${name}`;
+        return IconComponent;
+    }
 
     return {
         Sun: createIcon('Sun'),
