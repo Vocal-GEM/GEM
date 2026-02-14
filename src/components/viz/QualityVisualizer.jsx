@@ -30,11 +30,6 @@ const QualityVisualizer = ({ dataRef }) => {
         const data = dataRef.current;
 
         // Update local state
-        // Jitter/Shimmer are often small values (e.g. 0.01), we might want to scale them for display
-        // Jitter > 0.01 (1%) is often considered rough
-        // Shimmer > 0.35 dB (or 3-4%) is often considered rough.
-        // Assuming the engine returns raw values.
-
         setMetrics({
             jitter: data.jitter || 0,
             shimmer: data.shimmer || 0,
