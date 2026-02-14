@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useId } from 'react';
+import { useEffect, useRef, useState, useId, useMemo } from 'react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
 // Convert Hz to semitones (MIDI note number)
@@ -15,72 +15,94 @@ const getNoteFromSemitone = (semitone) => {
     return `${note}${octave}`;
 };
 
+// Default gender ranges
+const DEFAULT_RANGES = {
+    feminine: { min: 165, max: 300 },
+    androgynous: { min: 135, max: 175 },
+    masculine: { min: 85, max: 135 }
+};
+
+// Determine color based on pitch and gender ranges
+const getGenderColor = (pitch, ranges) => {
+    if (pitch >= ranges.feminine.min) {
+        return {
+            primary: '#ec4899',
+            glow: 'rgba(236, 72, 153, 0.6)',
+            label: 'Feminine'
+        };
+    }
+    if (pitch >= ranges.androgynous.min && pitch <= ranges.androgynous.max) {
+        return {
+            primary: '#a855f7',
+            glow: 'rgba(168, 85, 247, 0.6)',
+            label: 'Androgynous'
+        };
+    }
+    if (pitch >= ranges.masculine.min && pitch <= ranges.masculine.max) {
+        return {
+            primary: '#3b82f6',
+            glow: 'rgba(59, 130, 246, 0.6)',
+            label: 'Masculine'
+        };
+    }
+    return {
+        primary: '#64748b',
+        glow: 'rgba(100, 116, 139, 0.3)',
+        label: 'Out of Range'
+    };
+};
+
 const PitchOrb = ({ dataRef, settings = {} }) => {
     const canvasRef = useRef(null);
+    const dimensionsRef = useRef({ width: 0, height: 0 });
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
-    // Default gender ranges if not set in settings
-    const defaultRanges = {
-        feminine: { min: 165, max: 300 },
-        androgynous: { min: 135, max: 175 },
-        masculine: { min: 85, max: 135 }
-    };
-
-    const genderRanges = settings.genderRanges || defaultRanges;
+    const genderRanges = useMemo(() => settings.genderRanges || DEFAULT_RANGES, [settings.genderRanges]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
+        if (!canvas) return;
 
-        // Determine color based on pitch and gender ranges
-        const getGenderColor = (pitch) => {
-            if (pitch >= genderRanges.feminine.min) {
-                return {
-                    primary: '#ec4899',
-                    glow: 'rgba(236, 72, 153, 0.6)',
-                    label: 'Feminine'
-                };
+        // ResizeObserver to update dimensions efficiently
+        const resizeObserver = new ResizeObserver((entries) => {
+            const entry = entries[0];
+            if (!entry) return;
+
+            // Use contentRect for precise content box dimensions
+            const { width, height } = entry.contentRect;
+            const dpr = window.devicePixelRatio || 1;
+
+            const newWidth = Math.floor(width * dpr);
+            const newHeight = Math.floor(height * dpr);
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                ctx.scale(dpr, dpr);
+                dimensionsRef.current = { width, height };
             }
-            if (pitch >= genderRanges.androgynous.min && pitch <= genderRanges.androgynous.max) {
-                return {
-                    primary: '#a855f7',
-                    glow: 'rgba(168, 85, 247, 0.6)',
-                    label: 'Androgynous'
-                };
-            }
-            if (pitch >= genderRanges.masculine.min && pitch <= genderRanges.masculine.max) {
-                return {
-                    primary: '#3b82f6',
-                    glow: 'rgba(59, 130, 246, 0.6)',
-                    label: 'Masculine'
-                };
-            }
-            return {
-                primary: '#64748b',
-                glow: 'rgba(100, 116, 139, 0.3)',
-                label: 'Out of Range'
-            };
-        };
+        });
+
+        resizeObserver.observe(canvas);
 
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            // Optimization: Read cached dimensions instead of getBoundingClientRect()
+            const { width, height } = dimensionsRef.current;
 
-            const width = rect.width;
-            const height = rect.height;
+            // Skip rendering if dimensions are not yet established
+            if (width === 0 || height === 0) return;
+
             const centerX = width / 2;
             const centerY = height / 2;
 
             ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
-            const colorData = getGenderColor(pitch);
+            const colorData = getGenderColor(pitch, genderRanges);
 
             // Draw orb
             const baseRadius = Math.min(width, height) * 0.35;
@@ -165,6 +187,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         );
 
         return () => {
+            resizeObserver.disconnect();
             unsubscribe();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
