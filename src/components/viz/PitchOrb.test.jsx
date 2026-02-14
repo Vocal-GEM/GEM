@@ -2,7 +2,6 @@ import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import PitchOrb from './PitchOrb';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import React from 'react';
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
@@ -22,6 +21,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     stroke: vi.fn(),
     fillText: vi.fn(),
     scale: vi.fn(),
+    setTransform: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
@@ -30,7 +30,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+globalThis.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('PitchOrb', () => {
     let dataRef;
@@ -61,7 +61,7 @@ describe('PitchOrb', () => {
         await new Promise(resolve => setTimeout(resolve, 0));
 
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
-        const [id, callback] = renderCoordinator.subscribe.mock.calls[0];
+        const [, callback] = renderCoordinator.subscribe.mock.calls[0];
 
         // Execute the callback
         callback();
@@ -71,5 +71,24 @@ describe('PitchOrb', () => {
         // OR we assert it is NOT called if we want to write the test for the desired state.
         // Let's write the test for the DESIRED state (fail now, pass later).
         expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+    });
+
+    it('should not call getBoundingClientRect inside the draw loop', async () => {
+        render(<PitchOrb dataRef={dataRef} />);
+
+        // Wait for potential dynamic import resolution
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(renderCoordinator.subscribe).toHaveBeenCalled();
+        const [, callback] = renderCoordinator.subscribe.mock.calls[0];
+
+        // Clear previous calls (from initial render)
+        Element.prototype.getBoundingClientRect.mockClear();
+
+        // Run the loop manually
+        callback();
+
+        // Expect getBoundingClientRect NOT to be called to avoid layout thrashing
+        expect(Element.prototype.getBoundingClientRect).not.toHaveBeenCalled();
     });
 });

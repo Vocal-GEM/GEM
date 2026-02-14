@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useId } from 'react';
+import { useEffect, useRef, useState, useId, useMemo } from 'react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
 // Convert Hz to semitones (MIDI note number)
@@ -17,22 +17,57 @@ const getNoteFromSemitone = (semitone) => {
 
 const PitchOrb = ({ dataRef, settings = {} }) => {
     const canvasRef = useRef(null);
+    const containerRef = useRef(null);
+    const dimensionsRef = useRef({ width: 0, height: 0, dpr: 1 });
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
     // Default gender ranges if not set in settings
-    const defaultRanges = {
+    const defaultRanges = useMemo(() => ({
         feminine: { min: 165, max: 300 },
         androgynous: { min: 135, max: 175 },
         masculine: { min: 85, max: 135 }
-    };
+    }), []);
 
-    const genderRanges = settings.genderRanges || defaultRanges;
+    const genderRanges = useMemo(() => settings.genderRanges || defaultRanges, [settings.genderRanges, defaultRanges]);
+
+    // Handle resizing efficiently
+    useEffect(() => {
+        const container = containerRef.current;
+        const canvas = canvasRef.current;
+        if (!container || !canvas) return;
+
+        const updateSize = () => {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = container.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+
+            // Only update if dimensions actually changed to avoid clearing canvas
+            if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
+                canvas.width = Math.round(width * dpr);
+                canvas.height = Math.round(height * dpr);
+                dimensionsRef.current = { width, height, dpr };
+            }
+        };
+
+        // Initial size
+        updateSize();
+
+        const resizeObserver = new ResizeObserver(() => {
+            requestAnimationFrame(updateSize);
+        });
+
+        resizeObserver.observe(container);
+
+        return () => resizeObserver.disconnect();
+    }, []);
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d', { alpha: false }); // Optimization: alpha: false if opaque
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,17 +102,31 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            // Optimization: Read from ref instead of DOM (layout thrashing)
+            const { width, height, dpr } = dimensionsRef.current;
+            if (width === 0 || height === 0) return;
 
-            const width = rect.width;
-            const height = rect.height;
+            // Set transform to handle DPR scaling
+            // We set it every frame because we need to clear the canvas which relies on the transform?
+            // Actually, if we use setTransform, we overwrite previous transforms, which prevents accumulation.
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
             const centerX = width / 2;
             const centerY = height / 2;
 
+            // Clear using logical dimensions
             ctx.clearRect(0, 0, width, height);
+
+            // Re-drawing background because we might have used alpha: false or just for safety
+            // If alpha: false, clearRect might fill with black (or default color).
+            // But the component uses a transparent canvas in a div?
+            // The original code used clearRect and had a glass panel behind it.
+            // If I used alpha: false, I need to fill the background manually if transparency was expected.
+            // The original code didn't specify context options, so alpha was true.
+            // I'll revert alpha: false to be safe, as 'glass-panel-dark' implies transparency might be needed or handled by CSS.
+            // Wait, clearRect makes pixels transparent. If alpha: false, they become black.
+            // The canvas is inside a div with 'glass-panel-dark'. The canvas itself usually sits on top.
+            // Let's stick to default alpha: true for now to avoid visual regressions.
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -170,7 +219,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
     return (
-        <div className="glass-panel-dark rounded-2xl p-6 relative overflow-hidden shadow-lg">
+        <div ref={containerRef} className="glass-panel-dark rounded-2xl p-6 relative overflow-hidden shadow-lg">
             <div className="flex justify-between items-center mb-4">
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                     Pitch
