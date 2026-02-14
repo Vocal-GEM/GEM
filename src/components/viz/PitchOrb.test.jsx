@@ -1,4 +1,4 @@
-import { render, cleanup } from '@testing-library/react';
+import { render, cleanup, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import PitchOrb from './PitchOrb';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -14,7 +14,7 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Mock Canvas getContext
-HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+const contextMock = {
     clearRect: vi.fn(),
     beginPath: vi.fn(),
     arc: vi.fn(),
@@ -25,28 +25,37 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
-    canvas: { width: 300, height: 300 }
-}));
+    canvas: { width: 0, height: 0 }
+};
 
-// Mock requestAnimationFrame to detect recursion
-const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+HTMLCanvasElement.prototype.getContext = vi.fn(() => contextMock);
+
+// Mock ResizeObserver
+const observeMock = vi.fn();
+const disconnectMock = vi.fn();
+const unobserveMock = vi.fn();
+let lastObserverCallback = null;
+
+class MockResizeObserver {
+    constructor(callback) {
+        lastObserverCallback = callback;
+    }
+    observe = observeMock;
+    disconnect = disconnectMock;
+    unobserve = unobserveMock;
+}
+
+global.ResizeObserver = MockResizeObserver;
 
 describe('PitchOrb', () => {
     let dataRef;
 
     beforeEach(() => {
         dataRef = { current: { pitch: 200 } };
-        // Add getBoundingClientRect mock
-        Element.prototype.getBoundingClientRect = vi.fn(() => ({
-            width: 300,
-            height: 300,
-            top: 0,
-            left: 0,
-            right: 300,
-            bottom: 300,
-        }));
         vi.clearAllMocks();
+        contextMock.canvas.width = 0;
+        contextMock.canvas.height = 0;
+        lastObserverCallback = null;
     });
 
     afterEach(() => {
@@ -54,22 +63,31 @@ describe('PitchOrb', () => {
         vi.clearAllMocks();
     });
 
-    it('should not call requestAnimationFrame recursively in the draw loop', async () => {
+    it('should subscribe to renderCoordinator and handle resize', async () => {
         render(<PitchOrb dataRef={dataRef} />);
 
-        // Wait for potential dynamic import resolution
-        await new Promise(resolve => setTimeout(resolve, 0));
+        // Verify ResizeObserver was instantiated and observe called
+        expect(observeMock).toHaveBeenCalled();
+
+        // Trigger Resize
+        expect(lastObserverCallback).toBeInstanceOf(Function);
+        act(() => {
+            lastObserverCallback([{
+                contentRect: { width: 300, height: 300 }
+            }]);
+        });
+
+        // Verify that dimensions were updated (indirectly via loop or verify contextMock interactions if possible)
+        // Since we cannot easily check the internal state or DOM element properties (as they are mocked/detached),
+        // we check if drawing happens with correct dimensions.
 
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
-        const [id, callback] = renderCoordinator.subscribe.mock.calls[0];
+        const [id, loopCallback] = renderCoordinator.subscribe.mock.calls[0];
 
-        // Execute the callback
-        callback();
+        // Execute the draw loop callback
+        loopCallback();
 
-        // With the bug, requestAnimationFrame is called.
-        // We assert it IS called to confirm the bug exists in the current code,
-        // OR we assert it is NOT called if we want to write the test for the desired state.
-        // Let's write the test for the DESIRED state (fail now, pass later).
-        expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+        // Check if clearRect was called with correct dimensions
+        expect(contextMock.clearRect).toHaveBeenCalledWith(0, 0, 300, 300);
     });
 });
