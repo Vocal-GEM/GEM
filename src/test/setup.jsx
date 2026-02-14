@@ -128,8 +128,8 @@ global.indexedDB = indexedDBMock;
 global.window.indexedDB = indexedDBMock;
 
 // Mock Lucide React
-vi.mock('lucide-react', () => {
-    const React = require('react');
+vi.mock('lucide-react', async () => {
+    const React = await import('react');
 
     // Helper to create a mock icon
     const createIcon = (name) => {
