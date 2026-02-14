@@ -22,3 +22,6 @@
 7:25:17 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
 7:25:17 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
 7:27:23 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+7:34:44 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
+7:35:10 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
+7:38:24 AM [vite] page reload src/components/ui/button.test.jsx
