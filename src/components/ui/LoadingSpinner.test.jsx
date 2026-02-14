@@ -2,9 +2,6 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import LoadingSpinner from "./LoadingSpinner";
 import React from "react";
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-import LoadingSpinner from './LoadingSpinner';
 
 describe('LoadingSpinner', () => {
   it('renders with default accessibility attributes', () => {
@@ -13,8 +10,6 @@ describe('LoadingSpinner', () => {
     // It should have role="status"
     const spinner = screen.getByRole('status');
     expect(spinner).toBeInTheDocument();
-    expect(spinner).toHaveAttribute('aria-live', 'polite');
-
     expect(spinner).toHaveAttribute('aria-live', 'polite');
 
     // It should have a visually hidden label "Loading..." by default

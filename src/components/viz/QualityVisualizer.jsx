@@ -20,21 +20,7 @@ const QualityVisualizer = ({ dataRef }) => {
     });
     const maxHistory = 100;
 
-    // Define the loop callback (not creating it inside useEffect to allow useCallback if needed,
-    // though here it captures state setters so it's tricky.
-    // Actually, RenderCoordinator passes deltaTime, but we just need to poll dataRef.)
-    // We use useCallback to keep the function reference stable if possible,
-    // but we depend on dataRef.
-    const loop = useCallback(() => {
-        if (!dataRef.current) return;
-        const data = dataRef.current;
-
-        // Update local state
-        setMetrics({
-            jitter: data.jitter || 0,
-            shimmer: data.shimmer || 0,
-            weight: data.weight || 50
-        });
+    // Define the loop callback
     const loop = useCallback(() => {
         if (!dataRef.current) return;
         const data = dataRef.current;
