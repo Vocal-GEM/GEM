@@ -120,6 +120,7 @@ const FeminizationCourse = ({ onClose }) => {
                     <button
                         onClick={() => setActiveLesson(null)}
                         className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                        aria-label="Back to course"
                     >
                         <ArrowLeft className="w-6 h-6 text-slate-400" />
                     </button>
@@ -155,6 +156,7 @@ const FeminizationCourse = ({ onClose }) => {
                 <button
                     onClick={onClose}
                     className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                    aria-label="Close course"
                 >
                     <ArrowLeft className="w-6 h-6 text-slate-400" />
                 </button>

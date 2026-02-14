@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, CheckCircle, ChevronRight, PlayCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -27,6 +27,17 @@ const LessonView = ({ lesson, onComplete, onNext, onPrevious, hasNext, hasPrevio
     const { targetRange, calibration, activeProfile } = useProfile();
     const { settings } = useSettings();
     const [isLowConfidence, setIsLowConfidence] = useState(false);
+    const progressBarRef = useRef(null);
+
+    const handleScroll = (e) => {
+        const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+        const totalScroll = scrollHeight - clientHeight;
+        const progress = totalScroll > 0 ? (scrollTop / totalScroll) * 100 : 0;
+
+        if (progressBarRef.current) {
+            progressBarRef.current.style.width = `${progress}%`;
+        }
+    };
 
     // Monitor confidence
     useEffect(() => {
@@ -156,8 +167,19 @@ const LessonView = ({ lesson, onComplete, onNext, onPrevious, hasNext, hasPrevio
                 </div>
             </div>
 
+            {/* Reading Progress Bar */}
+            <div className="h-1 w-full bg-slate-800/50 rounded-full mb-6 overflow-hidden" role="progressbar" aria-label="Lesson reading progress" aria-valuemin="0" aria-valuemax="100">
+                <div
+                    ref={progressBarRef}
+                    className="h-full bg-pink-500 transition-all duration-75 ease-out w-0"
+                />
+            </div>
+
             {/* Content */}
-            <div className="flex-1 overflow-y-auto pr-2 space-y-8">
+            <div
+                onScroll={handleScroll}
+                className="flex-1 overflow-y-auto pr-2 space-y-8"
+            >
                 {/* Markdown Content */}
                 <div className="prose prose-invert prose-p:text-slate-300 prose-headings:text-white prose-strong:text-white max-w-none">
                     <ReactMarkdown>{lesson.content}</ReactMarkdown>
