@@ -607,7 +607,8 @@ export class AudioEngine {
                         f1: this.smoothedF1 || 0,
                         f2: this.smoothedF2 || 0,
                         raw: formants
-                    }
+                    },
+                    spectrum: freqData
                 };
 
                 // Store metrics if recording

@@ -19,6 +19,8 @@ const hzToNote = (hz) => {
 };
 
 const MAX_FREQ = 8000;
+const CANVAS_HEIGHT = 512;
+const SCROLL_SPEED = 2; // px per frame
 
 const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const canvasRef = useRef(null);
@@ -26,10 +28,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const lastFormantsRef = useRef({ f1: 0, f2: 0 });
     const { settings } = useSettings();
 
-    // Component ID for RenderCoordinator
-    const componentId = useId();
-
-    // Reusable buffers to avoid GC
     // Unique component ID for RenderCoordinator
     const uniqueId = useId();
     const componentId = `spectrogram-highres-${uniqueId}`;
@@ -37,6 +35,9 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     // Reusable buffers to avoid garbage collection churn
     const imgDataRef = useRef(null);
     const data32Ref = useRef(null);
+
+    // Cache for bin mapping to avoid re-calculating per pixel
+    const binMapRef = useRef(null);
 
     // Tap cursor state
     const [cursorData, setCursorData] = useState(null);
@@ -58,25 +59,17 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         const width = canvas.width;
         const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
-
-        // Optimization: Use alpha: false for better performance
-        const ctx = canvas.getContext('2d', { alpha: false });
+        const spectrum = dataRef.current.spectrum;
 
         // Optimization: Use alpha: false for better performance
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
 
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
-        const spectrum = dataRef.current.spectrum;
-
         // Ensure buffers are ready and match height
         if (!imgDataRef.current || imgDataRef.current.height !== height) {
             try {
-                // Optimization: Create ImageData with 'scrollSpeed' width
-                imgDataRef.current = ctx.createImageData(scrollSpeed, height);
+                // Optimization: Create ImageData with 'SCROLL_SPEED' width
+                imgDataRef.current = ctx.createImageData(SCROLL_SPEED, height);
                 data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
             } catch (e) {
                 console.error("Failed to create image data", e);
@@ -84,46 +77,59 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             }
         }
 
-        const imgData = imgDataRef.current;
-        const data32 = data32Ref.current;
-
-        // 1. Shift existing content to left
-        // Optimization: Draw canvas onto itself instead of using an offscreen temp canvas.
-        ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
-
-        // 2. Draw new column
-        // Reuse pre-allocated TypedArray
+        // Optimization: Precompute bin mapping if needed
         const maxBin = Math.floor(spectrum.length / 3); // 8kHz cutoff
-
-        for (let y = 0; y < height; y++) {
-            // Map y (0 at top, height at bottom) to frequency
-        // Copy the current canvas (from x=scrollSpeed to the end) to x=0
-        // This is much faster on GPU-accelerated contexts.
-        ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
-
-        // 2. Draw new column
-        // Optimized: Reuse pre-allocated TypedArray
-        const maxBin = Math.floor(spectrum.length / 3);
-
-        for (let y = 0; y < height; y++) {
-            const freqRatio = (height - 1 - y) / height;
-            const binIndex = Math.floor(freqRatio * maxBin);
-            const val = spectrum[binIndex] || 0;
-
-            let intensity = Math.log10(val + 1) * 60;
-            intensity = Math.min(255, Math.max(0, intensity));
-
-            const color = colormap[Math.floor(intensity)];
-
-            // Fill all pixels in the scrollSpeed strip for this row
-            const rowOffset = y * scrollSpeed;
-            for (let x = 0; x < scrollSpeed; x++) {
-                data32[rowOffset + x] = color;
+        if (!binMapRef.current || binMapRef.current.length !== height) {
+            binMapRef.current = new Uint16Array(height);
+            for (let y = 0; y < height; y++) {
+                const freqRatio = (height - 1 - y) / height;
+                binMapRef.current[y] = Math.floor(freqRatio * maxBin);
             }
         }
 
+        const imgData = imgDataRef.current;
+        const data32 = data32Ref.current;
+        const binMap = binMapRef.current;
+
+        // 1. Shift existing content to left
+        // Optimization: Draw canvas onto itself instead of using an offscreen temp canvas.
+        // This is much faster on GPU-accelerated contexts.
+        ctx.drawImage(canvas, SCROLL_SPEED, 0, width - SCROLL_SPEED, height, 0, 0, width - SCROLL_SPEED, height);
+
+        // 2. Draw new column
+        // Reuse pre-allocated TypedArray
+        // Optimized: Unrolled loop for fixed scroll speed
+        for (let y = 0; y < height; y++) {
+            // Use precomputed bin index
+            const binIndex = binMap[y];
+            const val = spectrum[binIndex] || -100; // Default to -100dB
+
+            // Optimized: Handle Float32Array (dB) directly
+            // Map -100dB (silence) to 0, -30dB (loud) to 255
+            // Formula: (val + 100) * (255 / 70) approx 3.6
+            // Or use a simpler range: -90dB to -10dB -> 80dB range
+            let intensity;
+            if (val > -100) {
+                 // Fast linear mapping from dB to 0-255
+                 // Assuming -90dB is black, -10dB is white
+                 intensity = (val + 90) * 3.2;
+                 if (intensity < 0) intensity = 0;
+                 else if (intensity > 255) intensity = 255;
+            } else {
+                intensity = 0;
+            }
+
+            const color = colormap[Math.floor(intensity)];
+
+            // Fill all pixels in the SCROLL_SPEED strip for this row
+            // Unrolled for SCROLL_SPEED = 2
+            const rowOffset = y * SCROLL_SPEED;
+            data32[rowOffset] = color;
+            data32[rowOffset + 1] = color;
+        }
+
         // Put the new strip on the right edge
-        ctx.putImageData(imgData, width - scrollSpeed, 0);
+        ctx.putImageData(imgData, width - SCROLL_SPEED, 0);
 
         // 3. Draw Formant Overlay (F1 & F2)
         const { f1, f2 } = dataRef.current;
@@ -140,10 +146,10 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
                     const lastY = height * (1 - lastFreq / MAX_FREQ);
                     ctx.beginPath();
                     ctx.strokeStyle = color;
-                    // Draw from previous frame's position (shifted left by scrollSpeed)
-                    // Previous point was at 'width - scrollSpeed', now at 'width - scrollSpeed * 2'
-                    ctx.moveTo(width - scrollSpeed * 2, lastY);
-                    ctx.lineTo(width - scrollSpeed, currY);
+                    // Draw from previous frame's position (shifted left by SCROLL_SPEED)
+                    // Previous point was at 'width - SCROLL_SPEED', now at 'width - SCROLL_SPEED * 2'
+                    ctx.moveTo(width - SCROLL_SPEED * 2, lastY);
+                    ctx.lineTo(width - SCROLL_SPEED, currY);
                     ctx.stroke();
                 }
             };
@@ -155,9 +161,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         lastFormantsRef.current = { f1, f2 };
 
     }, [dataRef, colormap]);
-
-    // Initial canvas setup & ResizeObserver
-    }, [dataRef, colormap, componentId]);
 
     // Initial canvas setup
     // Handle Resize with ResizeObserver
@@ -172,24 +175,18 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             const rect = container.getBoundingClientRect();
 
             // Only update if dimensions actually changed
-            const newWidth = Math.floor(rect.width * dpr);
-            const newHeight = 512; // Fixed high vertical resolution
             const newWidth = Math.round(rect.width * dpr);
-            const newHeight = 512; // Fixed internal height for vertical resolution
+            const newHeight = CANVAS_HEIGHT; // Fixed internal height for vertical resolution
 
             if (canvas.width !== newWidth || canvas.height !== newHeight) {
                 canvas.width = newWidth;
                 canvas.height = newHeight;
                 imgDataRef.current = null;
                 data32Ref.current = null;
+                // Invalidate bin map if height changes (though height is fixed constant here)
+                binMapRef.current = null;
             }
         };
-
-        // Initial size
-        updateSize();
-
-        const resizeObserver = new ResizeObserver(() => {
-            // Use RAF to debounce
 
         const resizeObserver = new ResizeObserver(() => {
             // Run in animation frame to avoid resize loops/tearing
@@ -217,7 +214,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         return () => {
             unsubscribe();
         };
-    }, [draw, componentId]);
     }, [componentId, draw]);
 
     /**
@@ -241,15 +237,15 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         if (spectrum) {
             const maxBin = Math.floor(spectrum.length / 3);
             const binIndex = Math.floor(freqRatio * maxBin);
-            const val = spectrum[binIndex] || 0;
-            dB = val < 0 ? val : 20 * Math.log10(val + 0.00001);
+            const val = spectrum[binIndex] || -100;
+            dB = val;
         }
 
         setCursorData({
             x: e.clientX - rect.left,
             y: e.clientY - rect.top,
             frequency: Math.round(frequency),
-            dB: dB.toFixed(1),
+            dB: typeof dB === 'number' ? dB.toFixed(1) : '-100',
             note: hzToNote(frequency)
         });
     }, [dataRef]);
