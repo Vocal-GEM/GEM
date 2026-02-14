@@ -17,3 +17,5 @@
 7:25:25 AM [vite] hmr update /src/components/views/PracticeMode.jsx, /src/index.css
 7:32:38 AM [vite] hmr update /src/components/views/PracticeMode.jsx, /src/index.css
 7:33:15 AM [vite] hmr update /src/components/views/PracticeMode.jsx, /src/index.css
+7:35:33 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+7:35:49 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
