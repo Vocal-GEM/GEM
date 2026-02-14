@@ -85,6 +85,7 @@ describe('AuthContext', () => {
             loginBtn.click();
         });
 
+        // Wait for state updates to propagate
         await waitFor(() => {
             expect(result.getByTestId('user').textContent).toBe('testuser');
         });

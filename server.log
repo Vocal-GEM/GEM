@@ -37,3 +37,7 @@
 7:48:53 AM [vite] page reload src/context/AuthContext.test.jsx
 7:49:48 AM [vite] page reload src/test/validation/algorithmValidation.test.js
 7:49:58 AM [vite] page reload src/components/layout/Sidebar.test.jsx
+7:56:16 AM [vite] page reload src/test/validation/algorithmValidation.test.js
+7:56:45 AM [vite] page reload src/engines/AudioEngine.socket.test.js
+7:57:11 AM [vite] page reload src/components/views/PracticeMode.test.jsx
+7:57:40 AM [vite] page reload src/context/AuthContext.test.jsx
