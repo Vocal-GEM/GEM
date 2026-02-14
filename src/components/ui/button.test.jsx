@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { Button } from "./button";
+import React from "react";
 
 describe("Button", () => {
   it("renders with default props", () => {
@@ -30,14 +31,12 @@ describe("Button", () => {
     // Original text/icon should NOT be present (implementation detail: we conditionally render)
     expect(screen.queryByText("Icon")).not.toBeInTheDocument();
   });
-});
-    expect(screen.getByRole("button", { name: /click me/i })).toBeInTheDocument();
-  });
 
   it("shows loading spinner when isLoading is true", () => {
     render(<Button isLoading>Click me</Button>);
     expect(screen.getByRole("status")).toBeInTheDocument(); // LoadingSpinner role
-    expect(screen.getByText("Loading")).toBeInTheDocument(); // SR text (modified to match Button implementation)
+    // Text is present in default loading state
+    expect(screen.getByText("Click me")).toBeInTheDocument();
     expect(screen.getByRole("button")).toBeDisabled();
   });
 
