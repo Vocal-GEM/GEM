@@ -19,6 +19,12 @@ vi.mock('../services/DataSyncService', () => ({
     syncFromServer: vi.fn().mockResolvedValue(true)
 }));
 
+// Mock runtime config
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: vi.fn().mockReturnValue(true),
+    getBackendUrl: vi.fn().mockReturnValue('http://localhost:5000')
+}));
+
 import { indexedDB } from '../services/IndexedDBManager';
 import { syncToServer, syncFromServer } from '../services/DataSyncService';
 
@@ -79,6 +85,7 @@ describe('AuthContext', () => {
             loginBtn.click();
         });
 
+        // Wait for state updates to propagate
         await waitFor(() => {
             expect(result.getByTestId('user').textContent).toBe('testuser');
         });

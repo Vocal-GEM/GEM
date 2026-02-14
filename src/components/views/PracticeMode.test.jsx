@@ -31,6 +31,8 @@ vi.mock('../../context/NavigationContext', () => ({
         navigationParams: {}
     })
 }));
+// DynamicOrb was swapped with PitchOrb in recent changes
+vi.mock('../viz/PitchOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
 vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
 vi.mock('../ui/ResizablePanel', () => ({

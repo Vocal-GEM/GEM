@@ -8,9 +8,16 @@ vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));
 
+// Mock runtime config to enable backend for tests
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: vi.fn().mockReturnValue(true),
+    getBackendUrl: vi.fn().mockReturnValue('http://localhost:5000')
+}));
+
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)),
     YIN: vi.fn(() => vi.fn((buffer) => 440))
 }));
 
