@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-22 - [Direct DOM Manipulation Pitfall]
+**Learning:** Components like `VoiceQualityMeter` bypass React for performance but introduced layout thrashing by reading `style.left` inside the animation loop.
+**Action:** When optimizing animation loops, ensure state is tracked in JS refs (`useRef`) to avoid reading from the DOM during writes.

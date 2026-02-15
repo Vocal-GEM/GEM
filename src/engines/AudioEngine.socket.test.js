@@ -8,9 +8,16 @@ vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));
 
+// Mock runtime config to enable backend
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: vi.fn().mockReturnValue(true),
+    getBackendUrl: vi.fn().mockReturnValue('http://localhost:5000')
+}));
+
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)), // Handle both spellings
     YIN: vi.fn(() => vi.fn((buffer) => 440))
 }));
 
@@ -33,7 +40,7 @@ const mockAudioContext = {
     }),
     createGain: () => ({
         connect: vi.fn(),
-        gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), setTargetAtTime: vi.fn() }
+        gain: { value: 0, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), setTargetAtTime: vi.fn(), cancelScheduledValues: vi.fn() }
     }),
     createBiquadFilter: () => ({
         connect: vi.fn(),
@@ -43,7 +50,8 @@ const mockAudioContext = {
     createBuffer: () => ({}),
     createBufferSource: () => ({
         connect: vi.fn(),
-        start: vi.fn()
+        start: vi.fn(),
+        buffer: null
     }),
     createMediaStreamSource: () => ({
         connect: vi.fn(),
@@ -108,14 +116,13 @@ describe('AudioEngine Socket Integration', () => {
     });
 
     it('should initialize socket on start', async () => {
-        await engine.start();
+        // Socket init happens in constructor
         expect(io).toHaveBeenCalled();
         expect(engine.socket).toBe(mockSocket);
     });
 
     it('should handle socket connection events', async () => {
-        await engine.start();
-
+        // Socket events are bound in constructor
         // Simulate connect
         mockSocket.connected = true;
         if (socketCallbacks['connect']) socketCallbacks['connect']();

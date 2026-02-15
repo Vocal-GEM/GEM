@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import { vi, describe, it, expect } from 'vitest';
 import PracticeMode from './PracticeMode';
@@ -22,6 +22,19 @@ global.navigator.mediaDevices = {
 /* eslint-enable no-undef */
 
 // Mock dependencies
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key) => key,
+        i18n: {
+            changeLanguage: () => new Promise(() => {}),
+        },
+    }),
+    initReactI18next: {
+        type: '3rdParty',
+        init: () => {},
+    }
+}));
+
 vi.mock('../../context/NavigationContext', () => ({
     NavigationProvider: ({ children }) => <div>{children}</div>,
     useNavigation: () => ({
@@ -31,7 +44,12 @@ vi.mock('../../context/NavigationContext', () => ({
         navigationParams: {}
     })
 }));
-vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
+
+// Mock the lazy loaded component
+vi.mock('../viz/DynamicOrb', () => ({
+    default: () => <div data-testid="dynamic-orb">Dynamic Orb</div>
+}));
+
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
 vi.mock('../ui/ResizablePanel', () => ({
     default: ({ children, className }) => <div className={className} data-testid="resizable-panel">{children}</div>
@@ -43,6 +61,8 @@ vi.mock('../viz/VoiceQualityAnalysis', () => ({ default: () => <div>Voice Qualit
 vi.mock('../viz/VowelAnalysis', () => ({ default: () => <div>Vowel Analysis</div> }));
 vi.mock('../ui/ToolExercises', () => ({ default: () => <div>Tool Exercises</div> }));
 vi.mock('../ui/ComparisonTool', () => ({ default: () => <div>Comparison Tool</div> }));
+vi.mock('../ui/VisualizerSkeleton', () => ({ default: () => <div data-testid="visualizer-skeleton">Loading...</div> }));
+
 vi.mock('../../context/AuthContext', () => ({
     useAuth: () => ({ user: { id: 'test-user', username: 'Tester' } }),
     AuthProvider: ({ children }) => <div>{children}</div>
@@ -86,9 +106,12 @@ describe('PracticeMode', () => {
             </SettingsProvider>
         );
 
-        expect(screen.getByText('Overview')).toBeInTheDocument();
-        expect(screen.getByText('Pitch')).toBeInTheDocument();
-        // Check for visualization area
-        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
+        expect(screen.getByText('practiceMode.tabs.overview')).toBeInTheDocument();
+        expect(screen.getByText('practiceMode.tabs.pitch')).toBeInTheDocument();
+
+        // Check for visualization area - wait for suspense to resolve
+        await waitFor(() => {
+            expect(screen.getByTestId('dynamic-orb')).toBeInTheDocument();
+        });
     });
 });
