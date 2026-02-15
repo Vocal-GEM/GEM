@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useVoiceProfile } from '../../context/VoiceProfileContext';
 import WarmUpGenerator from '../../services/WarmUpGenerator';
 
@@ -7,7 +6,7 @@ const WarmUpCustomizer = ({ onStart }) => {
     const { profile, loading } = useVoiceProfile();
     const [duration, setDuration] = useState(5);
     const [focus, setFocus] = useState('general');
-    const [energy, setEnergy] = useState('medium');
+    const [energy] = useState('medium'); // Fixed for now, can be exposed later
 
     const routine = useMemo(() => {
         if (!profile || loading) return null;

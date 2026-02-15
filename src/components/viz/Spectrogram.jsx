@@ -36,17 +36,9 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const [showControls, setShowControls] = useState(false);
 
     // Optimized History Buffer (Circular Buffer)
-    // We allocate a large flat array to store history instead of pushing/shifting objects.
-    // Each frame stores 'maxBin' floats.
-    // We increase history size to handle large screens (e.g. 4k).
-    // 2500 frames * 2px speed = 5000px width coverage.
     const HISTORY_FRAMES = 2500;
     const historyBufferRef = useRef(null); // Float32Array
     const historyMetaRef = useRef(null); // Metadata per frame
-
-    if (!historyMetaRef.current) {
-        historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
-    }
 
     if (!historyMetaRef.current) {
         historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
@@ -178,7 +170,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             ctx.fillStyle = '#000';
             ctx.fillRect(width - speed, 0, speed, h);
         }
-    }, [isAudioActive, audioContext, colormap]);
+    }, [dataRef, audioContext, colormap, speed, MAX_FREQ]); // Added missing dependencies
 
     useEffect(() => {
         let unsubscribe;
@@ -256,7 +248,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                 note: hzToNote(frequency)
             });
         }
-    }, []);
+    }, [speed, HISTORY_FRAMES]); // Added missing dependencies
 
     /**
      * Take high-quality screenshot of spectrogram
@@ -287,7 +279,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         link.download = `spectrogram_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
         link.href = tempCanvas.toDataURL('image/png');
         link.click();
-    }, []);
+    }, [MAX_FREQ]); // Added missing dependencies
 
     // Generate Labels
     const renderLabels = () => {

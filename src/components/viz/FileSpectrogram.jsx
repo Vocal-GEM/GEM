@@ -105,25 +105,43 @@ const FileSpectrogram = ({
         };
     }, [FFT_SIZE, HOP_SIZE, MAX_FREQ]);
 
-    // Generate spectrogram when buffer changes
-    useEffect(() => {
-        if (audioBuffer) {
-            spectrogramDataRef.current = generateSpectrogramData(audioBuffer);
-            renderSpectrogram();
-        }
-    }, [audioBuffer, generateSpectrogramData]);
+    /**
+     * Render playhead line
+     */
+    const renderPlayhead = useCallback(() => {
+        const canvas = canvasRef.current;
+        const data = spectrogramDataRef.current;
+        if (!canvas || !data || !duration) return;
 
-    // Re-render when colormap changes
-    useEffect(() => {
-        if (spectrogramDataRef.current) {
-            renderSpectrogram();
-        }
-    }, [colormap]);
+        const ctx = canvas.getContext('2d');
 
-    // Render playhead on time change
-    useEffect(() => {
-        renderPlayhead();
-    }, [currentTime]);
+        // We need to redraw the spectrogram portion under the playhead area
+        // For efficiency, just draw the playhead on top
+        const x = (currentTime / duration) * canvas.width;
+
+        // Save and restore to only clear the playhead area
+        // For simplicity, we'll just redraw the full spectrogram each time
+        // This could be optimized with double buffering
+
+        // Draw playhead line
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Draw playhead handle
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(x - 6, 0);
+        ctx.lineTo(x + 6, 0);
+        ctx.lineTo(x, 10);
+        ctx.closePath();
+        ctx.fill();
+    }, [currentTime, duration]);
 
     /**
      * Render the full spectrogram to canvas
@@ -186,45 +204,27 @@ const FileSpectrogram = ({
 
         // Render initial playhead
         renderPlayhead();
-    }, [colormap, MAX_FREQ]);
+    }, [colormap, MAX_FREQ, renderPlayhead]); // Added renderPlayhead
 
-    /**
-     * Render playhead line
-     */
-    const renderPlayhead = useCallback(() => {
-        const canvas = canvasRef.current;
-        const data = spectrogramDataRef.current;
-        if (!canvas || !data || !duration) return;
+    // Generate spectrogram when buffer changes
+    useEffect(() => {
+        if (audioBuffer) {
+            spectrogramDataRef.current = generateSpectrogramData(audioBuffer);
+            renderSpectrogram();
+        }
+    }, [audioBuffer, generateSpectrogramData, renderSpectrogram]); // Added renderSpectrogram
 
-        const ctx = canvas.getContext('2d');
+    // Re-render when colormap changes
+    useEffect(() => {
+        if (spectrogramDataRef.current) {
+            renderSpectrogram();
+        }
+    }, [colormap, renderSpectrogram]); // Added renderSpectrogram
 
-        // We need to redraw the spectrogram portion under the playhead area
-        // For efficiency, just draw the playhead on top
-        const x = (currentTime / duration) * canvas.width;
-
-        // Save and restore to only clear the playhead area
-        // For simplicity, we'll just redraw the full spectrogram each time
-        // This could be optimized with double buffering
-
-        // Draw playhead line
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Draw playhead handle
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.moveTo(x - 6, 0);
-        ctx.lineTo(x + 6, 0);
-        ctx.lineTo(x, 10);
-        ctx.closePath();
-        ctx.fill();
-    }, [currentTime, duration]);
+    // Render playhead on time change
+    useEffect(() => {
+        renderPlayhead();
+    }, [currentTime, renderPlayhead]); // Added renderPlayhead
 
     /**
      * Handle click to seek
