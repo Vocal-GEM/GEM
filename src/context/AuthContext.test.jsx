@@ -2,6 +2,12 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider, useAuth } from './AuthContext';
 
+// Mock runtime config to ensure backend is enabled for tests
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: () => true,
+    getBackendUrl: () => 'http://localhost:5000'
+}));
+
 // Mock Fetch
 globalThis.fetch = vi.fn();
 
@@ -59,11 +65,15 @@ describe('AuthContext', () => {
     });
 
     it('logs in successfully', async () => {
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
+        // Setup mock response sequence
+        // 1. Initial /me check
+        fetch.mockResolvedValueOnce({ ok: false });
+
+        // 2. Login response
         fetch.mockResolvedValueOnce({
             ok: true,
             json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
+        });
 
         let result;
         await act(async () => {
@@ -79,9 +89,8 @@ describe('AuthContext', () => {
             loginBtn.click();
         });
 
-        await waitFor(() => {
-            expect(result.getByTestId('user').textContent).toBe('testuser');
-        });
+        // Use findByTestId for auto-wait on async updates
+        expect(await result.findByTestId('user')).toHaveTextContent('testuser');
     });
 
     it('handles login failure', async () => {
@@ -131,9 +140,8 @@ describe('AuthContext', () => {
             loginBtn.click();
         });
 
-        await waitFor(() => {
-            expect(result.getByTestId('user').textContent).toBe('testuser');
-        });
+        // Wait for login to complete
+        expect(await result.findByTestId('user')).toHaveTextContent('testuser');
 
         // Logout
         const logoutBtn = result.getByText('Logout');
@@ -141,12 +149,10 @@ describe('AuthContext', () => {
             logoutBtn.click();
         });
 
-        await waitFor(() => {
-            // User should be cleared
-            expect(result.getByTestId('user').textContent).toBe('null');
-            // factoryReset should have been called to clear local data
-            expect(indexedDB.factoryReset).toHaveBeenCalled();
-        });
+        // Wait for logout to clear user
+        expect(await result.findByTestId('user')).toHaveTextContent('null');
+
+        // factoryReset should have been called to clear local data
+        expect(indexedDB.factoryReset).toHaveBeenCalled();
     });
 });
-

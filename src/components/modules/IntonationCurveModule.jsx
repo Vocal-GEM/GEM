@@ -52,7 +52,7 @@ const IntonationCurveModule = ({ embedded = false }) => {
         }, 30);
 
         return () => clearInterval(interval);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [isRecording, userTrace, pattern]);
 
     // Draw Canvas

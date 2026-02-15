@@ -137,7 +137,7 @@ const IntonationTrainingModule = ({ patternType = 'rising', onComplete }) => {
         if (isPlaying) draw();
 
         return () => cancelAnimationFrame(animationId);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [isPlaying, currentPattern]);
 
     const handleStart = () => {

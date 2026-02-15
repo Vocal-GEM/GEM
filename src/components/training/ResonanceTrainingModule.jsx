@@ -128,7 +128,7 @@ const ResonanceTrainingModule = ({ targetVowel = 'i', onComplete: _onComplete })
         }
 
         return () => cancelAnimationFrame(animationId);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [isPlaying, currentTarget]);
 
     const handleStart = () => {

@@ -46,7 +46,7 @@ const PitchMatchingModule = ({ embedded = false }) => {
         }, 100);
 
         return () => clearInterval(interval);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [isAudioActive, targetNote]);
 
     return (
