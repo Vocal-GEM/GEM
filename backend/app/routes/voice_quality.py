@@ -25,18 +25,19 @@ def analyze():
     if not is_valid:
         return jsonify({"error": error}), 400
 
-    goal_name = request.form.get("goal", "transfem_soft_slightly_breathy")
-    if goal_name not in GOAL_PRESETS:
-        goal_name = "transfem_soft_slightly_breathy"
-
-    include_transcript = request.form.get("include_transcript", "false").lower() == "true"
-
-    # Save to temp file
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-        tmp_path = tmp.name
-        file.save(tmp_path)
-
+    tmp_path = None
     try:
+        goal_name = request.form.get("goal", "transfem_soft_slightly_breathy")
+        if goal_name not in GOAL_PRESETS:
+            goal_name = "transfem_soft_slightly_breathy"
+
+        include_transcript = request.form.get("include_transcript", "false").lower() == "true"
+
+        # Save to temp file
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+            tmp_path = tmp.name
+            file.save(tmp_path)
+
         if include_transcript:
             result = analyze_file_with_transcript(
                 tmp_path,
@@ -46,15 +47,16 @@ def analyze():
             )
         else:
             result = analyze_file(tmp_path, goal_name=goal_name)
+
+        return jsonify(result)
+
     except Exception as e:
         # Security: Do not expose internal error details to client
         current_app.logger.error(f"Voice quality analysis error: {e}")
         return jsonify({"error": "An internal error occurred during voice quality analysis."}), 500
     finally:
-        if os.path.exists(tmp_path):
+        if tmp_path and os.path.exists(tmp_path):
             os.remove(tmp_path)
-
-    return jsonify(result)
 
 @voice_quality_bp.route('/api/voice-quality/clean', methods=['POST'])
 @limiter.limit("5 per minute")
