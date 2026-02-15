@@ -117,4 +117,32 @@ describe('TourOverlay', () => {
 
         document.body.removeChild(target);
     });
+
+    it('should have an accessible close button', () => {
+        useTour.mockReturnValue({
+            activeTour: 'test_tour',
+            currentStep: 0,
+            tourConfig: [
+                { target: 'test-target', title: 'Step 1', content: 'Content 1' }
+            ],
+            nextStep: mockNextStep,
+            prevStep: mockPrevStep,
+            skipTour: mockSkipTour
+        });
+
+        const target = document.createElement('div');
+        target.id = 'test-target';
+        target.scrollIntoView = vi.fn();
+        document.body.appendChild(target);
+
+        render(<TourOverlay />);
+
+        const closeButton = screen.getByRole('button', { name: /Close tour/i });
+        expect(closeButton).toBeInTheDocument();
+        fireEvent.click(closeButton);
+
+        expect(mockSkipTour).toHaveBeenCalled();
+
+        document.body.removeChild(target);
+    });
 });

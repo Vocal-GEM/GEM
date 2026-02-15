@@ -66,4 +66,17 @@ describe('TooltipOverlay', () => {
         expect(await screen.findByText('Finish')).toBeInTheDocument();
         expect(screen.queryByText('Next')).not.toBeInTheDocument();
     });
+
+    it('should have an accessible previous button', async () => {
+        const onPrev = vi.fn();
+        render(<TooltipOverlay isActive={true} step={mockStep} isFirstStep={false} onPrev={onPrev} />);
+
+        // Wait for it to appear
+        await screen.findByText('Test Title');
+
+        const prevButton = screen.getByRole('button', { name: /Previous step/i });
+        expect(prevButton).toBeInTheDocument();
+        fireEvent.click(prevButton);
+        expect(onPrev).toHaveBeenCalled();
+    });
 });
