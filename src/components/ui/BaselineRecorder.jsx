@@ -215,6 +215,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                     onClick={() => setShowMicTips(true)}
                     className="absolute top-0 right-0 p-1.5 text-slate-400 hover:text-pink-400 hover:bg-slate-700/50 rounded-lg transition-colors"
                     title="Recording Tips"
+                    aria-label="Recording tips"
                 >
                     <HelpCircle size={18} />
                 </button>
@@ -233,7 +234,10 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
 
             {/* Error message */}
             {error && (
-                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm text-center">
+                <div
+                    className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm text-center"
+                    role="alert"
+                >
                     {error}
                 </div>
             )}
@@ -246,6 +250,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                         className="w-20 h-20 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 
                                    flex items-center justify-center shadow-lg shadow-pink-500/20 
                                    hover:shadow-pink-500/40 hover:scale-105 transition-all group"
+                        aria-label="Start recording"
                     >
                         <Mic className="w-10 h-10 text-white group-hover:scale-110 transition-transform" />
                     </button>
@@ -259,6 +264,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                                 className="w-20 h-20 rounded-full bg-red-500 animate-pulse
                                            flex items-center justify-center shadow-lg shadow-red-500/30 
                                            hover:bg-red-600 transition-colors relative z-10"
+                                aria-label="Stop recording"
                             >
                                 <Square className="w-8 h-8 text-white" fill="white" />
                             </button>
@@ -267,14 +273,16 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                         </div>
                         <div className="flex items-center gap-2 text-red-400">
                             <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
-                            <span className="font-mono text-lg">{formatTime(recordingTime)}</span>
+                            <span className="font-mono text-lg" role="timer" aria-label="Recording duration">
+                                {formatTime(recordingTime)}
+                            </span>
                         </div>
                         <p className="text-sm text-slate-400">Recording... Click to stop</p>
                     </>
                 )}
 
                 {state === 'processing' && (
-                    <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-center gap-2" role="status" aria-label="Processing recording">
                         <Loader2 className="w-12 h-12 text-pink-400 animate-spin" />
                         <p className="text-slate-400">Saving recording...</p>
                     </div>
@@ -293,6 +301,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                                 className="w-14 h-14 rounded-full bg-gradient-to-r from-green-500 to-emerald-500
                                            flex items-center justify-center shadow-lg shadow-green-500/20 
                                            hover:shadow-green-500/40 hover:scale-105 transition-all"
+                                aria-label={isPlaying ? "Pause recording" : "Play recording"}
                             >
                                 {isPlaying ? (
                                     <Pause className="w-7 h-7 text-white" />
@@ -306,6 +315,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                                            flex items-center justify-center 
                                            hover:bg-slate-600 transition-colors"
                                 title="Record again"
+                                aria-label="Record again"
                             >
                                 <RotateCcw className="w-5 h-5 text-slate-300" />
                             </button>
