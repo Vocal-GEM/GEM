@@ -8,11 +8,28 @@ vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));
 
-// Mock pitchfinder
-vi.mock('pitchfinder', () => ({
-    McLeod: vi.fn(() => vi.fn((buffer) => 440)),
-    YIN: vi.fn(() => vi.fn((buffer) => 440))
+// Mock runtime config to enable backend for socket tests
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: () => true,
+    getBackendUrl: () => 'http://localhost:5000'
 }));
+
+// Mock pitchfinder
+vi.mock('pitchfinder', () => {
+    const mockMacleod = vi.fn(() => vi.fn((buffer) => 440));
+    const mockYIN = vi.fn(() => vi.fn((buffer) => 440));
+
+    return {
+        Macleod: mockMacleod,
+        McLeod: mockMacleod,
+        YIN: mockYIN,
+        default: {
+            Macleod: mockMacleod,
+            McLeod: mockMacleod,
+            YIN: mockYIN
+        }
+    };
+});
 
 // Mock AudioContext and browser APIs
 const mockAudioContext = {
@@ -33,7 +50,8 @@ const mockAudioContext = {
     }),
     createGain: () => ({
         connect: vi.fn(),
-        gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), setTargetAtTime: vi.fn() }
+        gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), setTargetAtTime: vi.fn() },
+        cancelScheduledValues: vi.fn()
     }),
     createBiquadFilter: () => ({
         connect: vi.fn(),
