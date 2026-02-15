@@ -5,12 +5,11 @@
  * Includes trend arrows, insights, and key metrics.
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
-    TrendingUp, TrendingDown, Minus, Calendar, Clock,
-    Target, Flame, ChevronRight, BarChart3, Award
+    TrendingUp, TrendingDown, Minus, Calendar, BarChart3
 } from 'lucide-react';
-import { getReports, getActivitySummary } from '../../services/SessionReportService';
+import { getReports } from '../../services/SessionReportService';
 import { getStreakData } from '../../services/StreakService';
 import { getXPData } from '../../services/XPService';
 import SpacedRepetitionService from '../../services/SpacedRepetitionService';
@@ -21,42 +20,7 @@ const WeeklyProgressSummary = ({ embedded = false }) => {
     const [insights, setInsights] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        loadData();
-    }, []);
-
-    const loadData = () => {
-        const reports = getReports();
-        const now = new Date();
-
-        // Current week (last 7 days)
-        const weekAgo = new Date(now);
-        weekAgo.setDate(weekAgo.getDate() - 7);
-
-        // Previous week (8-14 days ago)
-        const twoWeeksAgo = new Date(now);
-        twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-
-        const currentWeekReports = reports.filter(r => {
-            const d = new Date(r.timestamp);
-            return d >= weekAgo;
-        });
-
-        const previousWeekReports = reports.filter(r => {
-            const d = new Date(r.timestamp);
-            return d >= twoWeeksAgo && d < weekAgo;
-        });
-
-        const current = calculateWeekStats(currentWeekReports);
-        const previous = calculateWeekStats(previousWeekReports);
-
-        setCurrentWeek(current);
-        setPreviousWeek(previous);
-        setInsights(generateInsights(current, previous));
-        setIsLoading(false);
-    };
-
-    const calculateWeekStats = (reports) => {
+    const calculateWeekStats = useCallback((reports) => {
         const uniqueDays = new Set(reports.map(r => r.timestamp.split('T')[0])).size;
         const totalMinutes = reports.reduce((sum, r) => sum + (r.durationMinutes || 0), 0);
         const totalSessions = reports.length;
@@ -75,9 +39,9 @@ const WeeklyProgressSummary = ({ embedded = false }) => {
             exercises: exercisesCompleted,
             avgPitch
         };
-    };
+    }, []);
 
-    const generateInsights = (current, previous) => {
+    const generateInsights = useCallback((current, previous) => {
         const insights = [];
         const streak = getStreakData();
         const xp = getXPData();
@@ -141,7 +105,42 @@ const WeeklyProgressSummary = ({ embedded = false }) => {
         }
 
         return insights.slice(0, 3); // Max 3 insights
-    };
+    }, []);
+
+    const loadData = useCallback(() => {
+        const reports = getReports();
+        const now = new Date();
+
+        // Current week (last 7 days)
+        const weekAgo = new Date(now);
+        weekAgo.setDate(weekAgo.getDate() - 7);
+
+        // Previous week (8-14 days ago)
+        const twoWeeksAgo = new Date(now);
+        twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+        const currentWeekReports = reports.filter(r => {
+            const d = new Date(r.timestamp);
+            return d >= weekAgo;
+        });
+
+        const previousWeekReports = reports.filter(r => {
+            const d = new Date(r.timestamp);
+            return d >= twoWeeksAgo && d < weekAgo;
+        });
+
+        const current = calculateWeekStats(currentWeekReports);
+        const previous = calculateWeekStats(previousWeekReports);
+
+        setCurrentWeek(current);
+        setPreviousWeek(previous);
+        setInsights(generateInsights(current, previous));
+        setIsLoading(false);
+    }, [calculateWeekStats, generateInsights]);
+
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
 
     const getTrendIcon = (current, previous) => {
         if (current > previous) return <TrendingUp size={14} className="text-emerald-400" />;
