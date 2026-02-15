@@ -1,0 +1,23 @@
+
+> vocal-gem@0.1.0 lint
+> eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 600
+
+
+Oops! Something went wrong! :(
+
+ESLint: 9.39.2
+
+ESLint couldn't find the plugin "eslint-plugin-react".
+
+(The package "eslint-plugin-react" was not found when loaded as a Node module from the directory "/app".)
+
+It's likely that the plugin isn't installed correctly. Try reinstalling by running the following:
+
+    npm install eslint-plugin-react@latest --save-dev
+
+The plugin "eslint-plugin-react" was referenced from the config file in ".eslintrc.cjs".
+
+If you still can't figure out the problem, please see https://eslint.org/docs/latest/use/troubleshooting.
+
+(node:5535) ESLintRCWarning: You are using an eslintrc configuration file, which is deprecated and support will be removed in v10.0.0. Please migrate to an eslint.config.js file. See https://eslint.org/docs/latest/use/configure/migration-guide for details. An eslintrc configuration file is used because you have the ESLINT_USE_FLAT_CONFIG environment variable set to false. If you want to use an eslint.config.js file, remove the environment variable. If you want to find the location of the eslintrc configuration file, use the --debug flag.
+(Use `node --trace-warnings ...` to show where the warning was created)
