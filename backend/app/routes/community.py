@@ -2,8 +2,6 @@ from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
-from ..extensions import db
-from ..extensions import db, limiter
 from ..validators import validate_file_upload, sanitize_html
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
@@ -14,14 +12,10 @@ from datetime import datetime, timedelta
 import os
 import secrets
 import hashlib
-from ..validators import validate_file_upload
-from werkzeug.utils import secure_filename
-from ..validators import validate_file_upload, sanitize_html
 
 community_bp = Blueprint('community', __name__)
 
 # Helper functions
-
 
 def generate_share_id():
     """Generate a unique share ID"""
@@ -82,7 +76,6 @@ def check_moderation(text):
 
 # Routes
 
-
 @community_bp.route('/share-voice', methods=['POST'])
 @login_required
 @limiter.limit("5 per hour")
@@ -105,7 +98,6 @@ def share_voice():
         # Security: Sanitize context
         context = sanitize_html(context)
 
-        context = sanitize_html(request.form.get('context', ''))
         expiration_days = int(request.form.get('expiration_days', 7))
 
         # Save original file temporarily
@@ -120,6 +112,9 @@ def share_voice():
         filepath = os.path.join(upload_folder, filename)
 
         try:
+            # Save original file first
+            audio_file.save(filepath)
+
             # Anonymize audio
             anon_filepath = anonymize_audio(filepath)
         finally:
@@ -129,17 +124,6 @@ def share_voice():
                     os.remove(filepath)
                 except OSError:
                     pass
-            audio_file.save(filepath)
-
-            # Anonymize audio
-            anon_filepath = anonymize_audio(filepath)
-        finally:
-            # Security: Always remove the original raw audio file
-            if os.path.exists(filepath):
-                try:
-                    os.remove(filepath)
-                except Exception as e:
-                    current_app.logger.error(f"Failed to delete original file: {e}")
 
         # Create share record
         share_id = generate_share_id()
@@ -299,26 +283,6 @@ def submit_success_story():
             clean_techniques = [sanitize_html(str(t)) for t in techniques]
 
         # Moderation check
-        title = sanitize_html(data.get('title', ''))
-        story_content = sanitize_html(data.get('story', ''))
-
-        # Sanitize list of strings
-        techniques = data.get('techniques_used', [])
-        if isinstance(techniques, list):
-            techniques = [sanitize_html(t) for t in techniques]
-
-        # Security: Sanitize inputs
-        title = sanitize_html(data.get('title', ''))
-        story_content = sanitize_html(data.get('story', ''))
-
-        # Moderation check
-        is_safe, flagged = check_moderation(
-            title + ' ' + story_content)
-
-        story = SuccessStory(
-            user_id=current_user.id,
-            title=title,
-            story=story_content,
         is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
 
         story = SuccessStory(

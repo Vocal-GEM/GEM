@@ -3,16 +3,34 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AudioEngine } from './AudioEngine';
 import { io } from 'socket.io-client';
 
+// Mock runtime config to enable backend
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: vi.fn(() => true),
+    getBackendUrl: vi.fn(() => 'http://localhost:5000')
+}));
+
 // Mock socket.io-client
 vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));
 
 // Mock pitchfinder
-vi.mock('pitchfinder', () => ({
-    McLeod: vi.fn(() => vi.fn((buffer) => 440)),
-    YIN: vi.fn(() => vi.fn((buffer) => 440))
-}));
+// Ensure both default export and named exports are handled
+vi.mock('pitchfinder', () => {
+    const mockDetector = vi.fn(() => vi.fn((buffer) => 440));
+    return {
+        // Named exports
+        McLeod: mockDetector,
+        Macleod: mockDetector,
+        YIN: mockDetector,
+        // Default export containing them as properties
+        default: {
+            McLeod: mockDetector,
+            Macleod: mockDetector,
+            YIN: mockDetector
+        }
+    };
+});
 
 // Mock AudioContext and browser APIs
 const mockAudioContext = {

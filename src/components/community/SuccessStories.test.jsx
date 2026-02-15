@@ -1,9 +1,6 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { vi, describe, test, expect, beforeEach } from 'vitest';
-import React from 'react';
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, test, it, expect, vi, beforeEach } from 'vitest';
+import React from 'react';
 import SuccessStories from './SuccessStories';
 import CommunityService from '../../services/CommunityService';
 import ModerationService from '../../services/ModerationService';
@@ -32,6 +29,19 @@ vi.mock('lucide-react', () => ({
     Star: () => <div data-testid="star-icon" />
 }));
 
+// Mock Toast and Button
+vi.mock('../ui/Toast', () => ({
+  default: ({ message, type }) => <div data-testid="toast" data-type={type}>{message}</div>,
+}));
+
+vi.mock('../ui/button', () => ({
+  Button: ({ children, onClick, isLoading, ...props }) => (
+    <button onClick={onClick} disabled={isLoading} {...props}>
+      {isLoading ? 'Loading...' : children}
+    </button>
+  ),
+}));
+
 // Mock Audio
 const mockAudioInstances = [];
 
@@ -49,7 +59,8 @@ const MockAudio = vi.fn(function(src) {
     return new MockAudioImplementation(src);
 });
 
-global.Audio = MockAudio;
+// Fix: Use vi.stubGlobal instead of global.Audio assignment for better compatibility
+vi.stubGlobal('Audio', MockAudio);
 
 describe('SuccessStories Optimization Verification', () => {
     beforeEach(() => {
@@ -107,34 +118,9 @@ describe('SuccessStories Optimization Verification', () => {
         // Audio constructor should NOT be called again
         expect(MockAudio.mock.calls.length).toBe(initialCallCount);
     });
-  default: {
-    getSuccessStories: vi.fn(),
-    submitSuccessStory: vi.fn(),
-  },
-}));
+});
 
-vi.mock('../../services/ModerationService', () => ({
-  default: {
-    preCheckContent: vi.fn(),
-  },
-}));
-
-// Mock Toast and Button to avoid issues with their internal dependencies or animations
-vi.mock('../ui/Toast', () => ({
-  default: ({ message, type }) => <div data-testid="toast" data-type={type}>{message}</div>,
-}));
-
-// We can use the real Button if it's simple, but mocking ensures isolation
-// However, the real Button is imported as { Button }
-vi.mock('../ui/button', () => ({
-  Button: ({ children, onClick, isLoading, ...props }) => (
-    <button onClick={onClick} disabled={isLoading} {...props}>
-      {isLoading ? 'Loading...' : children}
-    </button>
-  ),
-}));
-
-describe('SuccessStories', () => {
+describe('SuccessStories Functionality', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -178,7 +164,7 @@ describe('SuccessStories', () => {
     });
 
     // Mock validation failure
-    ModerationService.preCheckContent.mockReturnValue({ safe: false });
+    ModerationService.default.preCheckContent.mockReturnValue({ safe: false });
 
     const submitButton = screen.getByText('Submit Story');
     fireEvent.click(submitButton);
