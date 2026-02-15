@@ -15,10 +15,20 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
     const metricsRef = useRef({ h1: null, h2: null, diff: null, centroid: null });
     const componentId = useId();
 
+    // Optimization: Track state in JS to avoid DOM thrashing
+    const currentLeftRef = useRef(0);
+    const lastZoneRef = useRef(null);
+
+    // Reset optimized state when settings change to force re-apply styles
+    useEffect(() => {
+        lastZoneRef.current = null;
+    }, [colorBlindMode]);
+
     const loop = useCallback(() => {
         if (indicatorRef.current && valueRef.current && dataRef.current) {
             const { weight, isSilent } = dataRef.current;
-            const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
+            // Optimization: Read from ref instead of DOM (layout thrashing)
+            const curLeft = currentLeftRef.current;
 
             if (isSilent) {
                 return;
@@ -31,24 +41,33 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
             target = Math.max(0, Math.min(100, target));
 
             const nextLeft = curLeft + (target - curLeft) * 0.05;
+            currentLeftRef.current = nextLeft;
             indicatorRef.current.style.left = `${nextLeft}%`;
 
-            // Color based on position
-            if (colorBlindMode) {
-                if (nextLeft > 70) {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.8)] transition-colors duration-75 bg-orange-500";
-                } else if (nextLeft < 30) {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.8)] transition-colors duration-75 bg-teal-400";
+            // Optimization: Only update className when zone changes to avoid style recalc
+            let zone = 'mid';
+            if (nextLeft > 70) zone = 'high';
+            else if (nextLeft < 30) zone = 'low';
+
+            if (zone !== lastZoneRef.current) {
+                lastZoneRef.current = zone;
+
+                if (colorBlindMode) {
+                    if (zone === 'high') {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.8)] transition-colors duration-75 bg-orange-500";
+                    } else if (zone === 'low') {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.8)] transition-colors duration-75 bg-teal-400";
+                    } else {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)] transition-colors duration-75 bg-purple-500";
+                    }
                 } else {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)] transition-colors duration-75 bg-purple-500";
-                }
-            } else {
-                if (nextLeft > 70) {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(255,100,100,0.8)] transition-colors duration-75 bg-red-500";
-                } else if (nextLeft < 30) {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-blue-400";
-                } else {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 bg-emerald-500";
+                    if (zone === 'high') {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(255,100,100,0.8)] transition-colors duration-75 bg-red-500";
+                    } else if (zone === 'low') {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-blue-400";
+                    } else {
+                        indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 bg-emerald-500";
+                    }
                 }
             }
 
