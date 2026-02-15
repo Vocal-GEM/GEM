@@ -5,6 +5,12 @@ import { AuthProvider, useAuth } from './AuthContext';
 // Mock Fetch
 globalThis.fetch = vi.fn();
 
+// Mock Runtime Config
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: vi.fn(() => true),
+    getBackendUrl: vi.fn(() => 'http://localhost:5000')
+}));
+
 // Mock IndexedDBManager
 vi.mock('../services/IndexedDBManager', () => ({
     indexedDB: {

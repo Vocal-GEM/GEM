@@ -3,6 +3,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AudioEngine } from './AudioEngine';
 import { io } from 'socket.io-client';
 
+// Mock runtime config
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: vi.fn(() => true),
+    getBackendUrl: vi.fn(() => 'http://localhost:5000')
+}));
+
 // Mock socket.io-client
 vi.mock('socket.io-client', () => ({
     io: vi.fn()
@@ -108,15 +114,13 @@ describe('AudioEngine Socket Integration', () => {
         vi.clearAllMocks();
     });
 
-    it('should initialize socket on start', async () => {
-        await engine.start();
+    it('should initialize socket on construction', async () => {
+        // Socket initialization happens in constructor
         expect(io).toHaveBeenCalled();
         expect(engine.socket).toBe(mockSocket);
     });
 
     it('should handle socket connection events', async () => {
-        await engine.start();
-
         // Simulate connect
         mockSocket.connected = true;
         if (socketCallbacks['connect']) socketCallbacks['connect']();
@@ -152,6 +156,7 @@ describe('AudioEngine Socket Integration', () => {
 
         // Should NOT emit yet
         expect(mockSocket.emit).not.toHaveBeenCalled();
+        // Check buffer size directly
         expect(engine.socketBuffer.length).toBe(1);
 
         // Simulate connection
@@ -179,7 +184,13 @@ describe('AudioEngine Socket Integration', () => {
             socketCallbacks['analysis_update'](analysisData);
         }
 
-        expect(engine.latestBackendAnalysis).toMatchObject(analysisData);
+        // We check partial match because timestamp is added
+        expect(engine.latestBackendAnalysis).toMatchObject({
+            rbi_score: 85,
+            breathiness_score: 10,
+            roughness_score: 5,
+            strain_score: 0
+        });
         expect(engine.latestBackendAnalysis.timestamp).toBeGreaterThan(0);
     });
 });
