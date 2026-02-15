@@ -16,7 +16,11 @@ vi.mock('../../services/RenderCoordinator', () => ({
 vi.mock('lucide-react', async () => {
     // Dynamically import React to avoid 'require' in ESM
     const React = await import('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+    const createIcon = (name) => {
+        const IconComponent = (props) => React.createElement('div', { ...props, 'data-testid': name });
+        IconComponent.displayName = `Icon(${name})`;
+        return IconComponent;
+    };
 
     return {
         Sun: createIcon('Sun'),
