@@ -1,6 +1,7 @@
 
 import { describe, it, expect, beforeAll } from 'vitest';
-import { PitchEnsemble } from '../../utils/pitchEnsemble';
+// PitchEnsemble might be a default export or named export. Checking import strategy.
+import PitchEnsemble from '../../utils/pitchEnsemble';
 import { FormantTracker } from '../../utils/formantTracker';
 import praatReferences from './praatReferences.json';
 

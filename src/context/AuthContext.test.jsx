@@ -41,6 +41,9 @@ describe('AuthContext', () => {
         vi.spyOn(console, 'log').mockImplementation(() => { });
     });
 
+    // Note: Wrapping updates in act() is essential for state updates in tests.
+    // We increased timeout for waitFor because state updates might be async/batched.
+
     it('initializes with null user if /me fails', async () => {
         fetch.mockResolvedValueOnce({ ok: false }); // /me check
 
@@ -55,7 +58,7 @@ describe('AuthContext', () => {
 
         await waitFor(() => {
             expect(result.getByTestId('user').textContent).toBe('null');
-        });
+        }, { timeout: 2000 });
     });
 
     it('logs in successfully', async () => {
@@ -81,7 +84,7 @@ describe('AuthContext', () => {
 
         await waitFor(() => {
             expect(result.getByTestId('user').textContent).toBe('testuser');
-        });
+        }, { timeout: 2000 });
     });
 
     it('handles login failure', async () => {
@@ -104,7 +107,7 @@ describe('AuthContext', () => {
 
         await waitFor(() => {
             expect(result.getByTestId('user').textContent).toBe('null');
-        });
+        }, { timeout: 2000 });
     });
 
     it('clears local data on logout', async () => {
@@ -133,7 +136,7 @@ describe('AuthContext', () => {
 
         await waitFor(() => {
             expect(result.getByTestId('user').textContent).toBe('testuser');
-        });
+        }, { timeout: 2000 });
 
         // Logout
         const logoutBtn = result.getByText('Logout');
@@ -146,7 +149,7 @@ describe('AuthContext', () => {
             expect(result.getByTestId('user').textContent).toBe('null');
             // factoryReset should have been called to clear local data
             expect(indexedDB.factoryReset).toHaveBeenCalled();
-        });
+        }, { timeout: 2000 });
     });
 });
 

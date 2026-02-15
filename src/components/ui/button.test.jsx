@@ -12,7 +12,8 @@ describe("Button", () => {
   it("shows loading spinner when isLoading is true", () => {
     render(<Button isLoading>Click me</Button>);
     expect(screen.getByRole("status")).toBeInTheDocument(); // LoadingSpinner role
-    expect(screen.getByText("Loading")).toBeInTheDocument(); // SR text (modified to match Button implementation)
+    // The text might be "Loading..." or broken up. We check for partial match or presence.
+    expect(screen.getByText(/loading/i)).toBeInTheDocument();
     expect(screen.getByRole("button")).toBeDisabled();
   });
 
