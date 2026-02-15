@@ -89,7 +89,7 @@ const PitchTrainingModule = ({ targetNote = 'A3', targetFreq = 220, tolerance = 
         }
 
         return () => cancelAnimationFrame(animationId);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [isPlaying, targetFreq, tolerance]);
 
     const handleStart = () => {

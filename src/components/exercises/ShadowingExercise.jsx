@@ -154,7 +154,7 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
             setPhase('listen');
             speakText(selectedClip.text, selectedClip.rate, selectedClip.pitch);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [selectedClip]);
 
     const handleStartRecording = useCallback(async () => {
@@ -170,7 +170,7 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
         setTimeout(() => {
             if (isRecording) handleStopRecording();
         }, 8000);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [isAudioActive, toggleAudio]);
 
     const handleStopRecording = useCallback(() => {

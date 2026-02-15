@@ -49,3 +49,15 @@
 8:21:40 AM [vite] page reload src/context/AuthContext.test.jsx
 8:21:57 AM [vite] page reload src/test/validation/algorithmValidation.test.js
 8:22:58 AM [vite] page reload src/engines/AudioEngine.socket.test.js
+8:39:44 AM [vite] page reload src/components/views/PracticeMode.test.jsx
+8:40:58 AM [vite] page reload src/components/views/PracticeMode.test.jsx
+8:42:38 AM [vite] page reload src/components/views/PracticeMode.test.jsx
+8:47:12 AM [vite] page reload src/components/modules/PitchMatchingModule.jsx
+8:47:12 AM [vite] hmr update /src/components/exercises/ShadowingExercise.jsx, /src/index.css
+8:47:12 AM [vite] page reload src/components/modules/IntonationCurveModule.jsx
+8:47:12 AM [vite] hmr update /src/components/training/PitchTrainingModule.jsx, /src/index.css
+8:47:12 AM [vite] hmr update /src/components/training/IntonationTrainingModule.jsx, /src/index.css
+8:47:12 AM [vite] page reload src/components/training/ResonanceTrainingModule.jsx
+8:47:12 AM [vite] hmr update /src/context/AudioContext.jsx, /src/index.css
+8:47:12 AM [vite] hmr update /src/components/ui/ResizablePanel.jsx, /src/index.css
+8:48:11 AM [vite] page reload src/components/views/PracticeMode.test.jsx

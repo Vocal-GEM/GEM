@@ -144,7 +144,7 @@ const ResizablePanel = ({
         // It's better to useCallback them OR disable the rule.
         // Since we cannot refactor everything to useCallback easily without potential staleness issues (startPos ref is fine, but setDimensions uses state),
         // we will suppress the warning for this specific hook as it manages global listeners.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [isResizing]);
 
     // On mobile, use full width and auto height

@@ -149,7 +149,7 @@ export const AudioProvider = ({ children }) => {
             window.removeEventListener('touchstart', unlockAudio);
             window.removeEventListener('click', unlockAudio);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, []);
 
     const [audioError, setAudioError] = useState(null);
