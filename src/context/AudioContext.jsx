@@ -95,7 +95,8 @@ export const AudioProvider = ({ children }) => {
         try {
             audioEngineRef.current = new AudioEngine((data) => {
                 // ... (data handler)
-                const currentHistory = dataRef.current.history;
+                // Use existing history array to avoid allocation
+                const history = dataRef.current.history;
                 let pitchToStore = data.pitch;
 
                 if (data.pitch > 0) {
@@ -110,12 +111,13 @@ export const AudioProvider = ({ children }) => {
                     }
                 }
 
-                dataRef.current = {
-                    ...data,
-                    history: [...currentHistory.slice(1), pitchToStore],
-                    silenceCounter: dataRef.current.silenceCounter,
-                    lastValidPitch: dataRef.current.lastValidPitch
-                };
+                // Update history in-place
+                history.shift();
+                history.push(pitchToStore);
+
+                // Update dataRef properties in-place instead of creating new object
+                // This prevents garbage collection of ~60 objects/sec
+                Object.assign(dataRef.current, data);
 
                 // Log audio data periodically for debugging
                 const now = Date.now();
