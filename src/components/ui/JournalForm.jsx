@@ -142,12 +142,12 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                         <button
                             type="button"
                             onClick={() => setAudioBlobUrl(null)}
-                            className="p-2 text-red-400 hover:text-red-300"
+                            className="p-2 text-red-400 hover:text-red-300 transition-colors"
                             aria-label="Delete recording"
+                            title="Delete recording"
                         >
-                            <Trash2 />
+                            <Trash2 size={20} />
                         </button>
-                        <button type="button" onClick={() => setAudioBlobUrl(null)} className="p-2 text-red-400 hover:text-red-300" aria-label="Delete recording"><Trash2 /></button>
                     </div>
                 )}
                 <p className="text-xs text-slate-500">{isRecording ? 'Recording... Read your script!' : 'Tap to record your voice'}</p>
@@ -233,20 +233,35 @@ const JournalForm = ({ onSubmit, onCancel }) => {
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <label htmlFor="journal-effort" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Effort (1-10)</label>
-                    <input id="journal-effort" type="range" min="1" max="10" value={effort} onChange={(e) => setEffort(parseInt(e.target.value))} className="w-full accent-blue-500" />
-                    <div className="text-center text-blue-400 font-bold">{effort}</div>
+                    <input
+                        id="journal-effort"
+                        type="range"
+                        min="1"
+                        max="10"
+                        value={effort}
+                        onChange={(e) => setEffort(parseInt(e.target.value))}
+                        className="w-full accent-blue-500 cursor-pointer"
+                        aria-valuemin="1"
+                        aria-valuemax="10"
+                        aria-valuenow={effort}
+                    />
+                    <div className="text-center text-blue-400 font-bold" aria-hidden="true">{effort}</div>
                 </div>
                 <div>
                     <label htmlFor="journal-confidence" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Confidence (1-10)</label>
-                    <input id="journal-confidence" type="range" min="1" max="10" value={confidence} onChange={(e) => setConfidence(parseInt(e.target.value))} className="w-full accent-emerald-500" />
-                    <label htmlFor="effort-slider" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Effort (1-10)</label>
-                    <input id="effort-slider" type="range" min="1" max="10" value={effort} onChange={(e) => setEffort(parseInt(e.target.value))} className="w-full accent-blue-500" />
-                    <div className="text-center text-blue-400 font-bold">{effort}</div>
-                </div>
-                <div>
-                    <label htmlFor="confidence-slider" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Confidence (1-10)</label>
-                    <input id="confidence-slider" type="range" min="1" max="10" value={confidence} onChange={(e) => setConfidence(parseInt(e.target.value))} className="w-full accent-emerald-500" />
-                    <div className="text-center text-emerald-400 font-bold">{confidence}</div>
+                    <input
+                        id="journal-confidence"
+                        type="range"
+                        min="1"
+                        max="10"
+                        value={confidence}
+                        onChange={(e) => setConfidence(parseInt(e.target.value))}
+                        className="w-full accent-emerald-500 cursor-pointer"
+                        aria-valuemin="1"
+                        aria-valuemax="10"
+                        aria-valuenow={confidence}
+                    />
+                    <div className="text-center text-emerald-400 font-bold" aria-hidden="true">{confidence}</div>
                 </div>
             </div>
 
