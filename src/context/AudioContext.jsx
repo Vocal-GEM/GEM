@@ -95,7 +95,6 @@ export const AudioProvider = ({ children }) => {
         try {
             audioEngineRef.current = new AudioEngine((data) => {
                 // ... (data handler)
-                const currentHistory = dataRef.current.history;
                 let pitchToStore = data.pitch;
 
                 if (data.pitch > 0) {
@@ -110,12 +109,14 @@ export const AudioProvider = ({ children }) => {
                     }
                 }
 
-                dataRef.current = {
-                    ...data,
-                    history: [...currentHistory.slice(1), pitchToStore],
-                    silenceCounter: dataRef.current.silenceCounter,
-                    lastValidPitch: dataRef.current.lastValidPitch
-                };
+                // Optimization: Update history in-place to reduce GC pressure
+                if (dataRef.current.history) {
+                    dataRef.current.history.shift();
+                    dataRef.current.history.push(pitchToStore);
+                }
+
+                // Update other properties in-place
+                Object.assign(dataRef.current, data);
 
                 // Log audio data periodically for debugging
                 const now = Date.now();
