@@ -8,8 +8,15 @@ vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));
 
+// Mock Config
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: () => true,
+    getBackendUrl: () => 'http://localhost:5000'
+}));
+
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)),
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
     YIN: vi.fn(() => vi.fn((buffer) => 440))
 }));
@@ -108,14 +115,15 @@ describe('AudioEngine Socket Integration', () => {
     });
 
     it('should initialize socket on start', async () => {
-        await engine.start();
+        // Note: socket connects in constructor if enabled, but let's just check it exists
+        // Actually, AudioEngine initializes socket in constructor
+        // await engine.start() is for audio context resume
+
         expect(io).toHaveBeenCalled();
         expect(engine.socket).toBe(mockSocket);
     });
 
     it('should handle socket connection events', async () => {
-        await engine.start();
-
         // Simulate connect
         mockSocket.connected = true;
         if (socketCallbacks['connect']) socketCallbacks['connect']();
@@ -165,7 +173,7 @@ describe('AudioEngine Socket Integration', () => {
     });
 
     it('should update latestBackendAnalysis on analysis_update', async () => {
-        await engine.start();
+        // await engine.start(); // Not strictly needed for socket listening as it's in constructor
 
         const analysisData = {
             rbi_score: 85,
