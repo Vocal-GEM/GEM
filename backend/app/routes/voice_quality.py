@@ -33,9 +33,13 @@ def analyze():
     include_transcript = request.form.get("include_transcript", "false").lower() == "true"
 
     # Save to temp file
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-        tmp_path = tmp.name
-        file.save(tmp_path)
+    tmp_path = None
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+            tmp_path = tmp.name
+            file.save(tmp_path)
+    except Exception as e:
+        return jsonify({"error": "Failed to save file."}), 500
 
     try:
         if include_transcript:
@@ -52,8 +56,11 @@ def analyze():
         print(f"Voice quality analysis error: {e}")
         return jsonify({"error": "An internal error occurred during voice quality analysis."}), 500
     finally:
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except Exception:
+                pass
 
     return jsonify(result)
 

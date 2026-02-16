@@ -10,12 +10,8 @@ module.exports = {
     ignorePatterns: ['dist', '.eslintrc.cjs', 'ios', 'android', 'build', 'public/assets'],
     parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
     settings: { react: { version: '18.2' } },
-    plugins: ['react-refresh'],
+    plugins: [],
     rules: {
-        'react-refresh/only-export-components': [
-            'warn',
-            { allowConstantExport: true },
-        ],
         'react/prop-types': 'off',
         'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
