@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import { vi, describe, it, expect } from 'vitest';
 import PracticeMode from './PracticeMode';
@@ -31,7 +31,12 @@ vi.mock('../../context/NavigationContext', () => ({
         navigationParams: {}
     })
 }));
-vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
+
+// Mock the DynamicOrb directly since it's lazy loaded
+vi.mock('../viz/DynamicOrb', () => ({
+    default: () => <div data-testid="dynamic-orb">Dynamic Orb</div>
+}));
+
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
 vi.mock('../ui/ResizablePanel', () => ({
     default: ({ children, className }) => <div className={className} data-testid="resizable-panel">{children}</div>
@@ -60,7 +65,6 @@ vi.mock('../../context/ProfileContext', () => ({
 
 describe('PracticeMode', () => {
     const mockDataRef = { current: { pitch: 200, resonance: 100, volume: 0.5 } };
-    const mockAudioEngine = { current: {} };
 
     it('renders without crashing', async () => {
 
@@ -86,9 +90,13 @@ describe('PracticeMode', () => {
             </SettingsProvider>
         );
 
+        // Should render main tabs
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
-        // Check for visualization area
-        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
+
+        // DynamicOrb is lazy loaded, so we must wait for it
+        await waitFor(() => {
+            expect(screen.getByTestId('dynamic-orb')).toBeInTheDocument();
+        });
     });
 });

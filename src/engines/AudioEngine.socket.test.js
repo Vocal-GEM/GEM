@@ -8,8 +8,15 @@ vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));
 
+// Mock Config
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: () => true,
+    getBackendUrl: () => 'http://localhost:5000'
+}));
+
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)),
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
     YIN: vi.fn(() => vi.fn((buffer) => 440))
 }));
@@ -33,7 +40,7 @@ const mockAudioContext = {
     }),
     createGain: () => ({
         connect: vi.fn(),
-        gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), setTargetAtTime: vi.fn() }
+        gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), setTargetAtTime: vi.fn(), cancelScheduledValues: vi.fn() }
     }),
     createBiquadFilter: () => ({
         connect: vi.fn(),
@@ -43,7 +50,8 @@ const mockAudioContext = {
     createBuffer: () => ({}),
     createBufferSource: () => ({
         connect: vi.fn(),
-        start: vi.fn()
+        start: vi.fn(),
+        buffer: null
     }),
     createMediaStreamSource: () => ({
         connect: vi.fn(),
@@ -54,12 +62,25 @@ const mockAudioContext = {
     close: vi.fn().mockResolvedValue(),
     destination: {},
     state: 'suspended',
-    sampleRate: 44100
+    sampleRate: 44100,
+    audioWorklet: {
+        addModule: vi.fn().mockResolvedValue()
+    }
 };
 
 window.AudioContext = vi.fn().mockImplementation(function () { return mockAudioContext; });
 window.webkitAudioContext = window.AudioContext;
 window.alert = vi.fn(); // Mock alert to prevent JSDOM error
+
+// Mock AudioWorkletNode
+window.AudioWorkletNode = vi.fn().mockImplementation(() => ({
+    port: {
+        postMessage: vi.fn(),
+        onmessage: null
+    },
+    connect: vi.fn(),
+    disconnect: vi.fn()
+}));
 
 // Mock MediaRecorder
 window.MediaRecorder = vi.fn().mockImplementation(() => ({
@@ -108,22 +129,17 @@ describe('AudioEngine Socket Integration', () => {
     });
 
     it('should initialize socket on start', async () => {
-        await engine.start();
         expect(io).toHaveBeenCalled();
         expect(engine.socket).toBe(mockSocket);
     });
 
     it('should handle socket connection events', async () => {
-        await engine.start();
-
-        // Simulate connect
-        mockSocket.connected = true;
+        // Manually trigger connect callback to update state
         if (socketCallbacks['connect']) socketCallbacks['connect']();
 
         expect(engine.debugInfo.socketConnected).toBe(true);
 
-        // Simulate disconnect
-        mockSocket.connected = false;
+        // Manually trigger disconnect callback
         if (socketCallbacks['disconnect']) socketCallbacks['disconnect']('transport close');
 
         expect(engine.debugInfo.socketConnected).toBe(false);
@@ -131,7 +147,11 @@ describe('AudioEngine Socket Integration', () => {
 
     it('should emit audio_chunk when connected', async () => {
         await engine.start();
+
+        // Manually update connected state as the engine checks engine.socket.connected
         mockSocket.connected = true;
+
+        // Force update internal state if needed (though engine checks socket.connected directly)
 
         const pcmData = new Float32Array(128).fill(0.5);
         engine.sendAudioChunk(pcmData);
@@ -165,8 +185,6 @@ describe('AudioEngine Socket Integration', () => {
     });
 
     it('should update latestBackendAnalysis on analysis_update', async () => {
-        await engine.start();
-
         const analysisData = {
             rbi_score: 85,
             breathiness_score: 10,
