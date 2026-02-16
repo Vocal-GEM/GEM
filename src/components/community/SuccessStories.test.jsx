@@ -123,6 +123,7 @@ describe('SuccessStories Optimization Verification', () => {
         render(<SuccessStories />);
 
         // Wait for loading to finish
+        // The text might be "No stories found yet. Be the first to share!" if empty, or just no stories.
         await waitFor(() => expect(screen.queryByText('Loading...')).not.toBeInTheDocument());
 
         const shareButton = screen.getByText('Share Your Story');

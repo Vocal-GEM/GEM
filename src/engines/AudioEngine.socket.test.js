@@ -40,7 +40,7 @@ const mockAudioContext = {
     }),
     createGain: () => ({
         connect: vi.fn(),
-        gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), setTargetAtTime: vi.fn() }
+        gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), setTargetAtTime: vi.fn(), cancelScheduledValues: vi.fn() }
     }),
     createBiquadFilter: () => ({
         connect: vi.fn(),
@@ -50,7 +50,8 @@ const mockAudioContext = {
     createBuffer: () => ({}),
     createBufferSource: () => ({
         connect: vi.fn(),
-        start: vi.fn()
+        start: vi.fn(),
+        buffer: null
     }),
     createMediaStreamSource: () => ({
         connect: vi.fn(),
@@ -61,12 +62,25 @@ const mockAudioContext = {
     close: vi.fn().mockResolvedValue(),
     destination: {},
     state: 'suspended',
-    sampleRate: 44100
+    sampleRate: 44100,
+    audioWorklet: {
+        addModule: vi.fn().mockResolvedValue()
+    }
 };
 
 window.AudioContext = vi.fn().mockImplementation(function () { return mockAudioContext; });
 window.webkitAudioContext = window.AudioContext;
 window.alert = vi.fn(); // Mock alert to prevent JSDOM error
+
+// Mock AudioWorkletNode
+window.AudioWorkletNode = vi.fn().mockImplementation(() => ({
+    port: {
+        postMessage: vi.fn(),
+        onmessage: null
+    },
+    connect: vi.fn(),
+    disconnect: vi.fn()
+}));
 
 // Mock MediaRecorder
 window.MediaRecorder = vi.fn().mockImplementation(() => ({
@@ -115,23 +129,17 @@ describe('AudioEngine Socket Integration', () => {
     });
 
     it('should initialize socket on start', async () => {
-        // Note: socket connects in constructor if enabled, but let's just check it exists
-        // Actually, AudioEngine initializes socket in constructor
-        // await engine.start() is for audio context resume
-
         expect(io).toHaveBeenCalled();
         expect(engine.socket).toBe(mockSocket);
     });
 
     it('should handle socket connection events', async () => {
-        // Simulate connect
-        mockSocket.connected = true;
+        // Manually trigger connect callback to update state
         if (socketCallbacks['connect']) socketCallbacks['connect']();
 
         expect(engine.debugInfo.socketConnected).toBe(true);
 
-        // Simulate disconnect
-        mockSocket.connected = false;
+        // Manually trigger disconnect callback
         if (socketCallbacks['disconnect']) socketCallbacks['disconnect']('transport close');
 
         expect(engine.debugInfo.socketConnected).toBe(false);
@@ -139,7 +147,11 @@ describe('AudioEngine Socket Integration', () => {
 
     it('should emit audio_chunk when connected', async () => {
         await engine.start();
+
+        // Manually update connected state as the engine checks engine.socket.connected
         mockSocket.connected = true;
+
+        // Force update internal state if needed (though engine checks socket.connected directly)
 
         const pcmData = new Float32Array(128).fill(0.5);
         engine.sendAudioChunk(pcmData);
@@ -173,8 +185,6 @@ describe('AudioEngine Socket Integration', () => {
     });
 
     it('should update latestBackendAnalysis on analysis_update', async () => {
-        // await engine.start(); // Not strictly needed for socket listening as it's in constructor
-
         const analysisData = {
             rbi_score: 85,
             breathiness_score: 10,
