@@ -30,6 +30,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
+// eslint-disable-next-line no-undef
 global.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('PitchOrb', () => {
