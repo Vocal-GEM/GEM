@@ -78,7 +78,7 @@ const QuickActions = ({ onAction }) => {
                                 <action.icon size={20} />
                             </div>
                         </button>
-                ))}
+                    ))}
             </div>
 
             {/* Main FAB */}
