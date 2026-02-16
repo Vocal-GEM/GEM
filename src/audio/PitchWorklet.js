@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * PitchWorklet.js
  * AudioWorklet processor for ultra-low-latency pitch detection

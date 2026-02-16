@@ -3,12 +3,11 @@ import { useSettings } from '../../context/SettingsContext';
 import { Info, TrendingDown } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
-const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -6 } }) => {
+const SpectralTiltMeter = ({ dataRef, targetRange = { min: -12, max: -6 } }) => {
     const { colorBlindMode } = useSettings();
-    const id = useId();
+    const componentId = useId();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
-    const componentId = useId();
 
     useEffect(() => {
         const loop = () => {
@@ -42,17 +41,6 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
             }
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                `spectral-tilt-meter-${id}`,
-                loop,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
-
         const unsubscribe = renderCoordinator.subscribe(
             `spectral-tilt-meter-${componentId}`,
             loop,
@@ -62,7 +50,6 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
         return () => {
             unsubscribe();
         };
-    }, [dataRef, targetRange, colorBlindMode, id]);
     }, [dataRef, targetRange, colorBlindMode, componentId]);
 
     return (
