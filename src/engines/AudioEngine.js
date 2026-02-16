@@ -598,6 +598,7 @@ export class AudioEngine {
                     weightLabel: weightLabel,
                     f3Noise: f3Noise,
                     harmonicRatio: harmonicRatio,
+                    spectrum: freqData,
                     debug: {
                         h1: weightAnalysis.h1,
                         h2: weightAnalysis.h2,
