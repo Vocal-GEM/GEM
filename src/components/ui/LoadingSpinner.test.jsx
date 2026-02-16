@@ -13,9 +13,9 @@ describe('LoadingSpinner', () => {
     expect(spinner).toHaveAttribute('aria-live', 'polite');
 
     // It should have a visually hidden label "Loading..." by default
-    const srText = screen.getByText('Loading...');
-    expect(srText).toBeInTheDocument();
-    expect(srText).toHaveClass('sr-only');
+    const srTextElement = screen.getByText('Loading...');
+    expect(srTextElement).toBeInTheDocument();
+    expect(srTextElement).toHaveClass('sr-only');
   });
 
   it("renders with custom label", () => {

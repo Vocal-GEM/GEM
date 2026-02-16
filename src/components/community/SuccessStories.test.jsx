@@ -46,7 +46,7 @@ const MockAudio = vi.fn(function(src) {
     return new MockAudioImplementation(src);
 });
 
-global.Audio = MockAudio;
+globalThis.Audio = MockAudio;
 
 describe('SuccessStories Optimization Verification', () => {
     beforeEach(() => {
