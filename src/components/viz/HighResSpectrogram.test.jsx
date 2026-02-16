@@ -45,7 +45,7 @@ describe('HighResSpectrogram', () => {
   beforeEach(() => {
     dataRef = {
       current: {
-        spectrum: new Float32Array(1024).fill(0.5),
+        spectrum: new Float32Array(1024).fill(-50), // dB values
         f1: 500,
         f2: 1500
       }
@@ -81,5 +81,11 @@ describe('HighResSpectrogram', () => {
 
     unmount();
     expect(unsubscribe).toHaveBeenCalled();
+  });
+
+  it('handles silence (low dB) gracefully', () => {
+    dataRef.current.spectrum.fill(-150); // Silence
+    render(<HighResSpectrogram dataRef={dataRef} />);
+    expect(renderCoordinator.subscribe).toHaveBeenCalled();
   });
 });
