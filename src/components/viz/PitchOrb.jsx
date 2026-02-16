@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useId } from 'react';
+import { useEffect, useRef, useState, useId, useMemo } from 'react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
 // Convert Hz to semitones (MIDI note number)
@@ -15,24 +15,47 @@ const getNoteFromSemitone = (semitone) => {
     return `${note}${octave}`;
 };
 
+// Default gender ranges if not set in settings
+const DEFAULT_RANGES = {
+    feminine: { min: 165, max: 300 },
+    androgynous: { min: 135, max: 175 },
+    masculine: { min: 85, max: 135 }
+};
+
 const PitchOrb = ({ dataRef, settings = {} }) => {
     const canvasRef = useRef(null);
+    const rectRef = useRef({ width: 0, height: 0 });
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
-    // Default gender ranges if not set in settings
-    const defaultRanges = {
-        feminine: { min: 165, max: 300 },
-        androgynous: { min: 135, max: 175 },
-        masculine: { min: 85, max: 135 }
-    };
-
-    const genderRanges = settings.genderRanges || defaultRanges;
+    const genderRanges = useMemo(() => settings.genderRanges || DEFAULT_RANGES, [settings.genderRanges]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
+
         const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
+
+        // Handle resizing efficiently
+        const handleResize = () => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            rectRef.current = { width: rect.width, height: rect.height };
+
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+        };
+
+        // Initialize size
+        handleResize();
+
+        // Use ResizeObserver to detect changes without layout thrashing in the loop
+        const resizeObserver = new ResizeObserver(() => {
+            handleResize();
+        });
+        resizeObserver.observe(canvas);
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,13 +90,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            // OPTIMIZED: Use cached dimensions to avoid layout thrashing (getBoundingClientRect)
+            const { width, height } = rectRef.current;
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -166,6 +184,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 

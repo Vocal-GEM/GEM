@@ -34,11 +34,13 @@ global.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('PitchOrb', () => {
     let dataRef;
+    let getBoundingClientRectMock;
 
     beforeEach(() => {
         dataRef = { current: { pitch: 200 } };
-        // Add getBoundingClientRect mock
-        Element.prototype.getBoundingClientRect = vi.fn(() => ({
+
+        // Mock getBoundingClientRect
+        getBoundingClientRectMock = vi.fn(() => ({
             width: 300,
             height: 300,
             top: 0,
@@ -46,6 +48,8 @@ describe('PitchOrb', () => {
             right: 300,
             bottom: 300,
         }));
+        Element.prototype.getBoundingClientRect = getBoundingClientRectMock;
+
         vi.clearAllMocks();
     });
 
@@ -66,10 +70,30 @@ describe('PitchOrb', () => {
         // Execute the callback
         callback();
 
-        // With the bug, requestAnimationFrame is called.
-        // We assert it IS called to confirm the bug exists in the current code,
-        // OR we assert it is NOT called if we want to write the test for the desired state.
-        // Let's write the test for the DESIRED state (fail now, pass later).
+        // Should not call rAF
         expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+    });
+
+    it('should NOT call getBoundingClientRect inside the render loop (optimized behavior)', async () => {
+        render(<PitchOrb dataRef={dataRef} />);
+
+        // Wait for potential dynamic import resolution
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        // Initial render triggers getBoundingClientRect inside handleResize
+        // verify it was called once for initialization
+        expect(getBoundingClientRectMock).toHaveBeenCalled();
+
+        // Reset the mock to check if it's called AGAIN during loop
+        getBoundingClientRectMock.mockClear();
+
+        expect(renderCoordinator.subscribe).toHaveBeenCalled();
+        const [id, callback] = renderCoordinator.subscribe.mock.calls[0];
+
+        // Execute the callback (simulate one frame)
+        callback();
+
+        // It should NOT call getBoundingClientRect in the optimized implementation
+        expect(getBoundingClientRectMock).not.toHaveBeenCalled();
     });
 });
