@@ -117,4 +117,41 @@ describe('TourOverlay', () => {
 
         document.body.removeChild(target);
     });
+
+    it('should have accessibility attributes', () => {
+        useTour.mockReturnValue({
+            activeTour: 'test_tour',
+            currentStep: 0,
+            tourConfig: [
+                { target: 'test-target', title: 'Accessible Step', content: 'Content' }
+            ],
+            nextStep: mockNextStep,
+            prevStep: mockPrevStep,
+            skipTour: mockSkipTour
+        });
+
+        const target = document.createElement('div');
+        target.id = 'test-target';
+        target.scrollIntoView = vi.fn();
+        document.body.appendChild(target);
+        target.getBoundingClientRect = () => ({
+            top: 100, left: 100, width: 100, height: 100, bottom: 200, right: 200
+        });
+
+        render(<TourOverlay />);
+
+        const dialog = screen.getByRole('dialog');
+        expect(dialog).toBeInTheDocument();
+        expect(dialog).toHaveAttribute('aria-modal', 'true');
+        expect(dialog).toHaveAttribute('aria-label', 'Accessible Step');
+
+        // Let's verify we have buttons to skip the tour
+        const closeButtons = screen.getAllByRole('button', { name: /skip tour/i });
+        expect(closeButtons.length).toBeGreaterThan(0);
+
+        fireEvent.click(closeButtons[0]);
+        expect(mockSkipTour).toHaveBeenCalled();
+
+        document.body.removeChild(target);
+    });
 });

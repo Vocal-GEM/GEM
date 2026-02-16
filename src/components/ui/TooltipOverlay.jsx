@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { X, ChevronRight, ChevronLeft } from 'lucide-react';
 
 const TooltipOverlay = ({
@@ -85,6 +85,9 @@ const TooltipOverlay = ({
 
             {/* Tooltip Card */}
             <div
+                role="dialog"
+                aria-modal="true"
+                aria-label={step.title}
                 className="absolute pointer-events-auto w-72 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-300"
                 style={{
                     ...tooltipStyle,
@@ -108,6 +111,7 @@ const TooltipOverlay = ({
                             <button
                                 onClick={onPrev}
                                 className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                                aria-label="Previous step"
                             >
                                 <ChevronLeft size={20} />
                             </button>
@@ -116,6 +120,7 @@ const TooltipOverlay = ({
                     <button
                         onClick={onNext}
                         className="px-4 py-2 bg-gradient-to-r from-teal-500 to-violet-500 hover:from-teal-400 hover:to-violet-400 text-white text-sm font-bold rounded-lg transition-all shadow-lg flex items-center gap-2"
+                        aria-label={isLastStep ? "Finish tour" : "Next step"}
                     >
                         {isLastStep ? 'Finish' : 'Next'} <ChevronRight size={16} />
                     </button>
