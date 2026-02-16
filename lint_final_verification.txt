@@ -45,9 +45,8 @@
   1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/professional/ClientDashboard.jsx
-    1:8   warning  'React' is defined but never used         no-unused-vars
-    2:55  warning  'ChevronRight' is defined but never used  no-unused-vars
-  130:38  error    'Activity' is not defined                 react/jsx-no-undef
+  1:8   warning  'React' is defined but never used         no-unused-vars
+  2:55  warning  'ChevronRight' is defined but never used  no-unused-vars
 
 /app/src/components/professional/SpectrogramComparison.jsx
    1:8   warning  'React' is defined but never used                  no-unused-vars
@@ -182,9 +181,7 @@
   1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/ui/RecommendedToolsWidget.jsx
-    1:8   warning  'React' is defined but never used                                no-unused-vars
-  124:21  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
-  124:64  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/ui/RecordingCountdown.jsx
    1:8   warning  'React' is defined but never used                                                                                               no-unused-vars
@@ -294,7 +291,7 @@
   136:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
 
 /app/src/components/ui/button.test.jsx
-  32:1  error  Parsing error: 'import' and 'export' may only appear at the top level
+  4:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/views/BeforeAfterCompare.jsx
   1:8   warning  'React' is defined but never used                   no-unused-vars
@@ -390,11 +387,6 @@
 /app/src/components/viz/BreathinessMeter.test.jsx
   1:27  warning  'waitFor' is defined but never used  no-unused-vars
   3:8   warning  'React' is defined but never used    no-unused-vars
-
-/app/src/components/viz/BrightnessMeter.test.jsx
-   4:8   warning  'React' is defined but never used             no-unused-vars
-  17:19  error    'require' is not defined                      no-undef
-  18:34  error    Component definition is missing display name  react/display-name
 
 /app/src/components/viz/FeedbackManager.jsx
    1:8   warning  'React' is defined but never used              no-unused-vars
@@ -626,9 +618,6 @@
 /app/src/services/LosslessRecorder.js
   59:38  warning  'reject' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
 
-/app/src/services/PrivacyManager.js
-  9:5  error  Duplicate key 'shareProgress'  no-dupe-keys
-
 /app/src/services/ProgressPredictor.js
   55:53  warning  'comparisonTarget' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
 
@@ -645,9 +634,6 @@
 
 /app/src/services/RecommendationService.js
   92:33  warning  'reports' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
-
-/app/src/services/ResearchMode.js
-  62:37  error  'process' is not defined  no-undef
 
 /app/src/services/RoutineBuilder.js
   106:69  warning  'difficulty' is assigned a value but never used  no-unused-vars
@@ -744,4 +730,4 @@
   347:29  warning  'sampleRate' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
   374:15  warning  'minDistance' is assigned a value but never used                              no-unused-vars
 
-✖ 383 problems (35 errors, 348 warnings)
+✖ 375 problems (27 errors, 348 warnings)

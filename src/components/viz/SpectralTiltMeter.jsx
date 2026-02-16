@@ -5,9 +5,10 @@ import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -6 } }) => {
     const { colorBlindMode } = useSettings();
-    const componentId = useId();
+    const id = useId();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
+    const componentId = useId();
 
     useEffect(() => {
         const loop = () => {
@@ -23,19 +24,17 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 let percent = ((tilt - minDisp) / (maxDisp - minDisp)) * 100;
                 percent = Math.max(0, Math.min(100, percent));
 
-                // We can't read style.left here to avoid thrashing, but for this component
-                // we'll just set it directly as it seems to be less critical or already optimized elsewhere?
-                // Actually, let's just set it. The optimization in VoiceQualityMeter was specific to that component.
-
-                indicatorRef.current.style.left = `${percent}%`;
+                const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
+                const nextLeft = curLeft + (percent - curLeft) * 0.1;
+                indicatorRef.current.style.left = `${nextLeft}%`;
 
                 // Color based on target range
                 const isWithinTarget = tilt >= targetRange.min && tilt <= targetRange.max;
 
                 if (isWithinTarget) {
-                    indicatorRef.current.className = `absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_15px_rgba(100,255,100,0.6)] border border-white/50 transition-all duration-100 ease-out z-10 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`;
+                    indicatorRef.current.className = `absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`;
                 } else {
-                    indicatorRef.current.className = "absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_15px_rgba(100,200,255,0.8)] transition-all duration-100 ease-out z-10 bg-slate-400";
+                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-slate-400";
                 }
 
                 // Update value display
@@ -43,8 +42,19 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
             }
         };
 
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                `spectral-tilt-meter-${id}`,
+                loop,
+                renderCoordinator.PRIORITY.MEDIUM
+            );
+        });
+            // No recursive requestAnimationFrame - RenderCoordinator handles this
+        };
+
         const unsubscribe = renderCoordinator.subscribe(
-            componentId,
+            `spectral-tilt-meter-${componentId}`,
             loop,
             renderCoordinator.PRIORITY.MEDIUM
         );
@@ -52,6 +62,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
         return () => {
             unsubscribe();
         };
+    }, [dataRef, targetRange, colorBlindMode, id]);
     }, [dataRef, targetRange, colorBlindMode, componentId]);
 
     return (
@@ -78,12 +89,8 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 {(() => {
                     const minDisp = -24;
                     const maxDisp = 0;
-                    const rangeMin = Math.max(minDisp, targetRange.min);
-                    const rangeMax = Math.min(maxDisp, targetRange.max);
-
-                    const left = ((rangeMin - minDisp) / (maxDisp - minDisp)) * 100;
-                    const width = ((rangeMax - rangeMin) / (maxDisp - minDisp)) * 100;
-
+                    const left = ((targetRange.min - minDisp) / (maxDisp - minDisp)) * 100;
+                    const width = ((targetRange.max - targetRange.min) / (maxDisp - minDisp)) * 100;
                     return (
                         <div
                             className={`absolute top-0 bottom-0 border-x ${colorBlindMode ? 'bg-amber-500/20 border-amber-500/30' : 'bg-emerald-500/20 border-emerald-500/30'}`}
