@@ -66,4 +66,36 @@ describe('TooltipOverlay', () => {
         expect(await screen.findByText('Finish')).toBeInTheDocument();
         expect(screen.queryByText('Next')).not.toBeInTheDocument();
     });
+
+    it('should have accessibility attributes', async () => {
+        const onPrev = vi.fn();
+        render(<TooltipOverlay isActive={true} step={mockStep} isFirstStep={false} isLastStep={false} onPrev={onPrev} />);
+
+        // Wait for rendering
+        await screen.findByText('Test Title');
+
+        // Check dialog role and label
+        const dialog = screen.getByRole('dialog');
+        expect(dialog).toBeInTheDocument();
+        expect(dialog).toHaveAttribute('aria-modal', 'true');
+        expect(dialog).toHaveAttribute('aria-label', 'Test Title');
+
+        // Check Previous button label
+        const prevBtn = screen.getByLabelText('Previous step');
+        expect(prevBtn).toBeInTheDocument();
+        fireEvent.click(prevBtn);
+        expect(onPrev).toHaveBeenCalled();
+
+        // Check Next button label
+        const nextBtn = screen.getByLabelText('Next step');
+        expect(nextBtn).toBeInTheDocument();
+    });
+
+    it('should have correct label for Finish button', async () => {
+        render(<TooltipOverlay isActive={true} step={mockStep} isLastStep={true} />);
+        await screen.findByText('Test Title');
+
+        const finishBtn = screen.getByLabelText('Finish tour');
+        expect(finishBtn).toBeInTheDocument();
+    });
 });

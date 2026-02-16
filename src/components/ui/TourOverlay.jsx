@@ -136,6 +136,9 @@ const TourOverlay = () => {
 
             {/* Tooltip */}
             <div
+                role="dialog"
+                aria-modal="true"
+                aria-label={step.title}
                 className={`absolute w-80 bg-slate-900 text-white p-5 rounded-2xl shadow-2xl pointer-events-auto transition-all duration-300 ease-in-out flex flex-col gap-3 animate-in fade-in zoom-in-95 border border-slate-700`}
                 style={{
                     top: position.top,
@@ -145,7 +148,7 @@ const TourOverlay = () => {
             >
                 <div className="flex justify-between items-start">
                     <h3 className="font-bold text-lg text-white">{step.title}</h3>
-                    <button onClick={skipTour} className="text-slate-400 hover:text-slate-200 p-1">
+                    <button onClick={skipTour} className="text-slate-400 hover:text-slate-200 p-1" aria-label="Skip tour">
                         <X size={16} />
                     </button>
                 </div>
