@@ -168,16 +168,6 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
 
         return unsubscribe;
     }, [dataRef, colorBlindMode, componentId]);
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            componentId,
-            updateMeter,
-
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `BreathinessMeter-${componentId}`,
             loop,
             renderCoordinator.PRIORITY.MEDIUM
         );
