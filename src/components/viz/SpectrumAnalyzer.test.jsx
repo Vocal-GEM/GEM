@@ -23,8 +23,8 @@ vi.mock('../../utils/lpcAnalysis', () => ({
   }
 }));
 
-// Mock ResizeObserver
-global.ResizeObserver = vi.fn(function() {
+// Mock ResizeObserver using globalThis
+globalThis.ResizeObserver = vi.fn(function() {
   this.observe = vi.fn();
   this.unobserve = vi.fn();
   this.disconnect = vi.fn();

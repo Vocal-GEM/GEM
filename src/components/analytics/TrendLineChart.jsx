@@ -1,5 +1,4 @@
-import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export const TrendLineChart = ({ data, metric, trendInfo }) => {
     // Prep data mapping
@@ -12,13 +11,6 @@ export const TrendLineChart = ({ data, metric, trendInfo }) => {
     };
 
     const dataKey = getDataKey(metric);
-
-    // Create projection line if trend info exists
-    const projectedData = [...data];
-    if (trendInfo && trendInfo.prediction) {
-        // Add a couple of future points for visualization
-        // logic simplified for demo
-    }
 
     return (
         <ResponsiveContainer width="100%" height="100%">
