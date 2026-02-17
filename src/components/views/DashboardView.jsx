@@ -95,7 +95,7 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
             </div>
 
             {/* Guided Journey Entry - Featured prominently for first-time users */}
-            {/* <div className="mb-8">
+            <div className="mb-8">
                 <JourneyEntryCard
                     onStart={handleStartJourney}
                     onResume={handleResumeJourney}
@@ -104,7 +104,7 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                     currentStepTitle={currentStep?.title || ''}
                     isComplete={isJourneyComplete}
                 />
-            </div> */}
+            </div>
 
             {/* Mood Check In */}
             <div className="mb-8">
