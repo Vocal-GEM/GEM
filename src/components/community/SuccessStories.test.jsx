@@ -46,7 +46,8 @@ const MockAudio = vi.fn(function(src) {
     return new MockAudioImplementation(src);
 });
 
-global.Audio = MockAudio;
+// Use globalThis for environment compatibility
+globalThis.Audio = MockAudio;
 
 // Mock Toast and Button to avoid issues with their internal dependencies or animations
 vi.mock('../ui/Toast', () => ({
