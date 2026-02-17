@@ -30,7 +30,8 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+// Use globalThis for JSDOM/Vitest environment compatibility
+globalThis.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('PitchOrb', () => {
     let dataRef;
