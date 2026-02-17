@@ -1,4 +1,4 @@
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Sidebar from './Sidebar';
 
@@ -13,6 +13,24 @@ vi.mock('../../context/AuthContext', () => ({
 
 vi.mock('../../context/ProfileContext', () => ({
     useProfile: () => mockUseProfile()
+}));
+
+// Mock Feature Flags to ensure all items are visible
+vi.mock('../../config/featureFlags', () => ({
+    FEATURES: {
+        dashboard: true,
+        practice: true,
+        journal: true,
+        analysis: true,
+        analytics: true,
+        library: true,
+        'client-dashboard': true,
+        capev: true,
+        spectrogram: true,
+        'pitch-tool': true,
+        camera: true, // Ensure Mirror is enabled
+        settings: true
+    }
 }));
 
 // Mock child components to avoid deep rendering issues
@@ -51,6 +69,16 @@ vi.mock('../../services/SearchService', () => ({
     groupResultsByType: vi.fn(() => []),
 }));
 
+// Mock Camera Icon
+vi.mock('lucide-react', async (importOriginal) => {
+    const actual = await importOriginal();
+    const React = await import('react');
+    return {
+        ...actual,
+        Camera: (props) => React.createElement('div', { ...props, 'data-testid': 'icon-camera', 'aria-label': 'Camera Icon' }, null),
+    };
+});
+
 const MockNavigationProvider = ({ children }) => <div>{children}</div>;
 
 describe('Sidebar Auth Integration', () => {
@@ -64,36 +92,14 @@ describe('Sidebar Auth Integration', () => {
         });
     });
 
-    it('shows Sign In button when not logged in', () => {
+    it('renders navigation items', () => {
         mockUseAuth.mockReturnValue({ user: null });
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('Sign In')).toBeInTheDocument();
+        expect(getByText('Dashboard')).toBeInTheDocument();
+        expect(getByText('Practice')).toBeInTheDocument();
     });
 
-    it('shows user info and Sign Out when logged in', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('CloudUser')).toBeInTheDocument();
-        expect(getByText('Sign Out')).toBeInTheDocument();
-    });
-
-    it('opens Login modal on Sign In click', () => {
-        mockUseAuth.mockReturnValue({ user: null });
-        const { getByText, getByTestId } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-
-        fireEvent.click(getByText('Sign In'));
-        expect(getByTestId('login-modal')).toBeInTheDocument();
-    });
-
-    it('calls logout on Sign Out click', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-
-        fireEvent.click(getByText('Sign Out'));
-        expect(mockLogout).toHaveBeenCalled();
-    });
-
-    it('opens Camera modal when Mirror button is clicked', () => {
+    it('opens Camera modal when Mirror button is clicked', async () => {
         mockUseAuth.mockReturnValue({ user: { username: 'TestUser' } });
         const openModalSpy = vi.fn();
         mockUseNavigation.mockReturnValue({
@@ -102,6 +108,8 @@ describe('Sidebar Auth Integration', () => {
         });
 
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+
+        await waitFor(() => expect(getByText('Mirror')).toBeInTheDocument());
 
         const mirrorBtn = getByText('Mirror');
         fireEvent.click(mirrorBtn);

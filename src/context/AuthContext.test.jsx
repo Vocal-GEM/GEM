@@ -1,6 +1,7 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider, useAuth } from './AuthContext';
+import React from 'react';
 
 // Mock Fetch
 globalThis.fetch = vi.fn();
@@ -19,8 +20,13 @@ vi.mock('../services/DataSyncService', () => ({
     syncFromServer: vi.fn().mockResolvedValue(true)
 }));
 
+// Mock config/runtime
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: () => true,
+    getBackendUrl: () => 'http://localhost:5000'
+}));
+
 import { indexedDB } from '../services/IndexedDBManager';
-import { syncToServer, syncFromServer } from '../services/DataSyncService';
 
 const TestComponent = () => {
     const { user, login, signup, logout } = useAuth();
@@ -59,11 +65,8 @@ describe('AuthContext', () => {
     });
 
     it('logs in successfully', async () => {
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
+        // 1. Initial /me check (fail)
+        fetch.mockResolvedValueOnce({ ok: false });
 
         let result;
         await act(async () => {
@@ -72,6 +75,15 @@ describe('AuthContext', () => {
                     <TestComponent />
                 </AuthProvider>
             );
+        });
+
+        // 2. Login call (success)
+        fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({
+                user: { id: 1, username: 'testuser' },
+                token: 'fake-token'
+            })
         });
 
         const loginBtn = result.getByText('Login');
@@ -86,7 +98,6 @@ describe('AuthContext', () => {
 
     it('handles login failure', async () => {
         fetch.mockResolvedValueOnce({ ok: false }); // initial /me
-        fetch.mockRejectedValueOnce(new Error('Network error')); // login fail
 
         let result;
         await act(async () => {
@@ -96,6 +107,8 @@ describe('AuthContext', () => {
                 </AuthProvider>
             );
         });
+
+        fetch.mockRejectedValueOnce(new Error('Network error')); // login fail
 
         const loginBtn = result.getByText('Login');
         await act(async () => {
@@ -108,13 +121,8 @@ describe('AuthContext', () => {
     });
 
     it('clears local data on logout', async () => {
-        // Setup: login first
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
-        fetch.mockResolvedValueOnce({ ok: true }); // logout
+        // 1. Initial /me check (fail)
+        fetch.mockResolvedValueOnce({ ok: false });
 
         let result;
         await act(async () => {
@@ -123,6 +131,12 @@ describe('AuthContext', () => {
                     <TestComponent />
                 </AuthProvider>
             );
+        });
+
+        // 2. Login call (success)
+        fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ user: { id: 1, username: 'testuser' }, token: 'fake-token' })
         });
 
         // Login
@@ -135,6 +149,9 @@ describe('AuthContext', () => {
             expect(result.getByTestId('user').textContent).toBe('testuser');
         });
 
+        // 3. Logout call (success)
+        fetch.mockResolvedValueOnce({ ok: true });
+
         // Logout
         const logoutBtn = result.getByText('Logout');
         await act(async () => {
@@ -142,11 +159,8 @@ describe('AuthContext', () => {
         });
 
         await waitFor(() => {
-            // User should be cleared
             expect(result.getByTestId('user').textContent).toBe('null');
-            // factoryReset should have been called to clear local data
             expect(indexedDB.factoryReset).toHaveBeenCalled();
         });
     });
 });
-
