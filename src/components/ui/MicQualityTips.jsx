@@ -1,25 +1,51 @@
-import { cloneElement } from 'react';
+import { cloneElement, useEffect, useRef } from 'react';
 import { Mic, X } from 'lucide-react';
 import { micQualityTips } from '../../data/micQualityTips';
 
 const MicQualityTips = ({ onClose }) => {
+    const closeRef = useRef(null);
+
+    useEffect(() => {
+        closeRef.current?.focus();
+
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="mic-tips-title"
+            aria-describedby="mic-tips-desc"
+        >
             <div className="glass-panel max-w-md w-full p-6 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden">
                 {/* Background Glow */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl -mr-20 -mt-20 animate-pulse"></div>
 
                 <div className="relative z-10">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                        <h2 id="mic-tips-title" className="text-2xl font-bold text-white flex items-center gap-2">
                             <Mic className="text-teal-400" /> Recording Tips
                         </h2>
-                        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                        <button
+                            ref={closeRef}
+                            onClick={onClose}
+                            className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                            aria-label="Close"
+                        >
                             <X className="w-5 h-5 text-slate-400" />
                         </button>
                     </div>
 
-                    <p className="text-slate-400 text-sm mb-4">
+                    <p id="mic-tips-desc" className="text-slate-400 text-sm mb-4">
                         Follow these tips to get the best voice analysis results.
                     </p>
 
