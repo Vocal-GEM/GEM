@@ -8,11 +8,18 @@ vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));
 
-// Mock pitchfinder
-vi.mock('pitchfinder', () => ({
-    McLeod: vi.fn(() => vi.fn((buffer) => 440)),
-    YIN: vi.fn(() => vi.fn((buffer) => 440))
-}));
+// Mock pitchfinder - Use dynamic import style if needed, or simple object mock
+vi.mock('pitchfinder', () => {
+    return {
+        default: {
+            Macleod: vi.fn(() => vi.fn((buffer) => 440)),
+            YIN: vi.fn(() => vi.fn((buffer) => 440))
+        },
+        // Also support named exports if the implementation imports { Macleod }
+        Macleod: vi.fn(() => vi.fn((buffer) => 440)),
+        YIN: vi.fn(() => vi.fn((buffer) => 440))
+    };
+});
 
 // Mock AudioContext and browser APIs
 const mockAudioContext = {

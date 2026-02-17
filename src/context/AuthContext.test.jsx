@@ -1,6 +1,7 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider, useAuth } from './AuthContext';
+import React from 'react';
 
 // Mock Fetch
 globalThis.fetch = vi.fn();
@@ -20,7 +21,6 @@ vi.mock('../services/DataSyncService', () => ({
 }));
 
 import { indexedDB } from '../services/IndexedDBManager';
-import { syncToServer, syncFromServer } from '../services/DataSyncService';
 
 const TestComponent = () => {
     const { user, login, signup, logout } = useAuth();
@@ -59,11 +59,18 @@ describe('AuthContext', () => {
     });
 
     it('logs in successfully', async () => {
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
+        // IMPORTANT: The fetch mock order must match the component's lifecycle calls
+        // 1. Initial /me check on mount
+        fetch.mockResolvedValueOnce({ ok: false });
+
+        // 2. Login call
         fetch.mockResolvedValueOnce({
             ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
+            json: async () => ({
+                user: { id: 1, username: 'testuser' },
+                token: 'fake-token' // Ensure token is present if context checks it
+            })
+        });
 
         let result;
         await act(async () => {
@@ -108,13 +115,17 @@ describe('AuthContext', () => {
     });
 
     it('clears local data on logout', async () => {
-        // Setup: login first
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
+        // 1. Initial /me check
+        fetch.mockResolvedValueOnce({ ok: false });
+
+        // 2. Login call
         fetch.mockResolvedValueOnce({
             ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
-        fetch.mockResolvedValueOnce({ ok: true }); // logout
+            json: async () => ({ user: { id: 1, username: 'testuser' }, token: 'fake-token' })
+        });
+
+        // 3. Logout call
+        fetch.mockResolvedValueOnce({ ok: true });
 
         let result;
         await act(async () => {
@@ -149,4 +160,3 @@ describe('AuthContext', () => {
         });
     });
 });
-

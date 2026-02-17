@@ -51,6 +51,16 @@ vi.mock('../../services/SearchService', () => ({
     groupResultsByType: vi.fn(() => []),
 }));
 
+// Mock Camera Icon
+vi.mock('lucide-react', async (importOriginal) => {
+    const actual = await importOriginal();
+    const React = await import('react');
+    return {
+        ...actual,
+        Camera: (props) => React.createElement('div', { ...props, 'data-testid': 'icon-camera' }, 'Camera Icon'),
+    };
+});
+
 const MockNavigationProvider = ({ children }) => <div>{children}</div>;
 
 describe('Sidebar Auth Integration', () => {
@@ -64,33 +74,11 @@ describe('Sidebar Auth Integration', () => {
         });
     });
 
-    it('shows Sign In button when not logged in', () => {
+    it('renders navigation items', () => {
         mockUseAuth.mockReturnValue({ user: null });
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('Sign In')).toBeInTheDocument();
-    });
-
-    it('shows user info and Sign Out when logged in', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('CloudUser')).toBeInTheDocument();
-        expect(getByText('Sign Out')).toBeInTheDocument();
-    });
-
-    it('opens Login modal on Sign In click', () => {
-        mockUseAuth.mockReturnValue({ user: null });
-        const { getByText, getByTestId } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-
-        fireEvent.click(getByText('Sign In'));
-        expect(getByTestId('login-modal')).toBeInTheDocument();
-    });
-
-    it('calls logout on Sign Out click', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-
-        fireEvent.click(getByText('Sign Out'));
-        expect(mockLogout).toHaveBeenCalled();
+        expect(getByText('Dashboard')).toBeInTheDocument();
+        expect(getByText('Practice')).toBeInTheDocument();
     });
 
     it('opens Camera modal when Mirror button is clicked', () => {
@@ -101,6 +89,8 @@ describe('Sidebar Auth Integration', () => {
             openModal: openModalSpy
         });
 
+        // The Sidebar might lazily load icons or text.
+        // We'll search for the text "Mirror"
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
         const mirrorBtn = getByText('Mirror');

@@ -12,7 +12,13 @@ describe("Button", () => {
   it("shows loading spinner when isLoading is true", () => {
     render(<Button isLoading>Click me</Button>);
     expect(screen.getByRole("status")).toBeInTheDocument(); // LoadingSpinner role
-    expect(screen.getByText("Loading")).toBeInTheDocument(); // SR text
+
+    // The SR text is "Loading..." but might be hidden or partial.
+    // The previous error was: Unable to find an element with the text: Loading.
+    // The output showed: <span class="sr-only">Loading...</span>
+    // So we should match "Loading..." exactly or use regex /Loading/i
+    expect(screen.getByText(/Loading/)).toBeInTheDocument();
+
     expect(screen.getByRole("button")).toBeDisabled();
   });
 
