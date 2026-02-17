@@ -1,4 +1,4 @@
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Sidebar from './Sidebar';
 
@@ -13,6 +13,24 @@ vi.mock('../../context/AuthContext', () => ({
 
 vi.mock('../../context/ProfileContext', () => ({
     useProfile: () => mockUseProfile()
+}));
+
+// Mock Feature Flags to ensure all items are visible
+vi.mock('../../config/featureFlags', () => ({
+    FEATURES: {
+        dashboard: true,
+        practice: true,
+        journal: true,
+        analysis: true,
+        analytics: true,
+        library: true,
+        'client-dashboard': true,
+        capev: true,
+        spectrogram: true,
+        'pitch-tool': true,
+        camera: true, // Ensure Mirror is enabled
+        settings: true
+    }
 }));
 
 // Mock child components to avoid deep rendering issues
@@ -57,7 +75,7 @@ vi.mock('lucide-react', async (importOriginal) => {
     const React = await import('react');
     return {
         ...actual,
-        Camera: (props) => React.createElement('div', { ...props, 'data-testid': 'icon-camera' }, 'Camera Icon'),
+        Camera: (props) => React.createElement('div', { ...props, 'data-testid': 'icon-camera', 'aria-label': 'Camera Icon' }, null),
     };
 });
 
@@ -81,7 +99,7 @@ describe('Sidebar Auth Integration', () => {
         expect(getByText('Practice')).toBeInTheDocument();
     });
 
-    it('opens Camera modal when Mirror button is clicked', () => {
+    it('opens Camera modal when Mirror button is clicked', async () => {
         mockUseAuth.mockReturnValue({ user: { username: 'TestUser' } });
         const openModalSpy = vi.fn();
         mockUseNavigation.mockReturnValue({
@@ -89,9 +107,9 @@ describe('Sidebar Auth Integration', () => {
             openModal: openModalSpy
         });
 
-        // The Sidebar might lazily load icons or text.
-        // We'll search for the text "Mirror"
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+
+        await waitFor(() => expect(getByText('Mirror')).toBeInTheDocument());
 
         const mirrorBtn = getByText('Mirror');
         fireEvent.click(mirrorBtn);
