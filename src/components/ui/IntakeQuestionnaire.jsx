@@ -162,11 +162,12 @@ const WelcomeStep = () => (
             <li>Tailor exercises to your learning style</li>
         </ul>
         <div className="mt-6 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg">
+        <div className="mt-6 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg">
             <p className="text-sm text-purple-300">
-                🔒 Your data is stored locally and private to you. We only capture what's needed to help you find your voice.
+                🔒 Your data is stored locally and private to you. We only capture what&apos;s needed to help you find your voice.
             </p>
         </div>
-    </div>
+        </div>
 );
 
 const GoalsStep = ({ data, update }) => (
@@ -398,7 +399,7 @@ const SummaryStep = ({ data }) => (
         </div>
 
         <p className="text-center text-gray-400 mt-4">
-            Click "Complete Profile" to generate your personalized roadmap.
+            Click &quot;Complete Profile&quot; to generate your personalized roadmap.
         </p>
     </div>
 );
