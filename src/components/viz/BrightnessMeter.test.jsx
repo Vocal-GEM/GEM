@@ -7,15 +7,20 @@ import { renderCoordinator } from '../../services/RenderCoordinator';
 // Mock RenderCoordinator
 vi.mock('../../services/RenderCoordinator', () => ({
     renderCoordinator: {
-        subscribe: vi.fn(() => vi.fn()), // Returns unsubscribe fn
+        subscribe: vi.fn().mockImplementation(() => vi.fn()), // Returns unsubscribe fn
         PRIORITY: { MEDIUM: 2 }
     }
 }));
 
 // Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+vi.mock('lucide-react', async () => {
+    // Dynamic import to avoid 'require' in ESM environment
+    const React = await import('react');
+    const createIcon = (name) => {
+        const Icon = (props) => React.createElement('div', { ...props, 'data-testid': name });
+        Icon.displayName = name;
+        return Icon;
+    };
 
     return {
         Sun: createIcon('Sun'),
