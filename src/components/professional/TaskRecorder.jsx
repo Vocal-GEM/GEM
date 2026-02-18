@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Play, Pause, RotateCcw, Check, Loader2 } from 'lucide-react';
 
 const TaskRecorder = ({ task, onComplete }) => {
     const [state, setState] = useState('idle'); // idle, recording, processing, done
     const [recordingTime, setRecordingTime] = useState(0);
     const [audioUrl, setAudioUrl] = useState(null);
-    const [audioBlob, setAudioBlob] = useState(null);
+    // const [audioBlob, setAudioBlob] = useState(null); // Unused
     const [isPlaying, setIsPlaying] = useState(false);
     const [error, setError] = useState(null);
 
@@ -65,7 +65,7 @@ const TaskRecorder = ({ task, onComplete }) => {
                 const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
                 const url = URL.createObjectURL(blob);
                 setAudioUrl(url);
-                setAudioBlob(blob);
+                // setAudioBlob(blob);
                 setState('done');
                 onComplete(task.id, blob); // Notify parent immediately
             };
@@ -91,7 +91,7 @@ const TaskRecorder = ({ task, onComplete }) => {
     const resetRecording = () => {
         if (audioUrl) URL.revokeObjectURL(audioUrl);
         setAudioUrl(null);
-        setAudioBlob(null);
+        // setAudioBlob(null);
         setState('idle');
         setRecordingTime(0);
     };
@@ -113,7 +113,7 @@ const TaskRecorder = ({ task, onComplete }) => {
                     <h3 className="text-white font-medium text-lg">{task.prompt}</h3>
                     {task.text && (
                         <div className="mt-2 p-3 bg-slate-900/50 rounded border border-slate-700 text-slate-300 italic">
-                            "{task.prompt.replace('Read: "', '').replace('"', '')}"
+                            &quot;{task.prompt.replace('Read: "', '').replace('"', '')}&quot;
                         </div>
                     )}
                     {task.duration && (
