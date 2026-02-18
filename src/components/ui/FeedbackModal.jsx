@@ -35,20 +35,32 @@ const FeedbackModal = ({ isOpen, onClose, initialType = 'feedback', errorDetails
     };
 
     return (
-        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="feedback-modal-title"
+        >
             <div className="w-full max-w-md bg-slate-900 rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
                 <div className="p-4 border-b border-white/5 flex justify-between items-center bg-slate-800/50">
-                    <h2 className="font-bold text-lg flex items-center gap-2">
+                    <h2 id="feedback-modal-title" className="font-bold text-lg flex items-center gap-2">
                         {type === 'bug' ? <Bug className="w-5 h-5 text-red-400" /> : <MessageSquare className="w-5 h-5 text-teal-400" />}
                         {type === 'bug' ? 'Report a Bug' : 'Send Feedback'}
                     </h2>
-                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <button
+                        onClick={onClose}
+                        className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                        aria-label="Close feedback modal"
+                    >
                         <X className="w-5 h-5 text-slate-400" />
                     </button>
                 </div>
 
                 {submitted ? (
-                    <div className="p-12 flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4">
+                    <div
+                        className="p-12 flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4"
+                        aria-live="polite"
+                    >
                         <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
                             <Send className="w-8 h-8 text-green-400" />
                         </div>
@@ -61,6 +73,7 @@ const FeedbackModal = ({ isOpen, onClose, initialType = 'feedback', errorDetails
                             <button
                                 type="button"
                                 onClick={() => setType('feedback')}
+                                aria-pressed={type === 'feedback'}
                                 className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${type === 'feedback' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                             >
                                 Feedback
@@ -68,6 +81,7 @@ const FeedbackModal = ({ isOpen, onClose, initialType = 'feedback', errorDetails
                             <button
                                 type="button"
                                 onClick={() => setType('bug')}
+                                aria-pressed={type === 'bug'}
                                 className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${type === 'bug' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                             >
                                 Bug Report
@@ -75,10 +89,11 @@ const FeedbackModal = ({ isOpen, onClose, initialType = 'feedback', errorDetails
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-slate-400 mb-2">
+                            <label htmlFor="feedback-message" className="block text-sm font-bold text-slate-400 mb-2">
                                 {type === 'bug' ? 'Describe the issue' : 'Your thoughts'}
                             </label>
                             <textarea
+                                id="feedback-message"
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 required
@@ -88,10 +103,11 @@ const FeedbackModal = ({ isOpen, onClose, initialType = 'feedback', errorDetails
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-slate-400 mb-2">
+                            <label htmlFor="feedback-email" className="block text-sm font-bold text-slate-400 mb-2">
                                 Email (optional)
                             </label>
                             <input
+                                id="feedback-email"
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
