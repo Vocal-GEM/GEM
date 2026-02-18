@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import PitchOrb from './PitchOrb';
@@ -30,7 +31,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+globalThis.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('PitchOrb', () => {
     let dataRef;
