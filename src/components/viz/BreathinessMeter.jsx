@@ -39,8 +39,6 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const zoneRef = useRef(null);
     const feedbackRef = useRef(null);
     const lastValueRef = useRef(50);
-    const componentId = useId();
-    const id = useId();
 
     // NEW: Refs for OQ and ventricular displays
     const oqValueRef = useRef(null);
