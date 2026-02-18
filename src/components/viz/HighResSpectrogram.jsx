@@ -190,7 +190,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             unsubscribe();
         };
     }, [draw, componentId]);
-    }, [componentId, draw]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position
