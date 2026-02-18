@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Users, UserPlus, Search, FileText, Calendar, Activity, MoreVertical } from 'lucide-react';
 
 const ClientDashboard = () => {
