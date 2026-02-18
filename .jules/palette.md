@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2026-05-24 - Dynamic Breadcrumb Navigation
+**Learning:** Nested views like "Learn Module" or "Exercise Detail" often lack structural navigation context, forcing users to rely on browser history or generic back buttons. A dynamic breadcrumb system can expose this hierarchy.
+**Action:** Implement a `setBreadcrumbs` context method that allows nested components to declare their own hierarchical path, overriding the default linear history.

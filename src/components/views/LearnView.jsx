@@ -30,6 +30,7 @@ const GenderPerceptionInfoView = lazy(() => import('./learn/GenderPerceptionInfo
 import ModuleNotes from '../ui/ModuleNotes';
 import QuizView from '../ui/QuizView';
 import { quizService } from '../../services/QuizService';
+import { useNavigation } from '../../context/NavigationContext';
 
 
 /**
@@ -38,10 +39,86 @@ import { quizService } from '../../services/QuizService';
  * Displays module cards that users can click to access in-depth
  * articles about each voice training concept.
  */
+const modules = [
+    {
+        id: 'pitch',
+        title: 'Pitch & Fundamental Frequency',
+        icon: Music2,
+        description: 'Understanding F0, gender-typical pitch ranges, and how to safely develop your target pitch.',
+        color: 'cyan',
+        readTime: '8 min',
+        component: PitchInfoView
+    },
+    {
+        id: 'formants',
+        title: 'Vocal Formants',
+        icon: Waves,
+        description: 'Learn about F1, F2, and F3 frequencies, how they\'re measured, and their impact on voice perception.',
+        color: 'purple',
+        readTime: '10 min',
+        component: FormantsInfoView
+    },
+    {
+        id: 'resonance',
+        title: 'Resonance & Brightness',
+        icon: Speaker,
+        description: 'Explore vocal tract resonance, larynx position, and techniques for forward resonance.',
+        color: 'blue',
+        readTime: '8 min',
+        component: ResonanceInfoView
+    },
+    {
+        id: 'voice-quality',
+        title: 'Voice Quality & Timbre',
+        icon: Waves,
+        description: 'Understand breathiness vs clarity, spectral tilt, and indicators of vocal health.',
+        color: 'emerald',
+        readTime: '7 min',
+        component: VoiceQualityInfoView
+    },
+    {
+        id: 'intonation',
+        title: 'Intonation & Prosody',
+        icon: MessageSquare,
+        description: 'Discover pitch variability, melodic speech patterns, and expressive communication.',
+        color: 'pink',
+        readTime: '6 min',
+        component: IntonationInfoView
+    },
+    {
+        id: 'articulation',
+        title: 'Articulation & Speech',
+        icon: Languages,
+        description: 'Vowel space, consonant clarity, and how articulation patterns affect perception.',
+        color: 'amber',
+        readTime: '6 min',
+        component: ArticulationInfoView
+    },
+    {
+        id: 'anatomy',
+        title: 'Vocal Anatomy',
+        icon: Heart,
+        description: 'The vocal folds, larynx, and vocal tract - understanding your instrument.',
+        color: 'rose',
+        readTime: '9 min',
+        component: VocalAnatomyInfoView
+    },
+    {
+        id: 'perception',
+        title: 'Gender Perception',
+        icon: Users,
+        description: 'How listeners perceive voice gender, the role of multiple cues, and setting realistic goals.',
+        color: 'violet',
+        readTime: '8 min',
+        component: GenderPerceptionInfoView
+    }
+];
+
 const LearnView = () => {
     const [activeModule, setActiveModule] = useState(null);
     const [showQuiz, setShowQuiz] = useState(false);
     const [quizProgress, setQuizProgress] = useState(null);
+    const { navigate, setBreadcrumbs } = useNavigation();
 
     // Load quiz progress on mount
     useEffect(() => {
@@ -49,80 +126,23 @@ const LearnView = () => {
         setQuizProgress(summary);
     }, [showQuiz]);
 
-    const modules = [
-        {
-            id: 'pitch',
-            title: 'Pitch & Fundamental Frequency',
-            icon: Music2,
-            description: 'Understanding F0, gender-typical pitch ranges, and how to safely develop your target pitch.',
-            color: 'cyan',
-            readTime: '8 min',
-            component: PitchInfoView
-        },
-        {
-            id: 'formants',
-            title: 'Vocal Formants',
-            icon: Waves,
-            description: 'Learn about F1, F2, and F3 frequencies, how they\'re measured, and their impact on voice perception.',
-            color: 'purple',
-            readTime: '10 min',
-            component: FormantsInfoView
-        },
-        {
-            id: 'resonance',
-            title: 'Resonance & Brightness',
-            icon: Speaker,
-            description: 'Explore vocal tract resonance, larynx position, and techniques for forward resonance.',
-            color: 'blue',
-            readTime: '8 min',
-            component: ResonanceInfoView
-        },
-        {
-            id: 'voice-quality',
-            title: 'Voice Quality & Timbre',
-            icon: Waves,
-            description: 'Understand breathiness vs clarity, spectral tilt, and indicators of vocal health.',
-            color: 'emerald',
-            readTime: '7 min',
-            component: VoiceQualityInfoView
-        },
-        {
-            id: 'intonation',
-            title: 'Intonation & Prosody',
-            icon: MessageSquare,
-            description: 'Discover pitch variability, melodic speech patterns, and expressive communication.',
-            color: 'pink',
-            readTime: '6 min',
-            component: IntonationInfoView
-        },
-        {
-            id: 'articulation',
-            title: 'Articulation & Speech',
-            icon: Languages,
-            description: 'Vowel space, consonant clarity, and how articulation patterns affect perception.',
-            color: 'amber',
-            readTime: '6 min',
-            component: ArticulationInfoView
-        },
-        {
-            id: 'anatomy',
-            title: 'Vocal Anatomy',
-            icon: Heart,
-            description: 'The vocal folds, larynx, and vocal tract - understanding your instrument.',
-            color: 'rose',
-            readTime: '9 min',
-            component: VocalAnatomyInfoView
-        },
-        {
-            id: 'perception',
-            title: 'Gender Perception',
-            icon: Users,
-            description: 'How listeners perceive voice gender, the role of multiple cues, and setting realistic goals.',
-            color: 'violet',
-            readTime: '8 min',
-            component: GenderPerceptionInfoView
+    // Handle Breadcrumbs
+    useEffect(() => {
+        if (activeModule) {
+            const module = modules.find(m => m.id === activeModule);
+            if (module) {
+                setBreadcrumbs([
+                    { label: 'Dashboard', action: () => navigate('dashboard') },
+                    { label: 'Learn', action: () => setActiveModule(null) },
+                    { label: module.title, action: null }
+                ]);
+            }
+        } else {
+            setBreadcrumbs([]);
         }
-    ];
+
+        return () => setBreadcrumbs([]);
+    }, [activeModule, navigate, setBreadcrumbs]);
 
     // Color classes - must be explicit for Tailwind's JIT compiler to detect them
     const colorClassMap = {
