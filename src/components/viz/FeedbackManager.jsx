@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import CelebrationAnimations from '../ui/CelebrationAnimations';
 import DriftAlert from '../ui/DriftAlert';
@@ -7,7 +7,7 @@ import FlowStateDetector from '../../utils/FlowStateDetector';
 
 const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     const { settings } = useSettings();
-    const [alert, setAlert] = useState(null);
+    // const [alert, setAlert] = useState(null); // Unused
     const [celebration, setCelebration] = useState(null);
     const flowDetector = useRef(null);
     const adaptiveController = useRef(null);
