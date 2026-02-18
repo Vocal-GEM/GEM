@@ -20,6 +20,7 @@ export const NavigationProvider = ({ children }) => {
 
     // History State for Breadcrumbs
     const [history, setHistory] = useState([]);
+    const [breadcrumbs, setBreadcrumbs] = useState([]);
 
     // Modals & Overlays State
     const [modals, setModals] = useState({
@@ -82,6 +83,7 @@ export const NavigationProvider = ({ children }) => {
             setNavigationParams(params);
             setActiveView(view);
             analyticsService.trackView(view, params);
+            setBreadcrumbs([]);
         }
     };
 
@@ -127,9 +129,11 @@ export const NavigationProvider = ({ children }) => {
         practiceTab,
         modals,
         history,
+        breadcrumbs,
         navigationParams,
         modalParams,
         navigate,
+        setBreadcrumbs,
         switchPracticeTab,
         openModal,
         closeModal,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Filter, Grid, List, BookOpen, X, Info, PlayCircle } from 'lucide-react';
 import { applyFilters, getCategories, getDifficulties, getExerciseStats } from '../../utils/exerciseSearchEngine';
 import { useNavigation } from '../../context/NavigationContext';
@@ -9,7 +9,22 @@ const ExerciseLibraryView = () => {
     const [selectedDifficulty, setSelectedDifficulty] = useState('all');
     const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
     const [selectedExercise, setSelectedExercise] = useState(null);
-    const { navigate } = useNavigation();
+    const { navigate, setBreadcrumbs } = useNavigation();
+
+    // Handle Breadcrumbs
+    useEffect(() => {
+        if (selectedExercise) {
+            setBreadcrumbs([
+                { label: 'Dashboard', action: () => navigate('dashboard') },
+                { label: 'Library', action: () => setSelectedExercise(null) },
+                { label: selectedExercise.title, action: null }
+            ]);
+        } else {
+            setBreadcrumbs([]);
+        }
+
+        return () => setBreadcrumbs([]);
+    }, [selectedExercise, navigate, setBreadcrumbs]);
 
     // Apply filters and get results
     const exercises = applyFilters({
