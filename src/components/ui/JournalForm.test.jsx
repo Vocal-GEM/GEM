@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import JournalForm from './JournalForm';
 
@@ -13,67 +13,12 @@ vi.mock('../../context/AudioContext', () => ({
       }
     }
   })
-        stopRecording: vi.fn(),
-      },
-    },
-  }),
 }));
 
 vi.mock('../../context/JournalContext', () => ({
   useJournal: () => ({
     journalEntryData: null
   })
-}));
-
-describe('JournalForm Accessibility', () => {
-  it('has accessible label for Reading Script textarea', () => {
-    render(<JournalForm />);
-    // This looks for a label associated with the input
-    expect(screen.getByLabelText(/reading script/i)).toBeInTheDocument();
-  });
-
-  it('has accessible label for Notes textarea', () => {
-    render(<JournalForm />);
-    expect(screen.getByLabelText(/how did it feel/i)).toBeInTheDocument();
-  });
-
-  it('has accessible label for Effort slider', () => {
-    render(<JournalForm />);
-    expect(screen.getByLabelText(/effort/i)).toBeInTheDocument();
-  });
-
-  it('has accessible label for Confidence slider', () => {
-    render(<JournalForm />);
-    expect(screen.getByLabelText(/confidence/i)).toBeInTheDocument();
-  });
-
-  it('has accessible name for Record button', () => {
-    render(<JournalForm />);
-    // Initially this will fail because the button has no text content (only divs) and no aria-label
-    // We accept "Start recording" or similar
-    expect(screen.getByRole('button', { name: /start recording/i })).toBeInTheDocument();
-  });
-
-  it('has accessible name for Sentiment buttons', () => {
-    render(<JournalForm />);
-    expect(screen.getByRole('button', { name: /dysphoric/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /euphoric/i })).toBeInTheDocument();
-  });
-
-  it('has accessible name for Prompt Refresh button', () => {
-     // Need to trigger the "Need a writing prompt?" state first or mock the random prompt?
-     // Actually the form starts with "Need a writing prompt?" button which has text.
-     // We want to test the RefreshCw button which appears AFTER clicking that.
-     // But wait, the "Need a writing prompt?" button has text, so it's accessible.
-     // Let's test the state where prompt is active.
-     // Since we can't easily force state without interacting, let's just test the initial state button first
-     // and maybe mock the state if we can.
-     // For now, let's stick to the initial button which SHOULD be accessible because it has text.
-     render(<JournalForm />);
-     expect(screen.getByRole('button', { name: /need a writing prompt/i })).toBeInTheDocument();
-  });
-    journalEntryData: null,
-  }),
 }));
 
 // Mock data
@@ -87,25 +32,51 @@ vi.mock('../../data/selfCareJournalPrompts', () => ({
 }));
 
 describe('JournalForm Accessibility', () => {
-  it('renders buttons with accessible labels', () => {
+  it('has accessible label for Reading Script textarea', () => {
     render(<JournalForm />);
-
-    // These assertions are expected to fail initially
-    expect(screen.getByRole('button', { name: /start recording/i })).toBeInTheDocument();
-
-    // Check sliders have labels associated
-    const effortSlider = screen.getByLabelText(/effort/i);
-    expect(effortSlider).toBeInTheDocument();
-
-    const confidenceSlider = screen.getByLabelText(/confidence/i);
-    expect(confidenceSlider).toBeInTheDocument();
+    expect(screen.getByLabelText(/reading script/i)).toBeInTheDocument();
   });
 
-  it('renders sentiment buttons with accessible labels', () => {
+  it('has accessible label for Notes textarea', () => {
     render(<JournalForm />);
+    expect(screen.getByLabelText(/how did it feel/i)).toBeInTheDocument();
+  });
 
-    // Check sentiment buttons
+  it('has accessible label for Effort slider', () => {
+    render(<JournalForm />);
+    // Note: In JournalForm.jsx, we fixed duplicate inputs. Now there should be only one input with this label.
+    // The previous failure was due to duplicate inputs.
+    expect(screen.getByLabelText(/effort/i)).toBeInTheDocument();
+  });
+
+  it('has accessible label for Confidence slider', () => {
+    render(<JournalForm />);
+    expect(screen.getByLabelText(/confidence/i)).toBeInTheDocument();
+  });
+
+  it('has accessible name for Record button', () => {
+    render(<JournalForm />);
+    expect(screen.getByRole('button', { name: /start recording/i })).toBeInTheDocument();
+  });
+
+  it('has accessible name for Sentiment buttons', () => {
+    render(<JournalForm />);
     expect(screen.getByRole('button', { name: /dysphoric/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /euphoric/i })).toBeInTheDocument();
+  });
+
+  it('has accessible name for Prompt Refresh button', () => {
+     render(<JournalForm />);
+
+     // 1. Initial State: "Get a writing prompt" button
+     const getPromptBtn = screen.getByRole('button', { name: /get a writing prompt/i });
+     expect(getPromptBtn).toBeInTheDocument();
+
+     // 2. Click it to show the prompt and the refresh button
+     fireEvent.click(getPromptBtn);
+
+     // 3. Now "Get another prompt" button should be visible
+     const refreshBtn = screen.getByRole('button', { name: /get another prompt/i });
+     expect(refreshBtn).toBeInTheDocument();
   });
 });
