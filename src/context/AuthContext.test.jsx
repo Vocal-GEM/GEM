@@ -19,6 +19,12 @@ vi.mock('../services/DataSyncService', () => ({
     syncFromServer: vi.fn().mockResolvedValue(true)
 }));
 
+// Mock runtime config
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: vi.fn().mockReturnValue(true),
+    getBackendUrl: vi.fn().mockReturnValue('http://mock-api')
+}));
+
 import { indexedDB } from '../services/IndexedDBManager';
 import { syncToServer, syncFromServer } from '../services/DataSyncService';
 
@@ -39,6 +45,8 @@ describe('AuthContext', () => {
         vi.resetAllMocks();
         vi.spyOn(console, 'error').mockImplementation(() => { });
         vi.spyOn(console, 'log').mockImplementation(() => { });
+        // Restore default mock implementations if needed
+        import('../config/runtime').then(m => m.isBackendEnabled.mockReturnValue(true));
     });
 
     it('initializes with null user if /me fails', async () => {
@@ -149,4 +157,3 @@ describe('AuthContext', () => {
         });
     });
 });
-

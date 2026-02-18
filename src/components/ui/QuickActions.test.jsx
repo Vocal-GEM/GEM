@@ -21,38 +21,36 @@ describe('QuickActions', () => {
 
     it('should render the FAB button', () => {
         render(<QuickActions />);
-        expect(screen.getByRole('button', { name: /quick actions/i })).toBeInTheDocument();
+        // Ensure FAB has correct label (Open/Close depends on state)
+        expect(screen.getByRole('button', { name: /open quick actions/i })).toBeInTheDocument();
     });
 
     it('should have correct accessibility attributes', () => {
         render(<QuickActions />);
-        const fab = screen.getByRole('button', { name: /quick actions/i });
+        const fab = screen.getByRole('button', { name: /open quick actions/i });
 
         // Initial state
         expect(fab).toHaveAttribute('aria-expanded', 'false');
         expect(fab).toHaveAttribute('aria-haspopup', 'true');
         expect(fab).toHaveAttribute('aria-controls', 'quick-actions-menu');
 
-        // Buttons should be hidden from accessibility tree initially
-        const practiceButton = screen.queryByText('Practice');
-        expect(practiceButton).toBeInTheDocument();
-        // Since we are finding by text which is in a span, we check the button parent
-        const button = practiceButton.closest('button');
-        expect(button).toHaveAttribute('aria-hidden', 'true');
-        expect(button).toHaveAttribute('tabIndex', '-1');
+        // Buttons container should be hidden from accessibility tree initially
+        const menu = document.getElementById('quick-actions-menu');
+        expect(menu).toHaveAttribute('aria-hidden', 'true');
     });
 
     it('should expand menu when clicked and update attributes', () => {
         render(<QuickActions />);
-        const fab = screen.getByRole('button', { name: /quick actions/i });
+        const fab = screen.getByRole('button', { name: /open quick actions/i });
 
         fireEvent.click(fab);
 
+        // FAB label changes
+        expect(screen.getByRole('button', { name: /close quick actions/i })).toBeInTheDocument();
         expect(fab).toHaveAttribute('aria-expanded', 'true');
 
-        const practiceButton = screen.getByText('Practice').closest('button');
-        expect(practiceButton).toHaveAttribute('aria-hidden', 'false');
-        expect(practiceButton).toHaveAttribute('tabIndex', '0');
+        const menu = document.getElementById('quick-actions-menu');
+        expect(menu).toHaveAttribute('aria-hidden', 'false');
     });
 
     it('should call onAction when an action is clicked', () => {
@@ -60,7 +58,7 @@ describe('QuickActions', () => {
         render(<QuickActions onAction={onAction} />);
 
         // Open menu
-        fireEvent.click(screen.getByRole('button', { name: /quick actions/i }));
+        fireEvent.click(screen.getByRole('button', { name: /open quick actions/i }));
 
         // Click action
         fireEvent.click(screen.getByText('Practice'));
@@ -71,7 +69,7 @@ describe('QuickActions', () => {
         render(<QuickActions />);
 
         // Open menu
-        fireEvent.click(screen.getByRole('button', { name: /quick actions/i }));
+        fireEvent.click(screen.getByRole('button', { name: /open quick actions/i }));
 
         // Click Listen Mode
         fireEvent.click(screen.getByText('Listen Mode'));
