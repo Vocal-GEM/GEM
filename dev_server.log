@@ -12,3 +12,7 @@
 7:31:17 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
 7:39:22 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
 7:39:27 AM [vite] page reload src/components/viz/HighResSpectrogram.test.jsx
+7:46:18 AM [vite] page reload src/components/viz/BreathinessMeter.test.jsx
+7:46:48 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:47:14 AM [vite] page reload src/components/viz/FeedbackManager.jsx
+7:47:44 AM [vite] page reload src/components/viz/FileSpectrogram.jsx
