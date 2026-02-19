@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
@@ -31,6 +30,7 @@ export const InsightCard = ({ insight, onDismiss }) => {
                                     size="icon"
                                     className="h-6 w-6 -mr-2 -mt-2 text-blue-400 hover:text-blue-600 hover:bg-blue-100/50"
                                     onClick={onDismiss}
+                                    aria-label="Dismiss insight"
                                 >
                                     <X size={16} />
                                 </Button>
