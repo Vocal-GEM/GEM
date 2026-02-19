@@ -66,7 +66,7 @@ const NotificationSettingsPanel = ({ onClose, embedded = false }) => {
                         </div>
                     </div>
                     {!embedded && (
-                        <button onClick={onClose} className="text-slate-400 hover:text-white">
+                        <button onClick={onClose} className="text-slate-400 hover:text-white" aria-label="Close settings">
                             <X size={20} />
                         </button>
                     )}
@@ -175,6 +175,8 @@ const NotificationSettingsPanel = ({ onClose, embedded = false }) => {
  */
 const SettingRow = ({ icon: Icon, iconColor, title, description, checked, onChange, disabled }) => (
     <button
+        role="switch"
+        aria-checked={checked}
         onClick={onChange}
         disabled={disabled}
         className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all text-left ${disabled
