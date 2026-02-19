@@ -210,6 +210,7 @@ const ClipAnalysisModal = ({ audioBlob, audioUrl, onClose }) => {
                     <button
                         onClick={onClose}
                         className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                        aria-label="Close analysis"
                     >
                         <X size={20} />
                     </button>
@@ -237,6 +238,7 @@ const ClipAnalysisModal = ({ audioBlob, audioUrl, onClose }) => {
                                 <button
                                     onClick={togglePlayback}
                                     className="p-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-500 hover:to-pink-500 transition-all"
+                                    aria-label={isPlaying ? "Pause playback" : "Start playback"}
                                 >
                                     {isPlaying ? <Pause size={20} /> : <Play size={20} />}
                                 </button>
