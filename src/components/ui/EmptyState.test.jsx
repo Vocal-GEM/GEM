@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import EmptyState from './EmptyState';
-import React from 'react';
 
 describe('EmptyState Component', () => {
     it('renders title and description', () => {

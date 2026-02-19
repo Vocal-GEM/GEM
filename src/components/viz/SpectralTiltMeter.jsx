@@ -5,18 +5,16 @@ import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -6 } }) => {
     const { colorBlindMode } = useSettings();
-    const id = useId();
+    const componentId = useId();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
-    const componentId = useId();
 
     useEffect(() => {
         const loop = () => {
-            if (indicatorRef.current && valueRef.current) {
+            if (indicatorRef.current && valueRef.current && dataRef.current) {
                 const tilt = dataRef.current.tilt || 0;
 
-                // Map Tilt: Typically -20dB/oct (Masc/Steep?) to 0dB/oct (Flat/Bright?)
-                // Visualization Range: -24 dB/oct to 0 dB/oct
+                // Map Tilt: Typically -24dB/oct (Steep) to 0dB/oct (Flat)
                 const minDisp = -24;
                 const maxDisp = 0;
 
@@ -24,37 +22,28 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 let percent = ((tilt - minDisp) / (maxDisp - minDisp)) * 100;
                 percent = Math.max(0, Math.min(100, percent));
 
-                const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
-                const nextLeft = curLeft + (percent - curLeft) * 0.1;
-                indicatorRef.current.style.left = `${nextLeft}%`;
-
-                // Color based on target range
+                // Indicator styling based on target
                 const isWithinTarget = tilt >= targetRange.min && tilt <= targetRange.max;
+                const indicatorColor = isWithinTarget
+                    ? (colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500')
+                    : 'bg-slate-400';
 
-                if (isWithinTarget) {
-                    indicatorRef.current.className = `absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`;
-                } else {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-slate-400";
-                }
+                const shadowColor = isWithinTarget
+                    ? 'rgba(100,255,100,0.8)'
+                    : 'rgba(100,200,255,0.8)';
+
+                // Update styles
+                indicatorRef.current.style.left = `${percent}%`;
+                indicatorRef.current.className = `absolute top-1 bottom-1 w-2 rounded-full border border-white/50 transition-all duration-100 ease-out z-10 ${indicatorColor}`;
+                indicatorRef.current.style.boxShadow = `0 0 15px ${shadowColor}`;
 
                 // Update value display
                 valueRef.current.innerText = tilt.toFixed(1);
             }
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                `spectral-tilt-meter-${id}`,
-                loop,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
-
         const unsubscribe = renderCoordinator.subscribe(
-            `spectral-tilt-meter-${componentId}`,
+            componentId,
             loop,
             renderCoordinator.PRIORITY.MEDIUM
         );
@@ -62,8 +51,13 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
         return () => {
             unsubscribe();
         };
-    }, [dataRef, targetRange, colorBlindMode, id]);
     }, [dataRef, targetRange, colorBlindMode, componentId]);
+
+    // Calculate target zone position for rendering
+    const minDisp = -24;
+    const maxDisp = 0;
+    const targetLeft = ((targetRange.min - minDisp) / (maxDisp - minDisp)) * 100;
+    const targetWidth = ((targetRange.max - targetRange.min) / (maxDisp - minDisp)) * 100;
 
     return (
         <div className="glass-panel rounded-2xl p-6 h-full flex flex-col justify-center">
@@ -86,22 +80,12 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 <div className={`absolute inset-0 bg-gradient-to-r ${colorBlindMode ? 'from-purple-900/40 to-teal-500/10' : 'from-indigo-900/40 to-blue-500/10'}`}></div>
 
                 {/* Target Range Zone */}
-                {(() => {
-                    const minDisp = -24;
-                    const maxDisp = 0;
-                    const left = ((targetRange.min - minDisp) / (maxDisp - minDisp)) * 100;
-                    const width = ((targetRange.max - targetRange.min) / (maxDisp - minDisp)) * 100;
-                    return (
-                        <div
-                            className={`absolute top-0 bottom-0 border-x ${colorBlindMode ? 'bg-amber-500/20 border-amber-500/30' : 'bg-emerald-500/20 border-emerald-500/30'}`}
-                            style={{ left: `${left}%`, width: `${width}%` }}
-                        >
-                            <div className={`absolute top-0 left-0 right-0 h-[2px] ${colorBlindMode ? 'bg-amber-500/50' : 'bg-emerald-500/50'}`}></div>
-                            <div className={`absolute bottom-0 left-0 right-0 h-[2px] ${colorBlindMode ? 'bg-amber-500/50' : 'bg-emerald-500/50'}`}></div>
-                            <div className={`absolute top-1 left-1 text-[8px] font-bold uppercase tracking-wider ${colorBlindMode ? 'text-amber-400' : 'text-emerald-400'}`}>Target</div>
-                        </div>
-                    );
-                })()}
+                <div
+                    className={`absolute top-0 bottom-0 border-x ${colorBlindMode ? 'bg-amber-500/20 border-amber-500/30' : 'bg-emerald-500/20 border-emerald-500/30'}`}
+                    style={{ left: `${targetLeft}%`, width: `${targetWidth}%` }}
+                >
+                    <div className={`absolute top-1 left-1 text-[8px] font-bold uppercase tracking-wider ${colorBlindMode ? 'text-amber-400' : 'text-emerald-400'}`}>Target</div>
+                </div>
 
                 {/* Grid Lines */}
                 <div className="absolute left-[25%] top-2 bottom-2 w-px bg-white/5"></div>
@@ -111,7 +95,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 {/* Indicator */}
                 <div
                     ref={indicatorRef}
-                    className={`absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_15px_rgba(100,255,100,0.6)] border border-white/50 transition-all duration-100 ease-out z-10 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                    className="absolute top-1 bottom-1 w-2 rounded-full bg-slate-400 border border-white/50 z-10"
                     style={{ left: '50%' }}
                 ></div>
             </div>
