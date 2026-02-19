@@ -19,16 +19,38 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
 
     // Subscribe to Data Stream
     useEffect(() => {
-        const updateLoop = () => {
-            if (dataRef?.current) {
-                const { pitch, resonance, weight, tilt, register } = dataRef.current;
-                setMetrics({
-                    pitch: pitch || 0,
-                    resonance: resonance || 0,
-                    weight: weight !== undefined ? weight : 50,
-                    tilt: tilt || 0,
-                    register: register
-                });
+        let lastUpdateTime = 0;
+        const updateLoop = (timestamp) => {
+            // Throttle updates to ~30fps to reduce React render load
+            if (timestamp - lastUpdateTime > 33) {
+                if (dataRef?.current) {
+                    const { pitch, resonance, weight, tilt, register } = dataRef.current;
+
+                    // Only update if values significantly changed to avoid re-renders
+                    // Use functional state update to prevent dependency on 'metrics'
+                    setMetrics(prev => {
+                        const newPitch = pitch || 0;
+                        const newResonance = resonance || 0;
+                        const newWeight = weight !== undefined ? weight : 50;
+
+                        // Check for significant changes
+                        if (Math.abs(prev.pitch - newPitch) < 1 &&
+                            Math.abs(prev.resonance - newResonance) < 5 &&
+                            Math.abs(prev.weight - newWeight) < 1 &&
+                            prev.register === register) {
+                            return prev;
+                        }
+
+                        return {
+                            pitch: newPitch,
+                            resonance: newResonance,
+                            weight: newWeight,
+                            tilt: tilt || 0,
+                            register: register
+                        };
+                    });
+                }
+                lastUpdateTime = timestamp;
             }
             requestAnimationFrame(updateLoop);
         };
