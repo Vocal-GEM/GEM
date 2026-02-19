@@ -113,7 +113,7 @@ const TaskRecorder = ({ task, onComplete }) => {
                     <h3 className="text-white font-medium text-lg">{task.prompt}</h3>
                     {task.text && (
                         <div className="mt-2 p-3 bg-slate-900/50 rounded border border-slate-700 text-slate-300 italic">
-                            "{task.prompt.replace('Read: "', '').replace('"', '')}"
+                            &quot;{task.prompt.replace('Read: "', '').replace('"', '')}&quot;
                         </div>
                     )}
                     {task.duration && (
@@ -159,7 +159,7 @@ const TaskRecorder = ({ task, onComplete }) => {
                         <button
                             onClick={togglePlayback}
                             className="p-2 bg-slate-700 hover:bg-slate-600 rounded-full text-white transition-colors"
-                        >
+                            >
                             {isPlaying ? <Pause size={18} /> : <Play size={18} />}
                         </button>
                         <button

@@ -82,4 +82,29 @@ describe('HighResSpectrogram', () => {
     unmount();
     expect(unsubscribe).toHaveBeenCalled();
   });
+
+  it('executes draw function without error', () => {
+      render(<HighResSpectrogram dataRef={dataRef} />);
+
+      const calls = renderCoordinator.subscribe.mock.calls;
+      expect(calls.length).toBeGreaterThan(0);
+      const callback = calls[0][1]; // arguments: id, callback
+
+      expect(typeof callback).toBe('function');
+
+      // Execute the draw callback
+      callback();
+
+      expect(mockContext.drawImage).toHaveBeenCalled();
+
+      // Verify scrollSpeed usage (2)
+      // ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
+      // width=800, height=512, scrollSpeed=2
+      expect(mockContext.drawImage).toHaveBeenCalledWith(
+          expect.anything(), // canvas
+          2, 0, 798, 512, 0, 0, 798, 512
+      );
+
+      expect(mockContext.putImageData).toHaveBeenCalled();
+  });
 });
