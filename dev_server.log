@@ -24,3 +24,9 @@
 7:38:05 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
 7:38:45 AM [vite] page reload src/components/professional/AudioSourceManager.jsx
 7:39:07 AM [vite] page reload src/components/marketplace/MarketplaceBrowser.jsx
+7:48:25 AM [vite] page reload src/services/ResearchMode.js
+7:48:40 AM [vite] page reload src/services/PrivacyManager.js
+7:49:00 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
+7:49:54 AM [vite] page reload src/components/research/ConsentFlow.jsx
+7:50:18 AM [vite] page reload src/components/professional/VASSlider.jsx
+7:50:27 AM [vite] page reload src/components/professional/TaskRecorder.jsx
