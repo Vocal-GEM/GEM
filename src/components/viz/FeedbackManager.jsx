@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import CelebrationAnimations from '../ui/CelebrationAnimations';
 import DriftAlert from '../ui/DriftAlert';
 import { getAdaptiveFeedbackController } from '../../services/AdaptiveFeedback';
 import FlowStateDetector from '../../utils/FlowStateDetector';
+import { useState, useRef, useEffect } from 'react';
 
 const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     const { settings } = useSettings();

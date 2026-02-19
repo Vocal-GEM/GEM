@@ -42,7 +42,6 @@ describe('LoadingSpinner', () => {
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import LoadingSpinner from "./LoadingSpinner";
-import React from 'react';
 
 describe("LoadingSpinner", () => {
   it("renders with default accessibility attributes", () => {

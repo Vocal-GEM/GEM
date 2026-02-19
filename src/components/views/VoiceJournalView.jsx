@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Mic, Square, Play, Pause, Trash2, Calendar, Clock, Music, Plus, X, Tag, FileText, Search, Filter, TrendingUp, ChevronDown } from 'lucide-react';
 import LoadingSpinner from '../ui/LoadingSpinner';
-import { getRecordings, saveRecording, deleteRecording, updateRecording } from '../../services/VoiceJournalService';
+import { getRecordings, saveRecording, deleteRecording } from '../../services/VoiceJournalService';
 import { recordPractice } from '../../services/StreakService';
-import { JOURNAL_TEMPLATES, getTemplateById, formatTemplateAsEntry } from '../../data/journalTemplates';
+import { JOURNAL_TEMPLATES, formatTemplateAsEntry } from '../../data/journalTemplates';
 
 // Waveform Visualization Component
 const WaveformVisualizer = ({ audioBlob, isPlaying, onSeek }) => {

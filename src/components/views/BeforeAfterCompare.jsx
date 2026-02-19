@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Calendar, TrendingUp, RefreshCw } from 'lucide-react';
 import { getReports } from '../../services/SessionReportService';
 

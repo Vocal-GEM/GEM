@@ -35,6 +35,35 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { audioEngineRef } = useAudio();
     const { settings: feedbackSettings, setSettings: setFeedbackSettings } = useFeedback(audioEngineRef, dataRef);
 
+    // ⚡ Bolt Optimization: Use ref to hold latest state for the render loop
+    // This prevents the loop function from being recreated on every render
+    // and avoids thrashing the RenderCoordinator subscription.
+    const latestStateRef = useRef({
+        zoomRange,
+        targetRange,
+        settings,
+        activeProfile,
+        voiceProfiles,
+        colorBlindMode,
+        exercise,
+        onScore,
+        dataRef
+    });
+
+    useEffect(() => {
+        latestStateRef.current = {
+            zoomRange,
+            targetRange,
+            settings,
+            activeProfile,
+            voiceProfiles,
+            colorBlindMode,
+            exercise,
+            onScore,
+            dataRef
+        };
+    });
+
     useEffect(() => {
         // Lazy initialization of Image objects
         if (!balloonRef.current) {
@@ -159,83 +188,22 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
         if (exercise) gameRef.current = { score: 0, lastUpdate: Date.now(), lastPitch: 0 };
 
-        // Pre-calculate profile ranges outside the loop
-        const fem = voiceProfiles.find(p => p.id === 'fem');
-        const masc = voiceProfiles.find(p => p.id === 'masc');
-        const femRange = fem?.genderRange || fem?.targetRange;
-        const mascRange = masc?.genderRange || masc?.targetRange;
-        const isFem = activeProfile === 'fem';
-        const mode = settings?.genderFeedbackMode || 'neutral';
-
-        // Pre-calculate game logic functions if exercise is active
-        let getExerciseFreq = null;
-        if (exercise) {
-            if (exercise.gameId === 'glide') {
-                const freqRange = exercise.range;
-                const center = (targetRange.min + targetRange.max) / 2;
-                getExerciseFreq = (t, now) => {
-                    const phase = (now / 2000) * Math.PI * 2;
-                    return center + (freqRange / 2) * Math.sin((t * Math.PI * 4) + phase);
-                };
-            } else if (exercise.gameId === 'step') {
-                const steps = 4;
-                const stepHeight = exercise.range / steps;
-                getExerciseFreq = (t, now) => {
-                    const phase = (now / 4000) % 1;
-                    const adjustedT = (t + phase) % 1;
-                    const currentStep = Math.floor(adjustedT * steps);
-                    return targetRange.min + (currentStep * stepHeight);
-                };
-            }
-        }
-
-        const getPitchColor = (freq, clarity = 1.0) => {
-            if (clarity < 0.8) {
-                return colorBlindMode ? '#9333ea' : '#ef4444';
-            }
-
-            // Target Zone (Always Winning Color)
-            if (targetRange && freq >= targetRange.min && (isFem || freq <= targetRange.max)) {
-                if (colorBlindMode) return '#0d9488';
-                return '#22c55e'; // Green
-            }
-
-            // Near Miss Zone
-            if (targetRange) {
-                const distMin = 1200 * Math.log2(freq / targetRange.min);
-                const distMax = 1200 * Math.log2(freq / targetRange.max);
-
-                if ((distMin > -50 && distMin < 0) || (distMax > 0 && distMax < 50)) {
-                    if (colorBlindMode) return '#f59e0b';
-                    return '#eab308'; // Yellow
-                }
-            }
-
-            // If Neutral or Off, avoid gendered colors
-            if (mode === 'neutral') {
-                if (freq < 155) return '#6366f1'; // Indigo (Low)
-                if (freq > 185) return '#f59e0b'; // Amber (High)
-                return '#10b981'; // Emerald (Mid/Target-ish)
-            }
-            if (mode === 'off') {
-                return '#94a3b8'; // Slate (Neutral feedback)
-            }
-
-            // Default Gendered Colors
-            if (femRange && freq >= femRange.min && freq <= femRange.max) {
-                return '#e879f9'; // Pink
-            }
-
-            if (mascRange && freq >= mascRange.min && freq <= mascRange.max) {
-                return '#60a5fa'; // Blue
-            }
-
-            if (colorBlindMode) return '#9333ea';
-            return '#ef4444';
-        };
-
+        // ⚡ Bolt Optimization: Use refs for loop logic to avoid recreation
         const loop = () => {
             if (!canvas) return;
+
+            // Access latest state from ref
+            const {
+                zoomRange,
+                targetRange,
+                settings,
+                activeProfile,
+                voiceProfiles,
+                colorBlindMode,
+                exercise,
+                onScore,
+                dataRef
+            } = latestStateRef.current;
 
             // Use cached dimensions - huge performance win
             // avoiding getBoundingClientRect() in the loop
@@ -267,6 +235,14 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
             const showNorms = settings?.showNorms !== false;
             const currentMode = settings?.genderFeedbackMode || 'neutral';
+
+            // Pre-calculate profile ranges inside loop (fast enough, avoids stale closures)
+            const fem = voiceProfiles.find(p => p.id === 'fem');
+            const masc = voiceProfiles.find(p => p.id === 'masc');
+            const femRange = fem?.genderRange || fem?.targetRange;
+            const mascRange = masc?.genderRange || masc?.targetRange;
+            const isFem = activeProfile === 'fem';
+
 
             if (showNorms && currentMode !== 'off') {
                 let genderId = null;
@@ -301,6 +277,52 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     }
                 }
             }
+
+            const getPitchColor = (freq, clarity = 1.0) => {
+                if (clarity < 0.8) {
+                    return colorBlindMode ? '#9333ea' : '#ef4444';
+                }
+
+                // Target Zone (Always Winning Color)
+                if (targetRange && freq >= targetRange.min && (isFem || freq <= targetRange.max)) {
+                    if (colorBlindMode) return '#0d9488';
+                    return '#22c55e'; // Green
+                }
+
+                // Near Miss Zone
+                if (targetRange) {
+                    const distMin = 1200 * Math.log2(freq / targetRange.min);
+                    const distMax = 1200 * Math.log2(freq / targetRange.max);
+
+                    if ((distMin > -50 && distMin < 0) || (distMax > 0 && distMax < 50)) {
+                        if (colorBlindMode) return '#f59e0b';
+                        return '#eab308'; // Yellow
+                    }
+                }
+
+                // If Neutral or Off, avoid gendered colors
+                if (currentMode === 'neutral') {
+                    if (freq < 155) return '#6366f1'; // Indigo (Low)
+                    if (freq > 185) return '#f59e0b'; // Amber (High)
+                    return '#10b981'; // Emerald (Mid/Target-ish)
+                }
+                if (currentMode === 'off') {
+                    return '#94a3b8'; // Slate (Neutral feedback)
+                }
+
+                // Default Gendered Colors
+                if (femRange && freq >= femRange.min && freq <= femRange.max) {
+                    return '#e879f9'; // Pink
+                }
+
+                if (mascRange && freq >= mascRange.min && freq <= mascRange.max) {
+                    return '#60a5fa'; // Blue
+                }
+
+                if (colorBlindMode) return '#9333ea';
+                return '#ef4444';
+            };
+
 
             if (targetRange && !exercise) {
                 const isFemProfile = activeProfile === 'fem';
@@ -374,47 +396,67 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 ctx.fillText('Crossover ~157 Hz', width - 10, crossY - 3);
             }
 
-            if (exercise && getExerciseFreq) {
+            if (exercise) {
+                // Inline getExerciseFreq calculation to avoid function creation overhead
+                let currentExerciseFreq = 0;
                 const now = Date.now();
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.setLineDash([10, 15]); ctx.beginPath();
-                let targetFreqAtCurrent = 0;
-
-                for (let i = 30; i < width; i += 5) {
-                    const t = (i - 30) / (width - 30);
-                    const freq = getExerciseFreq(t, now);
-
-                    const y = mapY(freq);
-                    if (i === 30) ctx.moveTo(i, y); else ctx.lineTo(i, y);
-                    if (i >= width - 50 && i < width - 40) targetFreqAtCurrent = freq;
-
-                    if (i % 150 === 0) {
-                        const birdY = y + (Math.sin(i + now / 100) * 20);
-                        if (birdRef.current?.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
-                    }
-                }
-                ctx.stroke(); ctx.setLineDash([]);
-
-                const currentPitch = dataRef.current.history[dataRef.current.history.length - 1];
-                if (currentPitch > 0) {
-                    const playerY = mapY(currentPitch);
-                    if (balloonRef.current?.complete) {
-                        ctx.drawImage(balloonRef.current, width - 60, playerY - 25, 50, 50);
-                    } else {
-                        ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(width - 40, playerY, 15, 0, Math.PI * 2); ctx.fill();
-                    }
-
-                    const diff = Math.abs(currentPitch - targetFreqAtCurrent);
-                    if (diff < 20) {
-                        gameRef.current.score += 1;
-                        ctx.shadowBlur = 20; ctx.shadowColor = "#4ade80";
-                        if (gameRef.current.score % 50 === 0) onScore(gameRef.current.score);
-                    } else {
-                        ctx.shadowBlur = 0;
-                    }
+                if (exercise.gameId === 'glide') {
+                    const freqRange = exercise.range;
+                    const center = (targetRange.min + targetRange.max) / 2;
+                    const phase = (now / 2000) * Math.PI * 2;
+                    currentExerciseFreq = (t) => center + (freqRange / 2) * Math.sin((t * Math.PI * 4) + phase);
+                } else if (exercise.gameId === 'step') {
+                    const steps = 4;
+                    const stepHeight = exercise.range / steps;
+                    const phase = (now / 4000) % 1;
+                    currentExerciseFreq = (t) => {
+                        const adjustedT = (t + phase) % 1;
+                        const currentStep = Math.floor(adjustedT * steps);
+                        return targetRange.min + (currentStep * stepHeight);
+                    };
                 }
 
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'left'; ctx.fillText(exercise.name.toUpperCase(), 40, 25);
-                ctx.fillStyle = '#4ade80'; ctx.font = 'bold 24px sans-serif'; ctx.fillText(`SCORE: ${gameRef.current.score}`, 40, 55);
+                if (currentExerciseFreq) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.setLineDash([10, 15]); ctx.beginPath();
+                    let targetFreqAtCurrent = 0;
+
+                    for (let i = 30; i < width; i += 5) {
+                        const t = (i - 30) / (width - 30);
+                        const freq = currentExerciseFreq(t);
+
+                        const y = mapY(freq);
+                        if (i === 30) ctx.moveTo(i, y); else ctx.lineTo(i, y);
+                        if (i >= width - 50 && i < width - 40) targetFreqAtCurrent = freq;
+
+                        if (i % 150 === 0) {
+                            const birdY = y + (Math.sin(i + now / 100) * 20);
+                            if (birdRef.current?.complete) ctx.drawImage(birdRef.current, i, birdY - 15, 30, 30);
+                        }
+                    }
+                    ctx.stroke(); ctx.setLineDash([]);
+
+                    const currentPitch = dataRef.current.history[dataRef.current.history.length - 1];
+                    if (currentPitch > 0) {
+                        const playerY = mapY(currentPitch);
+                        if (balloonRef.current?.complete) {
+                            ctx.drawImage(balloonRef.current, width - 60, playerY - 25, 50, 50);
+                        } else {
+                            ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(width - 40, playerY, 15, 0, Math.PI * 2); ctx.fill();
+                        }
+
+                        const diff = Math.abs(currentPitch - targetFreqAtCurrent);
+                        if (diff < 20) {
+                            gameRef.current.score += 1;
+                            ctx.shadowBlur = 20; ctx.shadowColor = "#4ade80";
+                            if (gameRef.current.score % 50 === 0) onScore(gameRef.current.score);
+                        } else {
+                            ctx.shadowBlur = 0;
+                        }
+                    }
+
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'left'; ctx.fillText(exercise.name.toUpperCase(), 40, 25);
+                    ctx.fillStyle = '#4ade80'; ctx.font = 'bold 24px sans-serif'; ctx.fillText(`SCORE: ${gameRef.current.score}`, 40, 55);
+                }
             }
 
             const history = dataRef.current.history;
@@ -480,24 +522,46 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             const currentClarity = dataRef.current.clarity || 0;
 
             if (currentP > 0) {
-                setAveragePitchRange(prev => ({
-                    lowest: prev.lowest === null ? currentP : Math.min(prev.lowest, currentP),
-                    highest: prev.highest === null ? currentP : Math.max(prev.highest, currentP)
-                }));
+                // ⚡ Bolt Optimization: Prevent redundant re-renders
+                setAveragePitchRange(prev => {
+                    const newLowest = prev.lowest === null ? currentP : Math.min(prev.lowest, currentP);
+                    const newHighest = prev.highest === null ? currentP : Math.max(prev.highest, currentP);
+
+                    if (newLowest === prev.lowest && newHighest === prev.highest) {
+                        return prev; // Return same reference to skip re-render
+                    }
+                    return { lowest: newLowest, highest: newHighest };
+                });
 
                 // Check if in ambiguity zone and update state
                 const f1 = dataRef.current.f1 || 0;
                 const rbi = dataRef.current.resonanceScore;
                 if (currentP >= AMBIGUITY_ZONE.min && currentP <= AMBIGUITY_ZONE.max) {
                     const prediction = predictGenderPerception(currentP, f1, rbi);
-                    setAmbiguityZoneData({
-                        pitch: currentP,
-                        f1,
-                        rbi,
-                        prediction
+
+                    // ⚡ Bolt Optimization: Prevent redundant re-renders for ambiguity data
+                    setAmbiguityZoneData(prev => {
+                        const newPitch = Math.round(currentP);
+                        const newF1 = Math.round(f1);
+                        const newRbi = rbi !== undefined ? Math.round(rbi) : undefined;
+
+                        if (prev &&
+                            Math.round(prev.pitch) === newPitch &&
+                            Math.round(prev.f1) === newF1 &&
+                            Math.round(prev.rbi) === newRbi &&
+                            prev.prediction?.label === prediction.label) {
+                            return prev;
+                        }
+
+                        return {
+                            pitch: currentP,
+                            f1,
+                            rbi,
+                            prediction
+                        };
                     });
                 } else {
-                    setAmbiguityZoneData(null);
+                    setAmbiguityZoneData(prev => prev === null ? prev : null);
                 }
             }
 
@@ -568,6 +632,8 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             }
         };
 
+        // Subscribe to RenderCoordinator
+        // We now rely on latestStateRef, so we don't need to resubscribe when props change
         const unsubscribe = renderCoordinator.subscribe(
             'pitch-visualizer',
             loop,
@@ -577,7 +643,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
         return () => {
             unsubscribe();
         };
-    }, [targetRange, exercise, zoomRange, voiceProfiles, settings, colorBlindMode, activeProfile, dataRef, onScore]);
+    }, []); // ⚡ Bolt: Empty dependency array ensures we only subscribe once
 
     return (
         <div className="w-full h-full relative overflow-hidden group">
