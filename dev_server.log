@@ -18,3 +18,9 @@
 7:28:41 AM [vite] hmr update /src/components/analytics/TrendLineChart.jsx, /src/index.css
 7:28:56 AM [vite] hmr update /src/components/analytics/InsightCard.jsx, /src/index.css
 7:29:19 AM [vite] hmr update /src/components/analytics/AnalyticsDashboardV2.jsx, /src/index.css
+7:36:50 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:37:09 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+7:37:30 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:38:05 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
+7:38:45 AM [vite] page reload src/components/professional/AudioSourceManager.jsx
+7:39:07 AM [vite] page reload src/components/marketplace/MarketplaceBrowser.jsx
