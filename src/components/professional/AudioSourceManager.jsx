@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
 
 const AudioSourceManager = ({ onSourceChange }) => {
