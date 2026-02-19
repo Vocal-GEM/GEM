@@ -23,8 +23,8 @@ window.Audio = class {
 };
 
 // Mock URL
-global.URL.createObjectURL = vi.fn(() => 'mock-url');
-global.URL.revokeObjectURL = vi.fn();
+globalThis.URL.createObjectURL = vi.fn(() => 'mock-url');
+globalThis.URL.revokeObjectURL = vi.fn();
 
 describe('RecordingsList', () => {
     const mockRecording = {
