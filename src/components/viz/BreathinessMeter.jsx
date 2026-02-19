@@ -2,7 +2,6 @@ import { useEffect, useRef, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Wind, CheckCircle2, AlertTriangle, Info, Sparkles, Activity, HelpCircle } from 'lucide-react';
-import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * BreathinessMeter Component
@@ -30,39 +29,28 @@ const ZONES = [
     { id: 3, label: 'Severe', color: 'red', range: [75, 100], feedback: 'Excessive ⚠', icon: 'warning' }
 ];
 
-
-
 const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const { colorBlindMode } = useSettings();
     const componentId = useId();
+
+    // Refs for DOM elements
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
     const zoneRef = useRef(null);
     const feedbackRef = useRef(null);
     const lastValueRef = useRef(50);
-    const componentId = useId();
-    const id = useId();
 
-    // NEW: Refs for OQ and ventricular displays
+    // Refs for OQ and ventricular displays
     const oqValueRef = useRef(null);
     const oqZoneRef = useRef(null);
     const oqIndicatorRef = useRef(null);
     const lastOqRef = useRef(50);
     const ventricularRef = useRef(null);
-    const componentId = useId();
 
     // Optimized: Use RenderCoordinator to manage animation loop
     useEffect(() => {
-        const update = () => {
-            if (!dataRef.current) return;
-        const updateMeter = () => {
-            if (!dataRef.current) return;
         const loop = () => {
             if (!dataRef.current) return;
-        const loop = (delta, currentTime) => {
-            if (!dataRef.current) {
-                return;
-            }
 
             const { breathinessGrbas, oq_percent, oq_zone, ventricular_detected, ventricular_severity, ventricular_feedback } = dataRef.current;
 
@@ -165,42 +153,14 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
 
         const unsubscribe = renderCoordinator.subscribe(
             componentId,
-            update,
-            renderCoordinator.PRIORITY.MEDIUM
-        );
-
-        return unsubscribe;
-    }, [dataRef, colorBlindMode, componentId]);
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            componentId,
-            updateMeter,
-
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `BreathinessMeter-${componentId}`,
             loop,
             renderCoordinator.PRIORITY.MEDIUM
-        );
-
-        return () => unsubscribe();
-    }, [dataRef, colorBlindMode, componentId]);
-            `breathiness-meter-${componentId}`,
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `breathiness-meter-${id}`,
-            loop,
-            renderCoordinator.PRIORITY.CRITICAL
         );
 
         return () => {
-            unsubscribe();
+            if (unsubscribe) unsubscribe();
         };
     }, [dataRef, colorBlindMode, componentId]);
-    }, [dataRef, colorBlindMode, id]);
 
     // Determine if in sweet spot for static rendering
     const breathinessGrbas = dataRef.current?.breathinessGrbas;
