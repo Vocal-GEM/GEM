@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
 
 const AudioSourceManager = ({ onSourceChange }) => {
@@ -5,9 +6,21 @@ const AudioSourceManager = ({ onSourceChange }) => {
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [permissionGranted, setPermissionGranted] = useState(false);
 
-    useEffect(() => {
-        checkPermissionAndEnumerate();
-    }, []);
+    const enumerateDevices = async () => {
+        try {
+            const allDevices = await navigator.mediaDevices.enumerateDevices();
+            const audioInputs = allDevices.filter(device => device.kind === 'audioinput');
+            setDevices(audioInputs);
+
+            // Auto-select first if none selected
+            if (audioInputs.length > 0 && !selectedDeviceId) {
+                setSelectedDeviceId(audioInputs[0].deviceId);
+                onSourceChange?.(audioInputs[0].deviceId);
+            }
+        } catch (err) {
+            console.error("Error enumerating devices:", err);
+        }
+    };
 
     const checkPermissionAndEnumerate = async () => {
         try {
@@ -28,21 +41,10 @@ const AudioSourceManager = ({ onSourceChange }) => {
         }
     };
 
-    const enumerateDevices = async () => {
-        try {
-            const allDevices = await navigator.mediaDevices.enumerateDevices();
-            const audioInputs = allDevices.filter(device => device.kind === 'audioinput');
-            setDevices(audioInputs);
-
-            // Auto-select first if none selected
-            if (audioInputs.length > 0 && !selectedDeviceId) {
-                setSelectedDeviceId(audioInputs[0].deviceId);
-                onSourceChange?.(audioInputs[0].deviceId);
-            }
-        } catch (err) {
-            console.error("Error enumerating devices:", err);
-        }
-    };
+    useEffect(() => {
+        checkPermissionAndEnumerate();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleDeviceChange = (e) => {
         const deviceId = e.target.value;

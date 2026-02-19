@@ -1,5 +1,5 @@
 import AudioWaveform from '../ui/AudioWaveform';
-import { Upload, Play, Pause, ZoomIn, ZoomOut } from 'lucide-react';
+import { Upload, Play, ZoomIn, ZoomOut } from 'lucide-react';
 import AudioSourceManager from './AudioSourceManager';
 
 const SpectrogramComparison = () => {
@@ -8,9 +8,10 @@ const SpectrogramComparison = () => {
     const [audioFile2, setAudioFile2] = useState(null);
     const [audioUrl2, setAudioUrl2] = useState(null);
 
-    const [isPlaying, setIsPlaying] = useState(false);
     const [zoomLevel, setZoomLevel] = useState(1);
-    const [deviceId, setDeviceId] = useState('');
+
+    // Using a ref to track device selection without re-render if not needed for UI
+    const deviceIdRef = useRef('');
 
     const handleFileUpload = (e, index) => {
         const file = e.target.files[0];
@@ -42,7 +43,7 @@ const SpectrogramComparison = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left Panel: Configuration */}
                 <div className="space-y-6">
-                    <AudioSourceManager onSourceChange={setDeviceId} />
+                    <AudioSourceManager onSourceChange={(id) => { deviceIdRef.current = id; }} />
 
                     <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
                         <h3 className="font-semibold mb-4 text-slate-200">Recording A (Reference)</h3>

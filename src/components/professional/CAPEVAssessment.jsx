@@ -1,7 +1,7 @@
+import { useState, FileText, Download, Activity } from 'react';
 import VASSlider from './VASSlider';
 import TaskRecorder from './TaskRecorder';
 import { motion } from 'framer-motion';
-import { FileText, Download, Activity } from 'lucide-react';
 
 const CAPEVAssessment = () => {
     const [scores, setScores] = useState({
