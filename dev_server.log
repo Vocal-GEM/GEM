@@ -9,3 +9,12 @@
   ➜  Network: use --host to expose
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
 7:23:54 AM [vite] hmr update /src/App.jsx, /src/index.css, /src/components/ui/BottomNav.jsx, /src/components/layout/Sidebar.jsx
+7:27:14 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:27:25 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:27:32 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:27:46 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:28:12 AM [vite] page reload src/audio/PitchWorklet.js
+7:28:25 AM [vite] hmr update /src/components/analytics/WeeklyDigest.jsx, /src/index.css
+7:28:41 AM [vite] hmr update /src/components/analytics/TrendLineChart.jsx, /src/index.css
+7:28:56 AM [vite] hmr update /src/components/analytics/InsightCard.jsx, /src/index.css
+7:29:19 AM [vite] hmr update /src/components/analytics/AnalyticsDashboardV2.jsx, /src/index.css
