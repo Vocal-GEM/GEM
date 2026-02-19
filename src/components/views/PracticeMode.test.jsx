@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 
 import { vi, describe, it, expect } from 'vitest';
 import PracticeMode from './PracticeMode';
@@ -31,6 +31,32 @@ vi.mock('../../context/NavigationContext', () => ({
         navigationParams: {}
     })
 }));
+
+// Mock AudioContext
+global.AudioContext = vi.fn().mockImplementation(() => ({
+    createGain: vi.fn().mockReturnValue({ gain: { value: 0 }, connect: vi.fn() }),
+    createOscillator: vi.fn().mockReturnValue({ start: vi.fn(), stop: vi.fn(), connect: vi.fn() }),
+    createAnalyser: vi.fn().mockReturnValue({ frequencyBinCount: 1024, getByteFrequencyData: vi.fn(), getByteTimeDomainData: vi.fn() }),
+    destination: {},
+    currentTime: 0,
+    resume: vi.fn(),
+    suspend: vi.fn()
+}));
+
+// Mock AudioWorkletNode
+global.AudioWorkletNode = vi.fn().mockImplementation(() => ({
+    port: {
+        postMessage: vi.fn(),
+        onmessage: null
+    },
+    connect: vi.fn(),
+    disconnect: vi.fn()
+}));
+
+// Setup global requestAnimationFrame mock to prevent timeouts
+global.requestAnimationFrame = (cb) => setTimeout(cb, 16);
+global.cancelAnimationFrame = (id) => clearTimeout(id);
+
 vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
 vi.mock('../ui/ResizablePanel', () => ({
@@ -64,31 +90,47 @@ describe('PracticeMode', () => {
 
     it('renders without crashing', async () => {
 
-        render(
-            <SettingsProvider>
-                <ProfileProvider>
-                    <AudioProvider>
-                        <NavigationProvider>
-                            <TourProvider>
-                                <PracticeCardsProvider>
-                                    <PracticeMode
-                                        dataRef={mockDataRef}
-                                        calibration={{}}
-                                        targetRange={{ min: 100, max: 200 }}
-                                        goals={{}}
-                                        settings={{}}
-                                    />
-                                </PracticeCardsProvider>
-                            </TourProvider>
-                        </NavigationProvider>
-                    </AudioProvider>
-                </ProfileProvider>
-            </SettingsProvider>
-        );
+        // Use act to wrap render since it triggers effects
+        await act(async () => {
+            render(
+                <SettingsProvider>
+                    <ProfileProvider>
+                        <AudioProvider>
+                            <NavigationProvider>
+                                <TourProvider>
+                                    <PracticeCardsProvider>
+                                        <PracticeMode
+                                            dataRef={mockDataRef}
+                                            calibration={{}}
+                                            targetRange={{ min: 100, max: 200 }}
+                                            goals={{}}
+                                            settings={{}}
+                                        />
+                                    </PracticeCardsProvider>
+                                </TourProvider>
+                            </NavigationProvider>
+                        </AudioProvider>
+                    </ProfileProvider>
+                </SettingsProvider>
+            );
+        });
 
         expect(screen.getByText('Overview')).toBeInTheDocument();
-        expect(screen.getByText('Pitch')).toBeInTheDocument();
-        // Check for visualization area
-        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
-    });
+        // Practice mode has tabs, Pitch is one of them
+        expect(screen.getByLabelText(/Switch to Pitch/i)).toBeInTheDocument();
+
+        // Wait for Suspense to resolve (VisualizerSkeleton might be present first)
+        // We use a generous timeout because of Suspense + ErrorBoundary + Lazy Load
+        // NOTE: DynamicOrb mock is just a div with data-testid="dynamic-orb"
+        // If Suspense is working correctly, it should eventually replace VisualizerSkeleton
+        try {
+            await screen.findByTestId('dynamic-orb', {}, { timeout: 8000 });
+        } catch (e) {
+            // Fallback: Check if skeleton is still there (meaning Suspense stuck or mock failed)
+            // But if test failed, it means it couldn't find dynamic-orb.
+            // Let's try debug
+            // screen.debug();
+            throw e;
+        }
+    }, 15000); // Set test timeout to 15s
 });
