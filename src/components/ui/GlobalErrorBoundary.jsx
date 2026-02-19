@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlertTriangle, RefreshCw, Bug } from 'lucide-react';
 import FeedbackModal from './FeedbackModal';
 
