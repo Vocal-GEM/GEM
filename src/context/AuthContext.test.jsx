@@ -1,4 +1,4 @@
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider, useAuth } from './AuthContext';
 
@@ -20,7 +20,6 @@ vi.mock('../services/DataSyncService', () => ({
 }));
 
 import { indexedDB } from '../services/IndexedDBManager';
-import { syncToServer, syncFromServer } from '../services/DataSyncService';
 
 const TestComponent = () => {
     const { user, login, signup, logout } = useAuth();
@@ -42,7 +41,7 @@ describe('AuthContext', () => {
     });
 
     it('initializes with null user if /me fails', async () => {
-        fetch.mockResolvedValueOnce({ ok: false }); // /me check
+        fetch.mockResolvedValue({ ok: false }); // All fetches fail initially
 
         let result;
         await act(async () => {
@@ -149,4 +148,3 @@ describe('AuthContext', () => {
         });
     });
 });
-

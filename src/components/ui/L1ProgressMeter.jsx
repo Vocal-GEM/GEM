@@ -8,7 +8,6 @@
  * to a unified progress metric.
  */
 
-import React from 'react';
 import PropTypes from 'prop-types';
 
 /**

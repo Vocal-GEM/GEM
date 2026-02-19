@@ -2,7 +2,6 @@ import { render, cleanup, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import HighResSpectrogram from './HighResSpectrogram';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import React from 'react';
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
@@ -18,29 +17,10 @@ vi.mock('../../context/SettingsContext', () => ({
   SettingsProvider: ({ children }) => <div>{children}</div>
 }));
 
-// Mock Canvas getContext
-const mockContext = {
-  createImageData: vi.fn((w, h) => ({
-    data: { buffer: new ArrayBuffer(w * h * 4) },
-    width: w,
-    height: h
-  })),
-  drawImage: vi.fn(),
-  putImageData: vi.fn(),
-  beginPath: vi.fn(),
-  moveTo: vi.fn(),
-  lineTo: vi.fn(),
-  stroke: vi.fn(),
-  fillRect: vi.fn(),
-  fillText: vi.fn(),
-  scale: vi.fn(),
-  canvas: { width: 800, height: 512 }
-};
-
-HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext);
-
 describe('HighResSpectrogram', () => {
   let dataRef;
+  let mockContext;
+  let drawImageSpy;
 
   beforeEach(() => {
     dataRef = {
@@ -50,6 +30,27 @@ describe('HighResSpectrogram', () => {
         f2: 1500
       }
     };
+
+    drawImageSpy = vi.fn();
+    mockContext = {
+      createImageData: vi.fn((w, h) => ({
+        data: { buffer: new ArrayBuffer(w * h * 4) },
+        width: w,
+        height: h
+      })),
+      drawImage: drawImageSpy,
+      putImageData: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      stroke: vi.fn(),
+      fillRect: vi.fn(),
+      fillText: vi.fn(),
+      scale: vi.fn(),
+      canvas: { width: 800, height: 512 }
+    };
+
+    HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext);
 
     Element.prototype.getBoundingClientRect = vi.fn(() => ({
       width: 800,
@@ -81,5 +82,24 @@ describe('HighResSpectrogram', () => {
 
     unmount();
     expect(unsubscribe).toHaveBeenCalled();
+  });
+
+  it('calls drawImage exactly once per frame (avoids N+1 re-renders)', () => {
+    // Capture the callback passed to subscribe
+    let drawCallback;
+    renderCoordinator.subscribe.mockImplementation((id, cb) => {
+      drawCallback = cb;
+      return vi.fn();
+    });
+
+    render(<HighResSpectrogram dataRef={dataRef} />);
+
+    expect(drawCallback).toBeDefined();
+
+    // Execute one frame
+    drawCallback();
+
+    // Verify optimization: drawImage should be called once (to shift canvas), not N times
+    expect(drawImageSpy).toHaveBeenCalledTimes(1);
   });
 });
