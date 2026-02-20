@@ -65,6 +65,7 @@ import { TourProvider } from './context/TourContext';
 import TourOverlay from './components/ui/TourOverlay';
 
 import CommandPalette from './components/ui/CommandPalette';
+import QuickActions from './components/ui/QuickActions';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
 import QuickSettings from './components/ui/QuickSettings';
 import { analyticsService } from './services/AnalyticsService';
@@ -182,6 +183,18 @@ const App = () => {
         window.addEventListener('openSettings', handleOpenSettings);
         return () => window.removeEventListener('openSettings', handleOpenSettings);
     }, [setShowSettings]);
+
+    const handleQuickAction = (action) => {
+        if (action === 'practice') {
+            setActiveTab('practice');
+        } else if (action === 'journal') {
+            setShowJournalForm(true);
+        } else if (action === 'warmup') {
+            openModal('warmup');
+        } else if (action === 'coach') {
+            setActiveTab('coach');
+        }
+    };
 
     return (
         <TourProvider>
@@ -457,7 +470,7 @@ const App = () => {
 
                         <TourOverlay />
                         <CommandPalette />
-                        <CommandPalette />
+                        <QuickActions onAction={handleQuickAction} />
                         <QuickSettings isOpen={false} onClose={() => { }} />
                         {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
                         {modals.analytics && <AnalyticsDashboard onClose={() => closeModal('analytics')} />}
