@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_login import login_required, current_user
 import google.generativeai as genai
 import os
@@ -37,7 +37,6 @@ def train_coach():
         
     if file:
         # Security: Validate file extension
-        is_valid, error = validate_file_upload(file.filename, allowed_types=['document'])
         is_valid, error = validate_file_upload(file.filename, allowed_types=['document'], file_stream=file)
         if not is_valid:
             return jsonify({"error": error}), 400
@@ -59,7 +58,7 @@ def train_coach():
         try:
             os.remove(temp_path)
         except Exception as e:
-            print(f"Warning: Failed to cleanup temp file {temp_path}: {e}")
+            current_app.logger.error(f"Warning: Failed to cleanup temp file {temp_path}: {e}")
             
         return jsonify({"message": f"Successfully trained on {count} chunks from {filename}"})
 
@@ -186,5 +185,5 @@ def chat():
         response = chat_session.send_message(full_prompt)
         return jsonify({"role": "assistant", "content": response.text})
     except Exception as e:
-        print(f"Gemini API Error: {e}")
+        current_app.logger.error(f"Gemini API Error: {e}")
         return jsonify({"role": "assistant", "content": "Sorry, I'm having trouble connecting to my brain right now. Try again later!"}), 500
