@@ -4,6 +4,8 @@ import { RotateCcw } from 'lucide-react';
 const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
     const canvasRef = useRef(null);
     const containerRef = useRef(null);
+    // Cache rect to avoid layout thrashing during drag
+    const rectRef = useRef(null);
 
     // Zoom state: { tMin, tMax, fMin, fMax } or null (default)
     const [zoom, setZoom] = useState(null);
@@ -30,8 +32,9 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
     const bounds = getBounds();
 
     // Coordinate Transforms
-    const getPointFromEvent = (e) => {
-        const rect = canvasRef.current.getBoundingClientRect();
+    const getPointFromEvent = (e, cachedRect = null) => {
+        // Use cached rect if provided, otherwise get new one
+        const rect = cachedRect || canvasRef.current.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         return {
@@ -106,14 +109,14 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
         // We only draw lines if they are visible or crossing the view
 
         ctx.beginPath();
-        let isDrawing = false;
+        let isDrawing = false; // eslint-disable-line no-unused-vars
 
         for (let i = 1; i < data.length; i++) {
             const p1 = data[i - 1];
             const p2 = data[i];
 
             if (!p1.frequency || !p2.frequency) {
-                isDrawing = false;
+                isDrawing = false; // eslint-disable-line no-unused-vars
                 continue;
             }
 
@@ -181,7 +184,7 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
             ctx.strokeRect(x, y, w, h);
         }
 
-    }, [data, targetRange, currentTime, duration, zoom, selection]);
+    }, [data, targetRange, currentTime, duration, zoom, selection, bounds.tMax, bounds.tMin, bounds.fMax, bounds.fMin]);
 
 
     // Interaction Handlers
@@ -192,20 +195,26 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
             // We'll handle via CSS touch-action: none
         }
 
-        const pt = getPointFromEvent(e);
+        // Cache rect to prevent layout thrashing during drag
+        rectRef.current = canvasRef.current.getBoundingClientRect();
+
+        const pt = getPointFromEvent(e, rectRef.current);
         setSelection({ start: pt, current: pt });
         setIsDragging(true);
     };
 
     const handleMove = (e) => {
         if (!isDragging || !selection) return;
-        const pt = getPointFromEvent(e);
+        // Use cached rect
+        const pt = getPointFromEvent(e, rectRef.current);
         setSelection(prev => ({ ...prev, current: pt }));
     };
 
     const handleEnd = () => {
         if (!isDragging || !selection) return;
         setIsDragging(false);
+        // Clear cached rect
+        rectRef.current = null;
 
         const canvas = canvasRef.current;
         const width = canvas.width;
