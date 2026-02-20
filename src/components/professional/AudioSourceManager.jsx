@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
 
 const AudioSourceManager = ({ onSourceChange }) => {
@@ -6,11 +6,44 @@ const AudioSourceManager = ({ onSourceChange }) => {
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [permissionGranted, setPermissionGranted] = useState(false);
 
-    useEffect(() => {
-        checkPermissionAndEnumerate();
+    const enumerateDevices = useCallback(async () => {
+        try {
+            const allDevices = await navigator.mediaDevices.enumerateDevices();
+            const audioInputs = allDevices.filter(device => device.kind === 'audioinput');
+            setDevices(audioInputs);
+
+            // Auto-select first if none selected
+            if (audioInputs.length > 0) {
+                // If current selected device is not in list (or empty), select first
+                // Use a functional update or just check selectedDeviceId via prop if needed?
+                // But selectedDeviceId is state.
+                // NOTE: 'selectedDeviceId' in this scope is the closure value.
+                // To avoid dependency on selectedDeviceId (causing loops), we can use the set state callback or just check if it's empty string.
+                // However, we can't easily check the *current* state inside this callback without adding it to deps.
+                // Simple logic: if we don't have a selection, pick the first.
+
+                // We'll dispatch the first one if we haven't selected one yet.
+                // We can't see the current 'selectedDeviceId' without adding it to deps.
+                // But we can check if we *just* loaded.
+
+                // Better approach: Let the effect handle initial selection or just do it here blindly if we assume it's init.
+                // Or better:
+                setDevices(audioInputs);
+
+                // Note: We can't access 'selectedDeviceId' here without adding it to dependencies,
+                // which might cause loops if we aren't careful.
+                // Instead, we rely on the user to select, OR we assume empty string means 'not selected'.
+                // Ideally, we'd check if (audioInputs.length > 0 && selectedDeviceId === '').
+
+                // Let's rely on a separate effect for setting default? Or just check current state in the setter?
+                // setDevices(prev => ...)
+            }
+        } catch (err) {
+            console.error("Error enumerating devices:", err);
+        }
     }, []);
 
-    const checkPermissionAndEnumerate = async () => {
+    const checkPermissionAndEnumerate = useCallback(async () => {
         try {
             // Must request permission first to get labels
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -19,7 +52,7 @@ const AudioSourceManager = ({ onSourceChange }) => {
             // Stop the temp stream immediately
             stream.getTracks().forEach(track => track.stop());
 
-            enumerateDevices();
+            await enumerateDevices();
 
             // Listen for changes
             navigator.mediaDevices.ondevicechange = enumerateDevices;
@@ -27,23 +60,20 @@ const AudioSourceManager = ({ onSourceChange }) => {
             console.error("Microphone permission denied:", err);
             setPermissionGranted(false);
         }
-    };
+    }, [enumerateDevices]);
 
-    const enumerateDevices = async () => {
-        try {
-            const allDevices = await navigator.mediaDevices.enumerateDevices();
-            const audioInputs = allDevices.filter(device => device.kind === 'audioinput');
-            setDevices(audioInputs);
+    useEffect(() => {
+        checkPermissionAndEnumerate();
+    }, [checkPermissionAndEnumerate]);
 
-            // Auto-select first if none selected
-            if (audioInputs.length > 0 && !selectedDeviceId) {
-                setSelectedDeviceId(audioInputs[0].deviceId);
-                onSourceChange?.(audioInputs[0].deviceId);
-            }
-        } catch (err) {
-            console.error("Error enumerating devices:", err);
+    // Effect to set default device if none selected
+    useEffect(() => {
+        if (devices.length > 0 && !selectedDeviceId) {
+            const defaultDevice = devices[0].deviceId;
+            setSelectedDeviceId(defaultDevice);
+            onSourceChange?.(defaultDevice);
         }
-    };
+    }, [devices, selectedDeviceId, onSourceChange]);
 
     const handleDeviceChange = (e) => {
         const deviceId = e.target.value;
