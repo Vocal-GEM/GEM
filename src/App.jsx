@@ -65,6 +65,7 @@ import { TourProvider } from './context/TourContext';
 import TourOverlay from './components/ui/TourOverlay';
 
 import CommandPalette from './components/ui/CommandPalette';
+import QuickActions from './components/ui/QuickActions';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
 import QuickSettings from './components/ui/QuickSettings';
 import { analyticsService } from './services/AnalyticsService';
@@ -455,9 +456,11 @@ const App = () => {
                         {showAssessment && <AssessmentModule onClose={() => setShowAssessment(false)} />}
                         {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}
 
-                        <TourOverlay />
                         <CommandPalette />
-                        <CommandPalette />
+                        <QuickActions onAction={(actionId) => {
+                            if (actionId === 'warmup') openModal('warmup');
+                            else setActiveTab(actionId);
+                        }} />
                         <QuickSettings isOpen={false} onClose={() => { }} />
                         {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
                         {modals.analytics && <AnalyticsDashboard onClose={() => closeModal('analytics')} />}
