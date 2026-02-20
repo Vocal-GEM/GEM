@@ -1,4 +1,4 @@
-import { render, cleanup, screen } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import HighResSpectrogram from './HighResSpectrogram';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -38,6 +38,9 @@ const mockContext = {
 };
 
 HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext);
+
+// Mock requestAnimationFrame
+global.requestAnimationFrame = (cb) => cb();
 
 describe('HighResSpectrogram', () => {
   let dataRef;
