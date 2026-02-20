@@ -1,21 +1,21 @@
 import { cloneElement, useState, useEffect } from 'react';
-import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen, Flame, Sparkles, Timer } from 'lucide-react';
+import { Play, ArrowRight, Mic, Dumbbell, BookOpen, Timer } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import VocalHealthPanel from '../dashboard/VocalHealthPanel';
-import SmartCoachWidget from '../dashboard/SmartCoachWidget';
-import JourneyEntryCard from '../ui/JourneyEntryCard';
+// import SmartCoachWidget from '../dashboard/SmartCoachWidget';
+// import JourneyEntryCard from '../ui/JourneyEntryCard';
 import SessionSummaryCard from '../ui/SessionSummaryCard';
-import RecommendedExercises from '../ui/RecommendedExercises';
-import DailyChallengeCard from '../ui/DailyChallengeCard';
+// import RecommendedExercises from '../ui/RecommendedExercises';
+// import DailyChallengeCard from '../ui/DailyChallengeCard';
 import SmartPracticeSession from '../ui/SmartPracticeSession';
 import QuickWarmupSession from '../ui/QuickWarmupSession';
 import QuickVoiceCheck from '../ui/QuickVoiceCheck';
 import { useGuidedJourney } from '../../context/GuidedJourneyContext';
 import { useNavigation } from '../../context/NavigationContext';
-import { checkStreakStatus, getStreakMessage } from '../../services/StreakService';
-import RecommendedToolsWidget from '../ui/RecommendedToolsWidget';
+import { checkStreakStatus } from '../../services/StreakService';
+// import RecommendedToolsWidget from '../ui/RecommendedToolsWidget';
 import MoodCheckIn from '../ui/MoodCheckIn';
-import PersonalMilestonesDisplay from '../ui/PersonalMilestonesDisplay';
+// import PersonalMilestonesDisplay from '../ui/PersonalMilestonesDisplay';
 import WelcomeBanner from '../ui/WelcomeBanner';
 import ContextualTips from '../ui/ContextualTips';
 
@@ -52,35 +52,32 @@ const ActionCard = ({ title, description, onClick, icon, color }) => (
 const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
     const { t } = useTranslation();
     const {
-        hasInProgressJourney,
-        isJourneyComplete,
-        getProgressPercentage,
-        getCurrentStep,
         resumeJourney
     } = useGuidedJourney();
     const { openModal } = useNavigation();
 
     // Streak tracking
-    const [streakData, setStreakData] = useState({ currentStreak: 0, needsPracticeToday: true });
+    // const [streakData, setStreakData] = useState({ currentStreak: 0, needsPracticeToday: true });
     const [showSmartPractice, setShowSmartPractice] = useState(false);
     const [showQuickWarmup, setShowQuickWarmup] = useState(false);
     const [showVoiceCheck, setShowVoiceCheck] = useState(false);
 
     useEffect(() => {
-        const status = checkStreakStatus();
-        setStreakData(status);
+        // const status = checkStreakStatus();
+        checkStreakStatus(); // Just run it to update local storage if needed
+        // setStreakData(status);
     }, []);
 
-    const handleStartJourney = () => {
-        openModal('guidedJourney');
-    };
+    // const handleStartJourney = () => {
+    //     openModal('guidedJourney');
+    // };
 
-    const handleResumeJourney = () => {
-        resumeJourney();
-        openModal('guidedJourney');
-    };
+    // const handleResumeJourney = () => {
+    //     resumeJourney();
+    //     openModal('guidedJourney');
+    // };
 
-    const currentStep = getCurrentStep();
+    // const currentStep = getCurrentStep();
 
     return (
         <div className="w-full min-h-screen bg-black p-4 sm:p-6 lg:p-12 text-white">
