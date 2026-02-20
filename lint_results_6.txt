@@ -3,10 +3,6 @@
 > eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 600
 
 
-/app/src/audio/PitchWorklet.js
-  39:21  warning  'outputs' is defined but never used. Allowed unused args must match /^_/u     no-unused-vars
-  39:30  warning  'parameters' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
-
 /app/src/components/analytics/AnalyticsDashboardV2.jsx
   1:8   warning  'React' is defined but never used        no-unused-vars
   3:16  warning  'TabsContent' is defined but never used  no-unused-vars
@@ -28,7 +24,7 @@
   5:10  warning  'ArrowUpRight' is defined but never used  no-unused-vars
 
 /app/src/components/community/SuccessStories.test.jsx
-  4:8  error  Parsing error: Identifier 'React' has already been declared
+  3:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/marketplace/MarketplaceBrowser.jsx
   1:8   warning  'React' is defined but never used   no-unused-vars
@@ -116,10 +112,12 @@
   11:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/ui/LoadingSpinner.test.jsx
-  5:10  error  Parsing error: Identifier 'render' has already been declared
+  4:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/ui/LoadingSpinnerVerification.jsx
-  86:5  error  Parsing error: Unexpected token return
+  1:8   warning  'React' is defined but never used   no-unused-vars
+  5:17  warning  'Search' is defined but never used  no-unused-vars
+  5:25  warning  'Plus' is defined but never used    no-unused-vars
 
 /app/src/components/ui/MicroCelebration.jsx
   141:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
@@ -171,9 +169,7 @@
   1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/ui/RecommendedToolsWidget.jsx
-    1:8   warning  'React' is defined but never used                                no-unused-vars
-  124:21  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
-  124:64  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/ui/RecordingCountdown.jsx
    1:8   warning  'React' is defined but never used                                                                                               no-unused-vars
@@ -283,7 +279,7 @@
   136:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
 
 /app/src/components/ui/button.test.jsx
-  32:1  error  Parsing error: 'import' and 'export' may only appear at the top level
+  4:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/views/BeforeAfterCompare.jsx
   1:8   warning  'React' is defined but never used                   no-unused-vars
@@ -713,5 +709,4 @@
   347:29  warning  'sampleRate' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
   374:15  warning  'minDistance' is assigned a value but never used                              no-unused-vars
 
-✖ 360 problems (7 errors, 353 warnings)
-
+✖ 358 problems (1 error, 357 warnings)
