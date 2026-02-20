@@ -106,9 +106,9 @@ def clean_audio():
         print(f"Cleaning error: {e}")
         # Cleanup on error since after_request might not run or file might exist
         if 'tmp_path' in locals() and tmp_path and os.path.exists(tmp_path):
-             try:
+            try:
                 os.remove(tmp_path)
-             except Exception:
+            except Exception:
                 pass
 
         # Security: Do not expose internal error details to client
@@ -190,14 +190,14 @@ def manipulate_file():
     except Exception as e:
         # If error occurred, clean up processed file too since we won't send it
         if processed_path and os.path.exists(processed_path):
-             try:
+            try:
                 os.remove(processed_path)
-             except Exception:
+            except Exception:
                 pass
         if tmp_path and os.path.exists(tmp_path):
-             try:
+            try:
                 os.remove(tmp_path)
-             except Exception:
+            except Exception:
                 pass
 
         # Security: Do not expose internal error details to client
