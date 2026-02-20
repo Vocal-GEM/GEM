@@ -189,49 +189,76 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             }
         }
 
+        // Optimization: Pre-calculate colors and thresholds to avoid repeated logic in render loop
+        const COLORS = {
+            unstable: colorBlindMode ? '#9333ea' : '#ef4444',
+            target: colorBlindMode ? '#0d9488' : '#22c55e',
+            nearMiss: colorBlindMode ? '#f59e0b' : '#eab308',
+            neutralLow: '#6366f1',
+            neutralHigh: '#f59e0b',
+            neutralMid: '#10b981',
+            off: '#94a3b8',
+            fem: '#e879f9',
+            masc: '#60a5fa'
+        };
+
+        const THRESHOLDS = {
+            targetMin: targetRange ? targetRange.min : 0,
+            targetMax: targetRange ? targetRange.max : 0,
+            // Pre-calculate +/- 50 cents boundaries for Near Miss zones
+            // 50 cents ratio = 2^(50/1200) ≈ 1.0293
+            nearMissMinLow: targetRange ? targetRange.min * 0.9715 : 0, // 2^(-50/1200)
+            nearMissMaxHigh: targetRange ? targetRange.max * 1.0293 : 0, // 2^(50/1200)
+            femMin: femRange ? femRange.min : 0,
+            femMax: femRange ? femRange.max : 0,
+            mascMin: mascRange ? mascRange.min : 0,
+            mascMax: mascRange ? mascRange.max : 0,
+            neutralLow: 155,
+            neutralHigh: 185
+        };
+
         const getPitchColor = (freq, clarity = 1.0) => {
             if (clarity < 0.8) {
-                return colorBlindMode ? '#9333ea' : '#ef4444';
+                return COLORS.unstable;
             }
 
             // Target Zone (Always Winning Color)
-            if (targetRange && freq >= targetRange.min && (isFem || freq <= targetRange.max)) {
-                if (colorBlindMode) return '#0d9488';
-                return '#22c55e'; // Green
+            if (targetRange && freq >= THRESHOLDS.targetMin && (isFem || freq <= THRESHOLDS.targetMax)) {
+                return COLORS.target;
             }
 
-            // Near Miss Zone
+            // Near Miss Zone (Optimization: check pre-calc thresholds instead of Math.log2)
             if (targetRange) {
-                const distMin = 1200 * Math.log2(freq / targetRange.min);
-                const distMax = 1200 * Math.log2(freq / targetRange.max);
-
-                if ((distMin > -50 && distMin < 0) || (distMax > 0 && distMax < 50)) {
-                    if (colorBlindMode) return '#f59e0b';
-                    return '#eab308'; // Yellow
+                // Check if slightly below min (within 50 cents)
+                if (freq > THRESHOLDS.nearMissMinLow && freq < THRESHOLDS.targetMin) {
+                    return COLORS.nearMiss;
+                }
+                // Check if slightly above max (within 50 cents)
+                if (freq > THRESHOLDS.targetMax && freq < THRESHOLDS.nearMissMaxHigh) {
+                    return COLORS.nearMiss;
                 }
             }
 
             // If Neutral or Off, avoid gendered colors
             if (mode === 'neutral') {
-                if (freq < 155) return '#6366f1'; // Indigo (Low)
-                if (freq > 185) return '#f59e0b'; // Amber (High)
-                return '#10b981'; // Emerald (Mid/Target-ish)
+                if (freq < THRESHOLDS.neutralLow) return COLORS.neutralLow;
+                if (freq > THRESHOLDS.neutralHigh) return COLORS.neutralHigh;
+                return COLORS.neutralMid;
             }
             if (mode === 'off') {
-                return '#94a3b8'; // Slate (Neutral feedback)
+                return COLORS.off;
             }
 
             // Default Gendered Colors
-            if (femRange && freq >= femRange.min && freq <= femRange.max) {
-                return '#e879f9'; // Pink
+            if (femRange && freq >= THRESHOLDS.femMin && freq <= THRESHOLDS.femMax) {
+                return COLORS.fem;
             }
 
-            if (mascRange && freq >= mascRange.min && freq <= mascRange.max) {
-                return '#60a5fa'; // Blue
+            if (mascRange && freq >= THRESHOLDS.mascMin && freq <= THRESHOLDS.mascMax) {
+                return COLORS.masc;
             }
 
-            if (colorBlindMode) return '#9333ea';
-            return '#ef4444';
+            return COLORS.unstable;
         };
 
         const loop = () => {
