@@ -33,8 +33,8 @@ vi.mock('../ui/button', () => ({
 }));
 
 // Mock Lucide icons
-vi.mock('lucide-react', () => {
-    const React = require('react');
+vi.mock('lucide-react', async () => {
+    const React = await import('react');
     const createIcon = (name) => {
         const Icon = (props) => React.createElement('div', { ...props, 'data-testid': name });
         Icon.displayName = name;
