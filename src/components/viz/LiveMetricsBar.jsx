@@ -1,40 +1,47 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, memo } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
-const LiveMetricsBar = ({ dataRef }) => {
-    const [metrics, setMetrics] = useState({ f0: 0, f1: 0, f2: 0, w: 0 });
+const LiveMetricsBar = memo(({ dataRef }) => {
+    const f0Ref = useRef(null);
+    const f1Ref = useRef(null);
+    const f2Ref = useRef(null);
+    const wRef = useRef(null);
+
     useEffect(() => {
         const loop = () => {
             if (dataRef.current) {
-                setMetrics({
-                    f0: Math.round(dataRef.current.pitch),
-                    f1: Math.round(dataRef.current.f1),
-                    f2: Math.round(dataRef.current.f2),
-                    w: Math.round(dataRef.current.weight)
-                });
+                const { pitch, f1, f2, weight } = dataRef.current;
+
+                if (f0Ref.current) {
+                    const p = Math.round(pitch);
+                    f0Ref.current.textContent = p > 0 ? p : '--';
+                }
+                if (f1Ref.current) f1Ref.current.textContent = Math.round(f1);
+                if (f2Ref.current) f2Ref.current.textContent = Math.round(f2);
+                if (wRef.current) wRef.current.textContent = Math.round(weight);
             }
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'live-metrics-bar',
-                loop,
-                renderCoordinator.PRIORITY.CRITICAL
-            );
-        });
+        const unsubscribe = renderCoordinator.subscribe(
+            'live-metrics-bar',
+            loop,
+            renderCoordinator.PRIORITY.CRITICAL
+        );
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
     }, [dataRef]);
+
     return (
         <div className="glass-panel rounded-xl p-3 mb-4 flex justify-between text-xs font-mono text-blue-300">
-            <span>F0: {metrics.f0 > 0 ? metrics.f0 : '--'}Hz</span>
-            <span>F1: {metrics.f1}Hz</span>
-            <span>F2: {metrics.f2}Hz</span>
-            <span>W: {metrics.w}</span>
+            <span>F0: <span ref={f0Ref}>--</span>Hz</span>
+            <span>F1: <span ref={f1Ref}>0</span>Hz</span>
+            <span>F2: <span ref={f2Ref}>0</span>Hz</span>
+            <span>W: <span ref={wRef}>0</span></span>
         </div>
     );
-};
+});
 
+LiveMetricsBar.displayName = 'LiveMetricsBar';
 export default LiveMetricsBar;

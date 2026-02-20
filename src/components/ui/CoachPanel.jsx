@@ -1,120 +1,149 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { Activity, AlertTriangle, ChevronRight, Mic } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import RegisterGauge from '../viz/RegisterGauge';
 
-const CoachPanel = ({ dataRef, onNavigate }) => {
+// Memoize CoachPanel to prevent re-renders from parent
+const CoachPanel = memo(({ dataRef, onNavigate }) => {
     const { targetRange, activeProfile } = useProfile();
-    const [metrics, setMetrics] = useState({
-        pitch: 0,
-        resonance: 0,
-        weight: 50,
-        tilt: 0,
-        register: null
-    });
 
+    // Refs for DOM elements
+    const pitchValueRef = useRef(null);
+    const pitchMarkerRef = useRef(null);
+
+    const weightValueRef = useRef(null); // The text "Pressed / Heavy"
+    const weightMarkerRef = useRef(null);
+
+    // State for advice only (low frequency updates)
     const [advice, setAdvice] = useState(null);
-
-    const { pitch, weight, resonance } = metrics;
+    const lastAdviceCheck = useRef(0);
 
     // Subscribe to Data Stream
     useEffect(() => {
+        let animationFrameId;
+
         const updateLoop = () => {
             if (dataRef?.current) {
-                const { pitch, resonance, weight, tilt, register } = dataRef.current;
-                setMetrics({
-                    pitch: pitch || 0,
-                    resonance: resonance || 0,
-                    weight: weight !== undefined ? weight : 50,
-                    tilt: tilt || 0,
-                    register: register
-                });
+                const { pitch, resonance, weight } = dataRef.current;
+
+                // 1. Update Pitch DOM
+                if (pitchValueRef.current) {
+                    pitchValueRef.current.textContent = `${Math.round(pitch || 0)} Hz`;
+                }
+
+                if (pitchMarkerRef.current && targetRange) {
+                    const min = 80;
+                    const max = 300;
+                    const range = max - min;
+                    // Clamp and calculate percentage
+                    const p = Math.max(0, Math.min(100, ((pitch || 0) - min) / range * 100));
+                    pitchMarkerRef.current.style.left = `${p}%`;
+                    pitchMarkerRef.current.style.opacity = pitch > 0 ? '1' : '0';
+                }
+
+                // 2. Update Weight DOM
+                if (weightMarkerRef.current) {
+                    const w = weight !== undefined ? weight : 50;
+                    weightMarkerRef.current.style.left = `${w}%`;
+                }
+
+                if (weightValueRef.current) {
+                    const w = weight !== undefined ? weight : 50;
+                    let text = 'Balanced';
+                    let colorClass = 'text-blue-400';
+
+                    if (w > 60) {
+                        text = 'Pressed / Heavy';
+                        colorClass = 'text-red-400';
+                    } else if (w < 40) {
+                        text = 'Breathy / Light';
+                        colorClass = 'text-blue-400';
+                    }
+
+                    // Only update if text changes to avoid thrashing
+                    if (weightValueRef.current.textContent !== text) {
+                        weightValueRef.current.textContent = text;
+                        // Reset classes and add new one
+                        weightValueRef.current.className = `font-bold ${colorClass}`;
+                    }
+                }
+
+                // 3. Update Advice (Low Frequency / Conditional)
+                const now = Date.now();
+                if (now - lastAdviceCheck.current > 500) { // Check every 500ms
+                    lastAdviceCheck.current = now;
+
+                    let newAdvice = null;
+
+                    if (weight > 65) {
+                        newAdvice = {
+                            type: 'alert',
+                            title: 'High Tension Detected',
+                            description: 'Your voice is showing signs of pressed phonation (high closed quotient).',
+                            action: 'Start Flow Drills',
+                            targetTab: 'weight',
+                            icon: AlertTriangle,
+                            color: 'red'
+                        };
+                    } else if (pitch > 0) {
+                        if (pitch < targetRange.min - 10) {
+                            newAdvice = {
+                                type: 'info',
+                                title: 'Pitch Below Target',
+                                description: `You are below your target floor of ${targetRange.min}Hz.`,
+                                action: 'Open Pitch Trainer',
+                                targetTab: 'pitch',
+                                icon: Activity,
+                                color: 'blue'
+                            };
+                        } else if (activeProfile === 'masc' && pitch > targetRange.max + 10) {
+                            newAdvice = {
+                                type: 'info',
+                                title: 'Pitch Above Target',
+                                description: `You are above your target ceiling of ${targetRange.max}Hz for masculine voice. Try relaxing down.`,
+                                action: 'Open Pitch Trainer',
+                                targetTab: 'pitch',
+                                icon: Activity,
+                                color: 'blue'
+                            };
+                        } else if (activeProfile === 'fem' && resonance > 0 && resonance < 2200) {
+                            newAdvice = {
+                                type: 'suggestion',
+                                title: 'Resonance is Dark',
+                                description: 'Try brightening your vowels (smile slightly, raise tongue).',
+                                action: 'Resonance Lab',
+                                targetTab: 'resonance',
+                                icon: Mic,
+                                color: 'purple'
+                            };
+                        } else {
+                            newAdvice = {
+                                type: 'success',
+                                title: 'On Track',
+                                description: 'Your metrics are balanced within your target range.',
+                                action: 'Keep Going',
+                                targetTab: null,
+                                icon: Activity,
+                                color: 'emerald'
+                            };
+                        }
+                    }
+
+                    // Only set if changed
+                    setAdvice(prev => {
+                        if (prev === newAdvice) return prev;
+                        if (!prev && !newAdvice) return null; // Handle null correctly
+                        if (!prev || !newAdvice) return newAdvice; // One is null, one is not
+                        if (prev.title === newAdvice.title && prev.type === newAdvice.type) return prev;
+                        return newAdvice;
+                    });
+                }
             }
-            requestAnimationFrame(updateLoop);
+            animationFrameId = requestAnimationFrame(updateLoop);
         };
-        const handle = requestAnimationFrame(updateLoop);
-        return () => cancelAnimationFrame(handle);
-    }, [dataRef]);
-
-    // Derived Advice Logic
-    useEffect(() => {
-
-        // Priority 1: Strain / Pressed Phonation
-        // If weight > 65 or Register says 'Strain'
-        if (weight > 65) {
-            setAdvice({
-                type: 'alert',
-                title: 'High Tension Detected',
-                description: 'Your voice is showing signs of pressed phonation (high closed quotient).',
-                action: 'Start Flow Drills',
-                targetTab: 'weight', // Assuming 'weight' tab has the flow validator
-                icon: AlertTriangle,
-                color: 'red'
-            });
-            return;
-        }
-
-        // Priority 2: Pitch out of Target Range
-        if (pitch > 0) {
-            if (pitch < targetRange.min - 10) {
-                setAdvice({
-                    type: 'info',
-                    title: 'Pitch Below Target',
-                    description: `You are below your target floor of ${targetRange.min}Hz.`,
-                    action: 'Open Pitch Trainer',
-                    targetTab: 'pitch',
-                    icon: Activity,
-                    color: 'blue'
-                });
-                return;
-            }
-            // Only show "pitch too high" warning for masculine goal (they need lower pitch)
-            // Feminine voices can go as high as they want - there is no ceiling
-            if (activeProfile === 'masc' && pitch > targetRange.max + 10) {
-                setAdvice({
-                    type: 'info',
-                    title: 'Pitch Above Target',
-                    description: `You are above your target ceiling of ${targetRange.max}Hz for masculine voice. Try relaxing down.`,
-                    action: 'Open Pitch Trainer',
-                    targetTab: 'pitch',
-                    icon: Activity,
-                    color: 'blue'
-                });
-                return;
-            }
-        }
-
-        // Priority 3: Resonance Mismatch (Generic logic)
-        // Simple logic: if 'fem' profile and resonance < 2200 (Dark)
-        if (activeProfile === 'fem' && resonance > 0 && resonance < 2200) {
-            setAdvice({
-                type: 'suggestion',
-                title: 'Resonance is Dark',
-                description: 'Try brightening your vowels (smile slightly, raise tongue).',
-                action: 'Resonance Lab',
-                targetTab: 'resonance',
-                icon: Mic,
-                color: 'purple'
-            });
-            return;
-        }
-
-        // Default: Good Job
-        if (pitch > 0) {
-            setAdvice({
-                type: 'success',
-                title: 'On Track',
-                description: 'Your metrics are balanced within your target range.',
-                action: 'Keep Going',
-                targetTab: null,
-                icon: Activity,
-                color: 'emerald'
-            });
-        } else {
-            setAdvice(null); // Silent
-        }
-
-    }, [pitch, weight, resonance, targetRange, activeProfile]);
+        animationFrameId = requestAnimationFrame(updateLoop);
+        return () => cancelAnimationFrame(animationFrameId);
+    }, [dataRef, targetRange, activeProfile]);
 
     return (
         <div className="h-full flex flex-col gap-4">
@@ -158,7 +187,7 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
                         <span className="text-slate-400">
                             Pitch (Target: {activeProfile === 'fem' ? `>${targetRange.min}Hz` : `${targetRange.min}-${targetRange.max}Hz`})
                         </span>
-                        <span className="font-mono text-white font-bold">{Math.round(metrics.pitch)} Hz</span>
+                        <span ref={pitchValueRef} className="font-mono text-white font-bold">0 Hz</span>
                     </div>
                     <div className="h-2 bg-slate-800 rounded-full overflow-hidden relative">
                         {/* Target Zone */}
@@ -172,14 +201,11 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
                             }}
                         />
                         {/* Current Value Marker */}
-                        {metrics.pitch > 0 && (
-                            <div
-                                className="absolute top-0 bottom-0 w-1.5 bg-white shadow-[0_0_8px_white] transition-all duration-200"
-                                style={{
-                                    left: `${Math.max(0, Math.min(100, (metrics.pitch - 80) / (300 - 80) * 100))}%`
-                                }}
-                            />
-                        )}
+                        <div
+                            ref={pitchMarkerRef}
+                            className="absolute top-0 bottom-0 w-1.5 bg-white shadow-[0_0_8px_white] transition-all duration-200"
+                            style={{ left: '0%', opacity: '0' }}
+                        />
                     </div>
                 </div>
 
@@ -192,8 +218,8 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
                 <div className="bg-slate-800/50 p-3 rounded-xl border border-slate-700/50">
                     <div className="flex justify-between text-xs mb-2">
                         <span className="text-slate-400">Vocal Weight</span>
-                        <span className={`font-bold ${metrics.weight > 60 ? 'text-red-400' : 'text-blue-400'}`}>
-                            {metrics.weight > 60 ? 'Pressed / Heavy' : metrics.weight < 40 ? 'Breathy / Light' : 'Balanced'}
+                        <span ref={weightValueRef} className="font-bold text-blue-400">
+                            Balanced
                         </span>
                     </div>
                     {/* Multi-colored bar */}
@@ -205,8 +231,9 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
                     {/* Marker */}
                     <div className="relative h-2 mt-[-5px]">
                         <div
+                            ref={weightMarkerRef}
                             className="absolute top-0 w-1.5 h-3 bg-white rounded-full shadow transition-all duration-300"
-                            style={{ left: `${metrics.weight}%` }}
+                            style={{ left: '50%' }}
                         />
                     </div>
                 </div>
@@ -214,6 +241,7 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
             </div>
         </div>
     );
-};
+});
 
+CoachPanel.displayName = 'CoachPanel';
 export default CoachPanel;
