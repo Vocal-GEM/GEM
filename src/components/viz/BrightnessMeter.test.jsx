@@ -16,7 +16,9 @@ vi.mock('../../services/RenderCoordinator', () => ({
 vi.mock('lucide-react', async () => {
     const React = await import('react');
     const createIcon = (name) => {
-        const Icon = (props) => React.createElement('div', { ...props, 'data-testid': name });
+        const Icon = function MockIcon(props) {
+            return React.createElement('div', { ...props, 'data-testid': name });
+        };
         Icon.displayName = name;
         return Icon;
     };
