@@ -9,3 +9,19 @@
   ➜  Network: use --host to expose
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
 7:12:35 AM [vite] hmr update /src/App.jsx, /src/index.css
+7:20:51 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+7:21:34 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+7:22:02 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
+7:22:27 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:22:50 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:22:58 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:23:04 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:23:13 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:23:27 AM [vite] page reload src/services/PrivacyManager.js
+7:23:35 AM [vite] page reload src/services/ResearchMode.js
+7:23:55 AM [vite] page reload src/audio/PitchWorklet.js
+7:24:14 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:24:25 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+7:24:39 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:24:50 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
+7:26:46 AM [vite] page reload src/components/community/SuccessStories.test.jsx
