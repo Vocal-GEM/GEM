@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -120,29 +120,36 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
 
             // Reuse ImageData object
             // Reusable objects to reduce GC
-            if (!canvas.imageDataRef) {
+            if (!canvas.imageDataRef || canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
                 canvas.imageDataRef = ctx.createImageData(speed, h);
-            }
-            // Ensure size match
-            if (canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
+                // Bolt: also cache the view to avoid creating object every frame
+                canvas.data32Ref = new Uint32Array(canvas.imageDataRef.data.buffer);
             }
 
             const imageData = canvas.imageDataRef;
-            const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
+            const data32 = canvas.data32Ref;
+
+            // --- OPTIMIZATION: Pre-calculate Bin Map ---
+            // Pre-calculate frequency bin mapping to avoid repeated floating point math per pixel
+            if (!canvas.binMap || canvas.binMapHeight !== h || canvas.binMapMaxBin !== maxBin) {
+                const map = new Int32Array(h);
+                for (let y = 0; y < h; y++) {
+                    const freqRatio = 1 - (y / h);
+                    map[y] = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                }
+                canvas.binMap = map;
+                canvas.binMapHeight = h;
+                canvas.binMapMaxBin = maxBin;
+            }
+            const binMap = canvas.binMap;
+            // -------------------------------------------
 
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
             // We map pixels (y) to frequency bins.
             for (let y = 0; y < h; y++) {
                 // Invert y because canvas 0 is top, but we want low freq at bottom
-                // y=0 is top (high freq), y=h is bottom (low freq)
-                // Bin mapping: 0 -> maxBin (low -> high)
-
-                // Linear mapping matches the original code: y = h - (i / maxBin) * h
-                // So i / maxBin = (h - y) / h = 1 - y/h
-
-                const freqRatio = 1 - (y / h);
-                const binIndex = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                // Bin mapping pre-calculated
+                const binIndex = binMap[y];
 
                 // Get intensity from spectrum
                 const value = spectrum[binIndex] || 0;
@@ -178,7 +185,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             ctx.fillStyle = '#000';
             ctx.fillRect(width - speed, 0, speed, h);
         }
-    }, [isAudioActive, audioContext, colormap]);
+    }, [audioContext, colormap, dataRef]);
 
     useEffect(() => {
         let unsubscribe;
