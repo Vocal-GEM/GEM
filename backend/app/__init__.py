@@ -2,6 +2,7 @@ from flask import Flask, request, redirect, jsonify
 from flask_cors import CORS
 from .extensions import db, login_manager, limiter, csrf, socketio, migrate
 from .models import User
+from werkzeug.middleware.proxy_fix import ProxyFix
 import os
 from dotenv import load_dotenv
 from datetime import timedelta
@@ -17,6 +18,10 @@ def create_app():
     # Gunicorn runs from root, so 'build' should be in os.getcwd()
     static_folder = os.path.join(os.getcwd(), 'build')
     app = Flask(__name__, static_folder=static_folder, static_url_path='')
+
+    # Security: Apply ProxyFix for correct IP resolution behind proxies (Render, Vercel)
+    if os.environ.get('FLASK_ENV') == 'production' or os.environ.get('RENDER') or os.environ.get('VERCEL') or os.environ.get('ENABLE_PROXY_FIX'):
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
     # Configuration
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-prod')
