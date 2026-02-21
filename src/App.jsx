@@ -67,6 +67,7 @@ import TourOverlay from './components/ui/TourOverlay';
 import CommandPalette from './components/ui/CommandPalette';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
 import QuickSettings from './components/ui/QuickSettings';
+import QuickActions from './components/ui/QuickActions';
 import { analyticsService } from './services/AnalyticsService';
 import { useVoiceProfile } from './context/VoiceProfileContext';
 import IntakeQuestionnaire from './components/ui/IntakeQuestionnaire';
@@ -182,6 +183,12 @@ const App = () => {
         window.addEventListener('openSettings', handleOpenSettings);
         return () => window.removeEventListener('openSettings', handleOpenSettings);
     }, [setShowSettings]);
+
+    const handleQuickAction = (actionId) => {
+        if (actionId === 'practice') setActiveTab('practice');
+        if (actionId === 'journal') setShowJournalForm(true);
+        if (actionId === 'warmup') openModal('warmup');
+    };
 
     return (
         <TourProvider>
@@ -455,6 +462,7 @@ const App = () => {
                         {showAssessment && <AssessmentModule onClose={() => setShowAssessment(false)} />}
                         {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}
 
+                        <QuickActions onAction={handleQuickAction} />
                         <TourOverlay />
                         <CommandPalette />
                         <CommandPalette />
