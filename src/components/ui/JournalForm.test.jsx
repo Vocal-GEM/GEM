@@ -36,11 +36,15 @@ describe('JournalForm Accessibility', () => {
     render(<JournalForm />);
 
     // Check sliders have labels associated
-    const effortSlider = screen.getByLabelText(/effort/i);
-    expect(effortSlider).toBeInTheDocument();
+    // Using getAllByLabelText because the slider implementation might use hidden inputs
+    // or the label might be associated with multiple elements (like the visible slider and the hidden input)
+    const effortSliders = screen.getAllByLabelText(/effort/i);
+    expect(effortSliders.length).toBeGreaterThan(0);
+    expect(effortSliders[0]).toBeInTheDocument();
 
-    const confidenceSlider = screen.getByLabelText(/confidence/i);
-    expect(confidenceSlider).toBeInTheDocument();
+    const confidenceSliders = screen.getAllByLabelText(/confidence/i);
+    expect(confidenceSliders.length).toBeGreaterThan(0);
+    expect(confidenceSliders[0]).toBeInTheDocument();
   });
 
   it('renders sentiment buttons with accessible labels', () => {

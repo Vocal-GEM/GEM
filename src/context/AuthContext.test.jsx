@@ -19,6 +19,12 @@ vi.mock('../services/DataSyncService', () => ({
     syncFromServer: vi.fn().mockResolvedValue(true)
 }));
 
+// Mock runtime config to enable backend
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: () => true,
+    getBackendUrl: () => 'http://localhost:5000'
+}));
+
 import { indexedDB } from '../services/IndexedDBManager';
 import { syncToServer, syncFromServer } from '../services/DataSyncService';
 
@@ -59,11 +65,17 @@ describe('AuthContext', () => {
     });
 
     it('logs in successfully', async () => {
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
+        // Setup mock sequence
+        fetch
+            .mockResolvedValueOnce({ ok: false }) // 1. Initial /me check (fails)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ user: { id: 1, username: 'testuser' }, token: 'fake-token' })
+            }) // 2. Login request (success)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ user: { id: 1, username: 'testuser' } })
+            }); // 3. Subsequent /me check after login (success)
 
         let result;
         await act(async () => {
@@ -72,6 +84,11 @@ describe('AuthContext', () => {
                     <TestComponent />
                 </AuthProvider>
             );
+        });
+
+        // Ensure we start logged out
+        await waitFor(() => {
+            expect(result.getByTestId('user').textContent).toBe('null');
         });
 
         const loginBtn = result.getByText('Login');
@@ -108,13 +125,18 @@ describe('AuthContext', () => {
     });
 
     it('clears local data on logout', async () => {
-        // Setup: login first
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
-        fetch.mockResolvedValueOnce({ ok: true }); // logout
+        // Setup mock sequence
+        fetch
+            .mockResolvedValueOnce({ ok: false }) // 1. Initial /me check
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ user: { id: 1, username: 'testuser' }, token: 'fake-token' })
+            }) // 2. Login request
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ user: { id: 1, username: 'testuser' } })
+            }) // 3. Post-login /me check
+            .mockResolvedValueOnce({ ok: true }); // 4. Logout request
 
         let result;
         await act(async () => {
@@ -123,6 +145,11 @@ describe('AuthContext', () => {
                     <TestComponent />
                 </AuthProvider>
             );
+        });
+
+        // Ensure we start logged out
+        await waitFor(() => {
+            expect(result.getByTestId('user').textContent).toBe('null');
         });
 
         // Login

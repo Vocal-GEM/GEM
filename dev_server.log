@@ -30,3 +30,15 @@
 7:41:36 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
 7:42:04 AM [vite] page reload src/components/ui/button.test.jsx
 7:44:11 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:56:58 AM [vite] page reload src/engines/AudioEngine.socket.test.js
+7:57:29 AM [vite] page reload src/components/layout/Sidebar.test.jsx
+7:58:04 AM [vite] page reload src/context/AuthContext.test.jsx
+7:58:35 AM [vite] page reload src/components/ui/JournalForm.test.jsx
+7:59:00 AM [vite] page reload src/components/views/PracticeMode.test.jsx
+7:59:06 AM [vite] page reload src/components/views/PracticeMode.test.jsx
+7:59:37 AM [vite] page reload src/test/validation/algorithmValidation.test.js
+8:01:37 AM [vite] page reload src/engines/AudioEngine.socket.test.js
+8:02:03 AM [vite] page reload src/context/AuthContext.test.jsx
+8:02:32 AM [vite] page reload src/components/layout/Sidebar.test.jsx
+8:03:01 AM [vite] page reload src/test/validation/algorithmValidation.test.js
+8:03:10 AM [vite] page reload src/test/validation/algorithmValidation.test.js
