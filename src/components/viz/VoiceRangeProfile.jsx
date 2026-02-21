@@ -45,23 +45,22 @@ const calculatePolygonArea = (points) => {
     return Math.abs(area) / 2;
 };
 
+// Configuration
+const config = {
+    minPitch: 50,
+    maxPitch: 400,
+    minIntensity: 30, // dB
+    maxIntensity: 100, // dB
+    pitchBins: 50,
+    intensityBins: 40
+};
+
 const VoiceRangeProfile = ({ sessions = [], targetRange }) => {
     const canvasRef = useRef(null);
-    const [hoverInfo, setHoverInfo] = useState(null);
     const [showInfo, setShowInfo] = useState(false);
 
-    // Configuration
-    const config = {
-        minPitch: 50,
-        maxPitch: 400,
-        minIntensity: 30, // dB
-        maxIntensity: 100, // dB
-        pitchBins: 50,
-        intensityBins: 40
-    };
-
     // 1. Process Data into 2D Histogram
-    const { grid, points, bounds, hull } = useMemo(() => {
+    const { grid, bounds, hull } = useMemo(() => {
         const grid = new Array(config.pitchBins).fill(0).map(() => new Array(config.intensityBins).fill(0));
         const points = [];
         let minP = Infinity, maxP = -Infinity, minI = Infinity, maxI = -Infinity;
@@ -99,7 +98,6 @@ const VoiceRangeProfile = ({ sessions = [], targetRange }) => {
 
         return {
             grid,
-            points,
             bounds: { minP, maxP, minI, maxI },
             hull
         };

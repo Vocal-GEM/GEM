@@ -305,7 +305,7 @@ const determineFocusArea = (evals) => {
     };
 };
 
-const generateContextualSummary = (pitch, resonance, voiceQuality, focus) => {
+const generateContextualSummary = (pitch, resonance, voiceQuality, _focus) => {
     // Generate smart, contextual summaries based on metric combinations
 
     const allGood = pitch.score >= 8 && resonance.score >= 8 && voiceQuality.score >= 8;

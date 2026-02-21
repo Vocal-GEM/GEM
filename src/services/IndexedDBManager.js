@@ -33,7 +33,7 @@ class IndexedDBManager {
     async init() {
         return new Promise((resolve, reject) => {
             // Version 5 adds CONTENT_CACHE store
-            const request = window.indexedDB.open(DB_NAME, 5);
+            const request = window.indexedDB.open(DB_NAME, DB_VERSION);
 
             request.onerror = () => reject(request.error);
             request.onsuccess = () => {

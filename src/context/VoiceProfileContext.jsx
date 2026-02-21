@@ -17,7 +17,7 @@ export const useVoiceProfile = () => {
 };
 
 export const VoiceProfileProvider = ({ children }) => {
-    const { activeProfile, switchProfile: legacySwitchProfile } = useProfile();
+    const { activeProfile } = useProfile();
 
     // Detailed Voice Profile State
     const [currentProfile, setCurrentProfile] = useState(null);
@@ -71,11 +71,10 @@ export const VoiceProfileProvider = ({ children }) => {
      * Update baseline measurements based on calibration recording
      */
     const updateBaseline = useCallback((recordingAnalysis) => {
-        if (!currentProfile) return;
-
         const updatedBaseline = VoiceProfileService.analyzeBaseline([recordingAnalysis]);
 
         setCurrentProfile(prev => {
+            if (!prev) return null;
             const updated = {
                 ...prev,
                 baseline: { ...prev.baseline, ...updatedBaseline }
@@ -87,13 +86,14 @@ export const VoiceProfileProvider = ({ children }) => {
 
             return updated;
         });
-    }, [currentProfile]);
+    }, []);
 
     /**
      * Update user goals and regenerate recommendations
      */
     const updateGoals = useCallback((newGoals) => {
         setCurrentProfile(prev => {
+            if (!prev) return null;
             const updated = {
                 ...prev,
                 goals: { ...prev.goals, ...newGoals }
@@ -105,7 +105,7 @@ export const VoiceProfileProvider = ({ children }) => {
 
             return updated;
         });
-    }, [currentProfile]);
+    }, []);
 
     /**
      * Update health factors
@@ -121,8 +121,6 @@ export const VoiceProfileProvider = ({ children }) => {
      * Track a user interaction to refine learning style
      */
     const trackInteraction = useCallback((interactionType) => {
-        if (!currentProfile) return;
-
         // Use the service to update logic
         // In reality we'd store the full learning style object
         // Here we just update local state for UI
@@ -141,12 +139,15 @@ export const VoiceProfileProvider = ({ children }) => {
             });
 
             // Persist to profile preferences
-            setCurrentProfile(prev => ({
-                ...prev,
-                preferences: { ...prev.preferences, learningStyle: result.dominantStyle }
-            }));
+            setCurrentProfile(prev => {
+                if (!prev) return null;
+                return {
+                    ...prev,
+                    preferences: { ...prev.preferences, learningStyle: result.dominantStyle }
+                };
+            });
         }
-    }, [currentProfile, learningStyle]);
+    }, [learningStyle]);
 
     /**
      * Check in with mood to adapt UI

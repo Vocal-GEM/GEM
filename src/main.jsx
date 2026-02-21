@@ -18,6 +18,7 @@ import { ToastProvider } from './context/ToastContext'
 import { GuidedJourneyProvider } from './context/GuidedJourneyContext'
 import { PracticeCardsProvider } from './context/PracticeCardsContext'
 import GlobalErrorBoundary from './components/ui/GlobalErrorBoundary'
+import ReactDOM from 'react-dom/client'
 
 import { registerSW } from 'virtual:pwa-register'
 

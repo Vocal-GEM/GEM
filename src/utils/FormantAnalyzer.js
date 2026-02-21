@@ -6,7 +6,7 @@ export class FormantAnalyzer {
         this.smoothedF2 = 0;
     }
 
-    analyze(windowedBuffer, sampleRate) {
+    analyze(windowedBuffer, _sampleRate) {
         const lpcOrder = 12;
         const r = DSP.computeAutocorrelation(windowedBuffer, lpcOrder);
         const { a, error } = DSP.levinsonDurbin(r, lpcOrder);

@@ -56,7 +56,7 @@ export class LosslessRecorder {
     }
 
     stop() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _reject) => {
             if (!this.mediaRecorder) {
                 return resolve(null);
             }

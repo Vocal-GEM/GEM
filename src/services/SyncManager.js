@@ -224,7 +224,7 @@ class SyncManager {
         }
     }
 
-    async resolveConflict(localItem, serverData) {
+    async resolveConflict(localItem, _serverData) {
         // Simple strategy: Server wins for settings/profile, Merge for journals
         if (localItem.type === 'journal') {
             // If server has a newer version, maybe we duplicate our local one as a "copy"

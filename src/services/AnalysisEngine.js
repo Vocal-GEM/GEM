@@ -76,11 +76,9 @@ class AnalysisEngine {
         const issues = [];
 
         // 1. Analyze Pitch Consistency
-        let lowPitchDuration = 0;
-        let highPitchDuration = 0;
         let currentIssue = null;
 
-        metrics.forEach((m, index) => {
+        metrics.forEach((m) => {
             if (!m.pitch || m.pitch <= 0 || m.volume < 0.02) return; // Ignore silence/noise
 
             const isLow = m.pitch < targetRange.min - 5;

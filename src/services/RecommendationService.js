@@ -89,7 +89,7 @@ const isToday = (isoString) => {
 /**
  * Helper: Analyze recent category focus
  */
-const getRecentCategoryFocus = (reports) => {
+const getRecentCategoryFocus = (_reports) => {
     // This is simplified - in reality we'd track which exercises were done
     // For now, return an empty array since we don't store category info in reports
     return [];

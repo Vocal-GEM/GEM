@@ -106,7 +106,7 @@ const EXERCISE_DB = [
  * @returns {Array} List of recommended exercise objects
  */
 export const selectExercises = (profile, sessionContext = {}) => {
-    const { skillAssessment, goals, preferences } = profile;
+    const { skillAssessment } = profile;
     const { timeAvailable = 15, mood = 'neutral' } = sessionContext;
 
     // 1. Identify weak areas

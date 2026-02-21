@@ -68,7 +68,7 @@ export class CoachingEngine {
         return null;
     }
 
-    checkStability(data, now) {
+    checkStability(_data, _now) {
         if (!this.state.isVoiced || this.state.history.length < 20) return null;
 
         // Calculate variance of last 20 frames
@@ -87,7 +87,7 @@ export class CoachingEngine {
         return null;
     }
 
-    checkResonance(data, now) {
+    checkResonance(data, _now) {
         if (!this.state.isVoiced || this.state.history.length < 10) return null;
 
         // Simple heuristic: if pitch is stable but resonance is low (e.g. < 1000Hz for fem voice? Need context)
@@ -102,7 +102,7 @@ export class CoachingEngine {
         return null;
     }
 
-    checkDrift(data, now) {
+    checkDrift(data, _now) {
         if (!this.state.isVoiced || !this.state.currentPhraseStartPitch) return null;
 
         const startPitch = this.state.currentPhraseStartPitch;
@@ -117,7 +117,7 @@ export class CoachingEngine {
         return null;
     }
 
-    checkSilence(data, now) {
+    checkSilence(_data, now) {
         if (this.state.isVoiced || !this.state.silenceStart) return null;
 
         const duration = now - this.state.silenceStart;

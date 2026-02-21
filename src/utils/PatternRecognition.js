@@ -288,7 +288,7 @@ export class PatternRecognizer {
     /**
      * Get context-aware feedback based on detected pattern
      */
-    getContextualFeedback(metrics) {
+    getContextualFeedback(_metrics) {
         if (!this.currentPattern) {
             return null;
         }

@@ -17,7 +17,7 @@ export class TrendAnalyzer {
      * @param {string} timeframe - 'week', 'month', 'quarter', 'year', 'all'
      * @returns {Object} comprehensive analysis
      */
-    analyzeProgress(sessions, timeframe = 'month') {
+    analyzeProgress(sessions, _timeframe = 'month') {
         if (!sessions || sessions.length === 0) {
             return {
                 pitch: null,

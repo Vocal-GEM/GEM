@@ -52,7 +52,7 @@ export const predictProgress = (profile) => {
 /**
  * Predict metric trajectory
  */
-const predictMetric = (current, weeklyRate, target, comparisonTarget) => {
+const predictMetric = (current, weeklyRate, target, _comparisonTarget) => {
     const distance = target - current;
     const isApproaching = (distance > 0 && weeklyRate > 0) || (distance < 0 && weeklyRate < 0);
 

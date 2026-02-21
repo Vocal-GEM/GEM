@@ -13,7 +13,7 @@ export class InsightGenerator {
      * @param {Object} userData - full user profile and history
      * @returns {Object} insight
      */
-    generateDailyInsight(userId, userData) {
+    generateDailyInsight(_userId, userData) {
         // Use simple randomization or round-robin for now, combined with checks
         const types = ['pattern', 'education', 'milestone', 'motivation'];
         const type = types[Math.floor(Math.random() * types.length)]; // simple random for now
@@ -31,7 +31,7 @@ export class InsightGenerator {
         }
     }
 
-    findInterestingPatterns(userData) {
+    findInterestingPatterns(_userData) {
         // Mock pattern finding logic
         // Real logic would correlate time of day vs performance, etc.
         return {
@@ -42,7 +42,7 @@ export class InsightGenerator {
         };
     }
 
-    createEducationalInsight(level = 'beginner') {
+    createEducationalInsight(_level = 'beginner') {
         const facts = [
             "Hydration is key! Your vocal folds need systemic hydration to vibrate efficiently.",
             "Vocal warm-ups shouldn't just be scales—try sirens to stretch the range gently.",
@@ -58,7 +58,7 @@ export class InsightGenerator {
         };
     }
 
-    checkMilestones(userData) {
+    checkMilestones(_userData) {
         // Mock milestone check
         return {
             type: 'milestone',
@@ -68,7 +68,7 @@ export class InsightGenerator {
         };
     }
 
-    generateMotivationalInsight(userData) {
+    generateMotivationalInsight(_userData) {
         const quotes = [
             "Progress is not linear. Be patient with yourself.",
             "Every minute of practice counts towards your new voice.",

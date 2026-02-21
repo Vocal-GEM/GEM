@@ -1,15 +1,15 @@
 
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Mic, Square, Play, Pause, Trash2, Calendar, Clock, Music, Plus, X, Tag, FileText, Search, Filter, TrendingUp, ChevronDown } from 'lucide-react';
 import LoadingSpinner from '../ui/LoadingSpinner';
-import { getRecordings, saveRecording, deleteRecording, updateRecording } from '../../services/VoiceJournalService';
+import { getRecordings, saveRecording, deleteRecording } from '../../services/VoiceJournalService';
 import { recordPractice } from '../../services/StreakService';
-import { JOURNAL_TEMPLATES, getTemplateById, formatTemplateAsEntry } from '../../data/journalTemplates';
+import { JOURNAL_TEMPLATES, formatTemplateAsEntry } from '../../data/journalTemplates';
 
 // Waveform Visualization Component
-const WaveformVisualizer = ({ audioBlob, isPlaying, onSeek }) => {
+const WaveformVisualizer = ({ audioBlob, onSeek }) => {
     const canvasRef = useRef(null);
     const [waveformData, setWaveformData] = useState([]);
-    const [progress, setProgress] = useState(0);
 
     useEffect(() => {
         if (!audioBlob) return;
@@ -63,17 +63,10 @@ const WaveformVisualizer = ({ audioBlob, isPlaying, onSeek }) => {
             const x = index * barWidth;
             const y = (height - barHeight) / 2;
 
-            // Color based on progress
-            const progressIndex = Math.floor(progress * waveformData.length);
-            if (index < progressIndex) {
-                ctx.fillStyle = '#ec4899'; // Pink for played
-            } else {
-                ctx.fillStyle = '#475569'; // Slate for unplayed
-            }
-
+            ctx.fillStyle = '#475569'; // Slate for unplayed
             ctx.fillRect(x, y, barWidth - 1, barHeight);
         });
-    }, [waveformData, progress]);
+    }, [waveformData]);
 
     const handleClick = (e) => {
         if (!onSeek) return;

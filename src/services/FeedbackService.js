@@ -25,7 +25,7 @@ class FeedbackService {
         };
     }
 
-    getFeedback(metric, value, goal = 'exploration', personality = 'gentle') {
+    getFeedback(metric, value, goal = 'exploration', _personality = 'gentle') {
         const goalConfig = this.goals[goal] || this.goals.exploration;
 
         // Safety/Strain Check (Universal)

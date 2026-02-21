@@ -3,8 +3,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import SuccessStories from './SuccessStories';
 import CommunityService from '../../services/CommunityService';
-import ModerationService from '../../services/ModerationService';
-import React from 'react';
 
 // Mock services
 vi.mock('../../services/CommunityService', () => ({

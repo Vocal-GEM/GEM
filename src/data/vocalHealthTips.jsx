@@ -1,4 +1,4 @@
-import { Droplets, HeartPulse, Moon, AlertTriangle, Music, Stethoscope, Utensils, Zap, Wind } from 'lucide-react';
+import { Droplets, Moon, AlertTriangle, Music, Stethoscope, Utensils, Zap, Wind } from 'lucide-react';
 
 
 export const vocalHealthTips = [

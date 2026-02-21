@@ -6,7 +6,6 @@
 import { describe, it, expect } from 'vitest';
 import {
     VVD_PITCH_THRESHOLDS,
-    VVD_FORMANT_THRESHOLDS,
     VVD_HNR_THRESHOLDS,
     VVD_L1_CONFIGURATIONS,
     calculateL1Distance,

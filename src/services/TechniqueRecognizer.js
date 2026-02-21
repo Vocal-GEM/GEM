@@ -213,8 +213,7 @@ export const recognizeTechnique = (analysisData) => {
         pitchHistory = [],
         audioBuffer = null,
         sampleRate = 44100,
-        formants = null,
-        currentExercise = null
+        formants = null
     } = analysisData;
 
     const results = [];

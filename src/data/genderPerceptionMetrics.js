@@ -143,8 +143,6 @@ export const predictGenderPerception = (metrics, listenerContext = 'CG') => {
     const f0 = metrics.raw?.pitch?.mean || 150;
     const hnr = metrics.raw?.hnr || 15;
     const abi = metrics.indices?.abi?.score || 3;
-    const shimmer = metrics.raw?.shimmer || 4;
-    const jitter = metrics.raw?.jitter || 1.5;
     const cvint = metrics.prosody?.cvint?.cvint || 12;
 
     // Calculate weighted score for each dimension

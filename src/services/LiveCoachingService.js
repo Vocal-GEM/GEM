@@ -5,8 +5,6 @@
  * Analyzes voice patterns over time and provides timely, relevant feedback.
  */
 
-import { VoiceCalibrationService } from './VoiceCalibrationService';
-
 const FEEDBACK_COOLDOWN_MS = 10000; // 10 seconds between same-type feedback
 
 // Coaching messages organized by type and severity

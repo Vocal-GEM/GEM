@@ -52,7 +52,7 @@ export class PDFReportGenerator {
         }
 
         // Session Log
-        yPos = this.addSessionLog(sessions, yPos);
+        this.addSessionLog(sessions, yPos);
 
         // Footer
         this.addFooter();
