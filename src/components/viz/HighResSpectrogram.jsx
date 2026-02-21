@@ -85,16 +85,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const maxBin = Math.floor(spectrum.length / 3); // 8kHz cutoff
 
         for (let y = 0; y < height; y++) {
-            // Map y (0 at top, height at bottom) to frequency
-        // Copy the current canvas (from x=scrollSpeed to the end) to x=0
-        // This is much faster on GPU-accelerated contexts.
-        ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
-
-        // 2. Draw new column
-        // Optimized: Reuse pre-allocated TypedArray
-        const maxBin = Math.floor(spectrum.length / 3);
-
-        for (let y = 0; y < height; y++) {
             const freqRatio = (height - 1 - y) / height;
             const binIndex = Math.floor(freqRatio * maxBin);
             const val = spectrum[binIndex] || 0;
@@ -143,7 +133,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         lastFormantsRef.current = { f1, f2 };
 
-    }, [dataRef, colormap, componentId]);
+    }, [dataRef, colormap]);
 
     // Handle Resize with ResizeObserver
     useEffect(() => {
