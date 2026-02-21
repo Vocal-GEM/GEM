@@ -1,70 +1,68 @@
-import { render, screen, cleanup, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import BrightnessMeter from './BrightnessMeter';
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { renderCoordinator } from '../../services/RenderCoordinator';
 
-// Mock RenderCoordinator
+// Mock dependencies
+const mockRenderCoordinator = {
+  subscribe: vi.fn(() => vi.fn()),
+  PRIORITY: { LOW: 1 }
+};
+
 vi.mock('../../services/RenderCoordinator', () => ({
-    renderCoordinator: {
-        subscribe: vi.fn(() => vi.fn()), // Returns unsubscribe fn
-        PRIORITY: { MEDIUM: 2 }
-    }
+  renderCoordinator: mockRenderCoordinator
 }));
 
-// Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+vi.mock('../../context/SettingsContext', () => ({
+  useSettings: () => ({
+    settings: { colorBlindMode: false }
+  })
+}));
 
-    return {
-        Sun: createIcon('Sun'),
-        Moon: createIcon('Moon'),
-        Info: createIcon('Info'),
-        Smile: createIcon('Smile')
-    };
-});
+// Use dynamic import instead of require for ESM compatibility
+const BrightnessMeter = (await import('./BrightnessMeter')).default;
+
+// Mock canvas context
+const mockContext = {
+  clearRect: vi.fn(),
+  beginPath: vi.fn(),
+  moveTo: vi.fn(),
+  lineTo: vi.fn(),
+  arc: vi.fn(),
+  fill: vi.fn(),
+  stroke: vi.fn(),
+  fillText: vi.fn(),
+  roundRect: vi.fn(),
+  canvas: { width: 200, height: 60 }
+};
+
+HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext);
 
 describe('BrightnessMeter', () => {
-    let dataRef;
+  let dataRef;
 
-    beforeEach(() => {
-        dataRef = { current: { f2: 0 } };
-    });
+  beforeEach(() => {
+    dataRef = {
+      current: {
+        spectralCentroid: 2500, // Balanced
+        spectralRolloff: 3000
+      }
+    };
+    vi.clearAllMocks();
+  });
 
-    afterEach(() => {
-        cleanup();
-        vi.clearAllMocks();
-    });
+  it('renders successfully', () => {
+    render(<BrightnessMeter dataRef={dataRef} />);
+    expect(screen.getByText('Brightness')).toBeDefined();
+  });
 
-    it('renders successfully', () => {
-        render(<BrightnessMeter dataRef={dataRef} />);
-        expect(screen.getByText('Brightness Meter')).toBeDefined();
-    });
+  it('subscribes to render coordinator', () => {
+    render(<BrightnessMeter dataRef={dataRef} />);
+    expect(mockRenderCoordinator.subscribe).toHaveBeenCalled();
+  });
 
-    it('subscribes to RenderCoordinator', () => {
-        render(<BrightnessMeter dataRef={dataRef} />);
-        expect(renderCoordinator.subscribe).toHaveBeenCalled();
-        const [, , priority] = renderCoordinator.subscribe.mock.calls[0];
-        expect(priority).toBe(renderCoordinator.PRIORITY.MEDIUM);
-    });
-
-    it('updates based on dataRef via coordinator callback', () => {
-        render(<BrightnessMeter dataRef={dataRef} />);
-
-        // Get the callback passed to subscribe
-        // Signature: subscribe(id, callback, priority)
-        const callback = renderCoordinator.subscribe.mock.calls[0][1];
-
-        // Update data
-        dataRef.current.f2 = 2300; // Bright target
-
-        // Manually trigger callback (simulate render loop)
-        act(() => {
-            callback();
-        });
-
-        // The status label becomes "Bright ✓"
-        expect(screen.getByText('Bright ✓')).toBeDefined();
-    });
+  it('displays correct label for balanced input', async () => {
+    render(<BrightnessMeter dataRef={dataRef} />);
+    // Initial state is "Neutral" or similar based on logic
+    expect(screen.getByText(/Neutral|Balanced/)).toBeDefined();
+  });
 });

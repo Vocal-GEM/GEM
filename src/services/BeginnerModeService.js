@@ -6,7 +6,7 @@
  */
 
 import { getXPData } from './XPService';
-import { getStreakData } from './StreakService';
+
 import { getReports } from './SessionReportService';
 
 const STORAGE_KEY = 'gem_beginner_mode';

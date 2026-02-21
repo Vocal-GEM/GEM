@@ -1,83 +1,59 @@
+import { useRef } from 'react';
+
 /**
- * PrivacyManager - Manages granular privacy controls for social features
+ * Service to manage privacy settings and local storage
  */
-
-const PRIVACY_KEY = 'gem_privacy_settings';
-
-const DEFAULT_SETTINGS = {
-    shareProgress: false,
-    shareProgress: false,
-    showInLeaderboards: false,
-    dataRetentionDays: 90
-};
-
 class PrivacyManager {
     constructor() {
+        this.STORAGE_KEY = 'gem_privacy_settings';
+        this.defaultSettings = {
+            localOnly: true,
+            analyticsEnabled: false,
+            shareProgress: false, // shareProgress is the intended key
+            allowCloudSync: false,
+            retentionPeriod: '30d' // 30d, 90d, forever
+        };
+
         this.currentSettings = this.loadSettings();
     }
 
     loadSettings() {
         try {
-            const stored = localStorage.getItem(PRIVACY_KEY);
-            return stored ? { ...DEFAULT_SETTINGS, ...JSON.parse(stored) } : { ...DEFAULT_SETTINGS };
+            const stored = localStorage.getItem(this.STORAGE_KEY);
+            if (stored) {
+                return { ...this.defaultSettings, ...JSON.parse(stored) };
+            }
         } catch (e) {
             console.error('Failed to load privacy settings', e);
-            return { ...DEFAULT_SETTINGS };
         }
+        return { ...this.defaultSettings };
     }
 
-    saveSettings(settings) {
-        this.currentSettings = { ...this.currentSettings, ...settings };
-        localStorage.setItem(PRIVACY_KEY, JSON.stringify(this.currentSettings));
-        // In future: sync to backend
-        return this.currentSettings;
+    saveSettings(newSettings) {
+        this.currentSettings = { ...this.currentSettings, ...newSettings };
+        try {
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.currentSettings));
+        } catch (e) {
+            console.error('Failed to save privacy settings', e);
+        }
     }
 
     getSettings() {
         return this.currentSettings;
     }
 
-    /**
-     * Check if a specific feature is allowed by privacy settings
-     */
-    canShare(featureType) {
-        switch (featureType) {
-            case 'milestone':
-                return this.currentSettings.shareMilestones;
-            case 'progress':
-                return this.currentSettings.shareProgress;
-            case 'profile':
-                return this.currentSettings.profileVisibility === 'public';
-            default:
-                return false;
-        }
+    // Check specific permissions
+    canCollectAnalytics() {
+        return this.currentSettings.analyticsEnabled;
     }
 
-    /**
-     * Export all user data (GDPR/Compliance)
-     */
-    async exportMyData() {
-        // Collect local data
-        const localData = {
-            settings: this.currentSettings,
-            ...localStorage
-        };
+    canShareProgress() {
+        return this.currentSettings.shareProgress;
+    }
 
-        // Create downloadable blob
-        const blob = new Blob([JSON.stringify(localData, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `gem_data_export_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
+    canSyncCloud() {
+        return this.currentSettings.allowCloudSync;
     }
 }
 
-
-
-export default new PrivacyManager();
+export const privacyManager = new PrivacyManager();
