@@ -1,6 +1,6 @@
 import { render, cleanup, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import React from 'react';
+
 import BreathinessMeter from './BreathinessMeter';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
