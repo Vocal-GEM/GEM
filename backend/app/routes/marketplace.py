@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify, request
-from app.models import db, ExercisePack, PackExercise, PackDownload, PackReview, User
-from app.extensions import limiter
+from ..models import db, ExercisePack, PackExercise, PackDownload, PackReview, User
 from flask_login import login_required, current_user
 from ..extensions import limiter
 from ..validators import sanitize_html
@@ -113,7 +112,6 @@ def create_pack():
 
 @marketplace_bp.route('/packs/<pack_id>/download', methods=['POST'])
 @login_required
-@limiter.limit("60 per minute")
 @limiter.limit("20 per minute")
 def download_pack(pack_id):
     pack = ExercisePack.query.get_or_404(pack_id)
