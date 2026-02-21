@@ -2,7 +2,6 @@ import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import PitchOrb from './PitchOrb';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import React from 'react';
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
@@ -30,7 +29,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+globalThis.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('PitchOrb', () => {
     let dataRef;
@@ -64,7 +63,9 @@ describe('PitchOrb', () => {
         const [id, callback] = renderCoordinator.subscribe.mock.calls[0];
 
         // Execute the callback
-        callback();
+        if (callback) {
+            callback();
+        }
 
         // With the bug, requestAnimationFrame is called.
         // We assert it IS called to confirm the bug exists in the current code,

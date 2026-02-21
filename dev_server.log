@@ -8,3 +8,14 @@
   ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+7:41:14 AM [vite] page reload src/audio/PitchWorklet.js
+7:41:31 AM [vite] page reload src/components/viz/HighResSpectrogram.test.jsx
+7:42:15 AM [vite] hmr update /src/components/viz/Spectrogram.jsx, /src/index.css
+7:43:11 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+7:43:45 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
+7:44:09 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:44:25 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:44:46 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:45:07 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
+7:45:31 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+7:45:52 AM [vite] page reload src/components/ui/button.test.jsx
