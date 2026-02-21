@@ -19,3 +19,16 @@
 7:45:07 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
 7:45:31 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
 7:45:52 AM [vite] page reload src/components/ui/button.test.jsx
+7:57:39 AM [vite] page reload src/services/PrivacyManager.js
+7:58:02 AM [vite] page reload src/services/ResearchMode.js
+7:58:28 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:58:43 AM [vite] page reload src/components/ui/button.test.jsx
+7:59:08 AM [vite] hmr update /src/components/viz/Spectrogram.jsx, /src/index.css
+7:59:32 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
+7:59:57 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+8:00:25 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+8:00:44 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+8:01:21 AM [vite] hmr update /src/components/analytics/WeeklyDigest.jsx, /src/index.css
+8:01:32 AM [vite] hmr update /src/components/analytics/TrendLineChart.jsx, /src/index.css
+8:01:42 AM [vite] hmr update /src/components/analytics/InsightCard.jsx, /src/index.css
+8:01:58 AM [vite] hmr update /src/components/analytics/AnalyticsDashboardV2.jsx, /src/index.css
