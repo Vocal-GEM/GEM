@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+
 import { useSettings } from '../../context/SettingsContext';
 import CelebrationAnimations from '../ui/CelebrationAnimations';
 import DriftAlert from '../ui/DriftAlert';

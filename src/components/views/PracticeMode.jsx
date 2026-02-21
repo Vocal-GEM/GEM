@@ -17,7 +17,7 @@ const VowelSpacePlot = lazy(() => import('../viz/VowelSpacePlot'));
 const Spectrogram = lazy(() => import('../viz/Spectrogram'));
 
 import PracticeCardsPanel from '../ui/PracticeCardsPanel';
-import LoadingSpinner from '../ui/LoadingSpinner';
+
 import ErrorBoundary from '../ui/ErrorBoundary';
 import WarmupRoutine from '../ui/WarmupRoutine';
 import VocalStatsSummary from '../ui/VocalStatsSummary';

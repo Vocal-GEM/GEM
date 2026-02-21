@@ -1,21 +1,15 @@
 import { cloneElement, useState, useEffect } from 'react';
-import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen, Flame, Sparkles, Timer } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ArrowRight, Timer, Mic, Play, Dumbbell, BookOpen } from 'lucide-react';
 import VocalHealthPanel from '../dashboard/VocalHealthPanel';
-import SmartCoachWidget from '../dashboard/SmartCoachWidget';
-import JourneyEntryCard from '../ui/JourneyEntryCard';
 import SessionSummaryCard from '../ui/SessionSummaryCard';
-import RecommendedExercises from '../ui/RecommendedExercises';
-import DailyChallengeCard from '../ui/DailyChallengeCard';
 import SmartPracticeSession from '../ui/SmartPracticeSession';
 import QuickWarmupSession from '../ui/QuickWarmupSession';
 import QuickVoiceCheck from '../ui/QuickVoiceCheck';
 import { useGuidedJourney } from '../../context/GuidedJourneyContext';
 import { useNavigation } from '../../context/NavigationContext';
-import { checkStreakStatus, getStreakMessage } from '../../services/StreakService';
-import RecommendedToolsWidget from '../ui/RecommendedToolsWidget';
+import { checkStreakStatus } from '../../services/StreakService';
 import MoodCheckIn from '../ui/MoodCheckIn';
-import PersonalMilestonesDisplay from '../ui/PersonalMilestonesDisplay';
 import WelcomeBanner from '../ui/WelcomeBanner';
 import ContextualTips from '../ui/ContextualTips';
 
@@ -52,10 +46,6 @@ const ActionCard = ({ title, description, onClick, icon, color }) => (
 const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
     const { t } = useTranslation();
     const {
-        hasInProgressJourney,
-        isJourneyComplete,
-        getProgressPercentage,
-        getCurrentStep,
         resumeJourney
     } = useGuidedJourney();
     const { openModal } = useNavigation();
@@ -79,8 +69,6 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
         resumeJourney();
         openModal('guidedJourney');
     };
-
-    const currentStep = getCurrentStep();
 
     return (
         <div className="w-full min-h-screen bg-black p-4 sm:p-6 lg:p-12 text-white">

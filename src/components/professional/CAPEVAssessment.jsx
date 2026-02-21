@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+
 import VASSlider from './VASSlider';
 import TaskRecorder from './TaskRecorder';
 import { motion } from 'framer-motion';
