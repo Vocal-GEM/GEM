@@ -2,7 +2,7 @@
  * KeyboardShortcuts - Global keyboard navigation
  */
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { useNavigation } from '../context/NavigationContext';
 
 const SHORTCUTS = {
@@ -25,8 +25,8 @@ const SHORTCUTS = {
  */
 export const useKeyboardShortcuts = (onAction) => {
     const { navigate } = useNavigation();
-    let keySequence = '';
-    let keyTimeout = null;
+    const keySequenceRef = useRef('');
+    const keyTimeoutRef = useRef(null);
 
     const handleKeyDown = useCallback((event) => {
         // Ignore if typing in input
@@ -40,12 +40,12 @@ export const useKeyboardShortcuts = (onAction) => {
         const key = event.key;
 
         // Clear timeout and reset if too slow
-        if (keyTimeout) clearTimeout(keyTimeout);
+        if (keyTimeoutRef.current) clearTimeout(keyTimeoutRef.current);
 
-        keySequence += key === ' ' ? ' ' : key.toLowerCase();
+        keySequenceRef.current += key === ' ' ? ' ' : key.toLowerCase();
 
         // Check for match
-        const matchedShortcut = SHORTCUTS[keySequence];
+        const matchedShortcut = SHORTCUTS[keySequenceRef.current];
 
         if (matchedShortcut) {
             event.preventDefault();
@@ -67,11 +67,11 @@ export const useKeyboardShortcuts = (onAction) => {
                     break;
             }
 
-            keySequence = '';
+            keySequenceRef.current = '';
         } else {
             // Reset after delay
-            keyTimeout = setTimeout(() => {
-                keySequence = '';
+            keyTimeoutRef.current = setTimeout(() => {
+                keySequenceRef.current = '';
             }, 1000);
         }
     }, [navigate, onAction]);

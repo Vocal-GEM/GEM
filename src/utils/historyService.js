@@ -95,7 +95,7 @@ class HistoryService {
                 resolve(request.result);
             };
 
-            request.onerror = (event) => {
+            request.onerror = (_event) => {
                 reject('Could not fetch session');
             };
         });
@@ -113,7 +113,7 @@ class HistoryService {
                 resolve();
             };
 
-            request.onerror = (event) => {
+            request.onerror = (_event) => {
                 reject('Could not delete session');
             };
         });
@@ -147,7 +147,7 @@ class HistoryService {
     async getSettings() {
         await this.open();
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _reject) => {
             const transaction = this.db.transaction([USER_STORE_NAME], 'readonly');
             const store = transaction.objectStore(USER_STORE_NAME);
             const request = store.get('user_preferences');

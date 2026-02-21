@@ -9,7 +9,7 @@
  * @param {number} sampleRate - Sample rate in Hz
  * @returns {Object} Validation result with issues and confidence score
  */
-export const validateAudioSignal = (audioBuffer, sampleRate) => {
+export const validateAudioSignal = (audioBuffer, _sampleRate) => {
     const issues = [];
 
     // Check for clipping

@@ -150,6 +150,7 @@ const TrainingView = () => {
             if (tech) setActiveModule(tech);
             // Could also check categories if needed, but usually we link to tools
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigationParams]);
 
     return (

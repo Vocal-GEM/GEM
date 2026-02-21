@@ -65,7 +65,7 @@ export const initializeTheme = () => {
 
     // Listen for system theme changes
     if (getTheme() === THEMES.SYSTEM) {
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (_e) => {
             if (getTheme() === THEMES.SYSTEM) {
                 applyTheme(THEMES.SYSTEM);
             }

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import {
     Mic, Square, Play, Pause, RotateCcw, Eye, Check,
     ClipboardCheck, Zap, Target, Clock,
@@ -41,7 +41,7 @@ const GOAL_PRESETS = {
 };
 
 const VoiceAssessmentView = () => {
-    // const { t } = useTranslation(); // unused for now
+    //  // unused for now
     const { dataRef, isAudioActive, toggleAudio } = useAudio();
     const { navigationParams } = useNavigation();
 

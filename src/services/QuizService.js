@@ -354,16 +354,13 @@ class QuizService {
 
         let totalMastered = 0;
         let totalLearning = 0;
-        let totalNew = 0;
 
         // Calculate overall progress
         quizQuestions.forEach(q => {
             const progress = this.progress.questions[q.id];
-            if (!progress || progress.state === QuestionState.NEW) {
-                totalNew++;
-            } else if (progress.state === QuestionState.MASTERED) {
+            if (progress && progress.state === QuestionState.MASTERED) {
                 totalMastered++;
-            } else {
+            } else if (progress && progress.state !== QuestionState.NEW) {
                 totalLearning++;
             }
         });

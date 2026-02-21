@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { PracticeRoutineGenerator } from '../services/PracticeRoutineGenerator';
-import { EXERCISE_LIBRARY } from '../data/ExerciseLibrary';
 
 describe('PracticeRoutineGenerator', () => {
     it('should generate a routine with a warmup', () => {

@@ -195,7 +195,7 @@ export const SettingsProvider = ({ children }) => {
         if (!settings.feedback) return;
 
         // Sync Adaptive Feedback
-        const adaptiveController = getAdaptiveFeedbackController();
+        // const adaptiveController = getAdaptiveFeedbackController();
         // adaptiveController.updateSensitivity(settings.feedback.sensitivity); (Method to be added or handled by getThresholds param)
 
         // Sync Haptic

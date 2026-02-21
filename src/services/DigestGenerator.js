@@ -18,7 +18,7 @@ export class DigestGenerator {
      * @param {Object} weekData - collection of sessions and goals for the week
      * @returns {Object} digest object
      */
-    generateWeeklyDigest(userId, weekData) {
+    generateWeeklyDigest(_userId, weekData) {
         const { sessions, goals, previousWeekSessions } = weekData;
 
         return {
@@ -144,7 +144,7 @@ export class DigestGenerator {
         return sessions.length > 0 ? sessions.length : 0;
     }
 
-    getNextMilestone(sessions) {
+    getNextMilestone(_sessions) {
         // mock milestone
         return {
             title: "100 Sessions Club",

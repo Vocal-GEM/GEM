@@ -213,6 +213,7 @@ const VoiceQualityView = () => {
             if (interval) clearInterval(interval);
             if (isLive) stopLiveAnalysis(); // Cleanup on unmount
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isLive, audioEngine]);
 
     // --- History Logic ---

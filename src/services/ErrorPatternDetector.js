@@ -52,7 +52,7 @@ const saveErrorHistory = (history) => {
  * @param {Object} target - Target pitch range
  * @returns {Object|null} Error detection result
  */
-const detectPitchDrop = (pitchHistory, target = { min: 160, max: 260 }) => {
+const detectPitchDrop = (pitchHistory, _target = { min: 160, max: 260 }) => {
     if (pitchHistory.length < 10) return null;
 
     const validPitches = pitchHistory.filter(p => p > 0);

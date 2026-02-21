@@ -58,7 +58,7 @@ const SKILL_DIMENSIONS = {
         name: 'Consistency',
         description: 'Maintaining voice quality over time',
         weight: 0.9,
-        assess: (data) => {
+        assess: (_data) => {
             const streak = getStreakData();
             if (streak.currentStreak >= 14) return 5;
             if (streak.currentStreak >= 7) return 4;
@@ -71,10 +71,9 @@ const SKILL_DIMENSIONS = {
         name: 'Vocal Range',
         description: 'Usable pitch range in semitones',
         weight: 0.7,
-        assess: (data) => {
+        assess: (_data) => {
             const baseline = VoiceCalibrationService.getBaseline();
             if (!baseline?.pitch) return 3; // Neutral if no data
-            const range = baseline.pitch.max - baseline.pitch.min;
             const semitones = 12 * Math.log2((baseline.pitch.max) / (baseline.pitch.min));
             if (semitones >= 24) return 5; // 2 octaves
             if (semitones >= 18) return 4;
@@ -99,7 +98,6 @@ const SKILL_LEVELS = [
  */
 export const assessSkills = () => {
     const reports = getReports();
-    const baseline = VoiceCalibrationService.getBaseline();
 
     // Extract metrics from recent sessions
     const recentReports = reports.slice(-20);
@@ -187,7 +185,7 @@ const saveAssessment = (assessment) => {
 /**
  * Generate personalized recommendations based on weaknesses
  */
-const generateRecommendations = (weaknesses, dimensions) => {
+const generateRecommendations = (weaknesses, _dimensions) => {
     const recommendations = [];
 
     weaknesses.forEach(weakness => {
@@ -269,7 +267,7 @@ const calculateAverageResonance = (reports) => {
         : 45;
 };
 
-const calculateWeightConsistency = (reports) => {
+const calculateWeightConsistency = (_reports) => {
     // Simulate consistency based on practice frequency
     const streak = getStreakData();
     return Math.min(90, 40 + (streak.currentStreak * 5));

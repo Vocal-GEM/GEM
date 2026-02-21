@@ -103,7 +103,7 @@ const EXERCISES = [
  * @param {number} difficulty - Difficulty level (1-5) - currently unused but reserved for future.
  * @returns {Array} Array of exercise objects for the routine.
  */
-export const generateRoutine = (durationMinutes = 5, focus = 'any', difficulty = 1) => {
+export const generateRoutine = (durationMinutes = 5, focus = 'any', _difficulty = 1) => {
     const totalSeconds = durationMinutes * 60;
     let currentSeconds = 0;
     const routine = [];

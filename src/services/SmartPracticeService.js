@@ -119,7 +119,7 @@ export const generateSmartSession = (durationMinutes = 15) => {
     });
 
     // Add focus area exercises
-    recommendations.forEach((rec, index) => {
+    recommendations.forEach((rec, _index) => {
         const category = TRAINING_CATEGORIES.find(c => c.id === rec.category);
         if (category) {
             const exerciseCount = rec.priority === 'high' ? 3 : 2;

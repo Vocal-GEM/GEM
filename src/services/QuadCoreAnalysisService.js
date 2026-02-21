@@ -123,7 +123,7 @@ export class QuadCoreAnalysisService {
      * Goal: Prevent strain.
      * Input: Spectral Tilt (dB/octave estimate)
      */
-    evaluateHealth(tilt, volume) {
+    evaluateHealth(tilt, _volume) {
         // Tilt > -6: Shallow (High high-freq energy) -> Pressed/Bright
         // Tilt < -18: Steep (Low high-freq energy) -> Breathy/Hollow
         // Target: -10 to -15 (Balanced)

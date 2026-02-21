@@ -443,7 +443,7 @@ export const checkMilestones = (progress, profile = 'fem') => {
 };
 
 // Helper to get all lesson IDs in a module
-const getModuleLessons = (moduleId, profile) => {
+const getModuleLessons = (moduleId, _profile) => {
     // This would ideally import from courseData, but to avoid circular dependencies
     // we'll use a simplified version
     const moduleLessons = {

@@ -110,7 +110,6 @@ describe('Gender Perception Metrics', () => {
         });
 
         it('should apply context modifier for TNB', () => {
-            const cgResult = predictGenderPerception(feminineMetrics, 'CG');
             const tnbResult = predictGenderPerception(feminineMetrics, 'TNB');
             // TNB context reduces f0 dominance, so scores may differ
             expect(tnbResult.context).toBe('TNB');

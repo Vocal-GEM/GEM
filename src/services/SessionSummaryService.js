@@ -5,11 +5,6 @@
  * Analyzes patterns, identifies achievements, and provides actionable next steps.
  */
 
-import { getReports, saveReport } from './SessionReportService';
-import { getStreakData } from './StreakService';
-import { VoiceCalibrationService } from './VoiceCalibrationService';
-import LiveCoachingService from './LiveCoachingService';
-
 const STORAGE_KEY = 'gem_session_summaries';
 
 /**
@@ -21,8 +16,7 @@ export const generateSessionSummary = (sessionData) => {
     const {
         durationMs = 0,
         exercisesCompleted = [],
-        metricsHistory = [],
-        feedbackGiven = 0
+        metricsHistory = []
     } = sessionData;
 
     const durationMinutes = Math.round(durationMs / 60000);

@@ -1,6 +1,6 @@
-import { render, cleanup, screen } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import HighResSpectrogram from './HighResSpectrogram';
+import Spectrogram from './Spectrogram';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
 
@@ -16,6 +16,20 @@ vi.mock('../../services/RenderCoordinator', () => ({
 vi.mock('../../context/SettingsContext', () => ({
   useSettings: () => ({ settings: { spectrogramColorScheme: 'magma' } }),
   SettingsProvider: ({ children }) => <div>{children}</div>
+}));
+
+// Mock AudioContext
+vi.mock('../../context/AudioContext', () => ({
+  useAudio: () => ({
+    dataRef: {
+      current: {
+        spectrum: new Float32Array(1024).fill(0.5)
+      }
+    },
+    isAudioActive: true,
+    audioContext: { sampleRate: 44100 }
+  }),
+  AudioProvider: ({ children }) => <div>{children}</div>
 }));
 
 // Mock Canvas getContext
@@ -34,32 +48,13 @@ const mockContext = {
   fillRect: vi.fn(),
   fillText: vi.fn(),
   scale: vi.fn(),
-  canvas: { width: 800, height: 512 }
+  canvas: { width: 800, height: 200 }
 };
 
 HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext);
 
-describe('HighResSpectrogram', () => {
-  let dataRef;
-
+describe('Spectrogram', () => {
   beforeEach(() => {
-    dataRef = {
-      current: {
-        spectrum: new Float32Array(1024).fill(0.5),
-        f1: 500,
-        f2: 1500
-      }
-    };
-
-    Element.prototype.getBoundingClientRect = vi.fn(() => ({
-      width: 800,
-      height: 512,
-      top: 0,
-      left: 0,
-      right: 800,
-      bottom: 512,
-    }));
-
     vi.clearAllMocks();
   });
 
@@ -69,15 +64,16 @@ describe('HighResSpectrogram', () => {
   });
 
   it('renders successfully and subscribes to coordinator', () => {
-    render(<HighResSpectrogram dataRef={dataRef} />);
+    render(<Spectrogram height={200} />);
     expect(renderCoordinator.subscribe).toHaveBeenCalled();
   });
 
   it('cleans up subscription on unmount', () => {
+    // Mock unsubscribe function
     const unsubscribe = vi.fn();
     renderCoordinator.subscribe.mockReturnValue(unsubscribe);
 
-    const { unmount } = render(<HighResSpectrogram dataRef={dataRef} />);
+    const { unmount } = render(<Spectrogram height={200} />);
 
     unmount();
     expect(unsubscribe).toHaveBeenCalled();

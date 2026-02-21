@@ -74,7 +74,7 @@ export const generateAdaptiveCurriculum = () => {
 /**
  * Generate a single week's training plan
  */
-const generateWeekPlan = (weekIndex, assessment, levelIndex, streak) => {
+const generateWeekPlan = (weekIndex, assessment, levelIndex, _streak) => {
     const weekPlan = {
         week: weekIndex + 1,
         theme: getWeekTheme(weekIndex, assessment),

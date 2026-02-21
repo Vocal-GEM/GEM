@@ -68,7 +68,7 @@ export class GoalForecaster {
         return points;
     }
 
-    adjustForPlateaus(estimate, history) {
+    adjustForPlateaus(estimate, _history) {
         // Advanced: if recent history shows plateau, add buffer to estimate
         return estimate * 1.5;
     }

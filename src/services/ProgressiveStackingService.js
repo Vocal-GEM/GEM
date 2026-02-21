@@ -40,7 +40,7 @@ export class ProgressiveStackingService {
     }
 
     _initializeLayerStates() {
-        this.layers.forEach((layer, index) => {
+        this.layers.forEach((layer, _index) => {
             this.layerStates[layer.id] = createLayerState(layer);
         });
         // Unlock first layer
@@ -322,7 +322,7 @@ export class ProgressiveStackingService {
     /**
      * Handle no data state
      */
-    _handleNoData(layer, state, now) {
+    _handleNoData(layer, state, _now) {
         if (state.status === LAYER_STATUS.HOLDING) {
             state.holdStartTime = null;
             state.holdDuration = 0;

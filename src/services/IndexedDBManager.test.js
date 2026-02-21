@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { indexedDB as dbManager, STORES } from './IndexedDBManager';
 
 describe('IndexedDBManager', () => {

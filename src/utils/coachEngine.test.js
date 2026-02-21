@@ -1,6 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { CoachEngine } from './coachEngine';
-import { KnowledgeService } from '../services/KnowledgeService';
 
 describe('CoachEngine', () => {
     it('should handle real-time pitch feedback', () => {

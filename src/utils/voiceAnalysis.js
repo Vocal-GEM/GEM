@@ -223,14 +223,12 @@ export class VoiceAnalyzer {
 
         // Find first peak (fundamental period)
         let maxCorr = -Infinity;
-        let peakIndex = 0;
         const minLag = Math.floor(sampleRate / 600);
         const maxLag = Math.floor(sampleRate / 75);
 
         for (let i = minLag; i < Math.min(maxLag, autocorr.length); i++) {
             if (autocorr[i] > maxCorr) {
                 maxCorr = autocorr[i];
-                peakIndex = i;
             }
         }
 
@@ -309,7 +307,6 @@ export class VoiceAnalyzer {
         const spectrum = fft.map(c => Math.sqrt(c.real * c.real + c.imag * c.imag));
 
         // Calculate energy in specific bands
-        let energyLow = 0;   // 0 - 3kHz
         let energyHigh = 0;  // 4kHz - 8kHz
         let totalEnergy = 0;
 
@@ -323,9 +320,7 @@ export class VoiceAnalyzer {
 
             totalEnergy += magnitude;
 
-            if (freq < 3000) {
-                energyLow += magnitude;
-            } else if (freq >= 4000 && freq <= 8000) {
+            if (freq >= 4000 && freq <= 8000) {
                 energyHigh += magnitude;
                 highFreqWeightedSum += freq * magnitude;
                 highFreqTotalSum += magnitude;
@@ -371,7 +366,6 @@ export class VoiceAnalyzer {
      */
     findSpectralPeaks(spectrum, sampleRate, fftSize, numPeaks = 3) {
         const peaks = [];
-        const minDistance = Math.floor(fftSize * 200 / sampleRate); // Min 200 Hz apart
 
         for (let i = 1; i < spectrum.length / 2 - 1; i++) {
             if (spectrum[i] > spectrum[i - 1] && spectrum[i] > spectrum[i + 1]) {

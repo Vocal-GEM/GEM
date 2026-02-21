@@ -5,8 +5,6 @@
  * and current vocal health.
  */
 
-import { selectExercises } from './ExerciseSelector';
-
 /**
  * Generates a warm-up routine
  * @param {Object} profile - User voice profile
