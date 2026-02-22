@@ -75,3 +75,11 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2024-05-23 - Critical Syntax Error in Security Logic
+**Vulnerability:** A merge conflict in `backend/app/routes/community.py` resulted in a syntax error (`finally` block without `try`) and duplicated logic in the `share_voice` endpoint. This prevented the backend from starting (Availability) and, if it had run, would have caused the security controls (anonymization, file cleanup) to fail or behave unpredictably.
+**Learning:** Security controls (like anonymization and cleanup) are only effective if the code is syntactically valid and logically sound. Merge conflicts in security-sensitive files can silently introduce vulnerabilities or break the application entirely if not caught by CI/CD.
+**Prevention:**
+1.  Ensure all code changes are verified with local tests before merging.
+2.  Use pre-commit hooks or CI steps to run syntax checks (`python -m py_compile`) and unit tests on all modified files.
+3.  When resolving merge conflicts, pay extra attention to control flow structures (`try/except/finally`) to ensure they remain valid.

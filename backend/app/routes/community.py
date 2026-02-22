@@ -2,8 +2,6 @@ from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
-from ..extensions import db
-from ..extensions import db, limiter
 from ..validators import validate_file_upload, sanitize_html
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
@@ -14,9 +12,6 @@ from datetime import datetime, timedelta
 import os
 import secrets
 import hashlib
-from ..validators import validate_file_upload
-from werkzeug.utils import secure_filename
-from ..validators import validate_file_upload, sanitize_html
 
 community_bp = Blueprint('community', __name__)
 
@@ -54,14 +49,13 @@ def anonymize_audio(audio_path):
         sf.write(anon_path, y_stretched, sr)
 
         return anon_path
-    except ImportError:
+    except ImportError as e:
         # If librosa not available, we cannot anonymize.
         # Fail securely - do not copy the raw file.
-        raise ImportError("Audio anonymization library (librosa) not available")
-    except ImportError as e:
-        # Fail securely - do not copy raw file if anonymization fails
-        # Log error and raise
         current_app.logger.error(f"Failed to anonymize audio (librosa missing?): {str(e)}")
+        raise ImportError("Audio anonymization library (librosa) not available")
+    except Exception as e:
+        current_app.logger.error(f"Anonymization error: {str(e)}")
         raise e
 
 
@@ -88,6 +82,7 @@ def check_moderation(text):
 @limiter.limit("5 per hour")
 def share_voice():
     """Share a voice sample anonymously"""
+    filepath = None
     try:
         if 'audio' not in request.files:
             return jsonify({'error': 'No audio file provided'}), 400
@@ -95,7 +90,6 @@ def share_voice():
         audio_file = request.files['audio']
 
         # Security: Validate file type
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
         is_valid, error = validate_file_upload(
             audio_file.filename, allowed_types=['audio'], file_stream=audio_file)
         if not is_valid:
@@ -105,8 +99,10 @@ def share_voice():
         # Security: Sanitize context
         context = sanitize_html(context)
 
-        context = sanitize_html(request.form.get('context', ''))
-        expiration_days = int(request.form.get('expiration_days', 7))
+        try:
+            expiration_days = int(request.form.get('expiration_days', 7))
+        except ValueError:
+            expiration_days = 7
 
         # Save original file temporarily
         upload_folder = current_app.config.get(
@@ -119,27 +115,11 @@ def share_voice():
 
         filepath = os.path.join(upload_folder, filename)
 
-        try:
-            # Anonymize audio
-            anon_filepath = anonymize_audio(filepath)
-        finally:
-            # Security: Always remove the original raw file to prevent PII retention
-            if os.path.exists(filepath):
-                try:
-                    os.remove(filepath)
-                except OSError:
-                    pass
-            audio_file.save(filepath)
+        # Save the original file first
+        audio_file.save(filepath)
 
-            # Anonymize audio
-            anon_filepath = anonymize_audio(filepath)
-        finally:
-            # Security: Always remove the original raw audio file
-            if os.path.exists(filepath):
-                try:
-                    os.remove(filepath)
-                except Exception as e:
-                    current_app.logger.error(f"Failed to delete original file: {e}")
+        # Anonymize audio
+        anon_filepath = anonymize_audio(filepath)
 
         # Create share record
         share_id = generate_share_id()
@@ -166,6 +146,13 @@ def share_voice():
     except Exception as e:
         current_app.logger.error(f"Error sharing voice: {str(e)}")
         return jsonify({'error': 'Failed to share voice sample'}), 500
+    finally:
+        # Security: Always remove the original raw audio file to prevent PII retention
+        if filepath and os.path.exists(filepath):
+            try:
+                os.remove(filepath)
+            except Exception as e:
+                current_app.logger.error(f"Failed to delete original file: {e}")
 
 
 @community_bp.route('/shared/<share_id>', methods=['GET'])
@@ -299,26 +286,6 @@ def submit_success_story():
             clean_techniques = [sanitize_html(str(t)) for t in techniques]
 
         # Moderation check
-        title = sanitize_html(data.get('title', ''))
-        story_content = sanitize_html(data.get('story', ''))
-
-        # Sanitize list of strings
-        techniques = data.get('techniques_used', [])
-        if isinstance(techniques, list):
-            techniques = [sanitize_html(t) for t in techniques]
-
-        # Security: Sanitize inputs
-        title = sanitize_html(data.get('title', ''))
-        story_content = sanitize_html(data.get('story', ''))
-
-        # Moderation check
-        is_safe, flagged = check_moderation(
-            title + ' ' + story_content)
-
-        story = SuccessStory(
-            user_id=current_user.id,
-            title=title,
-            story=story_content,
         is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
 
         story = SuccessStory(
@@ -503,9 +470,6 @@ def request_connection():
         connection_id = data.get('connection_id')
         connection_type = data.get('connection_type', 'pen_pal')
         message = sanitize_html(data.get('message', ''))
-
-        # Security: Sanitize message
-        message = sanitize_html(message)
 
         if not connection_id:
             return jsonify({'error': 'Connection ID required'}), 400
