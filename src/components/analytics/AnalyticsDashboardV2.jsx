@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { TrendAnalyzer } from '../../services/TrendAnalyzer';
