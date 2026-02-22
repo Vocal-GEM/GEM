@@ -1,8 +1,7 @@
-import { render, cleanup, screen } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import HighResSpectrogram from './HighResSpectrogram';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import React from 'react';
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
@@ -15,6 +14,7 @@ vi.mock('../../services/RenderCoordinator', () => ({
 // Mock SettingsContext
 vi.mock('../../context/SettingsContext', () => ({
   useSettings: () => ({ settings: { spectrogramColorScheme: 'magma' } }),
+  // eslint-disable-next-line react/display-name, react/prop-types
   SettingsProvider: ({ children }) => <div>{children}</div>
 }));
 
