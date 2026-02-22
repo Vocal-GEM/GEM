@@ -1,26 +1,61 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Mic, Book, Bot, Zap, Volume2, VolumeX } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
-import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { FEATURES } from '../../config/featureFlags';
 
 const QuickActions = ({ onAction }) => {
     const [isOpen, setIsOpen] = useState(false);
     const { settings, updateSettings } = useSettings();
 
     const actions = [
-        { id: 'practice', label: 'Practice', icon: Mic, color: 'bg-blue-500' },
-        { id: 'journal', label: 'Journal', icon: Book, color: 'bg-emerald-500' },
-        { id: 'coach', label: 'Ask Coach', icon: Bot, color: 'bg-purple-500' },
-        { id: 'warmup', label: 'Warm Up', icon: Zap, color: 'bg-orange-500' },
+        {
+            id: 'practice',
+            label: 'Practice',
+            icon: Mic,
+            color: 'bg-blue-500',
+            visible: FEATURES.practice
+        },
+        {
+            id: 'journal',
+            label: 'Journal',
+            icon: Book,
+            color: 'bg-emerald-500',
+            visible: FEATURES.journal
+        },
+        {
+            id: 'coach',
+            label: 'Ask Coach',
+            icon: Bot,
+            color: 'bg-purple-500',
+            visible: FEATURES.learn
+        },
+        {
+            id: 'warmup',
+            label: 'Warm Up',
+            icon: Zap,
+            color: 'bg-orange-500',
+            visible: true
+        },
         {
             id: 'listen',
-            label: settings.listenMode ? 'Stop Listening' : 'Listen Mode',
-            icon: settings.listenMode ? VolumeX : Volume2,
-            color: settings.listenMode ? 'bg-red-500' : 'bg-indigo-500',
-            isToggle: true
+            label: settings?.listenMode ? 'Stop Listening' : 'Listen Mode',
+            icon: settings?.listenMode ? VolumeX : Volume2,
+            color: settings?.listenMode ? 'bg-red-500' : 'bg-indigo-500',
+            isToggle: true,
+            visible: true
         },
-    ];
+    ].filter(action => action.visible !== false);
+
+    useEffect(() => {
+        const handleEscape = (e) => {
+            if (e.key === 'Escape' && isOpen) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, [isOpen]);
 
     const handleAction = (action) => {
         if (action.isToggle) {
@@ -32,6 +67,8 @@ const QuickActions = ({ onAction }) => {
         }
         setIsOpen(false);
     };
+
+    if (actions.length === 0) return null;
 
     return (
         <div
@@ -46,7 +83,6 @@ const QuickActions = ({ onAction }) => {
                     "flex flex-col gap-3 mb-4 transition-all duration-300",
                     isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
                 )}
-                className={`flex flex-col gap-3 mb-4 transition-all duration-300 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
                 aria-hidden={!isOpen}
             >
                 {actions.map((action, index) => (
@@ -54,8 +90,6 @@ const QuickActions = ({ onAction }) => {
                         key={action.id}
                         onClick={() => handleAction(action)}
                         tabIndex={isOpen ? 0 : -1}
-                        aria-hidden={!isOpen}
-                        className="flex items-center justify-end gap-3 group focus:outline-none"
                         className="flex items-center justify-end gap-3 group focus-visible:outline-none"
                         style={{ transitionDelay: `${index * 50}ms` }}
                         aria-label={action.label}
@@ -67,14 +101,12 @@ const QuickActions = ({ onAction }) => {
                         >
                             {action.label}
                         </span>
-                        <div className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-white transition-transform hover:scale-110 group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-white ${action.color}`}>
                         <div
                             className={twMerge(
                                 "w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-white transition-transform hover:scale-110 group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-white",
                                 action.color
                             )}
                         >
-                        <div className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-white transition-transform hover:scale-110 group-focus-visible:scale-110 group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-black ${action.color}`}>
                             <action.icon size={20} />
                         </div>
                     </button>
@@ -84,18 +116,14 @@ const QuickActions = ({ onAction }) => {
             {/* Main FAB */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-white transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-teal-500/50 ${isOpen ? 'bg-slate-700 rotate-45' : 'bg-gradient-to-r from-teal-500 to-violet-500 hover:shadow-teal-500/30'}`}
-                className={`w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal-500/50 ${isOpen ? 'bg-slate-700 rotate-45' : 'bg-gradient-to-r from-teal-500 to-violet-500 hover:shadow-teal-500/30'}`}
                 className={twMerge(
                     "w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal-500/50",
                     isOpen ? "bg-slate-700 rotate-45" : "bg-gradient-to-r from-teal-500 to-violet-500 hover:shadow-teal-500/30"
                 )}
-                className={`w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-white transition-all duration-300 focus-visible:ring-4 focus-visible:ring-teal-500/50 focus-visible:outline-none ${isOpen ? 'bg-slate-700 rotate-45' : 'bg-gradient-to-r from-teal-500 to-violet-500 hover:shadow-teal-500/30'}`}
                 aria-label={isOpen ? "Close Quick Actions" : "Open Quick Actions"}
                 aria-expanded={isOpen}
                 aria-controls="quick-actions-menu"
                 aria-haspopup="true"
-                aria-controls="quick-actions-menu"
             >
                 <Plus size={28} />
             </button>
