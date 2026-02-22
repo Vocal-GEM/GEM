@@ -65,6 +65,7 @@ import { TourProvider } from './context/TourContext';
 import TourOverlay from './components/ui/TourOverlay';
 
 import CommandPalette from './components/ui/CommandPalette';
+import QuickActions from './components/ui/QuickActions';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
 import QuickSettings from './components/ui/QuickSettings';
 import { analyticsService } from './services/AnalyticsService';
@@ -132,6 +133,25 @@ const App = () => {
     } = useNavigation();
 
     const [dismissedError, setDismissedError] = useState(false);
+
+    const handleQuickAction = (actionId) => {
+        switch (actionId) {
+            case 'practice':
+                setActiveTab('practice');
+                break;
+            case 'journal':
+                setShowJournalForm(true);
+                break;
+            case 'coach':
+                setActiveTab('learn');
+                break;
+            case 'warmup':
+                setShowWarmUp(true);
+                break;
+            default:
+                break;
+        }
+    };
 
     // Initialize Analytics
     useEffect(() => {
@@ -455,9 +475,8 @@ const App = () => {
                         {showAssessment && <AssessmentModule onClose={() => setShowAssessment(false)} />}
                         {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}
 
-                        <TourOverlay />
                         <CommandPalette />
-                        <CommandPalette />
+                        <QuickActions onAction={handleQuickAction} />
                         <QuickSettings isOpen={false} onClose={() => { }} />
                         {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
                         {modals.analytics && <AnalyticsDashboard onClose={() => closeModal('analytics')} />}
