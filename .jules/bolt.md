@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Canvas Pixel Manipulation Optimization
+**Learning:** In `Spectrogram.jsx`, creating `new Uint32Array(imageData.data.buffer)` and performing `Math.floor` / division inside the pixel loop (60fps * 4096+ iterations) creates significant GC pressure and CPU overhead.
+**Action:** Cache the `Uint32Array` view and pre-calculate frequency bin mappings (`binMap`) in a `useRef` cache. Only invalidate when dimensions change.
