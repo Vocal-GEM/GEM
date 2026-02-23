@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Mic, LineChart, Target, BookOpen, Zap, Award } from 'lucide-react';
 import { useNavigation } from '../../context/NavigationContext';
 import { lightTap } from '../../services/HapticService';

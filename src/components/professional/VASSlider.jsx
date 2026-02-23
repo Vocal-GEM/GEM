@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { motion } from 'framer-motion';
 
 const VASSlider = ({ label, value, onChange, min = 0, max = 100, markers = [], disabled = false }) => {

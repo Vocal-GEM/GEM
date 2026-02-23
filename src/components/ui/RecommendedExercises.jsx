@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Sparkles, ArrowRight } from 'lucide-react';
 import { getRecommendations } from '../../services/RecommendationService';
 import { TRAINING_CATEGORIES } from '../../data/trainingData';

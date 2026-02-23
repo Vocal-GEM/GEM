@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Toast from './Toast';
-import React from 'react';
+
 
 describe('Toast Component', () => {
   beforeEach(() => {
