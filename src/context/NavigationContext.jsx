@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { analyticsService } from '../services/AnalyticsService';
 
 const NavigationContext = createContext();
@@ -48,31 +48,6 @@ export const NavigationProvider = ({ children }) => {
         practiceCards: false // Practice Cards feature
     });
 
-    // Initialize Analytics
-    useEffect(() => {
-        analyticsService.init();
-    }, []);
-
-    // Global Event Listeners (moved from App.jsx)
-    useEffect(() => {
-        const handleOpenVocalHealth = () => openModal('vocalHealth');
-        const handleOpenAssessment = () => openModal('assessment');
-        const handleOpenWarmUp = () => openModal('warmup');
-        const handleOpenForwardFocus = () => openModal('forwardFocus');
-
-        window.addEventListener('openVocalHealth', handleOpenVocalHealth);
-        window.addEventListener('openAssessment', handleOpenAssessment);
-        window.addEventListener('openWarmUp', handleOpenWarmUp);
-        window.addEventListener('openForwardFocus', handleOpenForwardFocus);
-
-        return () => {
-            window.removeEventListener('openVocalHealth', handleOpenVocalHealth);
-            window.removeEventListener('openAssessment', handleOpenAssessment);
-            window.removeEventListener('openWarmUp', handleOpenWarmUp);
-            window.removeEventListener('openForwardFocus', handleOpenForwardFocus);
-        };
-    }, []);
-
     const [navigationParams, setNavigationParams] = useState({});
     const [modalParams, setModalParams] = useState({});
 
@@ -121,6 +96,31 @@ export const NavigationProvider = ({ children }) => {
             return newHistory;
         });
     };
+
+    // Initialize Analytics
+    useEffect(() => {
+        analyticsService.init();
+    }, []);
+
+    // Global Event Listeners (moved from App.jsx)
+    useEffect(() => {
+        const handleOpenVocalHealth = () => openModal('vocalHealth');
+        const handleOpenAssessment = () => openModal('assessment');
+        const handleOpenWarmUp = () => openModal('warmup');
+        const handleOpenForwardFocus = () => openModal('forwardFocus');
+
+        window.addEventListener('openVocalHealth', handleOpenVocalHealth);
+        window.addEventListener('openAssessment', handleOpenAssessment);
+        window.addEventListener('openWarmUp', handleOpenWarmUp);
+        window.addEventListener('openForwardFocus', handleOpenForwardFocus);
+
+        return () => {
+            window.removeEventListener('openVocalHealth', handleOpenVocalHealth);
+            window.removeEventListener('openAssessment', handleOpenAssessment);
+            window.removeEventListener('openWarmUp', handleOpenWarmUp);
+            window.removeEventListener('openForwardFocus', handleOpenForwardFocus);
+        };
+    }, []);
 
     const value = {
         activeView,

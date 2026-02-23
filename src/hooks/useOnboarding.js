@@ -3,18 +3,11 @@ import { useState, useEffect } from 'react';
 export const useOnboarding = (steps = []) => {
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [isActive, setIsActive] = useState(false);
-    const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
 
-    useEffect(() => {
-        const seen = localStorage.getItem('gem_onboarding_seen');
-        if (seen) {
-            setHasSeenOnboarding(true);
-        } else {
-            // Start onboarding automatically if not seen
-            // You might want to delay this or trigger it manually depending on UX preference
-            // setIsActive(true); 
-        }
-    }, []);
+    // Lazy initialize to avoid setState in effect
+    const [hasSeenOnboarding, setHasSeenOnboarding] = useState(() => {
+        return !!localStorage.getItem('gem_onboarding_seen');
+    });
 
     const startOnboarding = () => {
         setCurrentStepIndex(0);

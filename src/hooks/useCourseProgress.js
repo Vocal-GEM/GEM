@@ -10,14 +10,18 @@ export const useCourseProgress = () => {
         console.warn("useCourseProgress: ProfileContext is missing. Using 'guest' profile.");
     }
     const [completedLessons, setCompletedLessons] = useState([]);
-    const [currentCourse, setCurrentCourse] = useState([]);
 
-    // Load progress and set current course
+    // Lazy initialize to avoid setState in effect
+    const [currentCourse, setCurrentCourse] = useState(() => getCourseForProfile(activeProfile));
+
+    // Update current course when activeProfile changes
     useEffect(() => {
         const course = getCourseForProfile(activeProfile);
         setCurrentCourse(course);
+    }, [activeProfile]);
 
-        // Load progress specific to this profile (or global for now, can be refined)
+    // Load progress specific to this profile
+    useEffect(() => {
         const savedProgress = localStorage.getItem(`gem_course_progress_${activeProfile}`);
         if (savedProgress) {
             setCompletedLessons(JSON.parse(savedProgress));

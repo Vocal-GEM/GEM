@@ -37,12 +37,12 @@ export const ProfileProvider = ({ children }) => {
     const [goals, setGoals] = useState([]);
     const [showCalibration, setShowCalibration] = useState(false);
 
-    // Vocal Health State
-    const [vocalHealth, setVocalHealth] = useState({
+    // Vocal Health State - Use lazy initialization to avoid impure function call during render
+    const [vocalHealth, setVocalHealth] = useState(() => ({
         hydration: { current: 0, goal: 8, lastUpdated: Date.now() },
         fatigue: { level: 1, note: '', lastUpdated: Date.now() },
         usage: { dailyLimitMinutes: 30, todaySeconds: 0, lastUpdated: Date.now() }
-    });
+    }));
 
     // Onboarding State
     const { user } = useAuth();
