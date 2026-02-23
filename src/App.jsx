@@ -64,6 +64,7 @@ import { useAchievements } from './hooks/useAchievements';
 import { TourProvider } from './context/TourContext';
 import TourOverlay from './components/ui/TourOverlay';
 
+import QuickActions from './components/ui/QuickActions';
 import CommandPalette from './components/ui/CommandPalette';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
 import QuickSettings from './components/ui/QuickSettings';
@@ -456,7 +457,12 @@ const App = () => {
                         {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}
 
                         <TourOverlay />
-                        <CommandPalette />
+                        <QuickActions onAction={(id) => {
+                            if (id === 'practice') setActiveTab('practice');
+                            if (id === 'journal') setShowJournalForm(true);
+                            if (id === 'coach') setActiveTab('coach');
+                            if (id === 'warmup') setShowWarmUp(true);
+                        }} />
                         <CommandPalette />
                         <QuickSettings isOpen={false} onClose={() => { }} />
                         {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
