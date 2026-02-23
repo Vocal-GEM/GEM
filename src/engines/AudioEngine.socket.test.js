@@ -8,8 +8,14 @@ vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));
 
-// Mock pitchfinder
+// Mock pitchfinder - Updated to use importOriginal for partial mocking if needed,
+// but primarily ensuring the default export works as expected by McLeodPitchDetector
 vi.mock('pitchfinder', () => ({
+    default: {
+        McLeod: vi.fn(() => vi.fn((buffer) => 440)),
+        YIN: vi.fn(() => vi.fn((buffer) => 440))
+    },
+    // Also provide named exports just in case
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
     YIN: vi.fn(() => vi.fn((buffer) => 440))
 }));

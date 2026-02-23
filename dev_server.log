@@ -38,3 +38,8 @@
 7:27:44 AM [vite] hmr update /src/components/analytics/TrendLineChart.jsx, /src/index.css
 7:27:53 AM [vite] hmr update /src/components/analytics/InsightCard.jsx, /src/index.css
 7:28:14 AM [vite] hmr update /src/components/analytics/AnalyticsDashboardV2.jsx, /src/index.css
+7:38:36 AM [vite] page reload src/components/layout/Sidebar.test.jsx
+7:39:09 AM [vite] page reload src/engines/AudioEngine.socket.test.js
+7:39:45 AM [vite] page reload src/context/AuthContext.test.jsx
+7:41:09 AM [vite] page reload src/test/validation/algorithmValidation.test.js
+7:41:38 AM [vite] page reload src/components/ui/JournalForm.test.jsx

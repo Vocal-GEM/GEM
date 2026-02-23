@@ -20,7 +20,6 @@ vi.mock('../services/DataSyncService', () => ({
 }));
 
 import { indexedDB } from '../services/IndexedDBManager';
-import { syncToServer, syncFromServer } from '../services/DataSyncService';
 
 const TestComponent = () => {
     const { user, login, signup, logout } = useAuth();
@@ -62,7 +61,7 @@ describe('AuthContext', () => {
         fetch.mockResolvedValueOnce({ ok: false }); // initial /me
         fetch.mockResolvedValueOnce({
             ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
+            json: async () => ({ user: { id: 1, username: 'testuser' }, access_token: 'fake_token' })
         }); // login
 
         let result;
@@ -110,10 +109,13 @@ describe('AuthContext', () => {
     it('clears local data on logout', async () => {
         // Setup: login first
         fetch.mockResolvedValueOnce({ ok: false }); // initial /me
+
+        // Login response needs to be robust for the test to set state
         fetch.mockResolvedValueOnce({
             ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
+            json: async () => ({ user: { id: 1, username: 'testuser' }, access_token: 'fake_token' })
+        });
+
         fetch.mockResolvedValueOnce({ ok: true }); // logout
 
         let result;
@@ -131,6 +133,7 @@ describe('AuthContext', () => {
             loginBtn.click();
         });
 
+        // Ensure login completed before trying logout
         await waitFor(() => {
             expect(result.getByTestId('user').textContent).toBe('testuser');
         });
@@ -149,4 +152,3 @@ describe('AuthContext', () => {
         });
     });
 });
-
