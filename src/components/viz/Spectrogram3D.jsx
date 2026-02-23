@@ -93,13 +93,12 @@ const SpectrogramMesh = ({ dataRef }) => {
         // Update geometry
         const positionsAttribute = meshRef.current.geometry.attributes.position;
         if (positionsAttribute) {
-            for (let i = 0; i < numCols; i++) {
-                for (let j = 0; j < numRows; j++) {
-                    const index = i * numRows + j;
-                    const val = history[index];
-                    // Update Y coordinate
-                    positionsAttribute.setY(index, val);
-                }
+            // Optimization: Direct array access avoids method call overhead
+            const positions = positionsAttribute.array;
+            const count = numCols * numRows;
+
+            for (let k = 0; k < count; k++) {
+                positions[k * 3 + 1] = history[k];
             }
             positionsAttribute.needsUpdate = true;
         }
@@ -113,22 +112,32 @@ const SpectrogramMesh = ({ dataRef }) => {
         }
 
         if (colorsAttribute) {
-            const colors = colorsAttribute;
-            for (let i = 0; i < numCols; i++) {
-                for (let j = 0; j < numRows; j++) {
-                    const index = i * numRows + j;
-                    const val = history[index];
+            const colors = colorsAttribute.array;
 
-                    // Color map: Blue -> Purple -> Red -> Yellow
-                    const t = Math.min(1, val / 2); // Normalize somewhat
+            // Optimization: Shift existing colors to avoid recalculating 98% of the grid
+            // Shift by numRows * 3 (since itemSize is 3)
+            colors.copyWithin(0, numRows * 3);
 
-                    // Optimization: Reuse tempColor object to avoid creating 4096 objects per frame
-                    tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
+            // Update only the new column (last column)
+            const i = numCols - 1;
+            const offset = i * numRows;
 
-                    colors.setXYZ(index, tempColor.r, tempColor.g, tempColor.b);
-                }
+            for (let j = 0; j < numRows; j++) {
+                const index = offset + j;
+                const val = history[index];
+
+                // Color map: Blue -> Purple -> Red -> Yellow
+                const t = Math.min(1, val / 2); // Normalize somewhat
+
+                // Optimization: Reuse tempColor object
+                tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
+
+                // Write directly to TypedArray
+                colors[index * 3] = tempColor.r;
+                colors[index * 3 + 1] = tempColor.g;
+                colors[index * 3 + 2] = tempColor.b;
             }
-            colors.needsUpdate = true;
+            colorsAttribute.needsUpdate = true;
         }
     });
 
