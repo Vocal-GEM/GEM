@@ -1,4 +1,5 @@
 /**
+ * ResearchMode.js
  * Research Mode Controller
  * Manages clinical trials, research studies, and participant data collection
  */
@@ -59,7 +60,13 @@ export class ResearchModeController {
      */
     generateParticipantId(userId) {
         // Use cryptographic hash with study-specific salt
-        const salt = this.studyId + process.env.REACT_APP_RESEARCH_SALT;
+        // Safe access to process.env for Vite/CRA compatibility
+        // eslint-disable-next-line no-undef
+        const researchSalt = (typeof process !== 'undefined' && process.env && process.env.REACT_APP_RESEARCH_SALT) ||
+                             (import.meta && import.meta.env && import.meta.env.VITE_RESEARCH_SALT) ||
+                             'default-salt-DO-NOT-USE-IN-PROD';
+
+        const salt = this.studyId + researchSalt;
         const hash = CryptoJS.SHA256(userId + salt).toString();
 
         // Take first 16 characters for readability

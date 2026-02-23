@@ -3,12 +3,15 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 export const useTTS = () => {
     const [voices, setVoices] = useState([]);
     const [speaking, setSpeaking] = useState(false);
-    const [supported, setSupported] = useState(true);
+
+    // Check support synchronously during init
+    const [supported, setSupported] = useState(() => !!window.speechSynthesis);
     const synth = useRef(window.speechSynthesis);
 
     useEffect(() => {
         if (!synth.current) {
-            setSupported(false);
+            // Already handled by lazy init, but keep for safety if ref changes (unlikely)
+            if (supported) setSupported(false);
             return;
         }
 
@@ -23,7 +26,7 @@ export const useTTS = () => {
         if (synth.current.onvoiceschanged !== undefined) {
             synth.current.onvoiceschanged = loadVoices;
         }
-    }, []);
+    }, [supported]);
 
     const getBestVoice = useCallback((gender) => {
         if (voices.length === 0) return null;

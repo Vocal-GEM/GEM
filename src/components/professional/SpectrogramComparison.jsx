@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AudioWaveform from '../ui/AudioWaveform';
-import { Upload, Play, Pause, ZoomIn, ZoomOut } from 'lucide-react';
+import { Upload, Play, ZoomIn, ZoomOut } from 'lucide-react';
 import AudioSourceManager from './AudioSourceManager';
 
 const SpectrogramComparison = () => {
@@ -9,9 +9,14 @@ const SpectrogramComparison = () => {
     const [audioFile2, setAudioFile2] = useState(null);
     const [audioUrl2, setAudioUrl2] = useState(null);
 
-    const [isPlaying, setIsPlaying] = useState(false);
+    // Unused state removed: isPlaying
     const [zoomLevel, setZoomLevel] = useState(1);
-    const [deviceId, setDeviceId] = useState('');
+    // Unused state removed: deviceId (passed directly via AudioSourceManager prop if needed, but not used in component logic yet)
+
+    // Using a callback for deviceId if we need it later
+    const handleDeviceChange = (id) => {
+        console.log("Active device:", id);
+    };
 
     const handleFileUpload = (e, index) => {
         const file = e.target.files[0];
@@ -43,7 +48,7 @@ const SpectrogramComparison = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left Panel: Configuration */}
                 <div className="space-y-6">
-                    <AudioSourceManager onSourceChange={setDeviceId} />
+                    <AudioSourceManager onSourceChange={handleDeviceChange} />
 
                     <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
                         <h3 className="font-semibold mb-4 text-slate-200">Recording A (Reference)</h3>

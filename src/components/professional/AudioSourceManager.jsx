@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
 
 const AudioSourceManager = ({ onSourceChange }) => {
@@ -6,11 +6,41 @@ const AudioSourceManager = ({ onSourceChange }) => {
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [permissionGranted, setPermissionGranted] = useState(false);
 
-    useEffect(() => {
-        checkPermissionAndEnumerate();
-    }, []);
+    const enumerateDevices = useCallback(async () => {
+        try {
+            const allDevices = await navigator.mediaDevices.enumerateDevices();
+            const audioInputs = allDevices.filter(device => device.kind === 'audioinput');
+            setDevices(audioInputs);
 
-    const checkPermissionAndEnumerate = async () => {
+            // Auto-select first if none selected
+            // We use functional update to check latest state or ref, but here since we depend on deviceId logic:
+            // Since we are in an effect/callback chain, let's rely on effect to sync if needed
+            // But here we want to set default ONLY if not set.
+            // Using a ref for current selection might be cleaner but let's stick to state for now
+            // and assume re-render is fine.
+            // Actually, we can check state inside setState callback? No, that's for update.
+            // Let's just set it.
+
+            // To avoid closure staleness on selectedDeviceId, we can check a ref or just update.
+            // Or better, let the parent handle selection?
+            // For now:
+            if (audioInputs.length > 0) {
+                // If we don't have a selection, or if selection is no longer valid?
+                // For now just auto select first if empty.
+                setSelectedDeviceId(prev => {
+                    if (!prev) {
+                        onSourceChange?.(audioInputs[0].deviceId);
+                        return audioInputs[0].deviceId;
+                    }
+                    return prev;
+                });
+            }
+        } catch (err) {
+            console.error("Error enumerating devices:", err);
+        }
+    }, [onSourceChange]);
+
+    const checkPermissionAndEnumerate = useCallback(async () => {
         try {
             // Must request permission first to get labels
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -27,23 +57,18 @@ const AudioSourceManager = ({ onSourceChange }) => {
             console.error("Microphone permission denied:", err);
             setPermissionGranted(false);
         }
-    };
+    }, [enumerateDevices]);
 
-    const enumerateDevices = async () => {
-        try {
-            const allDevices = await navigator.mediaDevices.enumerateDevices();
-            const audioInputs = allDevices.filter(device => device.kind === 'audioinput');
-            setDevices(audioInputs);
+    useEffect(() => {
+        checkPermissionAndEnumerate();
 
-            // Auto-select first if none selected
-            if (audioInputs.length > 0 && !selectedDeviceId) {
-                setSelectedDeviceId(audioInputs[0].deviceId);
-                onSourceChange?.(audioInputs[0].deviceId);
+        // Cleanup listener
+        return () => {
+            if (navigator.mediaDevices) {
+                navigator.mediaDevices.ondevicechange = null;
             }
-        } catch (err) {
-            console.error("Error enumerating devices:", err);
-        }
-    };
+        };
+    }, [checkPermissionAndEnumerate]);
 
     const handleDeviceChange = (e) => {
         const deviceId = e.target.value;

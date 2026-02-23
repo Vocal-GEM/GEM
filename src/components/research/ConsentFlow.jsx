@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
 
 const ConsentFlow = ({ study, onComplete, onCancel }) => {
+    // eslint-disable-next-line no-unused-vars
     const [step, setStep] = useState(0);
     const [signature, setSignature] = useState('');
     const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);

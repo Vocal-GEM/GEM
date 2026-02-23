@@ -8,14 +8,16 @@ export const useTour = () => useContext(TourContext);
 export const TourProvider = ({ children }) => {
     const [activeTour, setActiveTour] = useState(null);
     const [currentStep, setCurrentStep] = useState(0);
-    const [completedTours, setCompletedTours] = useState([]);
-
-    useEffect(() => {
-        const saved = localStorage.getItem('gem_completed_tours');
-        if (saved) {
-            setCompletedTours(JSON.parse(saved));
+    // Initialize state lazily to avoid useEffect setState on mount
+    const [completedTours, setCompletedTours] = useState(() => {
+        try {
+            const saved = localStorage.getItem('gem_completed_tours');
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            console.error("Failed to load tours:", e);
+            return [];
         }
-    }, []);
+    });
 
     const startTour = useCallback((tourId, force = false) => {
         if (!TOURS[tourId]) {

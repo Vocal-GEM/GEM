@@ -20,8 +20,10 @@ export const useFeedback = (audioEngineRef, dataRef, config = {}) => {
     // Store latest configuration in a ref to avoid restarting the interval on every render
     const configRef = useRef({ metric, target, targetFreq, settings });
 
-    // Update refs on every render
-    configRef.current = { metric, target, targetFreq, settings };
+    // Update refs in useEffect
+    useEffect(() => {
+        configRef.current = { metric, target, targetFreq, settings };
+    }, [metric, target, targetFreq, settings]);
 
     useEffect(() => {
         const checkFeedback = () => {

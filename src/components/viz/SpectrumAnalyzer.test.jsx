@@ -24,7 +24,7 @@ vi.mock('../../utils/lpcAnalysis', () => ({
 }));
 
 // Mock ResizeObserver
-global.ResizeObserver = vi.fn(function() {
+globalThis.ResizeObserver = vi.fn(function() {
   this.observe = vi.fn();
   this.unobserve = vi.fn();
   this.disconnect = vi.fn();
@@ -79,6 +79,6 @@ describe('SpectrumAnalyzer', () => {
     render(<SpectrumAnalyzer dataRef={dataRef} />);
     // Initial verification for dynamic import would be hard,
     // but once we switch to static import, we expect this:
-    // expect(renderCoordinator.subscribe).toHaveBeenCalled();
+    expect(renderCoordinator.subscribe).toHaveBeenCalled();
   });
 });
