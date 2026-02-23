@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -268,7 +268,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                 note: hzToNote(frequency)
             });
         }
-    }, []);
+    }, [dataRef]);
 
     /**
      * Take high-quality screenshot of spectrogram
