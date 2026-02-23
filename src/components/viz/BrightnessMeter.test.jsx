@@ -13,17 +13,25 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+vi.mock('lucide-react', async () => {
+    // We can't use require here in ESM
+    // Just return a simple functional component for icons
+    const IconMock = (props) => <div {...props} data-testid={props['data-testid'] || 'icon'} />;
 
     return {
-        Sun: createIcon('Sun'),
-        Moon: createIcon('Moon'),
-        Info: createIcon('Info'),
-        Smile: createIcon('Smile')
+        Sun: (props) => <IconMock {...props} data-testid="Sun" />,
+        Moon: (props) => <IconMock {...props} data-testid="Moon" />,
+        Info: (props) => <IconMock {...props} data-testid="Info" />,
+        Smile: (props) => <IconMock {...props} data-testid="Smile" />,
+        // Add others if needed
+        Wind: (props) => <IconMock {...props} data-testid="Wind" />,
+        CheckCircle2: (props) => <IconMock {...props} data-testid="CheckCircle2" />,
+        AlertTriangle: (props) => <IconMock {...props} data-testid="AlertTriangle" />
     };
 });
+
+// Explicit display name for the component to satisfy eslint
+BrightnessMeter.displayName = 'BrightnessMeter';
 
 describe('BrightnessMeter', () => {
     let dataRef;

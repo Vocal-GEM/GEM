@@ -24,11 +24,19 @@ vi.mock('../../utils/lpcAnalysis', () => ({
 }));
 
 // Mock ResizeObserver
-global.ResizeObserver = vi.fn(function() {
+const MockResizeObserver = vi.fn(function() {
   this.observe = vi.fn();
   this.unobserve = vi.fn();
   this.disconnect = vi.fn();
 });
+
+if (typeof globalThis !== 'undefined') {
+    globalThis.ResizeObserver = MockResizeObserver;
+} else if (typeof window !== 'undefined') {
+    window.ResizeObserver = MockResizeObserver;
+} else {
+    global.ResizeObserver = MockResizeObserver;
+}
 
 // Mock Canvas getContext
 const mockContext = {
@@ -77,8 +85,6 @@ describe('SpectrumAnalyzer', () => {
 
   it('subscribes to coordinator', async () => {
     render(<SpectrumAnalyzer dataRef={dataRef} />);
-    // Initial verification for dynamic import would be hard,
-    // but once we switch to static import, we expect this:
-    // expect(renderCoordinator.subscribe).toHaveBeenCalled();
+    expect(renderCoordinator.subscribe).toHaveBeenCalled();
   });
 });
