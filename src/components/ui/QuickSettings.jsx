@@ -1,25 +1,46 @@
 
 import { X, Moon, Sun, Zap, Eye, EyeOff } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
+import { useEffect } from 'react';
 
 const QuickSettings = ({ isOpen, onClose }) => {
     const { settings, updateSettings } = useSettings();
 
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape' && isOpen) {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
+
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[60] flex justify-end">
+        <div
+            className="fixed inset-0 z-[60] flex justify-end"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="quick-settings-title"
+        >
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
                 onClick={onClose}
+                aria-hidden="true"
             />
 
             {/* Panel */}
             <div className="relative w-80 h-full bg-slate-900 border-l border-white/10 shadow-2xl p-6 animate-in slide-in-from-right duration-300 flex flex-col">
                 <div className="flex justify-between items-center mb-8">
-                    <h2 className="text-xl font-bold text-white">Quick Settings</h2>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                    <h2 id="quick-settings-title" className="text-xl font-bold text-white">Quick Settings</h2>
+                    <button
+                        onClick={onClose}
+                        aria-label="Close settings"
+                        className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
+                    >
                         <X size={20} />
                     </button>
                 </div>
@@ -31,15 +52,17 @@ const QuickSettings = ({ isOpen, onClose }) => {
                         <div className="grid grid-cols-2 gap-2">
                             <button
                                 onClick={() => updateSettings({ ...settings, theme: 'dark' })}
+                                aria-pressed={settings.theme === 'dark'}
                                 className={`p-3 rounded-xl border flex items-center justify-center gap-2 transition-all ${settings.theme === 'dark' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'}`}
                             >
-                                <Moon size={18} /> Dark
+                                <Moon size={18} aria-hidden="true" /> Dark
                             </button>
                             <button
                                 onClick={() => updateSettings({ ...settings, theme: 'light' })}
+                                aria-pressed={settings.theme === 'light'}
                                 className={`p-3 rounded-xl border flex items-center justify-center gap-2 transition-all ${settings.theme === 'light' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'}`}
                             >
-                                <Sun size={18} /> Light
+                                <Sun size={18} aria-hidden="true" /> Light
                             </button>
                         </div>
                     </div>
@@ -49,19 +72,21 @@ const QuickSettings = ({ isOpen, onClose }) => {
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Audio</label>
                         <div className="space-y-2">
                             <button
+                                role="switch"
+                                aria-checked={settings.listenMode}
                                 onClick={() => updateSettings({ ...settings, listenMode: !settings.listenMode })}
                                 className={`w-full p-3 rounded-xl border text-left flex items-center justify-between transition-all ${settings.listenMode ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'}`}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className={`p-2 rounded-lg ${settings.listenMode ? 'bg-white/20' : 'bg-slate-700'}`}>
-                                        <Zap size={16} className={settings.listenMode ? 'text-white' : 'text-slate-400'} />
+                                        <Zap size={16} className={settings.listenMode ? 'text-white' : 'text-slate-400'} aria-hidden="true" />
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="font-medium">Listen Mode</span>
                                         <span className="text-[10px] opacity-70">Hear yourself (Use headphones!)</span>
                                     </div>
                                 </div>
-                                <div className={`w-10 h-5 rounded-full relative transition-colors ${settings.listenMode ? 'bg-white/30' : 'bg-slate-700'}`}>
+                                <div className={`w-10 h-5 rounded-full relative transition-colors ${settings.listenMode ? 'bg-white/30' : 'bg-slate-700'}`} aria-hidden="true">
                                     <div className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${settings.listenMode ? 'left-6' : 'left-1'}`} />
                                 </div>
                             </button>
@@ -76,10 +101,11 @@ const QuickSettings = ({ isOpen, onClose }) => {
                                 <button
                                     key={mode}
                                     onClick={() => updateSettings({ ...settings, performanceMode: mode })}
+                                    aria-pressed={settings.performanceMode === mode}
                                     className={`p-3 rounded-xl border text-left flex items-center justify-between transition-all ${settings.performanceMode === mode ? 'bg-blue-600/20 border-blue-500/50 text-blue-400' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'}`}
                                 >
                                     <span className="capitalize font-medium">{mode} Power</span>
-                                    {settings.performanceMode === mode && <Zap size={16} />}
+                                    {settings.performanceMode === mode && <Zap size={16} aria-hidden="true" />}
                                 </button>
                             ))}
                         </div>
@@ -92,11 +118,13 @@ const QuickSettings = ({ isOpen, onClose }) => {
                     <div className="space-y-3">
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Privacy</label>
                         <button
+                            role="switch"
+                            aria-checked={settings.analyticsEnabled}
                             onClick={() => updateSettings({ ...settings, analyticsEnabled: !settings.analyticsEnabled })}
                             className={`w-full p-3 rounded-xl border text-left flex items-center justify-between transition-all ${settings.analyticsEnabled ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'}`}
                         >
                             <span className="font-medium">Share Usage Data</span>
-                            {settings.analyticsEnabled ? <Eye size={16} /> : <EyeOff size={16} />}
+                            {settings.analyticsEnabled ? <Eye size={16} aria-hidden="true" /> : <EyeOff size={16} aria-hidden="true" />}
                         </button>
                     </div>
                 </div>

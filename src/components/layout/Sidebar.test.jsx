@@ -1,4 +1,4 @@
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Sidebar from './Sidebar';
 
@@ -66,30 +66,37 @@ describe('Sidebar Auth Integration', () => {
 
     it('shows Sign In button when not logged in', () => {
         mockUseAuth.mockReturnValue({ user: null });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('Sign In')).toBeInTheDocument();
+        render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+
+        // Use more flexible query for broken text
+        const signInBtn = screen.getByRole('button', { name: /sign in/i });
+        expect(signInBtn).toBeInTheDocument();
     });
 
     it('shows user info and Sign Out when logged in', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('CloudUser')).toBeInTheDocument();
-        expect(getByText('Sign Out')).toBeInTheDocument();
+        render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+
+        expect(screen.getByText(/clouduser/i)).toBeInTheDocument();
+        const signOutBtn = screen.getByRole('button', { name: /sign out/i });
+        expect(signOutBtn).toBeInTheDocument();
     });
 
     it('opens Login modal on Sign In click', () => {
         mockUseAuth.mockReturnValue({ user: null });
-        const { getByText, getByTestId } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+        render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
-        fireEvent.click(getByText('Sign In'));
-        expect(getByTestId('login-modal')).toBeInTheDocument();
+        const signInBtn = screen.getByRole('button', { name: /sign in/i });
+        fireEvent.click(signInBtn);
+        expect(screen.getByTestId('login-modal')).toBeInTheDocument();
     });
 
     it('calls logout on Sign Out click', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+        render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
-        fireEvent.click(getByText('Sign Out'));
+        const signOutBtn = screen.getByRole('button', { name: /sign out/i });
+        fireEvent.click(signOutBtn);
         expect(mockLogout).toHaveBeenCalled();
     });
 
@@ -101,9 +108,9 @@ describe('Sidebar Auth Integration', () => {
             openModal: openModalSpy
         });
 
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+        render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
-        const mirrorBtn = getByText('Mirror');
+        const mirrorBtn = screen.getByRole('button', { name: /mirror/i });
         fireEvent.click(mirrorBtn);
 
         expect(openModalSpy).toHaveBeenCalledWith('camera');

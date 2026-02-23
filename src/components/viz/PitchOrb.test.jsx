@@ -30,7 +30,16 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+// Use globalThis or window instead of global
+if (typeof globalThis !== 'undefined') {
+    globalThis.requestAnimationFrame = mockRequestAnimationFrame;
+} else if (typeof window !== 'undefined') {
+    window.requestAnimationFrame = mockRequestAnimationFrame;
+} else {
+    // Fallback for node environment if needed, though jsdom should provide window
+    // eslint-disable-next-line no-undef
+    global.requestAnimationFrame = mockRequestAnimationFrame;
+}
 
 describe('PitchOrb', () => {
     let dataRef;
