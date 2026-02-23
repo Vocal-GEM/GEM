@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import { RotateCcw } from 'lucide-react';
 
 const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
@@ -17,7 +17,7 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
     const MAX_FREQ_DEFAULT = 400;
 
     // Helper to get current bounds
-    const getBounds = () => {
+    const bounds = useMemo(() => {
         if (zoom) return zoom;
         return {
             tMin: 0,
@@ -25,9 +25,7 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
             fMin: MIN_FREQ_DEFAULT,
             fMax: MAX_FREQ_DEFAULT
         };
-    };
-
-    const bounds = getBounds();
+    }, [zoom, duration]);
 
     // Coordinate Transforms
     const getPointFromEvent = (e) => {
@@ -105,15 +103,18 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
         // Filter and Draw Segments
         // We only draw lines if they are visible or crossing the view
 
-        ctx.beginPath();
-        let isDrawing = false;
+        // Optimization: Batch segments by color to reduce draw calls
+        const paths = {
+            '#ef4444': [], // Red
+            '#4ade80': [], // Green
+            '#facc15': []  // Yellow
+        };
 
         for (let i = 1; i < data.length; i++) {
             const p1 = data[i - 1];
             const p2 = data[i];
 
             if (!p1.frequency || !p2.frequency) {
-                isDrawing = false;
                 continue;
             }
 
@@ -139,17 +140,20 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
                 }
             }
 
-            // Because we want per-segment coloring, we must stroke each segment individually
-            // or batch them by color. For simplicity/correctness of gradient transition 
-            // in this specific "color by target" logic, stroking individually is easiest 
-            // though less performant. Given data size (~seconds of audio), it's fine.
+            paths[color].push({ x1, y1, x2, y2 });
+        }
 
+        // Batch Draw
+        Object.entries(paths).forEach(([color, segments]) => {
+            if (segments.length === 0) return;
             ctx.strokeStyle = color;
             ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
+            segments.forEach(({ x1, y1, x2, y2 }) => {
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+            });
             ctx.stroke();
-        }
+        });
 
         // Draw Playback Cursor
         if (currentTime !== undefined) {
@@ -181,7 +185,7 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
             ctx.strokeRect(x, y, w, h);
         }
 
-    }, [data, targetRange, currentTime, duration, zoom, selection]);
+    }, [data, targetRange, currentTime, bounds, selection]);
 
 
     // Interaction Handlers
