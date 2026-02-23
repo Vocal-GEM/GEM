@@ -1,6 +1,6 @@
 import { render, cleanup, waitFor, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import React from 'react';
+
 import ResonanceMetrics from './ResonanceMetrics';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 

@@ -8,7 +8,7 @@
  * Reference: da Cruz Martinho et al. (2024)
  */
 
-import React from 'react';
+
 import PropTypes from 'prop-types';
 
 const CONTEXTS = [
