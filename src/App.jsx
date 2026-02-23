@@ -63,6 +63,7 @@ import { useAchievements } from './hooks/useAchievements';
 
 import { TourProvider } from './context/TourContext';
 import TourOverlay from './components/ui/TourOverlay';
+import QuickActions from './components/ui/QuickActions';
 
 import CommandPalette from './components/ui/CommandPalette';
 import AnalyticsDashboard from './components/ui/AnalyticsDashboard';
@@ -457,7 +458,7 @@ const App = () => {
 
                         <TourOverlay />
                         <CommandPalette />
-                        <CommandPalette />
+                        <QuickActions onAction={setActiveTab} />
                         <QuickSettings isOpen={false} onClose={() => { }} />
                         {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
                         {modals.analytics && <AnalyticsDashboard onClose={() => closeModal('analytics')} />}
