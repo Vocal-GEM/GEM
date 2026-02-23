@@ -37,7 +37,7 @@ class PitchProcessor extends AudioWorkletProcessor {
     }
 
     process(inputs, outputs, parameters) {
-        // eslint-disable-next-line no-undef
+        /* global currentTime */
         const currentTime = globalThis.currentTime;
 
         const input = inputs[0];
