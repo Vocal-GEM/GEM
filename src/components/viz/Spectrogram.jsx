@@ -47,15 +47,15 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     if (!historyMetaRef.current) {
         historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
     }
-
-    if (!historyMetaRef.current) {
-        historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
-    }
     const historyHeadRef = useRef(0); // Points to the next write position (frame index)
 
     useEffect(() => {
         historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
     }, []);
+
+    // Optimization: Pre-calculated bin index map to avoid per-pixel frequency calculations
+    const binMapRef = useRef(null);
+    const lastMapParamsRef = useRef({ height: 0, maxBin: 0 });
 
     // Spectrogram State
     const speed = 2; // Pixels per frame
@@ -131,6 +131,21 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             const imageData = canvas.imageDataRef;
             const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
 
+            // Optimization: Update bin map if dimensions changed
+            if (!binMapRef.current ||
+                lastMapParamsRef.current.height !== h ||
+                lastMapParamsRef.current.maxBin !== maxBin) {
+
+                binMapRef.current = new Int32Array(h);
+                for (let y = 0; y < h; y++) {
+                    const freqRatio = 1 - (y / h);
+                    binMapRef.current[y] = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                }
+                lastMapParamsRef.current = { height: h, maxBin };
+            }
+
+            const binMap = binMapRef.current;
+
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
             // We map pixels (y) to frequency bins.
             for (let y = 0; y < h; y++) {
@@ -138,11 +153,8 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                 // y=0 is top (high freq), y=h is bottom (low freq)
                 // Bin mapping: 0 -> maxBin (low -> high)
 
-                // Linear mapping matches the original code: y = h - (i / maxBin) * h
-                // So i / maxBin = (h - y) / h = 1 - y/h
-
-                const freqRatio = 1 - (y / h);
-                const binIndex = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                // Optimization: Use pre-calculated bin index
+                const binIndex = binMap[y];
 
                 // Get intensity from spectrum
                 const value = spectrum[binIndex] || 0;
