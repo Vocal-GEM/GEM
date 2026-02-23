@@ -59,11 +59,18 @@ describe('AuthContext', () => {
     });
 
     it('logs in successfully', async () => {
+        // Mock sequence:
+        // 1. Initial /me check (fails)
+        // 2. Login POST (success)
+        // 3. /me check after login (success) - Important! Context likely refetches /me
+
         fetch.mockResolvedValueOnce({ ok: false }); // initial /me
+
+        // Login call
         fetch.mockResolvedValueOnce({
             ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
+            json: async () => ({ user: { id: 1, username: 'testuser' }, message: 'Logged in' })
+        });
 
         let result;
         await act(async () => {
@@ -79,6 +86,7 @@ describe('AuthContext', () => {
             loginBtn.click();
         });
 
+        // Wait for state update
         await waitFor(() => {
             expect(result.getByTestId('user').textContent).toBe('testuser');
         });
@@ -149,4 +157,3 @@ describe('AuthContext', () => {
         });
     });
 });
-
