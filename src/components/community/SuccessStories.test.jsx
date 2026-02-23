@@ -46,7 +46,15 @@ const MockAudio = vi.fn(function(src) {
     return new MockAudioImplementation(src);
 });
 
-global.Audio = MockAudio;
+// Use globalThis or window for compatibility
+if (typeof globalThis !== 'undefined') {
+    globalThis.Audio = MockAudio;
+} else if (typeof window !== 'undefined') {
+    window.Audio = MockAudio;
+} else {
+    // eslint-disable-next-line no-undef
+    global.Audio = MockAudio;
+}
 
 describe('SuccessStories Optimization Verification', () => {
     beforeEach(() => {

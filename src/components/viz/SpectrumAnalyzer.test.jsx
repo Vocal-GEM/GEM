@@ -35,6 +35,7 @@ if (typeof globalThis !== 'undefined') {
 } else if (typeof window !== 'undefined') {
     window.ResizeObserver = MockResizeObserver;
 } else {
+    // eslint-disable-next-line no-undef
     global.ResizeObserver = MockResizeObserver;
 }
 

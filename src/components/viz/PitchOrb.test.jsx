@@ -37,6 +37,7 @@ if (typeof globalThis !== 'undefined') {
     window.requestAnimationFrame = mockRequestAnimationFrame;
 } else {
     // Fallback for node environment if needed, though jsdom should provide window
+    // eslint-disable-next-line no-undef
     global.requestAnimationFrame = mockRequestAnimationFrame;
 }
 
