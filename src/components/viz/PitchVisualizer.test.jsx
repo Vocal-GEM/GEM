@@ -2,7 +2,6 @@ import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import PitchVisualizer from './PitchVisualizer';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import React from 'react';
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
@@ -117,7 +116,7 @@ describe('PitchVisualizer', () => {
     };
 
     // Mock ResizeObserver
-    global.ResizeObserver = class {
+    globalThis.ResizeObserver = class {
       observe() {}
       disconnect() {}
     };
