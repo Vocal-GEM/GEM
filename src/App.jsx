@@ -49,7 +49,6 @@ const PracticeCardsPanel = lazy(() => import('./components/ui/PracticeCardsPanel
 const ProgramView = lazy(() => import('./components/views/ProgramView'));
 
 // Lazy Loaded Components - Visualizations
-// Lazy Loaded Components - Visualizations
 
 import FeedbackSettings from './components/ui/FeedbackSettings';
 import FeedbackModal from './components/ui/FeedbackModal';
@@ -456,8 +455,6 @@ const App = () => {
                         {showAssessment && <AssessmentModule onClose={() => setShowAssessment(false)} />}
                         {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}
 
-                        <TourOverlay />
-                        <CommandPalette />
                         <CommandPalette />
                         <QuickSettings isOpen={false} onClose={() => { }} />
                         {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
@@ -499,7 +496,6 @@ const App = () => {
                 onClose={closeAchievement}
             />
             <TourOverlay />
-            <ErrorRecovery />
             {showIntake && (
                 <IntakeQuestionnaire
                     onComplete={() => {
