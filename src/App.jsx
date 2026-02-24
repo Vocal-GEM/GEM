@@ -71,6 +71,7 @@ import { analyticsService } from './services/AnalyticsService';
 import { useVoiceProfile } from './context/VoiceProfileContext';
 import IntakeQuestionnaire from './components/ui/IntakeQuestionnaire';
 import Breadcrumbs from './components/ui/Breadcrumbs';
+import QuickActions from './components/ui/QuickActions';
 
 // VoiceTwinDiscovery is not used in App directly, it's a widget in Dashboard
 // But if we want it accessible elsewhere we can import it. 
@@ -477,6 +478,12 @@ const App = () => {
                                 <PracticeCardsPanel onClose={() => closeModal('practiceCards')} />
                             </Suspense>
                         )}
+                        <QuickActions onAction={(action) => {
+                            if (action === 'practice') setActiveTab('practice');
+                            if (action === 'journal') setActiveTab('journal');
+                            if (action === 'warmup') openModal('warmup');
+                            if (action === 'coach') openModal('feedback');
+                        }} />
                     </main>
 
                     {/* Mobile Bottom Navigation */}
