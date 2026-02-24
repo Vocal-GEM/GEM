@@ -40,33 +40,6 @@ const QualityVisualizer = ({ dataRef }) => {
             shimmer: data.shimmer || 0,
             weight: data.weight || 50
         });
-    useEffect(() => {
-        const loop = () => {
-            if (!dataRef.current) return;
-            const data = dataRef.current;
-
-            // Update local state
-            // Jitter/Shimmer are often small values (e.g. 0.01), we might want to scale them for display
-            // Jitter > 0.01 (1%) is often considered rough
-            // Shimmer > 0.35 dB (or 3-4%) is often considered rough. 
-            // Assuming the engine returns raw values.
-
-            setMetrics({
-                jitter: data.jitter || 0,
-                shimmer: data.shimmer || 0,
-                weight: data.weight || 50
-            });
-
-            // Update history
-            ['jitter', 'shimmer', 'weight'].forEach(key => {
-                historyRef.current[key].push(data[key] || 0);
-                if (historyRef.current[key].length > maxHistory) {
-                    historyRef.current[key].shift();
-                }
-            });
-
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
 
         // Update history
         ['jitter', 'shimmer', 'weight'].forEach(key => {
@@ -76,7 +49,7 @@ const QualityVisualizer = ({ dataRef }) => {
             }
         });
 
-        // REMOVED: requestAnimationFrame(loop) - handled by renderCoordinator
+        // No recursive requestAnimationFrame - RenderCoordinator handles this
     }, [dataRef]);
 
     useEffect(() => {
@@ -118,26 +91,25 @@ const QualityVisualizer = ({ dataRef }) => {
         );
     };
 
-    // Helper for status labels
+    // Helper for status labels (moved out or kept simple)
     const getStatus = (type, val) => {
+        let status = { label: '-', color: 'text-slate-400' };
         if (type === 'jitter') {
             // Thresholds for Jitter (approximate for visual feedback)
-            if (val < 0.004) return { label: 'Stable', color: 'text-emerald-400' };
-            if (val < 0.01) return { label: 'Normal', color: 'text-blue-400' };
-            return { label: 'Rough', color: 'text-orange-400' };
-        }
-        if (type === 'shimmer') {
+            if (val < 0.004) status = { label: 'Stable', color: 'text-emerald-400' };
+            else if (val < 0.01) status = { label: 'Normal', color: 'text-blue-400' };
+            else status = { label: 'Rough', color: 'text-orange-400' };
+        } else if (type === 'shimmer') {
             // Thresholds for Shimmer
-            if (val < 0.15) return { label: 'Stable', color: 'text-emerald-400' };
-            if (val < 0.35) return { label: 'Normal', color: 'text-blue-400' };
-            return { label: 'Breathy/Rough', color: 'text-orange-400' };
+            if (val < 0.15) status = { label: 'Stable', color: 'text-emerald-400' };
+            else if (val < 0.35) status = { label: 'Normal', color: 'text-blue-400' };
+            else status = { label: 'Breathy/Rough', color: 'text-orange-400' };
+        } else if (type === 'weight') {
+            if (val < 30) status = { label: 'Breathy', color: 'text-cyan-400' };
+            else if (val > 70) status = { label: 'Pressed', color: 'text-orange-400' };
+            else status = { label: 'Balanced', color: 'text-emerald-400' };
         }
-        if (type === 'weight') {
-            if (val < 30) return { label: 'Breathy', color: 'text-cyan-400' };
-            if (val > 70) return { label: 'Pressed', color: 'text-orange-400' };
-            return { label: 'Balanced', color: 'text-emerald-400' };
-        }
-        return { label: '-', color: 'text-slate-400' };
+        return status;
     };
 
     return (

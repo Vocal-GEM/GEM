@@ -1,4 +1,3 @@
-from flask import Blueprint, request, jsonify, send_file, after_this_request
 from flask import Blueprint, request, jsonify, send_file, after_this_request, current_app
 import os
 import tempfile
@@ -32,12 +31,13 @@ def analyze():
 
     include_transcript = request.form.get("include_transcript", "false").lower() == "true"
 
-    # Save to temp file
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-        tmp_path = tmp.name
-        file.save(tmp_path)
-
+    tmp_path = None
     try:
+        # Save to temp file
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+            tmp_path = tmp.name
+            file.save(tmp_path)
+
         if include_transcript:
             result = analyze_file_with_transcript(
                 tmp_path,
@@ -47,15 +47,19 @@ def analyze():
             )
         else:
             result = analyze_file(tmp_path, goal_name=goal_name)
+
+        return jsonify(result)
+
     except Exception as e:
         # Security: Do not expose internal error details to client
-        print(f"Voice quality analysis error: {e}")
+        current_app.logger.error(f"Voice quality analysis error: {e}")
         return jsonify({"error": "An internal error occurred during voice quality analysis."}), 500
     finally:
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
-
-    return jsonify(result)
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except Exception as e:
+                current_app.logger.error(f"Error removing temp file {tmp_path}: {e}")
 
 @voice_quality_bp.route('/api/voice-quality/clean', methods=['POST'])
 @limiter.limit("5 per minute")
@@ -88,12 +92,13 @@ def clean_audio():
         @after_this_request
         def remove_file(response):
             try:
-                if os.path.exists(tmp_path):
+                if tmp_path and os.path.exists(tmp_path):
                     os.remove(tmp_path)
             except Exception as e:
-                print(f"Error removing temp file: {e}")
+                current_app.logger.error(f"Error removing temp file: {e}")
             return response
-        # Schedule cleanup after response
+
+        # Schedule cleanup after response (backup mechanism)
         cleanup_file_after_request(tmp_path)
 
         return send_file(
@@ -104,20 +109,16 @@ def clean_audio():
         )
 
     except Exception as e:
-        print(f"Cleaning error: {e}")
-        # Cleanup on error since after_request might not run or file might exist
-        if 'tmp_path' in locals() and os.path.exists(tmp_path):
-            os.remove(tmp_path)
-        return jsonify({'error': str(e)}), 500
-        # If we failed before send_file, clean up manually
-        # Manual cleanup on error since after_request might not run if we crash before return
+        current_app.logger.error(f"Voice cleaning error: {e}")
+
+        # Cleanup on error since after_request might not run
         if tmp_path and os.path.exists(tmp_path):
             try:
                 os.remove(tmp_path)
-            except:
-                pass
+            except Exception as cleanup_error:
+                current_app.logger.error(f"Cleanup error: {cleanup_error}")
+
         # Security: Do not expose internal error details to client
-        print(f"Voice cleaning error: {e}")
         return jsonify({'error': 'An internal error occurred during audio cleaning.'}), 500
 
 # ----------------------
@@ -167,6 +168,9 @@ def manipulate_file():
         manipulated = manipulate_voice(sound, pitch_shift, formant_shift)
         
         if manipulated is None:
+             # Clean up temp file before returning
+             if tmp_path and os.path.exists(tmp_path):
+                 os.remove(tmp_path)
              return jsonify({"error": "Manipulation failed"}), 500
              
         # Save output
@@ -178,12 +182,11 @@ def manipulate_file():
             try:
                 if processed_path and os.path.exists(processed_path):
                     os.remove(processed_path)
+                if tmp_path and os.path.exists(tmp_path):
+                    os.remove(tmp_path)
             except Exception as e:
-                print(f"Error removing processed file: {e}")
+                current_app.logger.error(f"Error removing files: {e}")
             return response
-        # Schedule cleanup for both files
-        cleanup_file_after_request(tmp_path)
-        cleanup_file_after_request(processed_path)
 
         return send_file(
             processed_path,
@@ -193,39 +196,21 @@ def manipulate_file():
         )
 
     except Exception as e:
-        # If error occurred, clean up processed file too since we won't send it
-        if processed_path and os.path.exists(processed_path):
-             try:
-                os.remove(processed_path)
-             except:
-                pass
-        if tmp_path and os.path.exists(tmp_path):
-             try:
-                os.remove(tmp_path)
-             except:
-                pass
-        return jsonify({'error': str(e)}), 500
-        # Cleanup original temp file
-        # Security: Do not expose internal error details to client
         current_app.logger.error(f"Voice manipulation error: {e}")
-        return jsonify({'error': 'An internal error occurred during voice manipulation.'}), 500
-    finally:
-        # Cleanup original temp file immediately
-        if tmp_path and os.path.exists(tmp_path):
-            os.remove(tmp_path)
-
-        # Cleanup processed file on error
+        # Cleanup on error
         if processed_path and os.path.exists(processed_path):
-            # Only if we're not sending it (which we aren't if we're in the except block)
              try:
                 os.remove(processed_path)
-             except:
-        # Cleanup original temp file immediately (always safe as it's not the one being sent)
+             except Exception as cleanup_error:
+                current_app.logger.error(f"Cleanup error (processed): {cleanup_error}")
         if tmp_path and os.path.exists(tmp_path):
-            try:
+             try:
                 os.remove(tmp_path)
-            except:
-                pass
+             except Exception as cleanup_error:
+                current_app.logger.error(f"Cleanup error (tmp): {cleanup_error}")
+
+        # Security: Do not expose internal error details to client
+        return jsonify({'error': 'An internal error occurred during voice manipulation.'}), 500
 
 @voice_quality_bp.route('/api/voice-quality/goals', methods=['GET'])
 def get_goals():
