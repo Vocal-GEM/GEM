@@ -7,12 +7,50 @@
  * derived from LPC coefficients provides a smooth representation of the
  * vocal tract transfer function, making it ideal for identifying formants
  * (F1, F2, F3, etc.) independent of the harmonic structure.
+ *
+ * OPTIMIZED: Uses reused buffers and precomputed tables to minimize garbage collection.
  */
 
 export class LPCAnalyzer {
     constructor(order = 12, sampleRate = 48000) {
         this.order = order; // Typically 10-12 for speech at 8-10kHz, maybe higher for 48kHz
         this.sampleRate = sampleRate;
+
+        // Precompute trig tables for spectrum calculation (512 points)
+        this.numSpectrumPoints = 512;
+        this._initTrigTables();
+
+        // Internal buffers (lazy initialized where size depends on input)
+        this._preEmphasisBuffer = null;
+        this._windowBuffer = null;
+        this._hammingWindow = null;
+
+        // Fixed size buffers
+        this._autocorrBuffer = new Float32Array(this.order + 1);
+
+        // Levinson-Durbin buffers
+        this._levinsonA = new Float32Array(this.order + 1);
+        this._levinsonE = new Float32Array(this.order + 1);
+        this._levinsonK = new Float32Array(this.order + 1);
+        this._levinsonAPrev = new Float32Array(this.order + 1);
+
+        // Spectrum buffer
+        this._spectrumBuffer = new Float32Array(this.numSpectrumPoints);
+    }
+
+    _initTrigTables() {
+        this._cosTable = new Float32Array(this.numSpectrumPoints * this.order);
+        this._sinTable = new Float32Array(this.numSpectrumPoints * this.order);
+
+        for (let i = 0; i < this.numSpectrumPoints; i++) {
+            const omega = (Math.PI * i) / (this.numSpectrumPoints - 1); // 0 to Pi
+            for (let k = 0; k < this.order; k++) {
+                const angle = -omega * (k + 1);
+                const idx = i * this.order + k;
+                this._cosTable[idx] = Math.cos(angle);
+                this._sinTable[idx] = Math.sin(angle);
+            }
+        }
     }
 
     /**
@@ -38,23 +76,28 @@ export class LPCAnalyzer {
         // 5. Compute Spectral Envelope (Frequency Response of LPC filter)
         // We evaluate the filter H(z) = G / (1 - sum(a[k] * z^-k))
         // at various frequencies.
-        const envelope = this.computeLPCSpectrum(a, error, 512); // 512 points
+        const envelope = this.computeLPCSpectrum(a, error, this.numSpectrumPoints);
 
         // 6. Find Formants (Roots of the polynomial or Peak picking from envelope)
         // Peak picking from envelope is simpler and often sufficient for visualization
         const formants = this.findPeaks(envelope, this.sampleRate);
 
         return {
-            coefficients: a,
-            envelope,
+            coefficients: a.slice(1), // Return coefficients a1...ap (matching previous API)
+            envelope: Float32Array.from(envelope), // Return copy to be safe
             formants
         };
     }
 
     applyPreEmphasis(signal, coeff = 0.97) {
-        const output = new Float32Array(signal.length);
+        const N = signal.length;
+        if (!this._preEmphasisBuffer || this._preEmphasisBuffer.length !== N) {
+            this._preEmphasisBuffer = new Float32Array(N);
+        }
+        const output = this._preEmphasisBuffer;
+
         output[0] = signal[0];
-        for (let i = 1; i < signal.length; i++) {
+        for (let i = 1; i < N; i++) {
             output[i] = signal[i] - coeff * signal[i - 1];
         }
         return output;
@@ -62,18 +105,28 @@ export class LPCAnalyzer {
 
     applyWindow(signal) {
         const N = signal.length;
-        const output = new Float32Array(N);
+        if (!this._windowBuffer || this._windowBuffer.length !== N) {
+            this._windowBuffer = new Float32Array(N);
+            this._hammingWindow = new Float32Array(N);
+            for (let i = 0; i < N; i++) {
+                // Hamming window
+                this._hammingWindow[i] = 0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (N - 1));
+            }
+        }
+        const output = this._windowBuffer;
+        const w = this._hammingWindow;
+
         for (let i = 0; i < N; i++) {
-            // Hamming window
-            const w = 0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (N - 1));
-            output[i] = signal[i] * w;
+            output[i] = signal[i] * w[i];
         }
         return output;
     }
 
     computeAutocorrelation(signal, order) {
-        const R = new Float32Array(order + 1);
+        // We assume order is consistent with this.order
+        const R = this._autocorrBuffer;
         const N = signal.length;
+
         for (let k = 0; k <= order; k++) {
             let sum = 0;
             for (let i = 0; i < N - k; i++) {
@@ -85,16 +138,15 @@ export class LPCAnalyzer {
     }
 
     levinsonDurbin(R, order) {
-        const a = new Float32Array(order + 1);
-        const E = new Float32Array(order + 1);
+        // Reuse internal buffers
+        const a = this._levinsonA;
+        const E = this._levinsonE;
+        const k_coeff = this._levinsonK;
+        const a_prev = this._levinsonAPrev;
 
         // Initialization
         E[0] = R[0];
         a[0] = 1; // a[0] is always 1
-
-        // Temporary arrays
-        const k_coeff = new Float32Array(order + 1);
-        const a_prev = new Float32Array(order + 1);
 
         for (let i = 1; i <= order; i++) {
             let sum = 0;
@@ -126,7 +178,7 @@ export class LPCAnalyzer {
         // Usually we want the predictor coefficients.
         // Let's stick to the standard definition: A(z) = 1 + sum_{k=1}^p a_k z^{-k}
 
-        return { a: a.slice(1), error: E[order] }; // Return coefficients a1...ap
+        return { a: a, error: E[order] }; // Return full a buffer (a[0]=1, a[1]...a[p])
     }
 
     computeLPCSpectrum(a, error, numPoints) {
@@ -134,23 +186,31 @@ export class LPCAnalyzer {
         // A(z) = 1 + a1*z^-1 + ... + ap*z^-p
         // z = e^(j*omega)
 
-        const magnitude = new Float32Array(numPoints);
+        const magnitude = this._spectrumBuffer;
         const gain = Math.sqrt(error); // Gain G
 
         if (gain < 1e-10) {
-            return new Float32Array(numPoints).fill(-100); // Return low dB floor
+            magnitude.fill(-100); // Return low dB floor
+            return magnitude;
         }
 
-        for (let i = 0; i < numPoints; i++) {
-            const omega = (Math.PI * i) / (numPoints - 1); // 0 to Pi
+        // Using precomputed trig tables
+        // table index: i * order + k
+        // where i is frequency index (0..numPoints-1)
+        // and k is coefficient index (0..order-1) corresponding to a[k+1]
 
+        for (let i = 0; i < numPoints; i++) {
             let real = 1.0;
             let imag = 0.0;
 
-            for (let k = 0; k < a.length; k++) {
-                const angle = -omega * (k + 1);
-                real += a[k] * Math.cos(angle);
-                imag += a[k] * Math.sin(angle);
+            const baseIdx = i * this.order;
+
+            for (let k = 0; k < this.order; k++) {
+                const coeff = a[k + 1]; // Skip a[0]=1
+                const idx = baseIdx + k;
+
+                real += coeff * this._cosTable[idx];
+                imag += coeff * this._sinTable[idx];
             }
 
             const magA = Math.sqrt(real * real + imag * imag);

@@ -40,43 +40,17 @@ const QualityVisualizer = ({ dataRef }) => {
             shimmer: data.shimmer || 0,
             weight: data.weight || 50
         });
-    useEffect(() => {
-        const loop = () => {
-            if (!dataRef.current) return;
-            const data = dataRef.current;
-
-            // Update local state
-            // Jitter/Shimmer are often small values (e.g. 0.01), we might want to scale them for display
-            // Jitter > 0.01 (1%) is often considered rough
-            // Shimmer > 0.35 dB (or 3-4%) is often considered rough. 
-            // Assuming the engine returns raw values.
-
-            setMetrics({
-                jitter: data.jitter || 0,
-                shimmer: data.shimmer || 0,
-                weight: data.weight || 50
-            });
-
-            // Update history
-            ['jitter', 'shimmer', 'weight'].forEach(key => {
-                historyRef.current[key].push(data[key] || 0);
-                if (historyRef.current[key].length > maxHistory) {
-                    historyRef.current[key].shift();
-                }
-            });
-
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
 
         // Update history
         ['jitter', 'shimmer', 'weight'].forEach(key => {
-            historyRef.current[key].push(data[key] || 0);
+            const val = data[key] !== undefined ? data[key] : (key === 'weight' ? 50 : 0);
+            if (!historyRef.current[key]) historyRef.current[key] = [];
+
+            historyRef.current[key].push(val);
             if (historyRef.current[key].length > maxHistory) {
                 historyRef.current[key].shift();
             }
         });
-
-        // REMOVED: requestAnimationFrame(loop) - handled by renderCoordinator
     }, [dataRef]);
 
     useEffect(() => {
@@ -93,26 +67,31 @@ const QualityVisualizer = ({ dataRef }) => {
 
     // Helper to render sparkline
     const renderSparkline = (key, colorClass, _height = 40) => {
-        const data = historyRef.current[key];
+        const data = historyRef.current[key] || [];
         if (data.length < 2) return null;
 
-        const max = Math.max(...data, key === 'weight' ? 100 : 0.05); // Dynamic max or fixed
+        let max = Math.max(...data);
         const min = 0;
+
+        // Ensure reasonable scaling even for small values
+        if (key === 'weight') max = Math.max(max, 100);
+        else max = Math.max(max, 0.05);
 
         const points = data.map((val, i) => {
             const x = (i / (maxHistory - 1)) * 100;
-            const y = 100 - ((val - min) / (max - min)) * 100;
+            // Prevent division by zero if max is 0
+            const range = max - min || 1;
+            const y = 100 - ((val - min) / range) * 100;
             return `${x},${y}`;
         }).join(' ');
 
         return (
-            <svg className="w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <svg className={`w-full h-full overflow-visible ${colorClass}`} viewBox="0 0 100 100" preserveAspectRatio="none">
                 <polyline
                     points={points}
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
-                    className={colorClass}
                 />
             </svg>
         );
@@ -139,6 +118,10 @@ const QualityVisualizer = ({ dataRef }) => {
         }
         return { label: '-', color: 'text-slate-400' };
     };
+
+    const jitterStatus = getStatus('jitter', metrics.jitter);
+    const shimmerStatus = getStatus('shimmer', metrics.shimmer);
+    const weightStatus = getStatus('weight', metrics.weight);
 
     return (
         <div className="h-full flex flex-col p-6">
@@ -173,8 +156,8 @@ const QualityVisualizer = ({ dataRef }) => {
                             <div className="text-3xl font-mono font-bold text-white">
                                 {(metrics.jitter * 100).toFixed(2)}<span className="text-sm text-slate-500 ml-1">%</span>
                             </div>
-                            <div className={`text-sm font-bold uppercase ${getStatus('jitter', metrics.jitter).color}`}>
-                                {getStatus('jitter', metrics.jitter).label}
+                            <div className={`text-sm font-bold uppercase ${jitterStatus.color}`}>
+                                {jitterStatus.label}
                             </div>
                         </div>
                     </div>
@@ -203,8 +186,8 @@ const QualityVisualizer = ({ dataRef }) => {
                             <div className="text-3xl font-mono font-bold text-white">
                                 {metrics.shimmer.toFixed(2)}<span className="text-sm text-slate-500 ml-1">dB</span>
                             </div>
-                            <div className={`text-sm font-bold uppercase ${getStatus('shimmer', metrics.shimmer).color}`}>
-                                {getStatus('shimmer', metrics.shimmer).label}
+                            <div className={`text-sm font-bold uppercase ${shimmerStatus.color}`}>
+                                {shimmerStatus.label}
                             </div>
                         </div>
                     </div>
@@ -238,8 +221,8 @@ const QualityVisualizer = ({ dataRef }) => {
                             <div className="text-3xl font-mono font-bold text-white">
                                 {metrics.weight.toFixed(0)}<span className="text-sm text-slate-500 ml-1">/100</span>
                             </div>
-                            <div className={`text-sm font-bold uppercase ${getStatus('weight', metrics.weight).color}`}>
-                                {getStatus('weight', metrics.weight).label}
+                            <div className={`text-sm font-bold uppercase ${weightStatus.color}`}>
+                                {weightStatus.label}
                             </div>
                         </div>
                     </div>
