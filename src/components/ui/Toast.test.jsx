@@ -1,7 +1,6 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Toast from './Toast';
-import React from 'react';
 
 describe('Toast Component', () => {
   beforeEach(() => {
@@ -75,5 +74,43 @@ describe('Toast Component', () => {
     expect(status).toHaveAttribute('aria-live', 'polite');
     expect(status).toHaveAttribute('aria-atomic', 'true');
     expect(screen.getByText('Information:')).toHaveClass('sr-only');
+  });
+
+  it('pauses timer on hover', () => {
+    const onClose = vi.fn();
+    render(<Toast message="Test Message" onClose={onClose} duration={3000} />);
+
+    // Hover
+    fireEvent.mouseEnter(screen.getByRole('status'));
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(onClose).not.toHaveBeenCalled();
+
+    // Unhover
+    fireEvent.mouseLeave(screen.getByRole('status'));
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('pauses timer on focus', () => {
+    const onClose = vi.fn();
+    render(<Toast message="Test Message" onClose={onClose} duration={3000} />);
+
+    // Focus
+    fireEvent.focus(screen.getByRole('status'));
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(onClose).not.toHaveBeenCalled();
+
+    // Blur
+    fireEvent.blur(screen.getByRole('status'));
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(onClose).toHaveBeenCalled();
   });
 });
