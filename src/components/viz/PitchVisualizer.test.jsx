@@ -2,7 +2,6 @@ import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import PitchVisualizer from './PitchVisualizer';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import React from 'react';
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
@@ -61,11 +60,11 @@ vi.mock('./FeedbackManager', () => ({
 }));
 
 // Mock ResizeObserver
-global.ResizeObserver = class ResizeObserver {
+globalThis.ResizeObserver = class ResizeObserver {
     constructor(callback) {
         this.callback = callback;
     }
-    observe(element) {
+    observe(_element) {
         // Immediately trigger resize to set dimensions
         this.callback([{ contentRect: { width: 800, height: 600 } }]);
     }
@@ -74,7 +73,7 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 // Mock Image
-global.Image = class {
+globalThis.Image = class {
     constructor() {
         this.src = '';
         this.complete = true;
