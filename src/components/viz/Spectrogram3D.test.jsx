@@ -2,11 +2,30 @@ import { render, cleanup, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Spectrogram3D from './Spectrogram3D';
 import React from 'react';
-import * as THREE from 'three';
 
 // Mock Three.js to avoid WebGL context issues in tests
 vi.mock('three', async () => {
     const actual = await vi.importActual('three');
+    class MockBufferAttribute {
+        constructor(array, itemSize) {
+            this.array = array;
+            this.itemSize = itemSize;
+            this.needsUpdate = false;
+        }
+        setY(index, val) {
+            if (this.array && index * 3 + 1 < this.array.length) {
+                this.array[index * 3 + 1] = val;
+            }
+        }
+        setXYZ(index, x, y, z) {
+             if (this.array && index * 3 + 2 < this.array.length) {
+                this.array[index * 3] = x;
+                this.array[index * 3 + 1] = y;
+                this.array[index * 3 + 2] = z;
+            }
+        }
+    }
+
     return {
         ...actual,
         Color: class {
@@ -16,33 +35,13 @@ vi.mock('three', async () => {
                 this.b = 0;
             }
             setHSL(h, s, l) {
-                // Mock implementation
                 this.r = h;
                 this.g = s;
                 this.b = l;
             }
         },
-        BufferAttribute: class {
-            constructor(array, itemSize) {
-                this.array = array;
-                this.itemSize = itemSize;
-                this.needsUpdate = false;
-            }
-            setY(index, val) {
-                this.array[index * 3 + 1] = val;
-            }
-            setXYZ(index, x, y, z) {
-                this.array[index * 3] = x;
-                this.array[index * 3 + 1] = y;
-                this.array[index * 3 + 2] = z;
-            }
-        },
-        Float32BufferAttribute: class {
-            constructor(array, itemSize) {
-                this.array = array;
-                this.itemSize = itemSize;
-            }
-        }
+        BufferAttribute: MockBufferAttribute,
+        Float32BufferAttribute: MockBufferAttribute
     };
 });
 
@@ -52,7 +51,7 @@ vi.mock('@react-three/fiber', () => ({
     Canvas: ({ children }) => <div>{children}</div>,
     useFrame: (cb) => {
         // Expose callback for testing
-        global.mockUseFrameCallback = cb;
+        globalThis.mockUseFrameCallback = cb;
     }
 }));
 
@@ -63,7 +62,7 @@ vi.mock('@react-three/drei', () => ({
 }));
 
 // Setup global requestAnimationFrame mock
-global.requestAnimationFrame = (cb) => setTimeout(cb, 16);
+globalThis.requestAnimationFrame = (cb) => setTimeout(cb, 16);
 
 describe('Spectrogram3D', () => {
     let dataRef;
@@ -79,7 +78,7 @@ describe('Spectrogram3D', () => {
     afterEach(() => {
         cleanup();
         vi.clearAllMocks();
-        delete global.mockUseFrameCallback;
+        delete globalThis.mockUseFrameCallback;
     });
 
     it('renders successfully', () => {
@@ -91,12 +90,12 @@ describe('Spectrogram3D', () => {
         render(<Spectrogram3D dataRef={dataRef} />);
 
         // Ensure useFrame callback was captured
-        expect(global.mockUseFrameCallback).toBeDefined();
+        expect(globalThis.mockUseFrameCallback).toBeDefined();
 
         // Execute the frame callback (simulation)
         // This should not throw even if meshRef is undefined (thanks to our safety checks)
-        if (global.mockUseFrameCallback) {
-            expect(() => global.mockUseFrameCallback()).not.toThrow();
+        if (globalThis.mockUseFrameCallback) {
+            expect(() => globalThis.mockUseFrameCallback()).not.toThrow();
         }
     });
 });
