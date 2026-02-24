@@ -189,6 +189,14 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             }
         }
 
+        // Optimization: Pre-calculate thresholds for "Near Miss" zone to avoid Math.log2 in the loop
+        // 50 cents deviation = 2^(50/1200) ≈ 1.0293
+        // -50 cents deviation = 2^(-50/1200) ≈ 0.9715
+        const nearMissLowMin = targetRange ? targetRange.min * 0.97153194115 : 0;
+        const nearMissLowMax = targetRange ? targetRange.min : 0;
+        const nearMissHighMin = targetRange ? targetRange.max : 0;
+        const nearMissHighMax = targetRange ? targetRange.max * 1.02930223664 : 0;
+
         const getPitchColor = (freq, clarity = 1.0) => {
             if (clarity < 0.8) {
                 return colorBlindMode ? '#9333ea' : '#ef4444';
@@ -201,11 +209,10 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             }
 
             // Near Miss Zone
+            // Optimization: Use pre-calculated thresholds instead of Math.log2
             if (targetRange) {
-                const distMin = 1200 * Math.log2(freq / targetRange.min);
-                const distMax = 1200 * Math.log2(freq / targetRange.max);
-
-                if ((distMin > -50 && distMin < 0) || (distMax > 0 && distMax < 50)) {
+                if ((freq > nearMissLowMin && freq < nearMissLowMax) ||
+                    (freq > nearMissHighMin && freq < nearMissHighMax)) {
                     if (colorBlindMode) return '#f59e0b';
                     return '#eab308'; // Yellow
                 }
@@ -246,7 +253,15 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
             const yMin = zoomRange.min;
             const yMax = zoomRange.max;
-            const mapY = (freq) => height - ((freq - yMin) / (yMax - yMin)) * height;
+
+            // Optimization: Pre-calculate scaling factors for coordinate mapping
+            // mapY = height - ((freq - yMin) / (yMax - yMin)) * height
+            //      = height - (freq - yMin) * scaleY
+            //      = (height + yMin * scaleY) - freq * scaleY
+            //      = offsetY - freq * scaleY
+            const scaleY = height / (yMax - yMin);
+            const offsetY = height + yMin * scaleY;
+            const mapY = (freq) => offsetY - freq * scaleY;
 
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
             ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
@@ -434,15 +449,18 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 }
             };
 
+            // Optimization: Reuse Y coordinates to halve mapY calls
+            let p1 = history[0];
+            let y1 = mapY(p1);
+            const xStep = (width - 30) / (history.length - 1);
+
             for (let i = 1; i < history.length; i++) {
-                const p1 = history[i - 1];
                 const p2 = history[i];
+                const y2 = mapY(p2);
 
                 if (p1 > 0 && p2 > 0) {
-                    const x1 = 30 + ((i - 1) / (history.length - 1)) * (width - 30);
-                    const y1 = mapY(p1);
-                    const x2 = 30 + (i / (history.length - 1)) * (width - 30);
-                    const y2 = mapY(p2);
+                    const x1 = 30 + (i - 1) * xStep;
+                    const x2 = 30 + i * xStep;
 
                     // Use p1 color for the segment (simplification for performance)
                     const color = getPitchColor(p1);
@@ -472,6 +490,10 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     // Gap/Silence detected
                     flush();
                 }
+
+                // Advance p1 and y1 for next iteration
+                p1 = p2;
+                y1 = y2;
             }
             flush();
 
