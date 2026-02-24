@@ -254,12 +254,19 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             ctx.textAlign = 'right';
             ctx.lineWidth = 1;
 
-            for (let f = Math.ceil(yMin / 50) * 50; f < yMax; f += 50) {
+            // Optimized: Batch grid lines to reduce draw calls
+            ctx.beginPath();
+            const startF = Math.ceil(yMin / 50) * 50;
+            for (let f = startF; f < yMax; f += 50) {
                 const y = mapY(f);
-                ctx.beginPath();
                 ctx.moveTo(30, y);
                 ctx.lineTo(width, y);
-                ctx.stroke();
+            }
+            ctx.stroke();
+
+            // Draw grid labels separately
+            for (let f = startF; f < yMax; f += 50) {
+                const y = mapY(f);
                 ctx.fillText(`${f}`, 25, y + 3);
             }
 
