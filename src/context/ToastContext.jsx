@@ -51,9 +51,9 @@ export const ToastProvider = ({ children }) => {
     return (
         <ToastContext.Provider value={value}>
             {children}
-            <div className="fixed bottom-20 md:bottom-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none">
+            <div className="fixed bottom-20 md:bottom-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none items-end">
                 {toasts.map(toast => (
-                    <div key={toast.id} className="pointer-events-auto">
+                    <div key={toast.id} className="pointer-events-auto w-full flex justify-end">
                         <Toast
                             message={toast.message}
                             type={toast.type}
