@@ -61,6 +61,11 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const speed = 2; // Pixels per frame
     const MAX_FREQ = 8000;
 
+    // Optimization Refs
+    const binMapRef = useRef(null);
+    const data32Ref = useRef(null);
+    const lastRenderConfigRef = useRef({ height: 0, maxBin: 0 });
+
     // Pre-calculate colormap as Uint32Array (ABGR) for fast pixel manipulation
     const colormap = useMemo(
         () => generateColormap(settings.spectrogramColorScheme),
@@ -114,35 +119,48 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             historyHeadRef.current = (head + 1) % HISTORY_FRAMES;
             // -----------------------------------------------
 
-            // --- OPTIMIZATION: Direct Pixel Manipulation ---
-            // Instead of thousands of ctx.fillRect calls, we generate the column pixels
-            // directly into an ImageData buffer and put it onto the canvas.
+            // --- OPTIMIZATION: Pre-calculate Bin Map & Cache Buffers ---
+            // If height or maxBin changed, regenerate the bin lookup map
+            if (h !== lastRenderConfigRef.current.height || maxBin !== lastRenderConfigRef.current.maxBin) {
+                const map = new Int32Array(h);
+                for (let y = 0; y < h; y++) {
+                    const freqRatio = 1 - (y / h);
+                    map[y] = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                }
+                binMapRef.current = map;
+                lastRenderConfigRef.current = { height: h, maxBin };
+            }
 
             // Reuse ImageData object
             // Reusable objects to reduce GC
             if (!canvas.imageDataRef) {
                 canvas.imageDataRef = ctx.createImageData(speed, h);
+                data32Ref.current = new Uint32Array(canvas.imageDataRef.data.buffer);
             }
             // Ensure size match
             if (canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
                 canvas.imageDataRef = ctx.createImageData(speed, h);
+                data32Ref.current = new Uint32Array(canvas.imageDataRef.data.buffer);
             }
 
             const imageData = canvas.imageDataRef;
-            const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
+            // Use cached Uint32Array view to avoid per-frame allocation
+            let data32 = data32Ref.current;
+            // Fallback safety if ref is somehow out of sync (shouldn't happen with logic above)
+            if (!data32 || data32.buffer !== imageData.data.buffer) {
+                 data32 = new Uint32Array(imageData.data.buffer);
+                 data32Ref.current = data32;
+            }
+
+            const binMap = binMapRef.current;
 
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
             // We map pixels (y) to frequency bins.
             for (let y = 0; y < h; y++) {
-                // Invert y because canvas 0 is top, but we want low freq at bottom
-                // y=0 is top (high freq), y=h is bottom (low freq)
-                // Bin mapping: 0 -> maxBin (low -> high)
-
-                // Linear mapping matches the original code: y = h - (i / maxBin) * h
-                // So i / maxBin = (h - y) / h = 1 - y/h
-
-                const freqRatio = 1 - (y / h);
-                const binIndex = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                // OPTIMIZATION: Use pre-calculated bin index
+                // Replaces: const freqRatio = 1 - (y / h);
+                // Replaces: const binIndex = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                const binIndex = binMap[y];
 
                 // Get intensity from spectrum
                 const value = spectrum[binIndex] || 0;
