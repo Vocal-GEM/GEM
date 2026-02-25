@@ -87,15 +87,20 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
     // Generate unique component ID for RenderCoordinator
     const uniqueId = useId();
     const componentId = `voice-quality-${uniqueId}`;
+    const lastUpdateRef = useRef(0);
 
-    const analyze = useCallback(() => {
+    const analyze = useCallback((delta, currentTime) => {
         if (dataRef.current && isAudioActive && serviceRef.current) {
+            // Always run analysis service to maintain internal state (history buffers, onset detection)
             const results = serviceRef.current.analyze(dataRef.current, {
                 targetF2: 2000 // Default to neutral/chem until calibration is fuller
             });
 
-            if (results) {
+            // Throttle UI updates to ~15fps (66ms) to reduce React re-renders
+            // This decouples the analysis frequency (60fps) from the UI update frequency (15fps)
+            if (results && (currentTime - lastUpdateRef.current > 66)) {
                 setAnalysis(results);
+                lastUpdateRef.current = currentTime;
             }
         }
     }, [dataRef, isAudioActive]);
