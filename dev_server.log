@@ -10,3 +10,17 @@
 7:27:24 AM [vite] hmr update /src/context/ToastContext.jsx, /src/index.css
 7:30:20 AM [vite] hmr update /src/context/ToastContext.jsx, /src/index.css
 7:30:33 AM [vite] hmr update /src/context/ToastContext.jsx, /src/index.css
+7:37:47 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:37:55 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:38:05 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:38:23 AM [vite] page reload src/audio/PitchWorklet.js
+7:38:31 AM [vite] page reload src/services/ResearchMode.js
+7:38:48 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+7:39:08 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+7:39:21 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:39:28 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
+7:39:35 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+7:39:45 AM [vite] page reload src/services/PrivacyManager.js
+7:39:58 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
+7:40:12 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:40:24 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
