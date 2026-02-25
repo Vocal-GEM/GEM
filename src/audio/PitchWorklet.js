@@ -4,6 +4,8 @@
  * Runs in dedicated audio thread for <50ms latency
  */
 
+/* global currentTime */
+
 class PitchProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
@@ -36,7 +38,7 @@ class PitchProcessor extends AudioWorkletProcessor {
         };
     }
 
-    process(inputs, outputs, parameters) {
+    process(inputs, _outputs, _parameters) {
         const input = inputs[0];
         if (!input || !input[0]) return true;
 
@@ -84,7 +86,7 @@ class PitchProcessor extends AudioWorkletProcessor {
      * Optimized for real-time performance in audio thread
      */
     detectPitchYIN(buffer) {
-        const bufferSize = buffer.length;
+        // const bufferSize = buffer.length; // Unused
         const minPeriod = Math.floor(this.sampleRate / this.maxFreq);
         const maxPeriod = Math.floor(this.sampleRate / this.minFreq);
 
@@ -101,7 +103,7 @@ class PitchProcessor extends AudioWorkletProcessor {
 
         for (let tau = minPeriod; tau < maxPeriod; tau++) {
             let sum = 0;
-            for (let i = 0; i < bufferSize - tau; i++) {
+            for (let i = 0; i < buffer.length - tau; i++) {
                 const delta = buffer[i] - buffer[i + tau];
                 sum += delta * delta;
             }
