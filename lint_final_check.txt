@@ -11,12 +11,10 @@
   4:8  error  Parsing error: Identifier 'React' has already been declared
 
 /app/src/components/marketplace/MarketplaceBrowser.jsx
-  1:8   warning  'React' is defined but never used   no-unused-vars
-  3:34  warning  'Filter' is defined but never used  no-unused-vars
+  1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/professional/AudioSourceManager.jsx
-   1:8  warning  'React' is defined but never used                                                                                               no-unused-vars
-  11:8  warning  React Hook useEffect has a missing dependency: 'checkPermissionAndEnumerate'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/professional/CAPEVAssessment.jsx
   1:8  warning  'React' is defined but never used  no-unused-vars
@@ -25,11 +23,8 @@
   1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/professional/SpectrogramComparison.jsx
-   1:8   warning  'React' is defined but never used                  no-unused-vars
-   3:24  warning  'Pause' is defined but never used                  no-unused-vars
-  12:12  warning  'isPlaying' is assigned a value but never used     no-unused-vars
-  12:23  warning  'setIsPlaying' is assigned a value but never used  no-unused-vars
-  14:12  warning  'deviceId' is assigned a value but never used      no-unused-vars
+   1:8   warning  'React' is defined but never used              no-unused-vars
+  13:12  warning  'deviceId' is assigned a value but never used  no-unused-vars
 
 /app/src/components/professional/TaskRecorder.jsx
   1:8   warning  'React' is defined but never used               no-unused-vars
@@ -150,9 +145,7 @@
   1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/ui/RecommendedToolsWidget.jsx
-    1:8   warning  'React' is defined but never used                                no-unused-vars
-  124:21  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
-  124:64  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/ui/RecordingCountdown.jsx
    1:8   warning  'React' is defined but never used                                                                                               no-unused-vars
@@ -680,6 +673,6 @@
   347:29  warning  'sampleRate' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
   374:15  warning  'minDistance' is assigned a value but never used                              no-unused-vars
 
-✖ 338 problems (8 errors, 330 warnings)
+✖ 331 problems (6 errors, 325 warnings)
 
  ELIFECYCLE  Command failed with exit code 1.
