@@ -30,9 +30,6 @@
   1:8   warning  'React' is defined but never used               no-unused-vars
   8:12  warning  'audioBlob' is assigned a value but never used  no-unused-vars
 
-/app/src/components/professional/VASSlider.jsx
-  1:8  warning  'React' is defined but never used  no-unused-vars
-
 /app/src/components/research/ConsentFlow.jsx
   2:8   warning  'React' is defined but never used             no-unused-vars
   3:10  warning  'motion' is defined but never used            no-unused-vars
@@ -673,6 +670,6 @@
   347:29  warning  'sampleRate' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
   374:15  warning  'minDistance' is assigned a value but never used                              no-unused-vars
 
-✖ 331 problems (6 errors, 325 warnings)
+✖ 330 problems (6 errors, 324 warnings)
 
  ELIFECYCLE  Command failed with exit code 1.
