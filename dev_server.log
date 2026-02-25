@@ -11,3 +11,16 @@
 7:13:42 AM [vite] hmr update /src/index.css, /src/App.jsx, /src/components/ui/BottomNav.jsx, /src/components/layout/Sidebar.jsx
 7:13:42 AM [vite] hmr update /src/index.css, /src/App.jsx, /src/components/ui/BottomNav.jsx, /src/components/layout/Sidebar.jsx
 7:15:50 AM [vite] hmr update /src/index.css, /src/App.jsx, /src/components/ui/BottomNav.jsx, /src/components/layout/Sidebar.jsx
+7:23:02 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+7:23:02 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+7:23:03 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
+7:23:03 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
+7:23:03 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:23:03 AM [vite] page reload src/services/PrivacyManager.js
+7:23:04 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:23:04 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:23:04 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:23:04 AM [vite] page reload src/audio/PitchWorklet.js
+7:23:29 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:23:29 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:23:30 AM [vite] page reload src/services/ResearchMode.js
