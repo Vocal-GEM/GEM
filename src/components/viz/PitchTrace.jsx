@@ -102,20 +102,16 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
-        // Filter and Draw Segments
-        // We only draw lines if they are visible or crossing the view
-
-        ctx.beginPath();
-        let isDrawing = false;
+        // Optimized: Batch segments by color to reduce draw calls
+        const redSegments = [];
+        const greenSegments = [];
+        const yellowSegments = [];
 
         for (let i = 1; i < data.length; i++) {
             const p1 = data[i - 1];
             const p2 = data[i];
 
-            if (!p1.frequency || !p2.frequency) {
-                isDrawing = false;
-                continue;
-            }
+            if (!p1.frequency || !p2.frequency) continue;
 
             // Optimization: Skip if completely out of horizontal view
             if (p2.time < bounds.tMin || p1.time > bounds.tMax) continue;
@@ -126,30 +122,36 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
             const y2 = getY(p2.frequency);
 
             // Determine color based on target
-            let color = '#ef4444'; // Red default
+            let colorGroup = redSegments; // Default
             if (targetRange) {
                 const avgFreq = (p1.frequency + p2.frequency) / 2;
                 if (avgFreq >= targetRange.min && avgFreq <= targetRange.max) {
-                    color = '#4ade80'; // Green
+                    colorGroup = greenSegments;
                 } else if (
                     (avgFreq >= targetRange.min * 0.9 && avgFreq < targetRange.min) ||
                     (avgFreq > targetRange.max && avgFreq <= targetRange.max * 1.1)
                 ) {
-                    color = '#facc15'; // Yellow
+                    colorGroup = yellowSegments;
                 }
             }
 
-            // Because we want per-segment coloring, we must stroke each segment individually
-            // or batch them by color. For simplicity/correctness of gradient transition 
-            // in this specific "color by target" logic, stroking individually is easiest 
-            // though less performant. Given data size (~seconds of audio), it's fine.
+            colorGroup.push(x1, y1, x2, y2);
+        }
 
+        const drawSegments = (segments, color) => {
+            if (segments.length === 0) return;
             ctx.strokeStyle = color;
             ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
+            for (let i = 0; i < segments.length; i += 4) {
+                ctx.moveTo(segments[i], segments[i + 1]);
+                ctx.lineTo(segments[i + 2], segments[i + 3]);
+            }
             ctx.stroke();
-        }
+        };
+
+        drawSegments(redSegments, '#ef4444');
+        drawSegments(greenSegments, '#4ade80');
+        drawSegments(yellowSegments, '#facc15');
 
         // Draw Playback Cursor
         if (currentTime !== undefined) {
