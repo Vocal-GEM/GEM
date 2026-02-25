@@ -60,9 +60,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
 
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
         const spectrum = dataRef.current.spectrum;
 
         // Ensure buffers are ready and match height
@@ -141,10 +138,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     }, [dataRef, colormap]);
 
     // Initial canvas setup & ResizeObserver
-    }, [dataRef, colormap, componentId]);
-
-    // Initial canvas setup
-    // Handle Resize with ResizeObserver
     useEffect(() => {
         const container = containerRef.current;
         const canvas = canvasRef.current;
@@ -156,8 +149,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             const rect = container.getBoundingClientRect();
 
             // Only update if dimensions actually changed
-            const newWidth = Math.floor(rect.width * dpr);
-            const newHeight = 512; // Fixed high vertical resolution
             const newWidth = Math.round(rect.width * dpr);
             const newHeight = 512; // Fixed internal height for vertical resolution
 
@@ -171,9 +162,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         // Initial size
         updateSize();
-
-        const resizeObserver = new ResizeObserver(() => {
-            // Use RAF to debounce
 
         const resizeObserver = new ResizeObserver(() => {
             // Run in animation frame to avoid resize loops/tearing
