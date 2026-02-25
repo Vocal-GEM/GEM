@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Mic, Square, Play, Pause, Trash2, Calendar, Clock, Music, Plus, X, Tag, FileText, Search, Filter, TrendingUp, ChevronDown } from 'lucide-react';
 import LoadingSpinner from '../ui/LoadingSpinner';
-import { getRecordings, saveRecording, deleteRecording, updateRecording } from '../../services/VoiceJournalService';
+import { getRecordings, saveRecording, deleteRecording } from '../../services/VoiceJournalService';
 import { recordPractice } from '../../services/StreakService';
-import { JOURNAL_TEMPLATES, getTemplateById, formatTemplateAsEntry } from '../../data/journalTemplates';
+import { JOURNAL_TEMPLATES, formatTemplateAsEntry } from '../../data/journalTemplates';
 
 // Waveform Visualization Component
 const WaveformVisualizer = ({ audioBlob, isPlaying, onSeek }) => {
@@ -81,7 +81,22 @@ const WaveformVisualizer = ({ audioBlob, isPlaying, onSeek }) => {
         const x = e.clientX - rect.left;
         const progress = x / rect.width;
         onSeek(progress);
+        setProgress(progress); // Optimistic update
     };
+
+    // Update progress based on isPlaying (simplified simulation)
+    useEffect(() => {
+        let interval;
+        if (isPlaying) {
+            interval = setInterval(() => {
+                setProgress(p => (p >= 1 ? 0 : p + 0.01));
+            }, 100);
+        } else {
+            // Reset progress when not playing (or keep it if paused logic was better)
+            // For now, keep it simple
+        }
+        return () => clearInterval(interval);
+    }, [isPlaying]);
 
     return (
         <canvas
