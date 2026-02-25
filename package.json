@@ -67,10 +67,5 @@
     "rollup-plugin-visualizer": "^6.0.5",
     "vitest": "^4.0.14",
     "workbox-window": "^7.4.0"
-  },
-  "engines": {
-    "node": ">=20.11 <21",
-    "npm": ">=10"
-  },
-  "packageManager": "npm@10"
+  }
 }

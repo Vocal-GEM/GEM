@@ -37,6 +37,63 @@ describe('Toast Component', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('pauses timer on hover', () => {
+    const onClose = vi.fn();
+    render(<Toast message="Test Message" onClose={onClose} duration={3000} />);
+
+    // Advance time partially
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+    expect(onClose).not.toHaveBeenCalled();
+
+    // Hover to pause
+    const toast = screen.getByRole('status');
+    fireEvent.mouseEnter(toast);
+
+    // Advance time past original duration
+    act(() => {
+      vi.advanceTimersByTime(2000); // Total 4000ms elapsed
+    });
+    expect(onClose).not.toHaveBeenCalled();
+
+    // Leave to resume
+    fireEvent.mouseLeave(toast);
+
+    // Advance time again (timer restarts for full duration or remaining? Implementation restarts full duration)
+    // The implementation uses setTimeout inside useEffect. When isPaused changes, useEffect re-runs.
+    // If isPaused goes false, setTimeout(..., duration) is called.
+    // So it resets to full duration (3000ms).
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('pauses timer on focus', () => {
+    const onClose = vi.fn();
+    render(<Toast message="Test Message" onClose={onClose} duration={3000} />);
+
+    // Focus to pause
+    const toast = screen.getByRole('status');
+    fireEvent.focus(toast);
+
+    // Advance time past duration
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
+    expect(onClose).not.toHaveBeenCalled();
+
+    // Blur to resume
+    fireEvent.blur(toast);
+
+    // Advance time
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(onClose).toHaveBeenCalled();
+  });
+
   it('has correct accessibility attributes for success type', () => {
     render(<Toast message="Success!" type="success" onClose={() => {}} />);
 
@@ -75,5 +132,13 @@ describe('Toast Component', () => {
     expect(status).toHaveAttribute('aria-live', 'polite');
     expect(status).toHaveAttribute('aria-atomic', 'true');
     expect(screen.getByText('Information:')).toHaveClass('sr-only');
+  });
+
+  it('merges custom className correctly', () => {
+    render(<Toast message="Test" onClose={() => {}} className="bg-purple-500" />);
+    const toast = screen.getByRole('status');
+    expect(toast).toHaveClass('bg-purple-500');
+    // Check if it still has some base classes (twMerge might remove conflicting ones but keep non-conflicting)
+    expect(toast).toHaveClass('fixed');
   });
 });
