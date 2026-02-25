@@ -123,7 +123,6 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
 
     const showToast = (message, type = 'info') => {
         setToast({ message, type });
-        setTimeout(() => setToast(null), 3000);
     };
 
     const handleRecordingComplete = async (recordingResult) => {
