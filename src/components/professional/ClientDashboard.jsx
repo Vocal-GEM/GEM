@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, UserPlus, Search, FileText, Calendar, ChevronRight, MoreVertical } from 'lucide-react';
+import { Users, UserPlus, Search, FileText, Calendar, MoreVertical, Activity } from 'lucide-react';
 
 const ClientDashboard = () => {
     const [clients, setClients] = useState([
@@ -66,7 +66,7 @@ const ClientDashboard = () => {
                             className={`p-4 border-b border-slate-700/50 cursor-pointer hover:bg-slate-700/50 transition-colors ${selectedClient?.id === client.id ? 'bg-slate-700/80 border-l-4 border-l-pink-500' : ''}`}
                         >
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-sm">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-sm text-white">
                                     {client.avatar}
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -104,8 +104,8 @@ const ClientDashboard = () => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
-                                <button className="px-4 py-2 bg-pink-600 hover:bg-pink-500 rounded-lg font-medium text-sm transition-colors">Start Session</button>
-                                <button className="p-2 hover:bg-slate-700 rounded-lg transition-colors"><MoreVertical size={20} /></button>
+                                <button className="px-4 py-2 bg-pink-600 hover:bg-pink-500 rounded-lg font-medium text-sm transition-colors text-white">Start Session</button>
+                                <button className="p-2 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-white"><MoreVertical size={20} /></button>
                             </div>
                         </div>
 

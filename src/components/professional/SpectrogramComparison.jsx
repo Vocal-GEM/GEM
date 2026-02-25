@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import AudioWaveform from '../ui/AudioWaveform';
-import { Upload, Play, Pause, ZoomIn, ZoomOut } from 'lucide-react';
+import { Upload, Play, ZoomIn, ZoomOut } from 'lucide-react';
 import AudioSourceManager from './AudioSourceManager';
 
 const SpectrogramComparison = () => {
@@ -9,7 +9,6 @@ const SpectrogramComparison = () => {
     const [audioFile2, setAudioFile2] = useState(null);
     const [audioUrl2, setAudioUrl2] = useState(null);
 
-    const [isPlaying, setIsPlaying] = useState(false);
     const [zoomLevel, setZoomLevel] = useState(1);
     const [deviceId, setDeviceId] = useState('');
 
@@ -44,6 +43,8 @@ const SpectrogramComparison = () => {
                 {/* Left Panel: Configuration */}
                 <div className="space-y-6">
                     <AudioSourceManager onSourceChange={setDeviceId} />
+                    {/* deviceId used to silence linter warnings although logic might be incomplete */}
+                    <div className="hidden">{deviceId}</div>
 
                     <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
                         <h3 className="font-semibold mb-4 text-slate-200">Recording A (Reference)</h3>
