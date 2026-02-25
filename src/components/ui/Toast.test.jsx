@@ -76,4 +76,74 @@ describe('Toast Component', () => {
     expect(status).toHaveAttribute('aria-atomic', 'true');
     expect(screen.getByText('Information:')).toHaveClass('sr-only');
   });
+
+  it('pauses timer on hover', () => {
+    const onClose = vi.fn();
+    render(<Toast message="Test Message" onClose={onClose} duration={3000} />);
+
+    // Fast forward partially
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+
+    // Hover
+    fireEvent.mouseEnter(screen.getByRole('status'));
+
+    // Fast forward past duration
+    act(() => {
+      vi.advanceTimersByTime(2000); // Total 4000ms if not paused
+    });
+
+    expect(onClose).not.toHaveBeenCalled();
+
+    // Leave
+    fireEvent.mouseLeave(screen.getByRole('status'));
+
+    // Fast forward to finish
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('pauses timer on focus', () => {
+    const onClose = vi.fn();
+    render(<Toast message="Test Message" onClose={onClose} duration={3000} />);
+
+    // Focus
+    fireEvent.focus(screen.getByRole('status'));
+
+    // Fast forward past duration
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
+
+    expect(onClose).not.toHaveBeenCalled();
+
+    // Blur
+    fireEvent.blur(screen.getByRole('status'));
+
+    // Fast forward
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('merges custom className correctly', () => {
+    render(
+      <Toast
+        message="Test Message"
+        onClose={() => {}}
+        className="relative bg-purple-500"
+      />
+    );
+
+    const toast = screen.getByRole('status');
+    expect(toast).toHaveClass('relative');
+    expect(toast).not.toHaveClass('fixed'); // twMerge should remove conflicting 'fixed'
+    expect(toast).toHaveClass('bg-purple-500');
+  });
 });

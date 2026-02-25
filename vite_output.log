@@ -1,0 +1,13 @@
+ WARN  Unsupported engine: wanted: {"node":">=20.11 <21"} (current: {"node":"v22.22.0","pnpm":"10.28.0"})
+
+> vocal-gem@0.1.0 dev /app
+> vite
+
+
+  VITE v5.4.21  ready in 371 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+7:27:27 AM [vite] hmr update /src/App.jsx, /src/index.css
+7:29:53 AM [vite] hmr update /src/App.jsx, /src/index.css
+ ELIFECYCLE  Command failed.
