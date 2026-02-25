@@ -5,7 +5,6 @@ const STORAGE_KEY = 'gem_welcome_dismissed';
 
 const WelcomeBanner = ({ onStartTutorial, onDismiss }) => {
     const [isVisible, setIsVisible] = useState(false);
-    const [currentStep, setCurrentStep] = useState(0);
 
     useEffect(() => {
         // Check if banner was previously dismissed
