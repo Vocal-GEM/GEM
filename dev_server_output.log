@@ -24,3 +24,8 @@
 7:53:52 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
 7:54:16 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
 7:56:07 AM [vite] page reload src/services/ResearchMode.js
+8:09:21 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
+8:09:27 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+8:10:03 AM [vite] page reload src/services/ResearchMode.js
+8:10:22 AM [vite] hmr update /src/components/analytics/WeeklyDigest.jsx, /src/index.css
+8:11:08 AM [vite] page reload src/components/ui/button.test.jsx
