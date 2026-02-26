@@ -1,5 +1,5 @@
 import { Mic, Volume2, Home, MapPin, Smartphone, Sliders, Wind, Headphones, Monitor, CheckCircle } from 'lucide-react';
-import React from 'react';
+
 
 export const micQualityTips = [
     {

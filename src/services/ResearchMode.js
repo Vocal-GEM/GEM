@@ -1,3 +1,4 @@
+
 /**
  * Research Mode Controller
  * Manages clinical trials, research studies, and participant data collection
@@ -5,6 +6,21 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import CryptoJS from 'crypto-js';
+
+// Safe process.env access for Vite/Frontend environment
+const getEnv = (key) => {
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+        return import.meta.env[key];
+    }
+
+    // eslint-disable-next-line no-undef
+    if (typeof process !== 'undefined' && process.env) {
+
+        // eslint-disable-next-line no-undef
+        return process.env[key];
+    }
+    return '';
+};
 
 export class ResearchModeController {
     constructor(studyConfig) {
@@ -59,7 +75,8 @@ export class ResearchModeController {
      */
     generateParticipantId(userId) {
         // Use cryptographic hash with study-specific salt
-        const salt = this.studyId + process.env.REACT_APP_RESEARCH_SALT;
+        // Safe access to environment variable
+        const salt = this.studyId + (getEnv('REACT_APP_RESEARCH_SALT') || 'default-salt');
         const hash = CryptoJS.SHA256(userId + salt).toString();
 
         // Take first 16 characters for readability

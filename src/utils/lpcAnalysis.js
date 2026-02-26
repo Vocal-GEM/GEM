@@ -13,6 +13,27 @@ export class LPCAnalyzer {
     constructor(order = 12, sampleRate = 48000) {
         this.order = order; // Typically 10-12 for speech at 8-10kHz, maybe higher for 48kHz
         this.sampleRate = sampleRate;
+
+        // Object pooling to reduce GC pressure
+        this.buffers = {};
+
+        // Precomputed trig tables
+        this.trigTables = {
+            cos: null,
+            sin: null,
+            order: 0,
+            numPoints: 0
+        };
+    }
+
+    /**
+     * ensureBuffer - Get or create a reusable Float32Array
+     */
+    ensureBuffer(name, size) {
+        if (!this.buffers[name] || this.buffers[name].length < size) {
+            this.buffers[name] = new Float32Array(size);
+        }
+        return this.buffers[name];
     }
 
     /**
@@ -23,14 +44,17 @@ export class LPCAnalyzer {
     analyze(audioBuffer) {
         if (!audioBuffer || audioBuffer.length === 0) return null;
 
+        const N = audioBuffer.length;
+
         // 1. Pre-emphasis
         const signal = this.applyPreEmphasis(audioBuffer);
 
         // 2. Windowing (Hamming)
-        const windowed = this.applyWindow(signal);
+        // Note: signal is reused buffer, so pass length explicitly or rely on N
+        const windowed = this.applyWindow(signal, N);
 
         // 3. Autocorrelation
-        const r = this.computeAutocorrelation(windowed, this.order);
+        const r = this.computeAutocorrelation(windowed, this.order, N);
 
         // 4. Levinson-Durbin Recursion
         const { a, error } = this.levinsonDurbin(r, this.order);
@@ -45,35 +69,42 @@ export class LPCAnalyzer {
         const formants = this.findPeaks(envelope, this.sampleRate);
 
         return {
-            coefficients: a,
-            envelope,
+            coefficients: a, // This is a slice (new array), safe to return
+            envelope,       // This is a slice (new array), safe to return
             formants
         };
     }
 
     applyPreEmphasis(signal, coeff = 0.97) {
-        const output = new Float32Array(signal.length);
+        const N = signal.length;
+        const output = this.ensureBuffer('signal', N);
+
         output[0] = signal[0];
-        for (let i = 1; i < signal.length; i++) {
+        for (let i = 1; i < N; i++) {
             output[i] = signal[i] - coeff * signal[i - 1];
         }
-        return output;
+        return output; // Returns reusable buffer
     }
 
-    applyWindow(signal) {
-        const N = signal.length;
-        const output = new Float32Array(N);
+    applyWindow(signal, length) {
+        const N = length || signal.length;
+        const output = this.ensureBuffer('windowed', N);
+
+        // Precompute window if length is stable?
+        // For now, compute on fly but avoid allocation
         for (let i = 0; i < N; i++) {
             // Hamming window
             const w = 0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (N - 1));
             output[i] = signal[i] * w;
         }
-        return output;
+        return output; // Returns reusable buffer
     }
 
-    computeAutocorrelation(signal, order) {
-        const R = new Float32Array(order + 1);
-        const N = signal.length;
+    computeAutocorrelation(signal, order, length) {
+        // Reuse buffer for R
+        const R = this.ensureBuffer('autocorr', order + 1);
+        const N = length || signal.length;
+
         for (let k = 0; k <= order; k++) {
             let sum = 0;
             for (let i = 0; i < N - k; i++) {
@@ -81,20 +112,22 @@ export class LPCAnalyzer {
             }
             R[k] = sum;
         }
-        return R;
+        return R; // Returns reusable buffer
     }
 
     levinsonDurbin(R, order) {
-        const a = new Float32Array(order + 1);
-        const E = new Float32Array(order + 1);
+        // Reusable buffers
+        const a = this.ensureBuffer('levinson_a', order + 1);
+        const E = this.ensureBuffer('levinson_E', order + 1);
+        const k_coeff = this.ensureBuffer('levinson_k', order + 1);
+        const a_prev = this.ensureBuffer('levinson_prev', order + 1);
 
         // Initialization
         E[0] = R[0];
         a[0] = 1; // a[0] is always 1
 
-        // Temporary arrays
-        const k_coeff = new Float32Array(order + 1);
-        const a_prev = new Float32Array(order + 1);
+        // Clear a_prev just in case, though it's overwritten
+        a_prev.fill(0);
 
         for (let i = 1; i <= order; i++) {
             let sum = 0;
@@ -121,43 +154,77 @@ export class LPCAnalyzer {
             for (let j = 0; j <= i; j++) a_prev[j] = a[j];
         }
 
-        // The coefficients 'a' correspond to 1, -a1, -a2... in standard DSP notation for IIR denominator
-        // But Levinson returns 1, a1, a2... where H(z) = G / (1 + sum(ak * z^-k))
-        // Usually we want the predictor coefficients.
-        // Let's stick to the standard definition: A(z) = 1 + sum_{k=1}^p a_k z^{-k}
+        // Return slice to ensure immutability for consumer
+        return { a: a.slice(1, order + 1), error: E[order] };
+    }
 
-        return { a: a.slice(1), error: E[order] }; // Return coefficients a1...ap
+    ensureTrigTables(order, numPoints) {
+        if (this.trigTables.order === order && this.trigTables.numPoints === numPoints) {
+            return;
+        }
+
+        const size = numPoints * order;
+        this.trigTables.cos = new Float32Array(size);
+        this.trigTables.sin = new Float32Array(size);
+        this.trigTables.order = order;
+        this.trigTables.numPoints = numPoints;
+
+        for (let i = 0; i < numPoints; i++) {
+            const omega = (Math.PI * i) / (numPoints - 1);
+            for (let k = 0; k < order; k++) {
+                const angle = -omega * (k + 1);
+                const idx = i * order + k;
+                this.trigTables.cos[idx] = Math.cos(angle);
+                this.trigTables.sin[idx] = Math.sin(angle);
+            }
+        }
     }
 
     computeLPCSpectrum(a, error, numPoints) {
-        // Evaluate magnitude response of 1/A(z)
-        // A(z) = 1 + a1*z^-1 + ... + ap*z^-p
-        // z = e^(j*omega)
+        // Prepare tables
+        this.ensureTrigTables(a.length, numPoints);
 
-        const magnitude = new Float32Array(numPoints);
+        const cosTable = this.trigTables.cos;
+        const sinTable = this.trigTables.sin;
+        const order = a.length;
+
+        // Use a reusable buffer for calculation, but return a slice/copy
+        // Actually, we can just create a new Float32Array to return since it's the output
+        // and usually consumed immediately or stored.
+        // Given existing usage returns a new array, we should probably stick to that
+        // or return a slice of a reused buffer.
+        // Let's optimize allocation by using a reused buffer but returning a slice.
+
+        const magnitudeBuffer = this.ensureBuffer('magnitude', numPoints);
+
         const gain = Math.sqrt(error); // Gain G
 
         if (gain < 1e-10) {
-            return new Float32Array(numPoints).fill(-100); // Return low dB floor
+             // Fill buffer with floor
+             for(let i=0; i<numPoints; i++) magnitudeBuffer[i] = -100;
+             return magnitudeBuffer.slice(0, numPoints);
         }
 
         for (let i = 0; i < numPoints; i++) {
-            const omega = (Math.PI * i) / (numPoints - 1); // 0 to Pi
-
             let real = 1.0;
             let imag = 0.0;
 
-            for (let k = 0; k < a.length; k++) {
-                const angle = -omega * (k + 1);
-                real += a[k] * Math.cos(angle);
-                imag += a[k] * Math.sin(angle);
+            const baseIdx = i * order;
+
+            for (let k = 0; k < order; k++) {
+                // const angle = -omega * (k + 1);
+                // real += a[k] * Math.cos(angle);
+                // imag += a[k] * Math.sin(angle);
+
+                real += a[k] * cosTable[baseIdx + k];
+                imag += a[k] * sinTable[baseIdx + k];
             }
 
             const magA = Math.sqrt(real * real + imag * imag);
-            magnitude[i] = 20 * Math.log10(gain / (magA + 1e-10)); // dB
+            magnitudeBuffer[i] = 20 * Math.log10(gain / (magA + 1e-10)); // dB
         }
 
-        return magnitude;
+        return magnitudeBuffer.slice(0, numPoints);
     }
 
     findPeaks(envelope, sampleRate) {
