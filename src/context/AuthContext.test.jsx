@@ -19,8 +19,13 @@ vi.mock('../services/DataSyncService', () => ({
     syncFromServer: vi.fn().mockResolvedValue(true)
 }));
 
+// Mock runtime config to enable backend
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: () => true,
+    getBackendUrl: () => 'http://localhost:5000'
+}));
+
 import { indexedDB } from '../services/IndexedDBManager';
-import { syncToServer, syncFromServer } from '../services/DataSyncService';
 
 const TestComponent = () => {
     const { user, login, signup, logout } = useAuth();
@@ -59,11 +64,14 @@ describe('AuthContext', () => {
     });
 
     it('logs in successfully', async () => {
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
+        // First mock: /me check (initially not logged in)
+        fetch.mockResolvedValueOnce({ ok: false });
+
+        // Second mock: login request (successful)
         fetch.mockResolvedValueOnce({
             ok: true,
             json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
+        });
 
         let result;
         await act(async () => {
@@ -108,13 +116,17 @@ describe('AuthContext', () => {
     });
 
     it('clears local data on logout', async () => {
-        // Setup: login first
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
+        // Setup: /me check returns not logged in initially
+        fetch.mockResolvedValueOnce({ ok: false });
+
+        // Login mock
         fetch.mockResolvedValueOnce({
             ok: true,
             json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
-        fetch.mockResolvedValueOnce({ ok: true }); // logout
+        });
+
+        // Logout mock
+        fetch.mockResolvedValueOnce({ ok: true });
 
         let result;
         await act(async () => {
@@ -149,4 +161,3 @@ describe('AuthContext', () => {
         });
     });
 });
-

@@ -10,7 +10,7 @@ vi.mock('socket.io-client', () => ({
 
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
-    McLeod: vi.fn(() => vi.fn((buffer) => 440)),
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)),
     YIN: vi.fn(() => vi.fn((buffer) => 440))
 }));
 
@@ -107,16 +107,33 @@ describe('AudioEngine Socket Integration', () => {
         vi.clearAllMocks();
     });
 
-    it('should initialize socket on start', async () => {
+    it('should initialize socket on start if backend is enabled', async () => {
+        // Mock isBackendEnabled to true for this test
+        vi.mock('../config/runtime', async () => ({
+            ...(await vi.importActual('../config/runtime')),
+            isBackendEnabled: () => true
+        }));
+
+        // Re-init engine to pick up new config
+        engine = new AudioEngine(() => {});
+
         await engine.start();
         expect(io).toHaveBeenCalled();
         expect(engine.socket).toBe(mockSocket);
     });
 
     it('should handle socket connection events', async () => {
+        vi.mock('../config/runtime', async () => ({
+            ...(await vi.importActual('../config/runtime')),
+            isBackendEnabled: () => true
+        }));
+        engine = new AudioEngine(() => {});
         await engine.start();
 
-        // Simulate connect
+        // Simulate connect - we need to manually trigger what 'io()' would return's .on('connect') callback
+        // The mock 'io' returns 'mockSocket'. 'AudioEngine' calls 'mockSocket.on("connect", ...)'
+        // We captured the callback in 'socketCallbacks["connect"]'.
+
         mockSocket.connected = true;
         if (socketCallbacks['connect']) socketCallbacks['connect']();
 
@@ -130,8 +147,17 @@ describe('AudioEngine Socket Integration', () => {
     });
 
     it('should emit audio_chunk when connected', async () => {
+        vi.mock('../config/runtime', async () => ({
+            ...(await vi.importActual('../config/runtime')),
+            isBackendEnabled: () => true
+        }));
+        engine = new AudioEngine(() => {});
+
         await engine.start();
         mockSocket.connected = true;
+
+        // Need to make sure socket is set on engine
+        if (socketCallbacks['connect']) socketCallbacks['connect']();
 
         const pcmData = new Float32Array(128).fill(0.5);
         engine.sendAudioChunk(pcmData);
@@ -143,6 +169,12 @@ describe('AudioEngine Socket Integration', () => {
     });
 
     it('should buffer chunks when disconnected and flush on connect', async () => {
+        vi.mock('../config/runtime', async () => ({
+            ...(await vi.importActual('../config/runtime')),
+            isBackendEnabled: () => true
+        }));
+        engine = new AudioEngine(() => {});
+
         await engine.start();
         mockSocket.connected = false;
 
@@ -165,6 +197,12 @@ describe('AudioEngine Socket Integration', () => {
     });
 
     it('should update latestBackendAnalysis on analysis_update', async () => {
+        vi.mock('../config/runtime', async () => ({
+            ...(await vi.importActual('../config/runtime')),
+            isBackendEnabled: () => true
+        }));
+        engine = new AudioEngine(() => {});
+
         await engine.start();
 
         const analysisData = {
