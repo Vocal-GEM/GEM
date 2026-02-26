@@ -3,7 +3,7 @@ import { LPCAnalyzer } from './lpcAnalysis';
 
 describe('LPCAnalyzer', () => {
     it('should initialize with default parameters', () => {
-        const analyzer = new LPCAnalyzer(48000);
+        const analyzer = new LPCAnalyzer();
         expect(analyzer.sampleRate).toBe(48000);
         expect(analyzer.order).toBeGreaterThan(0);
     });
