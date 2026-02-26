@@ -59,12 +59,15 @@ describe('AuthContext', () => {
     });
 
     it('logs in successfully', async () => {
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
+        // Mock the sequence of fetch calls expected by AuthProvider
+        fetch.mockResolvedValueOnce({ ok: false }); // 1. Initial /me check (fails, user is null)
+
         fetch.mockResolvedValueOnce({
             ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
+            json: async () => ({ user: { id: 1, username: 'testuser' }, token: 'mock-token' })
+        }); // 2. Login call (returns user)
 
+        // Render the component
         let result;
         await act(async () => {
             result = render(
@@ -74,11 +77,16 @@ describe('AuthContext', () => {
             );
         });
 
+        // Verify initial state is null
+        expect(result.getByTestId('user').textContent).toBe('null');
+
+        // Click login
         const loginBtn = result.getByText('Login');
         await act(async () => {
             loginBtn.click();
         });
 
+        // Wait for user to be updated
         await waitFor(() => {
             expect(result.getByTestId('user').textContent).toBe('testuser');
         });
@@ -108,13 +116,15 @@ describe('AuthContext', () => {
     });
 
     it('clears local data on logout', async () => {
-        // Setup: login first
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
+        // Setup sequence for login -> logout
+        fetch.mockResolvedValueOnce({ ok: false }); // 1. Initial /me check
+
         fetch.mockResolvedValueOnce({
             ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
-        fetch.mockResolvedValueOnce({ ok: true }); // logout
+            json: async () => ({ user: { id: 1, username: 'testuser' }, token: 'mock-token' })
+        }); // 2. Login call
+
+        fetch.mockResolvedValueOnce({ ok: true }); // 3. Logout call
 
         let result;
         await act(async () => {
@@ -125,7 +135,7 @@ describe('AuthContext', () => {
             );
         });
 
-        // Login
+        // Login first
         const loginBtn = result.getByText('Login');
         await act(async () => {
             loginBtn.click();
@@ -149,4 +159,3 @@ describe('AuthContext', () => {
         });
     });
 });
-

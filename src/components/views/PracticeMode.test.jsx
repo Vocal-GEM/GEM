@@ -58,9 +58,18 @@ vi.mock('../../context/ProfileContext', () => ({
     ProfileProvider: ({ children }) => <div>{children}</div>
 }));
 
+// Mock useAudio to simulate active engine
+vi.mock('../../context/AudioContext', () => ({
+    useAudio: () => ({
+        isAudioActive: true,
+        dataRef: { current: { pitch: 200, resonance: 100, volume: 0.5 } },
+        audioEngineRef: { current: { start: vi.fn(), stop: vi.fn() } }
+    }),
+    AudioProvider: ({ children }) => <div>{children}</div>
+}));
+
 describe('PracticeMode', () => {
     const mockDataRef = { current: { pitch: 200, resonance: 100, volume: 0.5 } };
-    const mockAudioEngine = { current: {} };
 
     it('renders without crashing', async () => {
 
