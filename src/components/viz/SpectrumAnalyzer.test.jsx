@@ -1,4 +1,4 @@
-import { render, cleanup, screen } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import SpectrumAnalyzer from './SpectrumAnalyzer';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -7,78 +7,54 @@ import React from 'react';
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
-  renderCoordinator: {
-    subscribe: vi.fn(() => vi.fn()),
-    unsubscribe: vi.fn(),
-    PRIORITY: { MEDIUM: 2 }
-  }
+    renderCoordinator: {
+        subscribe: vi.fn(() => vi.fn()),
+        unsubscribe: vi.fn(),
+        PRIORITY: { MEDIUM: 1 }
+    }
 }));
 
 vi.mock('../../utils/lpcAnalysis', () => ({
-  lpcAnalyzer: {
-    analyze: vi.fn(() => ({
-      envelope: new Float32Array(512).fill(0.5),
-      formants: [{ freq: 500, amp: 0.5 }, { freq: 1500, amp: 0.4 }]
-    }))
-  }
+    lpcAnalyzer: {
+        analyze: vi.fn(() => new Float32Array(512).fill(0))
+    }
 }));
 
-// Mock ResizeObserver
-global.ResizeObserver = vi.fn(function() {
-  this.observe = vi.fn();
-  this.unobserve = vi.fn();
-  this.disconnect = vi.fn();
-});
-
 // Mock Canvas getContext
-const mockContext = {
-  createImageData: vi.fn((w, h) => ({
-    data: { buffer: new ArrayBuffer(w * h * 4) },
-    width: w,
-    height: h
-  })),
-  drawImage: vi.fn(),
-  putImageData: vi.fn(),
-  beginPath: vi.fn(),
-  moveTo: vi.fn(),
-  lineTo: vi.fn(),
-  stroke: vi.fn(),
-  fill: vi.fn(),
-  fillRect: vi.fn(),
-  fillText: vi.fn(),
-  arc: vi.fn(),
-  canvas: { width: 600, height: 200 }
-};
+HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+    clearRect: vi.fn(),
+    beginPath: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    stroke: vi.fn(),
+    fillText: vi.fn(),
+    canvas: { width: 500, height: 200 }
+}));
 
-HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext);
+// Mock requestAnimationFrame
+const mockRequestAnimationFrame = vi.fn();
+vi.stubGlobal('requestAnimationFrame', mockRequestAnimationFrame);
 
 describe('SpectrumAnalyzer', () => {
-  let dataRef;
+    let dataRef;
 
-  beforeEach(() => {
-    dataRef = {
-      current: {
-        spectrum: new Uint8Array(1024).fill(100),
-        timeDomainData: new Uint8Array(1024).fill(128)
-      }
-    };
-    vi.clearAllMocks();
-  });
+    beforeEach(() => {
+        dataRef = { current: { spectrum: new Float32Array(1024).fill(0.5) } };
+        vi.clearAllMocks();
+    });
 
-  afterEach(() => {
-    cleanup();
-    vi.clearAllMocks();
-  });
+    afterEach(() => {
+        cleanup();
+    });
 
-  it('renders successfully', () => {
-    render(<SpectrumAnalyzer dataRef={dataRef} />);
-    expect(screen.getByText(/Spectrum & LPC Overlay/i)).toBeDefined();
-  });
+    it('renders successfully', () => {
+        render(<SpectrumAnalyzer dataRef={dataRef} />);
+        expect(screen.getByText('Formant Analysis')).toBeDefined();
+    });
 
-  it('subscribes to coordinator', async () => {
-    render(<SpectrumAnalyzer dataRef={dataRef} />);
-    // Initial verification for dynamic import would be hard,
-    // but once we switch to static import, we expect this:
-    // expect(renderCoordinator.subscribe).toHaveBeenCalled();
-  });
+    it('subscribes to render loop', async () => {
+        render(<SpectrumAnalyzer dataRef={dataRef} />);
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(renderCoordinator.subscribe).toHaveBeenCalled();
+    });
 });

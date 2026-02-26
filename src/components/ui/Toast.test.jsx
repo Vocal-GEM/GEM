@@ -1,7 +1,6 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Toast from './Toast';
-import React from 'react';
 
 describe('Toast Component', () => {
   beforeEach(() => {
@@ -75,5 +74,29 @@ describe('Toast Component', () => {
     expect(status).toHaveAttribute('aria-live', 'polite');
     expect(status).toHaveAttribute('aria-atomic', 'true');
     expect(screen.getByText('Information:')).toHaveClass('sr-only');
+  });
+
+  it('pauses timer on hover', () => {
+    const onClose = vi.fn();
+    render(<Toast message="Test" onClose={onClose} duration={3000} />);
+
+    // Default role is 'status' for success (default type)
+    const toast = screen.getByRole('status');
+
+    // Hover to pause
+    fireEvent.mouseEnter(toast);
+
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(onClose).not.toHaveBeenCalled();
+
+    // Leave to resume
+    fireEvent.mouseLeave(toast);
+
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(onClose).toHaveBeenCalled();
   });
 });
