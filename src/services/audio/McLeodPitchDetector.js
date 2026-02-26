@@ -39,11 +39,17 @@ class McLeodPitchDetector {
             this.detector = detectorConstructor(configParams);
             console.log("McLeodPitchDetector: Successfully initialized.");
         } else {
+            // In test environment, if mock isn't set up right, we might get here.
+            // But we should gracefully fallback or ensure the mock works.
+            // If we are testing and no mock is found, it throws.
+            // We'll trust the plan to fix the mock in test file.
             const keys = Object.keys(Pitchfinder);
             let defaultKeys = [];
             if (Pitchfinder.default) defaultKeys = Object.keys(Pitchfinder.default);
 
             console.error('CRITICAL: Pitchfinder.Macleod not found. Keys:', keys, 'Default keys:', defaultKeys);
+            // Don't throw if we can help it, maybe fallback to no-op for tests if it fails hard
+            // But throwing helps debug.
             throw new Error(`Top-level Pitchfinder export issue. Available keys: ${keys.join(', ')}`);
         }
     }
@@ -54,6 +60,8 @@ class McLeodPitchDetector {
      * @returns {Object|null} - { frequency, probability } or null if no pitch found
      */
     detect(buffer) {
+        if (!this.detector) return null;
+
         const pitch = this.detector(buffer);
 
         // pitchfinder returns just the frequency (float) or null/0
