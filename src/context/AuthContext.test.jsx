@@ -2,6 +2,12 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider, useAuth } from './AuthContext';
 
+// Mock Config
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: () => true,
+    getBackendUrl: () => 'http://test-api'
+}));
+
 // Mock Fetch
 globalThis.fetch = vi.fn();
 
@@ -39,6 +45,7 @@ describe('AuthContext', () => {
         vi.resetAllMocks();
         vi.spyOn(console, 'error').mockImplementation(() => { });
         vi.spyOn(console, 'log').mockImplementation(() => { });
+        vi.spyOn(console, 'warn').mockImplementation(() => { });
     });
 
     it('initializes with null user if /me fails', async () => {
@@ -59,11 +66,8 @@ describe('AuthContext', () => {
     });
 
     it('logs in successfully', async () => {
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
+        // Initial load /me check (fails)
+        fetch.mockResolvedValueOnce({ ok: false });
 
         let result;
         await act(async () => {
@@ -74,10 +78,19 @@ describe('AuthContext', () => {
             );
         });
 
+        // Setup login response
+        fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ user: { id: 1, username: 'testuser' } })
+        });
+
         const loginBtn = result.getByText('Login');
         await act(async () => {
             loginBtn.click();
         });
+
+        // Add a small delay to allow promises to resolve
+        await new Promise(resolve => setTimeout(resolve, 0));
 
         await waitFor(() => {
             expect(result.getByTestId('user').textContent).toBe('testuser');
@@ -86,7 +99,6 @@ describe('AuthContext', () => {
 
     it('handles login failure', async () => {
         fetch.mockResolvedValueOnce({ ok: false }); // initial /me
-        fetch.mockRejectedValueOnce(new Error('Network error')); // login fail
 
         let result;
         await act(async () => {
@@ -96,6 +108,9 @@ describe('AuthContext', () => {
                 </AuthProvider>
             );
         });
+
+        // Setup login failure
+        fetch.mockRejectedValueOnce(new Error('Network error'));
 
         const loginBtn = result.getByText('Login');
         await act(async () => {
@@ -108,13 +123,8 @@ describe('AuthContext', () => {
     });
 
     it('clears local data on logout', async () => {
-        // Setup: login first
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
-        fetch.mockResolvedValueOnce({ ok: true }); // logout
+        // 1. Initial /me check (fails)
+        fetch.mockResolvedValueOnce({ ok: false });
 
         let result;
         await act(async () => {
@@ -125,17 +135,30 @@ describe('AuthContext', () => {
             );
         });
 
-        // Login
+        // 2. Login response
+        fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ user: { id: 1, username: 'testuser' } })
+        });
+
+        // Perform login
         const loginBtn = result.getByText('Login');
         await act(async () => {
             loginBtn.click();
         });
 
+        // Add a small delay to allow promises to resolve
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        // Wait for login to complete
         await waitFor(() => {
             expect(result.getByTestId('user').textContent).toBe('testuser');
         });
 
-        // Logout
+        // 3. Logout response
+        fetch.mockResolvedValueOnce({ ok: true });
+
+        // Perform logout
         const logoutBtn = result.getByText('Logout');
         await act(async () => {
             logoutBtn.click();
@@ -149,4 +172,3 @@ describe('AuthContext', () => {
         });
     });
 });
-

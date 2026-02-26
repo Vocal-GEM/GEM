@@ -235,8 +235,16 @@ export function getEnsembleStats(batchResults) {
     return stats;
 }
 
+// Wrapper class for compatibility with tests expecting 'new PitchEnsemble()'
+export class PitchEnsemble {
+    detectPitch(buffer, sampleRate, options = {}) {
+        return detectPitchEnsemble(buffer, sampleRate, options);
+    }
+}
+
 export default {
     detectPitchEnsemble,
     detectPitchEnsembleBatch,
-    getEnsembleStats
+    getEnsembleStats,
+    PitchEnsemble
 };
