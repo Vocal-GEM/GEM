@@ -1,10 +1,10 @@
-/* global currentTime, registerProcessor, AudioWorkletProcessor */
-
 /**
  * PitchWorklet.js
  * AudioWorklet processor for ultra-low-latency pitch detection
  * Runs in dedicated audio thread for <50ms latency
  */
+
+/* global currentTime */
 
 class PitchProcessor extends AudioWorkletProcessor {
     constructor() {
