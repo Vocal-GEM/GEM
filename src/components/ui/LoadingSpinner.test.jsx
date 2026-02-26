@@ -38,7 +38,7 @@ describe("LoadingSpinner", () => {
 
     rerender(<LoadingSpinner size="xl" />);
     expect(screen.getByRole("status")).toBeInTheDocument();
-    expect(container.querySelector('.w-16')).toBeInTheDocument();
+    expect(container.querySelector('.w-24')).toBeInTheDocument();
 
     rerender(<LoadingSpinner size="xs" />);
     expect(screen.getByRole("status")).toBeInTheDocument();

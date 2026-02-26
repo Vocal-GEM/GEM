@@ -51,9 +51,27 @@ vi.mock('../../services/SearchService', () => ({
     groupResultsByType: vi.fn(() => []),
 }));
 
+// Mock featureFlags to ensure items are visible
+vi.mock('../../config/featureFlags', () => ({
+    FEATURES: {
+        dashboard: true,
+        practice: true,
+        journal: true,
+        analysis: true,
+        analytics: true,
+        library: true,
+        'client-dashboard': true,
+        capev: true,
+        spectrogram: true,
+        'pitch-tool': true,
+        camera: true,
+        settings: true
+    }
+}));
+
 const MockNavigationProvider = ({ children }) => <div>{children}</div>;
 
-describe('Sidebar Auth Integration', () => {
+describe('Sidebar', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockUseProfile.mockReturnValue({ activeProfile: { name: 'LocalUser' } });
@@ -62,39 +80,33 @@ describe('Sidebar Auth Integration', () => {
             navigateTo: vi.fn(),
             openModal: vi.fn()
         });
+        // Default auth mock - but Sidebar doesn't actually use AuthContext for display logic currently!
+        // It seems the Sidebar component logic changed to remove Auth integration (Sign In/Out buttons),
+        // relying on ProfileManager or just being a nav menu.
+        // Let's check what it actually renders based on the file content.
+
+        // Based on read_file output of Sidebar.jsx:
+        // It renders Nav Items, Search, Header, Footer.
+        // It does NOT render Sign In / Sign Out buttons anymore.
+        // Instead, it has a "Frontend Demo Mode" footer.
     });
 
-    it('shows Sign In button when not logged in', () => {
-        mockUseAuth.mockReturnValue({ user: null });
+    it('renders navigation items', () => {
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('Sign In')).toBeInTheDocument();
+        expect(getByText('Dashboard')).toBeInTheDocument();
+        expect(getByText('Practice')).toBeInTheDocument();
+        expect(getByText('Settings')).toBeInTheDocument();
     });
 
-    it('shows user info and Sign Out when logged in', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('CloudUser')).toBeInTheDocument();
-        expect(getByText('Sign Out')).toBeInTheDocument();
+    it('calls onViewChange when a nav item is clicked', () => {
+        const onViewChange = vi.fn();
+        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={onViewChange} />, { wrapper: MockNavigationProvider });
+
+        fireEvent.click(getByText('Practice'));
+        expect(onViewChange).toHaveBeenCalledWith('practice');
     });
 
-    it('opens Login modal on Sign In click', () => {
-        mockUseAuth.mockReturnValue({ user: null });
-        const { getByText, getByTestId } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-
-        fireEvent.click(getByText('Sign In'));
-        expect(getByTestId('login-modal')).toBeInTheDocument();
-    });
-
-    it('calls logout on Sign Out click', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-
-        fireEvent.click(getByText('Sign Out'));
-        expect(mockLogout).toHaveBeenCalled();
-    });
-
-    it('opens Camera modal when Mirror button is clicked', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'TestUser' } });
+    it('opens modal for modal-type items (Mirror)', () => {
         const openModalSpy = vi.fn();
         mockUseNavigation.mockReturnValue({
             activeView: 'dashboard',
@@ -107,5 +119,14 @@ describe('Sidebar Auth Integration', () => {
         fireEvent.click(mirrorBtn);
 
         expect(openModalSpy).toHaveBeenCalledWith('camera');
+    });
+
+    it('highlights active view', () => {
+        const { getByText } = render(<Sidebar activeView="practice" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
+
+        // Practice button should have active class (blue bg)
+        // We can check if it contains the class or just basic rendering
+        const practiceBtn = getByText('Practice').closest('button');
+        expect(practiceBtn.className).toContain('bg-blue-600');
     });
 });

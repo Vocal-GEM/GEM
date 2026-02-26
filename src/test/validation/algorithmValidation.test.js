@@ -1,6 +1,6 @@
 
 import { describe, it, expect, beforeAll } from 'vitest';
-import { PitchEnsemble } from '../../utils/pitchEnsemble';
+import * as pitchEnsemble from '../../utils/pitchEnsemble';
 import { FormantTracker } from '../../utils/formantTracker';
 import praatReferences from './praatReferences.json';
 
@@ -60,14 +60,13 @@ describe('Algorithm Validation against PRAAT', () => {
     let formantTracker;
 
     beforeAll(() => {
-        pitchEnsemble = new PitchEnsemble();
         formantTracker = new FormantTracker(44100);
     });
 
     praatReferences.forEach(ref => {
         it(`accurately estimates pitch for ${ref.description}`, () => {
             const audioBuffer = synthesizeAudio(ref.praatValues, 0.5);
-            const result = pitchEnsemble.detectPitch(audioBuffer, 44100);
+            const result = pitchEnsemble.detectPitchEnsemble(audioBuffer, 44100);
 
             expect(result).not.toBeNull();
             expect(result.pitch).not.toBeNull();
@@ -102,8 +101,8 @@ describe('Algorithm Validation against PRAAT', () => {
         const lowPitch = synthesizeAudio({ meanPitch: 100 });
         const highPitch = synthesizeAudio({ meanPitch: 250 });
 
-        const lowResult = pitchEnsemble.detectPitch(lowPitch, 44100);
-        const highResult = pitchEnsemble.detectPitch(highPitch, 44100);
+        const lowResult = pitchEnsemble.detectPitchEnsemble(lowPitch, 44100);
+        const highResult = pitchEnsemble.detectPitchEnsemble(highPitch, 44100);
 
         expect(lowResult.pitch).toBeLessThan(150);
         expect(highResult.pitch).toBeGreaterThan(200);
