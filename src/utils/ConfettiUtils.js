@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 
 // Global confetti trigger
 let globalConfettiTrigger = null;

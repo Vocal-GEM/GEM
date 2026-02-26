@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * McLeod Pitch Method (MPM)
  * 

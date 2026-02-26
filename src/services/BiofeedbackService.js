@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export class BiofeedbackService {
     /**
      * Calculates a score based on how close the current pitch is to the target.

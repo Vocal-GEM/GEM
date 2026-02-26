@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AudioProvider, useAudio } from './AudioContext';

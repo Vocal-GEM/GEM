@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * Pitch Detection Utilities
  * Implements YIN algorithm for robust pitch tracking

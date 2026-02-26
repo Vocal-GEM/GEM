@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import { useClient } from '../../context/ClientContext';
 import { useSettings } from '../../context/SettingsContext';

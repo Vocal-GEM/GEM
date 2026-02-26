@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { indexedDB, STORES } from './IndexedDBManager';
 
 class SyncManager {

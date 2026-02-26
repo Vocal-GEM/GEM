@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * VoiceJournalService - Records and stores voice clips with metadata
  * Uses IndexedDB for audio blob storage (large files)

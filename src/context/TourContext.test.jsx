@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TourProvider, useTour } from './TourContext';

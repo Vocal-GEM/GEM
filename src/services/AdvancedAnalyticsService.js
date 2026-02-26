@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * AnalyticsService - Advanced voice analytics and formant tracking
  */

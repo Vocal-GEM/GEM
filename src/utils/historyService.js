@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const DB_NAME = 'VocalGEM_DB';
 const STORE_NAME = 'analysis_sessions';
 const USER_STORE_NAME = 'user_settings';

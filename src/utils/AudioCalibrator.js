@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * AudioCalibrator.js
  * Handles microphone calibration for accurate SPL (dB) measurements.

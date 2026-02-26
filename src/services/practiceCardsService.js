@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * Practice Cards Service
  * IndexedDB storage for custom card sets and practice activity tracking.

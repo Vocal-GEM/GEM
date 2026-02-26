@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { KNOWLEDGE_BASE } from '../data/knowledgeBase.js';
 
 export const KnowledgeService = {

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Download, Upload, Trash2, AlertTriangle, Check, FileJson, Eye, Globe, TrendingUp, Heart, Edit3, Bell, Moon, Sun, Volume2, Activity, Vibrate, Clock } from 'lucide-react';
 import { indexedDB } from '../../services/IndexedDBManager';

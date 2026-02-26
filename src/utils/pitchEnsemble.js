@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * Pitch Ensemble - Multi-Algorithm Consensus Voting
  * 

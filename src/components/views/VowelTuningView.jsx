@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAudio } from '../../context/AudioContext';

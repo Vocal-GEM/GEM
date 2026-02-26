@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable no-unused-vars */
+
 import { MarketplaceBrowser } from '../marketplace/MarketplaceBrowser';
 
 const MarketplaceView = () => {

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * Analytics Service for Vocal GEM
  * Handles tracking of user events, view changes, and feature usage.

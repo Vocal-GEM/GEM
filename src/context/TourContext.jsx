@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { TOURS } from '../config/tours';
 

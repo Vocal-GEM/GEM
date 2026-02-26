@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * Quad-Core Voice Analysis Service
  * Implements the "Quad-Core" architecture for voice analysis:

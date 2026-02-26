@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * VoiceCalibrationService.js
  * Extracts and persists voice baseline metrics (pitch, formants, SPL) from audio recordings.

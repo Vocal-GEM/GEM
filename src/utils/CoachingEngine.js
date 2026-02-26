@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export class CoachingEngine {
     constructor(config = {}) {
         this.config = {

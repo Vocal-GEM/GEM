@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Activity, Mic, BarChart2, BookOpen, Waves, FlaskConical } from 'lucide-react';

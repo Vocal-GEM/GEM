@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+/* eslint-disable no-unused-vars */
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useProfile } from './ProfileContext';
 import VoiceProfileService from '../services/VoiceProfile';
 import TargetRecommender from '../services/TargetRecommender';

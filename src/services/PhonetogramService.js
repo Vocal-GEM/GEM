@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * PhonetogramService
  * Manages the data for a Voice Range Profile (Phonetogram).

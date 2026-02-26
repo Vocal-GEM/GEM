@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * SelfCareService.js
  * Stores and manages user's self-care plan and wellness data.

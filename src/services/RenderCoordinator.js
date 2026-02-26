@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * RenderCoordinator - Singleton service for coordinating all visualization RAF loops
  * Reduces CPU usage by consolidating multiple independent animation loops into one

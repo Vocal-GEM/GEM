@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * Language Acoustics Configuration
  * Defines acoustic norms and phonetic characteristics for different languages

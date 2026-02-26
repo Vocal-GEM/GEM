@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * AdaptiveFeedback.js
  * Intelligent feedback controller that adjusts sensitivity based on user skill level

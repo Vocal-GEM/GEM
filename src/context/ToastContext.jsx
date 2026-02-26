@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { createContext, useContext, useState, useCallback } from 'react';
 import Toast from '../components/ui/Toast';
 

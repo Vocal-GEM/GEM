@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { FormantAnalyzer } from './FormantAnalyzer';
 import { DSP } from './DSP';

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * Voice Analysis Utilities
  * Client-side voice analysis using Web Audio API

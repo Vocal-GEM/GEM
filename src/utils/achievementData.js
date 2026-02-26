@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // Achievement definitions used in AchievementShowcase
 export const ACHIEVEMENTS = [
     { id: 'first-session', title: 'First Steps', description: 'Complete your first practice session', icon: '🎤', xp: 50 },

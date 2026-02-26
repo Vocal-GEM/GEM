@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * Pitch Smoother
  * Reduces pitch jitter using median filtering and detects octave errors

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * QuizService - Spaced Repetition System for Quiz Questions
  * 

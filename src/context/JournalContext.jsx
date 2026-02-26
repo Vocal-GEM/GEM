@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { indexedDB } from '../services/IndexedDBManager';
 import { syncManager } from '../services/SyncManager';

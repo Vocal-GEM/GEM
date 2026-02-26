@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react';
 import { Search, Filter, Grid, List, BookOpen, X, Info, PlayCircle } from 'lucide-react';
 import { applyFilters, getCategories, getDifficulties, getExerciseStats } from '../../utils/exerciseSearchEngine';

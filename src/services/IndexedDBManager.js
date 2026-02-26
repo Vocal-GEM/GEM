@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * IndexedDB Manager for Vocal GEM
  * Provides a simple API for storing and retrieving data with better performance

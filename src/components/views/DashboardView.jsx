@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { cloneElement, useState, useEffect } from 'react';
 import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen, Flame, Sparkles, Timer } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 
 import { useAudio } from '../../context/AudioContext';
 import LTASPlot from '../viz/LTASPlot';

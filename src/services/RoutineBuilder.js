@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 
 // Exercise Templates
 const EXERCISES = [

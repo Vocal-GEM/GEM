@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * HapticService - Provides haptic feedback on supported devices
  */

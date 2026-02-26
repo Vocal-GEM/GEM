@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * Normative Service
  * Provides population norms for voice metrics based on demographics.

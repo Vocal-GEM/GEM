@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * NotificationService - Handles push notifications and reminders
  */

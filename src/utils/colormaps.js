@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * Spectrogram Colormap Utilities
  * Provides multiple color schemes for spectrogram visualizations

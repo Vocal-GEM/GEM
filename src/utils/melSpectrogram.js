@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export function computeMelSpectrogram(audioBuffer, config) {
     const {
         sampleRate = 16000,

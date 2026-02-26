@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { search, getSearchableItems, refreshSearchIndex, getTypeLabel, groupResultsByType } from './SearchService';
 

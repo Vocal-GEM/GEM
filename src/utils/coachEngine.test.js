@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { describe, it, expect, vi } from 'vitest';
 import { CoachEngine } from './coachEngine';
 import { KnowledgeService } from '../services/KnowledgeService';

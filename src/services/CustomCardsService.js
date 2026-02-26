@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * CustomCardsService - Create and manage user's personal practice cards
  */

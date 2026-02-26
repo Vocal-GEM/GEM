@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // Tension Relief Recommendation Engine
 // Parses user input and recommends exercises for body tension areas
 

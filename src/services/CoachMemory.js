@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 
 const STORAGE_KEY = 'gem_coach_memory';
 

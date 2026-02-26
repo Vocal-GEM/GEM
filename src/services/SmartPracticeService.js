@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * SmartPracticeService - Generates personalized practice sessions based on user data
  */

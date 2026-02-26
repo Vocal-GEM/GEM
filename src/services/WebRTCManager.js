@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { io } from 'socket.io-client';
 
 export class WebRTCManager {

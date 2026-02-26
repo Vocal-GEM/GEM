@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from 'react';
 import { Mic, Square, Trash2, Save, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
