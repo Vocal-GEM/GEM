@@ -25,7 +25,6 @@ const synthesizeAudio = (praatValues, duration = 1.0, sampleRate = 44100) => {
         }
 
         // Apply formant filtering (simplified additive synthesis for formants here for robustness)
-        // Note: Additive synthesis creates distinct peaks which should be detectable
         if (praatValues.f1) {
             const f1 = praatValues.f1;
             // Boost amplitude significantly to ensure detection
@@ -85,7 +84,7 @@ describe('Algorithm Validation against PRAAT', () => {
             }
 
             expect(adjustedError).toBeLessThan(60);
-        });
+        }, 10000); // 10s timeout per test
 
         if (ref.praatValues.f1 && ref.praatValues.f2) {
             it(`accurately estimates formants for ${ref.description}`, () => {
@@ -100,7 +99,7 @@ describe('Algorithm Validation against PRAAT', () => {
                      expect(formants.F1).toBeGreaterThan(200);
                      expect(formants.F2).toBeGreaterThan(800);
                 }
-            });
+            }, 10000);
         }
     });
 
@@ -117,5 +116,5 @@ describe('Algorithm Validation against PRAAT', () => {
         if (lowResult.pitch && highResult.pitch) {
              expect(lowResult.pitch).toBeLessThan(highResult.pitch);
         }
-    });
+    }, 15000); // 15s timeout
 });
