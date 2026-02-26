@@ -45,12 +45,10 @@ describe('QuickActions', () => {
 
         // Check the menu container visibility
         // Finding by ID is robust here
-        // eslint-disable-next-line testing-library/no-node-access
         const menuContainer = document.getElementById('quick-actions-menu');
         expect(menuContainer).toHaveAttribute('aria-hidden', 'true');
 
         // Check tabIndex of the button
-        // eslint-disable-next-line testing-library/no-node-access
         const button = practiceLabel.closest('button');
         expect(button).toHaveAttribute('tabIndex', '-1');
     });
@@ -65,12 +63,10 @@ describe('QuickActions', () => {
         // Check label change
         expect(fab).toHaveAttribute('aria-label', 'Close Quick Actions');
 
-        // eslint-disable-next-line testing-library/no-node-access
         const menuContainer = document.getElementById('quick-actions-menu');
         expect(menuContainer).toHaveAttribute('aria-hidden', 'false');
 
         const practiceLabel = screen.getByText('Practice');
-        // eslint-disable-next-line testing-library/no-node-access
         const button = practiceLabel.closest('button');
         expect(button).toHaveAttribute('tabIndex', '0');
     });
