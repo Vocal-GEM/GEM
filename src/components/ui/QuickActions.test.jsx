@@ -3,19 +3,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import QuickActions from './QuickActions';
 
-describe('QuickActions', () => {
-    const { mockSettings, mockUpdateSettings } = vi.hoisted(() => ({
-        mockSettings: { listenMode: false },
-        mockUpdateSettings: vi.fn(),
-    }));
+const { mockSettings, mockUpdateSettings } = vi.hoisted(() => ({
+    mockSettings: { listenMode: false },
+    mockUpdateSettings: vi.fn(),
+}));
 
+vi.mock('../../context/SettingsContext', () => ({
+    useSettings: () => ({
+        settings: mockSettings,
+        updateSettings: mockUpdateSettings
+    })
+}));
+
+describe('QuickActions', () => {
     beforeEach(() => {
-        vi.mock('../../context/SettingsContext', () => ({
-            useSettings: () => ({
-                settings: mockSettings,
-                updateSettings: mockUpdateSettings
-            })
-        }));
         mockUpdateSettings.mockClear();
     });
 
@@ -77,5 +78,19 @@ describe('QuickActions', () => {
         fireEvent.click(screen.getByText('Listen Mode'));
 
         expect(mockUpdateSettings).toHaveBeenCalledWith({ ...mockSettings, listenMode: true });
+    });
+
+    it('should close menu when Escape is pressed', () => {
+        render(<QuickActions />);
+        const fab = screen.getByRole('button', { name: /quick actions/i });
+
+        // Open menu
+        fireEvent.click(fab);
+        expect(fab).toHaveAttribute('aria-expanded', 'true');
+
+        // Press Escape
+        fireEvent.keyDown(window, { key: 'Escape', code: 'Escape' });
+
+        expect(fab).toHaveAttribute('aria-expanded', 'false');
     });
 });
