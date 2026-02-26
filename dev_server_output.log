@@ -29,3 +29,5 @@
 8:10:03 AM [vite] page reload src/services/ResearchMode.js
 8:10:22 AM [vite] hmr update /src/components/analytics/WeeklyDigest.jsx, /src/index.css
 8:11:08 AM [vite] page reload src/components/ui/button.test.jsx
+8:22:58 AM [vite] page reload src/components/marketplace/MarketplaceBrowser.jsx
+8:23:05 AM [vite] hmr update /src/components/analytics/WeeklyDigest.jsx, /src/index.css
