@@ -9,9 +9,19 @@ vi.mock('socket.io-client', () => ({
 }));
 
 // Mock pitchfinder
-vi.mock('pitchfinder', () => ({
-    McLeod: vi.fn(() => vi.fn((buffer) => 440)),
-    YIN: vi.fn(() => vi.fn((buffer) => 440))
+vi.mock('pitchfinder', () => {
+    const mockDetector = vi.fn(() => vi.fn((buffer) => 440));
+    return {
+        McLeod: mockDetector,
+        Macleod: mockDetector,
+        YIN: mockDetector
+    };
+});
+
+// Mock config/runtime to enable backend
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: vi.fn(() => true),
+    getBackendUrl: vi.fn(() => 'http://localhost:5000')
 }));
 
 // Mock AudioContext and browser APIs
