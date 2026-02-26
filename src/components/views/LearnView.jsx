@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect, lazy, Suspense } from 'react';
 import {
     BookOpen,

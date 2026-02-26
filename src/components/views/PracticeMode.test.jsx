@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-env jest */
 
 import { render, screen } from '@testing-library/react';

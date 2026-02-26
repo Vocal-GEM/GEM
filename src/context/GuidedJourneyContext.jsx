@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { FEMINIZATION_JOURNEY } from '../data/guidedJourneyData';
 import { recordPractice } from '../services/StreakService';

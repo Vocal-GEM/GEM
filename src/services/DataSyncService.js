@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * DataSyncService - High-level service for syncing user data to/from server
  * 

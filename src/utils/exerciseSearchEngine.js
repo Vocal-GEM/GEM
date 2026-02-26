@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 // Exercise Search and Filter Engine
 // Powers the Exercise Library browser with search and filtering
 

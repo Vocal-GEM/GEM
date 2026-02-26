@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * NormsService
  * Provides standardized vocal norms for different gender identities.

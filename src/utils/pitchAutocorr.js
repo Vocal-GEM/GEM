@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * Autocorrelation-based Pitch Detection
  * 

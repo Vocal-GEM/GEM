@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { DSP } from './DSP';
 
 export class PitchDetector {

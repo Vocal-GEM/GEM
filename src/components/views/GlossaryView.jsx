@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState } from 'react';
 import { Search, ArrowLeft, Book } from 'lucide-react';
 import { GLOSSARY_TERMS } from '../../data/glossaryData';

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 
 import { MarketplaceBrowser } from '../marketplace/MarketplaceBrowser';
 

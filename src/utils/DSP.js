@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * DSP Utility Library
  * Ported from resonance-processor.js for main-thread fallback

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { pipeline, env } from '@xenova/transformers';
 
 class TranscriptionEngine {

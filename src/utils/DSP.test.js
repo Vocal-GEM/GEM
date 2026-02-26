@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { describe, it, expect } from 'vitest';
 import { DSP } from './DSP';
 

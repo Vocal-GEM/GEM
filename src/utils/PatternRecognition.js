@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * PatternRecognition.js
  * Detect vocal techniques and patterns from audio analysis

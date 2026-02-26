@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * FlowStateDetector.js
  * Detects when a user is in "the zone" (consistent high performance)

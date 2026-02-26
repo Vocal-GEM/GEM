@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Volume2, Info, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

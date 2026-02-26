@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * VoiceDataCollector - Local-first voice data collection service
  * 

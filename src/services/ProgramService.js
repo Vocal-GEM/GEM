@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 
 // ProgramService - Manages structured curricula and programs
 import { SINGING_COURSE } from '../data/SingingCourse';

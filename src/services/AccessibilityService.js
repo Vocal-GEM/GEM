@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * AccessibilityService - Manages accessibility settings
  */

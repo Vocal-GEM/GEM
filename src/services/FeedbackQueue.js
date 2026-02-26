@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * FeedbackQueue.js
  * Priority-based feedback queue to prevent overwhelming users

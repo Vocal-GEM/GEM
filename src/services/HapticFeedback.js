@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * HapticFeedback.js
  * Vibration patterns for mobile and laptop haptic feedback

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { createContext, useContext, useState } from 'react';
 import en from '../locales/en.json';
 

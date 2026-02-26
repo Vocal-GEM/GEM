@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderCoordinator } from './RenderCoordinator';
 

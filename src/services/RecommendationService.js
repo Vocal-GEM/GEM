@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * RecommendationService - Suggests exercises based on user's practice patterns
  */

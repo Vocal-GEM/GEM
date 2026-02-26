@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { LanguageProvider, useLanguage } from './LanguageContext';

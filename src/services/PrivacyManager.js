@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * PrivacyManager - Manages granular privacy controls for social features
  */

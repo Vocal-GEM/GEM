@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * Signal Validator
  * Validates audio signal quality before analysis to prevent inaccurate readings

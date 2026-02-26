@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 export class ResonanceCalculator {
     calculate(spectrum, nyquist) {
         let spectralCentroid = 0;

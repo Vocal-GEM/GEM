@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * Haptic Feedback Utility
  * Provides tactile feedback for mobile devices

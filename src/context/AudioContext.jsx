@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { createContext, useContext, useState, useEffect, useRef, useMemo } from 'react';
 import { AudioEngine } from '../engines/AudioEngine';
 import { useSettings } from './SettingsContext';

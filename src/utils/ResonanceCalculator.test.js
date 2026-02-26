@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ResonanceCalculator } from './ResonanceCalculator';
 

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import IntonationTrainingModule from '../training/IntonationTrainingModule';
 import PitchTrainingModule from '../training/PitchTrainingModule';

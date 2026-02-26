@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Calendar, Target, Zap, ChevronRight, RefreshCw, Brain } from 'lucide-react';
 import { generateWeeklyCurriculum, getTodayRecommendation } from '../../services/AICoachService';

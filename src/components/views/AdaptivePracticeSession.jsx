@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Play, Pause, SkipForward, ThumbsUp, ThumbsDown, ArrowLeft, CheckCircle, RefreshCw, AlertTriangle, Timer } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react';
 import { Calendar, Clock } from 'lucide-react';
 import ProgressCharts from '../viz/ProgressCharts';

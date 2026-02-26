@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * DailyChallengeService - Generates and tracks daily practice challenges
  */

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * SearchService - Global search across all app content
  * 

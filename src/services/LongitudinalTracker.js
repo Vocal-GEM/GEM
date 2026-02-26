@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * Longitudinal Tracker
  * Manages long-term progress tracking spanning months to years.

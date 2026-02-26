@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import 'fake-indexeddb/auto';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { practiceCardsService } from './practiceCardsService';

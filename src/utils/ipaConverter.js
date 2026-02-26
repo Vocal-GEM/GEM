@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * IPA Converter Utility
  * Converts English text to Broad IPA (International Phonetic Alphabet)

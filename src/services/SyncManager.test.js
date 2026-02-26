@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { syncManager } from './SyncManager';
 import { indexedDB } from './IndexedDBManager';

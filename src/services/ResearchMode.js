@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-undef */
+
 /**
  * Research Mode Controller
  * Manages clinical trials, research studies, and participant data collection
@@ -13,8 +12,10 @@ const getEnv = (key) => {
     if (typeof import.meta !== 'undefined' && import.meta.env) {
         return import.meta.env[key];
     }
+
     // eslint-disable-next-line no-undef
     if (typeof process !== 'undefined' && process.env) {
+
         // eslint-disable-next-line no-undef
         return process.env[key];
     }

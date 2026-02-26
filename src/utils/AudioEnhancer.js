@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * AudioEnhancer - Audio quality improvement utility
  * Applies noise reduction, normalization, and DC offset removal to audio recordings

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * FeedbackThemes.js
  * Theme configurations for visual feedback components

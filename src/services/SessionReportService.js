@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * SessionReportService - Generates practice session summaries
  */

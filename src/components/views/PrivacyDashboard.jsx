@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from 'react';
 import { Shield, Download, Upload, Trash2, HardDrive, AlertTriangle, Check } from 'lucide-react';
 import { exportAllData, importBackup, getDataSummary, clearAllData } from '../../services/DataBackupService';

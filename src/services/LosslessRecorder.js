@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 export class LosslessRecorder {
     constructor() {
         this.mediaRecorder = null;

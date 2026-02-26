@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * Convert frequency (Hz) to musical note name
  * @param {number} frequency - Frequency in Hz

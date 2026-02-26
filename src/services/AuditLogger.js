@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * Audit Logger Service
  * Maintains a tamper-evident log of all research activities for IRB compliance.

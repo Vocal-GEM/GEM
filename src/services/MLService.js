@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { EdgePitchModel } from '../ml/EdgePitchModel';
 
 class MLService {

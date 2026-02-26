@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * AudioFeedback.js
  * Auditory feedback system for pitch guidance and coaching cues

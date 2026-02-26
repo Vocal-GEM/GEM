@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * StreakService - Tracks daily practice streaks
  * 

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Calendar, TrendingUp, Flame, Clock, Trophy, BarChart2 } from 'lucide-react';
 import { getActivitySummary, getReports } from '../../services/SessionReportService';

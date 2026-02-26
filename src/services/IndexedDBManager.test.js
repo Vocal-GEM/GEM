@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import 'fake-indexeddb/auto';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { indexedDB as dbManager, STORES } from './IndexedDBManager';

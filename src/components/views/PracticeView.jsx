@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState } from 'react';
 import { Mic, Activity, Anchor, Aperture, Maximize2, Waves, Stethoscope } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';

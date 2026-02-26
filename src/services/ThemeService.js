@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * ThemeService - Manages light/dark theme preferences
  */

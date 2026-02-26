@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { EXERCISE_LIBRARY } from '../data/ExerciseLibrary';
 
 export class PracticeRoutineGenerator {

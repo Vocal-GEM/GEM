@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * YIN Pitch Detection Algorithm
  * 

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * DataBackupService - Export and restore all user data
  */

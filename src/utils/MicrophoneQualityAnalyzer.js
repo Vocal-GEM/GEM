@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * Microphone Quality Analyzer
  * Analyzes microphone quality and recommends optimal settings

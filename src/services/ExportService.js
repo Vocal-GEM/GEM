@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * ExportService - Export progress reports in various formats
  */

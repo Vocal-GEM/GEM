@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState } from 'react';
 import {
     BookOpen, Activity, Brain, Heart,

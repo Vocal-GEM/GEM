@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider, useAuth } from './AuthContext';

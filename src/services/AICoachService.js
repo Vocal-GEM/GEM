@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /**
  * AICoachService - Personalized AI coaching and curriculum generation
  */
