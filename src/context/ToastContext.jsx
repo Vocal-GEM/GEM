@@ -59,6 +59,7 @@ export const ToastProvider = ({ children }) => {
                             type={toast.type}
                             duration={toast.duration}
                             onClose={() => hideToast(toast.id)}
+                            className="relative transform-none left-auto bottom-auto"
                         />
                     </div>
                 ))}
