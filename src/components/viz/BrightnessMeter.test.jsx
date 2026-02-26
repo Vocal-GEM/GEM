@@ -1,7 +1,7 @@
 import { render, screen, cleanup, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import BrightnessMeter from './BrightnessMeter';
 import React from 'react';
+import BrightnessMeter from './BrightnessMeter';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
 // Mock RenderCoordinator
@@ -12,16 +12,21 @@ vi.mock('../../services/RenderCoordinator', () => ({
     }
 }));
 
-// Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+// Mock lucide-react with top-level imports to avoid require()
+vi.mock('lucide-react', async (importOriginal) => {
+    const actual = await importOriginal();
+    const MockIcon = (name) => {
+        const Icon = (props) => <div data-testid={name} {...props} />;
+        Icon.displayName = name;
+        return Icon;
+    };
 
     return {
-        Sun: createIcon('Sun'),
-        Moon: createIcon('Moon'),
-        Info: createIcon('Info'),
-        Smile: createIcon('Smile')
+        ...actual,
+        Sun: MockIcon('Sun'),
+        Moon: MockIcon('Moon'),
+        Info: MockIcon('Info'),
+        Smile: MockIcon('Smile')
     };
 });
 
@@ -45,7 +50,8 @@ describe('BrightnessMeter', () => {
     it('subscribes to RenderCoordinator', () => {
         render(<BrightnessMeter dataRef={dataRef} />);
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
-        const [, , priority] = renderCoordinator.subscribe.mock.calls[0];
+        // eslint-disable-next-line no-unused-vars
+        const [_id, _callback, priority] = renderCoordinator.subscribe.mock.calls[0];
         expect(priority).toBe(renderCoordinator.PRIORITY.MEDIUM);
     });
 

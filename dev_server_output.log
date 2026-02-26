@@ -8,3 +8,19 @@
   ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+7:47:50 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:47:57 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:48:02 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:48:58 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:49:23 AM [vite] page reload src/services/PrivacyManager.js
+7:49:32 AM [vite] page reload src/services/ResearchMode.js
+7:50:00 AM [vite] page reload src/audio/PitchWorklet.js
+7:50:40 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+7:50:59 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:51:05 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:51:15 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
+7:52:52 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+7:53:22 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+7:53:52 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
+7:54:16 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+7:56:07 AM [vite] page reload src/services/ResearchMode.js
