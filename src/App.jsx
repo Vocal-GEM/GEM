@@ -71,6 +71,7 @@ import { analyticsService } from './services/AnalyticsService';
 import { useVoiceProfile } from './context/VoiceProfileContext';
 import IntakeQuestionnaire from './components/ui/IntakeQuestionnaire';
 import Breadcrumbs from './components/ui/Breadcrumbs';
+import QuickActions from './components/ui/QuickActions';
 
 // VoiceTwinDiscovery is not used in App directly, it's a widget in Dashboard
 // But if we want it accessible elsewhere we can import it. 
@@ -182,6 +183,25 @@ const App = () => {
         window.addEventListener('openSettings', handleOpenSettings);
         return () => window.removeEventListener('openSettings', handleOpenSettings);
     }, [setShowSettings]);
+
+    const handleQuickAction = (action) => {
+        switch (action) {
+            case 'practice':
+                setActiveTab('practice');
+                break;
+            case 'journal':
+                setShowJournalForm(true);
+                break;
+            case 'warmup':
+                setShowWarmUp(true);
+                break;
+            case 'coach':
+                setActiveTab('learn');
+                break;
+            default:
+                break;
+        }
+    };
 
     return (
         <TourProvider>
@@ -455,10 +475,9 @@ const App = () => {
                         {showAssessment && <AssessmentModule onClose={() => setShowAssessment(false)} />}
                         {showWarmUp && <WarmUpModule onComplete={() => setShowWarmUp(false)} onSkip={() => setShowWarmUp(false)} />}
 
-                        <TourOverlay />
-                        <CommandPalette />
                         <CommandPalette />
                         <QuickSettings isOpen={false} onClose={() => { }} />
+                        <QuickActions onAction={handleQuickAction} />
                         {showCamera && <FloatingCamera onClose={() => setShowCamera(false)} />}
                         {modals.analytics && <AnalyticsDashboard onClose={() => closeModal('analytics')} />}
                         {modals.adaptiveSession && (
