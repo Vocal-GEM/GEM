@@ -13,6 +13,60 @@ export class LPCAnalyzer {
     constructor(order = 12, sampleRate = 48000) {
         this.order = order; // Typically 10-12 for speech at 8-10kHz, maybe higher for 48kHz
         this.sampleRate = sampleRate;
+        this.numPoints = 512; // Fixed resolution for spectrum
+
+        // Reusable Buffers
+        this._preEmphasisBuffer = null;
+        this._windowBuffer = null;
+        this._autocorrBuffer = new Float32Array(this.order + 1);
+        this._levinsonBuffers = {
+            a: new Float32Array(this.order + 1),
+            e: new Float32Array(this.order + 1),
+            k_coeff: new Float32Array(this.order + 1),
+            a_prev: new Float32Array(this.order + 1)
+        };
+        this._spectrumBuffer = new Float32Array(this.numPoints);
+
+        // Precomputed Tables
+        this._hammingWindow = null;
+        this._cosTable = null;
+        this._sinTable = null;
+
+        this._initTrigTables();
+    }
+
+    _initBuffers(size) {
+        if (!this._preEmphasisBuffer || this._preEmphasisBuffer.length !== size) {
+            this._preEmphasisBuffer = new Float32Array(size);
+            this._windowBuffer = new Float32Array(size);
+
+            // Recompute Window
+            this._hammingWindow = new Float32Array(size);
+            for (let i = 0; i < size; i++) {
+                this._hammingWindow[i] = 0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (size - 1));
+            }
+        }
+    }
+
+    _initTrigTables() {
+        // Precompute Cos/Sin for computeLPCSpectrum
+        // Outer loop: numPoints (0 to 511)
+        // Inner loop: order (1 to order) -> k
+        // angle = -omega * k
+        // omega = (Math.PI * i) / (numPoints - 1)
+
+        this._cosTable = new Float32Array(this.numPoints * (this.order + 1));
+        this._sinTable = new Float32Array(this.numPoints * (this.order + 1));
+
+        for (let i = 0; i < this.numPoints; i++) {
+            const omega = (Math.PI * i) / (this.numPoints - 1);
+            for (let k = 1; k <= this.order; k++) { // We only need k=1 to order
+                const angle = -omega * k;
+                const idx = i * (this.order + 1) + k;
+                this._cosTable[idx] = Math.cos(angle);
+                this._sinTable[idx] = Math.sin(angle);
+            }
+        }
     }
 
     /**
@@ -23,6 +77,9 @@ export class LPCAnalyzer {
     analyze(audioBuffer) {
         if (!audioBuffer || audioBuffer.length === 0) return null;
 
+        // Ensure buffers match input size
+        this._initBuffers(audioBuffer.length);
+
         // 1. Pre-emphasis
         const signal = this.applyPreEmphasis(audioBuffer);
 
@@ -30,7 +87,8 @@ export class LPCAnalyzer {
         const windowed = this.applyWindow(signal);
 
         // 3. Autocorrelation
-        const r = this.computeAutocorrelation(windowed, this.order);
+        this.computeAutocorrelation(windowed, this.order, this._autocorrBuffer);
+        const r = this._autocorrBuffer;
 
         // 4. Levinson-Durbin Recursion
         const { a, error } = this.levinsonDurbin(r, this.order);
@@ -38,7 +96,7 @@ export class LPCAnalyzer {
         // 5. Compute Spectral Envelope (Frequency Response of LPC filter)
         // We evaluate the filter H(z) = G / (1 - sum(a[k] * z^-k))
         // at various frequencies.
-        const envelope = this.computeLPCSpectrum(a, error, 512); // 512 points
+        const envelope = this.computeLPCSpectrum(a, error); // 512 points
 
         // 6. Find Formants (Roots of the polynomial or Peak picking from envelope)
         // Peak picking from envelope is simpler and often sufficient for visualization
@@ -46,13 +104,13 @@ export class LPCAnalyzer {
 
         return {
             coefficients: a,
-            envelope,
+            envelope: envelope.slice(), // Return a copy to ensure immutability for React consumers
             formants
         };
     }
 
     applyPreEmphasis(signal, coeff = 0.97) {
-        const output = new Float32Array(signal.length);
+        const output = this._preEmphasisBuffer;
         output[0] = signal[0];
         for (let i = 1; i < signal.length; i++) {
             output[i] = signal[i] - coeff * signal[i - 1];
@@ -61,40 +119,38 @@ export class LPCAnalyzer {
     }
 
     applyWindow(signal) {
-        const N = signal.length;
-        const output = new Float32Array(N);
-        for (let i = 0; i < N; i++) {
+        const output = this._windowBuffer;
+        const window = this._hammingWindow;
+        for (let i = 0; i < signal.length; i++) {
             // Hamming window
-            const w = 0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (N - 1));
-            output[i] = signal[i] * w;
+            output[i] = signal[i] * window[i];
         }
         return output;
     }
 
-    computeAutocorrelation(signal, order) {
-        const R = new Float32Array(order + 1);
+    computeAutocorrelation(signal, order, outputBuffer) {
         const N = signal.length;
+        // outputBuffer is this._autocorrBuffer
         for (let k = 0; k <= order; k++) {
             let sum = 0;
             for (let i = 0; i < N - k; i++) {
                 sum += signal[i] * signal[i + k];
             }
-            R[k] = sum;
+            outputBuffer[k] = sum;
         }
-        return R;
+        return outputBuffer;
     }
 
     levinsonDurbin(R, order) {
-        const a = new Float32Array(order + 1);
-        const E = new Float32Array(order + 1);
+        const { a, e: E, k_coeff, a_prev } = this._levinsonBuffers;
 
         // Initialization
         E[0] = R[0];
         a[0] = 1; // a[0] is always 1
 
         // Temporary arrays
-        const k_coeff = new Float32Array(order + 1);
-        const a_prev = new Float32Array(order + 1);
+        // const k_coeff = new Float32Array(order + 1);
+        // const a_prev = new Float32Array(order + 1);
 
         for (let i = 1; i <= order; i++) {
             let sum = 0;
@@ -118,7 +174,8 @@ export class LPCAnalyzer {
             E[i] = E[i - 1] * (1 - k * k);
 
             // Update a_prev for next iteration
-            for (let j = 0; j <= i; j++) a_prev[j] = a[j];
+            // for (let j = 0; j <= i; j++) a_prev[j] = a[j];
+            a_prev.set(a.subarray(0, i + 1));
         }
 
         // The coefficients 'a' correspond to 1, -a1, -a2... in standard DSP notation for IIR denominator
@@ -126,31 +183,38 @@ export class LPCAnalyzer {
         // Usually we want the predictor coefficients.
         // Let's stick to the standard definition: A(z) = 1 + sum_{k=1}^p a_k z^{-k}
 
-        return { a: a.slice(1), error: E[order] }; // Return coefficients a1...ap
+        return { a: a.subarray(1, order + 1), error: E[order] }; // Return coefficients a1...ap as subarray
     }
 
-    computeLPCSpectrum(a, error, numPoints) {
-        // Evaluate magnitude response of 1/A(z)
-        // A(z) = 1 + a1*z^-1 + ... + ap*z^-p
-        // z = e^(j*omega)
-
-        const magnitude = new Float32Array(numPoints);
+    computeLPCSpectrum(a, error) {
+        const numPoints = this.numPoints;
+        const magnitude = this._spectrumBuffer;
         const gain = Math.sqrt(error); // Gain G
 
         if (gain < 1e-10) {
-            return new Float32Array(numPoints).fill(-100); // Return low dB floor
+            magnitude.fill(-100);
+            return magnitude;
         }
 
         for (let i = 0; i < numPoints; i++) {
-            const omega = (Math.PI * i) / (numPoints - 1); // 0 to Pi
+            // const omega = (Math.PI * i) / (numPoints - 1); // 0 to Pi
 
             let real = 1.0;
             let imag = 0.0;
 
+            const tableBase = i * (this.order + 1);
+
             for (let k = 0; k < a.length; k++) {
-                const angle = -omega * (k + 1);
-                real += a[k] * Math.cos(angle);
-                imag += a[k] * Math.sin(angle);
+                // const angle = -omega * (k + 1);
+                // real += a[k] * Math.cos(angle);
+                // imag += a[k] * Math.sin(angle);
+
+                const idx = tableBase + k + 1;
+                const cosVal = this._cosTable[idx];
+                const sinVal = this._sinTable[idx];
+
+                real += a[k] * cosVal;
+                imag += a[k] * sinVal;
             }
 
             const magA = Math.sqrt(real * real + imag * imag);
