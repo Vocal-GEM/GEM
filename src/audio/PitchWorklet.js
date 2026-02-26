@@ -1,3 +1,5 @@
+/* global currentTime, registerProcessor, AudioWorkletProcessor */
+
 /**
  * PitchWorklet.js
  * AudioWorklet processor for ultra-low-latency pitch detection
