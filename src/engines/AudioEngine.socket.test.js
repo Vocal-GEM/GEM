@@ -9,9 +9,25 @@ vi.mock('socket.io-client', () => ({
 }));
 
 // Mock pitchfinder
-vi.mock('pitchfinder', () => ({
-    McLeod: vi.fn(() => vi.fn((buffer) => 440)),
-    YIN: vi.fn(() => vi.fn((buffer) => 440))
+vi.mock('pitchfinder', () => {
+    // The library can have unpredictable export structures depending on version/bundler
+    // We mock both 'Macleod' (common typo in library) and 'McLeod'
+    const Macleod = vi.fn(() => vi.fn((buffer) => 440));
+    return {
+        McLeod: Macleod,
+        Macleod: Macleod, // Support the library's typo
+        YIN: vi.fn(() => vi.fn((buffer) => 440)),
+        default: {
+            Macleod: Macleod,
+            McLeod: Macleod
+        }
+    };
+});
+
+// Mock Runtime Config
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: () => true,
+    getBackendUrl: () => 'http://localhost:5000'
 }));
 
 // Mock AudioContext and browser APIs
@@ -97,7 +113,8 @@ describe('AudioEngine Socket Integration', () => {
             disconnect: vi.fn(),
             connected: false
         };
-        io.mockReturnValue(mockSocket);
+        // Reset the mock implementation for each test to return our fresh mockSocket
+        io.mockImplementation(() => mockSocket);
 
         engine = new AudioEngine(() => { });
     });
