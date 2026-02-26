@@ -3,24 +3,29 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import QuickActions from './QuickActions';
 
-describe('QuickActions', () => {
-    const { mockSettings, mockUpdateSettings } = vi.hoisted(() => ({
-        mockSettings: { listenMode: false },
-        mockUpdateSettings: vi.fn(),
-    }));
+// Hoist mocks to top level
+const { mockSettings, mockUpdateSettings } = vi.hoisted(() => ({
+    mockSettings: { listenMode: false },
+    mockUpdateSettings: vi.fn(),
+}));
 
+// Mock the context
+vi.mock('../../context/SettingsContext', () => ({
+    useSettings: () => ({
+        settings: mockSettings,
+        updateSettings: mockUpdateSettings
+    })
+}));
+
+describe('QuickActions', () => {
     beforeEach(() => {
-        vi.mock('../../context/SettingsContext', () => ({
-            useSettings: () => ({
-                settings: mockSettings,
-                updateSettings: mockUpdateSettings
-            })
-        }));
         mockUpdateSettings.mockClear();
+        mockSettings.listenMode = false; // Reset state if needed, though objects are ref
     });
 
     it('should render the FAB button', () => {
         render(<QuickActions />);
+        // Matches "Open Quick Actions"
         expect(screen.getByRole('button', { name: /quick actions/i })).toBeInTheDocument();
     });
 
@@ -34,11 +39,19 @@ describe('QuickActions', () => {
         expect(fab).toHaveAttribute('aria-controls', 'quick-actions-menu');
 
         // Buttons should be hidden from accessibility tree initially
-        const practiceButton = screen.queryByText('Practice');
-        expect(practiceButton).toBeInTheDocument();
-        // Since we are finding by text which is in a span, we check the button parent
-        const button = practiceButton.closest('button');
-        expect(button).toHaveAttribute('aria-hidden', 'true');
+        // We look for text inside the button
+        const practiceLabel = screen.queryByText('Practice');
+        expect(practiceLabel).toBeInTheDocument();
+
+        // Check the menu container visibility
+        // Finding by ID is robust here
+        // eslint-disable-next-line testing-library/no-node-access
+        const menuContainer = document.getElementById('quick-actions-menu');
+        expect(menuContainer).toHaveAttribute('aria-hidden', 'true');
+
+        // Check tabIndex of the button
+        // eslint-disable-next-line testing-library/no-node-access
+        const button = practiceLabel.closest('button');
         expect(button).toHaveAttribute('tabIndex', '-1');
     });
 
@@ -49,10 +62,33 @@ describe('QuickActions', () => {
         fireEvent.click(fab);
 
         expect(fab).toHaveAttribute('aria-expanded', 'true');
+        // Check label change
+        expect(fab).toHaveAttribute('aria-label', 'Close Quick Actions');
 
-        const practiceButton = screen.getByText('Practice').closest('button');
-        expect(practiceButton).toHaveAttribute('aria-hidden', 'false');
-        expect(practiceButton).toHaveAttribute('tabIndex', '0');
+        // eslint-disable-next-line testing-library/no-node-access
+        const menuContainer = document.getElementById('quick-actions-menu');
+        expect(menuContainer).toHaveAttribute('aria-hidden', 'false');
+
+        const practiceLabel = screen.getByText('Practice');
+        // eslint-disable-next-line testing-library/no-node-access
+        const button = practiceLabel.closest('button');
+        expect(button).toHaveAttribute('tabIndex', '0');
+    });
+
+    it('should close menu when Escape key is pressed', () => {
+        render(<QuickActions />);
+        const fab = screen.getByRole('button', { name: /quick actions/i });
+
+        // Open menu
+        fireEvent.click(fab);
+        expect(fab).toHaveAttribute('aria-expanded', 'true');
+
+        // Press Escape
+        fireEvent.keyDown(window, { key: 'Escape' });
+
+        // Menu should close
+        expect(fab).toHaveAttribute('aria-expanded', 'false');
+        expect(fab).toHaveAttribute('aria-label', 'Open Quick Actions');
     });
 
     it('should call onAction when an action is clicked', () => {
