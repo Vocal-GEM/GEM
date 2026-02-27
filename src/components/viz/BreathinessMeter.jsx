@@ -165,24 +165,14 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
             renderCoordinator.PRIORITY.MEDIUM
         );
 
-        return unsubscribe;
-    }, [dataRef, colorBlindMode, componentId]);
-        };
-
         const unsubscribe = renderCoordinator.subscribe(
             componentId,
-            updateMeter,
-
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `BreathinessMeter-${componentId}`,
             loop,
             renderCoordinator.PRIORITY.MEDIUM
         );
 
         return () => unsubscribe();
-    }, [dataRef, colorBlindMode, componentId]);
+    }, [dataRef, colorBlindMode, componentId, loop]);
             `breathiness-meter-${componentId}`,
         };
 
