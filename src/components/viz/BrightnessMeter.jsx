@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useId } from 'react';
+import { useState, useEffect, useRef, useId, memo } from 'react';
 import { Sun, Moon, Info, Smile } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
@@ -8,7 +8,7 @@ import { renderCoordinator } from '../../services/RenderCoordinator';
  * Based on research: All vowels should have an underlying /i/ posture
  * for bright resonance. F2 is the primary acoustic correlate of brightness.
  */
-const BrightnessMeter = ({ dataRef, showTip = true }) => {
+const BrightnessMeter = memo(({ dataRef, showTip = true }) => {
     // State for low-frequency updates (UI layout/colors)
     const [zone, setZone] = useState('neutral');
     const [showTooltip, setShowTooltip] = useState(false);
@@ -108,7 +108,7 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
                         )}
                     </div>
                     <div>
-                        <h3 className="text-sm font-bold text-white">Brightness Meter</h3>
+                        <h3 className="text-sm font-bold text-white">BrightnessMeter</h3>
                         <p className="text-xs text-slate-400">F2 → /i/ Target</p>
                     </div>
                 </div>
@@ -198,6 +198,8 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
             )}
         </div>
     );
-};
+});
+
+BrightnessMeter.displayName = 'BrightnessMeter';
 
 export default BrightnessMeter;
