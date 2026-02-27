@@ -12,7 +12,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
 
     useEffect(() => {
         const loop = () => {
-            if (indicatorRef.current && valueRef.current) {
+            if (indicatorRef.current && valueRef.current && dataRef.current) {
                 const tilt = dataRef.current.tilt || 0;
 
                 // Map Tilt: Typically -20dB/oct (Masc/Steep?) to 0dB/oct (Flat/Bright?)
@@ -42,17 +42,6 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
             }
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                `spectral-tilt-meter-${id}`,
-                loop,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
-
         const unsubscribe = renderCoordinator.subscribe(
             `spectral-tilt-meter-${componentId}`,
             loop,
@@ -62,7 +51,6 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
         return () => {
             unsubscribe();
         };
-    }, [dataRef, targetRange, colorBlindMode, id]);
     }, [dataRef, targetRange, colorBlindMode, componentId]);
 
     return (
@@ -89,8 +77,14 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 {(() => {
                     const minDisp = -24;
                     const maxDisp = 0;
-                    const left = ((targetRange.min - minDisp) / (maxDisp - minDisp)) * 100;
-                    const width = ((targetRange.max - targetRange.min) / (maxDisp - minDisp)) * 100;
+                    // Calculate left and width for the target range overlay
+                    let left = ((targetRange.min - minDisp) / (maxDisp - minDisp)) * 100;
+                    let width = ((targetRange.max - targetRange.min) / (maxDisp - minDisp)) * 100;
+
+                    // Clamp values to ensure they stay within 0-100%
+                    left = Math.max(0, Math.min(100, left));
+                    width = Math.max(0, Math.min(100 - left, width));
+
                     return (
                         <div
                             className={`absolute top-0 bottom-0 border-x ${colorBlindMode ? 'bg-amber-500/20 border-amber-500/30' : 'bg-emerald-500/20 border-emerald-500/30'}`}
