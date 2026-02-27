@@ -17,7 +17,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 }));
 
 // Mock ResizeObserver
-global.ResizeObserver = class {
+globalThis.ResizeObserver = class {
     observe() {}
     disconnect() {}
     unobserve() {}
