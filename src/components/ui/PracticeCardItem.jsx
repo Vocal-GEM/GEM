@@ -65,7 +65,7 @@ const PracticeCardItem = ({ card, index, onSelect, onViewActivity }) => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                     <button
                         onClick={(e) => { e.stopPropagation(); onSelect(); }}
                         className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white transition-all shadow-lg shadow-violet-500/20"

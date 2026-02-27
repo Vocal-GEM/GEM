@@ -166,6 +166,14 @@ const PracticeCardsPanel = ({ onClose, embedded = false }) => {
                             key={set.id}
                             className="group bg-slate-800/50 hover:bg-slate-800 rounded-xl border border-white/5 hover:border-violet-500/30 p-4 transition-all cursor-pointer"
                             onClick={() => handleSelectSet(set.id)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    handleSelectSet(set.id);
+                                }
+                            }}
                         >
                             <div className="flex items-start justify-between">
                                 <div className="flex-1 min-w-0">
@@ -189,7 +197,7 @@ const PracticeCardsPanel = ({ onClose, embedded = false }) => {
 
                                 {/* Actions for custom sets */}
                                 {!set.isDefault && (
-                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity ml-2">
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleEdit(set); }}
                                             className="p-1.5 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-slate-400 hover:text-white transition-all"
