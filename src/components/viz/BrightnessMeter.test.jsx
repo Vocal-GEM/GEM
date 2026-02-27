@@ -13,9 +13,15 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+vi.mock('lucide-react', async (importOriginal) => {
+    // In Vitest ESM environment, require is not available.
+    // We use dynamic import or simple component mocks.
+    // For icons, a simple function returning a div is enough.
+    const createIcon = (name) => {
+        const Icon = (props) => React.createElement('div', { ...props, 'data-testid': name });
+        Icon.displayName = name;
+        return Icon;
+    };
 
     return {
         Sun: createIcon('Sun'),
