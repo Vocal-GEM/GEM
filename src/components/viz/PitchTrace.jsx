@@ -105,15 +105,41 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
         // Filter and Draw Segments
         // We only draw lines if they are visible or crossing the view
 
-        ctx.beginPath();
-        let isDrawing = false;
+        // --- OPTIMIZATION: Batch segments by color ---
+        // Instead of calling stroke() for every segment, we only call it when the color changes.
+        // This reduces draw calls from O(N) to O(1) (technically O(C) where C is number of color groups).
+
+        let currentColor = null;
+        let isBatchActive = false;
+
+        const flushBatch = () => {
+            if (isBatchActive) {
+                ctx.stroke();
+                isBatchActive = false;
+            }
+        };
+
+        const getColor = (f1, f2) => {
+            if (!targetRange) return '#ef4444';
+            const avgFreq = (f1 + f2) / 2;
+            if (avgFreq >= targetRange.min && avgFreq <= targetRange.max) {
+                return '#4ade80'; // Green
+            } else if (
+                (avgFreq >= targetRange.min * 0.9 && avgFreq < targetRange.min) ||
+                (avgFreq > targetRange.max && avgFreq <= targetRange.max * 1.1)
+            ) {
+                return '#facc15'; // Yellow
+            }
+            return '#ef4444'; // Red
+        };
 
         for (let i = 1; i < data.length; i++) {
             const p1 = data[i - 1];
             const p2 = data[i];
 
+            // Gap detection
             if (!p1.frequency || !p2.frequency) {
-                isDrawing = false;
+                flushBatch();
                 continue;
             }
 
@@ -125,31 +151,32 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
             const x2 = getX(p2.time);
             const y2 = getY(p2.frequency);
 
-            // Determine color based on target
-            let color = '#ef4444'; // Red default
-            if (targetRange) {
-                const avgFreq = (p1.frequency + p2.frequency) / 2;
-                if (avgFreq >= targetRange.min && avgFreq <= targetRange.max) {
-                    color = '#4ade80'; // Green
-                } else if (
-                    (avgFreq >= targetRange.min * 0.9 && avgFreq < targetRange.min) ||
-                    (avgFreq > targetRange.max && avgFreq <= targetRange.max * 1.1)
-                ) {
-                    color = '#facc15'; // Yellow
+            const color = getColor(p1.frequency, p2.frequency);
+
+            if (color !== currentColor) {
+                // Color changed - flush previous batch and start new one
+                flushBatch();
+                currentColor = color;
+                ctx.strokeStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                isBatchActive = true;
+            } else {
+                // Same color - continue path
+                if (!isBatchActive) {
+                    // Starting a new batch after a gap
+                    ctx.strokeStyle = color;
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    isBatchActive = true;
+                } else {
+                    ctx.lineTo(x2, y2);
                 }
             }
-
-            // Because we want per-segment coloring, we must stroke each segment individually
-            // or batch them by color. For simplicity/correctness of gradient transition 
-            // in this specific "color by target" logic, stroking individually is easiest 
-            // though less performant. Given data size (~seconds of audio), it's fine.
-
-            ctx.strokeStyle = color;
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.stroke();
         }
+        flushBatch(); // Draw any remaining path
 
         // Draw Playback Cursor
         if (currentTime !== undefined) {
