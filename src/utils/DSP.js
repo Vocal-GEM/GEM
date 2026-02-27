@@ -496,9 +496,10 @@ export class DSP {
      * @param {Float32Array} freqData - FFT magnitude data in dB
      * @param {number} pitch - Fundamental frequency (Hz)
      * @param {number} sampleRate - Audio sample rate
+     * @param {number|null} precalculatedTilt - Optional pre-calculated spectral tilt to avoid re-calculation
      * @returns {Object} { weight: 0-100, h1h2: dB, centroid: Hz, label: string }
      */
-    static calculateVocalWeight(freqData, pitch, sampleRate) {
+    static calculateVocalWeight(freqData, pitch, sampleRate, precalculatedTilt = null) {
         if (!pitch || pitch < 50) {
             return { weight: 50, h1h2: 0, centroid: 0, label: 'Unknown', h1: 0, h2: 0 };
         }
@@ -526,21 +527,26 @@ export class DSP {
         // Calculate spectral centroid
         const centroid = this.calculateSpectralCentroid(freqData, sampleRate);
 
-        // Calculate spectral tilt (0-4kHz)
-        const bin1k = Math.floor(1000 / binSize);
-        const bin4k = Math.floor(4000 / binSize);
+        // Calculate spectral tilt (0-4kHz) if not provided
+        let spectralTilt;
+        if (precalculatedTilt !== null) {
+            spectralTilt = precalculatedTilt;
+        } else {
+            const bin1k = Math.floor(1000 / binSize);
+            const bin4k = Math.floor(4000 / binSize);
 
-        let sumLow = 0, sumHigh = 0;
-        for (let i = 1; i < bin1k; i++) {
-            sumLow += Math.pow(10, freqData[i] / 10);
-        }
-        for (let i = bin1k; i < bin4k; i++) {
-            sumHigh += Math.pow(10, freqData[i] / 10);
-        }
+            let sumLow = 0, sumHigh = 0;
+            for (let i = 1; i < bin1k; i++) {
+                sumLow += Math.pow(10, freqData[i] / 10);
+            }
+            for (let i = bin1k; i < bin4k; i++) {
+                sumHigh += Math.pow(10, freqData[i] / 10);
+            }
 
-        const dbLow = 10 * Math.log10(sumLow + 1e-10);
-        const dbHigh = 10 * Math.log10(sumHigh + 1e-10);
-        const spectralTilt = (dbHigh - dbLow) / 2.0;
+            const dbLow = 10 * Math.log10(sumLow + 1e-10);
+            const dbHigh = 10 * Math.log10(sumHigh + 1e-10);
+            spectralTilt = (dbHigh - dbLow) / 2.0;
+        }
 
         // --- WEIGHT CALCULATION ---
 
