@@ -69,7 +69,7 @@
     "workbox-window": "^7.4.0"
   },
   "engines": {
-    "node": ">=20.11 <21",
+    "node": ">=20.11 <23",
     "npm": ">=10"
   },
   "packageManager": "npm@10"
