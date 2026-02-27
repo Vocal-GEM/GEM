@@ -5,8 +5,9 @@
 const PRIVACY_KEY = 'gem_privacy_settings';
 
 const DEFAULT_SETTINGS = {
+    shareMilestones: false,
     shareProgress: false,
-    shareProgress: false,
+    profileVisibility: 'private',
     showInLeaderboards: false,
     dataRetentionDays: 90
 };
