@@ -59,11 +59,21 @@ describe('AuthContext', () => {
     });
 
     it('logs in successfully', async () => {
-        fetch.mockResolvedValueOnce({ ok: false }); // initial /me
+        // Mock initial check (failed)
+        fetch.mockResolvedValueOnce({ ok: false });
+
+        // Mock login call
         fetch.mockResolvedValueOnce({
             ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
-        }); // login
+            json: async () => ({ user: { id: 1, username: 'testuser' }, token: 'mock-token' })
+        });
+
+        // Mock /me check after login (often AuthProvider re-checks or uses the returned user)
+        // If AuthContext uses the returned user directly, this might not be needed, but safe to add
+        fetch.mockResolvedValueOnce({
+             ok: true,
+             json: async () => ({ user: { id: 1, username: 'testuser' } })
+        });
 
         let result;
         await act(async () => {
@@ -112,9 +122,11 @@ describe('AuthContext', () => {
         fetch.mockResolvedValueOnce({ ok: false }); // initial /me
         fetch.mockResolvedValueOnce({
             ok: true,
-            json: async () => ({ user: { id: 1, username: 'testuser' } })
+            json: async () => ({ user: { id: 1, username: 'testuser' }, token: 'mock-token' })
         }); // login
-        fetch.mockResolvedValueOnce({ ok: true }); // logout
+
+        // Mock logout
+        fetch.mockResolvedValueOnce({ ok: true });
 
         let result;
         await act(async () => {
@@ -149,4 +161,3 @@ describe('AuthContext', () => {
         });
     });
 });
-
