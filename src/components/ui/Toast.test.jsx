@@ -76,4 +76,33 @@ describe('Toast Component', () => {
     expect(status).toHaveAttribute('aria-atomic', 'true');
     expect(screen.getByText('Information:')).toHaveClass('sr-only');
   });
+
+  it('pauses timer on hover', () => {
+    const onClose = vi.fn();
+    render(<Toast message="Test Message" onClose={onClose} duration={3000} />);
+
+    const toast = screen.getByRole('status');
+
+    // Simulate hover
+    fireEvent.mouseEnter(toast);
+
+    // Advance time past duration
+    act(() => {
+      vi.advanceTimersByTime(3500);
+    });
+
+    // Should not close yet
+    expect(onClose).not.toHaveBeenCalled();
+
+    // Simulate mouse leave
+    fireEvent.mouseLeave(toast);
+
+    // Advance time again
+    act(() => {
+      vi.advanceTimersByTime(3500);
+    });
+
+    // Now it should close
+    expect(onClose).toHaveBeenCalled();
+  });
 });
