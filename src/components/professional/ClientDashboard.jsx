@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, UserPlus, Search, FileText, Calendar, ChevronRight, MoreVertical } from 'lucide-react';
+import { Users, UserPlus, Search, FileText, Calendar, ChevronRight, MoreVertical, Activity } from 'lucide-react';
 
 const ClientDashboard = () => {
     const [clients, setClients] = useState([
@@ -18,14 +18,15 @@ const ClientDashboard = () => {
     const handleAddClient = () => {
         const name = prompt("Enter client name:");
         if (name) {
-            setClients([...clients, {
+            const newClient = {
                 id: Date.now(),
                 name,
                 status: 'Pending',
                 nextSession: 'TBD',
                 goal: 'Assessment',
                 avatar: name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
-            }]);
+            };
+            setClients([...clients, newClient]);
         }
     };
 
