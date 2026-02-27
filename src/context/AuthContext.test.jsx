@@ -19,6 +19,12 @@ vi.mock('../services/DataSyncService', () => ({
     syncFromServer: vi.fn().mockResolvedValue(true)
 }));
 
+// Mock Runtime Config
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: () => true,
+    getBackendUrl: () => 'http://localhost:5000'
+}));
+
 import { indexedDB } from '../services/IndexedDBManager';
 import { syncToServer, syncFromServer } from '../services/DataSyncService';
 
