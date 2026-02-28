@@ -77,6 +77,7 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                     <button
                         onClick={onClose}
                         className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                        aria-label="Close consent modal"
                     >
                         <X size={20} />
                     </button>
@@ -136,6 +137,9 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                                     onClick={() => handleToggle('enabled')}
                                     className={`w-12 h-6 rounded-full transition-colors relative ${currentConsent.enabled ? 'bg-green-500' : 'bg-slate-700'
                                         }`}
+                                    role="switch"
+                                    aria-checked={currentConsent.enabled}
+                                    aria-label="Enable data collection"
                                 >
                                     <div
                                         className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${currentConsent.enabled ? 'left-6' : 'left-0.5'
@@ -165,6 +169,9 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                                             onClick={() => handleToggle('anonymousUpload')}
                                             className={`w-12 h-6 rounded-full transition-colors relative ${currentConsent.anonymousUpload ? 'bg-blue-500' : 'bg-slate-700'
                                                 }`}
+                                            role="switch"
+                                            aria-checked={currentConsent.anonymousUpload}
+                                            aria-label="Allow anonymous upload"
                                         >
                                             <div
                                                 className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${currentConsent.anonymousUpload ? 'left-6' : 'left-0.5'
@@ -187,6 +194,8 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                                             <button
                                                 onClick={() => setShowDetails(!showDetails)}
                                                 className="text-slate-400 hover:text-white"
+                                                aria-expanded={showDetails}
+                                                aria-label="Show details about gender label"
                                             >
                                                 <HelpCircle size={14} />
                                             </button>
@@ -195,6 +204,9 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                                             onClick={() => handleToggle('includeGenderLabel')}
                                             className={`w-12 h-6 rounded-full transition-colors relative ${currentConsent.includeGenderLabel ? 'bg-purple-500' : 'bg-slate-700'
                                                 }`}
+                                            role="switch"
+                                            aria-checked={currentConsent.includeGenderLabel}
+                                            aria-label="Include self-reported gender"
                                         >
                                             <div
                                                 className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${currentConsent.includeGenderLabel ? 'left-6' : 'left-0.5'
