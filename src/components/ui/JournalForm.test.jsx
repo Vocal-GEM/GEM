@@ -13,10 +13,6 @@ vi.mock('../../context/AudioContext', () => ({
       }
     }
   })
-        stopRecording: vi.fn(),
-      },
-    },
-  }),
 }));
 
 vi.mock('../../context/JournalContext', () => ({
@@ -25,7 +21,7 @@ vi.mock('../../context/JournalContext', () => ({
   })
 }));
 
-describe('JournalForm Accessibility', () => {
+describe('JournalForm Accessibility Test 1', () => {
   it('has accessible label for Reading Script textarea', () => {
     render(<JournalForm />);
     // This looks for a label associated with the input
@@ -70,11 +66,9 @@ describe('JournalForm Accessibility', () => {
      // and maybe mock the state if we can.
      // For now, let's stick to the initial button which SHOULD be accessible because it has text.
      render(<JournalForm />);
-     expect(screen.getByRole('button', { name: /need a writing prompt/i })).toBeInTheDocument();
+     expect(screen.getByRole('button', { name: /get a writing prompt/i })).toBeInTheDocument();
   });
-    journalEntryData: null,
-  }),
-}));
+});
 
 // Mock data
 vi.mock('../../data/selfCareJournalPrompts', () => ({
@@ -86,7 +80,7 @@ vi.mock('../../data/selfCareJournalPrompts', () => ({
   }),
 }));
 
-describe('JournalForm Accessibility', () => {
+describe('JournalForm Accessibility Test 2', () => {
   it('renders buttons with accessible labels', () => {
     render(<JournalForm />);
 
