@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - HighResSpectrogram Optimization
+**Learning:** `HighResSpectrogram` failed tests due to syntax errors in my previous refactoring. Specifically, I duplicated variables definitions during a merge logic when I was editing via a string replacement, which broke `vite:esbuild`.
+**Action:** Be more careful when refactoring variables in files, especially when using diff replacements that could easily duplicate variable declarations.
