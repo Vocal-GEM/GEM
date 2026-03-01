@@ -20,6 +20,42 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
+    // Cached dimensions to avoid getBoundingClientRect in loop
+    const dimensionsRef = useRef({ width: 0, height: 0 });
+
+    // Monitor canvas size with ResizeObserver
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const updateDimensions = () => {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+
+            // Update physical dimensions
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+
+            // Update ref for the loop
+            dimensionsRef.current = {
+                width: rect.width,
+                height: rect.height
+            };
+
+            // Restore scale after resize clears canvas
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+        };
+
+        const observer = new ResizeObserver(updateDimensions);
+        observer.observe(canvas);
+
+        // Initial setup
+        updateDimensions();
+
+        return () => observer.disconnect();
+    }, []);
+
     // Default gender ranges if not set in settings
     const defaultRanges = {
         feminine: { min: 165, max: 300 },
@@ -67,16 +103,16 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            // Use cached dimensions - huge performance win
+            // avoiding getBoundingClientRect() in the loop
+            const { width, height } = dimensionsRef.current;
 
-            const width = rect.width;
-            const height = rect.height;
+            if (width === 0 || height === 0) return;
+
             const centerX = width / 2;
             const centerY = height / 2;
 
+            // Clear the canvas explicitly since we are no longer doing it implicitly by resetting width/height
             ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
