@@ -1,3 +1,30 @@
+
+import PitchOrb from './components/viz/PitchOrb.jsx';
+import React, { useRef, useEffect } from 'react';
+
+const PitchOrbVerification = () => {
+  const dataRef = useRef({ pitch: 220 }); // A3, Feminine/Androgynous range
+
+  useEffect(() => {
+    let animationFrame;
+    const animate = () => {
+      // Modulate pitch slightly for the orb pulse effect
+      dataRef.current.pitch = 220 + Math.sin(Date.now() / 500) * 10;
+      animationFrame = requestAnimationFrame(animate);
+    };
+    animate();
+    return () => cancelAnimationFrame(animationFrame);
+  }, []);
+
+  return (
+    <div style={{ padding: '50px', backgroundColor: '#0f172a', height: '100vh' }}>
+      <h2 style={{ color: 'white', marginBottom: '20px' }}>PitchOrb Verification (ResizeObserver + RAF)</h2>
+      <div style={{ width: '400px', height: '400px' }}>
+        <PitchOrb dataRef={dataRef} settings={{}} />
+      </div>
+    </div>
+  );
+};
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './i18n';
