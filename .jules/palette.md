@@ -37,3 +37,4 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-03-01 - Icon-Only Buttons in Dynamic Forms\n**Learning:** Dynamic inline form elements (like adding a custom voice mode) frequently miss `aria-label` attributes on standard save/cancel icon buttons since they're rapidly prototyped. This creates significant accessibility barriers for screen reader users trying to submit or cancel local component state changes.\n**Action:** Always verify that localized form controls (especially icon-only inputs like `<Save>` and `<Trash2>`) include descriptive `aria-label`s and focus indicators.

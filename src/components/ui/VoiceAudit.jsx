@@ -87,7 +87,7 @@ const VoiceAudit = ({ onComplete }) => {
 
                                     <button
                                         onClick={() => toggleRecording(mode.id)}
-                                        className={`w-full py-2 rounded-lg flex items-center justify-center gap-2 font-bold transition-all ${activeRecordingId === mode.id
+                                        className={`w-full py-2 rounded-lg flex items-center justify-center gap-2 font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 ${activeRecordingId === mode.id
                                             ? 'bg-red-500 text-white animate-pulse'
                                             : mode.recordingUrl
                                                 ? 'bg-green-600/20 text-green-400 hover:bg-green-600/30'
@@ -146,13 +146,27 @@ const VoiceAudit = ({ onComplete }) => {
                                 autoFocus
                                 onKeyDown={(e) => e.key === 'Enter' && handleAddMode()}
                             />
-                            <button onClick={handleAddMode} className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500"><Save size={16} /></button>
-                            <button onClick={() => setIsAddingMode(false)} className="p-2 text-slate-400 hover:text-white"><Trash2 size={16} /></button>
+                            <button
+                                onClick={handleAddMode}
+                                aria-label="Save new voice mode"
+                                title="Save new voice mode"
+                                className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                            >
+                                <Save size={16} />
+                            </button>
+                            <button
+                                onClick={() => setIsAddingMode(false)}
+                                aria-label="Cancel adding voice mode"
+                                title="Cancel adding voice mode"
+                                className="p-2 text-slate-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 rounded-lg"
+                            >
+                                <Trash2 size={16} />
+                            </button>
                         </div>
                     ) : (
                         <button
                             onClick={() => setIsAddingMode(true)}
-                            className="w-full py-3 rounded-xl border-2 border-dashed border-slate-700 text-slate-400 hover:text-white hover:border-slate-600 hover:bg-slate-800/30 transition-all flex items-center justify-center gap-2 font-bold"
+                            className="w-full py-3 rounded-xl border-2 border-dashed border-slate-700 text-slate-400 hover:text-white hover:border-slate-600 hover:bg-slate-800/30 transition-all flex items-center justify-center gap-2 font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
                         >
                             <Plus size={20} /> Add Another Voice Mode
                         </button>
@@ -169,7 +183,7 @@ const VoiceAudit = ({ onComplete }) => {
                 <button
                     onClick={() => onComplete?.(modes)}
                     disabled={completedCount < 1}
-                    className={`px-6 py-2 rounded-lg font-bold transition-all ${completedCount > 0
+                    className={`px-6 py-2 rounded-lg font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 ${completedCount > 0
                         ? 'bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-900/20'
                         : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                         }`}
