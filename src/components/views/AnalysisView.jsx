@@ -450,7 +450,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
         <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto">
             {/* Header */}
             <div className="sticky top-0 bg-slate-900 z-10 border-b border-slate-800 p-4 flex items-center justify-between">
-                <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-full transition-colors">
+                <button onClick={onClose} aria-label="Close analysis" className="p-2 hover:bg-slate-800 rounded-full transition-colors">
                     <ChevronLeft className="w-6 h-6 text-slate-400" />
                 </button>
                 <h2 className="text-xl font-bold text-white">{t('analysis.header')}</h2>
@@ -813,6 +813,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
                             {/* Play/Pause */}
                             <button
+                                aria-label={isPlaying ? 'Pause playback' : 'Play audio'}
                                 onClick={() => {
                                     if (audioRef.current) {
                                         if (isPlaying) {
