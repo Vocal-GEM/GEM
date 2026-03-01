@@ -66,7 +66,6 @@ const QualityVisualizer = ({ dataRef }) => {
             });
 
             // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
 
         // Update history
         ['jitter', 'shimmer', 'weight'].forEach(key => {
@@ -75,8 +74,8 @@ const QualityVisualizer = ({ dataRef }) => {
                 historyRef.current[key].shift();
             }
         });
+        };
 
-        // REMOVED: requestAnimationFrame(loop) - handled by renderCoordinator
     }, [dataRef]);
 
     useEffect(() => {
