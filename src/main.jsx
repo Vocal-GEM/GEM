@@ -18,6 +18,7 @@ import { ToastProvider } from './context/ToastContext'
 import { GuidedJourneyProvider } from './context/GuidedJourneyContext'
 import { PracticeCardsProvider } from './context/PracticeCardsContext'
 import GlobalErrorBoundary from './components/ui/GlobalErrorBoundary'
+import PitchOrbVerification from './PitchOrbVerification'
 
 import { registerSW } from 'virtual:pwa-register'
 
@@ -29,7 +30,12 @@ const updateSW = registerSW({
     },
 })
 
+// Check for verify param
+const params = new URLSearchParams(window.location.search);
+const isVerify = params.get('verify') === 'true';
+
 ReactDOM.createRoot(document.getElementById('root')).render(
+    isVerify ? <PitchOrbVerification /> :
     <GlobalErrorBoundary>
         <ToastProvider>
             <SettingsProvider>
