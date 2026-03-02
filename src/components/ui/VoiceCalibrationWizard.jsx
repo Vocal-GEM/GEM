@@ -128,7 +128,7 @@ const VoiceCalibrationWizard = ({ onComplete, onClose }) => {
                     </h2>
                     <div className="flex items-center gap-4">
                         <div className="text-slate-400 text-sm">Step {step + 1} of 4</div>
-                        <button onClick={onClose} className="text-slate-400 hover:text-white">
+                        <button onClick={onClose} className="text-slate-400 hover:text-white" aria-label="Close wizard">
                             <X size={20} />
                         </button>
                     </div>
@@ -178,6 +178,7 @@ const VoiceCalibrationWizard = ({ onComplete, onClose }) => {
                                 <div className="flex flex-col items-center gap-4">
                                     <button
                                         onClick={stopRecording}
+                                        aria-label="Stop recording"
                                         className="w-20 h-20 rounded-full bg-red-500 animate-pulse flex items-center justify-center shadow-lg shadow-red-500/30 hover:bg-red-600 transition-colors"
                                     >
                                         <Square size={32} className="text-white" fill="white" />
@@ -191,6 +192,7 @@ const VoiceCalibrationWizard = ({ onComplete, onClose }) => {
                             ) : (
                                 <button
                                     onClick={startRecording}
+                                    aria-label="Start recording"
                                     className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:scale-105 transition-all mx-auto"
                                 >
                                     <Mic size={40} className="text-white" />
