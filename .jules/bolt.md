@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-21 - Unbounded Autocorrelation (O(N^2))
+**Learning:** `VoiceAnalyzer.autocorrelate()` computed autocorrelation across the entire length of the input frame, an O(N^2) operation. In `estimateHNR()`, this was entirely unnecessary because it only searches for a fundamental period up to `Math.floor(sampleRate / 75)` lags. Computing unused lags wasted ~75% of the processing time for this function.
+**Action:** When implementing or using array-based math operations (like autocorrelation or cross-correlation) in DSP utilities, always pass a maximum bound (`maxLag`) if the downstream consumer only needs a subset of the results. This reduces inner loop iterations from N to min(N, maxLag).
