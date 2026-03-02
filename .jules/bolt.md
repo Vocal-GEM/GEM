@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-21 - Canvas Context Resetting
+**Learning:** Removing `getBoundingClientRect()` and the related canvas dimension resets (`canvas.width = ...`) from a `requestAnimationFrame` loop removes layout thrashing. However, setting `canvas.width` implicitly clears the canvas pixels and resets the transformation matrix. When extracting canvas dimension updates to a `ResizeObserver`, we must explicitly add `ctx.clearRect()` and `ctx.resetTransform()` (and re-apply scaling if needed) at the start of the render loop to prevent visual smearing and infinite transformation stacking.
+**Action:** Always pair asynchronous canvas dimension updates via `ResizeObserver` with explicit `ctx.clearRect` and `ctx.resetTransform` inside the render loop to correctly simulate the removed implicit reset behavior.

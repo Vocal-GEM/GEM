@@ -1,0 +1,25 @@
+
+> vocal-gem@0.1.0 dev
+> vite --host 0.0.0.0
+
+
+  VITE v5.4.21  ready in 330 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: http://192.168.0.2:3000/
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+8:17:29 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+8:19:11 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+8:20:45 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+8:22:16 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+8:27:30 AM [vite] page reload src/audio/PitchWorklet.js
+8:35:13 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+8:37:03 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+8:38:52 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+8:40:48 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+8:42:39 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+8:44:27 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+8:46:14 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
+8:52:35 AM [vite] page reload src/services/ResearchMode.js
+8:54:39 AM [vite] page reload src/services/PrivacyManager.js
+8:56:31 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
