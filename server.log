@@ -13,3 +13,10 @@
 8:20:45 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
 8:22:16 AM [vite] page reload src/components/professional/TaskRecorder.jsx
 8:27:30 AM [vite] page reload src/audio/PitchWorklet.js
+8:35:13 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+8:37:03 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+8:38:52 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+8:40:48 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+8:42:39 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+8:44:27 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+8:46:14 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
