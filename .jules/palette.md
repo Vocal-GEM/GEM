@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2024-05-18 - Keyboard Accessibility & Disabled State Visuals for Icon-Only Toolbars
+**Learning:** Icon-only toolbar controls (like `LayoutControls`) often rely solely on `title` attributes for tooltips, which screen readers may read inconsistently or skip entirely depending on configuration. Additionally, global `disabled` attributes prevent interaction but often lack visual feedback (like opacity reduction or `cursor-not-allowed`) in custom Tailwind components, leaving users confused about why an action isn't responding.
+**Action:** When adding or auditing icon-only toolbars, ensure `aria-label` is always present alongside `title`. For keyboard users, prefer `focus-visible:ring-2` to provide clear focus rings without affecting mouse users. Always pair `disabled` attributes with `disabled:opacity-50 disabled:cursor-not-allowed` utility classes to visually communicate state changes effectively.
