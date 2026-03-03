@@ -2,8 +2,10 @@
 import { useState } from 'react';
 import { useProgram } from '../../hooks/useProgram';
 import { CheckCircle, Circle, Lock, PlayCircle, BookOpen, Clock, ChevronRight } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
 
 const ProgramView = ({ onNavigate }) => {
+    const { showSuccess } = useToast();
     const { activeProgram, progress, currentDay, completeTask, isTaskComplete, nextDay } = useProgram();
     const [selectedWeekId, setSelectedWeekId] = useState(activeProgram?.weeks[Math.min(progress.currentWeek, activeProgram.weeks.length - 1)].id);
 
@@ -156,7 +158,12 @@ const ProgramView = ({ onNavigate }) => {
 
                         <div className="p-6 border-t border-white/5 bg-slate-900/50 flex justify-end">
                             <button
-                                onClick={nextDay}
+                                onClick={() => {
+                                    const isComplete = nextDay();
+                                    if (isComplete) {
+                                        showSuccess("Congratulations! You've finished the program!");
+                                    }
+                                }}
                                 className="px-6 py-3 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-2"
                             >
                                 Complete Day <ChevronRight size={16} />
