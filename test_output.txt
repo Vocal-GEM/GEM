@@ -1,0 +1,2695 @@
+
+> vocal-gem@0.1.0 test
+> vitest
+
+
+[1m[46m RUN [49m[22m [36mv4.0.14 [39m[90m/app[39m
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ [32m✓[39m src/data/genderPerceptionMetrics.test.js [2m([22m[2m17 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mCustom Card Sets[2m > [22m[2mshould create a custom card set and return an ID
+[22m[39m[PracticeCardsService] Created custom set: custom-1772523339479-31
+
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mCustom Card Sets[2m > [22m[2mshould retrieve all custom card sets
+[22m[39m[PracticeCardsService] Created custom set: custom-1772523339487-393
+
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mCustom Card Sets[2m > [22m[2mshould retrieve all custom card sets
+[22m[39m[PracticeCardsService] Created custom set: custom-1772523339488-179
+
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mCustom Card Sets[2m > [22m[2mshould update a custom card set
+[22m[39m[PracticeCardsService] Created custom set: custom-1772523339506-729
+
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mCustom Card Sets[2m > [22m[2mshould delete a custom card set
+[22m[39m[PracticeCardsService] Created custom set: custom-1772523339512-764
+
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mCustom Card Sets[2m > [22m[2mshould delete a custom card set
+[22m[39m[PracticeCardsService] Deleted custom set: custom-1772523339512-764
+
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mCustom Card Sets[2m > [22m[2mshould generate unique IDs for each card in a set
+[22m[39m[PracticeCardsService] Created custom set: custom-1772523339516-312
+
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mEdge Cases[2m > [22m[2mshould handle empty card set gracefully
+[22m[39m[PracticeCardsService] Created custom set: custom-1772523339532-644
+
+ [32m✓[39m src/services/practiceCardsService.test.js [2m([22m[2m15 tests[22m[2m)[22m[32m 67[2mms[22m[39m
+ [32m✓[39m src/utils/PitchSmoother.test.js [2m([22m[2m19 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/services/SearchService.test.js [2m([22m[2m19 tests[22m[2m)[22m[32m 48[2mms[22m[39m
+ [32m✓[39m src/data/vvdReferenceData.test.js [2m([22m[2m16 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m src/utils/DSP.test.js [2m([22m[2m10 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [31m❯[39m src/engines/AudioEngine.socket.test.js [2m([22m[2m5 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[32m 37[2mms[22m[39m
+[31m     [31m×[31m should initialize socket on start[39m[32m 30[2mms[22m[39m
+[31m     [31m×[31m should handle socket connection events[39m[32m 2[2mms[22m[39m
+[31m     [31m×[31m should emit audio_chunk when connected[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should buffer chunks when disconnected and flush on connect[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should update latestBackendAnalysis on analysis_update[39m[32m 1[2mms[22m[39m
+ [31m❯[39m src/components/layout/Sidebar.test.jsx [2m([22m[2m5 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[32m 199[2mms[22m[39m
+[31m     [31m×[31m shows Sign In button when not logged in[39m[32m 98[2mms[22m[39m
+[31m     [31m×[31m shows user info and Sign Out when logged in[39m[32m 18[2mms[22m[39m
+[31m     [31m×[31m opens Login modal on Sign In click[39m[32m 20[2mms[22m[39m
+[31m     [31m×[31m calls logout on Sign Out click[39m[32m 40[2mms[22m[39m
+[31m     [31m×[31m opens Camera modal when Mirror button is clicked[39m[32m 17[2mms[22m[39m
+ [31m❯[39m src/test/validation/algorithmValidation.test.js [2m([22m[2m6 tests[22m[2m | [22m[33m6 skipped[39m[2m)[22m[32m 13[2mms[22m[39m
+     [2m[90m↓[39m[22m accurately estimates pitch for Sustained /a/ vowel, cisgender female speaker
+     [2m[90m↓[39m[22m accurately estimates formants for Sustained /a/ vowel, cisgender female speaker
+     [2m[90m↓[39m[22m accurately estimates pitch for Sustained /a/ vowel, cisgender male speaker
+     [2m[90m↓[39m[22m accurately estimates formants for Sustained /a/ vowel, cisgender male speaker
+     [2m[90m↓[39m[22m accurately estimates pitch for Pitch glide up, transgender female speaker
+     [2m[90m↓[39m[22m handles diverse voice types correctly
+[90mstdout[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mMcLeodPitchDetector: Successfully initialized.
+
+ [31m❯[39m src/context/AuthContext.test.jsx [2m([22m[2m4 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 2134[2mms[22m[39m
+     [32m✓[39m initializes with null user if /me fails[32m 72[2mms[22m[39m
+[31m     [31m×[31m logs in successfully[39m[33m 1037[2mms[22m[39m
+     [32m✓[39m handles login failure[32m 10[2mms[22m[39m
+[31m     [31m×[31m clears local data on logout[39m[33m 1012[2mms[22m[39m
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+ [32m✓[39m src/utils/signalValidator.test.js [2m([22m[2m9 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+[90mstderr[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mWarning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at CoachPanel (/app/src/components/ui/CoachPanel.jsx:12:23)
+    at div
+    at div
+    at div
+    at div
+    at PracticeMode (/app/src/components/views/PracticeMode.jsx:87:3)
+    at PracticeCardsProvider (/app/src/context/PracticeCardsContext.jsx:20:34)
+    at TourProvider (/app/src/context/TourContext.jsx:11:25)
+    at div
+    at NavigationProvider (/app/src/components/views/PracticeMode.test.jsx:3:26)
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at div
+    at ProfileProvider (/app/src/components/views/PracticeMode.test.jsx:83:23)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+
+ [31m❯[39m src/components/views/PracticeMode.test.jsx [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1255[2mms[22m[39m
+[31m     [31m×[31m renders without crashing[39m[33m 1253[2mms[22m[39m
+[90mstderr[2m | src/context/AudioContext.test.jsx[2m > [22m[2mAudioContext Integration[2m > [22m[2mshould initialize AudioEngine on mount
+[22m[39mWarning: An update to AudioProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:20:28)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:78:20)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:20:28)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:78:20)
+Warning: An update to SettingsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:78:20)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:20:28)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:78:20)
+Warning: An update to SettingsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:78:20)
+
+[90mstderr[2m | src/context/AudioContext.test.jsx[2m > [22m[2mAudioContext Integration[2m > [22m[2mshould update dataRef when AudioEngine sends updates
+[22m[39mWarning: An update to AudioProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at AudioProvider (/app/src/context/AudioContext.jsx:15:26)
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:20:28)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:78:20)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:20:28)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:78:20)
+Warning: An update to SettingsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:78:20)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:20:28)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:78:20)
+Warning: An update to SettingsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:29:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:78:20)
+
+ [32m✓[39m src/context/AudioContext.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 63[2mms[22m[39m
+[90mstderr[2m | src/services/SyncManager.test.js[2m > [22m[2mSyncManager[2m > [22m[2mOffline Behavior[2m > [22m[2mshould forceSyncNow returning false when offline
+[22m[39mCannot sync: offline
+
+ [32m✓[39m src/services/SyncManager.test.js [2m([22m[2m7 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m src/context/TourContext.test.jsx [2m([22m[2m6 tests[22m[2m)[22m[32m 45[2mms[22m[39m
+ [32m✓[39m src/test/SmartCoachWidget.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[32m 93[2mms[22m[39m
+ [32m✓[39m src/components/ui/TourOverlay.test.jsx [2m([22m[2m4 tests[22m[2m)[22m[32m 96[2mms[22m[39m
+[90mstderr[2m | src/test/ProfileContext.test.jsx[2m > [22m[2mProfileContext Integration[2m > [22m[2mshould provide default values
+[22m[39mWarning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:20:28)
+    at wrapper (/app/src/test/ProfileContext.test.jsx:41:22)
+
+[90mstderr[2m | src/test/ProfileContext.test.jsx[2m > [22m[2mProfileContext Integration[2m > [22m[2mshould update hydration
+[22m[39mWarning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:20:28)
+    at wrapper (/app/src/test/ProfileContext.test.jsx:41:22)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:20:28)
+    at wrapper (/app/src/test/ProfileContext.test.jsx:41:22)
+
+[90mstderr[2m | src/test/ProfileContext.test.jsx[2m > [22m[2mProfileContext Integration[2m > [22m[2mshould log fatigue
+[22m[39mWarning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:20:28)
+    at wrapper (/app/src/test/ProfileContext.test.jsx:41:22)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:20:28)
+    at wrapper (/app/src/test/ProfileContext.test.jsx:41:22)
+
+[90mstderr[2m | src/test/ProfileContext.test.jsx[2m > [22m[2mProfileContext Integration[2m > [22m[2mwith multiple profiles[2m > [22m[2mshould switch profile
+[22m[39mWarning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:20:28)
+    at wrapper (/app/src/test/ProfileContext.test.jsx:41:22)
+
+ [32m✓[39m src/test/ProfileContext.test.jsx [2m([22m[2m4 tests[22m[2m)[22m[32m 101[2mms[22m[39m
+[90mstderr[2m | src/components/ui/HistoryView.test.jsx[2m > [22m[2mHistoryView Personalization[2m > [22m[2mshould render all widgets by default
+[22m[39mWarning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (/app/src/components/ui/HistoryView.jsx:42:24)
+    at div
+    at MockPracticeCardsProvider (/app/src/components/ui/HistoryView.test.jsx:54:38)
+
+[90mstderr[2m | src/components/ui/HistoryView.test.jsx[2m > [22m[2mHistoryView Personalization[2m > [22m[2mshould hide widgets based on config
+[22m[39mWarning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (/app/src/components/ui/HistoryView.jsx:42:24)
+
+[90mstderr[2m | src/components/ui/HistoryView.test.jsx[2m > [22m[2mHistoryView Personalization[2m > [22m[2mshould dispatch openDashboardConfig event
+[22m[39mWarning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (/app/src/components/ui/HistoryView.jsx:42:24)
+
+[90mstderr[2m | src/components/ui/HistoryView.test.jsx[2m > [22m[2mHistoryView Personalization[2m > [22m[2mshould dispatch openDashboardConfig event
+[22m[39mWarning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (/app/src/components/ui/HistoryView.jsx:42:24)
+
+[90mstderr[2m | src/components/ui/HistoryView.test.jsx[2m > [22m[2mHistoryView Personalization[2m > [22m[2mshould dispatch openDashboardConfig event
+[22m[39mWarning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (/app/src/components/ui/HistoryView.jsx:42:24)
+
+ [32m✓[39m src/components/ui/HistoryView.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 137[2mms[22m[39m
+ [32m✓[39m src/test/VocalHealthPanel.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[32m 95[2mms[22m[39m
+ [32m✓[39m src/test/IndexedDBManager.test.js [2m([22m[2m8 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+[90mstderr[2m | src/components/ui/CoachView.test.jsx[2m > [22m[2mCoachView Component[2m > [22m[2mrenders empty state when messages are cleared or initial
+[22m[39mWarning: An update to CoachView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CoachView (/app/src/components/ui/CoachView.jsx:37:69)
+    at div
+    at MockNavigationProvider (/app/src/components/ui/CoachView.test.jsx:40:35)
+
+ [32m✓[39m src/components/ui/CoachView.test.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 77[2mms[22m[39m
+ [32m✓[39m src/components/viz/FlowPhonationMeter.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 82[2mms[22m[39m
+ [32m✓[39m src/components/ui/Breadcrumbs.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[32m 79[2mms[22m[39m
+ [32m✓[39m src/components/ui/CommandPalette.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[32m 147[2mms[22m[39m
+ [32m✓[39m src/test/PracticeRoutineGenerator.test.js [2m([22m[2m6 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+[90mstderr[2m | src/components/viz/Spectrogram3D.test.jsx[2m > [22m[2mSpectrogram3D[2m > [22m[2mrenders successfully
+[22m[39mWarning: <ambientLight /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at ambientLight
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: The tag <ambientLight> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter.
+    at ambientLight
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: <pointLight /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at pointLight
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: The tag <pointLight> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter.
+    at pointLight
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: <bufferAttribute /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: The tag <bufferAttribute> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: React does not recognize the `itemSize` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `itemsize` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: <bufferAttribute /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: <bufferAttribute /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: <bufferGeometry /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: The tag <bufferGeometry> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter.
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: <meshStandardMaterial /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at meshStandardMaterial
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: The tag <meshStandardMaterial> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter.
+    at meshStandardMaterial
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: React does not recognize the `vertexColors` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `vertexcolors` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+    at meshStandardMaterial
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: Received `true` for a non-boolean attribute `wireframe`.
+
+If you want to write it to the DOM, pass a string instead: wireframe="true" or wireframe={value.toString()}.
+    at meshStandardMaterial
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: The tag <mesh> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter.
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: <gridHelper /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at gridHelper
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: The tag <gridHelper> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter.
+    at gridHelper
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+
+[90mstderr[2m | src/components/viz/Spectrogram3D.test.jsx[2m > [22m[2mSpectrogram3D[2m > [22m[2mruns the animation loop safely
+[22m[39mWarning: <ambientLight /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at ambientLight
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: <pointLight /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at pointLight
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: <bufferAttribute /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: <bufferAttribute /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: <bufferAttribute /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: <bufferGeometry /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: <meshStandardMaterial /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at meshStandardMaterial
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:12:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+Warning: <gridHelper /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at gridHelper
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:42:14)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:187:26)
+
+ [32m✓[39m src/components/viz/Spectrogram3D.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[32m 104[2mms[22m[39m
+ [32m✓[39m src/components/ui/Toast.test.jsx [2m([22m[2m7 tests[22m[2m)[22m[33m 391[2mms[22m[39m
+ [32m✓[39m src/test/gavt_enhancements.test.js [2m([22m[2m7 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/services/BiofeedbackService.test.js [2m([22m[2m7 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/hooks/useFeedback.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m src/components/ui/OfflineIndicator.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[33m 327[2mms[22m[39m
+ [32m✓[39m src/hooks/useTTS.test.js [2m([22m[2m5 tests[22m[2m)[22m[32m 45[2mms[22m[39m
+ [32m✓[39m src/components/ui/TooltipOverlay.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[32m 122[2mms[22m[39m
+ [32m✓[39m src/test/PhonetogramService.test.js [2m([22m[2m6 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/services/AnalyticsService.test.js [2m([22m[2m5 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/components/viz/PitchOrb.test.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m src/components/ui/EmptyState.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[33m 406[2mms[22m[39m
+ [32m✓[39m src/components/tools/PitchFeedbackTool/PitchFeedbackTool.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[33m 579[2mms[22m[39m
+     [33m[2m✓[22m[39m renders start listening state and toggles microphone on click [33m 426[2mms[22m[39m
+ [32m✓[39m src/components/viz/BrightnessMeter.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 93[2mms[22m[39m
+ [32m✓[39m src/utils/FormantAnalyzer.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/components/viz/SpectrumAnalyzer.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[32m 45[2mms[22m[39m
+ [32m✓[39m src/hooks/useCourseProgress.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 36[2mms[22m[39m
+ [32m✓[39m src/components/ui/VoicePlot2D.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m src/services/RenderCoordinator.test.js [2m([22m[2m2 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/utils/cppAnalysis.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m src/context/SettingsContext.test.js [2m([22m[2m2 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32m✓[39m src/components/viz/ProgressCharts.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 67[2mms[22m[39m
+ [32m✓[39m src/components/viz/ResonanceMetrics.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 72[2mms[22m[39m
+ [32m✓[39m src/test/advanced_signal_analysis.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/context/LanguageContext.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 62[2mms[22m[39m
+ [32m✓[39m src/services/ProgramService.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/utils/pitch.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32m✓[39m src/test/NormsService.test.js [2m([22m[2m5 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/utils/ResonanceCalculator.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m src/data/SingingCourse.test.js [2m([22m[2m6 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/utils/PitchDetector.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 35[2mms[22m[39m
+ [32m✓[39m src/utils/lpcAnalysis.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m src/components/ui/CelebrationModal.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 76[2mms[22m[39m
+ [32m✓[39m src/components/ui/SkeletonLoader.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[33m 320[2mms[22m[39m
+ [32m✓[39m src/utils/coachEngine.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m src/services/IndexedDBManager.test.js [2m([22m[2m2 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m src/components/ui/AudioLibrary.test.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 59[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 9 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/community/SuccessStories.test.jsx[2m [ src/components/community/SuccessStories.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 10 errors:
+/app/src/components/community/SuccessStories.test.jsx:4:7: ERROR: The symbol "React" has already been declared
+/app/src/components/community/SuccessStories.test.jsx:5:9: ERROR: The symbol "render" has already been declared
+/app/src/components/community/SuccessStories.test.jsx:5:17: ERROR: The symbol "screen" has already been declared
+/app/src/components/community/SuccessStories.test.jsx:5:25: ERROR: The symbol "fireEvent" has already been declared
+/app/src/components/community/SuccessStories.test.jsx:5:36: ERROR: The symbol "waitFor" has already been declared
+...[39m
+  Plugin: [35mvite:esbuild[39m
+  File: [36m/app/src/components/community/SuccessStories.test.jsx[39m:4:7
+[33m
+  The symbol "React" has already been declared
+  2  |  import { vi, describe, test, expect, beforeEach } from 'vitest';
+  3  |  import React from 'react';
+  4  |  import React from 'react';
+     |         ^
+  5  |  import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+  6  |  import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+  The symbol "render" has already been declared
+  3  |  import React from 'react';
+  4  |  import React from 'react';
+  5  |  import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+     |           ^
+  6  |  import { describe, it, expect, vi, beforeEach } from 'vitest';
+  7  |  import SuccessStories from './SuccessStories';
+
+  The symbol "screen" has already been declared
+  3  |  import React from 'react';
+  4  |  import React from 'react';
+  5  |  import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+     |                   ^
+  6  |  import { describe, it, expect, vi, beforeEach } from 'vitest';
+  7  |  import SuccessStories from './SuccessStories';
+
+  The symbol "fireEvent" has already been declared
+  3  |  import React from 'react';
+  4  |  import React from 'react';
+  5  |  import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+     |                           ^
+  6  |  import { describe, it, expect, vi, beforeEach } from 'vitest';
+  7  |  import SuccessStories from './SuccessStories';
+
+  The symbol "waitFor" has already been declared
+  3  |  import React from 'react';
+  4  |  import React from 'react';
+  5  |  import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+     |                                      ^
+  6  |  import { describe, it, expect, vi, beforeEach } from 'vitest';
+  7  |  import SuccessStories from './SuccessStories';
+
+  The symbol "describe" has already been declared
+  4  |  import React from 'react';
+  5  |  import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+  6  |  import { describe, it, expect, vi, beforeEach } from 'vitest';
+     |           ^
+  7  |  import SuccessStories from './SuccessStories';
+  8  |  import CommunityService from '../../services/CommunityService';
+
+  The symbol "expect" has already been declared
+  4  |  import React from 'react';
+  5  |  import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+  6  |  import { describe, it, expect, vi, beforeEach } from 'vitest';
+     |                         ^
+  7  |  import SuccessStories from './SuccessStories';
+  8  |  import CommunityService from '../../services/CommunityService';
+
+  The symbol "vi" has already been declared
+  4  |  import React from 'react';
+  5  |  import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+  6  |  import { describe, it, expect, vi, beforeEach } from 'vitest';
+     |                                 ^
+  7  |  import SuccessStories from './SuccessStories';
+  8  |  import CommunityService from '../../services/CommunityService';
+
+  The symbol "beforeEach" has already been declared
+  4  |  import React from 'react';
+  5  |  import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+  6  |  import { describe, it, expect, vi, beforeEach } from 'vitest';
+     |                                     ^
+  7  |  import SuccessStories from './SuccessStories';
+  8  |  import CommunityService from '../../services/CommunityService';
+
+  Unexpected "default"
+  108 |          expect(MockAudio.mock.calls.length).toBe(initialCallCount);
+  109 |      });
+  110 |    default: {
+      |    ^
+  111 |      getSuccessStories: vi.fn(),
+  112 |      submitSuccessStory: vi.fn(),
+  [39m
+[90m [2m❯[22m failureErrorWithLog node_modules/vitest/node_modules/esbuild/lib/main.js:[2m1467:15[22m[39m
+[90m [2m❯[22m node_modules/vitest/node_modules/esbuild/lib/main.js:[2m736:50[22m[39m
+[90m [2m❯[22m responseCallbacks.<computed> node_modules/vitest/node_modules/esbuild/lib/main.js:[2m603:9[22m[39m
+[90m [2m❯[22m handleIncomingPacket node_modules/vitest/node_modules/esbuild/lib/main.js:[2m658:12[22m[39m
+[90m [2m❯[22m Socket.readFromStdout node_modules/vitest/node_modules/esbuild/lib/main.js:[2m581:7[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/viz/BreathinessMeter.test.jsx[2m [ src/components/viz/BreathinessMeter.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 4 errors:
+/app/src/components/viz/BreathinessMeter.jsx:5:9: ERROR: The symbol "renderCoordinator" has already been declared
+/app/src/components/viz/BreathinessMeter.jsx:43:10: ERROR: The symbol "componentId" has already been declared
+/app/src/components/viz/BreathinessMeter.jsx:52:10: ERROR: The symbol "componentId" has already been declared
+/app/src/components/viz/BreathinessMeter.jsx:173:45: ERROR: Expected ";" but found ")"[39m
+  Plugin: [35mvite:esbuild[39m
+  File: [36m/app/src/components/viz/BreathinessMeter.jsx[39m:5:9
+[33m
+  The symbol "renderCoordinator" has already been declared
+  3  |  import { renderCoordinator } from '../../services/RenderCoordinator';
+  4  |  import { Wind, CheckCircle2, AlertTriangle, Info, Sparkles, Activity, HelpCircle } from 'lucide-react';
+  5  |  import { renderCoordinator } from '../../services/RenderCoordinator';
+     |           ^
+  6  |
+  7  |  /**
+
+  The symbol "componentId" has already been declared
+  41 |      const feedbackRef = useRef(null);
+  42 |      const lastValueRef = useRef(50);
+  43 |      const componentId = useId();
+     |            ^
+  44 |      const id = useId();
+  45 |
+
+  The symbol "componentId" has already been declared
+  50 |      const lastOqRef = useRef(50);
+  51 |      const ventricularRef = useRef(null);
+  52 |      const componentId = useId();
+     |            ^
+  53 |
+  54 |      // Optimized: Use RenderCoordinator to manage animation loop
+
+  Expected ";" but found ")"
+  171 |
+  172 |          return unsubscribe;
+  173 |      }, [dataRef, colorBlindMode, componentId]);
+      |                                               ^
+  174 |          };
+  175 |
+  [39m
+[90m [2m❯[22m failureErrorWithLog node_modules/vitest/node_modules/esbuild/lib/main.js:[2m1467:15[22m[39m
+[90m [2m❯[22m node_modules/vitest/node_modules/esbuild/lib/main.js:[2m736:50[22m[39m
+[90m [2m❯[22m responseCallbacks.<computed> node_modules/vitest/node_modules/esbuild/lib/main.js:[2m603:9[22m[39m
+[90m [2m❯[22m handleIncomingPacket node_modules/vitest/node_modules/esbuild/lib/main.js:[2m658:12[22m[39m
+[90m [2m❯[22m Socket.readFromStdout node_modules/vitest/node_modules/esbuild/lib/main.js:[2m581:7[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/viz/HighResSpectrogram.test.jsx[2m [ src/components/viz/HighResSpectrogram.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 6 errors:
+/app/src/components/viz/HighResSpectrogram.jsx:35:10: ERROR: The symbol "componentId" has already been declared
+/app/src/components/viz/HighResSpectrogram.jsx:68:14: ERROR: The symbol "ctx" has already been declared
+/app/src/components/viz/HighResSpectrogram.jsx:70:14: ERROR: The symbol "width" has already been declared
+/app/src/components/viz/HighResSpectrogram.jsx:71:14: ERROR: The symbol "height" has already been declared
+/app/src/components/viz/HighResSpectrogram.jsx:72:14: ERROR: The symbol "scrollSpeed" has already been declared
+...[39m
+  Plugin: [35mvite:esbuild[39m
+  File: [36m/app/src/components/viz/HighResSpectrogram.jsx[39m:35:10
+[33m
+  The symbol "componentId" has already been declared
+  33 |      // Unique component ID for RenderCoordinator
+  34 |      const uniqueId = useId();
+  35 |      const componentId = `spectrogram-highres-${uniqueId}`;
+     |            ^
+  36 |
+  37 |      // Reusable buffers to avoid garbage collection churn
+
+  The symbol "ctx" has already been declared
+  66 |          // Optimization: Use alpha: false for better performance
+  67 |          // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
+  68 |          const ctx = canvas.getContext('2d', { alpha: false });
+     |                ^
+  69 |
+  70 |          const width = canvas.width;
+
+  The symbol "width" has already been declared
+  68 |          const ctx = canvas.getContext('2d', { alpha: false });
+  69 |
+  70 |          const width = canvas.width;
+     |                ^
+  71 |          const height = canvas.height;
+  72 |          const scrollSpeed = 2; // px per frame
+
+  The symbol "height" has already been declared
+  69 |
+  70 |          const width = canvas.width;
+  71 |          const height = canvas.height;
+     |                ^
+  72 |          const scrollSpeed = 2; // px per frame
+  73 |          const spectrum = dataRef.current.spectrum;
+
+  The symbol "scrollSpeed" has already been declared
+  70 |          const width = canvas.width;
+  71 |          const height = canvas.height;
+  72 |          const scrollSpeed = 2; // px per frame
+     |                ^
+  73 |          const spectrum = dataRef.current.spectrum;
+  74 |
+
+  Unexpected ","
+  155 |          lastFormantsRef.current = { f1, f2 };
+  156 |
+  157 |      }, [dataRef, colormap]);
+      |       ^
+  158 |
+  159 |      // Initial canvas setup & ResizeObserver
+  [39m
+[90m [2m❯[22m failureErrorWithLog node_modules/vitest/node_modules/esbuild/lib/main.js:[2m1467:15[22m[39m
+[90m [2m❯[22m node_modules/vitest/node_modules/esbuild/lib/main.js:[2m736:50[22m[39m
+[90m [2m❯[22m responseCallbacks.<computed> node_modules/vitest/node_modules/esbuild/lib/main.js:[2m603:9[22m[39m
+[90m [2m❯[22m handleIncomingPacket node_modules/vitest/node_modules/esbuild/lib/main.js:[2m658:12[22m[39m
+[90m [2m❯[22m Socket.readFromStdout node_modules/vitest/node_modules/esbuild/lib/main.js:[2m581:7[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/viz/QualityVisualizer.test.jsx[2m [ src/components/viz/QualityVisualizer.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 1 error:
+/app/src/components/viz/QualityVisualizer.jsx:253:1: ERROR: Expected ")" but found ";"[39m
+  Plugin: [35mvite:esbuild[39m
+  File: [36m/app/src/components/viz/QualityVisualizer.jsx[39m:253:1
+[33m
+  Expected ")" but found ";"
+  251 |          </div>
+  252 |      );
+  253 |  };
+      |   ^
+  254 |
+  255 |  export default QualityVisualizer;
+  [39m
+[90m [2m❯[22m failureErrorWithLog node_modules/vitest/node_modules/esbuild/lib/main.js:[2m1467:15[22m[39m
+[90m [2m❯[22m node_modules/vitest/node_modules/esbuild/lib/main.js:[2m736:50[22m[39m
+[90m [2m❯[22m responseCallbacks.<computed> node_modules/vitest/node_modules/esbuild/lib/main.js:[2m603:9[22m[39m
+[90m [2m❯[22m handleIncomingPacket node_modules/vitest/node_modules/esbuild/lib/main.js:[2m658:12[22m[39m
+[90m [2m❯[22m Socket.readFromStdout node_modules/vitest/node_modules/esbuild/lib/main.js:[2m581:7[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/ui/JournalForm.test.jsx[2m [ src/components/ui/JournalForm.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 1 error:
+/app/src/components/ui/JournalForm.test.jsx:16:8: ERROR: Expected "}" but found "stopRecording"[39m
+  Plugin: [35mvite:esbuild[39m
+  File: [36m/app/src/components/ui/JournalForm.test.jsx[39m:16:8
+[33m
+  Expected "}" but found "stopRecording"
+  14 |      }
+  15 |    })
+  16 |          stopRecording: vi.fn(),
+     |          ^
+  17 |        },
+  18 |      },
+  [39m
+[90m [2m❯[22m failureErrorWithLog node_modules/vitest/node_modules/esbuild/lib/main.js:[2m1467:15[22m[39m
+[90m [2m❯[22m node_modules/vitest/node_modules/esbuild/lib/main.js:[2m736:50[22m[39m
+[90m [2m❯[22m responseCallbacks.<computed> node_modules/vitest/node_modules/esbuild/lib/main.js:[2m603:9[22m[39m
+[90m [2m❯[22m handleIncomingPacket node_modules/vitest/node_modules/esbuild/lib/main.js:[2m658:12[22m[39m
+[90m [2m❯[22m Socket.readFromStdout node_modules/vitest/node_modules/esbuild/lib/main.js:[2m581:7[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/ui/LoadingSpinner.test.jsx[2m [ src/components/ui/LoadingSpinner.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 10 errors:
+/app/src/components/ui/LoadingSpinner.test.jsx:5:9: ERROR: The symbol "render" has already been declared
+/app/src/components/ui/LoadingSpinner.test.jsx:5:17: ERROR: The symbol "screen" has already been declared
+/app/src/components/ui/LoadingSpinner.test.jsx:6:9: ERROR: The symbol "describe" has already been declared
+/app/src/components/ui/LoadingSpinner.test.jsx:6:19: ERROR: The symbol "it" has already been declared
+/app/src/components/ui/LoadingSpinner.test.jsx:6:23: ERROR: The symbol "expect" has already been declared
+...[39m
+  Plugin: [35mvite:esbuild[39m
+  File: [36m/app/src/components/ui/LoadingSpinner.test.jsx[39m:5:9
+[33m
+  The symbol "render" has already been declared
+  3  |  import LoadingSpinner from "./LoadingSpinner";
+  4  |  import React from "react";
+  5  |  import { render, screen } from '@testing-library/react';
+     |           ^
+  6  |  import { describe, it, expect } from 'vitest';
+  7  |  import LoadingSpinner from './LoadingSpinner';
+
+  The symbol "screen" has already been declared
+  3  |  import LoadingSpinner from "./LoadingSpinner";
+  4  |  import React from "react";
+  5  |  import { render, screen } from '@testing-library/react';
+     |                   ^
+  6  |  import { describe, it, expect } from 'vitest';
+  7  |  import LoadingSpinner from './LoadingSpinner';
+
+  The symbol "describe" has already been declared
+  4  |  import React from "react";
+  5  |  import { render, screen } from '@testing-library/react';
+  6  |  import { describe, it, expect } from 'vitest';
+     |           ^
+  7  |  import LoadingSpinner from './LoadingSpinner';
+  8  |
+
+  The symbol "it" has already been declared
+  4  |  import React from "react";
+  5  |  import { render, screen } from '@testing-library/react';
+  6  |  import { describe, it, expect } from 'vitest';
+     |                     ^
+  7  |  import LoadingSpinner from './LoadingSpinner';
+  8  |
+
+  The symbol "expect" has already been declared
+  4  |  import React from "react";
+  5  |  import { render, screen } from '@testing-library/react';
+  6  |  import { describe, it, expect } from 'vitest';
+     |                         ^
+  7  |  import LoadingSpinner from './LoadingSpinner';
+  8  |
+
+  The symbol "LoadingSpinner" has already been declared
+  5  |  import { render, screen } from '@testing-library/react';
+  6  |  import { describe, it, expect } from 'vitest';
+  7  |  import LoadingSpinner from './LoadingSpinner';
+     |         ^
+  8  |
+  9  |  describe('LoadingSpinner', () => {
+
+  The symbol "srText" has already been declared
+  22 |
+  23 |      // It should have a visually hidden label "Loading..." by default
+  24 |      const srText = screen.getByText('Loading...');
+     |            ^
+  25 |      expect(spinner).toBeInTheDocument();
+  26 |
+
+  The symbol "srText" has already been declared
+  34 |
+  35 |      // It should have a visually hidden label "Loading..." by default
+  36 |      const srText = screen.getByText('Loading...');
+     |            ^
+  37 |      expect(spinner).toBeInTheDocument();
+  38 |      expect(spinner).toHaveAttribute('aria-live', 'polite');
+
+  The symbol "srText" has already been declared
+  39 |
+  40 |      // It should have a visually hidden label "Loading..." by default
+  41 |      const srText = screen.getByText('Loading...');
+     |            ^
+  42 |  import { render, screen } from "@testing-library/react";
+  43 |  import { describe, it, expect } from "vitest";
+
+  Unexpected "{"
+  40 |      // It should have a visually hidden label "Loading..." by default
+  41 |      const srText = screen.getByText('Loading...');
+  42 |  import { render, screen } from "@testing-library/react";
+     |         ^
+  43 |  import { describe, it, expect } from "vitest";
+  44 |  import LoadingSpinner from "./LoadingSpinner";
+  [39m
+[90m [2m❯[22m failureErrorWithLog node_modules/vitest/node_modules/esbuild/lib/main.js:[2m1467:15[22m[39m
+[90m [2m❯[22m node_modules/vitest/node_modules/esbuild/lib/main.js:[2m736:50[22m[39m
+[90m [2m❯[22m responseCallbacks.<computed> node_modules/vitest/node_modules/esbuild/lib/main.js:[2m603:9[22m[39m
+[90m [2m❯[22m handleIncomingPacket node_modules/vitest/node_modules/esbuild/lib/main.js:[2m658:12[22m[39m
+[90m [2m❯[22m Socket.readFromStdout node_modules/vitest/node_modules/esbuild/lib/main.js:[2m581:7[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/ui/QuickActions.test.jsx[2m [ src/components/ui/QuickActions.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 3 errors:
+/app/src/components/ui/QuickActions.jsx:80:22: ERROR: Unexpected closing "button" tag does not match opening "div" tag
+/app/src/components/ui/QuickActions.jsx:111:10: ERROR: Unexpected closing "div" tag does not match opening "button" tag
+/app/src/components/ui/QuickActions.jsx:112:5: ERROR: Expected ")" but found ";"[39m
+  Plugin: [35mvite:esbuild[39m
+  File: [36m/app/src/components/ui/QuickActions.jsx[39m:80:22
+[33m
+  Unexpected closing "button" tag does not match opening "div" tag
+  78 |                              <action.icon size={20} />
+  79 |                          </div>
+  80 |                      </button>
+     |                        ^
+  81 |                  ))}
+  82 |              </div>
+
+  Unexpected closing "div" tag does not match opening "button" tag
+  109 |                  />
+  110 |              )}
+  111 |          </div>
+      |            ^
+  112 |      );
+  113 |  };
+
+  Expected ")" but found ";"
+  110 |              )}
+  111 |          </div>
+  112 |      );
+      |       ^
+  113 |  };
+  114 |
+  [39m
+[90m [2m❯[22m failureErrorWithLog node_modules/vitest/node_modules/esbuild/lib/main.js:[2m1467:15[22m[39m
+[90m [2m❯[22m node_modules/vitest/node_modules/esbuild/lib/main.js:[2m736:50[22m[39m
+[90m [2m❯[22m responseCallbacks.<computed> node_modules/vitest/node_modules/esbuild/lib/main.js:[2m603:9[22m[39m
+[90m [2m❯[22m handleIncomingPacket node_modules/vitest/node_modules/esbuild/lib/main.js:[2m658:12[22m[39m
+[90m [2m❯[22m Socket.readFromStdout node_modules/vitest/node_modules/esbuild/lib/main.js:[2m581:7[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/ui/button.test.jsx[2m [ src/components/ui/button.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 1 error:
+/app/src/components/ui/button.test.jsx:32:7: ERROR: Unexpected "React"[39m
+  Plugin: [35mvite:esbuild[39m
+  File: [36m/app/src/components/ui/button.test.jsx[39m:32:7
+[33m
+  Unexpected "React"
+  30 |      // Original text/icon should NOT be present (implementation detail: we conditionally render)
+  31 |      expect(screen.queryByText("Icon")).not.toBeInTheDocument();
+  32 |  import React from "react";
+     |         ^
+  33 |
+  34 |  describe("Button", () => {
+  [39m
+[90m [2m❯[22m failureErrorWithLog node_modules/vitest/node_modules/esbuild/lib/main.js:[2m1467:15[22m[39m
+[90m [2m❯[22m node_modules/vitest/node_modules/esbuild/lib/main.js:[2m736:50[22m[39m
+[90m [2m❯[22m responseCallbacks.<computed> node_modules/vitest/node_modules/esbuild/lib/main.js:[2m603:9[22m[39m
+[90m [2m❯[22m handleIncomingPacket node_modules/vitest/node_modules/esbuild/lib/main.js:[2m658:12[22m[39m
+[90m [2m❯[22m Socket.readFromStdout node_modules/vitest/node_modules/esbuild/lib/main.js:[2m581:7[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/test/validation/algorithmValidation.test.js[2m > [22mAlgorithm Validation against PRAAT
+[31m[1mTypeError[22m: __vite_ssr_import_1__.PitchEnsemble is not a constructor[39m
+[36m [2m❯[22m src/test/validation/algorithmValidation.test.js:[2m63:25[22m[39m
+    [90m 61| [39m
+    [90m 62| [39m    [34mbeforeAll[39m(() [33m=>[39m {
+    [90m 63| [39m        pitchEnsemble [33m=[39m [35mnew[39m [33mPitchEnsemble[39m()[33m;[39m
+    [90m   | [39m                        [31m^[39m
+    [90m 64| [39m        formantTracker [33m=[39m [35mnew[39m [33mFormantTracker[39m([34m44100[39m)[33m;[39m
+    [90m 65| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/22]⎯[22m[39m
+
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 13 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/context/AuthContext.test.jsx[2m > [22mAuthContext[2m > [22mlogs in successfully
+[31m[1mAssertionError[22m: expected 'null' to be 'testuser' // Object.is equality
+
+Ignored nodes: comments, script, style
+[36m<html>[31m
+  [36m<head />[31m
+  [36m<body>[31m
+    [36m<div>[31m
+      [36m<div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"user"[31m
+        [36m>[31m
+          [0mnull[0m
+        [36m</div>[31m
+        [36m<button>[31m
+          [0mLogin[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mSignup[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mLogout[0m
+        [36m</button>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</body>[31m
+[36m</html>[31m[39m
+
+Expected: [32m"testuser"[39m
+Received: [31m"null"[39m
+
+[36m [2m❯[22m src/context/AuthContext.test.jsx:[2m83:60[22m[39m
+    [90m 81| [39m
+    [90m 82| [39m        [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m 83| [39m            expect(result.getByTestId('user').textContent).toBe('testu…
+    [90m   | [39m                                                           [31m^[39m
+    [90m 84| [39m        })[33m;[39m
+    [90m 85| [39m    })[33m;[39m
+[90m [2m❯[22m runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:[2m47:12[22m[39m
+[90m [2m❯[22m checkCallback node_modules/@testing-library/dom/dist/wait-for.js:[2m124:77[22m[39m
+[90m [2m❯[22m Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:[2m118:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/context/AuthContext.test.jsx[2m > [22mAuthContext[2m > [22mclears local data on logout
+[31m[1mAssertionError[22m: expected 'null' to be 'testuser' // Object.is equality
+
+Ignored nodes: comments, script, style
+[36m<html>[31m
+  [36m<head />[31m
+  [36m<body>[31m
+    [36m<div>[31m
+      [36m<div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"user"[31m
+        [36m>[31m
+          [0mnull[0m
+        [36m</div>[31m
+        [36m<button>[31m
+          [0mLogin[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mSignup[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mLogout[0m
+        [36m</button>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</body>[31m
+[36m</html>[31m[39m
+
+Expected: [32m"testuser"[39m
+Received: [31m"null"[39m
+
+[36m [2m❯[22m src/context/AuthContext.test.jsx:[2m135:60[22m[39m
+    [90m133| [39m
+    [90m134| [39m        [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m135| [39m            expect(result.getByTestId('user').textContent).toBe('testu…
+    [90m   | [39m                                                           [31m^[39m
+    [90m136| [39m        })[33m;[39m
+    [90m137| [39m
+[90m [2m❯[22m runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:[2m47:12[22m[39m
+[90m [2m❯[22m checkCallback node_modules/@testing-library/dom/dist/wait-for.js:[2m124:77[22m[39m
+[90m [2m❯[22m Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:[2m118:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/engines/AudioEngine.socket.test.js[2m > [22mAudioEngine Socket Integration[2m > [22mshould initialize socket on start
+[41m[1m FAIL [22m[49m src/engines/AudioEngine.socket.test.js[2m > [22mAudioEngine Socket Integration[2m > [22mshould handle socket connection events
+[41m[1m FAIL [22m[49m src/engines/AudioEngine.socket.test.js[2m > [22mAudioEngine Socket Integration[2m > [22mshould emit audio_chunk when connected
+[41m[1m FAIL [22m[49m src/engines/AudioEngine.socket.test.js[2m > [22mAudioEngine Socket Integration[2m > [22mshould buffer chunks when disconnected and flush on connect
+[41m[1m FAIL [22m[49m src/engines/AudioEngine.socket.test.js[2m > [22mAudioEngine Socket Integration[2m > [22mshould update latestBackendAnalysis on analysis_update
+[31m[1mError[22m: [vitest] No "Macleod" export is defined on the "pitchfinder" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+[39m
+vi.mock(import("pitchfinder"), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    // your mocked methods
+  }
+})
+
+[36m [2m❯[22m new McLeodPitchDetector src/services/audio/McLeodPitchDetector.js:[2m30:25[22m[39m
+    [90m 28| [39m
+    [90m 29| [39m        [90m// Check direct named export[39m
+    [90m 30| [39m        if (Pitchfinder.Macleod) detectorConstructor = Pitchfinder.Mac…
+    [90m   | [39m                        [31m^[39m
+    [90m 31| [39m        else if (Pitchfinder.McLeod) detectorConstructor = Pitchfinder…
+    [90m 32| [39m        [90m// Check default export (ESM interop)[39m
+[90m [2m❯[22m new AudioEngine src/engines/AudioEngine.js:[2m67:31[22m[39m
+[90m [2m❯[22m src/engines/AudioEngine.socket.test.js:[2m102:18[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/Sidebar.test.jsx[2m > [22mSidebar Auth Integration[2m > [22mshows Sign In button when not logged in
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: Sign In. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<button[39m
+        [33mclass[39m=[32m"lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mdata-testid[39m=[32m"icon-menu"[39m
+          [33mrole[39m=[32m"img"[39m
+          [33msize[39m=[32m"24"[39m
+        [36m/>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col h-full"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-6 border-b border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-start justify-between"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<h1[39m
+                  [33mclass[39m=[32m"text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"[39m
+                [36m>[39m
+                  [0mVocal GEM[0m
+                [36m</h1>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-slate-500 mt-1"[39m
+                [36m>[39m
+                  [0mGender Expression Modulator[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-[10px] text-slate-600 font-mono bg-slate-800 px-2 py-1 rounded"[39m
+                [33mtitle[39m=[32m"App Version"[39m
+              [36m>[39m
+                [0mv[0m
+                [0m0.1.0[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"px-4 py-3 border-b border-slate-800/50 relative"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"relative"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4"[39m
+                [33mdata-testid[39m=[32m"icon-search"[39m
+                [33mrole[39m=[32m"img"[39m
+              [36m/>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"[39m
+                [33mplaceholder[39m=[32m"Search..."[39m
+                [33mtype[39m=[32m"text"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+              [36m<kbd[39m
+                [33mclass[39m=[32m"absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-block px-1.5 py-0.5 bg-slate-700/50 rounded text-[10px] text-slate-500 font-mono"[39m
+              [36m>[39m
+                [0m⌘K[0m
+              [36m</kbd>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"flex-1 p-4 space-y-2 overflow-y-auto"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-blue-600 text-white shadow-lg shadow-blue-900/20"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-home"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mDashboard[0m
+              [36m</span>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"ml-auto opacity-50"[39m
+                [33mdata-testid[39m=[32m"icon-chevron-right"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"16"[39m
+              [36m/>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mPractice[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-mic"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mVoice Log[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mHaptic Tool[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-settings"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mSettings[0m
+              [36m</span>[39m
+            [36m</button>[39m
+          [36m</nav>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-4 border-t border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"text-xs text-slate-500 text-center"[39m
+            [36m>[39m
+              [0mFrontend Demo Mode[0m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/layout/Sidebar.test.jsx:[2m70:16[22m[39m
+    [90m 68| [39m        mockUseAuth[33m.[39m[34mmockReturnValue[39m({ user[33m:[39m [35mnull[39m })[33m;[39m
+    [90m 69| [39m        const { getByText } = render(<Sidebar activeView="dashboard" o…
+    [90m 70| [39m        [34mexpect[39m([34mgetByText[39m([32m'Sign In'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   | [39m               [31m^[39m
+    [90m 71| [39m    })[33m;[39m
+    [90m 72| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/Sidebar.test.jsx[2m > [22mSidebar Auth Integration[2m > [22mshows user info and Sign Out when logged in
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: CloudUser. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<button[39m
+        [33mclass[39m=[32m"lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mdata-testid[39m=[32m"icon-menu"[39m
+          [33mrole[39m=[32m"img"[39m
+          [33msize[39m=[32m"24"[39m
+        [36m/>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col h-full"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-6 border-b border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-start justify-between"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<h1[39m
+                  [33mclass[39m=[32m"text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"[39m
+                [36m>[39m
+                  [0mVocal GEM[0m
+                [36m</h1>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-slate-500 mt-1"[39m
+                [36m>[39m
+                  [0mGender Expression Modulator[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-[10px] text-slate-600 font-mono bg-slate-800 px-2 py-1 rounded"[39m
+                [33mtitle[39m=[32m"App Version"[39m
+              [36m>[39m
+                [0mv[0m
+                [0m0.1.0[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"px-4 py-3 border-b border-slate-800/50 relative"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"relative"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4"[39m
+                [33mdata-testid[39m=[32m"icon-search"[39m
+                [33mrole[39m=[32m"img"[39m
+              [36m/>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"[39m
+                [33mplaceholder[39m=[32m"Search..."[39m
+                [33mtype[39m=[32m"text"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+              [36m<kbd[39m
+                [33mclass[39m=[32m"absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-block px-1.5 py-0.5 bg-slate-700/50 rounded text-[10px] text-slate-500 font-mono"[39m
+              [36m>[39m
+                [0m⌘K[0m
+              [36m</kbd>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"flex-1 p-4 space-y-2 overflow-y-auto"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-blue-600 text-white shadow-lg shadow-blue-900/20"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-home"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mDashboard[0m
+              [36m</span>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"ml-auto opacity-50"[39m
+                [33mdata-testid[39m=[32m"icon-chevron-right"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"16"[39m
+              [36m/>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mPractice[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-mic"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mVoice Log[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mHaptic Tool[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-settings"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mSettings[0m
+              [36m</span>[39m
+            [36m</button>[39m
+          [36m</nav>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-4 border-t border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"text-xs text-slate-500 text-center"[39m
+            [36m>[39m
+              [0mFrontend Demo Mode[0m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/layout/Sidebar.test.jsx:[2m76:16[22m[39m
+    [90m 74| [39m        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' },…
+    [90m 75| [39m        const { getByText } = render(<Sidebar activeView="dashboard" o…
+    [90m 76| [39m        [34mexpect[39m([34mgetByText[39m([32m'CloudUser'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   | [39m               [31m^[39m
+    [90m 77| [39m        [34mexpect[39m([34mgetByText[39m([32m'Sign Out'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m 78| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/Sidebar.test.jsx[2m > [22mSidebar Auth Integration[2m > [22mopens Login modal on Sign In click
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: Sign In. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<button[39m
+        [33mclass[39m=[32m"lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mdata-testid[39m=[32m"icon-menu"[39m
+          [33mrole[39m=[32m"img"[39m
+          [33msize[39m=[32m"24"[39m
+        [36m/>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col h-full"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-6 border-b border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-start justify-between"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<h1[39m
+                  [33mclass[39m=[32m"text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"[39m
+                [36m>[39m
+                  [0mVocal GEM[0m
+                [36m</h1>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-slate-500 mt-1"[39m
+                [36m>[39m
+                  [0mGender Expression Modulator[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-[10px] text-slate-600 font-mono bg-slate-800 px-2 py-1 rounded"[39m
+                [33mtitle[39m=[32m"App Version"[39m
+              [36m>[39m
+                [0mv[0m
+                [0m0.1.0[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"px-4 py-3 border-b border-slate-800/50 relative"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"relative"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4"[39m
+                [33mdata-testid[39m=[32m"icon-search"[39m
+                [33mrole[39m=[32m"img"[39m
+              [36m/>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"[39m
+                [33mplaceholder[39m=[32m"Search..."[39m
+                [33mtype[39m=[32m"text"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+              [36m<kbd[39m
+                [33mclass[39m=[32m"absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-block px-1.5 py-0.5 bg-slate-700/50 rounded text-[10px] text-slate-500 font-mono"[39m
+              [36m>[39m
+                [0m⌘K[0m
+              [36m</kbd>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"flex-1 p-4 space-y-2 overflow-y-auto"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-blue-600 text-white shadow-lg shadow-blue-900/20"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-home"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mDashboard[0m
+              [36m</span>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"ml-auto opacity-50"[39m
+                [33mdata-testid[39m=[32m"icon-chevron-right"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"16"[39m
+              [36m/>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mPractice[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-mic"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mVoice Log[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mHaptic Tool[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-settings"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mSettings[0m
+              [36m</span>[39m
+            [36m</button>[39m
+          [36m</nav>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-4 border-t border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"text-xs text-slate-500 text-center"[39m
+            [36m>[39m
+              [0mFrontend Demo Mode[0m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/layout/Sidebar.test.jsx:[2m84:25[22m[39m
+    [90m 82| [39m        const { getByText, getByTestId } = render(<Sidebar activeView=…
+    [90m 83| [39m
+    [90m 84| [39m        fireEvent[33m.[39m[34mclick[39m([34mgetByText[39m([32m'Sign In'[39m))[33m;[39m
+    [90m   | [39m                        [31m^[39m
+    [90m 85| [39m        [34mexpect[39m([34mgetByTestId[39m([32m'login-modal'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m 86| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/Sidebar.test.jsx[2m > [22mSidebar Auth Integration[2m > [22mcalls logout on Sign Out click
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: Sign Out. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<button[39m
+        [33mclass[39m=[32m"lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mdata-testid[39m=[32m"icon-menu"[39m
+          [33mrole[39m=[32m"img"[39m
+          [33msize[39m=[32m"24"[39m
+        [36m/>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col h-full"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-6 border-b border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-start justify-between"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<h1[39m
+                  [33mclass[39m=[32m"text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"[39m
+                [36m>[39m
+                  [0mVocal GEM[0m
+                [36m</h1>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-slate-500 mt-1"[39m
+                [36m>[39m
+                  [0mGender Expression Modulator[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-[10px] text-slate-600 font-mono bg-slate-800 px-2 py-1 rounded"[39m
+                [33mtitle[39m=[32m"App Version"[39m
+              [36m>[39m
+                [0mv[0m
+                [0m0.1.0[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"px-4 py-3 border-b border-slate-800/50 relative"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"relative"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4"[39m
+                [33mdata-testid[39m=[32m"icon-search"[39m
+                [33mrole[39m=[32m"img"[39m
+              [36m/>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"[39m
+                [33mplaceholder[39m=[32m"Search..."[39m
+                [33mtype[39m=[32m"text"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+              [36m<kbd[39m
+                [33mclass[39m=[32m"absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-block px-1.5 py-0.5 bg-slate-700/50 rounded text-[10px] text-slate-500 font-mono"[39m
+              [36m>[39m
+                [0m⌘K[0m
+              [36m</kbd>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"flex-1 p-4 space-y-2 overflow-y-auto"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-blue-600 text-white shadow-lg shadow-blue-900/20"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-home"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mDashboard[0m
+              [36m</span>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"ml-auto opacity-50"[39m
+                [33mdata-testid[39m=[32m"icon-chevron-right"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"16"[39m
+              [36m/>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mPractice[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-mic"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mVoice Log[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mHaptic Tool[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-settings"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mSettings[0m
+              [36m</span>[39m
+            [36m</button>[39m
+          [36m</nav>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-4 border-t border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"text-xs text-slate-500 text-center"[39m
+            [36m>[39m
+              [0mFrontend Demo Mode[0m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/layout/Sidebar.test.jsx:[2m92:25[22m[39m
+    [90m 90| [39m        const { getByText } = render(<Sidebar activeView="dashboard" o…
+    [90m 91| [39m
+    [90m 92| [39m        fireEvent[33m.[39m[34mclick[39m([34mgetByText[39m([32m'Sign Out'[39m))[33m;[39m
+    [90m   | [39m                        [31m^[39m
+    [90m 93| [39m        [34mexpect[39m(mockLogout)[33m.[39m[34mtoHaveBeenCalled[39m()[33m;[39m
+    [90m 94| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/Sidebar.test.jsx[2m > [22mSidebar Auth Integration[2m > [22mopens Camera modal when Mirror button is clicked
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: Mirror. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<button[39m
+        [33mclass[39m=[32m"lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mdata-testid[39m=[32m"icon-menu"[39m
+          [33mrole[39m=[32m"img"[39m
+          [33msize[39m=[32m"24"[39m
+        [36m/>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col h-full"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-6 border-b border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-start justify-between"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<h1[39m
+                  [33mclass[39m=[32m"text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"[39m
+                [36m>[39m
+                  [0mVocal GEM[0m
+                [36m</h1>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-slate-500 mt-1"[39m
+                [36m>[39m
+                  [0mGender Expression Modulator[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-[10px] text-slate-600 font-mono bg-slate-800 px-2 py-1 rounded"[39m
+                [33mtitle[39m=[32m"App Version"[39m
+              [36m>[39m
+                [0mv[0m
+                [0m0.1.0[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"px-4 py-3 border-b border-slate-800/50 relative"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"relative"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4"[39m
+                [33mdata-testid[39m=[32m"icon-search"[39m
+                [33mrole[39m=[32m"img"[39m
+              [36m/>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"[39m
+                [33mplaceholder[39m=[32m"Search..."[39m
+                [33mtype[39m=[32m"text"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+              [36m<kbd[39m
+                [33mclass[39m=[32m"absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-block px-1.5 py-0.5 bg-slate-700/50 rounded text-[10px] text-slate-500 font-mono"[39m
+              [36m>[39m
+                [0m⌘K[0m
+              [36m</kbd>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"flex-1 p-4 space-y-2 overflow-y-auto"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-blue-600 text-white shadow-lg shadow-blue-900/20"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-home"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mDashboard[0m
+              [36m</span>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"ml-auto opacity-50"[39m
+                [33mdata-testid[39m=[32m"icon-chevron-right"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"16"[39m
+              [36m/>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mPractice[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-mic"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mVoice Log[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mHaptic Tool[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-settings"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mSettings[0m
+              [36m</span>[39m
+            [36m</button>[39m
+          [36m</nav>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-4 border-t border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"text-xs text-slate-500 text-center"[39m
+            [36m>[39m
+              [0mFrontend Demo Mode[0m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/layout/Sidebar.test.jsx:[2m106:27[22m[39m
+    [90m104| [39m        const { getByText } = render(<Sidebar activeView="dashboard" o…
+    [90m105| [39m
+    [90m106| [39m        [35mconst[39m mirrorBtn [33m=[39m [34mgetByText[39m([32m'Mirror'[39m)[33m;[39m
+    [90m   | [39m                          [31m^[39m
+    [90m107| [39m        fireEvent[33m.[39m[34mclick[39m(mirrorBtn)[33m;[39m
+    [90m108| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/22]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/views/PracticeMode.test.jsx[2m > [22mPracticeMode[2m > [22mrenders without crashing
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element by: [data-testid="dynamic-orb"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"animate-in fade-in slide-in-from-bottom-4 duration-500 relative"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"mb-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-center gap-2 px-3 py-2 rounded-lg border bg-purple-500/10 border-purple-500/20 text-purple-400 text-sm"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"flex-shrink-0"[39m
+                [33mdata-testid[39m=[32m"icon-lightbulb"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"14"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"flex-1 text-slate-300"[39m
+              [36m>[39m
+                [0mThe orb shows your overall voice characteristics. Brighter = higher resonance.[0m
+              [36m</span>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"text-slate-500 hover:text-white p-1"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mdata-testid[39m=[32m"icon-x"[39m
+                  [33mrole[39m=[32m"img"[39m
+                  [33msize[39m=[32m"12"[39m
+                [36m/>[39m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col mb-4 gap-4 py-2"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-center justify-center gap-1 p-1 bg-slate-900/50 rounded-full border border-white/5 w-fit mx-auto"[39m
+              [33mid[39m=[32m"practice-tabs"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"Switch to Overview"[39m
+                [33mclass[39m=[32m"px-4 py-2 rounded-full text-sm font-medium transition-all bg-slate-700 text-white shadow-sm"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"hidden sm:inline"[39m
+                [36m>[39m
+                  [0mOverview[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"sm:hidden"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mdata-testid[39m=[32m"icon-activity"[39m
+                    [33mrole[39m=[32m"img"[39m
+                    [33msize[39m=[32m"16"[39m
+                  [36m/>[39m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"Switch to Pitch"[39m
+                [33mclass[39m=[32m"px-4 py-2 rounded-full text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-white/5"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"hidden sm:inline"[39m
+                [36m>[39m
+                  [0mPitch[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"sm:hidden"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mdata-testid[39m=[32m"icon-mic-2"[39m
+                    [33mrole[39m=[32m"img"[39m
+                    [33msize[39m=[32m"16"[39m
+                  [36m/>[39m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"Switch to Resonance"[39m
+                [33mclass[39m=[32m"px-4 py-2 rounded-full text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-white/5"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"hidden sm:inline"[39m
+                [36m>[39m
+                  [0mResonance[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"sm:hidden"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mdata-testid[39m=[32m"icon-volume-2"[39m
+                    [33mrole[39m=[32m"img"[39m
+                    [33msize[39m=[32m"16"[39m
+                  [36m/>[39m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"Switch to Perception"[39m
+                [33mclass[39m=[32m"px-4 py-2 rounded-full text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-white/5"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"hidden sm:inline"[39m
+                [36m>[39m
+                  [0mPerception[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"sm:hidden"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mdata-testid[39m=[32m"icon-layers"[39m
+                    [33mrole[39m=[32m"img"[39m
+                    [33msize[39m=[32m"16"[39m
+                  [36m/>[39m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"Switch to Weight"[39m
+                [33mclass[39m=[32m"px-4 py-2 rounded-full text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-white/5"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"hidden sm:inline"[39m
+                [36m>[39m
+                  [0mWeight[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"sm:hidden"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mdata-testid[39m=[32m"icon-bar-chart-2"[39m
+                    [33mrole[39m=[32m"img"[39m
+                    [33msize[39m=[32m"16"[39m
+                  [36m/>[39m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"Switch to Vowel"[39m
+                [33mclass[39m=[32m"px-4 py-2 rounded-full text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-white/5"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"hidden sm:inline"[39m
+                [36m>[39m
+                  [0mVowel[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"sm:hidden"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mdata-testid[39m=[32m"icon-book-open"[39m
+                    [33mrole[39m=[32m"img"...
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"animate-in fade-in slide-in-from-bottom-4 duration-500 relative"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"mb-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-center gap-2 px-3 py-2 rounded-lg border bg-purple-500/10 border-purple-500/20 text-purple-400 text-sm"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"flex-shrink-0"[39m
+                [33mdata-testid[39m=[32m"icon-lightbulb"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"14"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"flex-1 text-slate-300"[39m
+              [36m>[39m
+                [0mThe orb shows your overall voice characteristics. Brighter = higher resonance.[0m
+              [36m</span>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"text-slate-500 hover:text-white p-1"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mdata-testid[39m=[32m"icon-x"[39m
+                  [33mrole[39m=[32m"img"[39m
+                  [33msize[39m=[32m"12"[39m
+                [36m/>[39m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col mb-4 gap-4 py-2"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-center justify-center gap-1 p-1 bg-slate-900/50 rounded-full border border-white/5 w-fit mx-auto"[39m
+              [33mid[39m=[32m"practice-tabs"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"Switch to Overview"[39m
+                [33mclass[39m=[32m"px-4 py-2 rounded-full text-sm font-medium transition-all bg-slate-700 text-white shadow-sm"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"hidden sm:inline"[39m
+                [36m>[39m
+                  [0mOverview[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"sm:hidden"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mdata-testid[39m=[32m"icon-activity"[39m
+                    [33mrole[39m=[32m"img"[39m
+                    [33msize[39m=[32m"16"[39m
+                  [36m/>[39m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"Switch to Pitch"[39m
+                [33mclass[39m=[32m"px-4 py-2 rounded-full text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-white/5"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"hidden sm:inline"[39m
+                [36m>[39m
+                  [0mPitch[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"sm:hidden"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mdata-testid[39m=[32m"icon-mic-2"[39m
+                    [33mrole[39m=[32m"img"[39m
+                    [33msize[39m=[32m"16"[39m
+                  [36m/>[39m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"Switch to Resonance"[39m
+                [33mclass[39m=[32m"px-4 py-2 rounded-full text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-white/5"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"hidden sm:inline"[39m
+                [36m>[39m
+                  [0mResonance[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"sm:hidden"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mdata-testid[39m=[32m"icon-volume-2"[39m
+                    [33mrole[39m=[32m"img"[39m
+                    [33msize[39m=[32m"16"[39m
+                  [36m/>[39m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"Switch to Perception"[39m
+                [33mclass[39m=[32m"px-4 py-2 rounded-full text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-white/5"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"hidden sm:inline"[39m
+                [36m>[39m
+                  [0mPerception[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"sm:hidden"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mdata-testid[39m=[32m"icon-layers"[39m
+                    [33mrole[39m=[32m"img"[39m
+                    [33msize[39m=[32m"16"[39m
+                  [36m/>[39m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"Switch to Weight"[39m
+                [33mclass[39m=[32m"px-4 py-2 rounded-full text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-white/5"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"hidden sm:inline"[39m
+                [36m>[39m
+                  [0mWeight[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"sm:hidden"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mdata-testid[39m=[32m"icon-bar-chart-2"[39m
+                    [33mrole[39m=[32m"img"[39m
+                    [33msize[39m=[32m"16"[39m
+                  [36m/>[39m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"Switch to Vowel"[39m
+                [33mclass[39m=[32m"px-4 py-2 rounded-full text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-white/5"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"hidden sm:inline"[39m
+                [36m>[39m
+                  [0mVowel[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"sm:hidden"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mdata-testid[39m=[32m"icon-book-open"[39m
+                    [33mrole[39m=[32m"img"...
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m86:33[22m[39m
+[36m [2m❯[22m src/components/views/PracticeMode.test.jsx:[2m92:29[22m[39m
+    [90m 90| [39m        [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([32m'Pitch'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m 91| [39m        [90m// Check for visualization area[39m
+    [90m 92| [39m        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocu…
+    [90m   | [39m                            [31m^[39m
+    [90m 93| [39m    })[33m;[39m
+    [90m 94| [39m})[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/22]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m13 failed[39m[22m[2m | [22m[1m[32m58 passed[39m[22m[90m (71)[39m
+[2m      Tests [22m [1m[31m13 failed[39m[22m[2m | [22m[1m[32m310 passed[39m[22m[2m | [22m[33m6 skipped[39m[90m (329)[39m
+[2m   Start at [22m 07:35:36
+[2m   Duration [22m 34.05s[2m (transform 4.13s, setup 7.25s, import 11.29s, tests 8.01s, environment 59.16s)[22m
