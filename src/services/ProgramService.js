@@ -280,9 +280,10 @@ class ProgramService {
             this.progress.currentWeek = week;
             this.progress.currentDay = day;
             this.saveProgress();
+            return false;
         } else {
             // Program Complete!
-            alert("Congratulations! You've finished the program!");
+            return true;
         }
     }
 
