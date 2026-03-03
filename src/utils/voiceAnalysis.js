@@ -217,27 +217,43 @@ export class VoiceAnalyzer {
 
     /**
      * Estimate Harmonics-to-Noise Ratio
+     * ⚡ Bolt Optimization: Calculate only the required lags (minLag to maxLag)
+     * instead of the full O(N^2) autocorrelation array. This reduces computation
+     * from ~2048 iterations to ~560 iterations for a standard buffer, yielding
+     * a 3-4x speedup.
      */
     estimateHNR(samples, sampleRate) {
-        const autocorr = this.autocorrelate(samples);
+        // Calculate r0 (lag 0) for normalization
+        let r0 = 0;
+        for (let i = 0; i < samples.length; i++) {
+            r0 += samples[i] * samples[i];
+        }
 
-        // Find first peak (fundamental period)
-        let maxCorr = -Infinity;
-        let peakIndex = 0;
+        if (r0 === 0) return null;
+
         const minLag = Math.floor(sampleRate / 600);
         const maxLag = Math.floor(sampleRate / 75);
+        const computeLength = Math.min(maxLag, samples.length);
 
-        for (let i = minLag; i < Math.min(maxLag, autocorr.length); i++) {
-            if (autocorr[i] > maxCorr) {
-                maxCorr = autocorr[i];
-                peakIndex = i;
+        // Find highest correlation peak in the fundamental frequency range
+        let maxCorr = -Infinity;
+        let peakIndex = 0;
+
+        for (let lag = minLag; lag < computeLength; lag++) {
+            let sum = 0;
+            for (let i = 0; i < samples.length - lag; i++) {
+                sum += samples[i] * samples[i + lag];
+            }
+            if (sum > maxCorr) {
+                maxCorr = sum;
+                peakIndex = lag; // Unused, but kept for clarity/compatibility
             }
         }
 
         if (maxCorr <= 0) return null;
 
         // HNR approximation
-        const hnrLinear = maxCorr / Math.abs(autocorr[0]);
+        const hnrLinear = maxCorr / Math.abs(r0);
         const hnrDb = 10 * Math.log10(hnrLinear + 1e-10);
 
         return hnrDb;
