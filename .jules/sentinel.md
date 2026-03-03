@@ -75,3 +75,15 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-18 - Stored XSS via Improper Sanitization Assignment and PII Leak via Poor Exception Handling
+**Vulnerability:**
+1. A Stored XSS vulnerability was found in the `/api/community/success-stories` and `/api/community/flag-content` endpoints. The `submit_success_story` route attempted to sanitize user inputs, but failed to pass the sanitized variables (e.g. `clean_title` and `clean_story`) into the database object `SuccessStory`, instead passing the raw `title` and `story_content` strings. Similarly, the `flag_content` route stored a user-provided `reason` field in the database without any sanitization.
+2. An information leak/PII vulnerability was present in the `/api/community/share-voice` endpoint. If anonymization failed, the raw, non-anonymized voice sample (PII) remained on disk because the deletion logic only occurred inside the `finally` block of a successfully-saved file's anonymization scope. It also suffered from duplicate `finally` blocks due to merge conflicts or poor rebasing.
+
+**Learning:**
+1. Even when sanitization functions (`sanitize_html`) are called, assigning the output to new variables (`clean_title`) but continuing to use the old unsanitized variables (`title`) in database operations nullifies the security control. This is a common pattern when refactoring code to add security later.
+2. In file handling logic, particularly regarding user-uploaded data requiring anonymization, cleanup blocks (`finally`) must be foolproof. Saving the raw file *before* attempting the anonymization try/catch means a crash during `anonymize_audio` or earlier logic can bypass the deletion, retaining sensitive user data unintentionally.
+
+**Prevention:**
+1. Ensure strict variable tracking. When sanitizing inputs, preferably overwrite the original variable or ensure the database object constructor strictly consumes the `clean_*` prefixed variables. Verify this during code review.
+2. Implement immediate and guaranteed cleanup for temporary files containing PII. Raw files should ideally be kept entirely in-memory if possible, or if saved to disk, their deletion must be absolutely guaranteed by an encompassing `try/finally` block that covers *all* possible failure paths immediately after the file handle is closed.
