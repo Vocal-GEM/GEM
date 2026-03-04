@@ -49,22 +49,27 @@ export class VoiceAnalyzer {
         const formants = this.estimateFormants(frame, sampleRate);
         const pitch = this.extractPitch(frame, sampleRate);
 
+        // Optimization: Cache expensive spectral and sibilance calculations
+        // to avoid redundant FFT computations on the same frame.
+        const spectralFeatures = this.calculateSpectralFeatures(frame, sampleRate);
+        const sibilance = this.calculateSibilance(frame, sampleRate);
+
         return {
             pitch: pitch,
             pitchSeries: this.extractPitchSeries(frame, sampleRate),
             formants: formants,
             avgFormantFreq: this.calculateAverageFormantFreq(formants),
             intensity: this.calculateIntensity(frame),
-            spectral: this.calculateSpectralFeatures(frame, sampleRate),
+            spectral: spectralFeatures,
             jitter: this.estimateJitter(frame, sampleRate),
             shimmer: this.estimateShimmer(frame, sampleRate),
             hnr: this.estimateHNR(frame, sampleRate),
             cpps: this.calculateCPPS(frame, sampleRate),
-            sibilance: this.calculateSibilance(frame, sampleRate),
-            spi: this.calculateSPI(this.calculateSpectralFeatures(frame, sampleRate).spectrum, sampleRate),
-            spectralSlope: this.calculateSpectralSlope(this.calculateSpectralFeatures(frame, sampleRate).spectrum, sampleRate),
+            sibilance: sibilance,
+            spi: this.calculateSPI(spectralFeatures.spectrum, sampleRate),
+            spectralSlope: this.calculateSpectralSlope(spectralFeatures.spectrum, sampleRate),
             formantMismatch: pitch ? this.detectFormantMismatch(pitch.mean, formants.f2) : false,
-            clarity: pitch ? pitch.confidence : (this.calculateSibilance(frame, sampleRate).score > 0.3 ? 0.8 : 0) // Combined voiced/unvoiced confidence
+            clarity: pitch ? pitch.confidence : (sibilance.score > 0.3 ? 0.8 : 0) // Combined voiced/unvoiced confidence
         };
     }
 
