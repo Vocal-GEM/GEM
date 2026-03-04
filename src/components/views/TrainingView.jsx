@@ -28,7 +28,7 @@ const ExerciseList = ({ category, onBack }) => {
     return (
         <div className="h-full flex flex-col">
             <div className="flex items-center gap-2 mb-6">
-                <button onClick={onBack} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                <button onClick={onBack} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:outline-none" aria-label="Back to Gym">
                     <ArrowLeft size={20} />
                 </button>
                 <div>
@@ -63,8 +63,9 @@ const ExerciseList = ({ category, onBack }) => {
                                 {isPerformanceCategory && supported && (
                                     <button
                                         onClick={() => handleSpeak(ex.content)}
-                                        className={`p-2 rounded-lg transition-colors ${speaking ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
+                                        className={`p-2 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:outline-none ${speaking ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
                                         title={speaking ? 'Stop' : 'Hear Example'}
+                                        aria-label={speaking ? 'Stop speaking example' : 'Hear example spoken aloud'}
                                     >
                                         {speaking ? <VolumeX size={16} /> : <Volume2 size={16} />}
                                     </button>
@@ -161,7 +162,7 @@ const TrainingView = () => {
                     (!activeModule.component || activeModule.id.startsWith('pitch') || activeModule.id.startsWith('intonation')) && (
                         <button
                             onClick={() => setActiveModule(null)}
-                            className="flex items-center gap-2 text-slate-400 hover:text-white mb-4 transition-colors"
+                            className="flex items-center gap-2 text-slate-400 hover:text-white mb-4 transition-colors focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:outline-none rounded-lg p-1 -ml-1"
                         >
                             <ArrowLeft size={20} /> Back to Gym
                         </button>
