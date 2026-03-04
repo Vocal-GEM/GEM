@@ -28,7 +28,12 @@ const ExerciseList = ({ category, onBack }) => {
     return (
         <div className="h-full flex flex-col">
             <div className="flex items-center gap-2 mb-6">
-                <button onClick={onBack} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                <button
+                    aria-label="Go back"
+                    title="Go back"
+                    onClick={onBack}
+                    className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors focus-visible:ring-2"
+                >
                     <ArrowLeft size={20} />
                 </button>
                 <div>
@@ -62,8 +67,9 @@ const ExerciseList = ({ category, onBack }) => {
                                 </div>
                                 {isPerformanceCategory && supported && (
                                     <button
+                                        aria-label={speaking ? 'Stop example' : 'Hear example'}
                                         onClick={() => handleSpeak(ex.content)}
-                                        className={`p-2 rounded-lg transition-colors ${speaking ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
+                                        className={`p-2 rounded-lg transition-colors focus-visible:ring-2 ${speaking ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
                                         title={speaking ? 'Stop' : 'Hear Example'}
                                     >
                                         {speaking ? <VolumeX size={16} /> : <Volume2 size={16} />}
