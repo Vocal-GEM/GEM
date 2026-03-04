@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-05-28 - Avoid Duplicate Heavy Calculations in Render Loop
+**Learning:** `DSP.calculateVocalWeight` duplicated the spectral tilt calculation already performed in `AudioEngine.js`, causing redundant O(N) iterations and hundreds of `Math.pow` calculations per frame.
+**Action:** Always check if complex features (like spectral tilt, centroids, or peak values) can be passed from the main audio engine to utility functions as optional parameters, rather than recalculating them independently in utility methods.

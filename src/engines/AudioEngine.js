@@ -507,7 +507,7 @@ export class AudioEngine {
             // --- IMPROVED VOCAL WEIGHT CALCULATION ---
             // Research-based multi-factor approach using H1-H2, spectral centroid, and tilt
             // Based on Garellek & Keating (2010) and related phonetics research
-            const weightAnalysis = DSP.calculateVocalWeight(freqData, pitch, this.audioContext.sampleRate);
+            const weightAnalysis = DSP.calculateVocalWeight(freqData, pitch, this.audioContext.sampleRate, tilt);
 
             // Apply lighter smoothing for better responsiveness (was 0.85/0.15, now 0.70/0.30)
             this.smoothedWeight = this.smoothedWeight || 50;
