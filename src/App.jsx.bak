@@ -58,7 +58,7 @@ import CelebrationModal from './components/ui/CelebrationModal';
 import ErrorRecovery from './components/ui/ErrorRecovery';
 import { useOnboarding } from './hooks/useOnboarding';
 import { useAchievements } from './hooks/useAchievements';
-import VoiceAudit from './components/ui/VoiceAudit';
+
 
 
 import { TourProvider } from './context/TourContext';
@@ -73,7 +73,7 @@ import IntakeQuestionnaire from './components/ui/IntakeQuestionnaire';
 import Breadcrumbs from './components/ui/Breadcrumbs';
 
 // VoiceTwinDiscovery is not used in App directly, it's a widget in Dashboard
-// But if we want it accessible elsewhere we can import it. 
+// But if we want it accessible elsewhere we can import it.
 // For now removing the unused import line causing confusion.
 
 const App = () => {
@@ -182,17 +182,6 @@ const App = () => {
         window.addEventListener('openSettings', handleOpenSettings);
         return () => window.removeEventListener('openSettings', handleOpenSettings);
     }, [setShowSettings]);
-
-    return (
-        <TourProvider>
-            <LanguageProvider>
-                <div className="w-full h-screen bg-slate-900 text-white p-8 overflow-y-auto">
-                    <h1 className="text-3xl mb-8">Verification Harness</h1>
-                    <VoiceAudit />
-                </div>
-            </LanguageProvider>
-        </TourProvider>
-    );
 
     return (
         <TourProvider>
