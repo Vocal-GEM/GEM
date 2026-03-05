@@ -119,18 +119,9 @@ def share_voice():
 
         filepath = os.path.join(upload_folder, filename)
 
-        try:
-            # Anonymize audio
-            anon_filepath = anonymize_audio(filepath)
-        finally:
-            # Security: Always remove the original raw file to prevent PII retention
-            if os.path.exists(filepath):
-                try:
-                    os.remove(filepath)
-                except OSError:
-                    pass
-            audio_file.save(filepath)
+        audio_file.save(filepath)
 
+        try:
             # Anonymize audio
             anon_filepath = anonymize_audio(filepath)
         finally:
@@ -315,10 +306,6 @@ def submit_success_story():
         is_safe, flagged = check_moderation(
             title + ' ' + story_content)
 
-        story = SuccessStory(
-            user_id=current_user.id,
-            title=title,
-            story=story_content,
         is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
 
         story = SuccessStory(
@@ -634,11 +621,15 @@ def flag_content():
     try:
         data = request.get_json()
 
+        # Security: Sanitize inputs to prevent Stored XSS
+        clean_type = sanitize_html(data.get('content_type', ''))
+        clean_reason = sanitize_html(data.get('reason', ''))
+
         flag = ModerationFlag(
-            content_type=data.get('content_type'),
+            content_type=clean_type,
             content_id=data.get('content_id'),
             flagged_by=current_user.id,
-            reason=data.get('reason'),
+            reason=clean_reason,
             status='pending'
         )
 
