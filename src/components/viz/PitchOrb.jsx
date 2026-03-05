@@ -16,7 +16,9 @@ const getNoteFromSemitone = (semitone) => {
 };
 
 const PitchOrb = ({ dataRef, settings = {} }) => {
+    const containerRef = useRef(null);
     const canvasRef = useRef(null);
+    const dimensionsRef = useRef({ width: 0, height: 0 });
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
@@ -29,10 +31,45 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     const genderRanges = settings.genderRanges || defaultRanges;
 
+    // Handle Resize with ResizeObserver
+    useEffect(() => {
+        const canvas = canvasRef.current;
+
+        if (!canvas) return;
+
+        const updateSize = () => {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+
+            const newWidth = rect.width;
+            const newHeight = rect.height;
+
+            if (dimensionsRef.current.width !== newWidth || dimensionsRef.current.height !== newHeight) {
+                dimensionsRef.current = { width: newWidth, height: newHeight };
+
+                canvas.width = newWidth * dpr;
+                canvas.height = newHeight * dpr;
+
+                const ctx = canvas.getContext('2d');
+                ctx.scale(dpr, dpr);
+            }
+        };
+
+        const resizeObserver = new ResizeObserver(() => {
+            requestAnimationFrame(updateSize);
+        });
+
+        resizeObserver.observe(canvas);
+        updateSize();
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,13 +104,9 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const { width, height } = dimensionsRef.current;
+            if (width === 0 || height === 0) return;
 
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -170,7 +203,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
     return (
-        <div className="glass-panel-dark rounded-2xl p-6 relative overflow-hidden shadow-lg">
+        <div ref={containerRef} className="glass-panel-dark rounded-2xl p-6 relative overflow-hidden shadow-lg">
             <div className="flex justify-between items-center mb-4">
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                     Pitch
