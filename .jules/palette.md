@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-03-05 - Missing context on icon-only action buttons in dynamic lists
+**Learning:** Icon-only buttons mapped to list items (like the Save/Delete actions on dynamically added Voice Audit modes) are frequently overlooked for accessibility. Without `aria-label` or `title`, screen readers just announce "button", and keyboard users lack focus indicators (`focus-visible`) to know which item's action they are currently highlighting.
+**Action:** When adding or reviewing dynamically generated lists with inline icon-only actions, ensure each action button explicitly includes both an `aria-label` and `title` (e.g., "Save mode", "Cancel adding mode"). Include `focus-visible:ring-2` to guarantee clear keyboard navigation without affecting the default mouse-click focus styling.
