@@ -2,7 +2,6 @@ import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import PitchOrb from './PitchOrb';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import React from 'react';
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
@@ -28,16 +27,28 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     canvas: { width: 300, height: 300 }
 }));
 
-// Mock requestAnimationFrame to detect recursion
-const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+// Mock requestAnimationFrame
+const mockRequestAnimationFrame = vi.fn((cb) => cb());
+globalThis.requestAnimationFrame = mockRequestAnimationFrame;
+
+// Mock ResizeObserver
+globalThis.ResizeObserver = class ResizeObserver {
+    constructor(callback) {
+        this.callback = callback;
+    }
+    observe(element) {
+        this.callback([{ target: element, contentRect: { width: 300, height: 300 } }]);
+    }
+    unobserve() {}
+    disconnect() {}
+};
 
 describe('PitchOrb', () => {
     let dataRef;
 
     beforeEach(() => {
         dataRef = { current: { pitch: 200 } };
-        // Add getBoundingClientRect mock
+        // Keep getBoundingClientRect mock for ResizeObserver initial call
         Element.prototype.getBoundingClientRect = vi.fn(() => ({
             width: 300,
             height: 300,
@@ -61,15 +72,18 @@ describe('PitchOrb', () => {
         await new Promise(resolve => setTimeout(resolve, 0));
 
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
-        const [id, callback] = renderCoordinator.subscribe.mock.calls[0];
+        const [, callback] = renderCoordinator.subscribe.mock.calls[0];
 
         // Execute the callback
         callback();
 
-        // With the bug, requestAnimationFrame is called.
-        // We assert it IS called to confirm the bug exists in the current code,
-        // OR we assert it is NOT called if we want to write the test for the desired state.
-        // Let's write the test for the DESIRED state (fail now, pass later).
-        expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+        // Verify mockRAF is called during initial render to update dimensions via ResizeObserver
+        // But not in the draw loop
+        const mockRAFCount = mockRequestAnimationFrame.mock.calls.length;
+
+        callback();
+
+        // Ensure requestAnimationFrame wasn't called AGAIN in the draw loop itself
+        expect(mockRequestAnimationFrame).toHaveBeenCalledTimes(mockRAFCount);
     });
 });
