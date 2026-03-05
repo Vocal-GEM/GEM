@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-03-05 - Optimization of O(N^2) Autocorrelation
+**Learning:** The autocorrelate function in DSP utilities was running an O(N^2) loop over the entire audio sample array. When computing Harmonics-to-Noise Ratio (HNR), only a small portion of the autocorrelation result (up to a specific lag) is actually needed.
+**Action:** Add an optional `maxLag` parameter to full-array operations like autocorrelation to limit computation bounds, significantly reducing CPU overhead in high-frequency analysis loops.
