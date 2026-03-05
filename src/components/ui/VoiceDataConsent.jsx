@@ -76,6 +76,7 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                     </div>
                     <button
                         onClick={onClose}
+                        aria-label="Close consent modal"
                         className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
                     >
                         <X size={20} />
@@ -130,9 +131,12 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <UserCheck size={16} className={currentConsent.enabled ? 'text-green-400' : 'text-slate-500'} />
-                                    <span className="text-sm font-medium text-white">Enable data collection</span>
+                                    <span id="label-enable-data" className="text-sm font-medium text-white">Enable data collection</span>
                                 </div>
                                 <button
+                                    role="switch"
+                                    aria-checked={currentConsent.enabled}
+                                    aria-labelledby="label-enable-data"
                                     onClick={() => handleToggle('enabled')}
                                     className={`w-12 h-6 rounded-full transition-colors relative ${currentConsent.enabled ? 'bg-green-500' : 'bg-slate-700'
                                         }`}
@@ -159,9 +163,12 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                                             ) : (
                                                 <EyeOff size={16} className="text-slate-500" />
                                             )}
-                                            <span className="text-sm text-white">Allow anonymous upload</span>
+                                            <span id="label-allow-upload" className="text-sm text-white">Allow anonymous upload</span>
                                         </div>
                                         <button
+                                            role="switch"
+                                            aria-checked={currentConsent.anonymousUpload}
+                                            aria-labelledby="label-allow-upload"
                                             onClick={() => handleToggle('anonymousUpload')}
                                             className={`w-12 h-6 rounded-full transition-colors relative ${currentConsent.anonymousUpload ? 'bg-blue-500' : 'bg-slate-700'
                                                 }`}
@@ -183,15 +190,20 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                                 <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50 ml-4">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-sm text-white">Include self-reported gender</span>
+                                            <span id="label-include-gender" className="text-sm text-white">Include self-reported gender</span>
                                             <button
                                                 onClick={() => setShowDetails(!showDetails)}
+                                                aria-label="More information about including gender label"
+                                                aria-expanded={showDetails}
                                                 className="text-slate-400 hover:text-white"
                                             >
                                                 <HelpCircle size={14} />
                                             </button>
                                         </div>
                                         <button
+                                            role="switch"
+                                            aria-checked={currentConsent.includeGenderLabel}
+                                            aria-labelledby="label-include-gender"
                                             onClick={() => handleToggle('includeGenderLabel')}
                                             className={`w-12 h-6 rounded-full transition-colors relative ${currentConsent.includeGenderLabel ? 'bg-purple-500' : 'bg-slate-700'
                                                 }`}

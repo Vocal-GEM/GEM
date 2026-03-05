@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2026-01-18 - Custom Toggle Switches Accessibility
+**Learning:** When using standard `<button>` tags to implement custom toggle switches, they are natively read as simple buttons unless explicitly marked. Screen readers won't know they have state or what that state is.
+**Action:** Always use `role="switch"` and `aria-checked` on custom toggle button elements, and link them to their descriptive labels using `aria-labelledby`.
