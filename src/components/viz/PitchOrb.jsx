@@ -29,10 +29,30 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     const genderRanges = settings.genderRanges || defaultRanges;
 
+    // Track dimensions asynchronously
+    const dimensionsRef = useRef({ width: 0, height: 0 });
+
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
+
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
+
+        // ResizeObserver to update dimensions asynchronously
+        const updateDimensions = () => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+
+            dimensionsRef.current = {
+                width: rect.width,
+                height: rect.height
+            };
+        };
+
+        const observer = new ResizeObserver(updateDimensions);
+        observer.observe(canvas);
+        updateDimensions();
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,13 +87,14 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
+            // Read dimensions from ref instead of synchronous getBoundingClientRect
+            const { width, height } = dimensionsRef.current;
+            if (width === 0 || height === 0) return;
+
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
             ctx.scale(dpr, dpr);
 
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -165,6 +186,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         );
 
         return () => {
+            observer.disconnect();
             unsubscribe();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);

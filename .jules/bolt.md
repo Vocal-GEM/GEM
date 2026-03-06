@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Implicit State Reset in Canvas
+**Learning:** Setting `canvas.width` and `canvas.height` implicitly clears the canvas AND resets context state (e.g., `ctx.scale`). When refactoring dimension assignments out of high-frequency animation loops to prevent layout thrashing (using `ResizeObserver`), removing them can cause animations to smear and transforms to compound indefinitely.
+**Action:** When removing `canvas.width` assignments from a render loop to optimize DOM reads, you must either keep the assignment itself (using cached dimensions instead of `getBoundingClientRect`) or manually manage state via `ctx.save()`/`ctx.restore()` alongside `ctx.clearRect()`. Keeping the assignment `canvas.width = cachedWidth` is often the simplest and safest way to preserve existing component behavior.
