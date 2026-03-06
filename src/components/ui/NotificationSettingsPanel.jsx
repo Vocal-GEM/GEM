@@ -175,6 +175,9 @@ const NotificationSettingsPanel = ({ onClose, embedded = false }) => {
  */
 const SettingRow = ({ icon: Icon, iconColor, title, description, checked, onChange, disabled }) => (
     <button
+        role="switch"
+        aria-checked={checked}
+        aria-label={title}
         onClick={onChange}
         disabled={disabled}
         className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all text-left ${disabled
