@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-23 - Stored XSS in flag_content route
+**Vulnerability:** The `flag_content` endpoint accepted user-provided text for `reason` and inserted it directly into the `ModerationFlag` model. When admins review flagged content, this could trigger Stored XSS. Also found a critical code duplication artifact in `submit_success_story` causing syntax errors and circumventing earlier sanitization attempts.
+**Learning:** All text fields accepted from users must be sanitized if they might be displayed to any user, including admins. Furthermore, complex functions with multiple stages of sanitization are prone to regression via merging, where raw input overwrites clean input.
+**Prevention:** Apply `sanitize_html` directly at instantiation to avoid accidentally overwriting clean variables with unsanitized `data.get()` pulls later in the method.
