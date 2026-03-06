@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2026-01-20 - Custom Toggle Switches
+**Learning:** The application heavily relies on custom, visually-styled toggle switches (using standard `<button>` tags with animated indicator divs) for settings panels like `AccessibilityPanel.jsx` and `NotificationSettingsPanel.jsx`. None of these included `role="switch"` or `aria-checked` attributes, causing screen readers to announce them simply as standard buttons without conveying their critical on/off state to visually impaired users.
+**Action:** When implementing custom toggle switches using standard `<button>` tags, always include `role="switch"` and the `aria-checked` attribute to ensure screen readers correctly interpret their state.

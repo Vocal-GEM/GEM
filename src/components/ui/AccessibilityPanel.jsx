@@ -82,6 +82,9 @@ const AccessibilityPanel = () => {
                             </div>
                         </div>
                         <button
+                            role="switch"
+                            aria-checked={settings[option.id]}
+                            aria-label={option.label}
                             onClick={() => toggleSetting(option.id)}
                             className={`w-12 h-6 rounded-full transition-colors relative ${settings[option.id] ? 'bg-blue-600' : 'bg-slate-600'
                                 }`}
