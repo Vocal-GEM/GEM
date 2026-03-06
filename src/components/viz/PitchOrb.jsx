@@ -29,10 +29,38 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     const genderRanges = settings.genderRanges || defaultRanges;
 
+    const dimensionsRef = useRef({ width: 0, height: 0 });
+    const targetDimensionsRef = useRef({ width: 0, height: 0 });
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const observer = new ResizeObserver((entries) => {
+            if (!entries || !entries.length) return;
+            // Use ResizeObserverEntry's contentRect to avoid getBoundingClientRect reflow
+            const rect = entries[0].contentRect;
+            targetDimensionsRef.current = {
+                width: rect.width,
+                height: rect.height
+            };
+        });
+
+        observer.observe(canvas);
+
+        // Initial setup to guarantee dimensions before first frame
+        const initialRect = canvas.getBoundingClientRect();
+        targetDimensionsRef.current = {
+            width: initialRect.width,
+            height: initialRect.height
+        };
+
+        return () => observer.disconnect();
+    }, []);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,16 +95,26 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            // Update physical canvas size if needed without layout thrashing
+            const target = targetDimensionsRef.current;
+            const dpr = window.devicePixelRatio || 1;
+            const newWidth = Math.round(target.width * dpr);
+            const newHeight = Math.round(target.height * dpr);
 
-            const width = rect.width;
-            const height = rect.height;
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                ctx.scale(dpr, dpr);
+                dimensionsRef.current = { width: target.width, height: target.height };
+            }
+
+            const { width, height } = dimensionsRef.current;
+            if (width === 0 || height === 0) return;
+
             const centerX = width / 2;
             const centerY = height / 2;
 
+            // Explicit clear required if width/height weren't just changed
             ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
