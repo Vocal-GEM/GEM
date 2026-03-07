@@ -228,10 +228,12 @@ export class VoiceAnalyzer {
         const autocorr = this.autocorrelate(samples, maxLag + 1);
 
         let maxCorr = -Infinity;
+        let peakIndex = 0;
 
         for (let i = minLag; i < Math.min(maxLag, autocorr.length); i++) {
             if (autocorr[i] > maxCorr) {
                 maxCorr = autocorr[i];
+                peakIndex = i;
             }
         }
 
