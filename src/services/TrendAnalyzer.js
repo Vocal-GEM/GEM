@@ -17,6 +17,7 @@ export class TrendAnalyzer {
      * @param {string} timeframe - 'week', 'month', 'quarter', 'year', 'all'
      * @returns {Object} comprehensive analysis
      */
+    // eslint-disable-next-line no-unused-vars
     analyzeProgress(sessions, timeframe = 'month') {
         if (!sessions || sessions.length === 0) {
             return {
@@ -67,20 +68,28 @@ export class TrendAnalyzer {
         // x values are just indices 0 to n-1 for simple linear regression over time
         // using indices assumes uniform spacing, which might not be true, but is a decent approximation for "sessions over time"
         const xMean = (n - 1) / 2;
-        const yMean = values.reduce((a, b) => a + b, 0) / n;
+
+        // Use a single loop to find the sum for yMean
+        let ySum = 0;
+        for (let i = 0; i < n; i++) {
+            ySum += values[i];
+        }
+        const yMean = ySum / n;
 
         let numerator = 0;
         let denominator = 0;
 
         for (let i = 0; i < n; i++) {
-            numerator += (i - xMean) * (values[i] - yMean);
-            denominator += (i - xMean) ** 2;
+            const xDiff = i - xMean;
+            numerator += xDiff * (values[i] - yMean);
+            denominator += xDiff * xDiff;
         }
 
         const slope = denominator === 0 ? 0 : numerator / denominator;
         const intercept = yMean - (slope * xMean);
 
-        const rSquared = this.calculateRSquared(values, slope, intercept);
+        // Pass yMean to avoid redundant O(N) recalculation
+        const rSquared = this.calculateRSquared(values, slope, intercept, yMean);
 
         return {
             direction: slope > 0.5 ? 'improving' : slope < -0.5 ? 'declining' : 'stable', // threshold depends on metric
@@ -95,18 +104,30 @@ export class TrendAnalyzer {
 
     /**
      * calculate r-squared value for goodness of fit
+     * @param {number} [yMean] - precalculated yMean to save redundant O(n) loop
      */
-    calculateRSquared(values, slope, intercept) {
+    calculateRSquared(values, slope, intercept, yMean) {
         const n = values.length;
-        const yMean = values.reduce((a, b) => a + b, 0) / n;
+
+        // Fallback for callers that don't pass yMean
+        if (yMean === undefined) {
+            let sum = 0;
+            for (let i = 0; i < n; i++) {
+                sum += values[i];
+            }
+            yMean = sum / n;
+        }
 
         let ssTot = 0; // total sum of squares
         let ssRes = 0; // residual sum of squares
 
         for (let i = 0; i < n; i++) {
+            const val = values[i];
             const yPred = intercept + slope * i;
-            ssTot += (values[i] - yMean) ** 2;
-            ssRes += (values[i] - yPred) ** 2;
+            const diffTot = val - yMean;
+            const diffRes = val - yPred;
+            ssTot += diffTot * diffTot;
+            ssRes += diffRes * diffRes;
         }
 
         if (ssTot === 0) return 1; // perfect fit (all values same)
