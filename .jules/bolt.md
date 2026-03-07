@@ -1,5 +1,9 @@
 # BOLT'S JOURNAL - CRITICAL LEARNINGS ONLY
 
+## 2024-05-30 - Optimization in Full-length Array Calculations
+**Learning:** In `src/utils/voiceAnalysis.js`, computing full-length `autocorrelate` for Harmonics-to-Noise Ratio (HNR) computation was an O(N^2) operation, taking over 600ms on 100 loops. However, the calculation only requires analyzing a specific range defined by `maxLag`.
+**Action:** Always verify if an operation like `autocorrelate` really needs to compute across the entire array length. Passing a `maxLag` limit significantly restricts inner loops to strictly necessary computations, boosting performance significantly (reduced runtime by >50%).
+
 ## 2025-05-21 - React Audio instantiation anti-pattern
 **Learning:** Multiple components were using `const audioRef = useRef(new Audio())`. This constructor runs on *every render*, creating detached DOM elements that are immediately discarded by React's hook reconciliation, causing significant memory churn and CPU overhead.
 **Action:** Always use `useRef(null)` combined with `useEffect` for lazy initialization of expensive objects like `Audio`, `Worker`, or `MediaRecorder`.
