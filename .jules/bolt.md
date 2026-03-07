@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - DSP Full Array Computations
+**Learning:** Functions like `autocorrelate` can cause massive $O(N^2)$ slowdowns when calculating across an entire buffer if the application only requires a subset of values (e.g., when finding fundamental frequency bounded between `minLag` and `maxLag`).
+**Action:** Always provide an optional `maxLagLimit` parameter to calculation-intensive DSP functions and boundedly constrain the iterations strictly to the required ranges to turn $O(N^2)$ into $O(N \cdot maxLag)$.
