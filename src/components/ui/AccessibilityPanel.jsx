@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Eye, Type, Zap, Volume2, Minus, Plus, RotateCcw } from 'lucide-react';
-import {
+import AccessibilityService, {
     getAccessibilitySettings,
     saveAccessibilitySettings,
-    DEFAULT_SETTINGS
 } from '../../services/AccessibilityService';
 
 const AccessibilityPanel = () => {
@@ -25,7 +24,7 @@ const AccessibilityPanel = () => {
     };
 
     const resetSettings = () => {
-        setSettings({ ...DEFAULT_SETTINGS });
+        setSettings({ ...AccessibilityService.DEFAULT_SETTINGS });
     };
 
     const options = [
@@ -61,7 +60,8 @@ const AccessibilityPanel = () => {
                 <h2 className="text-xl font-bold text-white">Accessibility</h2>
                 <button
                     onClick={resetSettings}
-                    className="text-sm text-slate-400 hover:text-white flex items-center gap-1"
+                    aria-label="Reset to default accessibility settings"
+                    className="text-sm text-slate-400 hover:text-white flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none rounded px-2 py-1 transition-colors"
                 >
                     <RotateCcw size={14} /> Reset
                 </button>
@@ -83,7 +83,10 @@ const AccessibilityPanel = () => {
                         </div>
                         <button
                             onClick={() => toggleSetting(option.id)}
-                            className={`w-12 h-6 rounded-full transition-colors relative ${settings[option.id] ? 'bg-blue-600' : 'bg-slate-600'
+                            role="switch"
+                            aria-checked={settings[option.id]}
+                            aria-label={option.label}
+                            className={`w-12 h-6 rounded-full transition-colors relative focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${settings[option.id] ? 'bg-blue-600' : 'bg-slate-600'
                                 }`}
                         >
                             <div
@@ -108,7 +111,8 @@ const AccessibilityPanel = () => {
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => adjustFontSize(-10)}
-                        className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white"
+                        aria-label="Decrease font size"
+                        className="p-2 bg-slate-700 hover:bg-slate-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none rounded-lg text-white transition-colors"
                     >
                         <Minus size={16} />
                     </button>
@@ -122,7 +126,8 @@ const AccessibilityPanel = () => {
 
                     <button
                         onClick={() => adjustFontSize(10)}
-                        className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white"
+                        aria-label="Increase font size"
+                        className="p-2 bg-slate-700 hover:bg-slate-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none rounded-lg text-white transition-colors"
                     >
                         <Plus size={16} />
                     </button>
