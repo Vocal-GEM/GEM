@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2024-05-24 - Overwritten Sanitization in Community Routes
+**Vulnerability:** User input for fields like `reason` in `flag_content` or `story_content` in `submit_success_story` were vulnerable to Stored XSS because explicitly sanitized variables were either not used or were overwritten by raw `data.get()` calls right before database insertion due to duplicated code blocks.
+**Learning:** Code duplication and bad merges can silently undo security sanitization. Even if `sanitize_html` is called earlier in a function, the developer must ensure that the output variable is actually the one passed to the database model.
+**Prevention:** Remove duplicated logic blocks and always verify that the variables being passed to database constructors are the explicit outputs of sanitization functions (e.g., `clean_story` instead of `data.get('story')`).
