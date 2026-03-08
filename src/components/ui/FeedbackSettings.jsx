@@ -102,7 +102,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
             <div className={`fixed inset-x-0 bottom-0 z-50 bg-slate-900 rounded-t-3xl border-t border-white/10 shadow-2xl transition-transform duration-300 transform ${isOpen ? 'translate-y-0' : 'translate-y-full'} max-h-[85vh] overflow-y-auto`}>
                 <div className="sticky top-0 bg-slate-900/95 backdrop-blur-md p-4 border-b border-white/5 flex justify-between items-center z-10">
                     <h2 className="text-lg font-bold text-white">Settings</h2>
-                    <button onClick={onClose} className="p-3 bg-slate-800 rounded-full text-slate-400 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
+                    <button onClick={onClose} aria-label="Close settings" className="p-3 bg-slate-800 rounded-full text-slate-400 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
                 </div>
 
                 <div className="p-6 space-y-8 pb-20">
@@ -223,7 +223,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                                 </div>
                                 <label className="relative inline-flex items-center cursor-pointer p-2">
                                     <input
-                                        type="checkbox"
+                                        type="checkbox" role="switch"
                                         checked={settings.ttsProvider === 'elevenlabs'}
                                         onChange={(e) => setSettings({ ...settings, ttsProvider: e.target.checked ? 'elevenlabs' : 'browser' })}
                                         className="sr-only peer"
@@ -306,7 +306,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                                 </div>
                                 <label className="relative inline-flex items-center cursor-pointer p-2">
                                     <input
-                                        type="checkbox"
+                                        type="checkbox" role="switch"
                                         checked={settings.feedback?.hapticEnabled ?? settings.vibration}
                                         onChange={(e) => setSettings({
                                             ...settings,
@@ -404,8 +404,8 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-bold text-white">Show Streak</span>
                                 <input
-                                    type="checkbox"
-                                    checked={settings.dashboardConfig?.showStreak ?? true}
+                                    type="checkbox" role="switch"
+                                     checked={settings.dashboardConfig?.showStreak ?? true}
                                     onChange={(e) => setSettings({ ...settings, dashboardConfig: { ...settings.dashboardConfig, showStreak: e.target.checked } })}
                                     className="accent-blue-500 w-5 h-5 rounded"
                                 />
@@ -413,8 +413,8 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-bold text-white">Show Total Practice</span>
                                 <input
-                                    type="checkbox"
-                                    checked={settings.dashboardConfig?.showTotalPractice ?? true}
+                                    type="checkbox" role="switch"
+                                     checked={settings.dashboardConfig?.showTotalPractice ?? true}
                                     onChange={(e) => setSettings({ ...settings, dashboardConfig: { ...settings.dashboardConfig, showTotalPractice: e.target.checked } })}
                                     className="accent-blue-500 w-5 h-5 rounded"
                                 />
@@ -422,8 +422,8 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-bold text-white">Show Weekly Activity</span>
                                 <input
-                                    type="checkbox"
-                                    checked={settings.dashboardConfig?.showWeeklyActivity ?? true}
+                                    type="checkbox" role="switch"
+                                     checked={settings.dashboardConfig?.showWeeklyActivity ?? true}
                                     onChange={(e) => setSettings({ ...settings, dashboardConfig: { ...settings.dashboardConfig, showWeeklyActivity: e.target.checked } })}
                                     className="accent-blue-500 w-5 h-5 rounded"
                                 />
@@ -431,8 +431,8 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-bold text-white">Show Progress Trends</span>
                                 <input
-                                    type="checkbox"
-                                    checked={settings.dashboardConfig?.showProgressTrends ?? true}
+                                    type="checkbox" role="switch"
+                                     checked={settings.dashboardConfig?.showProgressTrends ?? true}
                                     onChange={(e) => setSettings({ ...settings, dashboardConfig: { ...settings.dashboardConfig, showProgressTrends: e.target.checked } })}
                                     className="accent-blue-500 w-5 h-5 rounded"
                                 />
@@ -456,7 +456,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                                 </div>
                                 <label className="relative inline-flex items-center cursor-pointer p-2">
                                     <input
-                                        type="checkbox"
+                                        type="checkbox" role="switch"
                                         checked={settings.colorBlindMode || false}
                                         onChange={(e) => setSettings({ ...settings, colorBlindMode: e.target.checked })}
                                         className="sr-only peer"
@@ -520,7 +520,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                                 </div>
                                 <label className="relative inline-flex items-center cursor-pointer p-2">
                                     <input
-                                        type="checkbox"
+                                        type="checkbox" role="switch"
                                         checked={settings.theme === 'light'}
                                         onChange={(e) => setSettings({ ...settings, theme: e.target.checked ? 'light' : 'dark' })}
                                         className="sr-only peer"
@@ -542,7 +542,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                                 </div>
                                 <label className="relative inline-flex items-center cursor-pointer p-2">
                                     <input
-                                        type="checkbox"
+                                        type="checkbox" role="switch"
                                         checked={settings.beginnerMode || false}
                                         onChange={(e) => setSettings({ ...settings, beginnerMode: e.target.checked })}
                                         className="sr-only peer"
@@ -564,7 +564,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                                 </div>
                                 <label className="relative inline-flex items-center cursor-pointer p-2">
                                     <input
-                                        type="checkbox"
+                                        type="checkbox" role="switch"
                                         checked={settings.liteMode || false}
                                         onChange={(e) => setSettings({ ...settings, liteMode: e.target.checked, disable3D: e.target.checked })}
                                         className="sr-only peer"
@@ -621,7 +621,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
                                         <input
-                                            type="checkbox"
+                                            type="checkbox" role="switch"
                                             checked={settings.signalValidation !== false}
                                             onChange={(e) => setSettings({ ...settings, signalValidation: e.target.checked })}
                                             className="sr-only peer"
@@ -774,7 +774,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                                 </div>
                                 <label className="relative inline-flex items-center cursor-pointer p-2">
                                     <input
-                                        type="checkbox"
+                                        type="checkbox" role="switch"
                                         checked={settings.analyticsEnabled || false}
                                         onChange={(e) => setSettings({ ...settings, analyticsEnabled: e.target.checked })}
                                         className="sr-only peer"
