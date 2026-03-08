@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2024-05-19 - Adding role="switch" to visually customized checkboxes
+**Learning:** In Tailwind UI systems, toggle switches are often implemented using `<input type="checkbox" className="sr-only peer">` alongside styled sibling `<div>`s. While visually clear, these lack semantic meaning for screen readers. Simply hiding the input with `sr-only` is not enough; the input itself must explicitly declare `role="switch"` so assistive technologies announce its true interaction model (on/off) rather than a generic checkbox (checked/unchecked).
+**Action:** When auditing or implementing custom toggle switches built on top of native checkboxes, always ensure the hidden `<input>` element includes `role="switch"`.
