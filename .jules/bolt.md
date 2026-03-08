@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-18 - Optimize Autocorrelation ($O(N^2) \rightarrow O(N \times maxLag)$)
+**Learning:** In DSP utilities, computing the full autocorrelation sequence up to `samples.length` lag is an expensive $O(N^2)$ operation that causes performance bottlenecks on the frontend. Often, dependent algorithms (like HNR estimation or Pitch detection) only examine lags within a specific window (e.g. up to `maxLag = Math.floor(sampleRate / 75)`).
+**Action:** Always accept and pass a `maxLag` limit to correlation functions to restrict inner loop iterations to strictly what is necessary, drastically cutting unnecessary CPU cycles.
