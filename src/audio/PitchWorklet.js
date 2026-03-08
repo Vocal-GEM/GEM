@@ -43,7 +43,7 @@ class PitchProcessor extends AudioWorkletProcessor {
 
         const inputChannel = input[0];
         // eslint-disable-next-line no-undef
-        const timeNow = typeof currentTime !== 'undefined' ? currentTime : performance.now() / 1000;
+        const timeNow = typeof currentTime !== 'undefined' ? currentTime : Date.now() / 1000;
 
         // Fill buffer with incoming audio
         for (let i = 0; i < inputChannel.length; i++) {
@@ -57,7 +57,7 @@ class PitchProcessor extends AudioWorkletProcessor {
                 const result = this.detectPitchYIN(this.buffer);
 
                 // eslint-disable-next-line no-undef
-                const processingEndTime = typeof currentTime !== 'undefined' ? currentTime : performance.now() / 1000;
+                const processingEndTime = typeof currentTime !== 'undefined' ? currentTime : Date.now() / 1000;
                 const processingTime = (processingEndTime - startTime) * 1000; // Convert to ms
                 this.totalProcessTime += processingTime;
                 this.processCount++;
