@@ -21,7 +21,7 @@ export const WeeklyDigest = () => {
     };
 
     return (
-        <div className="space-y-4">
+        <Card className="space-y-4">
             <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
                 {digest.period}
             </div>
@@ -69,6 +69,6 @@ export const WeeklyDigest = () => {
                     />
                 </div>
             </div>
-        </div>
+        </Card>
     );
 };
