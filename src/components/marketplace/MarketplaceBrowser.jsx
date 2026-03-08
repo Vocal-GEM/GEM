@@ -1,6 +1,7 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Star, Download, Filter, ShoppingBag } from 'lucide-react';
+import { Search, Star, Download, ShoppingBag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export const MarketplaceBrowser = () => {
