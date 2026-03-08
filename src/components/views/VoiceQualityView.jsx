@@ -569,9 +569,11 @@ const VoiceQualityView = () => {
                                     </div>
                                     <button
                                         onClick={() => handleDeleteHistory(item.id)}
-                                        className="p-2 text-slate-600 hover:text-red-400 transition-colors"
+                                        className="p-2 text-slate-600 hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg"
+                                        title="Delete history item"
+                                        aria-label="Delete history item"
                                     >
-                                        <Trash2 size={18} />
+                                        <Trash2 size={18} aria-hidden="true" />
                                     </button>
                                 </div>
                             ))}
@@ -585,10 +587,11 @@ const VoiceQualityView = () => {
                             {/* Mic Quality Tips Button */}
                             <button
                                 onClick={() => setShowMicTips(true)}
-                                className="absolute top-4 right-0 p-2 text-slate-400 hover:text-teal-400 hover:bg-slate-800 rounded-lg transition-colors"
+                                className="absolute top-4 right-0 p-2 text-slate-400 hover:text-teal-400 hover:bg-slate-800 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                                 title="Recording Tips"
+                                aria-label="Recording Tips"
                             >
-                                <HelpCircle size={20} />
+                                <HelpCircle size={20} aria-hidden="true" />
                             </button>
 
                             <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl border border-slate-800">
@@ -678,10 +681,11 @@ const VoiceQualityView = () => {
                             {/* Mic Quality Tips Button */}
                             <button
                                 onClick={() => setShowMicTips(true)}
-                                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-teal-400 hover:bg-slate-800 rounded-lg transition-colors"
+                                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-teal-400 hover:bg-slate-800 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                                 title="Recording Tips"
+                                aria-label="Recording Tips"
                             >
-                                <HelpCircle size={20} />
+                                <HelpCircle size={20} aria-hidden="true" />
                             </button>
 
                             <Upload size={48} className="text-slate-600 mb-4" />
