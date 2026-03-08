@@ -23,7 +23,6 @@ class TestSettingsSecurity(unittest.TestCase):
         self.app = Flask(__name__)
         self.app.config['SECRET_KEY'] = 'test'
         self.app.register_blueprint(settings.settings_bp, url_prefix='/api/settings')
-        self.app.register_blueprint(settings.settings_bp)
 
         self.login_manager = LoginManager()
         self.login_manager.init_app(self.app)
