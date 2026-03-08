@@ -76,7 +76,8 @@ const SessionNotes = () => {
                 value={notes}
                 onChange={handleNotesChange}
                 placeholder="Enter session observations, goals, and homework..."
-                className="flex-1 w-full bg-slate-900/50 border border-slate-700/50 rounded-xl p-4 text-sm text-slate-300 focus:outline-none focus:border-blue-500/50 focus:bg-slate-900 transition-all resize-none font-sans leading-relaxed"
+                aria-label="Clinical Notes"
+                className="flex-1 w-full bg-slate-900/50 border border-slate-700/50 rounded-xl p-4 text-sm text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:border-blue-500/50 focus:bg-slate-900 transition-all resize-none font-sans leading-relaxed"
                 spellCheck="false"
             />
 
@@ -85,10 +86,10 @@ const SessionNotes = () => {
                     ID: {activeClient.id.slice(0, 8)}...
                 </div>
                 <div className="flex gap-2">
-                    <button className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold text-slate-400 transition-colors">
+                    <button className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold text-slate-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
                         Timestamp
                     </button>
-                    <button className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-lg text-xs font-bold transition-colors">
+                    <button className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-lg text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
                         Export PDF
                     </button>
                 </div>
