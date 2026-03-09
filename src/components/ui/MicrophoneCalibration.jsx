@@ -61,7 +61,7 @@ const MicrophoneCalibration = ({ audioEngine }) => {
 
     const startCalibration = async () => {
         if (!audioEngine || !audioEngine.audioContext || !audioEngine.microphone) {
-            console.error("Audio engine not ready");
+            console.error(Audio engine not ready&quot;);
             return;
         }
 
@@ -297,7 +297,7 @@ const MicrophoneCalibration = ({ audioEngine }) => {
                             <div className="text-center animate-in fade-in zoom-in duration-300">
                                 <Volume2 className="w-16 h-16 text-emerald-400 mx-auto mb-6 animate-pulse" />
                                 <h4 className="text-xl font-bold text-white mb-2">Speak Clearly</h4>
-                                <p className="text-slate-400 mb-6">Say "Ahhhh" or count to 5... ({countdown}s)</p>
+                                <p className="text-slate-400 mb-6">Say Ahhhh&quot; or count to 5... ({countdown}s)</p>
                                 <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
                                     <div className="h-full bg-emerald-500 transition-all duration-1000" style={{ width: `${((3 - countdown) / 3) * 100}%` }} />
                                 </div>
@@ -351,7 +351,7 @@ const MicrophoneCalibration = ({ audioEngine }) => {
 
                         <button
                             onClick={() => setCalibrationStatus('idle')}
-                            className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02]"
+                            className=w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02]&quot;
                         >
                             Done
                         </button>
@@ -376,7 +376,7 @@ const MicrophoneCalibration = ({ audioEngine }) => {
                                 step="0.001"
                                 value={manualThreshold || adaptiveThreshold}
                                 onChange={(e) => applyManualThreshold(parseFloat(e.target.value))}
-                                className="flex-1 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+                                className=flex-1 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer&quot;
                             />
                             <span className="text-xs font-mono text-slate-400 w-12 text-right">
                                 {(manualThreshold || adaptiveThreshold).toFixed(3)}

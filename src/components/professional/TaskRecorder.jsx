@@ -73,8 +73,8 @@ const TaskRecorder = ({ task, onComplete }) => {
             recorder.start();
             setState('recording');
         } catch (err) {
-            console.error("Error accessing microphone:", err);
-            setError("Microphone access denied or not available.");
+            console.error(Error accessing microphone:&quot;, err);
+            setError(&quot;Microphone access denied or not available.&quot;);
             setState('idle');
         }
     };
@@ -113,7 +113,7 @@ const TaskRecorder = ({ task, onComplete }) => {
                     <h3 className="text-white font-medium text-lg">{task.prompt}</h3>
                     {task.text && (
                         <div className="mt-2 p-3 bg-slate-900/50 rounded border border-slate-700 text-slate-300 italic">
-                            "{task.prompt.replace('Read: "', '').replace('"', '')}"
+                            {task.prompt.replace('Read: &quot;', '').replace('&quot;', '')}&quot;
                         </div>
                     )}
                     {task.duration && (
@@ -155,7 +155,7 @@ const TaskRecorder = ({ task, onComplete }) => {
 
                 {state === 'done' && (
                     <div className="flex items-center gap-2">
-                        <audio ref={audioRef} src={audioUrl} onEnded={() => setIsPlaying(false)} className="hidden" />
+                        <audio ref={audioRef} src={audioUrl} onEnded={() => setIsPlaying(false)} className=hidden&quot; />
                         <button
                             onClick={togglePlayback}
                             className="p-2 bg-slate-700 hover:bg-slate-600 rounded-full text-white transition-colors"
