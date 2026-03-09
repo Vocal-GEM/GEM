@@ -9,6 +9,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useSettings } from '../../context/SettingsContext';
 import { useTour } from '../../context/TourContext';
 import { usePracticeCards } from '../../context/PracticeCardsContext';
+import { useToast } from '../../context/ToastContext';
 import { pdfReportGenerator } from '../../utils/pdfReportGenerator';
 import {
     Chart as ChartJS,
@@ -40,6 +41,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
     const { settings } = useSettings();
     const { startTour } = useTour();
     const { cardSets } = usePracticeCards();
+    const { showError } = useToast();
     const [sessions, setSessions] = useState([]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [activeTab, setActiveTab] = useState('overview'); // overview, sessions, journals, recordings
@@ -158,7 +160,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
             doc.save(`voice-therapy-report-${new Date().toISOString().split('T')[0]}.pdf`);
         } catch (error) {
             console.error('Error generating report:', error);
-            alert('Failed to generate report.');
+            showError('Failed to generate report.');
         } finally {
             setIsGenerating(false);
         }
