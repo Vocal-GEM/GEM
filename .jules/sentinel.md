@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-20 - Stored XSS via Re-assigned Variables
+**Vulnerability:** User inputs were correctly sanitized with `sanitize_html`, but the raw data was subsequently fetched again via `data.get()` and used in database operations, bypassing the sanitization and causing a Stored XSS vulnerability.
+**Learning:** Even if input sanitization is present, the sanitized output must be consistently used throughout the function. Be wary of duplicate or redundant assignments that overwrite clean variables with dirty data before insertion.
+**Prevention:** Remove redundant code blocks that fetch data multiple times. Ensure sanitized variables (`clean_title`, `clean_story`) are exclusively used for all downstream operations, including database insertion and moderation checks.
