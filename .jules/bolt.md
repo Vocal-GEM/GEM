@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Unnecessary full-array autocorrelation
+**Learning:** `autocorrelate` was computing $O(N^2)$ cross-products over the entire audio buffer, but `estimateHNR` only needs values up to `maxLag` (around 500-600 samples max for typical speech). This was causing massive overhead in frame analysis.
+**Action:** Always verify if a mathematical DSP function needs to compute the entire array. Passing a `maxLag` or `limit` parameter to DSP primitives like autocorrelation can yield massive speedups.

@@ -219,13 +219,18 @@ export class VoiceAnalyzer {
      * Estimate Harmonics-to-Noise Ratio
      */
     estimateHNR(samples, sampleRate) {
-        const autocorr = this.autocorrelate(samples);
+        // Calculate min and max lag (fundamental period range: 75Hz - 600Hz)
+        const minLag = Math.floor(sampleRate / 600);
+        const maxLag = Math.floor(sampleRate / 75);
+
+        // Performance Optimization: Only calculate autocorrelation up to maxLag + 1
+        // Avoids O(N^2) operation over the entire sample array when we only need a small window
+        const limit = Math.min(maxLag + 1, samples.length);
+        const autocorr = this.autocorrelate(samples, limit);
 
         // Find first peak (fundamental period)
         let maxCorr = -Infinity;
         let peakIndex = 0;
-        const minLag = Math.floor(sampleRate / 600);
-        const maxLag = Math.floor(sampleRate / 75);
 
         for (let i = minLag; i < Math.min(maxLag, autocorr.length); i++) {
             if (autocorr[i] > maxCorr) {
@@ -245,10 +250,13 @@ export class VoiceAnalyzer {
 
     /**
      * Autocorrelation helper
+     * @param {Float32Array} samples - Audio samples
+     * @param {number} [maxLag] - Optional maximum lag to compute (optimization)
      */
-    autocorrelate(samples) {
-        const result = new Float32Array(samples.length);
-        for (let lag = 0; lag < samples.length; lag++) {
+    autocorrelate(samples, maxLag) {
+        const limit = maxLag !== undefined ? Math.min(maxLag, samples.length) : samples.length;
+        const result = new Float32Array(limit);
+        for (let lag = 0; lag < limit; lag++) {
             let sum = 0;
             for (let i = 0; i < samples.length - lag; i++) {
                 sum += samples[i] * samples[i + lag];

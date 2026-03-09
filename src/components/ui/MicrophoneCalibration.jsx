@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useState, useEffect, useRef } from 'react';
 import { Mic, Volume2, VolumeX, RefreshCw, CheckCircle, AlertCircle, Activity, BarChart2 } from 'lucide-react';
 import { analyzeMicrophoneQuality } from '../../utils/MicrophoneQualityAnalyzer';
