@@ -87,8 +87,7 @@ const QualityVisualizer = ({ dataRef }) => {
         );
 
         return () => {
-            unsubscribe();
-        };
+            unsubscribe()}
     }, [componentId, loop]);
 
     // Helper to render sparkline
@@ -115,8 +114,7 @@ const QualityVisualizer = ({ dataRef }) => {
                     className={colorClass}
                 />
             </svg>
-        );
-    };
+        )}
 
     // Helper for status labels
     const getStatus = (type, val) => {
@@ -137,8 +135,7 @@ const QualityVisualizer = ({ dataRef }) => {
             if (val > 70) return { label: 'Pressed', color: 'text-orange-400' };
             return { label: 'Balanced', color: 'text-emerald-400' };
         }
-        return { label: '-', color: 'text-slate-400' };
-    };
+        return { label: '-', color: 'text-slate-400' }}
 
     return (
         <div className="h-full flex flex-col p-6">
@@ -249,7 +246,6 @@ const QualityVisualizer = ({ dataRef }) => {
                 </div>
             </div>
         </div>
-    );
-};
+    )}
 
 export default QualityVisualizer;

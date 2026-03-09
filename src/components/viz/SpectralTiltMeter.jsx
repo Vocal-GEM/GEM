@@ -60,8 +60,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
         );
 
         return () => {
-            unsubscribe();
-        };
+            unsubscribe()}
     }, [dataRef, targetRange, colorBlindMode, id]);
     }, [dataRef, targetRange, colorBlindMode, componentId]);
 
@@ -139,7 +138,6 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 </div>
             </div>
         </div>
-    );
-};
+    )}
 
 export default SpectralTiltMeter;
