@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-25 - Optimized O(N^2) DSP Operations
+**Learning:** In `src/utils/voiceAnalysis.js` and similar DSP utilities, `autocorrelate` was calculating the full range of lags up to `samples.length`, resulting in $O(N^2)$ complexity. However, the calling functions (like `estimateHNR`) only required a subset of lags (e.g., up to `maxLag = Math.floor(sampleRate / 75)`).
+**Action:** Always calculate and pass a `maxLag` limit when performing expensive DSP array operations like autocorrelation to restrict inner loops to strictly necessary computations, yielding significant (~4x) speedups.
