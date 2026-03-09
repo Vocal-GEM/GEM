@@ -16,6 +16,7 @@ import WarmUpModule from './components/ui/WarmUpModule';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 import FloatingCamera from './components/ui/FloatingCamera';
 import OfflineIndicator from './components/ui/OfflineIndicator';
+import QuickActions from './components/ui/QuickActions';
 
 // Lazy Loaded Components - UI
 const Sidebar = lazy(() => import('./components/layout/Sidebar'));
@@ -487,6 +488,7 @@ const App = () => {
             </LanguageProvider>
             {/* Global Overlays */}
             <OfflineIndicator />
+            <QuickActions />
             <CelebrationModal
                 achievement={unlockedAchievement}
                 onClose={closeAchievement}
