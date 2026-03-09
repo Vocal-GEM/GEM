@@ -115,9 +115,10 @@ class TestVoiceQualitySecurity(unittest.TestCase):
                 # Since send_file is used, we expect file content
                 # We can't easily check 'get_json()' here as it might be binary
 
-    def test_manipulate_file_error_handling(self):
+    def test_manipulate_file_error_handling_1(self):
         """
         Test that an internal error returns a generic error message and does NOT leak details.
+        """
         mock_sound = MagicMock()
 
         def side_effect_save(path, format):
