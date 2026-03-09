@@ -101,7 +101,7 @@ const RecommendedToolsWidget = () => {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => navigate(tool.view)}
-                            className="relative overflow-hidden group rounded-lg p-3 text-left border border-gray-700 bg-gray-900 hover:border-gray-500 transition-all"
+                            className=relative overflow-hidden group rounded-lg p-3 text-left border border-gray-700 bg-gray-900 hover:border-gray-500 transition-all&quot;
                         >
                             <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 bg-gradient-to-br ${tool.color} transition-opacity`} />
 
@@ -121,7 +121,7 @@ const RecommendedToolsWidget = () => {
 
             {recommendations?.rationale && (
                 <div className="mt-4 text-xs text-gray-500 italic border-t border-gray-700 pt-2">
-                    "{recommendations.rationale.split('.')[0]}."
+                    {recommendations.rationale.split('.')[0]}.&quot;
                 </div>
             )}
         </div>
