@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-03-09 - Redundant Autocorrelation Computation Anti-pattern
+**Learning:** `autocorrelate()` operations inherently scale at $O(N^2)$ and are highly CPU intensive. Computing autocorrelation over the entire length of a long array (e.g., audio samples) when only the first few lags are needed is an anti-pattern. In `estimateHNR()`, the required max lag was only ~1/75th of the sample rate, but the function computed autocorrelation for the entire 2048+ sample array.
+**Action:** Always accept and pass a `maxLag` limit to limit inner loops of expensive mathematical functions like `autocorrelate()` to only the required computations, providing massive speedups (e.g., $O(N^2)$ to $O(N \times \text{maxLag})$).
