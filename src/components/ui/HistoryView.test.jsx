@@ -35,6 +35,15 @@ vi.mock('../../context/PracticeCardsContext', () => ({
     PracticeCardsProvider: ({ children }) => <div>{children}</div>
 }));
 
+// Mock ToastContext
+vi.mock('../../context/ToastContext', () => ({
+    useToast: () => ({
+        showError: vi.fn(),
+        showSuccess: vi.fn(),
+        showInfo: vi.fn(),
+    })
+}));
+
 const MockPracticeCardsProvider = ({ children }) => <div>{children}</div>;
 
 // Mock Chart.js components

@@ -37,3 +37,10 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-02-18 - Replacing Native Alerts
+**Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
+**Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2025-02-18 - Accessibility Improvements in QuickActions
+**Learning:** Having multiple duplicated `className` attributes in a single component can mask missing accessibility attributes or introduce conflicting styles.
+**Action:** Use `twMerge` to consolidate `className` props effectively. Ensure focus-visible states are correctly set so users relying on keyboards receive clear indicators.
