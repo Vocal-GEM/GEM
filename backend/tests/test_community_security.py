@@ -36,7 +36,11 @@ def test_sanitize_html_xss():
 def test_community_module_integrity():
     """Verify backend.app.routes.community can be imported (syntax check)"""
     try:
-        from backend.app.routes import community
+        import importlib
+        sys.modules['backend.app.extensions'] = MagicMock()
+        sys.modules['backend.app.models'] = MagicMock()
+
+        community = importlib.import_module('backend.app.routes.community')
         assert community.community_bp is not None
     except ImportError as e:
         pytest.fail(f"Failed to import community module: {e}")

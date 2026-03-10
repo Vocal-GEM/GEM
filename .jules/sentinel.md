@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-02-28 - Insecure File Cleanup in Error Handlers
+**Vulnerability:** Raw, un-anonymized user audio files (PII) were permanently retained on the server when audio processing (e.g., anonymization) failed or threw an exception because the file deletion was improperly nested or bypassed inside `finally` and `except` blocks.
+**Learning:** `try...finally` blocks intended for security cleanup must carefully account for *when* the temporary files are created (e.g., saved to disk) versus when exceptions can be thrown. Additionally, using duplicate code blocks or incorrect `try` scoping can completely circumvent intended PII removal.
+**Prevention:** Always verify that cleanup routines within `finally` or `except` blocks handle the exact file paths defined *before* the operation that might fail. Avoid redundant saves or overwriting variables that track temporary file locations.
