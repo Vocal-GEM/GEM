@@ -2,6 +2,11 @@ from .extensions import db
 from flask_login import UserMixin
 from datetime import datetime
 
+# Validation Constants
+ALLOWED_CATEGORIES = {'pitch', 'resonance', 'prosody', 'full_course'}
+ALLOWED_AUDIENCES = {'beginner', 'intermediate', 'advanced'}
+ALLOWED_GOALS = {'feminine', 'masculine', 'androgynous'}
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
