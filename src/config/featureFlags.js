@@ -44,7 +44,7 @@ export const FEATURES = {
     // ═══════════════════════════════════════════════════════════
     // MODALS & OVERLAYS
     // ═══════════════════════════════════════════════════════════
-    camera: false,
+    camera: true,
     adaptiveSession: false,
     guidedJourney: false,
     practiceCards: false,

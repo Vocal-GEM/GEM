@@ -299,9 +299,23 @@ const Sidebar = ({ activeView, onViewChange }) => {
 
                     {/* Footer */}
                     <div className="p-4 border-t border-slate-800">
-                        <div className="text-xs text-slate-500 text-center">
-                            Frontend Demo Mode
-                        </div>
+                        <button
+                            onClick={() => setShowProfileManager(true)}
+                            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all hover:bg-slate-800"
+                        >
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold text-white">
+                                👤
+                            </div>
+                            <div className="flex-1 text-left">
+                                <div className="text-sm font-medium text-white">
+                                    Guest User
+                                </div>
+                                <div className="text-xs text-slate-500">
+                                    Sign In / Profile
+                                </div>
+                            </div>
+                            <ChevronRight size={16} className="text-slate-500" />
+                        </button>
                     </div>
                 </div>
             </div>
