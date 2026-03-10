@@ -43,6 +43,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
         };
 
         let unsubscribe;
+        // Dynamic import to avoid circular dependency issues if any, or just standard subscription
         import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
             unsubscribe = renderCoordinator.subscribe(
                 `spectral-tilt-meter-${id}`,
@@ -50,20 +51,11 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 renderCoordinator.PRIORITY.MEDIUM
             );
         });
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `spectral-tilt-meter-${componentId}`,
-            loop,
-            renderCoordinator.PRIORITY.MEDIUM
-        );
 
         return () => {
-            unsubscribe();
+            if (unsubscribe) unsubscribe();
         };
     }, [dataRef, targetRange, colorBlindMode, id]);
-    }, [dataRef, targetRange, colorBlindMode, componentId]);
 
     return (
         <div className="glass-panel rounded-2xl p-6 h-full flex flex-col justify-center">

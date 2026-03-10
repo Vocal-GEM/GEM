@@ -4,6 +4,9 @@
  * Runs in dedicated audio thread for <50ms latency
  */
 
+/* global currentTime */
+/* eslint-disable no-undef */
+
 class PitchProcessor extends AudioWorkletProcessor {
     constructor() {
         super();

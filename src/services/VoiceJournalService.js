@@ -3,6 +3,8 @@
  * Uses IndexedDB for audio blob storage (large files)
  */
 
+import { getWaveform } from './WaveformService';
+
 const DB_NAME = 'gem_voice_journal';
 const DB_VERSION = 1;
 const STORE_NAME = 'recordings';
@@ -46,10 +48,21 @@ const initDB = () => {
 export const saveRecording = async ({ audioBlob, notes = '', tags = [], pitchData = null, duration = 0 }) => {
     const database = await initDB();
 
+    // ⚡ Bolt: Generate waveform now to avoid expensive decoding later
+    let waveform = null;
+    try {
+        if (audioBlob) {
+            waveform = await getWaveform(audioBlob);
+        }
+    } catch (err) {
+        console.warn('Failed to pre-generate waveform:', err);
+    }
+
     const recording = {
         id: `recording_${Date.now()}`,
         timestamp: new Date().toISOString(),
         audioBlob,
+        waveform,
         notes,
         tags,
         duration: Math.round(duration),
