@@ -7,7 +7,7 @@
  * - Break suggestion at 30+ minutes
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
 import { Timer, Droplets, Coffee, AlertTriangle } from 'lucide-react';
 
 const HYDRATION_INTERVAL = 15 * 60 * 1000; // 15 minutes
@@ -30,6 +30,13 @@ const PracticeSessionTimer = ({ isActive = true, onPause }) => {
 
         return () => clearInterval(timer);
     }, [isActive]);
+
+    // Trigger haptics when reminder shows
+    useEffect(() => {
+        if (showReminder && typeof navigator !== 'undefined' && navigator.vibrate) {
+            navigator.vibrate([100, 50, 100]);
+        }
+    }, [showReminder]);
 
     // Check for reminders
     useEffect(() => {
@@ -81,7 +88,11 @@ const PracticeSessionTimer = ({ isActive = true, onPause }) => {
     return (
         <>
             {/* Compact Timer Display */}
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 rounded-lg border border-slate-700">
+            <div
+                className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 rounded-lg border border-slate-700"
+                role="timer"
+                aria-label="Practice Timer"
+            >
                 <Timer size={14} className="text-slate-400" />
                 <span className={`font-mono text-sm font-bold ${getTimerColor()}`}>
                     {formatTime(elapsedSeconds)}
@@ -102,6 +113,8 @@ const PracticeSessionTimer = ({ isActive = true, onPause }) => {
                     message="Time for a sip of water! Keeping your vocal cords hydrated improves resonance and protects your voice."
                     primaryAction={{ label: "I'll Drink Water", onClick: () => handleDismiss('hydration') }}
                     secondaryAction={{ label: "Remind Later", onClick: () => handleDismiss('hydration') }}
+                    role="status"
+                    ariaLive="polite"
                 />
             )}
 
@@ -115,6 +128,8 @@ const PracticeSessionTimer = ({ isActive = true, onPause }) => {
                     message="You've been practicing for 20 minutes - great dedication! A short break helps prevent vocal fatigue."
                     primaryAction={{ label: "Keep Going", onClick: () => handleDismiss('rest') }}
                     secondaryAction={onPause ? { label: "Take a Break", onClick: () => { handleDismiss('rest'); onPause(); } } : undefined}
+                    role="alert"
+                    ariaLive="assertive"
                 />
             )}
 
@@ -129,6 +144,8 @@ const PracticeSessionTimer = ({ isActive = true, onPause }) => {
                     primaryAction={onPause ? { label: "Take a Break", onClick: () => { handleDismiss('break'); onPause(); } } : { label: "I'll Stop Soon", onClick: () => handleDismiss('break') }}
                     secondaryAction={{ label: "5 More Minutes", onClick: () => handleDismiss('break') }}
                     urgent
+                    role="alert"
+                    ariaLive="assertive"
                 />
             )}
         </>
@@ -147,40 +164,53 @@ const ReminderPopup = ({
     message,
     primaryAction,
     secondaryAction,
-    urgent = false
-}) => (
-    <div className="fixed bottom-24 right-6 z-40 max-w-sm animate-in slide-in-from-right duration-300">
-        <div className={`bg-gradient-to-br ${bgColor} backdrop-blur-xl rounded-2xl p-5 border ${borderColor} shadow-2xl`}>
-            <div className="flex items-start gap-4">
-                <div className={`p-3 rounded-xl bg-white/10 ${urgent ? 'animate-pulse' : ''}`}>
-                    <Icon size={24} className={iconColor} />
-                </div>
-                <div className="flex-1">
-                    <h3 className="font-bold text-white mb-1">{title}</h3>
-                    <p className="text-sm text-slate-300 leading-relaxed mb-4">{message}</p>
-                    <div className="flex gap-2">
-                        <button
-                            onClick={primaryAction.onClick}
-                            className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${urgent
-                                ? 'bg-red-500 hover:bg-red-400 text-white'
-                                : 'bg-white/20 hover:bg-white/30 text-white'
-                                }`}
-                        >
-                            {primaryAction.label}
-                        </button>
-                        {secondaryAction && (
+    urgent = false,
+    role = "status",
+    ariaLive = "polite"
+}) => {
+    const titleId = `reminder-title-${useId()}`;
+    const descId = `reminder-desc-${useId()}`;
+
+    return (
+        <div
+            className="fixed bottom-24 right-6 z-40 max-w-sm animate-in slide-in-from-right duration-300"
+            role={role}
+            aria-live={ariaLive}
+            aria-labelledby={titleId}
+            aria-describedby={descId}
+        >
+            <div className={`bg-gradient-to-br ${bgColor} backdrop-blur-xl rounded-2xl p-5 border ${borderColor} shadow-2xl`}>
+                <div className="flex items-start gap-4">
+                    <div className={`p-3 rounded-xl bg-white/10 ${urgent ? 'animate-pulse' : ''}`}>
+                        <Icon size={24} className={iconColor} aria-hidden="true" />
+                    </div>
+                    <div className="flex-1">
+                        <h3 id={titleId} className="font-bold text-white mb-1">{title}</h3>
+                        <p id={descId} className="text-sm text-slate-300 leading-relaxed mb-4">{message}</p>
+                        <div className="flex gap-2">
                             <button
-                                onClick={secondaryAction.onClick}
-                                className="px-4 py-2 rounded-lg font-bold text-sm text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+                                onClick={primaryAction.onClick}
+                                className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${urgent
+                                    ? 'bg-red-500 hover:bg-red-400 text-white'
+                                    : 'bg-white/20 hover:bg-white/30 text-white'
+                                    }`}
                             >
-                                {secondaryAction.label}
+                                {primaryAction.label}
                             </button>
-                        )}
+                            {secondaryAction && (
+                                <button
+                                    onClick={secondaryAction.onClick}
+                                    className="px-4 py-2 rounded-lg font-bold text-sm text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+                                >
+                                    {secondaryAction.label}
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 export default PracticeSessionTimer;
