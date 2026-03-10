@@ -137,16 +137,24 @@ const FileSpectrogram = ({
         const { width, height } = canvas;
         const { data: spectrogram, numFrames, maxBin } = data;
 
-        // Clear canvas
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, width, height);
-
-        // Draw spectrogram
+        // Draw spectrogram via direct pixel manipulation
         const pixelWidth = width / numFrames;
         const pixelHeight = height / maxBin;
 
+        const imgData = ctx.createImageData(width, height);
+        const data32 = new Uint32Array(imgData.data.buffer);
+
+        // Background is already black (alpha=255, rgb=0) in Uint32Array by default when created,
+        // but let's make sure it's fully opaque black (0xFF000000)
+        data32.fill(0xFF000000);
+
         for (let frame = 0; frame < numFrames; frame++) {
-            const x = frame * pixelWidth;
+            const startX = Math.floor(frame * pixelWidth);
+            const endX = Math.ceil((frame + 1) * pixelWidth);
+            // Cap to canvas bounds
+            const drawStartX = Math.max(0, startX);
+            const drawEndX = Math.min(width, endX);
+
             const magnitudes = spectrogram[frame];
 
             for (let bin = 0; bin < maxBin; bin++) {
@@ -154,19 +162,28 @@ const FileSpectrogram = ({
                 if (intensity > 10) { // Threshold
                     const color = colormap[Math.floor(intensity)];
 
-                    // Extract RGB from packed color
-                    const r = color & 0xFF;
-                    const g = (color >> 8) & 0xFF;
-                    const b = (color >> 16) & 0xFF;
-
-                    ctx.fillStyle = `rgb(${r},${g},${b})`;
-
                     // Y axis: low freq at bottom, high at top
-                    const y = height - (bin / maxBin) * height;
-                    ctx.fillRect(x, y - pixelHeight, Math.ceil(pixelWidth), Math.ceil(pixelHeight));
+                    // Mapping y range for this bin
+                    const bottomY = Math.ceil(height - (bin / maxBin) * height);
+                    const topY = Math.max(0, Math.floor(height - ((bin + 1) / maxBin) * height));
+
+                    // Ensure at least 1 pixel is drawn for thin bins to prevent data loss
+                    const drawTopY = topY === bottomY ? Math.max(0, bottomY - 1) : topY;
+
+                    // Fill the rectangle for this pixel
+                    for (let y = drawTopY; y < bottomY; y++) {
+                        const rowOffset = y * width;
+                        for (let x = drawStartX; x < drawEndX; x++) {
+                            // Ensure fully opaque by bitwise ORing with 0xFF000000 (Alpha=255)
+                            data32[rowOffset + x] = 0xFF000000 | color;
+                        }
+                    }
                 }
             }
         }
+
+        // Apply the generated image data
+        ctx.putImageData(imgData, 0, 0);
 
         // Draw frequency axis labels
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
