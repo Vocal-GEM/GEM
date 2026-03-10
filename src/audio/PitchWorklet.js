@@ -4,6 +4,8 @@
  * Runs in dedicated audio thread for <50ms latency
  */
 
+/* eslint-disable no-undef */
+
 class PitchProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
@@ -36,7 +38,7 @@ class PitchProcessor extends AudioWorkletProcessor {
         };
     }
 
-    process(inputs, outputs, parameters) {
+    process(inputs, _outputs, _parameters) {
         const input = inputs[0];
         if (!input || !input[0]) return true;
 
@@ -48,12 +50,12 @@ class PitchProcessor extends AudioWorkletProcessor {
 
             // Process when buffer is full
             if (this.bufferIndex >= this.bufferSize) {
-                const startTime = currentTime;
+                const startTime = globalThis.currentTime;
 
                 // Detect pitch using YIN algorithm
                 const result = this.detectPitchYIN(this.buffer);
 
-                const processingTime = (currentTime - startTime) * 1000; // Convert to ms
+                const processingTime = (globalThis.currentTime - startTime) * 1000; // Convert to ms
                 this.totalProcessTime += processingTime;
                 this.processCount++;
 
@@ -62,7 +64,7 @@ class PitchProcessor extends AudioWorkletProcessor {
                     type: 'pitch',
                     pitch: result.pitch,
                     confidence: result.confidence,
-                    timestamp: currentTime,
+                    timestamp: globalThis.currentTime,
                     latency: processingTime,
                     avgLatency: this.totalProcessTime / this.processCount
                 });
