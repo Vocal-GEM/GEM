@@ -20,53 +20,15 @@ const QualityVisualizer = ({ dataRef }) => {
     });
     const maxHistory = 100;
 
-    // Define the loop callback (not creating it inside useEffect to allow useCallback if needed,
-    // though here it captures state setters so it's tricky.
-    // Actually, RenderCoordinator passes deltaTime, but we just need to poll dataRef.)
-    // We use useCallback to keep the function reference stable if possible,
-    // but we depend on dataRef.
     const loop = useCallback(() => {
         if (!dataRef.current) return;
         const data = dataRef.current;
-
-        // Update local state
-        // Jitter/Shimmer are often small values (e.g. 0.01), we might want to scale them for display
-        // Jitter > 0.01 (1%) is often considered rough
-        // Shimmer > 0.35 dB (or 3-4%) is often considered rough.
-        // Assuming the engine returns raw values.
 
         setMetrics({
             jitter: data.jitter || 0,
             shimmer: data.shimmer || 0,
             weight: data.weight || 50
         });
-    useEffect(() => {
-        const loop = () => {
-            if (!dataRef.current) return;
-            const data = dataRef.current;
-
-            // Update local state
-            // Jitter/Shimmer are often small values (e.g. 0.01), we might want to scale them for display
-            // Jitter > 0.01 (1%) is often considered rough
-            // Shimmer > 0.35 dB (or 3-4%) is often considered rough. 
-            // Assuming the engine returns raw values.
-
-            setMetrics({
-                jitter: data.jitter || 0,
-                shimmer: data.shimmer || 0,
-                weight: data.weight || 50
-            });
-
-            // Update history
-            ['jitter', 'shimmer', 'weight'].forEach(key => {
-                historyRef.current[key].push(data[key] || 0);
-                if (historyRef.current[key].length > maxHistory) {
-                    historyRef.current[key].shift();
-                }
-            });
-
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
 
         // Update history
         ['jitter', 'shimmer', 'weight'].forEach(key => {
@@ -75,8 +37,6 @@ const QualityVisualizer = ({ dataRef }) => {
                 historyRef.current[key].shift();
             }
         });
-
-        // REMOVED: requestAnimationFrame(loop) - handled by renderCoordinator
     }, [dataRef]);
 
     useEffect(() => {
@@ -92,7 +52,7 @@ const QualityVisualizer = ({ dataRef }) => {
     }, [componentId, loop]);
 
     // Helper to render sparkline
-    const renderSparkline = (key, colorClass, _height = 40) => {
+    const renderSparkline = (key, colorClass) => {
         const data = historyRef.current[key];
         if (data.length < 2) return null;
 
@@ -121,13 +81,11 @@ const QualityVisualizer = ({ dataRef }) => {
     // Helper for status labels
     const getStatus = (type, val) => {
         if (type === 'jitter') {
-            // Thresholds for Jitter (approximate for visual feedback)
             if (val < 0.004) return { label: 'Stable', color: 'text-emerald-400' };
             if (val < 0.01) return { label: 'Normal', color: 'text-blue-400' };
             return { label: 'Rough', color: 'text-orange-400' };
         }
         if (type === 'shimmer') {
-            // Thresholds for Shimmer
             if (val < 0.15) return { label: 'Stable', color: 'text-emerald-400' };
             if (val < 0.35) return { label: 'Normal', color: 'text-blue-400' };
             return { label: 'Breathy/Rough', color: 'text-orange-400' };
@@ -178,9 +136,6 @@ const QualityVisualizer = ({ dataRef }) => {
                             </div>
                         </div>
                     </div>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                        Micro-fluctuations in pitch. Lower values indicate a smoother, more stable tone. High jitter is perceived as roughness.
-                    </p>
                 </div>
 
                 {/* Shimmer Card */}
@@ -208,9 +163,6 @@ const QualityVisualizer = ({ dataRef }) => {
                             </div>
                         </div>
                     </div>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                        Micro-fluctuations in loudness. High shimmer can sound breathy or hoarse. Lower is generally clearer.
-                    </p>
                 </div>
 
                 {/* Weight/Breathiness Card */}
@@ -243,9 +195,6 @@ const QualityVisualizer = ({ dataRef }) => {
                             </div>
                         </div>
                     </div>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                        Indicates vocal fold closure. Lower values are breathier (softer), higher values are pressed (harder).
-                    </p>
                 </div>
             </div>
         </div>

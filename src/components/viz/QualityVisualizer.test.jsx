@@ -53,6 +53,7 @@ describe('QualityVisualizer', () => {
   });
 
   it('does not call requestAnimationFrame directly', () => {
+    // Check window.requestAnimationFrame instead of global
     const rafSpy = vi.spyOn(window, 'requestAnimationFrame');
     render(<QualityVisualizer dataRef={dataRef} />);
     expect(rafSpy).not.toHaveBeenCalled();

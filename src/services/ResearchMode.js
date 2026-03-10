@@ -3,6 +3,8 @@
  * Manages clinical trials, research studies, and participant data collection
  */
 
+/* eslint-disable no-undef */
+
 import { v4 as uuidv4 } from 'uuid';
 import CryptoJS from 'crypto-js';
 
