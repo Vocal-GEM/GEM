@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-02-18 - Search Input Accessibility (Combobox Pattern)
+**Learning:** Custom search inputs with dropdown results often lack the proper WAI-ARIA combobox pattern (e.g., `role="combobox"`, `aria-expanded`, `aria-controls`, `aria-activedescendant`), leaving screen reader users unaware of the dropdown's existence or their current selection within it.
+**Action:** When implementing or auditing custom search components, ensure the input has `role="combobox"`, the results container has `role="listbox"`, and individual results have `role="option"`. Dynamically manage `aria-expanded` and `aria-activedescendant` based on state and keyboard navigation.

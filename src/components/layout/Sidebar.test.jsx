@@ -45,6 +45,24 @@ vi.mock('../../context/NavigationContext', () => ({
     NavigationProvider: ({ children }) => <div>{children}</div>
 }));
 
+// Mock featureFlags
+vi.mock('../../config/featureFlags', () => ({
+    FEATURES: {
+        'dashboard': true,
+        'practice': true,
+        'journal': true,
+        'analysis': true,
+        'analytics': true,
+        'library': true,
+        'client-dashboard': true,
+        'capev': true,
+        'spectrogram': true,
+        'pitch-tool': true,
+        'camera': true,
+        'settings': true
+    }
+}));
+
 // Mock SearchService
 vi.mock('../../services/SearchService', () => ({
     search: vi.fn(() => []),
