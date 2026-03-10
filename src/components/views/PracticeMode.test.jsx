@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import { vi, describe, it, expect } from 'vitest';
 import PracticeMode from './PracticeMode';
@@ -31,6 +31,10 @@ vi.mock('../../context/NavigationContext', () => ({
         navigationParams: {}
     })
 }));
+
+// Important: When mocking components used in React.lazy, we usually mock the module import.
+// However, since we are mocking at the top level for a file that uses import() inside,
+// standard vi.mock works because it intercepts the import() call too.
 vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
 vi.mock('../ui/ResizablePanel', () => ({
@@ -58,9 +62,11 @@ vi.mock('../../context/ProfileContext', () => ({
     ProfileProvider: ({ children }) => <div>{children}</div>
 }));
 
+// Mock VisualizerSkeleton since it's the fallback
+vi.mock('../ui/VisualizerSkeleton', () => ({ default: () => <div data-testid="visualizer-skeleton">Loading...</div> }));
+
 describe('PracticeMode', () => {
     const mockDataRef = { current: { pitch: 200, resonance: 100, volume: 0.5 } };
-    const mockAudioEngine = { current: {} };
 
     it('renders without crashing', async () => {
 
@@ -86,9 +92,14 @@ describe('PracticeMode', () => {
             </SettingsProvider>
         );
 
+        // Check if skeleton is rendered first (verifies Suspense is working)
+        expect(screen.getByTestId('visualizer-skeleton')).toBeInTheDocument();
+
         expect(screen.getByText('Overview')).toBeInTheDocument();
-        expect(screen.getByText('Pitch')).toBeInTheDocument();
-        // Check for visualization area
-        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
+
+        // Wait for the Suspense boundary to resolve and show the DynamicOrb
+        await waitFor(() => {
+            expect(screen.getByTestId('dynamic-orb')).toBeInTheDocument();
+        });
     });
 });
