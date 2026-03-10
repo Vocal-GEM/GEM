@@ -47,10 +47,6 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     if (!historyMetaRef.current) {
         historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
     }
-
-    if (!historyMetaRef.current) {
-        historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
-    }
     const historyHeadRef = useRef(0); // Points to the next write position (frame index)
 
     useEffect(() => {
@@ -129,7 +125,12 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             }
 
             const imageData = canvas.imageDataRef;
-            const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
+
+            // Cache Uint32Array view to avoid allocation every frame
+            if (!canvas.data32Ref || canvas.data32Ref.buffer !== imageData.data.buffer) {
+                canvas.data32Ref = new Uint32Array(imageData.data.buffer);
+            }
+            const data32 = canvas.data32Ref;
 
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
             // We map pixels (y) to frequency bins.
