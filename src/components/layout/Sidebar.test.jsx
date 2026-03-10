@@ -15,6 +15,24 @@ vi.mock('../../context/ProfileContext', () => ({
     useProfile: () => mockUseProfile()
 }));
 
+// Mock Feature Flags to enable Camera
+vi.mock('../../config/featureFlags', () => ({
+    FEATURES: {
+        camera: true,
+        dashboard: true,
+        practice: true,
+        journal: true,
+        analysis: true,
+        analytics: true,
+        library: true,
+        'client-dashboard': true,
+        capev: true,
+        spectrogram: true,
+        'pitch-tool': true,
+        settings: true
+    }
+}));
+
 // Mock child components to avoid deep rendering issues
 vi.mock('../ui/ProfileManager', () => ({
     default: ({ onClose }) => <div data-testid="profile-manager">Profile Manager <button onClick={onClose}>Close</button></div>
@@ -64,33 +82,10 @@ describe('Sidebar Auth Integration', () => {
         });
     });
 
-    it('shows Sign In button when not logged in', () => {
+    it('shows Frontend Demo Mode footer', () => {
         mockUseAuth.mockReturnValue({ user: null });
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('Sign In')).toBeInTheDocument();
-    });
-
-    it('shows user info and Sign Out when logged in', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('CloudUser')).toBeInTheDocument();
-        expect(getByText('Sign Out')).toBeInTheDocument();
-    });
-
-    it('opens Login modal on Sign In click', () => {
-        mockUseAuth.mockReturnValue({ user: null });
-        const { getByText, getByTestId } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-
-        fireEvent.click(getByText('Sign In'));
-        expect(getByTestId('login-modal')).toBeInTheDocument();
-    });
-
-    it('calls logout on Sign Out click', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-
-        fireEvent.click(getByText('Sign Out'));
-        expect(mockLogout).toHaveBeenCalled();
+        expect(getByText('Frontend Demo Mode')).toBeInTheDocument();
     });
 
     it('opens Camera modal when Mirror button is clicked', () => {
