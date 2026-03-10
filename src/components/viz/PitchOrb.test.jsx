@@ -30,7 +30,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+vi.stubGlobal('requestAnimationFrame', mockRequestAnimationFrame);
 
 describe('PitchOrb', () => {
     let dataRef;
@@ -52,6 +52,7 @@ describe('PitchOrb', () => {
     afterEach(() => {
         cleanup();
         vi.clearAllMocks();
+        vi.unstubAllGlobals();
     });
 
     it('should not call requestAnimationFrame recursively in the draw loop', async () => {

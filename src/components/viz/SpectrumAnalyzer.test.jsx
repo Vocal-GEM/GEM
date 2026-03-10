@@ -24,11 +24,11 @@ vi.mock('../../utils/lpcAnalysis', () => ({
 }));
 
 // Mock ResizeObserver
-global.ResizeObserver = vi.fn(function() {
+vi.stubGlobal('ResizeObserver', vi.fn(function() {
   this.observe = vi.fn();
   this.unobserve = vi.fn();
   this.disconnect = vi.fn();
-});
+}));
 
 // Mock Canvas getContext
 const mockContext = {
