@@ -161,13 +161,16 @@ const Sidebar = ({ activeView, onViewChange }) => {
             {/* Mobile Toggle */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
+                aria-expanded={isOpen}
+                aria-controls="sidebar-menu"
+                aria-label="Toggle navigation menu"
                 className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"
             >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
 
             {/* Sidebar Container */}
-            <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div id="sidebar-menu" className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="flex flex-col h-full">
                     {/* Header */}
                     <div className="p-6 border-b border-slate-800">
@@ -190,7 +193,13 @@ const Sidebar = ({ activeView, onViewChange }) => {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4" />
                             <input
                                 ref={searchInputRef}
-                                type="text"
+                                type="search"
+                                role="combobox"
+                                aria-expanded={showResults && searchResults.length > 0}
+                                aria-controls="search-results-listbox"
+                                aria-autocomplete="list"
+                                aria-activedescendant={showResults && searchResults.length > 0 && searchResults[selectedIndex] ? `search-result-${searchResults[selectedIndex].id}` : undefined}
+                                aria-label="Search navigation, exercises, and knowledge base"
                                 placeholder="Search..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -207,6 +216,9 @@ const Sidebar = ({ activeView, onViewChange }) => {
                         {showResults && searchResults.length > 0 && (
                             <div
                                 ref={resultsRef}
+                                id="search-results-listbox"
+                                role="listbox"
+                                aria-label="Search Results"
                                 className="absolute left-4 right-4 top-full mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 max-h-80 overflow-y-auto"
                             >
                                 {groupedResults.map((group, groupIndex) => (
@@ -223,6 +235,9 @@ const Sidebar = ({ activeView, onViewChange }) => {
                                             return (
                                                 <button
                                                     key={result.id}
+                                                    id={`search-result-${result.id}`}
+                                                    role="option"
+                                                    aria-selected={isSelected}
                                                     onClick={() => handleSelectResult(result)}
                                                     onMouseEnter={() => setSelectedIndex(resultIndex)}
                                                     className={`w-full px-3 py-2 flex items-center gap-3 text-left transition-colors ${isSelected
