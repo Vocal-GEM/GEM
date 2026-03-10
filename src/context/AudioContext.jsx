@@ -95,27 +95,30 @@ export const AudioProvider = ({ children }) => {
         try {
             audioEngineRef.current = new AudioEngine((data) => {
                 // ... (data handler)
-                const currentHistory = dataRef.current.history;
+                const ref = dataRef.current;
+
+                // OPTIMIZATION: Mutate in-place to avoid creating new objects/arrays
                 let pitchToStore = data.pitch;
 
                 if (data.pitch > 0) {
-                    dataRef.current.silenceCounter = 0;
-                    dataRef.current.lastValidPitch = data.pitch;
+                    ref.silenceCounter = 0;
+                    ref.lastValidPitch = data.pitch;
                 } else {
-                    dataRef.current.silenceCounter++;
-                    if (dataRef.current.silenceCounter < 15 && dataRef.current.lastValidPitch > 0) {
-                        pitchToStore = dataRef.current.lastValidPitch;
+                    ref.silenceCounter++;
+                    if (ref.silenceCounter < 15 && ref.lastValidPitch > 0) {
+                        pitchToStore = ref.lastValidPitch;
                     } else {
                         pitchToStore = 0;
                     }
                 }
 
-                dataRef.current = {
-                    ...data,
-                    history: [...currentHistory.slice(1), pitchToStore],
-                    silenceCounter: dataRef.current.silenceCounter,
-                    lastValidPitch: dataRef.current.lastValidPitch
-                };
+                // Update history in-place
+                const history = ref.history;
+                history.shift();
+                history.push(pitchToStore);
+
+                // Update properties in-place (shallow copy is safe as sub-objects are reused in AudioEngine)
+                Object.assign(ref, data);
 
                 // Log audio data periodically for debugging
                 const now = Date.now();
