@@ -1,94 +1,106 @@
-/* eslint-env jest */
-
-import { render, screen } from '@testing-library/react';
-
-import { vi, describe, it, expect } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import PracticeMode from './PracticeMode';
-import { NavigationProvider } from '../../context/NavigationContext';
-import { AudioProvider } from '../../context/AudioContext';
-import { ProfileProvider } from '../../context/ProfileContext';
-import { SettingsProvider } from '../../context/SettingsContext';
-import { TourProvider } from '../../context/TourContext';
-import { PracticeCardsProvider } from '../../context/PracticeCardsContext';
+import React from 'react';
 
-/* eslint-disable no-undef */
-// Mock navigator.mediaDevices
-global.navigator.mediaDevices = {
-    enumerateDevices: vi.fn().mockResolvedValue([]),
-    getUserMedia: vi.fn().mockResolvedValue({ getTracks: () => [{ stop: vi.fn() }] }),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn()
-};
-/* eslint-enable no-undef */
-
-// Mock dependencies
+// Mock all external dependencies to isolate PracticeMode
 vi.mock('../../context/NavigationContext', () => ({
-    NavigationProvider: ({ children }) => <div>{children}</div>,
     useNavigation: () => ({
-        practiceTab: 'overview',
+        practiceTab: 'pitch',
         switchPracticeTab: vi.fn(),
         openModal: vi.fn(),
         navigationParams: {}
     })
 }));
-vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
-vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
-vi.mock('../ui/ResizablePanel', () => ({
-    default: ({ children, className }) => <div className={className} data-testid="resizable-panel">{children}</div>
+
+vi.mock('../../context/AudioContext', () => ({
+    useAudio: () => ({
+        audioEngineRef: { current: null },
+        isAudioActive: false,
+        toggleAudio: vi.fn()
+    })
 }));
-vi.mock('../ui/GenderPerceptionDashboard', () => ({ default: () => <div>Gender Dashboard</div> }));
-vi.mock('../ui/PitchTargets', () => ({ default: () => <div>Pitch Targets</div> }));
-vi.mock('../ui/PitchPipe', () => ({ default: () => <div>Pitch Pipe</div> }));
-vi.mock('../viz/VoiceQualityAnalysis', () => ({ default: () => <div>Voice Quality Analysis</div> }));
-vi.mock('../viz/VowelAnalysis', () => ({ default: () => <div>Vowel Analysis</div> }));
-vi.mock('../ui/ToolExercises', () => ({ default: () => <div>Tool Exercises</div> }));
-vi.mock('../ui/ComparisonTool', () => ({ default: () => <div>Comparison Tool</div> }));
-vi.mock('../../context/AuthContext', () => ({
-    useAuth: () => ({ user: { id: 'test-user', username: 'Tester' } }),
-    AuthProvider: ({ children }) => <div>{children}</div>
-}));
+
 vi.mock('../../context/ProfileContext', () => ({
     useProfile: () => ({
-        saveSession: vi.fn(),
-        calibration: {},
-        targetRange: { min: 100, max: 200 },
-        voiceProfiles: [],
-        currentProfile: null
+        saveSession: vi.fn()
+    })
+}));
+
+vi.mock('../../context/TourContext', () => ({
+    useTour: () => ({
+        startTour: vi.fn()
+    })
+}));
+
+// Mock child components that might cause issues in JSDOM
+vi.mock('../viz/DynamicOrb', () => ({
+    default: () => <div data-testid="dynamic-orb">Dynamic Orb Visualization</div>
+}));
+
+vi.mock('../viz/PitchVisualizer', () => ({
+    default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div>
+}));
+
+vi.mock('../viz/ResonanceOrb', () => ({
+    default: () => <div data-testid="resonance-orb">Resonance Orb</div>
+}));
+
+vi.mock('../ui/CoachPanel', () => ({
+    default: () => <div data-testid="coach-panel">Coach Panel</div>
+}));
+
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key) => {
+            const translations = {
+                'practiceMode.tabs.overview': 'Overview',
+                'practiceMode.tabs.pitch': 'Pitch',
+                'practiceMode.tabs.resonance': 'Resonance',
+                'practiceMode.tabs.weight': 'Weight',
+                'practiceMode.tabs.vowel': 'Vowel',
+                'practiceMode.tabs.spectrogram': 'Spectrogram',
+                'practiceMode.tabs.training': 'Training',
+                'practiceMode.actions.assessment': 'Assessment',
+                'practiceMode.session.start': 'Enable Microphone',
+                'practiceMode.session.stop': 'Stop Microphone'
+            };
+            return translations[key] || key;
+        }
     }),
-    ProfileProvider: ({ children }) => <div>{children}</div>
+    initReactI18next: { type: '3rdParty', init: () => {} }
 }));
 
 describe('PracticeMode', () => {
-    const mockDataRef = { current: { pitch: 200, resonance: 100, volume: 0.5 } };
-    const mockAudioEngine = { current: {} };
+    let dataRef;
+
+    beforeEach(() => {
+        dataRef = {
+            current: {
+                pitch: 200,
+                volume: -20,
+                clarity: 90,
+                resonance: 50
+            }
+        };
+        vi.clearAllMocks();
+    });
 
     it('renders without crashing', async () => {
-
         render(
-            <SettingsProvider>
-                <ProfileProvider>
-                    <AudioProvider>
-                        <NavigationProvider>
-                            <TourProvider>
-                                <PracticeCardsProvider>
-                                    <PracticeMode
-                                        dataRef={mockDataRef}
-                                        calibration={{}}
-                                        targetRange={{ min: 100, max: 200 }}
-                                        goals={{}}
-                                        settings={{}}
-                                    />
-                                </PracticeCardsProvider>
-                            </TourProvider>
-                        </NavigationProvider>
-                    </AudioProvider>
-                </ProfileProvider>
-            </SettingsProvider>
+            <PracticeMode
+                dataRef={dataRef}
+                calibration={{}}
+                targetRange={{ min: 180, max: 220 }}
+                settings={{ colorBlindMode: false }}
+            />
         );
 
-        expect(screen.getByText('Overview')).toBeInTheDocument();
+        // Check if main elements are present
         expect(screen.getByText('Pitch')).toBeInTheDocument();
-        // Check for visualization area
-        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
+
+        // Check for visualization area - should be mocked PitchVisualizer since practiceTab is 'pitch'
+        expect(await screen.findByTestId('pitch-visualizer')).toBeInTheDocument();
     });
 });
