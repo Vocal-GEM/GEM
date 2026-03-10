@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -45,16 +45,25 @@ const SpectrogramMesh = ({ dataRef }) => {
 
     // Buffer for historical data
     const historyRef = useRef(null);
-    useEffect(() => {
-        historyRef.current = new Float32Array(numCols * numRows);
-    }, []);
     if (!historyRef.current) {
         historyRef.current = new Float32Array(numCols * numRows);
     }
 
-    // Reusable color object to prevent GC
-    // Optimization: Reuse Color object to avoid thousands of allocations per frame
-    const tempColor = useMemo(() => new THREE.Color(), []);
+    // Optimization: Precompute Color Look-Up Table (LUT)
+    // Avoids thousands of setHSL calls per frame (trigonometry/branching)
+    const colorLUT = useMemo(() => {
+        const lut = new Float32Array(256 * 3);
+        const c = new THREE.Color();
+        for (let i = 0; i < 256; i++) {
+            const t = i / 255;
+            // Matches original logic: setHSL(0.7 - t * 0.6, 1, 0.5)
+            c.setHSL(0.7 - t * 0.6, 1, 0.5);
+            lut[i * 3] = c.r;
+            lut[i * 3 + 1] = c.g;
+            lut[i * 3 + 2] = c.b;
+        }
+        return lut;
+    }, []);
 
     useFrame(() => {
         if (!meshRef.current || !meshRef.current.geometry || !meshRef.current.geometry.attributes) return;
@@ -114,6 +123,8 @@ const SpectrogramMesh = ({ dataRef }) => {
 
         if (colorsAttribute) {
             const colors = colorsAttribute;
+            const colorArray = colors.array;
+
             for (let i = 0; i < numCols; i++) {
                 for (let j = 0; j < numRows; j++) {
                     const index = i * numRows + j;
@@ -122,10 +133,17 @@ const SpectrogramMesh = ({ dataRef }) => {
                     // Color map: Blue -> Purple -> Red -> Yellow
                     const t = Math.min(1, val / 2); // Normalize somewhat
 
-                    // Optimization: Reuse tempColor object to avoid creating 4096 objects per frame
-                    tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
+                    // Optimization: Use LUT for O(1) color lookup instead of O(N) setHSL calculation
+                    const lutIndex = Math.floor(t * 255);
+                    const r = colorLUT[lutIndex * 3];
+                    const g = colorLUT[lutIndex * 3 + 1];
+                    const b = colorLUT[lutIndex * 3 + 2];
 
-                    colors.setXYZ(index, tempColor.r, tempColor.g, tempColor.b);
+                    // Direct array write is faster than method calls
+                    const baseIndex = index * 3;
+                    colorArray[baseIndex] = r;
+                    colorArray[baseIndex + 1] = g;
+                    colorArray[baseIndex + 2] = b;
                 }
             }
             colors.needsUpdate = true;
