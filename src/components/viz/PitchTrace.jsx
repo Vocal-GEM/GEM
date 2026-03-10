@@ -181,7 +181,7 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
             ctx.strokeRect(x, y, w, h);
         }
 
-    }, [data, targetRange, currentTime, duration, zoom, selection]);
+    }, [data, targetRange, currentTime, duration, zoom, selection, bounds]);
 
 
     // Interaction Handlers

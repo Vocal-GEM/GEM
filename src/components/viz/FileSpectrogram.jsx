@@ -111,19 +111,19 @@ const FileSpectrogram = ({
             spectrogramDataRef.current = generateSpectrogramData(audioBuffer);
             renderSpectrogram();
         }
-    }, [audioBuffer, generateSpectrogramData]);
+    }, [audioBuffer, generateSpectrogramData, renderSpectrogram]);
 
     // Re-render when colormap changes
     useEffect(() => {
         if (spectrogramDataRef.current) {
             renderSpectrogram();
         }
-    }, [colormap]);
+    }, [colormap, renderSpectrogram]);
 
     // Render playhead on time change
     useEffect(() => {
         renderPlayhead();
-    }, [currentTime]);
+    }, [currentTime, renderPlayhead]);
 
     /**
      * Render the full spectrogram to canvas

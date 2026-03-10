@@ -13,11 +13,16 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+vi.mock('lucide-react', async () => {
+    const actual = await vi.importActual('lucide-react');
+    const createIcon = (name) => {
+        const Icon = (props) => <div data-testid={name} {...props} />;
+        Icon.displayName = name;
+        return Icon;
+    };
 
     return {
+        ...actual,
         Sun: createIcon('Sun'),
         Moon: createIcon('Moon'),
         Info: createIcon('Info'),
@@ -45,6 +50,7 @@ describe('BrightnessMeter', () => {
     it('subscribes to RenderCoordinator', () => {
         render(<BrightnessMeter dataRef={dataRef} />);
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
+        // Priority is the 3rd arg
         const [, , priority] = renderCoordinator.subscribe.mock.calls[0];
         expect(priority).toBe(renderCoordinator.PRIORITY.MEDIUM);
     });
