@@ -137,36 +137,44 @@ const FileSpectrogram = ({
         const { width, height } = canvas;
         const { data: spectrogram, numFrames, maxBin } = data;
 
-        // Clear canvas
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, width, height);
+        // Optimization: Use ImageData instead of individual fillRects
+        const imgData = ctx.createImageData(width, height);
+        const data32 = new Uint32Array(imgData.data.buffer);
 
-        // Draw spectrogram
-        const pixelWidth = width / numFrames;
-        const pixelHeight = height / maxBin;
+        // Initialize background to opaque black (ABGR: 0xFF000000)
+        data32.fill(0xFF000000);
 
         for (let frame = 0; frame < numFrames; frame++) {
-            const x = frame * pixelWidth;
             const magnitudes = spectrogram[frame];
+
+            // Map frame to x pixels
+            const xStart = Math.floor((frame / numFrames) * width);
+            const xEnd = Math.floor(((frame + 1) / numFrames) * width);
 
             for (let bin = 0; bin < maxBin; bin++) {
                 const intensity = magnitudes[bin];
-                if (intensity > 10) { // Threshold
-                    const color = colormap[Math.floor(intensity)];
+                if (intensity > 10) {
+                    // Ensure the colormap value has an opaque alpha channel
+                    const color = colormap[Math.floor(intensity)] | 0xFF000000;
 
-                    // Extract RGB from packed color
-                    const r = color & 0xFF;
-                    const g = (color >> 8) & 0xFF;
-                    const b = (color >> 16) & 0xFF;
+                    // Map bin to y pixels
+                    const yStart = Math.floor(height - ((bin + 1) / maxBin) * height);
+                    const yEnd = Math.floor(height - (bin / maxBin) * height);
 
-                    ctx.fillStyle = `rgb(${r},${g},${b})`;
-
-                    // Y axis: low freq at bottom, high at top
-                    const y = height - (bin / maxBin) * height;
-                    ctx.fillRect(x, y - pixelHeight, Math.ceil(pixelWidth), Math.ceil(pixelHeight));
+                    // Fill all pixels for this bin block
+                    for (let x = xStart; x < xEnd; x++) {
+                        for (let y = yStart; y < yEnd; y++) {
+                            if (y >= 0 && y < height && x >= 0 && x < width) {
+                                // Important: data32 holds ABGR
+                                data32[y * width + x] = color;
+                            }
+                        }
+                    }
                 }
             }
         }
+
+        ctx.putImageData(imgData, 0, 0);
 
         // Draw frequency axis labels
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
