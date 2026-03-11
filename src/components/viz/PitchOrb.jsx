@@ -17,6 +17,7 @@ const getNoteFromSemitone = (semitone) => {
 
 const PitchOrb = ({ dataRef, settings = {} }) => {
     const canvasRef = useRef(null);
+    const dimensionsRef = useRef({ width: 0, height: 0 });
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
@@ -31,8 +32,36 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
+
+        // Optimization: Extract DOM measurement and canvas resizing out of the high-frequency render loop.
+        // Using a ResizeObserver prevents synchronous layout thrashing (forced reflow) from getBoundingClientRect()
+        // and avoids clearing/resetting the canvas context state on every single frame.
+        const updateDimensions = () => {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+
+            // Only update actual canvas size when the physical layout dimensions change
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+
+            // Cache the logical dimensions to be read asynchronously during the animation frame
+            dimensionsRef.current = {
+                width: rect.width,
+                height: rect.height
+            };
+
+            ctx.scale(dpr, dpr);
+        };
+
+        const observer = new ResizeObserver(() => {
+            // Debounce the observer callback to the next animation frame
+            requestAnimationFrame(updateDimensions);
+        });
+        observer.observe(canvas);
+
+        updateDimensions();
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,16 +96,15 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            // Optimization: Read cached dimensions instead of querying the DOM (getBoundingClientRect)
+            const { width, height } = dimensionsRef.current;
+            if (width === 0 || height === 0) return;
 
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
+            // Explicitly clear the previous frame. Previously this happened implicitly
+            // when canvas.width was reassigned in the loop.
             ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
@@ -166,6 +194,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            observer.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
