@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-24 - Stored XSS in Moderation Flag Reason
+**Vulnerability:** The `flag_content` route saved user-supplied `reason` text directly to the database without sanitization, allowing for potential Stored XSS when moderators review flags.
+**Learning:** Even internal-facing administrative fields (like moderation reasons) that are saved to the database must be explicitly sanitized, as failure to do so creates Stored XSS risks for admin/moderation users.
+**Prevention:** Consistently apply `sanitize_html()` to all free-form text inputs, regardless of whether they are displayed to standard users or internal moderators. When sanitizing optional fields, handle `None` types safely (e.g. `safe = sanitize_html(raw) if raw else None`) to prevent 500 errors.

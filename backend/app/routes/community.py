@@ -634,11 +634,14 @@ def flag_content():
     try:
         data = request.get_json()
 
+        raw_reason = data.get('reason')
+        safe_reason = sanitize_html(raw_reason) if raw_reason else None
+
         flag = ModerationFlag(
             content_type=data.get('content_type'),
             content_id=data.get('content_id'),
             flagged_by=current_user.id,
-            reason=data.get('reason'),
+            reason=safe_reason,
             status='pending'
         )
 
