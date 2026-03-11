@@ -450,7 +450,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
         <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto">
             {/* Header */}
             <div className="sticky top-0 bg-slate-900 z-10 border-b border-slate-800 p-4 flex items-center justify-between">
-                <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-full transition-colors">
+                <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-full transition-colors" aria-label={t('common.back', 'Back')}>
                     <ChevronLeft className="w-6 h-6 text-slate-400" />
                 </button>
                 <h2 className="text-xl font-bold text-white">{t('analysis.header')}</h2>
@@ -824,6 +824,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                                     }
                                 }}
                                 className="w-12 h-12 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-lg transition-colors"
+                                aria-label={isPlaying ? t('analysis.controls.pause', 'Pause playback') : t('analysis.controls.play', 'Play playback')}
                             >
                                 {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
                             </button>
@@ -836,6 +837,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                                     value={playbackSpeed}
                                     onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value))}
                                     className="bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer"
+                                    aria-label={t('analysis.controls.speed')}
                                 >
                                     <option value="0.5">0.5x</option>
                                     <option value="0.75">0.75x</option>
@@ -853,6 +855,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                                     ? 'bg-green-500/20 border-green-500/50 text-green-400'
                                     : 'bg-slate-800/50 border-white/10 text-slate-400 hover:text-white'
                                     }`}
+                                aria-pressed={isLooping}
                             >
                                 <Repeat className="w-4 h-4" />
                                 <span className="text-sm font-medium">{t('analysis.controls.loop')}</span>
