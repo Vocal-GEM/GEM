@@ -1,48 +1,7 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
-import LoadingSpinner from "./LoadingSpinner";
-import React from "react";
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-import LoadingSpinner from './LoadingSpinner';
-
-describe('LoadingSpinner', () => {
-  it('renders with default accessibility attributes', () => {
-    render(<LoadingSpinner />);
-
-    // It should have role="status"
-    const spinner = screen.getByRole('status');
-    expect(spinner).toBeInTheDocument();
-    expect(spinner).toHaveAttribute('aria-live', 'polite');
-
-    // It should have a visually hidden label "Loading..." by default
-    const srText = screen.getByText('Loading...');
-    expect(spinner).toBeInTheDocument();
-    expect(spinner).toHaveAttribute('aria-live', 'polite');
-
-    // It should have a visually hidden label "Loading..." by default
-    const srText = screen.getByText('Loading...');
-    expect(spinner).toBeInTheDocument();
-
-    // It should have aria-live="polite"
-    expect(spinner).toHaveAttribute('aria-live', 'polite');
-
-    // It should have a visually hidden label "Loading..." by default
-    expect(screen.getByText('Loading...')).toHaveClass('sr-only');
-    expect(spinner).toBeInTheDocument();
-    expect(spinner).toHaveAttribute('aria-live', 'polite');
-
-    // It should have a visually hidden label "Loading..." by default
-    const srText = screen.getByText('Loading...');
-    expect(spinner).toBeInTheDocument();
-    expect(spinner).toHaveAttribute('aria-live', 'polite');
-
-    // It should have a visually hidden label "Loading..." by default
-    const srText = screen.getByText('Loading...');
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
-import LoadingSpinner from "./LoadingSpinner";
 import React from 'react';
+import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
+import LoadingSpinner from "./LoadingSpinner";
 
 describe("LoadingSpinner", () => {
   it("renders with default accessibility attributes", () => {
@@ -135,15 +94,7 @@ describe("LoadingSpinner", () => {
     expect(container.firstChild).toHaveClass("inline-flex");
   });
 
-    const { rerender, container } = render(<LoadingSpinner size="xs" />);
-    expect(screen.getByRole("status")).toBeInTheDocument();
-    // xs should be inline-flex
-    expect(container.firstChild).toHaveClass('inline-flex');
 
-    rerender(<LoadingSpinner size="xl" />);
-    // xl should be flex (default)
-    expect(container.firstChild).toHaveClass('flex');
-  });
 
   it("overrides default min-height when custom class is provided", () => {
     const { container } = render(<LoadingSpinner className="min-h-0" />);
@@ -190,4 +141,7 @@ describe("LoadingSpinner", () => {
     const spinnerSegment = container.querySelector('.border-t-white');
     expect(spinnerSegment).toBeInTheDocument();
   });
+});
+});
+});
 });
