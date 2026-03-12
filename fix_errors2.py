@@ -1,4 +1,30 @@
-import React from "react";
+import re
+
+with open("src/services/ResearchMode.js", "r") as f:
+    content = f.read()
+content = content.replace("process.env.REACT_APP_RESEARCH_SALT", "import.meta.env.VITE_RESEARCH_SALT")
+with open("src/services/ResearchMode.js", "w") as f:
+    f.write(content)
+
+
+with open("src/components/viz/PitchOrb.test.jsx", "r") as f:
+    content = f.read()
+content = content.replace("global.requestAnimationFrame", "globalThis.requestAnimationFrame")
+with open("src/components/viz/PitchOrb.test.jsx", "w") as f:
+    f.write(content)
+
+
+with open("src/components/viz/SpectrumAnalyzer.test.jsx", "r") as f:
+    content = f.read()
+content = content.replace("global.ResizeObserver", "globalThis.ResizeObserver")
+with open("src/components/viz/SpectrumAnalyzer.test.jsx", "w") as f:
+    f.write(content)
+
+with open("src/components/ui/button.test.jsx", "r") as f:
+    content = f.read()
+
+# Replace the broken duplicate block
+fixed_button_test = """import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { Button } from "./button";
@@ -39,3 +65,6 @@ describe("Button", () => {
       expect(container.firstChild).toHaveClass("opacity-50");
   });
 });
+"""
+with open("src/components/ui/button.test.jsx", "w") as f:
+    f.write(fixed_button_test)
