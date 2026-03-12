@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Layout Thrashing with ResizeObserver
+**Learning:** Using `getBoundingClientRect()` inside a `ResizeObserver` callback (even when wrapped in `requestAnimationFrame`) causes synchronous layout thrashing. The correct approach is to read dimensions directly from the `ResizeObserverEntry` object (e.g., `entry.contentRect.width`) passed to the callback, which provides pre-calculated dimensions asynchronously without forcing a browser reflow.
+**Action:** Never use `getBoundingClientRect()` to measure elements inside resize or animation loops. Always use `ResizeObserverEntry.contentRect` or cache the dimensions in a ref for asynchronous reading.
