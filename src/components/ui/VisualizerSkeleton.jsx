@@ -54,7 +54,12 @@ const VisualizerSkeleton = ({ variant = 'default' }) => {
     );
 
     return (
-        <div className="flex flex-col h-full bg-slate-900 rounded-2xl overflow-hidden border border-white/5 relative">
+        <div
+            role="status"
+            aria-label="Loading visualization..."
+            aria-live="polite"
+            className="flex flex-col h-full bg-slate-900 rounded-2xl overflow-hidden border border-white/5 relative"
+        >
             {/* CSS Animations */}
             <style>{`
                 @keyframes waveBar {

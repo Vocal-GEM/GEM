@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-05-23 - Accessibility (Skeleton Loaders)
+**Learning:** Skeleton loading components (like `CardSkeleton` or `VisualizerSkeleton`) are often purely visual (`div`s with Tailwind `animate-pulse` classes), meaning screen readers do not announce that content is loading. If you add ARIA attributes to the base decorative blocks, a complex skeleton might repeatedly announce "Loading..." multiple times.
+**Action:** Always add `role="status"`, a descriptive `aria-label` (e.g., "Loading card..."), and `aria-live="polite"` to the **root** container of the composite skeleton. Simultaneously, apply `aria-hidden="true"` to the inner/base decorative skeleton blocks to prevent repetitive, annoying screen reader announcements.
