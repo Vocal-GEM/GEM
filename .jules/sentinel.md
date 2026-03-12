@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2024-05-01 - [Path Traversal in Audio Deletion]
+**Vulnerability:** In `share_voice` when cleaning up the temp file, an issue was identified when PII was being retained because `audio_file.save` was being called twice in error. Another issue: Missing sanitization in `/flag-content` endpoint where the reason wasn't sanitized.
+**Learning:** Python try/finally blocks can be malformed during merges or bad copy-paste, leading to redundant execution and bypassing intended logic, especially file deletions.
+**Prevention:** Ensure tight `try-finally` structures when creating temporary files where the file deletion in the finally block matches the singular save operation. For XSS, ensure all string inputs are consistently sanitized.
