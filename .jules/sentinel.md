@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-23 - PII Leak Prevention via Incorrect File Handling
+**Vulnerability:** In `backend/app/routes/community.py`, the `share_voice` endpoint contained an improperly nested and duplicated `try...finally` block. The original raw audio file containing Potential Personally Identifiable Information (PII) was being saved *after* the cleanup step in one branch, or the cleanup logic was failing to execute reliably, leading to the permanent retention of sensitive un-anonymized audio files on the server.
+**Learning:** When handling temporary files that require processing (like anonymization), the order of operations and the structure of `try...finally` blocks are critical. A duplicated or misplaced `finally` block can completely bypass intended security cleanups, leaving the system non-compliant with data minimization principles.
+**Prevention:** Always ensure that temporary file creation (saving the upload) occurs *before* processing, and that a single, well-structured `finally` block guarantees the deletion of the original file regardless of whether the processing succeeds or fails.
