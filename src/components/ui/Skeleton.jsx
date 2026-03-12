@@ -3,7 +3,7 @@ import React from 'react';
 /**
  * Skeleton - Animated loading placeholder
  */
-const Skeleton = ({ className = '', variant = 'default' }) => {
+const Skeleton = ({ className = '', variant = 'default', ...props }) => {
     const baseClasses = 'animate-pulse bg-slate-800 rounded';
 
     const variants = {
@@ -18,7 +18,11 @@ const Skeleton = ({ className = '', variant = 'default' }) => {
     };
 
     return (
-        <div className={`${baseClasses} ${variants[variant] || variants.default} ${className}`} />
+        <div
+            aria-hidden="true"
+            className={`${baseClasses} ${variants[variant] || variants.default} ${className}`}
+            {...props}
+        />
     );
 };
 
@@ -26,7 +30,12 @@ const Skeleton = ({ className = '', variant = 'default' }) => {
  * Card Skeleton - For dashboard cards
  */
 export const CardSkeleton = () => (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+    <div
+        role="status"
+        aria-label="Loading card..."
+        aria-live="polite"
+        className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4"
+    >
         <div className="flex items-center gap-3">
             <Skeleton variant="avatar" />
             <div className="flex-1 space-y-2">
@@ -42,7 +51,12 @@ export const CardSkeleton = () => (
  * List Skeleton - For lists of items
  */
 export const ListSkeleton = ({ items = 5 }) => (
-    <div className="space-y-3">
+    <div
+        role="status"
+        aria-label="Loading list..."
+        aria-live="polite"
+        className="space-y-3"
+    >
         {Array.from({ length: items }).map((_, i) => (
             <div key={i} className="flex items-center gap-4 p-4 bg-slate-900 rounded-xl">
                 <Skeleton variant="circle" className="w-10 h-10" />
@@ -59,7 +73,12 @@ export const ListSkeleton = ({ items = 5 }) => (
  * Stats Grid Skeleton
  */
 export const StatsGridSkeleton = () => (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div
+        role="status"
+        aria-label="Loading statistics..."
+        aria-live="polite"
+        className="grid grid-cols-2 md:grid-cols-4 gap-4"
+    >
         {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2">
                 <Skeleton className="w-8 h-8" />
@@ -74,7 +93,12 @@ export const StatsGridSkeleton = () => (
  * Chart Skeleton
  */
 export const ChartSkeleton = () => (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+    <div
+        role="status"
+        aria-label="Loading chart..."
+        aria-live="polite"
+        className="bg-slate-900 border border-slate-800 rounded-2xl p-6"
+    >
         <Skeleton variant="title" className="w-1/3 mb-4" />
         <div className="h-48 flex items-end gap-2">
             {Array.from({ length: 12 }).map((_, i) => (
@@ -92,7 +116,12 @@ export const ChartSkeleton = () => (
  * Full Page Skeleton
  */
 export const PageSkeleton = () => (
-    <div className="p-6 space-y-6">
+    <div
+        role="status"
+        aria-label="Loading page..."
+        aria-live="polite"
+        className="p-6 space-y-6"
+    >
         <div className="flex items-center justify-between">
             <Skeleton variant="title" className="w-1/4" />
             <Skeleton variant="button" />

@@ -1,6 +1,11 @@
 const MetricCardSkeleton = () => {
     return (
-        <div className="bg-slate-900/50 rounded-2xl p-4 border border-white/5 animate-pulse flex flex-col gap-4">
+        <div
+            role="status"
+            aria-label="Loading metric..."
+            aria-live="polite"
+            className="bg-slate-900/50 rounded-2xl p-4 border border-white/5 animate-pulse flex flex-col gap-4"
+        >
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div className="h-4 w-24 bg-slate-800 rounded-full"></div>
