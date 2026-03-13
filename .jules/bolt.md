@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Optimizing Hot Path Array Reductions in Audio Buffers
+**Learning:** In high-frequency functions (e.g., `validateAudioSignal` processing at 60fps), iterating over large `Float32Array` buffers (1024 or 2048 elements) using chained prototype methods (`.map()`, `.reduce()`) is extremely slow. Additionally, using array spread syntax like `Math.max(...buffer.map(Math.abs))` can cause `Maximum call stack size exceeded` errors if the buffer size grows, while creating intermediate arrays causes severe garbage collection churn.
+**Action:** When calculating multiple metrics (e.g., max amplitude, RMS, DC offset) from a large audio buffer, combine them into a single, standard `for` loop to avoid intermediate allocations. Use `new Float32Array` combined with an in-place `.sort()` when you actually need sorted values to avoid spreading and array mutations.
