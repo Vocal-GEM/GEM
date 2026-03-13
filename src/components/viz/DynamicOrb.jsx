@@ -512,7 +512,7 @@ const DynamicOrb = memo(({ dataRef, calibration, externalDataRef, audioEngine, t
               key={m.id}
               onClick={() => setMode(m.id)}
               className={`p-2 rounded-full transition-all ${isActive ? 'bg-teal-500 text-white shadow-[0_0_10px_rgba(20,184,166,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
-              title={m.label}
+              title={m.label} aria-label={m.label}
             >
               <Icon size={18} />
             </button>
@@ -523,7 +523,7 @@ const DynamicOrb = memo(({ dataRef, calibration, externalDataRef, audioEngine, t
           <button
             onClick={() => setShowDebug(!showDebug)}
             className={`p-2 rounded-full transition-all ${showDebug ? 'bg-amber-500 text-white shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
-            title="Toggle Debug Panel"
+            title="Toggle Debug Panel" aria-label="Toggle Debug Panel"
           >
             <Bug size={18} />
           </button>
