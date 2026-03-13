@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Canvas Dimension Assignment Anti-Pattern in High-Frequency Loops
+**Learning:** Assigning `canvas.width` and `canvas.height` implicitly clears the canvas AND resets context state (e.g., `ctx.scale`) on every assignment. In components like `PitchOrb.jsx`, this was happening on every frame (~60 FPS) along with `getBoundingClientRect()`, causing severe layout thrashing and compounding context state reset overhead.
+**Action:** Track dimensions asynchronously via `ResizeObserver` and only re-assign `canvas.width` and `canvas.height` when dimensions actually change, rather than within the render loop itself. Use `ctx.clearRect` for clearing frames instead of relying on dimension assignments.
