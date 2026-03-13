@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-15 - Interactive visualization controls missing ARIA labels
+**Learning:** Custom visualization and exercise components (like IntonationTrainer) heavily rely on icon-only buttons for playback, navigation, and display toggles. These frequently lack `aria-label` attributes, making the tools completely inaccessible to screen reader users who cannot visually interpret the icons.
+**Action:** Always audit interactive visualization controls for missing `aria-label` or `aria-labelledby` attributes, especially when they use generic icons (e.g., Lucide React icons like Volume2, ChevronLeft, RefreshCw) without visible text.
