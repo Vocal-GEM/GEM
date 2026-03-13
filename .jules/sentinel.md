@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-05-23 - Stored XSS in the Community Routes
+**Vulnerability:** The `flag_content` endpoint in `backend/app/routes/community.py` accepted a `reason` text field and passed it directly to the database without sanitization. While it's an internal moderation tool, if an admin panel displays this string raw, it constitutes a Stored XSS vulnerability. Additionally, there was no rate limit.
+**Learning:** Even fields not immediately visible to standard users must be sanitized if they might be displayed to moderators or admins later. Also, all mutating endpoints should have explicit rate limits to prevent DoS via mass abuse.
+**Prevention:** Always use `sanitize_html` on any user-provided string that will be stored, and always enforce `@limiter.limit` on public or authenticated endpoints that perform database writes.
