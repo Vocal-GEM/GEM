@@ -246,6 +246,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                         className="w-20 h-20 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 
                                    flex items-center justify-center shadow-lg shadow-pink-500/20 
                                    hover:shadow-pink-500/40 hover:scale-105 transition-all group"
+                        aria-label="Start recording baseline"
                     >
                         <Mic className="w-10 h-10 text-white group-hover:scale-110 transition-transform" />
                     </button>
@@ -259,6 +260,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                                 className="w-20 h-20 rounded-full bg-red-500 animate-pulse
                                            flex items-center justify-center shadow-lg shadow-red-500/30 
                                            hover:bg-red-600 transition-colors relative z-10"
+                                aria-label="Stop recording baseline"
                             >
                                 <Square className="w-8 h-8 text-white" fill="white" />
                             </button>
@@ -293,6 +295,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                                 className="w-14 h-14 rounded-full bg-gradient-to-r from-green-500 to-emerald-500
                                            flex items-center justify-center shadow-lg shadow-green-500/20 
                                            hover:shadow-green-500/40 hover:scale-105 transition-all"
+                                aria-label={isPlaying ? "Pause playback" : "Start playback"}
                             >
                                 {isPlaying ? (
                                     <Pause className="w-7 h-7 text-white" />
