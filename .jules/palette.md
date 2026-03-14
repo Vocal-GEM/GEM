@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-05-24 - Accessibility of Info Tooltips
+**Learning:** Icon-only tooltip triggers (like an info icon) are frequently added to visualization components to provide context for visual users, but without `aria-label`, `aria-expanded`, and `role="tooltip"` attributes, they become mystery buttons for screen reader users.
+**Action:** When auditing or building visualizations, always ensure info icons used to trigger tooltips have explicit `aria-label`s and proper tooltip ARIA patterns (`aria-expanded`, `role="tooltip"`).
