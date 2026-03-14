@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - High-fidelity Float32Array Audio Processing Anti-pattern
+**Learning:** Using array spread syntax (`...audioBuffer`), `.map()`, and `.reduce()` on large `Float32Array` buffers (e.g., 400k+ elements) causes severe performance bottlenecks and can trigger "Maximum call stack size exceeded" errors. In `src/utils/signalValidator.js`, chained operations like `Math.max(...audioBuffer.map(Math.abs))` were extremely inefficient because they iterate over the massive array multiple times and allocate large intermediate arrays.
+**Action:** Replace functional array methods on large audio buffers with single, optimized standard `for` loops. Combine multiple operations (e.g., finding max amplitude, RMS, and DC offset) into a single iteration pass over the array.

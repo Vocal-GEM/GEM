@@ -12,8 +12,21 @@
 export const validateAudioSignal = (audioBuffer, sampleRate) => {
     const issues = [];
 
+    // Calculate maxAmplitude, rms, and dcOffset in a single pass
+    let maxAmplitude = 0;
+    let sumSq = 0;
+    let sum = 0;
+    for (let i = 0; i < audioBuffer.length; i++) {
+        const s = audioBuffer[i];
+        const absS = Math.abs(s);
+        if (absS > maxAmplitude) maxAmplitude = absS;
+        sumSq += s * s;
+        sum += s;
+    }
+    const rms = Math.sqrt(sumSq / audioBuffer.length);
+    const dcOffset = sum / audioBuffer.length;
+
     // Check for clipping
-    const maxAmplitude = Math.max(...audioBuffer.map(Math.abs));
     if (maxAmplitude > 0.99) {
         issues.push({
             type: 'clipping',
@@ -23,7 +36,6 @@ export const validateAudioSignal = (audioBuffer, sampleRate) => {
     }
 
     // Check for silence
-    const rms = Math.sqrt(audioBuffer.reduce((sum, s) => sum + s * s, 0) / audioBuffer.length);
     if (rms < 0.001) {
         issues.push({
             type: 'silence',
@@ -33,7 +45,6 @@ export const validateAudioSignal = (audioBuffer, sampleRate) => {
     }
 
     // Check for DC offset
-    const dcOffset = audioBuffer.reduce((sum, s) => sum + s, 0) / audioBuffer.length;
     if (Math.abs(dcOffset) > 0.05) {
         issues.push({
             type: 'dc_offset',
@@ -76,15 +87,27 @@ export const validateAudioSignal = (audioBuffer, sampleRate) => {
  */
 const estimateSNR = (audioBuffer) => {
     // Calculate RMS (signal power)
-    const rms = Math.sqrt(audioBuffer.reduce((sum, s) => sum + s * s, 0) / audioBuffer.length);
+    let sumSq = 0;
+    for (let i = 0; i < audioBuffer.length; i++) {
+        sumSq += audioBuffer[i] * audioBuffer[i];
+    }
+    const rms = Math.sqrt(sumSq / audioBuffer.length);
 
     // Estimate noise floor from quietest 10% of samples
-    const sorted = [...audioBuffer].map(Math.abs).sort((a, b) => a - b);
+    const sorted = new Float32Array(audioBuffer);
+    for (let i = 0; i < sorted.length; i++) {
+        sorted[i] = Math.abs(sorted[i]);
+    }
+    sorted.sort();
+
     const noiseFloorIndex = Math.floor(sorted.length * 0.1);
-    const noiseFloorSamples = sorted.slice(0, noiseFloorIndex);
-    const noiseFloor = Math.sqrt(
-        noiseFloorSamples.reduce((sum, s) => sum + s * s, 0) / noiseFloorSamples.length
-    );
+    const noiseFloorSamples = sorted.subarray(0, noiseFloorIndex);
+
+    let noiseSumSq = 0;
+    for (let i = 0; i < noiseFloorSamples.length; i++) {
+        noiseSumSq += noiseFloorSamples[i] * noiseFloorSamples[i];
+    }
+    const noiseFloor = Math.sqrt(noiseSumSq / noiseFloorSamples.length);
 
     // Avoid division by zero
     if (noiseFloor < 0.00001) {
