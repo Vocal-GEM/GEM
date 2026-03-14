@@ -2,8 +2,6 @@ from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
-from ..extensions import db
-from ..extensions import db, limiter
 from ..validators import validate_file_upload, sanitize_html
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
@@ -14,9 +12,6 @@ from datetime import datetime, timedelta
 import os
 import secrets
 import hashlib
-from ..validators import validate_file_upload
-from werkzeug.utils import secure_filename
-from ..validators import validate_file_upload, sanitize_html
 
 community_bp = Blueprint('community', __name__)
 
@@ -95,16 +90,12 @@ def share_voice():
         audio_file = request.files['audio']
 
         # Security: Validate file type
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
         is_valid, error = validate_file_upload(
             audio_file.filename, allowed_types=['audio'], file_stream=audio_file)
         if not is_valid:
             return jsonify({'error': error}), 400
 
-        context = request.form.get('context', '')
         # Security: Sanitize context
-        context = sanitize_html(context)
-
         context = sanitize_html(request.form.get('context', ''))
         expiration_days = int(request.form.get('expiration_days', 7))
 
@@ -120,21 +111,12 @@ def share_voice():
         filepath = os.path.join(upload_folder, filename)
 
         try:
-            # Anonymize audio
-            anon_filepath = anonymize_audio(filepath)
-        finally:
-            # Security: Always remove the original raw file to prevent PII retention
-            if os.path.exists(filepath):
-                try:
-                    os.remove(filepath)
-                except OSError:
-                    pass
             audio_file.save(filepath)
 
             # Anonymize audio
             anon_filepath = anonymize_audio(filepath)
         finally:
-            # Security: Always remove the original raw audio file
+            # Security: Always remove the original raw audio file to prevent PII retention
             if os.path.exists(filepath):
                 try:
                     os.remove(filepath)
@@ -299,26 +281,6 @@ def submit_success_story():
             clean_techniques = [sanitize_html(str(t)) for t in techniques]
 
         # Moderation check
-        title = sanitize_html(data.get('title', ''))
-        story_content = sanitize_html(data.get('story', ''))
-
-        # Sanitize list of strings
-        techniques = data.get('techniques_used', [])
-        if isinstance(techniques, list):
-            techniques = [sanitize_html(t) for t in techniques]
-
-        # Security: Sanitize inputs
-        title = sanitize_html(data.get('title', ''))
-        story_content = sanitize_html(data.get('story', ''))
-
-        # Moderation check
-        is_safe, flagged = check_moderation(
-            title + ' ' + story_content)
-
-        story = SuccessStory(
-            user_id=current_user.id,
-            title=title,
-            story=story_content,
         is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
 
         story = SuccessStory(
@@ -634,11 +596,15 @@ def flag_content():
     try:
         data = request.get_json()
 
+        # Security: Sanitize reason to prevent Stored XSS
+        raw_reason = data.get('reason')
+        clean_reason = sanitize_html(raw_reason) if raw_reason else None
+
         flag = ModerationFlag(
             content_type=data.get('content_type'),
             content_id=data.get('content_id'),
             flagged_by=current_user.id,
-            reason=data.get('reason'),
+            reason=clean_reason,
             status='pending'
         )
 
