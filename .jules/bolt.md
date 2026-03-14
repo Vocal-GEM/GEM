@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-05-18 - Avoid layout thrashing in high-frequency loops
+**Learning:** `getBoundingClientRect()` forces synchronous layout calculations. In high-frequency rendering loops (like Canvas drawing managed by a `renderCoordinator`), doing this every frame causes severe layout thrashing and drops FPS.
+**Action:** Track dimensions asynchronously using `ResizeObserver`, caching `width` and `height` in a `useRef`, and using those cached values in the render loop instead of recalculating on the fly.
