@@ -16,6 +16,7 @@ const getNoteFromSemitone = (semitone) => {
 };
 
 const PitchOrb = ({ dataRef, settings = {} }) => {
+    const dimensionsRef = useRef({ width: 0, height: 0 });
     const canvasRef = useRef(null);
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
@@ -28,6 +29,35 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     };
 
     const genderRanges = settings.genderRanges || defaultRanges;
+
+
+    // Monitor canvas size with ResizeObserver to avoid getBoundingClientRect in loop
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const observer = new ResizeObserver((entries) => {
+            if (!entries.length) return;
+            const entry = entries[0];
+            const width = entry.contentRect.width;
+            const height = entry.contentRect.height;
+            const dpr = window.devicePixelRatio || 1;
+
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+
+            dimensionsRef.current = { width, height };
+
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+        });
+
+        observer.observe(canvas);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, []);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -67,13 +97,9 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            // Use cached dimensions to avoid layout thrashing
+            const { width, height } = dimensionsRef.current;
+            if (width === 0 || height === 0) return; // Skip render if not yet sized
             const centerX = width / 2;
             const centerY = height / 2;
 
