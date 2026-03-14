@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-03-14 - Float32Array spread performance overhead
+**Learning:** Using array spread syntax (e.g., `...audioBuffer`) on very large Float32Arrays inside `Math.max` causes a `Maximum call stack size exceeded` error because JavaScript engines limit the number of arguments passed to functions. Furthermore, chaining methods like `[...audioBuffer].map(Math.abs).sort(...)` creates large intermediate arrays, causing severe garbage collection thrashing and performance hits on hot paths.
+**Action:** For large numeric arrays (like audio buffers), always use traditional `for` loops or pre-allocated TypedArrays to compute metrics like maximum amplitude, RMS, and percentiles. Avoid spreading large TypedArrays and chaining array methods inside high-frequency processing functions.
