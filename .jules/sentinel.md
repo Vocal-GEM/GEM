@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-03-14 - Information Leakage in TTS Endpoint
+**Vulnerability:** The `/synthesize` and `/voices` endpoints in `backend/app/routes/tts.py` were catching `requests.exceptions.RequestException` and returning `str(e)` in the JSON error response to the client. This exposes internal server state and outbound request details (such as the target URL or connection failures) which could be leveraged by attackers.
+**Learning:** Returning raw exception strings directly to the client in error responses is a common anti-pattern during development but a security risk in production. Logs should be recorded server-side, while clients receive a generic error message.
+**Prevention:** Always log the full exception details on the server using `current_app.logger.error()` and return a generic error message (e.g., "Failed to connect to the text-to-speech service.") to the client.
