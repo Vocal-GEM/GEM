@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-22 - Float32Array Spread and Map Anti-Pattern
+**Learning:** Using `Math.max(...audioBuffer.map(Math.abs))` and `[...audioBuffer].map(Math.abs).sort((a,b)=>a-b)` on large TypedArrays causes "Maximum call stack size exceeded" errors and huge memory thrashing because it converts the buffer to a normal JS Array and allocates multiple intermediate arrays.
+**Action:** For large high-fidelity audio arrays, always use standard `for` loops to find maximums or perform reductions. When sorting is needed, pre-allocate a new `Float32Array` of the same length and use its native, optimized `.sort()` method.
