@@ -136,7 +136,7 @@ export default function LoadingSpinnerTest() {
                         title="No ghosts found"
                         description="It seems we are completely ghost-free at the moment. Try summoning one?"
                         actionLabel="Summon Ghost"
-                        onAction={() => console.log('Boo!')}
+                        onAction={() => alert('Boo!')}
                     />
                 </div>
             </section>

@@ -4,7 +4,6 @@ import LoadingSpinner from '../ui/LoadingSpinner';
 import { getRecordings, saveRecording, deleteRecording, updateRecording } from '../../services/VoiceJournalService';
 import { recordPractice } from '../../services/StreakService';
 import { JOURNAL_TEMPLATES, getTemplateById, formatTemplateAsEntry } from '../../data/journalTemplates';
-import { useToast } from '../../context/ToastContext';
 
 // Waveform Visualization Component
 const WaveformVisualizer = ({ audioBlob, isPlaying, onSeek }) => {
@@ -199,7 +198,6 @@ const AVAILABLE_TAGS = [
 ];
 
 const VoiceJournalView = () => {
-    const { showError } = useToast();
     const [recordings, setRecordings] = useState([]);
     const [isRecording, setIsRecording] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -316,7 +314,7 @@ const VoiceJournalView = () => {
             }, 1000);
         } catch (err) {
             console.error('Failed to start recording:', err);
-            showError('Could not access microphone. Please check permissions.');
+            alert('Could not access microphone. Please check permissions.');
         }
     };
 
