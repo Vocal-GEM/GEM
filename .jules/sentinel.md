@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-20 - Exposing Stack Traces in API Error Responses
+**Vulnerability:** Several endpoints in `backend/app/routes/tts.py` and `backend/app/routes/voice_quality.py` were catching exceptions and directly returning `str(e)` in the `jsonify({'error': ...})` response.
+**Learning:** Returning raw exception strings directly to the client can reveal internal server state, file paths, or external API details, which violates the "Fail securely" principle and leads to Information Leakage.
+**Prevention:** Always log the actual error securely on the server using `current_app.logger.error()` and return a generic, user-friendly error message to the client.
