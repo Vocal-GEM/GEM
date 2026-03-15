@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - TypedArray instantiation anti-pattern in Canvas loops
+**Learning:** `new Uint32Array(imageData.data.buffer)` inside a `renderCoordinator` or `requestAnimationFrame` loop creates significant memory churn by allocating new TypedArray views 60 times a second. In `Spectrogram.jsx`, this was causing unnecessary Garbage Collection pressure, unlike `HighResSpectrogram.jsx` which already cached its buffer correctly.
+**Action:** When updating raw canvas `ImageData` via an `ArrayBuffer` view (e.g. `Uint32Array`), cache the view alongside the `ImageData` object (e.g., attach it directly to the `canvas` object or use a `useRef`). Only instantiate a new view when the `ImageData` itself is recreated (e.g., due to canvas resizing).
