@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-05-24 - [Missing React.memo on Viz Components]
+**Learning:** High-frequency rendering visualization components (like `Spectrogram`) that consume `useAudio` context can cause unnecessary cascading re-renders across the DOM if not wrapped in `React.memo`, especially since their internal `canvas` updates are driven by a generic `renderCoordinator` loop bypassing React state.
+**Action:** Always wrap `canvas`-based visualization components in `React.memo` to isolate their high-frequency updates from parent component render cycles.
