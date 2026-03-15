@@ -29,6 +29,6 @@ export const useProgram = () => {
         enroll: (id) => programService.enroll(id),
         completeTask: (id) => programService.completeTask(id),
         isTaskComplete: (id) => programService.isTaskComplete(id),
-        nextDay: () => programService.nextDay()
+        nextDay: (onComplete) => programService.nextDay(onComplete)
     };
 };

@@ -265,7 +265,7 @@ class ProgramService {
         return this.progress.completedTasks.includes(taskId);
     }
 
-    nextDay() {
+    nextDay(onComplete) {
         if (!this.currentProgram) return;
 
         let week = this.progress.currentWeek;
@@ -282,7 +282,9 @@ class ProgramService {
             this.saveProgress();
         } else {
             // Program Complete!
-            alert("Congratulations! You've finished the program!");
+            if (onComplete) {
+                onComplete("Congratulations! You've finished the program!");
+            }
         }
     }
 

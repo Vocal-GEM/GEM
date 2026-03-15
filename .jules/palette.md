@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-03-15 - Replacing Native Alerts with Toasts
+**Learning:** Native `window.alert()` calls in UI components interrupt the user flow, are visually jarring, and generally provide a poor user experience. Replacing them with non-blocking feedback (like Toast notifications) maintains context and provides a smoother interaction.
+**Action:** Systematically replace all `alert()` calls in UI components with accessible alternatives, such as the `useToast` hook, ensuring that error messages are conveyed clearly without halting the application.
