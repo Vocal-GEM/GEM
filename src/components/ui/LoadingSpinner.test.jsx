@@ -1,7 +1,4 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
-import LoadingSpinner from "./LoadingSpinner";
-import React from "react";
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import LoadingSpinner from './LoadingSpinner';
@@ -58,7 +55,7 @@ describe("LoadingSpinner", () => {
 
     // Check for hidden label
     const srText = screen.getByText("Loading...");
-    expect(srText).toBeInTheDocument();
+    expect(srTextText).toBeInTheDocument();
     expect(srText).toHaveClass('sr-only');
   });
 

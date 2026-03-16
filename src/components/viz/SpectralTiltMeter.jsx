@@ -42,9 +42,9 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
             }
         };
 
-        let unsubscribe;
+        let componentUnsubscribe;
         import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
+            componentUnsubscribe = renderCoordinator.subscribe(
                 `spectral-tilt-meter-${id}`,
                 loop,
                 renderCoordinator.PRIORITY.MEDIUM
@@ -61,9 +61,9 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
         );
 
         return () => {
-            unsubscribe();
+            if(unsubscribe) unsubscribe();
+            if(componentUnsubscribe) componentUnsubscribe();
         };
-    }, [dataRef, targetRange, colorBlindMode, id]);
     }, [dataRef, targetRange, colorBlindMode, componentId]);
 
     return (

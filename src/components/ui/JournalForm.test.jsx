@@ -12,17 +12,13 @@ vi.mock('../../context/AudioContext', () => ({
         stopRecording: vi.fn().mockResolvedValue('mock-url'),
       }
     }
-  })
-        stopRecording: vi.fn(),
-      },
-    },
-  }),
+  });
 }));
 
 vi.mock('../../context/JournalContext', () => ({
   useJournal: () => ({
     journalEntryData: null
-  })
+  });
 }));
 
 describe('JournalForm Accessibility', () => {
@@ -30,35 +26,35 @@ describe('JournalForm Accessibility', () => {
     render(<JournalForm />);
     // This looks for a label associated with the input
     expect(screen.getByLabelText(/reading script/i)).toBeInTheDocument();
-  });
+  });;
 
   it('has accessible label for Notes textarea', () => {
     render(<JournalForm />);
     expect(screen.getByLabelText(/how did it feel/i)).toBeInTheDocument();
-  });
+  });;
 
   it('has accessible label for Effort slider', () => {
     render(<JournalForm />);
     expect(screen.getByLabelText(/effort/i)).toBeInTheDocument();
-  });
+  });;
 
   it('has accessible label for Confidence slider', () => {
     render(<JournalForm />);
     expect(screen.getByLabelText(/confidence/i)).toBeInTheDocument();
-  });
+  });;
 
   it('has accessible name for Record button', () => {
     render(<JournalForm />);
     // Initially this will fail because the button has no text content (only divs) and no aria-label
     // We accept "Start recording" or similar
     expect(screen.getByRole('button', { name: /start recording/i })).toBeInTheDocument();
-  });
+  });;
 
   it('has accessible name for Sentiment buttons', () => {
     render(<JournalForm />);
     expect(screen.getByRole('button', { name: /dysphoric/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /euphoric/i })).toBeInTheDocument();
-  });
+  });;
 
   it('has accessible name for Prompt Refresh button', () => {
      // Need to trigger the "Need a writing prompt?" state first or mock the random prompt?
@@ -71,9 +67,9 @@ describe('JournalForm Accessibility', () => {
      // For now, let's stick to the initial button which SHOULD be accessible because it has text.
      render(<JournalForm />);
      expect(screen.getByRole('button', { name: /need a writing prompt/i })).toBeInTheDocument();
-  });
+  });;
     journalEntryData: null,
-  }),
+  });,
 }));
 
 // Mock data
@@ -83,7 +79,7 @@ vi.mock('../../data/selfCareJournalPrompts', () => ({
     category: 'Test Category',
     prompt: 'This is a test prompt',
     icon: '🧪',
-  }),
+  });,
 }));
 
 describe('JournalForm Accessibility', () => {
@@ -99,7 +95,7 @@ describe('JournalForm Accessibility', () => {
 
     const confidenceSlider = screen.getByLabelText(/confidence/i);
     expect(confidenceSlider).toBeInTheDocument();
-  });
+  });;
 
   it('renders sentiment buttons with accessible labels', () => {
     render(<JournalForm />);
@@ -107,5 +103,5 @@ describe('JournalForm Accessibility', () => {
     // Check sentiment buttons
     expect(screen.getByRole('button', { name: /dysphoric/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /euphoric/i })).toBeInTheDocument();
-  });
+  });;
 });
