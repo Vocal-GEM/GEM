@@ -50,8 +50,9 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 renderCoordinator.PRIORITY.MEDIUM
             );
         });
+        /*
             // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
+        */
 
         const unsubscribe = renderCoordinator.subscribe(
             `spectral-tilt-meter-${componentId}`,
