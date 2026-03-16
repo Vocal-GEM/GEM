@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-03-16 - Stored XSS in Optional API Fields
+**Vulnerability:** Unsanitized optional string fields (`content_type`, `reason`) inserted into `ModerationFlag` from user JSON input.
+**Learning:** Even simple enum-like fields or optional descriptions must be sanitized to prevent malicious script storage in admin interfaces.
+**Prevention:** Always apply `sanitize_html(raw_value) if raw_value else None` before insertion into SQLAlchemy models from JSON payloads.
