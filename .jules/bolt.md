@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - Repeated Array Instantiation in RequestAnimationFrame
+**Learning:** `src/components/viz/Spectrogram.jsx` was creating a new `Uint32Array` view (`const data32 = new Uint32Array(imageData.data.buffer)`) on every animation frame. Since `requestAnimationFrame` fires at ~60 FPS, this caused 60 new array instances to be created and garbage collected every second, resulting in memory churn and possible frame drops.
+**Action:** When a TypedArray view relies on an underlying buffer that is persistent or pooled (like `ImageData.data.buffer`), always cache the TypedArray view (e.g., on a `ref` or object) alongside the buffer instead of recreating it per-frame.
