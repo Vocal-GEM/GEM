@@ -17,7 +17,6 @@ const getNoteFromSemitone = (semitone) => {
 
 const PitchOrb = ({ dataRef, settings = {} }) => {
     const canvasRef = useRef(null);
-    const dimensionsRef = useRef({ width: 0, height: 0 });
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
@@ -34,26 +33,6 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
-
-        // Handle Resize with ResizeObserver to avoid getBoundingClientRect in loop
-        const resizeObserver = new ResizeObserver((entries) => {
-            if (!entries.length) return;
-            const entry = entries[0];
-            const { width, height } = entry.contentRect;
-
-            dimensionsRef.current = { width, height };
-
-            if (canvas) {
-                canvas.width = width * dpr;
-                canvas.height = height * dpr;
-                ctx.scale(dpr, dpr);
-            }
-        });
-
-        if (canvas) {
-            resizeObserver.observe(canvas);
-        }
-
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -88,8 +67,13 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const { width, height } = dimensionsRef.current;
-            if (width === 0 || height === 0) return;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const width = rect.width;
+            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -182,7 +166,6 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
-            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 

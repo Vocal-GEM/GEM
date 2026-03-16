@@ -77,10 +77,10 @@ export default function LoadingSpinnerTest() {
             Loading Ghost
           </Button>
           <Button size="icon" isLoading>
-import React from 'react';
+            <span className="sr-only">Icon Button</span>
+          </Button>
 import EmptyState from './EmptyState';
 import { Ghost, Search, Plus } from 'lucide-react';
-import LoadingSpinner from './LoadingSpinner';
 
 export default function LoadingSpinnerTest() {
     return (
