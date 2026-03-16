@@ -120,21 +120,11 @@ def share_voice():
         filepath = os.path.join(upload_folder, filename)
 
         try:
+            audio_file.save(filepath)
             # Anonymize audio
             anon_filepath = anonymize_audio(filepath)
         finally:
             # Security: Always remove the original raw file to prevent PII retention
-            if os.path.exists(filepath):
-                try:
-                    os.remove(filepath)
-                except OSError:
-                    pass
-            audio_file.save(filepath)
-
-            # Anonymize audio
-            anon_filepath = anonymize_audio(filepath)
-        finally:
-            # Security: Always remove the original raw audio file
             if os.path.exists(filepath):
                 try:
                     os.remove(filepath)
@@ -311,14 +301,12 @@ def submit_success_story():
         title = sanitize_html(data.get('title', ''))
         story_content = sanitize_html(data.get('story', ''))
 
-        # Moderation check
-        is_safe, flagged = check_moderation(
-            title + ' ' + story_content)
+        # Security: Sanitize inputs
+        clean_title = sanitize_html(data.get('title', ''))
+        clean_story = sanitize_html(data.get('story', ''))
+        voice_goal = sanitize_html(data.get('voice_goal', ''))
 
-        story = SuccessStory(
-            user_id=current_user.id,
-            title=title,
-            story=story_content,
+        # Moderation check
         is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
 
         story = SuccessStory(
@@ -634,11 +622,14 @@ def flag_content():
     try:
         data = request.get_json()
 
+        raw_reason = data.get('reason')
+        safe_reason = sanitize_html(raw_reason) if raw_reason else None
+
         flag = ModerationFlag(
             content_type=data.get('content_type'),
             content_id=data.get('content_id'),
             flagged_by=current_user.id,
-            reason=data.get('reason'),
+            reason=safe_reason,
             status='pending'
         )
 

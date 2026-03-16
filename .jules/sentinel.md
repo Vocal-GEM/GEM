@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-03-16 - Stored XSS in Community API (flag_content)
+**Vulnerability:** The `flag_content` endpoint in `backend/app/routes/community.py` accepted an unsanitized `reason` string and stored it in the `ModerationFlag` model.
+**Learning:** Optional fields in API requests often bypass validation/sanitization in this codebase, leading to Stored XSS risks if an attacker injects malicious scripts in the JSON body.
+**Prevention:** Always use `sanitize_html(raw_value) if raw_value else None` on all user-submitted string inputs before saving them to the database, even if they are optional or simple description fields.
