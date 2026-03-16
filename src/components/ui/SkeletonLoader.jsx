@@ -16,12 +16,16 @@ const SkeletonLoader = ({ className = "", variant = "text", count = 1 }) => {
     };
 
     return (
-        <div className={`space-y-3 ${className}`}>
+        <div
+            className={`space-y-3 ${className}`}
+            role="status"
+            aria-label="Loading..."
+            aria-live="polite"
+        >
             {items.map((_, i) => (
                 <div
                     key={i}
-                    role="status"
-                    aria-label="Loading..."
+                    aria-hidden="true"
                     className={`bg-slate-800/50 animate-pulse ${getClasses()}`}
                     style={{
                         animationDelay: `${i * 100}ms`,

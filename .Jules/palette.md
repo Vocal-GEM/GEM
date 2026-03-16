@@ -1,0 +1,3 @@
+## 2024-05-24 - Screen Reader Support for Compound Loading Skeletons
+**Learning:** In complex React applications, compound loading skeletons (like `CardSkeleton` which contains multiple inner `Skeleton` nodes) cause screen readers to excessively announce "Loading..." for every single decorative pulsing block if ARIA properties are blindly applied to the base component.
+**Action:** When creating skeleton loaders, apply `role="status"`, `aria-label="Loading..."`, and `aria-live="polite"` only to the outermost container of the compound skeleton. All inner decorative components must receive `aria-hidden="true"` to prevent redundant, confusing announcements.

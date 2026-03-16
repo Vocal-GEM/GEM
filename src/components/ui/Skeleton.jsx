@@ -3,7 +3,7 @@ import React from 'react';
 /**
  * Skeleton - Animated loading placeholder
  */
-const Skeleton = ({ className = '', variant = 'default' }) => {
+const Skeleton = ({ className = '', variant = 'default', ...props }) => {
     const baseClasses = 'animate-pulse bg-slate-800 rounded';
 
     const variants = {
@@ -17,8 +17,13 @@ const Skeleton = ({ className = '', variant = 'default' }) => {
         circle: 'h-16 w-16 rounded-full'
     };
 
+    // If no props are passed and it's used standalone, we could provide default aria attrs,
+    // but the intention is to use the compound ones, or pass props.
     return (
-        <div className={`${baseClasses} ${variants[variant] || variants.default} ${className}`} />
+        <div
+            className={`${baseClasses} ${variants[variant] || variants.default} ${className}`}
+            {...props}
+        />
     );
 };
 
@@ -26,15 +31,15 @@ const Skeleton = ({ className = '', variant = 'default' }) => {
  * Card Skeleton - For dashboard cards
  */
 export const CardSkeleton = () => (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4" role="status" aria-label="Loading card" aria-live="polite">
         <div className="flex items-center gap-3">
-            <Skeleton variant="avatar" />
+            <Skeleton variant="avatar" aria-hidden="true" />
             <div className="flex-1 space-y-2">
-                <Skeleton variant="title" className="w-1/2" />
-                <Skeleton className="w-1/3" />
+                <Skeleton variant="title" className="w-1/2" aria-hidden="true" />
+                <Skeleton className="w-1/3" aria-hidden="true" />
             </div>
         </div>
-        <Skeleton className="h-24" />
+        <Skeleton className="h-24" aria-hidden="true" />
     </div>
 );
 
@@ -42,13 +47,13 @@ export const CardSkeleton = () => (
  * List Skeleton - For lists of items
  */
 export const ListSkeleton = ({ items = 5 }) => (
-    <div className="space-y-3">
+    <div className="space-y-3" role="status" aria-label="Loading list" aria-live="polite">
         {Array.from({ length: items }).map((_, i) => (
             <div key={i} className="flex items-center gap-4 p-4 bg-slate-900 rounded-xl">
-                <Skeleton variant="circle" className="w-10 h-10" />
+                <Skeleton variant="circle" className="w-10 h-10" aria-hidden="true" />
                 <div className="flex-1 space-y-2">
-                    <Skeleton className="w-2/3" />
-                    <Skeleton className="w-1/3" />
+                    <Skeleton className="w-2/3" aria-hidden="true" />
+                    <Skeleton className="w-1/3" aria-hidden="true" />
                 </div>
             </div>
         ))}
@@ -59,12 +64,12 @@ export const ListSkeleton = ({ items = 5 }) => (
  * Stats Grid Skeleton
  */
 export const StatsGridSkeleton = () => (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4" role="status" aria-label="Loading stats" aria-live="polite">
         {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2">
-                <Skeleton className="w-8 h-8" />
-                <Skeleton variant="title" className="w-1/2" />
-                <Skeleton className="w-1/3" />
+                <Skeleton className="w-8 h-8" aria-hidden="true" />
+                <Skeleton variant="title" className="w-1/2" aria-hidden="true" />
+                <Skeleton className="w-1/3" aria-hidden="true" />
             </div>
         ))}
     </div>
@@ -74,14 +79,15 @@ export const StatsGridSkeleton = () => (
  * Chart Skeleton
  */
 export const ChartSkeleton = () => (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <Skeleton variant="title" className="w-1/3 mb-4" />
+    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6" role="status" aria-label="Loading chart" aria-live="polite">
+        <Skeleton variant="title" className="w-1/3 mb-4" aria-hidden="true" />
         <div className="h-48 flex items-end gap-2">
             {Array.from({ length: 12 }).map((_, i) => (
                 <div
                     key={i}
                     className="flex-1 bg-slate-800 rounded-t animate-pulse"
                     style={{ height: `${Math.random() * 100}%` }}
+                    aria-hidden="true"
                 />
             ))}
         </div>
@@ -92,10 +98,10 @@ export const ChartSkeleton = () => (
  * Full Page Skeleton
  */
 export const PageSkeleton = () => (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6" role="status" aria-label="Loading page" aria-live="polite">
         <div className="flex items-center justify-between">
-            <Skeleton variant="title" className="w-1/4" />
-            <Skeleton variant="button" />
+            <Skeleton variant="title" className="w-1/4" aria-hidden="true" />
+            <Skeleton variant="button" aria-hidden="true" />
         </div>
         <StatsGridSkeleton />
         <CardSkeleton />
