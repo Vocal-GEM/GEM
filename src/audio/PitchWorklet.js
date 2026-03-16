@@ -48,6 +48,7 @@ class PitchProcessor extends AudioWorkletProcessor {
 
             // Process when buffer is full
             if (this.bufferIndex >= this.bufferSize) {
+                // eslint-disable-next-line no-undef
                 const getCurrentTime = () => typeof currentTime !== 'undefined' ? currentTime : Date.now() / 1000;
                 const startTime = getCurrentTime();
 
