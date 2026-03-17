@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-03-01 - Canvas Width Assignment Side Effect
+**Learning:** In the HTML5 Canvas API, assigning a value to `canvas.width` or `canvas.height` acts as an implicit hard reset. It completely clears the canvas pixels and resets all context state (like transforms, `fillStyle`, etc.). When removing these reassignments from a high-frequency `requestAnimationFrame` loop (e.g. to prevent layout thrashing), you must explicitly add `ctx.clearRect(0, 0, width, height)` back to the loop. Otherwise, the canvas stops clearing between frames, resulting in continuous overdrawing and visual smearing/ghosting.
+**Action:** Always add an explicit `ctx.clearRect()` when refactoring a canvas loop to remove dynamic resizing or canvas dimension reassignments.
