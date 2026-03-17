@@ -41,7 +41,3 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
-
-## 2025-05-22 - Spectrogram Canvas React Memoization optimization
-**Learning:** High-frequency canvas visualization components (`src/components/viz/Spectrogram.jsx`) relying on contexts like `useAudio` should not unnecessarily re-render and suffer from stuttering or performance bottleneck when their host/parent components are updating during playback.
-**Action:** Always wrap these canvas viz components that are handling frequent rendering cycles in `React.memo` to eliminate cascading updates triggered by parent re-renders and reduce processing/CPU spikes.
