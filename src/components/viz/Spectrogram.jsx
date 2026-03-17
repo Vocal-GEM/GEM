@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback, useId, memo } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -368,4 +368,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     );
 };
 
-export default Spectrogram;
+// Wrapped in React.memo() as an optimization. Because Spectrogram is a high-frequency visualization
+// component consuming context hooks like useAudio, this prevents unnecessary cascading re-renders
+// during audio playback when its parent component updates, avoiding UI stuttering and high CPU load.
+export default memo(Spectrogram);
