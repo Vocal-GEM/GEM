@@ -28,6 +28,13 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     canvas: { width: 300, height: 300 }
 }));
 
+// Mock ResizeObserver
+global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
+
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
 global.requestAnimationFrame = mockRequestAnimationFrame;
