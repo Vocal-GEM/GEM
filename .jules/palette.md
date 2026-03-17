@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-24 - Testing Web Speech UI in Playwright
+**Learning:** Playwright environments often lack `window.speechSynthesis` voices by default, meaning any UI state logic that depends on the `onend` event of a spoken utterance will hang indefinitely in headless verification environments.
+**Action:** When using Playwright to verify UI workflows that depend on the Web Speech API (e.g., speech synthesis finishing to auto-advance state), the test may hang or fail. Use `page.evaluate()` to trigger the required DOM events or state changes manually via JavaScript instead of relying on the UI to advance automatically.
