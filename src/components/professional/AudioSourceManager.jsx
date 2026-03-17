@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
 
 const AudioSourceManager = ({ onSourceChange }) => {
@@ -6,11 +6,45 @@ const AudioSourceManager = ({ onSourceChange }) => {
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [permissionGranted, setPermissionGranted] = useState(false);
 
-    useEffect(() => {
-        checkPermissionAndEnumerate();
+    const enumerateDevices = useCallback(async () => {
+        try {
+            const deviceList = await navigator.mediaDevices.enumerateDevices();
+            const audioInputs = deviceList.filter(d => d.kind === 'audioinput');
+
+            setDevices(audioInputs);
+
+            if (audioInputs.length > 0 && !selectedDeviceId) {
+                // Auto-select first default or any
+                const defaultDevice = audioInputs.find(d => d.deviceId === 'default') || audioInputs[0];
+                setSelectedDeviceId(defaultDevice.deviceId);
+                onSourceChange(defaultDevice.deviceId);
+            }
+        } catch (err) {
+            console.error('Failed to enumerate devices', err);
+        }
+    }, [selectedDeviceId, onSourceChange]);
+
+    const checkPermissionAndEnumerate = useCallback(async () => {
+        try {
+            // Must request permission first to get labels
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            setPermissionGranted(true);
+
+            // Release immediately, we just needed permission
+            stream.getTracks().forEach(t => t.stop());
+
+            enumerateDevices();
+        } catch (err) {
+            console.error('Audio permission denied', err);
+            setPermissionGranted(false);
+        }
     }, []);
 
-    const checkPermissionAndEnumerate = async () => {
+    useEffect(() => {
+        checkPermissionAndEnumerate();
+    }, [checkPermissionAndEnumerate]);
+
+    const enumerateDevices = async () => {
         try {
             // Must request permission first to get labels
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
