@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { Play, Pause, Trash2, Download, Edit2, Check, X, Mic, Calendar, Clock, Loader2 } from 'lucide-react';
 import { indexedDB } from '../../services/IndexedDBManager';
 
@@ -222,4 +222,6 @@ const RecordingsList = () => {
     );
 };
 
-export default RecordingsList;
+// ⚡ Bolt: Wrapped in React.memo to prevent unnecessary re-renders when parent HistoryView state changes.
+// The list manages its own state entirely and takes no props, making it a perfect candidate for memoization.
+export default memo(RecordingsList);
