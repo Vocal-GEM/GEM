@@ -63,7 +63,7 @@ class PitchProcessor extends AudioWorkletProcessor {
                     type: 'pitch',
                     pitch: result.pitch,
                     confidence: result.confidence,
-                    timestamp: currentTime,
+                    timestamp: typeof globalThis.currentTime !== 'undefined' ? globalThis.currentTime : Date.now() / 1000,
                     latency: processingTime,
                     avgLatency: this.totalProcessTime / this.processCount
                 });
