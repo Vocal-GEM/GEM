@@ -4,10 +4,10 @@ import sys
 import os
 
 # Ensure backend is in path
-sys.path.append(os.path.abspath('backend'))
+sys.path.append(os.path.abspath('.'))
 
 # Mock extensions and models before importing blueprint
-from backend.app.validators import sanitize_html
+from app.validators import sanitize_html
 
 def test_sanitize_html_xss():
     """Test that HTML sanitization removes XSS vectors"""
@@ -34,9 +34,9 @@ def test_sanitize_html_xss():
         assert sanitized == expected
 
 def test_community_module_integrity():
-    """Verify backend.app.routes.community can be imported (syntax check)"""
+    """Verify app.routes.community can be imported (syntax check)"""
     try:
-        from backend.app.routes import community
+        from app.routes import community
         assert community.community_bp is not None
     except ImportError as e:
         pytest.fail(f"Failed to import community module: {e}")
