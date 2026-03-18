@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Headphones, Volume2, VolumeX, Play, Square, Settings } from 'lucide-react';
-import Toast from './Toast';
 
 /**
  * DAFMode - Delayed Auditory Feedback
@@ -13,7 +12,6 @@ const DAFMode = ({ onClose }) => {
     const [volume, setVolume] = useState(0.8);
     const [isMuted, setIsMuted] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
-    const [toast, setToast] = useState(null);
 
     const audioContextRef = useRef(null);
     const streamRef = useRef(null);
@@ -96,7 +94,7 @@ const DAFMode = ({ onClose }) => {
             setIsActive(true);
         } catch (err) {
             console.error('Failed to start DAF:', err);
-            setToast({ message: 'Could not access microphone. Please check permissions.', type: 'error' });
+            alert('Could not access microphone. Please check permissions.');
         }
     };
 
@@ -250,14 +248,6 @@ const DAFMode = ({ onClose }) => {
                 >
                     Close
                 </button>
-            )}
-
-            {toast && (
-                <Toast
-                    message={toast.message}
-                    type={toast.type}
-                    onClose={() => setToast(null)}
-                />
             )}
         </div>
     );

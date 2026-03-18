@@ -42,9 +42,6 @@ class PitchProcessor extends AudioWorkletProcessor {
 
         const inputChannel = input[0];
 
-        // Get current time safely
-        const currentTime = typeof globalThis.currentTime !== 'undefined' ? globalThis.currentTime : Date.now() / 1000;
-
         // Fill buffer with incoming audio
         for (let i = 0; i < inputChannel.length; i++) {
             this.buffer[this.bufferIndex++] = inputChannel[i];
