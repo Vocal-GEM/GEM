@@ -11,6 +11,7 @@ import { audioCalibrator } from './AudioCalibrator';
 export class VoiceAnalyzer {
     constructor(audioContext) {
         this.audioContext = audioContext;
+        this.fftCache = new Map();
     }
 
     /**
@@ -259,42 +260,88 @@ export class VoiceAnalyzer {
     }
 
     /**
-     * Simple FFT implementation (Cooley-Tukey)
+     * Fast iterative FFT implementation (Cooley-Tukey)
      */
-    performFFT(samples) {
-        const n = samples.length;
-        if (n <= 1) return samples.map(s => ({ real: s, imag: 0 }));
+    getTwiddleFactors(n) {
+        if (this.fftCache.has(n)) return this.fftCache.get(n);
 
-        // Ensure power of 2
-        const powerOf2 = Math.pow(2, Math.ceil(Math.log2(n)));
-        const padded = new Float32Array(powerOf2);
-        padded.set(samples);
+        const w_r = new Float32Array(n / 2);
+        const w_i = new Float32Array(n / 2);
+        for (let i = 0; i < n / 2; i++) {
+            const angle = -2 * Math.PI * i / n;
+            w_r[i] = Math.cos(angle);
+            w_i[i] = Math.sin(angle);
+        }
 
-        return this.fftRecursive(Array.from(padded).map(s => ({ real: s, imag: 0 })));
+        const bitRev = new Uint32Array(n);
+        const log2n = Math.log2(n);
+        for (let i = 0; i < n; i++) {
+            let rev = 0;
+            let x = i;
+            for (let j = 0; j < log2n; j++) {
+                rev = (rev << 1) | (x & 1);
+                x >>= 1;
+            }
+            bitRev[i] = rev;
+        }
+
+        const data = { w_r, w_i, bitRev };
+        this.fftCache.set(n, data);
+        return data;
     }
 
-    fftRecursive(x) {
-        const n = x.length;
-        if (n <= 1) return x;
+    performFFT(samples) {
+        const n = samples.length;
 
-        const even = this.fftRecursive(x.filter((_, i) => i % 2 === 0));
-        const odd = this.fftRecursive(x.filter((_, i) => i % 2 === 1));
+        const isComplex = samples.length > 0 && typeof samples[0] === 'object' && 'real' in samples[0];
 
-        const result = new Array(n);
-        for (let k = 0; k < n / 2; k++) {
-            const angle = -2 * Math.PI * k / n;
-            const t = {
-                real: Math.cos(angle) * odd[k].real - Math.sin(angle) * odd[k].imag,
-                imag: Math.cos(angle) * odd[k].imag + Math.sin(angle) * odd[k].real
-            };
-            result[k] = {
-                real: even[k].real + t.real,
-                imag: even[k].imag + t.imag
-            };
-            result[k + n / 2] = {
-                real: even[k].real - t.real,
-                imag: even[k].imag - t.imag
-            };
+        if (n <= 1) return isComplex ? samples : Array.from(samples).map(s => ({ real: s, imag: 0 }));
+
+        const powerOf2 = Math.pow(2, Math.ceil(Math.log2(n)));
+
+        const { w_r, w_i, bitRev } = this.getTwiddleFactors(powerOf2);
+
+        const real = new Float32Array(powerOf2);
+        const imag = new Float32Array(powerOf2);
+
+        if (isComplex) {
+            for (let i = 0; i < n; i++) {
+                real[bitRev[i]] = samples[i].real;
+                imag[bitRev[i]] = samples[i].imag || 0;
+            }
+        } else {
+            for (let i = 0; i < n; i++) {
+                real[bitRev[i]] = samples[i];
+            }
+        }
+
+        for (let step = 1; step < powerOf2; step *= 2) {
+            const jump = step * 2;
+            const twiddleStep = powerOf2 / jump;
+
+            for (let i = 0; i < powerOf2; i += jump) {
+                for (let j = 0; j < step; j++) {
+                    const twiddleIdx = j * twiddleStep;
+                    const wr = w_r[twiddleIdx];
+                    const wi = w_i[twiddleIdx];
+
+                    const even = i + j;
+                    const odd = even + step;
+
+                    const tr = wr * real[odd] - wi * imag[odd];
+                    const ti = wr * imag[odd] + wi * real[odd];
+
+                    real[odd] = real[even] - tr;
+                    imag[odd] = imag[even] - ti;
+                    real[even] += tr;
+                    imag[even] += ti;
+                }
+            }
+        }
+
+        const result = new Array(powerOf2);
+        for (let i = 0; i < powerOf2; i++) {
+            result[i] = { real: real[i], imag: imag[i] };
         }
         return result;
     }
