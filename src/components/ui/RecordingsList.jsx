@@ -1,8 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Trash2, Download, Edit2, Check, X, Mic, Calendar, Clock, Loader2 } from 'lucide-react';
 import { indexedDB } from '../../services/IndexedDBManager';
 
-const RecordingsList = () => {
+// ⚡ Bolt: Wrapped in React.memo to prevent unnecessary re-renders when parent HistoryView state changes.
+// Since this component manages its own data fetching and has no props, memoizing it saves expensive list diffs.
+const RecordingsList = React.memo(() => {
     const [recordings, setRecordings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [playingId, setPlayingId] = useState(null);
@@ -220,6 +222,6 @@ const RecordingsList = () => {
             ))}
         </div>
     );
-};
+});
 
 export default RecordingsList;
