@@ -7,6 +7,7 @@ const ClipReviewModal = ({ clip, onClose }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [shareUrl, setShareUrl] = useState(null);
+    const [error, setError] = useState(null);
     const audioRef = useRef(null);
 
     useEffect(() => {
@@ -29,6 +30,7 @@ const ClipReviewModal = ({ clip, onClose }) => {
     const handleEnded = () => setIsPlaying(false);
 
     const handleUpload = async () => {
+        setError(null);
         setUploading(true);
         try {
             const formData = new FormData();
@@ -52,7 +54,7 @@ const ClipReviewModal = ({ clip, onClose }) => {
             setShareUrl(data.url);
         } catch (e) {
             console.error("Upload error:", e);
-            alert("Failed to upload clip.");
+            setError("Failed to upload clip.");
         } finally {
             setUploading(false);
         }
@@ -104,6 +106,12 @@ const ClipReviewModal = ({ clip, onClose }) => {
                         <div className="text-sm font-mono text-slate-300">{new Date().toLocaleTimeString()}</div>
                     </div>
                 </div>
+
+                {error && (
+                    <div role="alert" className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl mb-4 text-sm font-medium">
+                        {error}
+                    </div>
+                )}
 
                 {/* Actions */}
                 {shareUrl ? (

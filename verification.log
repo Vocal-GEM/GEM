@@ -1,0 +1,29 @@
+PAGE LOG: cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+PAGE LOG: [vite] connecting...
+PAGE LOG: [vite] connected.
+PAGE LOG: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+Verifying ClipReviewModal...
+PAGE LOG: Not allowed to load local resource: blob:mock-url
+PAGE LOG: Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+PAGE LOG: Upload error: Error: Upload failed
+    at handleUpload (http://localhost:3000/src/components/ui/ClipReviewModal.jsx:43:31)
+ClipReviewModal error verified.
+Verifying DAFMode...
+PAGE LOG: The above error occurred in the <DAFMode> component:
+
+    at DAFMode (http://localhost:3000/src/components/ui/DAFMode.jsx:5:20)
+    at div
+    at section
+    at div
+    at VerificationApp (http://localhost:3000/verification/VerificationApp.jsx?t=1773900905070:9:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+Verification failed: page.waitForSelector: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('h2:has-text("Delayed Auditory Feedback")') to be visible[22m
+
+    at /app/verification/verify.cjs:68:20 {
+  name: 'TimeoutError'
+}
+Verification finished.
