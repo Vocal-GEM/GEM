@@ -13,7 +13,13 @@ export const validateAudioSignal = (audioBuffer, sampleRate) => {
     const issues = [];
 
     // Check for clipping
-    const maxAmplitude = Math.max(...audioBuffer.map(Math.abs));
+    // ⚡ Bolt: Iterative loop avoids "Maximum call stack size exceeded" on large Float32Arrays from Math.max(...buffer)
+    let maxAmplitude = 0;
+    for (let i = 0; i < audioBuffer.length; i++) {
+        const abs = Math.abs(audioBuffer[i]);
+        if (abs > maxAmplitude) maxAmplitude = abs;
+    }
+
     if (maxAmplitude > 0.99) {
         issues.push({
             type: 'clipping',
@@ -79,7 +85,13 @@ const estimateSNR = (audioBuffer) => {
     const rms = Math.sqrt(audioBuffer.reduce((sum, s) => sum + s * s, 0) / audioBuffer.length);
 
     // Estimate noise floor from quietest 10% of samples
-    const sorted = [...audioBuffer].map(Math.abs).sort((a, b) => a - b);
+    // ⚡ Bolt: Pre-allocated TypedArray avoids GC thrashing from dynamic [...buffer].map() array allocations
+    const sorted = new Float32Array(audioBuffer.length);
+    for (let i = 0; i < audioBuffer.length; i++) {
+        sorted[i] = Math.abs(audioBuffer[i]);
+    }
+    sorted.sort();
+
     const noiseFloorIndex = Math.floor(sorted.length * 0.1);
     const noiseFloorSamples = sorted.slice(0, noiseFloorIndex);
     const noiseFloor = Math.sqrt(
