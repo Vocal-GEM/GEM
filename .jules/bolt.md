@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-03-19 - React.memo() Optimization in HistoryView
+**Learning:** RecordingsList component rendered inside HistoryView manages its own state and consumes no props, yet re-renders whenever parent (HistoryView) state changes.
+**Action:** Wrapped RecordingsList in React.memo() to prevent unnecessary re-renders when parent state changes, saving significant React reconciliation overhead for long lists.
