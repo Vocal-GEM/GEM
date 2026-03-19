@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-23 - Avoid Array Map/Spread on TypedArrays
+**Learning:** Using `[...buffer].map(Math.abs)` or `Math.max(...buffer.map(Math.abs))` on large `Float32Array` buffers (like those from `AudioContext` which can be 2048+ samples) inside high-frequency processing loops causes severe GC thrashing and frequently triggers "Maximum call stack size exceeded" errors due to V8 argument limits.
+**Action:** Always use iterative `for` loops and pre-allocated arrays (e.g., `new Float32Array(buffer.length)`) for buffer transformations to avoid dynamic JavaScript array allocation, and never use the spread operator (`...`) on potentially large typed arrays.

@@ -265,7 +265,13 @@ export class AudioEngine {
                     return;
                 }
                 const avgVolume = samples.reduce((a, b) => a + b, 0) / samples.length;
-                const maxVolume = Math.max(...samples);
+
+                // ⚡ Bolt: Iterative loop avoids "Maximum call stack size exceeded" risk from Math.max(...samples)
+                let maxVolume = 0;
+                for (let i = 0; i < samples.length; i++) {
+                    if (samples[i] > maxVolume) maxVolume = samples[i];
+                }
+
                 const noiseFloorDb = 20 * Math.log10(avgVolume + 0.0001);
                 let score = 100;
                 let message = "Environment is perfect!";
