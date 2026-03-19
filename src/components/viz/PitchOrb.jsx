@@ -64,16 +64,41 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        // Cache dimensions to avoid layout thrashing
+        let currentWidth = 0;
+        let currentHeight = 0;
+
+        const updateDimensions = () => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            const newWidth = rect.width;
+            const newHeight = rect.height;
+
+            if (newWidth !== currentWidth || newHeight !== currentHeight) {
+                currentWidth = newWidth;
+                currentHeight = newHeight;
+                canvas.width = newWidth * dpr;
+                canvas.height = newHeight * dpr;
+                ctx.scale(dpr, dpr);
+            }
+        };
+
+        const resizeObserver = new ResizeObserver(() => {
+            requestAnimationFrame(updateDimensions);
+        });
+
+        if (canvas) {
+            updateDimensions();
+            resizeObserver.observe(canvas);
+        }
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const width = currentWidth;
+            const height = currentHeight;
 
-            const width = rect.width;
-            const height = rect.height;
+            if (width === 0 || height === 0) return;
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -166,6 +191,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
