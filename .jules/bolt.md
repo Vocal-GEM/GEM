@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-21 - Canvas State Management in Animation Loops
+**Learning:** Removing `canvas.width = ...` assignments inside high-frequency animation loops (to prevent layout thrashing and buffer reallocation) removes the implicit clearing of the canvas and the implicit reset of the transform matrix. Failing to explicitly manage this state causes visual smearing and infinite accumulation of transforms (e.g., `ctx.translate` flying off-screen). Additionally, test environment mock canvas contexts may not fully implement standard methods like `save()`, `restore()`, or `setTransform()`.
+**Action:** When migrating canvas resizing to `ResizeObserver`, the `loop` must explicitly reset state: `if (ctx && typeof ctx.save === 'function') ctx.save();`, then `setTransform(1,0,0,1,0,0)`, then `clearRect`, and end with `ctx.restore()`.
