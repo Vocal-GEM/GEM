@@ -64,6 +64,7 @@ const ShareProgressCard = () => {
                 <button
                     onClick={handleCopy}
                     className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl flex items-center justify-center gap-2"
+                    title="Copy progress to clipboard"
                 >
                     {copied ? <Check size={18} /> : <Copy size={18} />}
                     {copied ? 'Copied!' : 'Copy Text'}
@@ -71,6 +72,8 @@ const ShareProgressCard = () => {
                 <button
                     onClick={handleTwitterShare}
                     className="py-3 px-4 bg-blue-500 hover:bg-blue-400 text-white rounded-xl"
+                    aria-label="Share on Twitter"
+                    title="Share progress on Twitter"
                 >
                     <Twitter size={18} />
                 </button>
