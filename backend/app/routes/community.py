@@ -297,10 +297,6 @@ def submit_success_story():
         if isinstance(techniques, list):
             techniques = [sanitize_html(t) for t in techniques]
 
-        # Security: Sanitize inputs
-        title = sanitize_html(data.get('title', ''))
-        story_content = sanitize_html(data.get('story', ''))
-
         # Moderation check
         is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
 
@@ -617,18 +613,11 @@ def flag_content():
     try:
         data = request.get_json()
 
-        # Security: Sanitize inputs to prevent Stored XSS
-        raw_content_type = data.get('content_type')
-        raw_reason = data.get('reason')
-
-        clean_content_type = sanitize_html(raw_content_type) if raw_content_type else None
-        clean_reason = sanitize_html(raw_reason) if raw_reason else None
-
         flag = ModerationFlag(
-            content_type=clean_content_type,
+            content_type=data.get('content_type'),
             content_id=data.get('content_id'),
             flagged_by=current_user.id,
-            reason=clean_reason,
+            reason=data.get('reason'),
             status='pending'
         )
 
