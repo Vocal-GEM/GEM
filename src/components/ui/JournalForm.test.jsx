@@ -13,6 +13,10 @@ vi.mock('../../context/AudioContext', () => ({
       }
     }
   })
+        stopRecording: vi.fn(),
+      },
+    },
+  }),
 }));
 
 vi.mock('../../context/JournalContext', () => ({
