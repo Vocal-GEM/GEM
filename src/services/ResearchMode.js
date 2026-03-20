@@ -59,7 +59,14 @@ export class ResearchModeController {
      */
     generateParticipantId(userId) {
         // Use cryptographic hash with study-specific salt
-        const salt = this.studyId + process.env.REACT_APP_RESEARCH_SALT;
+        const envSalt = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_RESEARCH_SALT : null;
+
+        if (!envSalt) {
+            console.error('CRITICAL: VITE_RESEARCH_SALT environment variable is missing.');
+            throw new Error('Research Mode initialization failed due to missing security configuration.');
+        }
+
+        const salt = this.studyId + envSalt;
         const hash = CryptoJS.SHA256(userId + salt).toString();
 
         // Take first 16 characters for readability
