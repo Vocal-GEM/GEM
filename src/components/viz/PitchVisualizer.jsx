@@ -633,6 +633,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                         onClick={handleResetAverage}
                         className="w-7 h-7 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-slate-700/50"
                         title="Reset Average"
+                        aria-label="Reset Average"
                     >
                         <RotateCcw size={14} />
                     </button>
@@ -644,6 +645,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     onClick={handleZoomIn}
                     className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-white flex items-center justify-center backdrop-blur-sm border border-slate-700"
                     title="Zoom In"
+                    aria-label="Zoom In"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
                 </button>
@@ -651,6 +653,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     onClick={handleZoomOut}
                     className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-white flex items-center justify-center backdrop-blur-sm border border-slate-700"
                     title="Zoom Out"
+                    aria-label="Zoom Out"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
                 </button>
@@ -673,6 +676,8 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     : 'bg-slate-800/80 border-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-700'
                     }`}
                 title="Toggle Gender Timeline"
+                aria-label="Toggle Gender Timeline"
+                aria-pressed={showGenderTimeline}
             >
                 <BarChart2 size={16} />
             </button>
@@ -689,6 +694,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                             <button
                                 onClick={() => setShowGenderTimeline(false)}
                                 className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white"
+                                aria-label="Close Gender Timeline"
                             >
                                 <X size={16} />
                             </button>
@@ -708,6 +714,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                         <button
                             onClick={() => setShowUnstableHelp(true)}
                             className="ml-1 hover:bg-white/20 rounded-full p-0.5 transition-colors"
+                            aria-label="Help with unstable signal"
                         >
                             <HelpCircle size={14} />
                         </button>
@@ -762,6 +769,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                         <button
                             onClick={() => setShowUnstableHelp(false)}
                             className="absolute top-4 right-4 text-slate-400 hover:text-white"
+                            aria-label="Close unstable signal help"
                         >
                             <X size={20} />
                         </button>
