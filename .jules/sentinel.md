@@ -75,8 +75,3 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
-
-## 2024-03-20 - [Stored XSS in Optional Enum/String Fields via SQLAlchemy Model Instantiation]
-**Vulnerability:** Found a Stored XSS vulnerability in the `/flag-content` endpoint where optional string and enum-like fields (`content_type`, `reason`) were directly read from the JSON request body and passed into the `ModerationFlag` SQLAlchemy model constructor without sanitization.
-**Learning:** Even simple enum-like fields or optional descriptive text fields can be injected with malicious scripts. Developers often only sanitize the "main" content blocks (like a full story or comment) but overlook smaller metadata fields when creating database models from user-supplied data.
-**Prevention:** Explicitly sanitize all optional string inputs (even simple enum/description fields) using `sanitize_html(raw_value) if raw_value else None` before insertion into SQLAlchemy models to prevent malicious script storage.
