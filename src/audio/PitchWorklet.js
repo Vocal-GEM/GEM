@@ -48,12 +48,14 @@ class PitchProcessor extends AudioWorkletProcessor {
 
             // Process when buffer is full
             if (this.bufferIndex >= this.bufferSize) {
-                const startTime = currentTime;
+                const now = typeof globalThis.currentTime !== 'undefined' ? globalThis.currentTime : Date.now() / 1000;
+                const startTime = now;
 
                 // Detect pitch using YIN algorithm
                 const result = this.detectPitchYIN(this.buffer);
 
-                const processingTime = (currentTime - startTime) * 1000; // Convert to ms
+                const afterProcessingNow = typeof globalThis.currentTime !== 'undefined' ? globalThis.currentTime : Date.now() / 1000;
+                const processingTime = (afterProcessingNow - startTime) * 1000; // Convert to ms
                 this.totalProcessTime += processingTime;
                 this.processCount++;
 
@@ -62,7 +64,7 @@ class PitchProcessor extends AudioWorkletProcessor {
                     type: 'pitch',
                     pitch: result.pitch,
                     confidence: result.confidence,
-                    timestamp: currentTime,
+                    timestamp: afterProcessingNow,
                     latency: processingTime,
                     avgLatency: this.totalProcessTime / this.processCount
                 });
