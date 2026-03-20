@@ -55,18 +55,11 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const width = canvas.width;
         const height = canvas.height;
         const scrollSpeed = 2; // px per frame
-
-        // Optimization: Use alpha: false for better performance
-        const ctx = canvas.getContext('2d', { alpha: false });
+        const spectrum = dataRef.current.spectrum;
 
         // Optimization: Use alpha: false for better performance
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
-
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
-        const spectrum = dataRef.current.spectrum;
 
         // Ensure buffers are ready and match height
         if (!imgDataRef.current || imgDataRef.current.height !== height) {
@@ -85,6 +78,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         // 1. Shift existing content to left
         // Optimization: Draw canvas onto itself instead of using an offscreen temp canvas.
+        // This is much faster on GPU-accelerated contexts.
         ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
 
         // 2. Draw new column
@@ -93,15 +87,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         for (let y = 0; y < height; y++) {
             // Map y (0 at top, height at bottom) to frequency
-        // Copy the current canvas (from x=scrollSpeed to the end) to x=0
-        // This is much faster on GPU-accelerated contexts.
-        ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
-
-        // 2. Draw new column
-        // Optimized: Reuse pre-allocated TypedArray
-        const maxBin = Math.floor(spectrum.length / 3);
-
-        for (let y = 0; y < height; y++) {
             const freqRatio = (height - 1 - y) / height;
             const binIndex = Math.floor(freqRatio * maxBin);
             const val = spectrum[binIndex] || 0;
