@@ -1,0 +1,19 @@
+
+> vocal-gem@0.1.0 dev
+> vite
+
+
+  VITE v5.4.21  ready in 386 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+6:23:23 AM [vite] page reload verification/dom_content.html
+6:23:27 AM [vite] page reload verification/dom_content2.html
+6:23:54 AM [vite] page reload verification/dom_content3.html
+6:24:39 AM [vite] page reload verification/dom_content4.html
+6:30:59 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+6:36:03 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+6:41:47 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+6:43:21 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+6:49:43 AM [vite] page reload src/audio/PitchWorklet.js
