@@ -122,14 +122,16 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             // Reusable objects to reduce GC
             if (!canvas.imageDataRef) {
                 canvas.imageDataRef = ctx.createImageData(speed, h);
+                canvas.data32Ref = new Uint32Array(canvas.imageDataRef.data.buffer);
             }
             // Ensure size match
             if (canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
                 canvas.imageDataRef = ctx.createImageData(speed, h);
+                canvas.data32Ref = new Uint32Array(canvas.imageDataRef.data.buffer);
             }
 
             const imageData = canvas.imageDataRef;
-            const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
+            const data32 = canvas.data32Ref; // View as 32-bit integers (ABGR)
 
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
             // We map pixels (y) to frequency bins.

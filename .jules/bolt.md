@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - TypedArray View GC Thrashing in Canvas Rendering
+**Learning:** Re-creating TypedArray views (e.g., `new Uint32Array(imageData.data.buffer)`) on every frame in high-frequency visualization loops like `Spectrogram.jsx` causes significant CPU overhead and garbage collection pauses. Even though the underlying buffer (`imageData.data.buffer`) is reused, the constructor for the view itself must allocate a new wrapper object each time.
+**Action:** When working with canvas `ImageData` and TypedArrays in animation loops, always cache the TypedArray view on the canvas or via a `useRef` and re-create it only when the canvas is resized.
