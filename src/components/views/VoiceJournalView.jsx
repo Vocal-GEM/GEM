@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Mic, Square, Play, Pause, Trash2, Calendar, Clock, Music, Plus, X, Tag, FileText, Search, Filter, TrendingUp, ChevronDown } from 'lucide-react';
 import LoadingSpinner from '../ui/LoadingSpinner';
+import Toast from '../ui/Toast';
 import { getRecordings, saveRecording, deleteRecording, updateRecording } from '../../services/VoiceJournalService';
 import { recordPractice } from '../../services/StreakService';
 import { JOURNAL_TEMPLATES, getTemplateById, formatTemplateAsEntry } from '../../data/journalTemplates';
@@ -208,6 +209,7 @@ const VoiceJournalView = () => {
     const [currentBlob, setCurrentBlob] = useState(null);
     const [recordingTime, setRecordingTime] = useState(0);
     const [selectedTags, setSelectedTags] = useState([]);
+    const [toastMsg, setToastMsg] = useState('');
 
     // Search and Filter State
     const [searchQuery, setSearchQuery] = useState('');
@@ -314,7 +316,7 @@ const VoiceJournalView = () => {
             }, 1000);
         } catch (err) {
             console.error('Failed to start recording:', err);
-            alert('Could not access microphone. Please check permissions.');
+            setToastMsg('Could not access microphone. Please check permissions.');
         }
     };
 
@@ -394,6 +396,7 @@ const VoiceJournalView = () => {
 
     return (
         <div className="max-w-4xl mx-auto pb-20">
+            {toastMsg && <Toast message={toastMsg} type="error" onClose={() => setToastMsg('')} />}
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div>

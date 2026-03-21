@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-03-21 - Replacing Native Alerts
+**Learning:** When refactoring components to replace native `window.alert()` with custom state-driven UI elements (like `<Toast />`), verify that the custom component is explicitly rendered within the component's JSX `return` block. Failing to mount the component after setting up its state hook will cause error messages to fail silently.
+**Action:** Always visually review the JSX `return` block of the target component to ensure the `<Toast />` component is mounted.

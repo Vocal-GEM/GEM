@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Book, FileText, TrendingUp, Calendar, Clock, Activity, BarChart2, Mic, Settings, X, Share2 } from 'lucide-react';
+import Toast from './Toast';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
 import ProgressCard from './ProgressCard';
@@ -45,6 +46,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
     const [activeTab, setActiveTab] = useState('overview'); // overview, sessions, journals, recordings
     const [cardFilter, setCardFilter] = useState(null); // Filter sessions by card set
     const [showProgressCard, setShowProgressCard] = useState(false);
+    const [toastMsg, setToastMsg] = useState('');
 
     useEffect(() => {
         const loadSessions = async () => {
@@ -158,7 +160,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
             doc.save(`voice-therapy-report-${new Date().toISOString().split('T')[0]}.pdf`);
         } catch (error) {
             console.error('Error generating report:', error);
-            alert('Failed to generate report.');
+            setToastMsg('Failed to generate report.');
         } finally {
             setIsGenerating(false);
         }
@@ -216,6 +218,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-24">
+            {toastMsg && <Toast message={toastMsg} type="error" onClose={() => setToastMsg('')} />}
             {/* Header / Tabs */}
             <div id="history-tabs" className="flex gap-2 mb-6 overflow-x-auto pb-2" role="tablist" aria-label="History Views">
                 <button
