@@ -1,7 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, memo } from 'react';
 import { Activity, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
-const ContourVisualizer = ({ dataRef }) => {
+// ⚡ Bolt: Wrapped ContourVisualizer in React.memo()
+// 💡 What: Prevents unnecessary component re-renders when parent state changes.
+// 🎯 Why: This component manages a high-frequency animation loop via RenderCoordinator (often 60fps) to draw pitch contours onto an HTML canvas.
+//         Re-rendering the React component interrupts the internal animation loop and can cause micro-stutters and increased garbage collection.
+// 📊 Impact: Smoother animation rendering and reduced main thread blocking during playback when parent components re-render.
+const ContourVisualizer = memo(({ dataRef }) => {
     const canvasRef = useRef(null);
     const [metrics, setMetrics] = useState({
         contour: 0,
@@ -200,6 +205,8 @@ const ContourVisualizer = ({ dataRef }) => {
             </div>
         </div>
     );
-};
+});
+
+ContourVisualizer.displayName = 'ContourVisualizer';
 
 export default ContourVisualizer;
