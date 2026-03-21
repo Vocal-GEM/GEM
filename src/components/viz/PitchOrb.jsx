@@ -54,12 +54,17 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         updateSize();
 
-        const resizeObserver = new ResizeObserver(() => {
-            requestAnimationFrame(updateSize);
-        });
-        if (canvas) {
-            resizeObserver.observe(canvas);
+
+        let resizeObserver = null;
+        if (typeof ResizeObserver !== 'undefined') {
+            resizeObserver = new ResizeObserver(() => {
+                requestAnimationFrame(updateSize);
+            });
+            if (canvas) {
+                resizeObserver.observe(canvas);
+            }
         }
+
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -189,10 +194,14 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             renderCoordinator.PRIORITY.CRITICAL
         );
 
+
         return () => {
             unsubscribe();
-            resizeObserver.disconnect();
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+            }
         };
+
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
     return (
