@@ -34,6 +34,38 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
 
+
+        let currentWidth = 0;
+        let currentHeight = 0;
+
+        // ⚡ Bolt Optimization: Avoid synchronous layout thrashing in high-frequency render loop
+        // by tracking dimensions asynchronously with ResizeObserver instead of getBoundingClientRect()
+        const updateSize = () => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            if (rect.width !== currentWidth || rect.height !== currentHeight) {
+                currentWidth = rect.width;
+                currentHeight = rect.height;
+                canvas.width = currentWidth * dpr;
+                canvas.height = currentHeight * dpr;
+                ctx.scale(dpr, dpr);
+            }
+        };
+
+        updateSize();
+
+
+        let resizeObserver = null;
+        if (typeof ResizeObserver !== 'undefined') {
+            resizeObserver = new ResizeObserver(() => {
+                requestAnimationFrame(updateSize);
+            });
+            if (canvas) {
+                resizeObserver.observe(canvas);
+            }
+        }
+
+
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
             if (pitch >= genderRanges.feminine.min) {
@@ -64,18 +96,16 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+
         const loop = () => {
-            if (!canvas) return; // Guard against cleanup
+            // ⚡ Bolt Optimization: Use cached dimensions, avoiding getBoundingClientRect() completely
+            if (!canvas || currentWidth === 0 || currentHeight === 0) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            const width = currentWidth;
+            const height = currentHeight;
             const centerX = width / 2;
             const centerY = height / 2;
+
 
             ctx.clearRect(0, 0, width, height);
 
@@ -164,9 +194,14 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             renderCoordinator.PRIORITY.CRITICAL
         );
 
+
         return () => {
             unsubscribe();
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+            }
         };
+
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
     return (

@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - Layout Thrashing in High-Frequency Canvas Render Loops
+**Learning:** Calling `canvas.getBoundingClientRect()` inside a render loop tied to `requestAnimationFrame` (e.g., via `RenderCoordinator` at 60 FPS) forces the browser to recalculate synchronous layout on every frame. In `PitchOrb.jsx`, this caused severe layout thrashing and unnecessary CPU overhead.
+**Action:** Replace synchronous dimension queries in high-frequency loops with asynchronous tracking using `ResizeObserver`. Cache the physical canvas dimensions in variables or refs, update them only when the observer fires, and use these cached values directly inside the loop.
