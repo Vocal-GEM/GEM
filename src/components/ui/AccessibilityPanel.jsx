@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { Eye, Type, Zap, Volume2, Minus, Plus, RotateCcw } from 'lucide-react';
 import {
     getAccessibilitySettings,
-    saveAccessibilitySettings,
-    DEFAULT_SETTINGS
+    saveAccessibilitySettings
 } from '../../services/AccessibilityService';
+import AccessibilityService from '../../services/AccessibilityService';
+
+const { DEFAULT_SETTINGS } = AccessibilityService;
 
 const AccessibilityPanel = () => {
     const [settings, setSettings] = useState(getAccessibilitySettings());
@@ -62,6 +64,7 @@ const AccessibilityPanel = () => {
                 <button
                     onClick={resetSettings}
                     className="text-sm text-slate-400 hover:text-white flex items-center gap-1"
+                    aria-label="Reset accessibility settings"
                 >
                     <RotateCcw size={14} /> Reset
                 </button>
@@ -85,6 +88,9 @@ const AccessibilityPanel = () => {
                             onClick={() => toggleSetting(option.id)}
                             className={`w-12 h-6 rounded-full transition-colors relative ${settings[option.id] ? 'bg-blue-600' : 'bg-slate-600'
                                 }`}
+                            role="switch"
+                            aria-checked={settings[option.id]}
+                            aria-label={`Toggle ${option.label}`}
                         >
                             <div
                                 className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${settings[option.id] ? 'translate-x-7' : 'translate-x-1'
@@ -109,6 +115,7 @@ const AccessibilityPanel = () => {
                     <button
                         onClick={() => adjustFontSize(-10)}
                         className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white"
+                        aria-label="Decrease font size"
                     >
                         <Minus size={16} />
                     </button>
@@ -123,6 +130,7 @@ const AccessibilityPanel = () => {
                     <button
                         onClick={() => adjustFontSize(10)}
                         className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white"
+                        aria-label="Increase font size"
                     >
                         <Plus size={16} />
                     </button>
