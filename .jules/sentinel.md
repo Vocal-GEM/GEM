@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-03-21 - [PII Retention via Incorrect Finally Block]
+**Vulnerability:** Raw, un-anonymized user audio files (PII) were potentially being permanently retained on the server disk if the anonymization process threw an exception or if the server crashed.
+**Learning:** `file.save()` was placed *after* the `try...finally` block that was supposed to clean it up, or placed *inside* the `finally` block alongside deletion logic. Because it was not safely written to disk *before* entering the `try` block protecting the anonymization process, a failure during processing meant the file would skip deletion but still potentially be saved later in the block.
+**Prevention:** Always write temporary files to disk *before* initiating the `try...finally` block that manages their processing and eventual secure deletion.
