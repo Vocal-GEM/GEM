@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## $(date +%Y-%m-%d) - Prevent Leaking Exception Stack Traces and Messages to Client
+**Vulnerability:** Endpoints handling audio processing (`clean_audio`, `manipulate_file`) were returning `jsonify({'error': str(e)}), 500` inside `except` blocks, exposing raw internal backend exception messages. In addition, nested `except` blocks for temporary file cleanup were incorrectly indented/syntaxed causing the process to crash entirely or leave temporary audio files hanging.
+**Learning:** `str(e)` on unhandled exceptions can leak internal component states, paths, or dependencies used by processing libraries like librosa/soundfile. Furthermore, blindly catching exceptions to delete files without the correct indentation crashed python entirely.
+**Prevention:** Never expose `str(e)` or raw internal errors directly to the client API response on a 500 status. Log the actual exception serverside with `logger.error` or `print`, and return a sanitized, generic error string to the client. Ensure robust file cleanup occurs within `finally` blocks rather than just `except`, checking `os.path.exists` securely.
