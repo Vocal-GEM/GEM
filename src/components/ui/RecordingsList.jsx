@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { Play, Pause, Trash2, Download, Edit2, Check, X, Mic, Calendar, Clock, Loader2 } from 'lucide-react';
 import { indexedDB } from '../../services/IndexedDBManager';
 
+// ⚡ Bolt: Wrap RecordingsList in memo to prevent unnecessary list re-renders when parent state changes
 const RecordingsList = () => {
     const [recordings, setRecordings] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -222,4 +223,4 @@ const RecordingsList = () => {
     );
 };
 
-export default RecordingsList;
+export default memo(RecordingsList);
