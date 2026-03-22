@@ -102,7 +102,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
             <div className={`fixed inset-x-0 bottom-0 z-50 bg-slate-900 rounded-t-3xl border-t border-white/10 shadow-2xl transition-transform duration-300 transform ${isOpen ? 'translate-y-0' : 'translate-y-full'} max-h-[85vh] overflow-y-auto`}>
                 <div className="sticky top-0 bg-slate-900/95 backdrop-blur-md p-4 border-b border-white/5 flex justify-between items-center z-10">
                     <h2 className="text-lg font-bold text-white">Settings</h2>
-                    <button onClick={onClose} className="p-3 bg-slate-800 rounded-full text-slate-400 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
+                    <button onClick={onClose} className="p-3 bg-slate-800 rounded-full text-slate-400 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Close Settings"><X className="w-5 h-5" /></button>
                 </div>
 
                 <div className="p-6 space-y-8 pb-20">
