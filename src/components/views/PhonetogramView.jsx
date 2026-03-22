@@ -5,6 +5,7 @@ import Toast from '../ui/Toast';
 import { useAudio } from '../../context/AudioContext';
 import { phonetogramService } from '../../services/PhonetogramService';
 import PhonetogramChart from '../viz/PhonetogramChart';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const PhonetogramView = () => {
     const { t } = useTranslation();
@@ -12,7 +13,6 @@ const PhonetogramView = () => {
     const [isRecording, setIsRecording] = useState(false);
     const [profileData, setProfileData] = useState([]);
     const [toast, setToast] = useState(null);
-    const requestRef = useRef();
 
     // Update loop
     const update = () => {
@@ -37,12 +37,13 @@ const PhonetogramView = () => {
                 }
             }
         }
-        requestRef.current = requestAnimationFrame(update);
     };
 
     useEffect(() => {
-        requestRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(requestRef.current);
+        // ⚡ Bolt: Centralize RAF loop using RenderCoordinator to reduce CPU overhead
+        const id = `phonetogram-${Math.random().toString(36).substr(2, 9)}`;
+        const unsubscribe = renderCoordinator.subscribe(id, update, renderCoordinator.PRIORITY.MEDIUM);
+        return () => unsubscribe();
     }, [isRecording]);
 
     const handleToggleRecording = async () => {

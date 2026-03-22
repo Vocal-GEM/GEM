@@ -7,6 +7,7 @@ import { useAudio } from '../../context/AudioContext';
 import { useProfile } from '../../context/ProfileContext';
 import { ProgressiveStackingService } from '../../services/ProgressiveStackingService';
 import { LAYER_STATUS } from '../../data/StackingLayers';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 // Icon mapping for layers
 const LAYER_ICONS = {
@@ -112,7 +113,6 @@ const ProgressiveStackingSession = ({ onClose }) => {
     const [celebrationLayer, setCelebrationLayer] = useState(null);
 
     const serviceRef = useRef(null);
-    const animationRef = useRef(null);
 
     // Initialize service
     useEffect(() => {
@@ -139,12 +139,6 @@ const ProgressiveStackingSession = ({ onClose }) => {
             }
         });
         setSessionState(serviceRef.current.startSession());
-
-        return () => {
-            if (animationRef.current) {
-                cancelAnimationFrame(animationRef.current);
-            }
-        };
     }, []);
 
     // Animation loop
@@ -159,15 +153,14 @@ const ProgressiveStackingSession = ({ onClose }) => {
                 const newState = serviceRef.current.processAudioData(dataRef.current, targets);
                 setSessionState(newState);
             }
-            animationRef.current = requestAnimationFrame(loop);
         };
 
-        loop();
+        // ⚡ Bolt: Centralize RAF loop using RenderCoordinator to reduce CPU overhead
+        const id = `progressiveStacking-${Math.random().toString(36).substr(2, 9)}`;
+        const unsubscribe = renderCoordinator.subscribe(id, loop, renderCoordinator.PRIORITY.HIGH);
 
         return () => {
-            if (animationRef.current) {
-                cancelAnimationFrame(animationRef.current);
-            }
+            unsubscribe();
         };
     }, [isPlaying, targetRange, dataRef]);
 

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Gauge, Sliders } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const MixingBoardView = ({ dataRef, calibration, compact = false, viewMode: propViewMode }) => {
     const [internalViewMode, setInternalViewMode] = useState('sliders'); // 'sliders' or 'gauges'
@@ -97,12 +98,13 @@ const MixingBoardView = ({ dataRef, calibration, compact = false, viewMode: prop
                     }
                 }
             });
-
-            requestAnimationFrame(loop);
         };
 
-        const id = requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(id);
+        // ⚡ Bolt: Centralize RAF loop using RenderCoordinator to reduce CPU overhead
+        // Generate unique ID in case of multiple instances
+        const id = `mixingBoard-${Math.random().toString(36).substr(2, 9)}`;
+        const unsubscribe = renderCoordinator.subscribe(id, loop, renderCoordinator.PRIORITY.HIGH);
+        return () => unsubscribe();
     }, [dataRef, calibration, viewMode]);
 
 
