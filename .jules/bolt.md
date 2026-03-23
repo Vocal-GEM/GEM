@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Canvas Dimension Caching in Animation Loops
+**Learning:** `getBoundingClientRect()` causes severe synchronous layout thrashing when called on every frame inside a `requestAnimationFrame` loop. I found this issue in `PitchOrb.jsx`.
+**Action:** To optimize performance, wrap the canvas element with a `ResizeObserver`, update a cached dimensions object in a `useRef`, and only read from that `useRef` during the render loop. Also, guard canvas mock functions (like `setTransform`) during testing.

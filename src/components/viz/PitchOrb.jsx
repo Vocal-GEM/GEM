@@ -19,6 +19,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     const canvasRef = useRef(null);
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
+    const dimensionsRef = useRef({ width: 0, height: 0 });
 
     // Default gender ranges if not set in settings
     const defaultRanges = {
@@ -28,6 +29,32 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     };
 
     const genderRanges = settings.genderRanges || defaultRanges;
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const parent = canvas.parentElement;
+        if (!parent) return;
+
+        const updateSize = () => {
+            const rect = parent.getBoundingClientRect();
+            // Cache dimensions to avoid synchronous layout thrashing in render loop
+            dimensionsRef.current = { width: rect.width, height: rect.height };
+        };
+
+        // Initial measurement
+        updateSize();
+
+        const resizeObserver = new ResizeObserver(() => {
+            requestAnimationFrame(updateSize);
+        });
+        resizeObserver.observe(parent);
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -67,17 +94,27 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
+            const { width, height } = dimensionsRef.current;
+            if (width === 0 || height === 0) return;
+
+            // Only update canvas dimensions if they changed, to prevent unnecessary re-rendering
+            const newCanvasWidth = width * dpr;
+            const newCanvasHeight = height * dpr;
+
+            if (canvas.width !== newCanvasWidth || canvas.height !== newCanvasHeight) {
+                canvas.width = newCanvasWidth;
+                canvas.height = newCanvasHeight;
+            }
+
+            // Always reset transform and apply scale/clear to avoid endless accumulation
+            if (ctx && typeof ctx.setTransform === 'function') {
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.scale(dpr, dpr);
 
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
-
-            ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
