@@ -1,0 +1,143 @@
+2026-03-23T06:45:49.867Z eslint:cli CLI args: [ 'src/components/viz/QualityVisualizer.jsx', '--debug' ]
+2026-03-23T06:45:49.868Z eslint:cli Using flat config? false
+2026-03-23T06:45:49.873Z eslint:cli Running on files
+2026-03-23T06:45:49.893Z eslintrc:config-array-factory Loading .eslintignore file: /app/.eslintignore
+2026-03-23T06:45:49.894Z eslintrc:ignore-pattern Create with: [ IgnorePattern { patterns: [ '/**/node_modules/*' ], basePath: '/app', loose: false } ]
+2026-03-23T06:45:49.895Z eslintrc:ignore-pattern   processed: { basePath: '/app', patterns: [ '/**/node_modules/*' ] }
+2026-03-23T06:45:49.896Z eslintrc:ignore-pattern Create with: [ IgnorePattern { patterns: [ '/**/node_modules/*' ], basePath: '/app', loose: false } ]
+2026-03-23T06:45:49.897Z eslintrc:ignore-pattern   processed: { basePath: '/app', patterns: [ '/**/node_modules/*' ] }
+2026-03-23T06:45:49.897Z eslint:file-enumerator Start to iterate files: [ 'src/components/viz/QualityVisualizer.jsx' ]
+2026-03-23T06:45:49.898Z eslint:file-enumerator File: /app/src/components/viz/QualityVisualizer.jsx
+2026-03-23T06:45:49.898Z eslintrc:cascading-config-array-factory Load config files for /app/src/components/viz.
+2026-03-23T06:45:49.899Z eslintrc:cascading-config-array-factory No cache found: /app/src/components/viz.
+2026-03-23T06:45:49.899Z eslintrc:config-array-factory Config file not found on /app/src/components/viz
+2026-03-23T06:45:49.899Z eslintrc:cascading-config-array-factory No cache found: /app/src/components.
+2026-03-23T06:45:49.899Z eslintrc:config-array-factory Config file not found on /app/src/components
+2026-03-23T06:45:49.899Z eslintrc:cascading-config-array-factory No cache found: /app/src.
+2026-03-23T06:45:49.899Z eslintrc:config-array-factory Config file not found on /app/src
+2026-03-23T06:45:49.899Z eslintrc:cascading-config-array-factory No cache found: /app.
+2026-03-23T06:45:49.899Z eslintrc:config-array-factory Loading JS config file: /app/.eslintrc.cjs
+2026-03-23T06:45:49.900Z eslintrc:config-array-factory Config file found: /app/.eslintrc.cjs
+2026-03-23T06:45:49.900Z eslintrc:config-array-factory Loading {extends:"eslint:recommended"} relative to /app/.eslintrc.cjs
+2026-03-23T06:45:49.901Z eslintrc:config-array-factory Loading {extends:"plugin:react/recommended"} relative to /app/.eslintrc.cjs
+2026-03-23T06:45:49.901Z eslintrc:config-array-factory Loading plugin "react" from /app/.eslintrc.cjs
+2026-03-23T06:45:49.902Z eslintrc:config-array-factory Loaded: eslint-plugin-react@7.37.5 (/app/node_modules/eslint-plugin-react/index.js)
+2026-03-23T06:45:50.121Z eslintrc:config-array-factory Plugin /app/node_modules/eslint-plugin-react/index.js loaded in: 219ms
+2026-03-23T06:45:50.122Z eslintrc:config-array-factory Loading plugin "react" from /app/node_modules/eslint-plugin-react/index.js
+2026-03-23T06:45:50.122Z eslintrc:config-array-factory Loaded: eslint-plugin-react@7.37.5 (/app/node_modules/eslint-plugin-react/index.js)
+2026-03-23T06:45:50.122Z eslintrc:config-array-factory Plugin /app/node_modules/eslint-plugin-react/index.js loaded in: 0ms
+2026-03-23T06:45:50.122Z eslintrc:config-array-factory Loading {extends:"plugin:react/jsx-runtime"} relative to /app/.eslintrc.cjs
+2026-03-23T06:45:50.122Z eslintrc:config-array-factory Loading plugin "react" from /app/.eslintrc.cjs
+2026-03-23T06:45:50.123Z eslintrc:config-array-factory Loaded: eslint-plugin-react@7.37.5 (/app/node_modules/eslint-plugin-react/index.js)
+2026-03-23T06:45:50.123Z eslintrc:config-array-factory Plugin /app/node_modules/eslint-plugin-react/index.js loaded in: 0ms
+2026-03-23T06:45:50.123Z eslintrc:config-array-factory Loading plugin "react" from /app/node_modules/eslint-plugin-react/index.js
+2026-03-23T06:45:50.123Z eslintrc:config-array-factory Loaded: eslint-plugin-react@7.37.5 (/app/node_modules/eslint-plugin-react/index.js)
+2026-03-23T06:45:50.123Z eslintrc:config-array-factory Plugin /app/node_modules/eslint-plugin-react/index.js loaded in: 0ms
+2026-03-23T06:45:50.123Z eslintrc:config-array-factory Loading {extends:"plugin:react-hooks/recommended"} relative to /app/.eslintrc.cjs
+2026-03-23T06:45:50.123Z eslintrc:config-array-factory Loading plugin "react-hooks" from /app/.eslintrc.cjs
+2026-03-23T06:45:50.123Z eslintrc:config-array-factory Loaded: eslint-plugin-react-hooks@4.6.2 (/app/node_modules/eslint-plugin-react-hooks/index.js)
+2026-03-23T06:45:50.126Z eslintrc:config-array-factory Plugin /app/node_modules/eslint-plugin-react-hooks/index.js loaded in: 2ms
+2026-03-23T06:45:50.126Z eslintrc:config-array-factory Loading plugin "react-hooks" from /app/node_modules/eslint-plugin-react-hooks/index.js
+2026-03-23T06:45:50.126Z eslintrc:config-array-factory Loaded: eslint-plugin-react-hooks@4.6.2 (/app/node_modules/eslint-plugin-react-hooks/index.js)
+2026-03-23T06:45:50.126Z eslintrc:config-array-factory Plugin /app/node_modules/eslint-plugin-react-hooks/index.js loaded in: 0ms
+2026-03-23T06:45:50.126Z eslintrc:config-array-factory Loading plugin "react-refresh" from /app/.eslintrc.cjs
+2026-03-23T06:45:50.126Z eslintrc:config-array-factory Loaded: eslint-plugin-react-refresh@0.4.24 (/app/node_modules/eslint-plugin-react-refresh/index.js)
+2026-03-23T06:45:50.127Z eslintrc:config-array-factory Plugin /app/node_modules/eslint-plugin-react-refresh/index.js loaded in: 1ms
+2026-03-23T06:45:50.128Z eslintrc:cascading-config-array-factory Stop traversing because of 'root:true'.
+2026-03-23T06:45:50.131Z eslint:rules Loading rule 'constructor-super' (remaining=290)
+2026-03-23T06:45:50.132Z eslint:rules Loading rule 'for-direction' (remaining=289)
+2026-03-23T06:45:50.133Z eslint:rules Loading rule 'getter-return' (remaining=288)
+2026-03-23T06:45:50.136Z eslint:rules Loading rule 'no-async-promise-executor' (remaining=287)
+2026-03-23T06:45:50.137Z eslint:rules Loading rule 'no-case-declarations' (remaining=286)
+2026-03-23T06:45:50.137Z eslint:rules Loading rule 'no-class-assign' (remaining=285)
+2026-03-23T06:45:50.137Z eslint:rules Loading rule 'no-compare-neg-zero' (remaining=284)
+2026-03-23T06:45:50.138Z eslint:rules Loading rule 'no-cond-assign' (remaining=283)
+2026-03-23T06:45:50.139Z eslint:rules Loading rule 'no-const-assign' (remaining=282)
+2026-03-23T06:45:50.139Z eslint:rules Loading rule 'no-constant-condition' (remaining=281)
+2026-03-23T06:45:50.141Z eslint:rules Loading rule 'no-control-regex' (remaining=280)
+2026-03-23T06:45:50.145Z eslint:rules Loading rule 'no-debugger' (remaining=279)
+2026-03-23T06:45:50.145Z eslint:rules Loading rule 'no-delete-var' (remaining=278)
+2026-03-23T06:45:50.146Z eslint:rules Loading rule 'no-dupe-args' (remaining=277)
+2026-03-23T06:45:50.146Z eslint:rules Loading rule 'no-dupe-class-members' (remaining=276)
+2026-03-23T06:45:50.146Z eslint:rules Loading rule 'no-dupe-else-if' (remaining=275)
+2026-03-23T06:45:50.147Z eslint:rules Loading rule 'no-dupe-keys' (remaining=274)
+2026-03-23T06:45:50.147Z eslint:rules Loading rule 'no-duplicate-case' (remaining=273)
+2026-03-23T06:45:50.148Z eslint:rules Loading rule 'no-empty' (remaining=272)
+2026-03-23T06:45:50.149Z eslint:rules Loading rule 'no-empty-character-class' (remaining=271)
+2026-03-23T06:45:50.150Z eslint:rules Loading rule 'no-empty-pattern' (remaining=270)
+2026-03-23T06:45:50.151Z eslint:rules Loading rule 'no-ex-assign' (remaining=269)
+2026-03-23T06:45:50.152Z eslint:rules Loading rule 'no-extra-boolean-cast' (remaining=268)
+2026-03-23T06:45:50.153Z eslint:rules Loading rule 'no-extra-semi' (remaining=267)
+2026-03-23T06:45:50.154Z eslint:rules Loading rule 'no-fallthrough' (remaining=266)
+2026-03-23T06:45:50.155Z eslint:rules Loading rule 'no-func-assign' (remaining=265)
+2026-03-23T06:45:50.156Z eslint:rules Loading rule 'no-global-assign' (remaining=264)
+2026-03-23T06:45:50.157Z eslint:rules Loading rule 'no-import-assign' (remaining=263)
+2026-03-23T06:45:50.158Z eslint:rules Loading rule 'no-inner-declarations' (remaining=262)
+2026-03-23T06:45:50.159Z eslint:rules Loading rule 'no-invalid-regexp' (remaining=261)
+2026-03-23T06:45:50.160Z eslint:rules Loading rule 'no-irregular-whitespace' (remaining=260)
+2026-03-23T06:45:50.162Z eslint:rules Loading rule 'no-loss-of-precision' (remaining=259)
+2026-03-23T06:45:50.162Z eslint:rules Loading rule 'no-misleading-character-class' (remaining=258)
+2026-03-23T06:45:50.165Z eslint:rules Loading rule 'no-mixed-spaces-and-tabs' (remaining=257)
+2026-03-23T06:45:50.166Z eslint:rules Loading rule 'no-new-symbol' (remaining=256)
+2026-03-23T06:45:50.166Z eslint:rules Loading rule 'no-nonoctal-decimal-escape' (remaining=255)
+2026-03-23T06:45:50.167Z eslint:rules Loading rule 'no-obj-calls' (remaining=254)
+2026-03-23T06:45:50.167Z eslint:rules Loading rule 'no-octal' (remaining=253)
+2026-03-23T06:45:50.168Z eslint:rules Loading rule 'no-prototype-builtins' (remaining=252)
+2026-03-23T06:45:50.168Z eslint:rules Loading rule 'no-redeclare' (remaining=251)
+2026-03-23T06:45:50.169Z eslint:rules Loading rule 'no-regex-spaces' (remaining=250)
+2026-03-23T06:45:50.170Z eslint:rules Loading rule 'no-self-assign' (remaining=249)
+2026-03-23T06:45:50.171Z eslint:rules Loading rule 'no-setter-return' (remaining=248)
+2026-03-23T06:45:50.172Z eslint:rules Loading rule 'no-shadow-restricted-names' (remaining=247)
+2026-03-23T06:45:50.172Z eslint:rules Loading rule 'no-sparse-arrays' (remaining=246)
+2026-03-23T06:45:50.172Z eslint:rules Loading rule 'no-this-before-super' (remaining=245)
+2026-03-23T06:45:50.173Z eslint:rules Loading rule 'no-undef' (remaining=244)
+2026-03-23T06:45:50.174Z eslint:rules Loading rule 'no-unexpected-multiline' (remaining=243)
+2026-03-23T06:45:50.174Z eslint:rules Loading rule 'no-unreachable' (remaining=242)
+2026-03-23T06:45:50.175Z eslint:rules Loading rule 'no-unsafe-finally' (remaining=241)
+2026-03-23T06:45:50.175Z eslint:rules Loading rule 'no-unsafe-negation' (remaining=240)
+2026-03-23T06:45:50.176Z eslint:rules Loading rule 'no-unsafe-optional-chaining' (remaining=239)
+2026-03-23T06:45:50.177Z eslint:rules Loading rule 'no-unused-labels' (remaining=238)
+2026-03-23T06:45:50.178Z eslint:rules Loading rule 'no-unused-vars' (remaining=237)
+2026-03-23T06:45:50.180Z eslint:rules Loading rule 'no-useless-backreference' (remaining=236)
+2026-03-23T06:45:50.181Z eslint:rules Loading rule 'no-useless-catch' (remaining=235)
+2026-03-23T06:45:50.181Z eslint:rules Loading rule 'no-useless-escape' (remaining=234)
+2026-03-23T06:45:50.183Z eslint:rules Loading rule 'no-with' (remaining=233)
+2026-03-23T06:45:50.183Z eslint:rules Loading rule 'require-yield' (remaining=232)
+2026-03-23T06:45:50.183Z eslint:rules Loading rule 'use-isnan' (remaining=231)
+2026-03-23T06:45:50.184Z eslint:rules Loading rule 'valid-typeof' (remaining=230)
+2026-03-23T06:45:50.199Z eslintrc:cascading-config-array-factory Configuration was determined: ConfigArray(7) [ { type: 'config', name: 'DefaultIgnorePattern', filePath: '', criteria: null, env: undefined, globals: undefined, ignorePattern: IgnorePattern { patterns: [Array], basePath: '/app', loose: false }, noInlineConfig: undefined, parser: undefined, parserOptions: undefined, plugins: undefined, processor: undefined, reportUnusedDisableDirectives: undefined, root: undefined, rules: undefined, settings: undefined }, { type: 'config', name: '.eslintrc.cjs » eslint:recommended', filePath: '', criteria: null, env: undefined, globals: undefined, ignorePattern: undefined, noInlineConfig: undefined, parser: undefined, parserOptions: undefined, plugins: undefined, processor: undefined, reportUnusedDisableDirectives: undefined, root: undefined, rules: { 'constructor-super': 'error', 'for-direction': 'error', 'getter-return': 'error', 'no-async-promise-executor': 'error', 'no-case-declarations': 'error', 'no-class-assign': 'error', 'no-compare-neg-zero': 'error', 'no-cond-assign': 'error', 'no-const-assign': 'error', 'no-constant-condition': 'error', 'no-control-regex': 'error', 'no-debugger': 'error', 'no-delete-var': 'error', 'no-dupe-args': 'error', 'no-dupe-class-members': 'error', 'no-dupe-else-if': 'error', 'no-dupe-keys': 'error', 'no-duplicate-case': 'error', 'no-empty': 'error', 'no-empty-character-class': 'error', 'no-empty-pattern': 'error', 'no-ex-assign': 'error', 'no-extra-boolean-cast': 'error', 'no-extra-semi': 'error', 'no-fallthrough': 'error', 'no-func-assign': 'error', 'no-global-assign': 'error', 'no-import-assign': 'error', 'no-inner-declarations': 'error', 'no-invalid-regexp': 'error', 'no-irregular-whitespace': 'error', 'no-loss-of-precision': 'error', 'no-misleading-character-class': 'error', 'no-mixed-spaces-and-tabs': 'error', 'no-new-symbol': 'error', 'no-nonoctal-decimal-escape': 'error', 'no-obj-calls': 'error', 'no-octal': 'error', 'no-prototype-builtins': 'error', 'no-redeclare': 'error', 'no-regex-spaces': 'error', 'no-self-assign': 'error', 'no-setter-return': 'error', 'no-shadow-restricted-names': 'error', 'no-sparse-arrays': 'error', 'no-this-before-super': 'error', 'no-undef': 'error', 'no-unexpected-multiline': 'error', 'no-unreachable': 'error', 'no-unsafe-finally': 'error', 'no-unsafe-negation': 'error', 'no-unsafe-optional-chaining': 'error', 'no-unused-labels': 'error', 'no-unused-vars': 'error', 'no-useless-backreference': 'error', 'no-useless-catch': 'error', 'no-useless-escape': 'error', 'no-with': 'error', 'require-yield': 'error', 'use-isnan': 'error', 'valid-typeof': 'error' }, settings: undefined }, { type: 'config', name: '.eslintrc.cjs » plugin:react/recommended', filePath: '/app/node_modules/eslint-plugin-react/index.js', criteria: null, env: undefined, globals: undefined, ignorePattern: undefined, noInlineConfig: undefined, parser: undefined, parserOptions: { ecmaFeatures: [Object] }, plugins: { react: [Object] }, processor: undefined, reportUnusedDisableDirectives: undefined, root: undefined, rules: { 'react/display-name': 2, 'react/jsx-key': 2, 'react/jsx-no-comment-textnodes': 2, 'react/jsx-no-duplicate-props': 2, 'react/jsx-no-target-blank': 2, 'react/jsx-no-undef': 2, 'react/jsx-uses-react': 2, 'react/jsx-uses-vars': 2, 'react/no-children-prop': 2, 'react/no-danger-with-children': 2, 'react/no-deprecated': 2, 'react/no-direct-mutation-state': 2, 'react/no-find-dom-node': 2, 'react/no-is-mounted': 2, 'react/no-render-return-value': 2, 'react/no-string-refs': 2, 'react/no-unescaped-entities': 2, 'react/no-unknown-property': 2, 'react/no-unsafe': 0, 'react/prop-types': 2, 'react/react-in-jsx-scope': 2, 'react/require-render-return': 2 }, settings: undefined }, { type: 'config', name: '.eslintrc.cjs » plugin:react/jsx-runtime', filePath: '/app/node_modules/eslint-plugin-react/index.js', criteria: null, env: undefined, globals: undefined, ignorePattern: undefined, noInlineConfig: undefined, parser: undefined, parserOptions: { ecmaFeatures: [Object], jsxPragma: null }, plugins: { react: [Object] }, processor: undefined, reportUnusedDisableDirectives: undefined, root: undefined, rules: { 'react/react-in-jsx-scope': 0, 'react/jsx-uses-react': 0 }, settings: undefined }, { type: 'config', name: '.eslintrc.cjs » plugin:react-hooks/recommended', filePath: '/app/node_modules/eslint-plugin-react-hooks/index.js', criteria: null, env: undefined, globals: undefined, ignorePattern: undefined, noInlineConfig: undefined, parser: undefined, parserOptions: undefined, plugins: { 'react-hooks': [Object] }, processor: undefined, reportUnusedDisableDirectives: undefined, root: undefined, rules: { 'react-hooks/rules-of-hooks': 'error', 'react-hooks/exhaustive-deps': 'warn' }, settings: undefined }, { type: 'config', name: '.eslintrc.cjs', filePath: '/app/.eslintrc.cjs', criteria: null, env: { browser: true, es2020: true }, globals: { __APP_VERSION__: 'readonly' }, ignorePattern: IgnorePattern { patterns: [Array], basePath: '/app', loose: false }, noInlineConfig: undefined, parser: undefined, parserOptions: { ecmaVersion: 'latest', sourceType: 'module' }, plugins: { 'react-refresh': [Object] }, processor: undefined, reportUnusedDisableDirectives: undefined, root: true, rules: { 'react-refresh/only-export-components': [Array], 'react/prop-types': 'off', 'no-unused-vars': [Array] }, settings: { react: [Object] } }, { type: 'ignore', name: '.eslintignore', filePath: '/app/.eslintignore', criteria: null, env: undefined, globals: undefined, ignorePattern: IgnorePattern { patterns: [Array], basePath: '/app', loose: true }, noInlineConfig: undefined, parser: undefined, parserOptions: undefined, plugins: undefined, processor: undefined, reportUnusedDisableDirectives: undefined, root: undefined, rules: undefined, settings: undefined } ] on /app/src/components/viz
+2026-03-23T06:45:50.201Z eslintrc:ignore-pattern Create with: [ IgnorePattern { patterns: [ '/**/node_modules/*' ], basePath: '/app', loose: false }, IgnorePattern { patterns: [ 'dist', '.eslintrc.cjs', 'ios', 'android', 'build', 'public/assets' ], basePath: '/app', loose: false }, IgnorePattern { patterns: [ 'backend/', 'venv/' ], basePath: '/app', loose: true } ]
+2026-03-23T06:45:50.202Z eslintrc:ignore-pattern   processed: { basePath: '/app', patterns: [ '/**/node_modules/*', 'dist', '.eslintrc.cjs', 'ios', 'android', 'build', 'public/assets', 'backend/', 'venv/' ] }
+2026-03-23T06:45:50.204Z eslintrc:ignore-pattern Check {
+  filePath: '/app/src/components/viz/QualityVisualizer.jsx',
+  dot: false,
+  relativePath: 'src/components/viz/QualityVisualizer.jsx',
+  result: false
+}
+2026-03-23T06:45:50.204Z eslint:cli-engine Lint /app/src/components/viz/QualityVisualizer.jsx
+2026-03-23T06:45:50.205Z eslint:linter Linting code for /app/src/components/viz/QualityVisualizer.jsx (pass 1)
+2026-03-23T06:45:50.205Z eslint:linter Verify
+2026-03-23T06:45:50.205Z eslint:linter With ConfigArray: /app/src/components/viz/QualityVisualizer.jsx
+2026-03-23T06:45:50.210Z eslint:linter Parsing: /app/src/components/viz/QualityVisualizer.jsx
+2026-03-23T06:45:50.261Z eslint:linter Parsing error: Unexpected token ;
+SyntaxError: Unexpected token ;
+    at Espree.raise (/app/node_modules/espree/dist/espree.cjs:674:25)
+    at Espree.unexpected (/app/node_modules/espree/dist/espree.cjs:719:18)
+    at pp$9.expect (/app/node_modules/acorn/dist/acorn.js:770:28)
+    at pp$5.parseExprList (/app/node_modules/acorn/dist/acorn.js:3593:14)
+    at pp$5.parseSubscript (/app/node_modules/acorn/dist/acorn.js:2925:27)
+    at pp$5.parseSubscripts (/app/node_modules/acorn/dist/acorn.js:2874:26)
+    at pp$5.parseExprSubscripts (/app/node_modules/acorn/dist/acorn.js:2858:23)
+    at pp$5.parseMaybeUnary (/app/node_modules/acorn/dist/acorn.js:2813:19)
+    at pp$5.parseExprOps (/app/node_modules/acorn/dist/acorn.js:2741:21)
+    at pp$5.parseMaybeConditional (/app/node_modules/acorn/dist/acorn.js:2724:21)
+2026-03-23T06:45:50.261Z eslint:linter Generating fixed text for /app/src/components/viz/QualityVisualizer.jsx (pass 1)
+2026-03-23T06:45:50.261Z eslint:source-code-fixer Applying fixes
+2026-03-23T06:45:50.261Z eslint:source-code-fixer shouldFix parameter was false, not attempting fixes
+2026-03-23T06:45:50.262Z eslint:file-enumerator Complete iterating files: ["src/components/viz/QualityVisualizer.jsx"]
+2026-03-23T06:45:50.262Z eslint:cli-engine Linting complete in: 365ms
+
+/app/src/components/viz/QualityVisualizer.jsx
+  253:2  error  Parsing error: Unexpected token ;
+
+✖ 1 problem (1 error, 0 warnings)
