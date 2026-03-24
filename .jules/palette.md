@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2026-03-24 - Interactive Tooltips
+**Learning:** Tooltips that appear on `onMouseEnter` are completely inaccessible to keyboard users if the trigger element is a generic `<div>` without a `tabindex`.
+**Action:** Always wrap tooltip triggers in a `<button type="button">` with `onFocus` and `onBlur` handlers. Use `useId()` to link the trigger (`aria-describedby`) to the tooltip content container (`role="tooltip"` with the generated `id`).
