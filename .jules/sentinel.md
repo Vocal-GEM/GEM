@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-24 - Information Exposure in Error Responses
+**Vulnerability:** API endpoints (`/api/tts` and `/api/voice-quality`) were exposing raw exception details (`str(e)`) directly to the client when third-party services failed or during internal file processing. This could leak internal architecture details, secrets, or file paths.
+**Learning:** Returning exception strings in JSON responses (e.g., `jsonify({"error": str(e)})`) is a common anti-pattern that bypasses secure error handling.
+**Prevention:** Always log the actual exception server-side using the application logger (`current_app.logger.error(e)`) and return a sanitized, generic error message (e.g., `jsonify({"error": "An internal error occurred."})`) to the user.
