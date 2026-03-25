@@ -133,7 +133,7 @@ const MicroSession = ({ onClose }) => {
                             <p className="text-xs text-slate-400">Quick focused practice</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-white">
+                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-white" aria-label="Close micro session">
                         <X size={20} />
                     </button>
                 </div>

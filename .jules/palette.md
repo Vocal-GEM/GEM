@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-02-18 - Missing ARIA Labels on Icon-only Buttons
+**Learning:** Foundational components or standard overlays (like `MicroSession.jsx`) often rely on visual cues (like an `X` icon) for closing them, leading to an inaccessible element for screen reader users when there is no supplementary text.
+**Action:** When working on modals, dialogs, or popovers, ensure that the close buttons (often rendering an `X` or similar icon) have descriptive `aria-label` attributes to improve screen reader accessibility.
