@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-02-18 - Accessibility of Interactive Icon Buttons
+**Learning:** Foundational components like `ShadowingExercise` contain interactive SVG buttons (like Back, Close, Record/Stop) that visually indicate their function but completely lack `aria-label` attributes, making them inaccessible to screen readers.
+**Action:** Always add descriptive `aria-label`s to purely icon-based buttons. For dynamic buttons (like Record/Stop), dynamically toggle the `aria-label` string to match the current state (e.g., `aria-label={isRecording ? "Stop recording" : "Start recording"}`).
