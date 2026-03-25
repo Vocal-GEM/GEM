@@ -65,8 +65,8 @@ class TestVoiceQualitySecurity(unittest.TestCase):
 
         # Import module under test
         # Ensure it's reloaded to use our mocks
-        if 'backend.app.routes.voice_quality' in sys.modules:
-             del sys.modules['backend.app.routes.voice_quality']
+        if 'app.routes.voice_quality' in sys.modules:
+             del sys.modules['app.routes.voice_quality']
 
         from backend.app.routes import voice_quality
         self.voice_quality = voice_quality
@@ -82,13 +82,13 @@ class TestVoiceQualitySecurity(unittest.TestCase):
         if os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir)
         # Clean up the module to prevent side effects on other tests
-        if 'backend.app.routes.voice_quality' in sys.modules:
-             del sys.modules['backend.app.routes.voice_quality']
+        if 'app.routes.voice_quality' in sys.modules:
+             del sys.modules['app.routes.voice_quality']
 
     def test_manipulate_file_success(self):
-        """
+        '''
         Test that a successful manipulation returns 200 OK.
-        """
+        '''
         file_content = b'fake audio data'
         file_storage = FileStorage(
             stream=BytesIO(file_content),
@@ -104,7 +104,7 @@ class TestVoiceQualitySecurity(unittest.TestCase):
         with patch('backend.app.services.voicelab_service.manipulate_voice', return_value=mock_sound):
             with patch('parselmouth.Sound', return_value=MagicMock()):
                 # Mock send_file to avoid FileNotFoundError since we don't actually create files
-                with patch('backend.app.routes.voice_quality.send_file', return_value='file_content') as mock_send_file:
+                with patch('app.routes.voice_quality.send_file', return_value='file_content') as mock_send_file:
                     response = self.client.post(
                         '/api/voice-quality/manipulate',
                         data={'audio': file_storage, 'pitch_shift': '0.0'},
@@ -115,9 +115,10 @@ class TestVoiceQualitySecurity(unittest.TestCase):
                 # Since send_file is used, we expect file content
                 # We can't easily check 'get_json()' here as it might be binary
 
-    def test_manipulate_file_error_handling(self):
-        """
+    def test_manipulate_file_error_handling_one(self):
+        '''
         Test that an internal error returns a generic error message and does NOT leak details.
+        '''
         mock_sound = MagicMock()
 
         def side_effect_save(path, format):
@@ -139,9 +140,9 @@ class TestVoiceQualitySecurity(unittest.TestCase):
         self.assertEqual(response.data, b"dummy audio")
 
     def test_manipulate_file_error_handling(self):
-        """
+        '''
         Test that an error in manipulation is handled safely (generic error, no leak).
-        """
+        '''
         file_content = b'fake audio data'
         file_storage = FileStorage(
             stream=BytesIO(file_content),
@@ -237,7 +238,7 @@ if 'backend.app.routes' not in sys.modules:
     backend_app_routes = create_mock_module('backend.app.routes')
     backend_app_routes.__path__ = [os.path.abspath('backend/app/routes')]
 
-from backend.app.routes.voice_quality import manipulate_file
+from app.routes.voice_quality import manipulate_file
 
 class TestVoiceQualitySecurity(unittest.TestCase):
     def setUp(self):
@@ -250,9 +251,9 @@ class TestVoiceQualitySecurity(unittest.TestCase):
     def tearDown(self):
         pass
 
-    @patch('backend.app.routes.voice_quality.validate_file_upload')
-    @patch('backend.app.routes.voice_quality.tempfile')
-    @patch('backend.app.routes.voice_quality.os')
+    @patch('app.routes.voice_quality.validate_file_upload')
+    @patch('app.routes.voice_quality.tempfile')
+    @patch('app.routes.voice_quality.os')
     def test_manipulate_file_exception_leakage(self, mock_os, mock_tempfile, mock_validate):
         mock_file = MagicMock()
         mock_file.filename = "test.wav"
