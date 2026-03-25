@@ -59,8 +59,7 @@ export class ResearchModeController {
      */
     generateParticipantId(userId) {
         // Use cryptographic hash with study-specific salt
-        const envSalt = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env.VITE_RESEARCH_SALT : 'default_salt';
-        const salt = this.studyId + envSalt;
+        const salt = this.studyId + process.env.REACT_APP_RESEARCH_SALT;
         const hash = CryptoJS.SHA256(userId + salt).toString();
 
         // Take first 16 characters for readability
