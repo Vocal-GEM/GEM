@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, test, it, expect, vi, beforeEach } from 'vitest';
 import SuccessStories from './SuccessStories';
 import CommunityService from '../../services/CommunityService';
 import ModerationService from '../../services/ModerationService';
@@ -46,7 +46,7 @@ const MockAudio = vi.fn(function(src) {
     return new MockAudioImplementation(src);
 });
 
-global.Audio = MockAudio;
+globalThis.Audio = MockAudio;
 
 describe('SuccessStories Optimization Verification', () => {
     beforeEach(() => {
@@ -70,7 +70,7 @@ describe('SuccessStories Optimization Verification', () => {
         });
     });
 
-    test('renders stories and initializes Audio correctly', async () => {
+    it('renders stories and initializes Audio correctly', async () => {
         render(<SuccessStories />);
 
         await waitFor(() => {
