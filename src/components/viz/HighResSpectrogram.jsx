@@ -133,7 +133,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         }
 
         lastFormantsRef.current = { f1, f2 };
-    }, [dataRef, colormap, uniqueId]);
+    }, [dataRef, colormap]);
 
     // Handle Resize with ResizeObserver
     useEffect(() => {
