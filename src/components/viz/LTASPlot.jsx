@@ -14,8 +14,6 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
     }
 
     useEffect(() => {
-        let animationId;
-
         const draw = () => {
             if (!canvasRef.current) return;
             const ctx = canvasRef.current.getContext('2d');
@@ -83,12 +81,23 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
                 }
                 ctx.stroke();
             }
-
-            animationId = requestAnimationFrame(draw);
         };
 
-        draw();
-        return () => cancelAnimationFrame(animationId);
+        let unsubscribe;
+        let isMounted = true;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            if (!isMounted) return;
+            unsubscribe = renderCoordinator.subscribe(
+                'ltas-plot',
+                draw,
+                renderCoordinator.PRIORITY.MEDIUM
+            );
+        });
+
+        return () => {
+            isMounted = false;
+            if (unsubscribe) unsubscribe();
+        };
     }, [isRecording, dataRef]);
 
     const reset = () => {

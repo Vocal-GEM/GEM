@@ -13,11 +13,13 @@ const VowelAnalysis = ({ dataRef, colorBlindMode }) => {
                 setCurrentF1(f1 || 0);
                 setCurrentF2(f2 || 0);
             }
-            requestAnimationFrame(loop);
+            // NO requestAnimationFrame(loop) as RenderCoordinator handles this
         };
 
         let unsubscribe;
+        let isMounted = true;
         import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            if (!isMounted) return;
             unsubscribe = renderCoordinator.subscribe(
                 'vowel-analysis',
                 loop,
@@ -26,6 +28,7 @@ const VowelAnalysis = ({ dataRef, colorBlindMode }) => {
         });
 
         return () => {
+            isMounted = false;
             if (unsubscribe) unsubscribe();
         };
     }, [dataRef]);

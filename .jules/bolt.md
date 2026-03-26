@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-03-26 - Prevent Async Memory Leaks in RenderCoordinator Migration
+**Learning:** When moving standalone requestAnimationFrame components to use a dynamically imported RenderCoordinator, setting up subscriptions asynchronously inside `useEffect` introduces a critical race condition. If the component unmounts before the import resolves, the cleanup function fires (doing nothing), and the subsequently resolved promise executes a subscription that will never be cleaned up.
+**Action:** Always wrap dynamically imported subscriptions inside `useEffect` with an `isMounted` flag check. Return `isMounted = false` in the cleanup function to ensure subscriptions on unmounted components are skipped, preventing memory leaks.
