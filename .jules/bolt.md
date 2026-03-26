@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-03-26 - Layout Thrashing in PitchOrb.jsx Animation Loop
+**Learning:** `PitchOrb.jsx` was synchronously calling `canvas.getBoundingClientRect()` inside a high-frequency render loop managed by `renderCoordinator` (potentially ~60fps). This forced synchronous layout calculation and caused severe layout thrashing.
+**Action:** Implemented a `ResizeObserver` in a separate `useEffect` to asynchronously track canvas dimensions, stored them in a `useRef`, and read from this reference in the render loop. Also ensured the transform matrix is reset via `ctx.setTransform(1, 0, 0, 1, 0, 0)` before applying the `dpr` scale and clearing the canvas to prevent compounding transforms and visual smearing.

@@ -32,12 +32,19 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 const mockRequestAnimationFrame = vi.fn();
 global.requestAnimationFrame = mockRequestAnimationFrame;
 
+// Mock ResizeObserver
+global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
+
 describe('PitchOrb', () => {
     let dataRef;
 
     beforeEach(() => {
         dataRef = { current: { pitch: 200 } };
-        // Add getBoundingClientRect mock
+        // Add getBoundingClientRect mock for initial sizing check
         Element.prototype.getBoundingClientRect = vi.fn(() => ({
             width: 300,
             height: 300,

@@ -19,6 +19,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     const canvasRef = useRef(null);
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
+    // Cached dimensions to avoid getBoundingClientRect in loop
+    const dimensionsRef = useRef({ width: 0, height: 0 });
 
     // Default gender ranges if not set in settings
     const defaultRanges = {
@@ -33,6 +35,25 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
+
+        // Observe canvas container size to avoid synchronous layout thrashing in the loop
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                if (entry.contentRect) {
+                    dimensionsRef.current = {
+                        width: entry.contentRect.width,
+                        height: entry.contentRect.height
+                    };
+                }
+            }
+        });
+
+        if (canvas && canvas.parentElement) {
+            resizeObserver.observe(canvas.parentElement);
+            // Initial read to prevent 0 width on first frame
+            const initialRect = canvas.parentElement.getBoundingClientRect();
+            dimensionsRef.current = { width: initialRect.width, height: initialRect.height };
+        }
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,17 +88,25 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
+            const width = dimensionsRef.current.width;
+            const height = dimensionsRef.current.height;
+
+            // Only update canvas dimensions if they changed to prevent wiping state unnecessarily
+            if (canvas.width !== Math.floor(width * dpr) || canvas.height !== Math.floor(height * dpr)) {
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+            }
+
+            // Always clear and scale for each frame
+            if (ctx && typeof ctx.setTransform === 'function') {
+                ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform matrix
+            }
+
+            ctx.clearRect(0, 0, width * dpr, height * dpr);
             ctx.scale(dpr, dpr);
 
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
-
-            ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -166,6 +195,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
