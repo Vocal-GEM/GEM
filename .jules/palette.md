@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2026-03-26 - Icon-Only Button Accessibility in Complex Visualizers
+**Learning:** Highly interactive, complex visualizer components (like canvas overlays and timeline toggles) frequently rely on compact, icon-only buttons (e.g., Lucide icons for Zoom, Reset, Toggle) to save screen space. These are almost always missing `aria-label` attributes because developers focus on the visual representation, leaving screen reader users completely unable to identify the button's function.
+**Action:** When reviewing or creating data visualization or media player components, specifically target all icon-only `<button>` elements that control playback, zooming, resetting, or toggling overlays. Ensure every single one has a clear, descriptive `aria-label` attribute (e.g., `aria-label="Zoom In"`, `aria-label="Reset Average"`).
