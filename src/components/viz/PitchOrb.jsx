@@ -107,7 +107,14 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             const centerX = width / 2;
             const centerY = height / 2;
 
-            ctx.clearRect(0, 0, width, height);
+            if (ctx && typeof ctx.save === 'function') {
+                ctx.save();
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+            } else {
+                ctx.clearRect(0, 0, width, height); // Fallback for tests
+            }
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
