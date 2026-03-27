@@ -41,3 +41,11 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-05-15 - Persistent Buffer Allocation in Real-Time DSP
+**Learning:** In audio processing methods called at high frequency (like LPC analysis via `requestAnimationFrame` or Web Audio Worklets), allocating new typed arrays (e.g., `new Float32Array()`) on every frame creates severe GC churn, leading to CPU spikes and visual/audio stuttering. The `LPCAnalyzer` class in this codebase suffered from this pattern.
+**Action:** Always pre-allocate reusable typed arrays in the class constructor or initialization phase and reuse them across continuous method calls, resizing only when strictly necessary (e.g., if the incoming buffer length dynamically changes).
+
+## 2024-05-15 - Referential Equality in React with Persistent Buffers
+**Learning:** While reusing typed arrays (e.g. `Float32Array`) in high-frequency audio processing eliminates GC churn, returning these internal class references directly to a React application creates critical bugs. React uses referential equality (`oldState === newState`) to determine if it should re-render. If the returned array is the same reference mutated in place, React silently drops the update. Additionally, this corrupts any historical arrays (like spectrograms) that store these references.
+**Action:** Always return a `.slice()` or a new wrapper (`new Float32Array(buffer)`) for the final public output of a processing function to ensure referential safety, while still keeping internal intermediate calculations fully persistent.
