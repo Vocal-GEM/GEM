@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2025-02-28 - Secure Error Handling in Voice and TTS APIs
+**Vulnerability:** The `/api/voice-quality/clean`, `/api/voice-quality/manipulate`, and TTS generation endpoints were returning the raw `str(e)` of internal exceptions directly to the client in JSON error responses. This exposes internal server details, file paths, or API connectivity specifics (like ElevenLabs API keys or endpoints) which can be leveraged by attackers.
+**Learning:** Returning `str(e)` in error handlers is a common anti-pattern that inadvertently leaks stack or environment context. In Flask applications, any `except Exception as e:` block must explicitly sanitize its output when communicating with external clients.
+**Prevention:** Always log the detailed error server-side (`current_app.logger.error(f"Error: {e}")`) and return a generic, sanitized error message to the client (e.g., `return jsonify({'error': 'An internal error occurred'}), 500`). Ensure this pattern is strictly enforced across all API endpoints.

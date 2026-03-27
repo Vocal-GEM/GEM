@@ -63,7 +63,8 @@ def synthesize_speech():
     except requests.exceptions.Timeout:
         return jsonify({"error": "Request to ElevenLabs timed out"}), 504
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Failed to connect to ElevenLabs: {str(e)}"}), 502
+        current_app.logger.error(f"Failed to connect to ElevenLabs: {e}")
+        return jsonify({"error": "Failed to connect to ElevenLabs"}), 502
 
 
 @tts_bp.route('/voices', methods=['GET'])
@@ -99,4 +100,5 @@ def get_voices():
     except requests.exceptions.Timeout:
         return jsonify({"error": "Request timed out", "voices": []}), 504
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Failed to connect: {str(e)}", "voices": []}), 502
+        current_app.logger.error(f"Failed to fetch voices from ElevenLabs: {e}")
+        return jsonify({"error": "Failed to connect to ElevenLabs", "voices": []}), 502
