@@ -168,6 +168,26 @@ export class AudioEngine {
         this.passthroughGain = this.audioContext.createGain();
         this.passthroughGain.gain.value = 0; // Muted by default
         this.passthroughGain.connect(this.audioContext.destination);
+
+        // Optimization: Reusable objects to avoid GC
+        this.reuseMetricData = {
+            volume: 0,
+            pitch: 0,
+            clarity: 0,
+            intensity: 0,
+            jitter: 0,
+            shimmer: 0,
+            hnr: 0,
+            tilt: 0,
+            weight: 0,
+            h1h2: 0,
+            weightLabel: '',
+            f3Noise: 0,
+            harmonicRatio: 0,
+            debug: { h1: 0, h2: 0, centroid: 0 },
+            formants: { f1: 0, f2: 0, raw: [] },
+            spectrum: null // Will reference Uint8Array
+        };
     }
 
     async start(deviceId = null) {
@@ -351,6 +371,11 @@ export class AudioEngine {
         const dataArray = new Float32Array(bufferLength);
         const freqData = new Float32Array(bufferLength);
 
+        // NEW: Byte frequency data for efficient visualization (Uint8 0-255)
+        if (!this.byteFreqData || this.byteFreqData.length !== bufferLength) {
+            this.byteFreqData = new Uint8Array(bufferLength);
+        }
+
         // Buffers for calculating perturbation metrics
         this.visualPitchBuffer = [];
         this.visualAmpBuffer = [];
@@ -362,6 +387,7 @@ export class AudioEngine {
             // Fetch data (always needed for visualization/RMS)
             this.analyser.getFloatTimeDomainData(dataArray);
             this.analyser.getFloatFrequencyData(freqData);
+            this.analyser.getByteFrequencyData(this.byteFreqData);
 
             // Hybrid Approach: Use Worklet for Pitch if active, Main Thread for the rest
 
@@ -583,42 +609,48 @@ export class AudioEngine {
 
             // For now, just call the update handler with some dummy data or processed data
             if (this.onAudioUpdate) {
-                const metricData = {
-                    ...this.latestBackendAnalysis, // Include backend/socket metrics (RBI, etc.)
-                    volume: maxAmp,
-                    pitch: pitch || 0,
-                    clarity: confidence || 0,
-                    intensity: intensity,
-                    jitter: jitter,
-                    shimmer: shimmer,
-                    hnr: hnr,
-                    tilt: tilt || -20,
-                    weight: weight,
-                    h1h2: h1h2,
-                    weightLabel: weightLabel,
-                    f3Noise: f3Noise,
-                    harmonicRatio: harmonicRatio,
-                    debug: {
-                        h1: weightAnalysis.h1,
-                        h2: weightAnalysis.h2,
-                        centroid: weightAnalysis.centroid
-                    },
-                    formants: {
-                        f1: this.smoothedF1 || 0,
-                        f2: this.smoothedF2 || 0,
-                        raw: formants
-                    }
-                };
+                // Optimization: Reuse object to reduce GC pressure
+                const m = this.reuseMetricData;
+
+                // Copy backend analysis properties
+                Object.assign(m, this.latestBackendAnalysis);
+
+                m.volume = maxAmp;
+                m.pitch = pitch || 0;
+                m.clarity = confidence || 0;
+                m.intensity = intensity;
+                m.jitter = jitter;
+                m.shimmer = shimmer;
+                m.hnr = hnr;
+                m.tilt = tilt || -20;
+                m.weight = weight;
+                m.h1h2 = h1h2;
+                m.weightLabel = weightLabel;
+                m.f3Noise = f3Noise;
+                m.harmonicRatio = harmonicRatio;
+                m.spectrum = this.byteFreqData; // Pass reference to Uint8Array
+
+                // Update nested objects safely
+                m.debug.h1 = weightAnalysis.h1;
+                m.debug.h2 = weightAnalysis.h2;
+                m.debug.centroid = weightAnalysis.centroid;
+
+                m.formants.f1 = this.smoothedF1 || 0;
+                m.formants.f2 = this.smoothedF2 || 0;
+                m.formants.raw = formants;
 
                 // Store metrics if recording
                 if (this.isRecording && this.recordingMetrics) {
+                    // Clone for history, but exclude spectrum to avoid memory bloat and ref issues
+                    // (Spectrum history should be derived from the recorded audio blob)
+                    const { spectrum, ...metricsToSave } = m;
                     this.recordingMetrics.push({
                         timestamp: Date.now() - (this.recordingStartTime || Date.now()),
-                        metrics: metricData
+                        metrics: metricsToSave
                     });
                 }
 
-                this.onAudioUpdate(metricData);
+                this.onAudioUpdate(m);
             }
         };
 

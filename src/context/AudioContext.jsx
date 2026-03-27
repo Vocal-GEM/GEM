@@ -17,7 +17,7 @@ export const AudioProvider = ({ children }) => {
         f2: 0,
         weight: 0,
         history: new Array(100).fill(0),
-        spectrum: new Float32Array(512),
+        spectrum: new Uint8Array(512), // Optimized: Uint8Array for visualization
         silenceCounter: 0,
         lastValidPitch: 0
     });
@@ -95,27 +95,28 @@ export const AudioProvider = ({ children }) => {
         try {
             audioEngineRef.current = new AudioEngine((data) => {
                 // ... (data handler)
-                const currentHistory = dataRef.current.history;
+                const d = dataRef.current; // Optimization: Mutate ref object directly
                 let pitchToStore = data.pitch;
 
                 if (data.pitch > 0) {
-                    dataRef.current.silenceCounter = 0;
-                    dataRef.current.lastValidPitch = data.pitch;
+                    d.silenceCounter = 0;
+                    d.lastValidPitch = data.pitch;
                 } else {
-                    dataRef.current.silenceCounter++;
-                    if (dataRef.current.silenceCounter < 15 && dataRef.current.lastValidPitch > 0) {
-                        pitchToStore = dataRef.current.lastValidPitch;
+                    d.silenceCounter++;
+                    if (d.silenceCounter < 15 && d.lastValidPitch > 0) {
+                        pitchToStore = d.lastValidPitch;
                     } else {
                         pitchToStore = 0;
                     }
                 }
 
-                dataRef.current = {
-                    ...data,
-                    history: [...currentHistory.slice(1), pitchToStore],
-                    silenceCounter: dataRef.current.silenceCounter,
-                    lastValidPitch: dataRef.current.lastValidPitch
-                };
+                // Optimization: Mutate properties to avoid object allocation
+                // Copy all properties from incoming data to dataRef
+                Object.assign(d, data);
+
+                // Optimization: Update history array in-place
+                d.history.shift();
+                d.history.push(pitchToStore);
 
                 // Log audio data periodically for debugging
                 const now = Date.now();
