@@ -31,7 +31,7 @@ export const FEATURES = {
     history: true,
     progress: false,
     program: false,
-    learn: false,
+    learn: true,
 
     // ═══════════════════════════════════════════════════════════
     // PROFESSIONAL TOOLS
