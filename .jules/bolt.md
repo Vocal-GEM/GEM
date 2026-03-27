@@ -41,3 +41,4 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-05-18 - Persistent Buffer for Real-Time Analysis\n**Learning:** In `CPPMeter.jsx`, a `setInterval` was allocating a `new Float32Array` every 200ms to process audio data. This creates continuous memory pressure and triggers frequent Garbage Collection (GC) pauses, which can cause jank in audio analysis applications.\n**Action:** Use a persistent buffer with `useRef(null)` and only reallocate it if the incoming `audioData.length` changes. Reusing the same typed array buffer significantly reduces GC churn and improves CPU efficiency during continuous analysis.
