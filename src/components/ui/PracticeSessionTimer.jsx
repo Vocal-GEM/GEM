@@ -31,6 +31,13 @@ const PracticeSessionTimer = ({ isActive = true, onPause }) => {
         return () => clearInterval(timer);
     }, [isActive]);
 
+    // Haptic feedback when reminder shows
+    useEffect(() => {
+        if (showReminder && navigator.vibrate) {
+            navigator.vibrate([100, 50, 100]);
+        }
+    }, [showReminder]);
+
     // Check for reminders
     useEffect(() => {
         if (!isActive || showReminder) return;
@@ -81,13 +88,17 @@ const PracticeSessionTimer = ({ isActive = true, onPause }) => {
     return (
         <>
             {/* Compact Timer Display */}
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 rounded-lg border border-slate-700">
-                <Timer size={14} className="text-slate-400" />
+            <div
+                className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 rounded-lg border border-slate-700"
+                role="timer"
+                aria-label={`Practice duration: ${formatTime(elapsedSeconds)}`}
+            >
+                <Timer size={14} className="text-slate-400" aria-hidden="true" />
                 <span className={`font-mono text-sm font-bold ${getTimerColor()}`}>
                     {formatTime(elapsedSeconds)}
                 </span>
                 {elapsedSeconds >= REST_WARNING && (
-                    <span className="text-xs text-amber-400 animate-pulse">⚡</span>
+                    <span className="text-xs text-amber-400 animate-pulse" aria-label="Warning: Long Session">⚡</span>
                 )}
             </div>
 
@@ -102,6 +113,8 @@ const PracticeSessionTimer = ({ isActive = true, onPause }) => {
                     message="Time for a sip of water! Keeping your vocal cords hydrated improves resonance and protects your voice."
                     primaryAction={{ label: "I'll Drink Water", onClick: () => handleDismiss('hydration') }}
                     secondaryAction={{ label: "Remind Later", onClick: () => handleDismiss('hydration') }}
+                    role="status"
+                    ariaLive="polite"
                 />
             )}
 
@@ -115,6 +128,8 @@ const PracticeSessionTimer = ({ isActive = true, onPause }) => {
                     message="You've been practicing for 20 minutes - great dedication! A short break helps prevent vocal fatigue."
                     primaryAction={{ label: "Keep Going", onClick: () => handleDismiss('rest') }}
                     secondaryAction={onPause ? { label: "Take a Break", onClick: () => { handleDismiss('rest'); onPause(); } } : undefined}
+                    role="status"
+                    ariaLive="polite"
                 />
             )}
 
@@ -129,6 +144,8 @@ const PracticeSessionTimer = ({ isActive = true, onPause }) => {
                     primaryAction={onPause ? { label: "Take a Break", onClick: () => { handleDismiss('break'); onPause(); } } : { label: "I'll Stop Soon", onClick: () => handleDismiss('break') }}
                     secondaryAction={{ label: "5 More Minutes", onClick: () => handleDismiss('break') }}
                     urgent
+                    role="alert"
+                    ariaLive="assertive"
                 />
             )}
         </>
@@ -147,9 +164,15 @@ const ReminderPopup = ({
     message,
     primaryAction,
     secondaryAction,
-    urgent = false
+    urgent = false,
+    role = "status",
+    ariaLive = "polite"
 }) => (
-    <div className="fixed bottom-24 right-6 z-40 max-w-sm animate-in slide-in-from-right duration-300">
+    <div
+        className="fixed bottom-24 right-6 z-40 max-w-sm animate-in slide-in-from-right duration-300"
+        role={role}
+        aria-live={ariaLive}
+    >
         <div className={`bg-gradient-to-br ${bgColor} backdrop-blur-xl rounded-2xl p-5 border ${borderColor} shadow-2xl`}>
             <div className="flex items-start gap-4">
                 <div className={`p-3 rounded-xl bg-white/10 ${urgent ? 'animate-pulse' : ''}`}>
