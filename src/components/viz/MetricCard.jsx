@@ -1,7 +1,12 @@
 
 import { Info } from 'lucide-react';
+import { memo } from 'react';
 
-const MetricCard = ({ label, value, unit, status = 'neutral', description, details }) => {
+// ⚡ Bolt: Wrapped MetricCard with React.memo() to prevent unnecessary re-renders.
+// This component is rendered many times (e.g. up to 27 instances across various analysis views)
+// and its props (label, value, etc.) rarely change independently of its parent.
+// Memoizing it significantly reduces React's reconciliation overhead during frequent updates.
+const MetricCard = memo(({ label, value, unit, status = 'neutral', description, details }) => {
     const statusColors = {
         good: 'bg-green-500/10 border-green-500/50 text-green-400',
         warning: 'bg-yellow-500/10 border-yellow-500/50 text-yellow-400',
@@ -41,6 +46,8 @@ const MetricCard = ({ label, value, unit, status = 'neutral', description, detai
             </div>
         </div>
     );
-};
+});
+
+MetricCard.displayName = 'MetricCard';
 
 export default MetricCard;
