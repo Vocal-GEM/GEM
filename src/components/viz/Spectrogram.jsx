@@ -53,6 +53,13 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     }
     const historyHeadRef = useRef(0); // Points to the next write position (frame index)
 
+    // Lookup table for bin indices to avoid per-pixel calculation
+    const lutRef = useRef({
+        height: 0,
+        maxBin: 0,
+        binIndexLUT: null // Uint16Array
+    });
+
     useEffect(() => {
         historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
     }, []);
@@ -131,6 +138,24 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             const imageData = canvas.imageDataRef;
             const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
 
+            // --- OPTIMIZATION: Lookup Table Generation ---
+            // If height or maxBin changed, regenerate the LUT
+            if (lutRef.current.height !== h || lutRef.current.maxBin !== maxBin) {
+                const newLUT = new Uint16Array(h);
+                // Pre-calculate bin indices for each pixel row
+                for (let y = 0; y < h; y++) {
+                    const freqRatio = 1 - (y / h);
+                    newLUT[y] = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                }
+                lutRef.current = {
+                    height: h,
+                    maxBin: maxBin,
+                    binIndexLUT: newLUT
+                };
+            }
+            const binIndexLUT = lutRef.current.binIndexLUT;
+            // ---------------------------------------------
+
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
             // We map pixels (y) to frequency bins.
             for (let y = 0; y < h; y++) {
@@ -138,11 +163,10 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                 // y=0 is top (high freq), y=h is bottom (low freq)
                 // Bin mapping: 0 -> maxBin (low -> high)
 
-                // Linear mapping matches the original code: y = h - (i / maxBin) * h
-                // So i / maxBin = (h - y) / h = 1 - y/h
-
-                const freqRatio = 1 - (y / h);
-                const binIndex = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                // Optimization: Use LUT instead of per-pixel floating point math
+                // const freqRatio = 1 - (y / h);
+                // const binIndex = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                const binIndex = binIndexLUT[y];
 
                 // Get intensity from spectrum
                 const value = spectrum[binIndex] || 0;
