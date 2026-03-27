@@ -13,9 +13,13 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+vi.mock('lucide-react', async () => {
+    const React = await import('react');
+    const createIcon = (name) => {
+        const Comp = (props) => React.createElement('div', { ...props, 'data-testid': name });
+        Comp.displayName = name;
+        return Comp;
+    };
 
     return {
         Sun: createIcon('Sun'),
@@ -51,20 +55,11 @@ describe('BrightnessMeter', () => {
 
     it('updates based on dataRef via coordinator callback', () => {
         render(<BrightnessMeter dataRef={dataRef} />);
-
-        // Get the callback passed to subscribe
-        // Signature: subscribe(id, callback, priority)
         const callback = renderCoordinator.subscribe.mock.calls[0][1];
-
-        // Update data
         dataRef.current.f2 = 2300; // Bright target
-
-        // Manually trigger callback (simulate render loop)
         act(() => {
             callback();
         });
-
-        // The status label becomes "Bright ✓"
         expect(screen.getByText('Bright ✓')).toBeDefined();
     });
 });

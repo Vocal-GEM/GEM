@@ -14,23 +14,25 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Mock Canvas getContext
-HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
-    clearRect: vi.fn(),
-    beginPath: vi.fn(),
-    arc: vi.fn(),
-    fill: vi.fn(),
-    stroke: vi.fn(),
-    fillText: vi.fn(),
-    scale: vi.fn(),
-    createRadialGradient: vi.fn(() => ({
-        addColorStop: vi.fn()
-    })),
-    canvas: { width: 300, height: 300 }
-}));
+if (typeof window !== 'undefined') {
+    HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+        clearRect: vi.fn(),
+        beginPath: vi.fn(),
+        arc: vi.fn(),
+        fill: vi.fn(),
+        stroke: vi.fn(),
+        fillText: vi.fn(),
+        scale: vi.fn(),
+        createRadialGradient: vi.fn(() => ({
+            addColorStop: vi.fn()
+        })),
+        canvas: { width: 300, height: 300 }
+    }));
+}
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+globalThis.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('PitchOrb', () => {
     let dataRef;
@@ -38,14 +40,16 @@ describe('PitchOrb', () => {
     beforeEach(() => {
         dataRef = { current: { pitch: 200 } };
         // Add getBoundingClientRect mock
-        Element.prototype.getBoundingClientRect = vi.fn(() => ({
-            width: 300,
-            height: 300,
-            top: 0,
-            left: 0,
-            right: 300,
-            bottom: 300,
-        }));
+        if (typeof window !== 'undefined') {
+            Element.prototype.getBoundingClientRect = vi.fn(() => ({
+                width: 300,
+                height: 300,
+                top: 0,
+                left: 0,
+                right: 300,
+                bottom: 300,
+            }));
+        }
         vi.clearAllMocks();
     });
 
