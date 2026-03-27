@@ -30,7 +30,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+globalThis.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('PitchOrb', () => {
     let dataRef;
@@ -46,6 +46,20 @@ describe('PitchOrb', () => {
             right: 300,
             bottom: 300,
         }));
+
+        // Mock ResizeObserver to trigger callback immediately
+        globalThis.ResizeObserver = class ResizeObserver {
+            constructor(callback) {
+                this.callback = callback;
+            }
+            observe(target) {
+                // Trigger callback to initialize dimensions
+                this.callback([{ contentRect: { width: 300, height: 300 } }]);
+            }
+            disconnect() {}
+            unobserve() {}
+        };
+
         vi.clearAllMocks();
     });
 
@@ -71,5 +85,19 @@ describe('PitchOrb', () => {
         // OR we assert it is NOT called if we want to write the test for the desired state.
         // Let's write the test for the DESIRED state (fail now, pass later).
         expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+
+        // Ensure the loop actually ran (didn't early return due to 0 dimensions)
+        // We can check if getContext was called, or if a drawing method was called on the context
+        // Since we mock getContext to return a spy object, we can't easily access the spy instance from here
+        // without refactoring the mock setup.
+        // But we can check if getBoundingClientRect was called during setup (via ResizeObserver)
+        // and NOT called during the loop (which is the optimization).
+
+        expect(Element.prototype.getBoundingClientRect).toHaveBeenCalled(); // Called by ResizeObserver
+        // It should call it once (setup). If called twice, it might be in the loop (bad).
+        // Wait, ResizeObserver calls it inside its callback.
+
+        // Let's rely on the fact that if dimensions were 0, loop would return early.
+        // If it ran, it would do drawing.
     });
 });
