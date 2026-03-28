@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2024-05-18 - Tooltips Need Accessible Focus Management
+**Learning:** Icon-only info buttons in visualizations (like BrightnessMeter) often lack keyboard accessibility. Relying only on `onMouseEnter`/`onMouseLeave` excludes keyboard users and screen readers from reading tooltip information explaining complex acoustic properties.
+**Action:** Always add `aria-label` to icon-only buttons, pair `onMouseEnter`/`onMouseLeave` with `onFocus`/`onBlur` for keyboard visibility, and ensure tooltips have `role="tooltip"` and an ID referenced by `aria-describedby` on the triggering element.
