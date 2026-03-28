@@ -7,7 +7,7 @@ import os
 sys.path.append(os.path.abspath('backend'))
 
 # Mock extensions and models before importing blueprint
-from backend.app.validators import sanitize_html
+from app.validators import sanitize_html
 
 def test_sanitize_html_xss():
     """Test that HTML sanitization removes XSS vectors"""
