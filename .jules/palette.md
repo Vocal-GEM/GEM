@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2024-05-24 - Hidden Menu Accessibility & HTML Integrity
+**Learning:** Hidden interactive menus (like a Quick Actions FAB) often fail to hide their nested children from screen readers when visually closed. Furthermore, duplicated attributes (e.g., `className`) and malformed HTML can cause both React hydration issues and unpredictable accessibility tree mappings.
+**Action:** When repairing malformed UI components, always verify that expandable/collapsible elements correctly apply `aria-hidden={!isOpen}` and `tabIndex={isOpen ? 0 : -1}` to their children to prevent screen readers from accessing invisible actions.
