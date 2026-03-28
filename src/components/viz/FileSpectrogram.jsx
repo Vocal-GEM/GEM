@@ -52,41 +52,77 @@ const FileSpectrogram = ({
 
         // Store spectrogram as 2D array [time][frequency]
         const spectrogram = [];
-        const fftBuffer = new Float32Array(FFT_SIZE);
         const windowFunction = new Float32Array(FFT_SIZE);
+
+        // Pre-allocate persistent arrays for FFT to prevent GC churn
+        const real = new Float32Array(FFT_SIZE);
+        const imag = new Float32Array(FFT_SIZE);
 
         // Hann window
         for (let i = 0; i < FFT_SIZE; i++) {
             windowFunction[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (FFT_SIZE - 1)));
         }
 
-        // Manual FFT processing (since OfflineAudioContext FFT is complex)
-        // We'll use a simpler approach: direct DFT for each frame
+        // Fast Fourier Transform (Cooley-Tukey Radix-2)
+        // Replaces the O(N^2) DFT with O(N log N) FFT
         for (let frame = 0; frame < numFrames; frame++) {
             const offset = frame * HOP_SIZE;
 
-            // Apply window
+            // Apply window and copy to real buffer
             for (let i = 0; i < FFT_SIZE; i++) {
                 if (offset + i < channelData.length) {
-                    fftBuffer[i] = channelData[offset + i] * windowFunction[i];
+                    real[i] = channelData[offset + i] * windowFunction[i];
                 } else {
-                    fftBuffer[i] = 0;
+                    real[i] = 0;
+                }
+                imag[i] = 0; // Clear imaginary part
+            }
+
+            // Bit-reversal permutation
+            let j = 0;
+            for (let i = 0; i < FFT_SIZE - 1; i++) {
+                if (i < j) {
+                    let tr = real[i]; real[i] = real[j]; real[j] = tr;
+                    let ti = imag[i]; imag[i] = imag[j]; imag[j] = ti;
+                }
+                let m = FFT_SIZE >> 1;
+                while (m >= 1 && j >= m) {
+                    j -= m;
+                    m >>= 1;
+                }
+                j += m;
+            }
+
+            // Danielson-Lanczos section
+            for (let size = 2; size <= FFT_SIZE; size <<= 1) {
+                const halfSize = size >> 1;
+                const step = -2 * Math.PI / size;
+                for (let i = 0; i < FFT_SIZE; i += size) {
+                    let angle = 0;
+                    for (let k = i; k < i + halfSize; k++) {
+                        const c = Math.cos(angle);
+                        const s = Math.sin(angle);
+                        const rIdx = k + halfSize;
+
+                        // Butterfly operation
+                        const tr = real[rIdx] * c - imag[rIdx] * s;
+                        const ti = real[rIdx] * s + imag[rIdx] * c;
+
+                        real[rIdx] = real[k] - tr;
+                        imag[rIdx] = imag[k] - ti;
+                        real[k] += tr;
+                        imag[k] += ti;
+
+                        angle += step;
+                    }
                 }
             }
 
-            // Compute magnitude spectrum using simple DFT
-            // For performance, we only compute up to maxBin
+            // Compute magnitude spectrum
             const magnitudes = new Float32Array(maxBin);
-
             for (let k = 0; k < maxBin; k++) {
-                let real = 0, imag = 0;
-                for (let n = 0; n < FFT_SIZE; n++) {
-                    const angle = -2 * Math.PI * k * n / FFT_SIZE;
-                    real += fftBuffer[n] * Math.cos(angle);
-                    imag += fftBuffer[n] * Math.sin(angle);
-                }
                 // Magnitude in dB
-                const magnitude = Math.sqrt(real * real + imag * imag) / FFT_SIZE;
+                const magnitude = Math.sqrt(real[k] * real[k] + imag[k] * imag[k]) / FFT_SIZE;
                 // Convert to dB with floor
                 const db = 20 * Math.log10(magnitude + 1e-10);
                 // Normalize to 0-255 range (-100dB to -20dB typical range)
