@@ -1,3 +1,5 @@
+#!/bin/bash
+cat << 'INNER' > src/components/viz/QualityVisualizer.jsx
 import React, { useState, useEffect, useRef, useId, useCallback } from 'react';
 import { Activity, Waves, Wind, Sparkles } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -59,7 +61,7 @@ const QualityVisualizer = ({ dataRef }) => {
         const points = data.map((val, i) => {
             const x = (i / (maxHistory - 1)) * 100;
             const y = 100 - ((val - min) / (max - min)) * 100;
-            return `${x},${y}`;
+            return \`\${x},\${y}\`;
         }).join(' ');
 
         return (
@@ -128,7 +130,7 @@ const QualityVisualizer = ({ dataRef }) => {
                             <div className="text-3xl font-mono font-bold text-white">
                                 {(metrics.jitter * 100).toFixed(2)}<span className="text-sm text-slate-500 ml-1">%</span>
                             </div>
-                            <div className={`text-sm font-bold uppercase \${getStatus('jitter', metrics.jitter).color}`}>
+                            <div className={\`text-sm font-bold uppercase \${getStatus('jitter', metrics.jitter).color}\`}>
                                 {getStatus('jitter', metrics.jitter).label}
                             </div>
                         </div>
@@ -158,7 +160,7 @@ const QualityVisualizer = ({ dataRef }) => {
                             <div className="text-3xl font-mono font-bold text-white">
                                 {metrics.shimmer.toFixed(2)}<span className="text-sm text-slate-500 ml-1">dB</span>
                             </div>
-                            <div className={`text-sm font-bold uppercase \${getStatus('shimmer', metrics.shimmer).color}`}>
+                            <div className={\`text-sm font-bold uppercase \${getStatus('shimmer', metrics.shimmer).color}\`}>
                                 {getStatus('shimmer', metrics.shimmer).label}
                             </div>
                         </div>
@@ -186,14 +188,14 @@ const QualityVisualizer = ({ dataRef }) => {
                             <div className="absolute inset-x-0 top-1/2 h-1 bg-gradient-to-r from-cyan-500 via-emerald-500 to-orange-500 rounded-full opacity-30"></div>
                             <div
                                 className="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-100"
-                                style={{ left: `\${metrics.weight}%` }}
+                                style={{ left: \`\${metrics.weight}%\` }}
                             ></div>
                         </div>
                         <div className="flex justify-between items-end">
                             <div className="text-3xl font-mono font-bold text-white">
                                 {metrics.weight.toFixed(0)}<span className="text-sm text-slate-500 ml-1">/100</span>
                             </div>
-                            <div className={`text-sm font-bold uppercase \${getStatus('weight', metrics.weight).color}`}>
+                            <div className={\`text-sm font-bold uppercase \${getStatus('weight', metrics.weight).color}\`}>
                                 {getStatus('weight', metrics.weight).label}
                             </div>
                         </div>
@@ -208,3 +210,4 @@ const QualityVisualizer = ({ dataRef }) => {
 };
 
 export default QualityVisualizer;
+INNER
