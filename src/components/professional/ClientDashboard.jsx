@@ -165,4 +165,6 @@ const ClientDashboard = () => {
     );
 };
 
+import { Activity } from "lucide-react";
+
 export default ClientDashboard;
