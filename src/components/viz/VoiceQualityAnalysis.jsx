@@ -4,6 +4,9 @@ import { QuadCoreAnalysisService } from '../../services/QuadCoreAnalysisService'
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import { useProfile } from '../../context/ProfileContext';
 
+/**
+ * QuadCoreCard component for displaying individual quality metrics.
+ */
 const QuadCoreCard = ({ icon: Icon, title, score, label, value, color, unit }) => (
     <div className="bg-slate-800/50 rounded-xl p-3 border border-white/5 relative overflow-hidden group hover:bg-slate-800/80 transition-colors">
         <div className="flex items-center gap-2 mb-2 text-xs font-bold text-slate-400 uppercase tracking-widest">

@@ -26,10 +26,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const lastFormantsRef = useRef({ f1: 0, f2: 0 });
     const { settings } = useSettings();
 
-    // Component ID for RenderCoordinator
-    const componentId = useId();
-
-    // Reusable buffers to avoid GC
     // Unique component ID for RenderCoordinator
     const uniqueId = useId();
     const componentId = `spectrogram-highres-${uniqueId}`;
@@ -37,6 +33,8 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     // Reusable buffers to avoid garbage collection churn
     const imgDataRef = useRef(null);
     const data32Ref = useRef(null);
+    // Optimization: Pre-calculate colors buffer
+    const binColorsRef = useRef(null);
 
     // Tap cursor state
     const [cursorData, setCursorData] = useState(null);
@@ -59,18 +57,10 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const width = canvas.width;
         const height = canvas.height;
         const scrollSpeed = 2; // px per frame
-
-        // Optimization: Use alpha: false for better performance
-        const ctx = canvas.getContext('2d', { alpha: false });
-
-        // Optimization: Use alpha: false for better performance
-        // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
-        const ctx = canvas.getContext('2d', { alpha: false });
-
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
         const spectrum = dataRef.current.spectrum;
+
+        // Optimization: Use alpha: false for better performance
+        const ctx = canvas.getContext('2d', { alpha: false });
 
         // Ensure buffers are ready and match height
         if (!imgDataRef.current || imgDataRef.current.height !== height) {
@@ -88,38 +78,44 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const data32 = data32Ref.current;
 
         // 1. Shift existing content to left
-        // Optimization: Draw canvas onto itself instead of using an offscreen temp canvas.
-        ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
-
-        // 2. Draw new column
-        // Reuse pre-allocated TypedArray
-        const maxBin = Math.floor(spectrum.length / 3); // 8kHz cutoff
-
-        for (let y = 0; y < height; y++) {
-            // Map y (0 at top, height at bottom) to frequency
         // Copy the current canvas (from x=scrollSpeed to the end) to x=0
         // This is much faster on GPU-accelerated contexts.
         ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
 
         // 2. Draw new column
-        // Optimized: Reuse pre-allocated TypedArray
+        // Reuse pre-allocated TypedArray
         const maxBin = Math.floor(spectrum.length / 3);
+
+        // Optimization: Pre-calculate colors for active bins
+        if (!binColorsRef.current || binColorsRef.current.length < maxBin) {
+            binColorsRef.current = new Uint32Array(maxBin);
+        }
+        const binColors = binColorsRef.current;
+
+        // Vectorized-ish color calculation
+        for (let i = 0; i < maxBin; i++) {
+            const val = spectrum[i] || 0;
+            // Only calculate if value > 0 (common case optimization)
+            if (val > 0) {
+                let intensity = Math.log10(val + 1) * 60;
+                intensity = Math.min(255, Math.max(0, intensity));
+                binColors[i] = colormap[Math.floor(intensity)];
+            } else {
+                binColors[i] = colormap[0];
+            }
+        }
 
         for (let y = 0; y < height; y++) {
             const freqRatio = (height - 1 - y) / height;
+            // Use same bin mapping logic
             const binIndex = Math.floor(freqRatio * maxBin);
-            const val = spectrum[binIndex] || 0;
-
-            let intensity = Math.log10(val + 1) * 60;
-            intensity = Math.min(255, Math.max(0, intensity));
-
-            const color = colormap[Math.floor(intensity)];
+            const color = binColors[binIndex] || colormap[0];
 
             // Fill all pixels in the scrollSpeed strip for this row
             const rowOffset = y * scrollSpeed;
-            for (let x = 0; x < scrollSpeed; x++) {
-                data32[rowOffset + x] = color;
-            }
+            // Manual loop unrolling since scrollSpeed is constant 2
+            data32[rowOffset] = color;
+            data32[rowOffset + 1] = color;
         }
 
         // Put the new strip on the right edge
@@ -157,10 +153,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     }, [dataRef, colormap]);
 
     // Initial canvas setup & ResizeObserver
-    }, [dataRef, colormap, componentId]);
-
-    // Initial canvas setup
-    // Handle Resize with ResizeObserver
     useEffect(() => {
         const container = containerRef.current;
         const canvas = canvasRef.current;
@@ -172,8 +164,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             const rect = container.getBoundingClientRect();
 
             // Only update if dimensions actually changed
-            const newWidth = Math.floor(rect.width * dpr);
-            const newHeight = 512; // Fixed high vertical resolution
             const newWidth = Math.round(rect.width * dpr);
             const newHeight = 512; // Fixed internal height for vertical resolution
 
@@ -184,12 +174,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
                 data32Ref.current = null;
             }
         };
-
-        // Initial size
-        updateSize();
-
-        const resizeObserver = new ResizeObserver(() => {
-            // Use RAF to debounce
 
         const resizeObserver = new ResizeObserver(() => {
             // Run in animation frame to avoid resize loops/tearing
@@ -217,7 +201,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         return () => {
             unsubscribe();
         };
-    }, [draw, componentId]);
     }, [componentId, draw]);
 
     /**

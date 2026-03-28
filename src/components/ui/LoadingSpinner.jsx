@@ -1,6 +1,9 @@
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+/**
+ * LoadingSpinner component with configurable size, variant, and label.
+ */
 const LoadingSpinner = ({
   size = 'md',
   variant = 'default',
