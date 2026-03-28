@@ -60,72 +60,36 @@ const FileSpectrogram = ({
             windowFunction[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (FFT_SIZE - 1)));
         }
 
-        // Pre-calculate tables for Cooley-Tukey FFT
-        const bits = Math.log2(FFT_SIZE);
-        const bitReverse = new Uint16Array(FFT_SIZE);
-        for (let i = 0; i < FFT_SIZE; i++) {
-            let rev = 0;
-            let p = i;
-            for (let j = 0; j < bits; j++) {
-                rev = (rev << 1) | (p & 1);
-                p >>= 1;
-            }
-            bitReverse[i] = rev;
-        }
-
-        const sinTable = new Float32Array(FFT_SIZE);
-        const cosTable = new Float32Array(FFT_SIZE);
-        for (let i = 0; i < FFT_SIZE; i++) {
-            const angle = -2 * Math.PI * i / FFT_SIZE;
-            sinTable[i] = Math.sin(angle);
-            cosTable[i] = Math.cos(angle);
-        }
-
-        // ⚡ Bolt: Replaced O(N^2) direct DFT with O(N log N) Cooley-Tukey FFT.
-        // This reduces blocking time on the main thread for a typical 5s audio file from ~15s down to <100ms.
+        // Manual FFT processing (since OfflineAudioContext FFT is complex)
+        // We'll use a simpler approach: direct DFT for each frame
         for (let frame = 0; frame < numFrames; frame++) {
             const offset = frame * HOP_SIZE;
 
-            // Apply window and bit-reversal simultaneously
-            const real = new Float32Array(FFT_SIZE);
-            const imag = new Float32Array(FFT_SIZE);
+            // Apply window
             for (let i = 0; i < FFT_SIZE; i++) {
                 if (offset + i < channelData.length) {
-                    real[bitReverse[i]] = channelData[offset + i] * windowFunction[i];
+                    fftBuffer[i] = channelData[offset + i] * windowFunction[i];
+                } else {
+                    fftBuffer[i] = 0;
                 }
             }
 
-            // In-place Cooley-Tukey FFT
-            for (let len = 2; len <= FFT_SIZE; len <<= 1) {
-                const halfLen = len >> 1;
-                const step = FFT_SIZE / len;
-                for (let i = 0; i < FFT_SIZE; i += len) {
-                    for (let j = 0; j < halfLen; j++) {
-                        const uReal = real[i + j];
-                        const uImag = imag[i + j];
-                        const angleIdx = j * step;
-                        const c = cosTable[angleIdx];
-                        const s = sinTable[angleIdx];
-
-                        const pReal = real[i + j + halfLen];
-                        const pImag = imag[i + j + halfLen];
-
-                        const vReal = pReal * c - pImag * s;
-                        const vImag = pReal * s + pImag * c;
-
-                        real[i + j] = uReal + vReal;
-                        imag[i + j] = uImag + vImag;
-                        real[i + j + halfLen] = uReal - vReal;
-                        imag[i + j + halfLen] = uImag - vImag;
-                    }
-                }
-            }
-
-            // Compute magnitudes
+            // Compute magnitude spectrum using simple DFT
+            // For performance, we only compute up to maxBin
             const magnitudes = new Float32Array(maxBin);
+
             for (let k = 0; k < maxBin; k++) {
-                const magnitude = Math.sqrt(real[k] * real[k] + imag[k] * imag[k]) / FFT_SIZE;
+                let real = 0, imag = 0;
+                for (let n = 0; n < FFT_SIZE; n++) {
+                    const angle = -2 * Math.PI * k * n / FFT_SIZE;
+                    real += fftBuffer[n] * Math.cos(angle);
+                    imag += fftBuffer[n] * Math.sin(angle);
+                }
+                // Magnitude in dB
+                const magnitude = Math.sqrt(real * real + imag * imag) / FFT_SIZE;
+                // Convert to dB with floor
                 const db = 20 * Math.log10(magnitude + 1e-10);
+                // Normalize to 0-255 range (-100dB to -20dB typical range)
                 magnitudes[k] = Math.max(0, Math.min(255, (db + 100) * 3.2));
             }
 
