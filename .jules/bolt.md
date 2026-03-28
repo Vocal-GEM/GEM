@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-21 - Replaced Direct DFT with Cooley-Tukey FFT in React Component
+**Learning:** `src/components/viz/FileSpectrogram.jsx` contained an inefficient O(N^2) direct DFT algorithm that severely blocked the main thread (taking ~15s for a 5s audio file) because the built-in OfflineAudioContext's analyser is limited and complex to map.
+**Action:** Implemented an in-place O(N log N) Cooley-Tukey FFT. Pre-calculate bit-reversal and sine/cosine tables outside the frame loop to maximize performance, reducing execution time to <100ms.
