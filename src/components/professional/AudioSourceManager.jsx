@@ -1,33 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
 
 const AudioSourceManager = ({ onSourceChange }) => {
     const [devices, setDevices] = useState([]);
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [permissionGranted, setPermissionGranted] = useState(false);
-
-    useEffect(() => {
-        checkPermissionAndEnumerate();
-    }, []);
-
-    const checkPermissionAndEnumerate = async () => {
-        try {
-            // Must request permission first to get labels
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            setPermissionGranted(true);
-
-            // Stop the temp stream immediately
-            stream.getTracks().forEach(track => track.stop());
-
-            enumerateDevices();
-
-            // Listen for changes
-            navigator.mediaDevices.ondevicechange = enumerateDevices;
-        } catch (err) {
-            console.error("Microphone permission denied:", err);
-            setPermissionGranted(false);
-        }
-    };
 
     const enumerateDevices = async () => {
         try {
@@ -44,6 +21,30 @@ const AudioSourceManager = ({ onSourceChange }) => {
             console.error("Error enumerating devices:", err);
         }
     };
+
+    useEffect(() => {
+        const checkPermissionAndEnumerate = async () => {
+            try {
+                // Must request permission first to get labels
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                setPermissionGranted(true);
+
+                // Stop the temp stream immediately
+                stream.getTracks().forEach(track => track.stop());
+
+                enumerateDevices();
+
+                // Listen for changes
+                navigator.mediaDevices.ondevicechange = enumerateDevices;
+            } catch (err) {
+                console.error("Microphone permission denied:", err);
+                setPermissionGranted(false);
+            }
+        };
+
+        checkPermissionAndEnumerate();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleDeviceChange = (e) => {
         const deviceId = e.target.value;
