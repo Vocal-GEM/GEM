@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2025-10-25 - Information Leakage in Voice Quality Endpoints
+**Vulnerability:** The `/api/voice-quality/clean` and `/api/voice-quality/manipulate` endpoints in `backend/app/routes/voice_quality.py` were returning raw exception strings (`str(e)`) to the client on failure, potentially leaking sensitive internal application details or stack traces.
+**Learning:** When cleaning up code that handles file cleanup (e.g., in a `finally` block), it is critical to guard uninitialized variable access with `'var_name' in locals()` (e.g., `if 'tmp_path' in locals() and tmp_path:`) to prevent `UnboundLocalError` crashes if the exception occurs before the variable is successfully assigned.
+**Prevention:** Always use a generic error message for the client (e.g., "An internal error occurred"). Log the full exception details on the server using `current_app.logger.error()`. Wrap file deletion operations (`os.remove`) in `try/except pass` blocks to ensure failures don't crash the error handler itself.
