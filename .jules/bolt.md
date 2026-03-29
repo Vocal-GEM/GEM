@@ -41,3 +41,11 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Canvas Context Rendering Optimization
+**Learning:** In HTML5 Canvas loops, pixel-shifting logic that relies on `getImageData` and `putImageData` suffers from severe CPU overhead and memory thrashing, especially at high refresh rates.
+**Action:** Replace `getImageData` and `putImageData` with `ctx.drawImage(canvas, ...)` (drawing the canvas onto itself) to leverage hardware acceleration and significantly improve rendering performance.
+
+## 2026-01-24 - Canvas Context Initialization
+**Learning:** `willReadFrequently: true` forces the canvas to use CPU rendering, bypassing hardware acceleration. While it speeds up `getImageData` readbacks, it severely degrades performance if the primary bottleneck is drawing operations like `drawImage`.
+**Action:** Remove `willReadFrequently: true` from `canvas.getContext` options to encourage GPU acceleration, and use `alpha: false` when transparency isn't needed to further optimize rendering.
