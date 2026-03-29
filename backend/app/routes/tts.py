@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
+from flask_login import login_required
 import os
 import requests
+import re
 from ..extensions import limiter
 
 tts_bp = Blueprint('tts', __name__, url_prefix='/api/tts')
@@ -8,6 +10,7 @@ tts_bp = Blueprint('tts', __name__, url_prefix='/api/tts')
 ELEVENLABS_API_KEY = os.environ.get('ELEVENLABS_API_KEY')
 
 @tts_bp.route('/synthesize', methods=['POST'])
+@login_required
 @limiter.limit("5 per minute")
 def synthesize_speech():
     """
@@ -20,12 +23,21 @@ def synthesize_speech():
         }), 503
 
     data = request.json
+    if not data:
+        return jsonify({"error": "Invalid JSON"}), 400
+
     text = data.get('text', '')
     voice_id = data.get('voiceId', '21m00Tcm4TlvDq8ikWAM')  # Default Rachel
     model_id = data.get('modelId', 'eleven_turbo_v2_5')
     
     if not text:
         return jsonify({"error": "No text provided"}), 400
+
+    # Input Validation
+    if not isinstance(voice_id, str) or not re.match(r'^[a-zA-Z0-9_-]+$', voice_id):
+        return jsonify({"error": "Invalid voiceId format"}), 400
+    if not isinstance(model_id, str) or not re.match(r'^[a-zA-Z0-9_-]+$', model_id):
+        return jsonify({"error": "Invalid modelId format"}), 400
 
     try:
         # Forward request to ElevenLabs API
@@ -67,6 +79,7 @@ def synthesize_speech():
 
 
 @tts_bp.route('/voices', methods=['GET'])
+@login_required
 @limiter.limit("20 per minute")
 def get_voices():
     """

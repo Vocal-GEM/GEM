@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2026-02-04 - Unauthenticated TTS Proxy Vulnerability
+**Vulnerability:** The `/api/tts/synthesize` and `/api/tts/voices` endpoints acted as open proxies to the ElevenLabs API, allowing unauthenticated users to consume the server's API quota ("Denial of Wallet") and potentially inject malicious parameters.
+**Learning:** Proxy endpoints that wrap paid APIs must strictly enforce authentication and input validation to prevent abuse. Hiding the API key on the backend is insufficient if the endpoint itself is public.
+**Prevention:** Applied `@login_required` to both endpoints and implemented regex-based input validation for `voice_id` and `model_id` parameters to prevent injection or malformed requests.
