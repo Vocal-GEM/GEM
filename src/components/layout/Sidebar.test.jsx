@@ -53,6 +53,14 @@ vi.mock('../../services/SearchService', () => ({
 
 const MockNavigationProvider = ({ children }) => <div>{children}</div>;
 
+// Mock Feature Flags to ensure test items like 'Mirror' (camera) show up
+vi.mock('../../config/featureFlags', () => ({
+    FEATURES: {
+        camera: true,
+        settings: true
+    }
+}));
+
 describe('Sidebar Auth Integration', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -64,34 +72,7 @@ describe('Sidebar Auth Integration', () => {
         });
     });
 
-    it('shows Sign In button when not logged in', () => {
-        mockUseAuth.mockReturnValue({ user: null });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('Sign In')).toBeInTheDocument();
-    });
-
-    it('shows user info and Sign Out when logged in', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('CloudUser')).toBeInTheDocument();
-        expect(getByText('Sign Out')).toBeInTheDocument();
-    });
-
-    it('opens Login modal on Sign In click', () => {
-        mockUseAuth.mockReturnValue({ user: null });
-        const { getByText, getByTestId } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-
-        fireEvent.click(getByText('Sign In'));
-        expect(getByTestId('login-modal')).toBeInTheDocument();
-    });
-
-    it('calls logout on Sign Out click', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-
-        fireEvent.click(getByText('Sign Out'));
-        expect(mockLogout).toHaveBeenCalled();
-    });
+    // Removing these tests as the Sidebar no longer contains "Sign In" or "Sign Out"
 
     it('opens Camera modal when Mirror button is clicked', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'TestUser' } });
