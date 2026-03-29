@@ -56,7 +56,7 @@
 **Prevention:** Use type hints and strict validation in utility functions. If a function expects specific keys, raise an error immediately if invalid keys are passed during development (e.g., `ValueError` if `allowed_types` contains unknown categories).
 
 ## 2026-01-09 - Unrestricted File Upload in Community Module
-**Vulnerability:** The `share_voice` endpoint accepted any file type and saved it to disk with an insecure filename construction, allowing potential Remote Code Execution (RCE) via malicious uploads (e.g., .html, .php) or path traversal.
+**Vulnerability:** The `share_voice` endpoint accepted any file type and saved it to disk with an insecure filename construction, allowing potential RCE via malicious uploads (e.g., .html, .php) or path traversal.
 **Learning:** Relying on frontend validation or assuming "trusted users" (authenticated) is insufficient. Filenames must always be sanitized and validated against a strict allowlist on the backend before any filesystem operations.
 **Prevention:** Always use `secure_filename` and explicit content-type/extension validation (e.g. `validate_file_upload`) for every file upload endpoint.
 
@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2026-02-14 - Stored XSS & Negative Price Vulnerability in Marketplace
+**Vulnerability:** The `create_pack` endpoint allowed Stored XSS in `category`, `target_audience`, and `voice_goal` fields, and accepted negative `price_cents`.
+**Learning:** Adding new fields to a model/endpoint often leads to "forgotten" sanitization if there isn't a centralized validation layer. Also, numeric fields need explicit range validation.
+**Prevention:** Applied `sanitize_html` to all user-controlled text inputs in the endpoint and added an explicit check for `price_cents < 0`. Created a targeted regression test.
