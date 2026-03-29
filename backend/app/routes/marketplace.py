@@ -1,8 +1,7 @@
 from flask import Blueprint, jsonify, request
-from app.models import db, ExercisePack, PackExercise, PackDownload, PackReview, User
-from app.extensions import limiter
-from flask_login import login_required, current_user
+from ..models import db, ExercisePack, PackExercise, PackDownload, PackReview, User, ALLOWED_CATEGORIES, ALLOWED_AUDIENCES, ALLOWED_GOALS
 from ..extensions import limiter
+from flask_login import login_required, current_user
 from ..validators import sanitize_html
 import uuid
 from datetime import datetime
@@ -76,16 +75,38 @@ def create_pack():
     title = sanitize_html(data.get('title', ''))
     description = sanitize_html(data.get('description', ''))
 
+    # Security: Validate Enums
+    category = data.get('category')
+    if category and category not in ALLOWED_CATEGORIES:
+        return jsonify({'error': f'Invalid category. Allowed: {", ".join(ALLOWED_CATEGORIES)}'}), 400
+
+    target_audience = data.get('target_audience')
+    if target_audience and target_audience not in ALLOWED_AUDIENCES:
+         return jsonify({'error': f'Invalid audience. Allowed: {", ".join(ALLOWED_AUDIENCES)}'}), 400
+
+    voice_goal = data.get('voice_goal')
+    if voice_goal and voice_goal not in ALLOWED_GOALS:
+        return jsonify({'error': f'Invalid voice goal. Allowed: {", ".join(ALLOWED_GOALS)}'}), 400
+
+    # Security: Validate Price
+    price_cents = data.get('price_cents', 0)
+    try:
+        price_cents = int(price_cents)
+        if price_cents < 0:
+            return jsonify({'error': 'Price cannot be negative'}), 400
+    except (ValueError, TypeError):
+         return jsonify({'error': 'Invalid price format'}), 400
+
     pack_id = str(uuid.uuid4())
     pack = ExercisePack(
         id=pack_id,
         creator_id=current_user.id,
         title=title,
         description=description,
-        category=data.get('category'),
-        target_audience=data.get('target_audience'),
-        voice_goal=data.get('voice_goal'),
-        price_cents=data.get('price_cents', 0)
+        category=category,
+        target_audience=target_audience,
+        voice_goal=voice_goal,
+        price_cents=price_cents
     )
     
     db.session.add(pack)
