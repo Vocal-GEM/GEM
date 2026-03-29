@@ -8,6 +8,9 @@
  * @module pitchYIN
  */
 
+// Persistent buffer for YIN algorithm to prevent GC churn in render loop
+let _sharedYinBuffer = null;
+
 /**
  * Detect pitch using the YIN algorithm
  * @param {Float32Array} buffer - Audio data
@@ -23,8 +26,16 @@ export function detectPitchYIN(buffer, sampleRate, threshold = 0.15) {
     const bufferSize = buffer.length;
     const halfSize = Math.floor(bufferSize / 2);
 
+    // ⚡ Bolt: Reuse persistent buffer to prevent GC churn during rapid RAF calls
+    if (!_sharedYinBuffer || _sharedYinBuffer.length < halfSize) {
+        _sharedYinBuffer = new Float32Array(halfSize);
+    } else {
+        // Clear only the part we'll use
+        _sharedYinBuffer.fill(0, 0, halfSize);
+    }
+
     // Step 1: Difference function
-    const yinBuffer = new Float32Array(halfSize);
+    const yinBuffer = _sharedYinBuffer;
     for (let tau = 0; tau < halfSize; tau++) {
         for (let i = 0; i < halfSize; i++) {
             const delta = buffer[i] - buffer[i + tau];
