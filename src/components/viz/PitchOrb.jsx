@@ -17,6 +17,7 @@ const getNoteFromSemitone = (semitone) => {
 
 const PitchOrb = ({ dataRef, settings = {} }) => {
     const canvasRef = useRef(null);
+    const containerRef = useRef(null);
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
@@ -29,10 +30,48 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     const genderRanges = settings.genderRanges || defaultRanges;
 
+    // Separate useEffect for ResizeObserver to handle canvas resizing
+    useEffect(() => {
+        const container = containerRef.current;
+        const canvas = canvasRef.current;
+        if (!container || !canvas) return;
+
+        const handleResize = () => {
+            const rect = container.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+
+            // Only update if dimensions actually changed
+            const newWidth = Math.floor(rect.width * dpr);
+            const newHeight = Math.floor(rect.height * dpr);
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                // Need to reset scale after resize
+                const ctx = canvas.getContext('2d');
+                ctx.scale(dpr, dpr);
+                // Store logical dimensions on canvas object for easy access in loop
+                canvas.logicalWidth = rect.width;
+                canvas.logicalHeight = rect.height;
+            }
+        };
+
+        const resizeObserver = new ResizeObserver(() => {
+            requestAnimationFrame(handleResize);
+        });
+
+        resizeObserver.observe(container);
+        handleResize(); // Initial sizing
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
+        // dpr is handled in ResizeObserver loop via scaling
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,13 +106,12 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            // Optimization: Use cached logical dimensions set by ResizeObserver
+            // If logicalWidth is missing (e.g. initial render race), fallback to clientWidth
+            // But NEVER call getBoundingClientRect here
+            const width = canvas.logicalWidth || canvas.clientWidth;
+            const height = canvas.logicalHeight || canvas.clientHeight;
 
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -170,7 +208,10 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
     return (
-        <div className="glass-panel-dark rounded-2xl p-6 relative overflow-hidden shadow-lg">
+        <div
+            ref={containerRef}
+            className="glass-panel-dark rounded-2xl p-6 relative overflow-hidden shadow-lg h-auto"
+        >
             <div className="flex justify-between items-center mb-4">
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                     Pitch
@@ -182,7 +223,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
                     {showSemitones ? 'Show Hz' : 'Show Notes'}
                 </button>
             </div>
-            <canvas ref={canvasRef} className="w-full h-64" />
+            {/* Added style={{ width: '100%' }} to ensure it takes parent width */}
+            <canvas ref={canvasRef} className="w-full h-64" style={{ width: '100%' }} />
         </div>
     );
 };
