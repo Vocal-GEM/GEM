@@ -22,26 +22,26 @@ const AudioSourceManager = ({ onSourceChange }) => {
         }
     };
 
+    const checkPermissionAndEnumerate = async () => {
+        try {
+            // Must request permission first to get labels
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            setPermissionGranted(true);
+
+            // Stop the temp stream immediately
+            stream.getTracks().forEach(track => track.stop());
+
+            enumerateDevices();
+
+            // Listen for changes
+            navigator.mediaDevices.ondevicechange = enumerateDevices;
+        } catch (err) {
+            console.error("Microphone permission denied:", err);
+            setPermissionGranted(false);
+        }
+    };
+
     useEffect(() => {
-        const checkPermissionAndEnumerate = async () => {
-            try {
-                // Must request permission first to get labels
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                setPermissionGranted(true);
-
-                // Stop the temp stream immediately
-                stream.getTracks().forEach(track => track.stop());
-
-                enumerateDevices();
-
-                // Listen for changes
-                navigator.mediaDevices.ondevicechange = enumerateDevices;
-            } catch (err) {
-                console.error("Microphone permission denied:", err);
-                setPermissionGranted(false);
-            }
-        };
-
         checkPermissionAndEnumerate();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
