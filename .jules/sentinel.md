@@ -75,3 +75,11 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2026-02-14 - Marketplace Business Logic Vulnerabilities
+**Vulnerability:** The `create_pack` endpoint in `backend/app/routes/marketplace.py` failed to validate inputs, allowing negative prices (`price_cents < 0`), invalid categories/metadata, and XSS payloads in text fields.
+**Learning:** Frameworks like Flask/SQLAlchemy do not inherently validate data integrity or business logic constraints (like non-negative prices) unless explicitly defined in the model or route. Storing invalid enum values can break filtering logic and frontend displays.
+**Prevention:**
+1. Define explicit allowlists (sets) for enum-like fields (`VALID_CATEGORIES`, etc.).
+2. Validate numeric inputs against business rules (e.g., `price_cents >= 0`) before object creation.
+3. Apply input sanitization (`sanitize_html`) to all text fields before usage or storage.
