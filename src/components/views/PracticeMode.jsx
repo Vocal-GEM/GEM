@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, Suspense, lazy, useCallback } from 'react';
-import { Play, Square, Mic, Volume2, Activity, BarChart2, RefreshCw, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer, Sparkles, MessageCircle, Target, Radio } from 'lucide-react';
+import { Play, Square, Mic, Volume2, Activity, BarChart2, RefreshCw, X, Mic2, Layers, BookOpen, Dumbbell, ClipboardCheck, Timer, Sparkles, MessageCircle, Target, Radio, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAudio } from '../../context/AudioContext';
@@ -58,7 +58,8 @@ const PracticeMode = ({
     dataRef,
     calibration,
     targetRange,
-    settings
+    settings,
+    onOpenJournal
 }) => {
     const {
         practiceTab,
@@ -391,6 +392,18 @@ const PracticeMode = ({
                                 />
                             )}
                             <InstantPlayback />
+
+                            {onOpenJournal && (
+                                <button
+                                    onClick={onOpenJournal}
+                                    className="p-2.5 rounded-full bg-black/50 hover:bg-slate-800 text-slate-400 hover:text-white transition-all backdrop-blur-sm border border-white/10"
+                                    title="Session Journal"
+                                    aria-label="Open Session Journal"
+                                >
+                                    <FileText size={18} />
+                                </button>
+                            )}
+
                             {timerActive ? (
                                 <PracticeTimer compact onClose={() => setTimerActive(false)} />
                             ) : (

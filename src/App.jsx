@@ -230,7 +230,7 @@ const App = () => {
                                         goals={goals}
                                         activeTab={activeTab}
                                         onOpenSettings={() => setShowSettings(true)}
-                                        onOpenJournal={() => { setActiveTab('history'); setShowJournalForm(true); }}
+                                        onOpenJournal={() => setShowJournalForm(true)}
                                         onOpenStats={() => setActiveTab('history')}
                                         onNavigate={setActiveTab}
                                         onUpdateRange={updateTargetRange}

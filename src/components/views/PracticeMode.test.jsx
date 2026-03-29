@@ -91,4 +91,32 @@ describe('PracticeMode', () => {
         // Check for visualization area
         expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
     });
+
+    it('renders the journal button when onOpenJournal is provided', async () => {
+        const onOpenJournal = vi.fn();
+        render(
+            <SettingsProvider>
+                <ProfileProvider>
+                    <AudioProvider>
+                        <NavigationProvider>
+                            <TourProvider>
+                                <PracticeCardsProvider>
+                                    <PracticeMode
+                                        dataRef={mockDataRef}
+                                        calibration={{}}
+                                        targetRange={{ min: 100, max: 200 }}
+                                        goals={{}}
+                                        settings={{}}
+                                        onOpenJournal={onOpenJournal}
+                                    />
+                                </PracticeCardsProvider>
+                            </TourProvider>
+                        </NavigationProvider>
+                    </AudioProvider>
+                </ProfileProvider>
+            </SettingsProvider>
+        );
+
+        expect(screen.getByTitle('Session Journal')).toBeInTheDocument();
+    });
 });
