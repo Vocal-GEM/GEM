@@ -27,10 +27,22 @@ export class DSP {
         return output;
     }
 
+    // Persistent buffer for YIN algorithm to prevent GC churn in render loop
+    static _yinBuffer = null;
+
     static calculatePitchYIN(buffer, sampleRate, adaptiveThreshold = 0.15) {
         const bufferSize = buffer.length;
         const halfSize = Math.floor(bufferSize / 2);
-        const yinBuffer = new Float32Array(halfSize);
+
+        // ⚡ Bolt: Reuse persistent buffer to prevent GC churn during rapid RAF calls
+        if (!DSP._yinBuffer || DSP._yinBuffer.length < halfSize) {
+            DSP._yinBuffer = new Float32Array(halfSize);
+        } else {
+            // Clear only the part we'll use
+            DSP._yinBuffer.fill(0, 0, halfSize);
+        }
+
+        const yinBuffer = DSP._yinBuffer;
 
         for (let tau = 0; tau < halfSize; tau++) {
             for (let i = 0; i < halfSize; i++) {
