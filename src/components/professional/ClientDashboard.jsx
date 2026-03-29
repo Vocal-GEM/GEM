@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, UserPlus, Search, FileText, Calendar, ChevronRight, MoreVertical } from 'lucide-react';
+import { Users, UserPlus, Search, FileText, Calendar, ChevronRight, MoreVertical, Activity } from 'lucide-react';
 
 const ClientDashboard = () => {
     const [clients, setClients] = useState([
@@ -95,7 +95,7 @@ const ClientDashboard = () => {
                                 <div>
                                     <h2 className="text-xl font-bold">{selectedClient.name}</h2>
                                     <div className="flex items-center gap-2 text-xs text-slate-400">
-                                        <span className={`px-2 py-0.5 rounded-full ${selectedClient.status === 'Active' ? 'bg-green-500/20 text-green-400' : 'bg-slate-600 text-slate-300'}`}>
+                                        <span className={`px-2 py-0.5 rounded-full ${selectedClient.status === 'Active' && 'bg-green-500/20 text-green-400'} ${selectedClient.status === 'Paused' && 'bg-yellow-500/20 text-yellow-400'} ${selectedClient.status === 'Pending' && 'bg-slate-600 text-slate-300'}`}>
                                             {selectedClient.status}
                                         </span>
                                         <span>•</span>
