@@ -43,6 +43,12 @@ vi.mock('../viz/VoiceQualityAnalysis', () => ({ default: () => <div>Voice Qualit
 vi.mock('../viz/VowelAnalysis', () => ({ default: () => <div>Vowel Analysis</div> }));
 vi.mock('../ui/ToolExercises', () => ({ default: () => <div>Tool Exercises</div> }));
 vi.mock('../ui/ComparisonTool', () => ({ default: () => <div>Comparison Tool</div> }));
+vi.mock('../ui/ContextualTips', () => ({ default: () => <div>Contextual Tips</div> }));
+vi.mock('../../utils/CoachingEngine', () => ({
+    CoachingEngine: class {
+        process() { return null; }
+    }
+}));
 vi.mock('../../context/AuthContext', () => ({
     useAuth: () => ({ user: { id: 'test-user', username: 'Tester' } }),
     AuthProvider: ({ children }) => <div>{children}</div>
@@ -57,6 +63,37 @@ vi.mock('../../context/ProfileContext', () => ({
     }),
     ProfileProvider: ({ children }) => <div>{children}</div>
 }));
+vi.mock('../../context/TourContext', () => ({
+    useTour: () => ({ startTour: vi.fn() }),
+    TourProvider: ({ children }) => <div>{children}</div>
+}));
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (k, d) => {
+            const map = {
+                'practiceMode.tabs.overview': 'Overview',
+                'practiceMode.tabs.pitch': 'Pitch',
+                'practiceMode.tabs.resonance': 'Resonance',
+                'practiceMode.tabs.weight': 'Weight',
+                'practiceMode.tabs.vowel': 'Vowel',
+                'practiceMode.tabs.spectrogram': 'Spectrogram',
+                'practiceMode.tabs.training': 'Training',
+                'practiceMode.actions.assessment': 'Assessment'
+            };
+            return map[k] || d || k;
+        }
+    }),
+    initReactI18next: {
+        type: '3rdParty',
+        init: () => {}
+    }
+}));
+vi.mock('../ui/VisualizerSkeleton', () => ({ default: () => <div data-testid="visualizer-skeleton">Skeleton</div> }));
+vi.mock('../ui/PracticeCardsPanel', () => ({ default: () => <div>Practice Cards</div> }));
+vi.mock('../ui/CoachPanel', () => ({ default: () => <div>Coach Panel</div> }));
+vi.mock('./TrainingView', () => ({ default: () => <div>Training View</div> }));
+vi.mock('./ProgressiveStackingSession', () => ({ default: () => <div>Progressive Stacking</div> }));
+vi.mock('../ui/AssessmentModule', () => ({ default: () => <div>Assessment Module</div> }));
 
 describe('PracticeMode', () => {
     const mockDataRef = { current: { pitch: 200, resonance: 100, volume: 0.5 } };
@@ -89,6 +126,6 @@ describe('PracticeMode', () => {
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
         // Check for visualization area
-        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
+        expect(await screen.findByTestId('dynamic-orb', {}, { timeout: 3000 })).toBeInTheDocument();
     });
 });
