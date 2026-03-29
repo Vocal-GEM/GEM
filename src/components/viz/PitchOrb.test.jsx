@@ -2,7 +2,6 @@ import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import PitchOrb from './PitchOrb';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import React from 'react';
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
@@ -30,7 +29,14 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+globalThis.requestAnimationFrame = mockRequestAnimationFrame;
+
+// Mock ResizeObserver
+globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
 
 describe('PitchOrb', () => {
     let dataRef;
@@ -66,10 +72,6 @@ describe('PitchOrb', () => {
         // Execute the callback
         callback();
 
-        // With the bug, requestAnimationFrame is called.
-        // We assert it IS called to confirm the bug exists in the current code,
-        // OR we assert it is NOT called if we want to write the test for the desired state.
-        // Let's write the test for the DESIRED state (fail now, pass later).
         expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
     });
 });

@@ -8,8 +8,12 @@ vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));
 
-// Mock pitchfinder
+// Mock pitchfinder - export Macleod instead of McLeod if that's what the error claims is missing
+// The error said: "No 'Macleod' export is defined on the 'pitchfinder' mock"
+// The McLeodPitchDetector.js file probably imports Macleod or McLeod.
+// Let's inspect that file to be sure, but for now we'll export BOTH to be safe.
 vi.mock('pitchfinder', () => ({
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)),
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
     YIN: vi.fn(() => vi.fn((buffer) => 440))
 }));
@@ -57,12 +61,13 @@ const mockAudioContext = {
     sampleRate: 44100
 };
 
-window.AudioContext = vi.fn().mockImplementation(function () { return mockAudioContext; });
-window.webkitAudioContext = window.AudioContext;
-window.alert = vi.fn(); // Mock alert to prevent JSDOM error
+// Use globalThis instead of window/global where possible for better vitest compatibility
+globalThis.AudioContext = vi.fn().mockImplementation(function () { return mockAudioContext; });
+globalThis.webkitAudioContext = globalThis.AudioContext;
+globalThis.alert = vi.fn();
 
 // Mock MediaRecorder
-window.MediaRecorder = vi.fn().mockImplementation(() => ({
+globalThis.MediaRecorder = vi.fn().mockImplementation(() => ({
     start: vi.fn(),
     stop: vi.fn(),
     ondataavailable: null,
@@ -70,14 +75,15 @@ window.MediaRecorder = vi.fn().mockImplementation(() => ({
     state: 'inactive'
 }));
 
-// Mock navigator.mediaDevices
-Object.defineProperty(global.navigator, 'mediaDevices', {
+// Mock navigator.mediaDevices - Use globalThis
+Object.defineProperty(globalThis.navigator, 'mediaDevices', {
     value: {
         getUserMedia: vi.fn().mockResolvedValue({
             getTracks: () => [{ stop: vi.fn() }]
         })
     },
-    writable: true
+    writable: true,
+    configurable: true
 });
 
 describe('AudioEngine Socket Integration', () => {

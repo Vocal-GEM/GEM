@@ -20,6 +20,9 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
+    // Optimization: Cache dimensions to avoid layout thrashing
+    const dimsRef = useRef({ width: 0, height: 0 });
+
     // Default gender ranges if not set in settings
     const defaultRanges = {
         feminine: { min: 165, max: 300 },
@@ -29,10 +32,33 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     const genderRanges = settings.genderRanges || defaultRanges;
 
+    // Monitor canvas size changes asynchronously
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        // Initial measurement
+        const rect = canvas.getBoundingClientRect();
+        dimsRef.current = { width: rect.width, height: rect.height };
+
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                // Use contentRect for the actual drawing area
+                const { width, height } = entry.contentRect;
+                dimsRef.current = { width, height };
+            }
+        });
+
+        resizeObserver.observe(canvas);
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,13 +93,24 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            // Optimization: Use cached dimensions to avoid layout thrashing
+            // const rect = canvas.getBoundingClientRect(); // REMOVED
+            const { width, height } = dimsRef.current;
 
-            const width = rect.width;
-            const height = rect.height;
+            // Skip if invalid dimensions
+            if (width === 0 || height === 0) return;
+
+            const dpr = window.devicePixelRatio || 1;
+            const targetWidth = Math.floor(width * dpr);
+            const targetHeight = Math.floor(height * dpr);
+
+            // Only update canvas size if physical size changed
+            if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+                ctx.scale(dpr, dpr);
+            }
+
             const centerX = width / 2;
             const centerY = height / 2;
 

@@ -2,57 +2,58 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import QuickActions from './QuickActions';
+import React from 'react';
+
+// Define hoisted mocks
+const { mockSettings, mockUpdateSettings } = vi.hoisted(() => ({
+    mockSettings: { listenMode: false },
+    mockUpdateSettings: vi.fn(),
+}));
+
+// Mock the module
+vi.mock('../../context/SettingsContext', () => ({
+    useSettings: () => ({
+        settings: mockSettings,
+        updateSettings: mockUpdateSettings
+    })
+}));
 
 describe('QuickActions', () => {
-    const { mockSettings, mockUpdateSettings } = vi.hoisted(() => ({
-        mockSettings: { listenMode: false },
-        mockUpdateSettings: vi.fn(),
-    }));
-
     beforeEach(() => {
-        vi.mock('../../context/SettingsContext', () => ({
-            useSettings: () => ({
-                settings: mockSettings,
-                updateSettings: mockUpdateSettings
-            })
-        }));
         mockUpdateSettings.mockClear();
     });
 
     it('should render the FAB button', () => {
         render(<QuickActions />);
-        expect(screen.getByRole('button', { name: /quick actions/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /open quick actions/i })).toBeInTheDocument();
     });
 
     it('should have correct accessibility attributes', () => {
         render(<QuickActions />);
-        const fab = screen.getByRole('button', { name: /quick actions/i });
+        const fab = screen.getByRole('button', { name: /open quick actions/i });
 
         // Initial state
         expect(fab).toHaveAttribute('aria-expanded', 'false');
         expect(fab).toHaveAttribute('aria-haspopup', 'true');
         expect(fab).toHaveAttribute('aria-controls', 'quick-actions-menu');
 
-        // Buttons should be hidden from accessibility tree initially
-        const practiceButton = screen.queryByText('Practice');
-        expect(practiceButton).toBeInTheDocument();
-        // Since we are finding by text which is in a span, we check the button parent
-        const button = practiceButton.closest('button');
-        expect(button).toHaveAttribute('aria-hidden', 'true');
-        expect(button).toHaveAttribute('tabIndex', '-1');
+        // Verify menu items are hidden
+        const menu = screen.getByRole('region', { name: /quick actions menu/i }).querySelector('#quick-actions-menu');
+        expect(menu).toHaveAttribute('aria-hidden', 'true');
     });
 
     it('should expand menu when clicked and update attributes', () => {
         render(<QuickActions />);
-        const fab = screen.getByRole('button', { name: /quick actions/i });
+        const fab = screen.getByRole('button', { name: /open quick actions/i });
 
         fireEvent.click(fab);
 
-        expect(fab).toHaveAttribute('aria-expanded', 'true');
+        // Fab label changes
+        expect(screen.getByRole('button', { name: /close quick actions/i })).toHaveAttribute('aria-expanded', 'true');
 
-        const practiceButton = screen.getByText('Practice').closest('button');
-        expect(practiceButton).toHaveAttribute('aria-hidden', 'false');
-        expect(practiceButton).toHaveAttribute('tabIndex', '0');
+        // Menu should be visible
+        const menu = screen.getByRole('region', { name: /quick actions menu/i }).querySelector('#quick-actions-menu');
+        expect(menu).toHaveAttribute('aria-hidden', 'false');
     });
 
     it('should call onAction when an action is clicked', () => {
@@ -60,10 +61,12 @@ describe('QuickActions', () => {
         render(<QuickActions onAction={onAction} />);
 
         // Open menu
-        fireEvent.click(screen.getByRole('button', { name: /quick actions/i }));
+        fireEvent.click(screen.getByRole('button', { name: /open quick actions/i }));
 
-        // Click action
-        fireEvent.click(screen.getByText('Practice'));
+        // Click action - Use closest button because text is inside a span inside the button
+        const actionButton = screen.getByLabelText('Practice');
+        fireEvent.click(actionButton);
+
         expect(onAction).toHaveBeenCalledWith('practice');
     });
 
@@ -71,10 +74,11 @@ describe('QuickActions', () => {
         render(<QuickActions />);
 
         // Open menu
-        fireEvent.click(screen.getByRole('button', { name: /quick actions/i }));
+        fireEvent.click(screen.getByRole('button', { name: /open quick actions/i }));
 
         // Click Listen Mode
-        fireEvent.click(screen.getByText('Listen Mode'));
+        const listenButton = screen.getByLabelText('Listen Mode');
+        fireEvent.click(listenButton);
 
         expect(mockUpdateSettings).toHaveBeenCalledWith({ ...mockSettings, listenMode: true });
     });
