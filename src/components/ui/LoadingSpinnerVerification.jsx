@@ -141,7 +141,5 @@ export default function LoadingSpinnerTest() {
                 </div>
             </section>
         </div>
-      </section>
-    </div>
-  );
+    );
 }
