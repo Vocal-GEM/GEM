@@ -1,4 +1,5 @@
 /* eslint-disable react/no-unknown-property */
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -401,7 +402,6 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
   const textRef = useRef(null);
 
   useEffect(() => {
-    let frameId;
     const loop = () => {
       if (dataRef.current) {
         const { pitch, volume } = dataRef.current;
@@ -414,10 +414,15 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
           textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
         }
       }
-      frameId = requestAnimationFrame(loop);
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
+
+    const unsubscribe = renderCoordinator.subscribe(
+        'dynamic-orb-safe',
+        loop,
+        renderCoordinator.PRIORITY.HIGH
+    );
+
+    return () => unsubscribe();
   }, [dataRef]);
 
   return (
