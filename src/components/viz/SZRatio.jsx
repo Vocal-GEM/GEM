@@ -1,3 +1,4 @@
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { useState, useRef, useEffect } from 'react';
 import { Play, Square, RotateCcw, Divide } from 'lucide-react';
 
@@ -10,8 +11,6 @@ const SZRatio = ({ dataRef, isActive }) => {
     const [threshold, setThreshold] = useState(0.02);
 
     const startTimeRef = useRef(null);
-    const animationRef = useRef(null);
-
     // Auto-detection logic (similar to MPT)
     useEffect(() => {
         if (!autoMode || !isActive) return;
@@ -33,21 +32,15 @@ const SZRatio = ({ dataRef, isActive }) => {
                     if (startTimeRef.current) startTimeRef.current.silenceStart = null;
                 }
             }
-            animationRef.current = requestAnimationFrame(checkAudio);
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'sz-ratio',
-                checkAudio,
-                renderCoordinator.PRIORITY.LOW
-            );
-        });
+        const unsubscribe = renderCoordinator.subscribe(
+            'sz-ratio',
+            checkAudio,
+            renderCoordinator.PRIORITY.LOW
+        );
 
-        return () => {
-            if (unsubscribe) unsubscribe();
-        };
+        return () => unsubscribe();
     }, [autoMode, isActive, isRecording, threshold, dataRef]);
 
     // Timer update
