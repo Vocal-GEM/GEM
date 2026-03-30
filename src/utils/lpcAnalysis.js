@@ -13,6 +13,16 @@ export class LPCAnalyzer {
     constructor(order = 12, sampleRate = 48000) {
         this.order = order; // Typically 10-12 for speech at 8-10kHz, maybe higher for 48kHz
         this.sampleRate = sampleRate;
+
+        // Persistent buffers to avoid GC churn
+        this.preEmphasisBuffer = new Float32Array(0);
+        this.windowBuffer = new Float32Array(0);
+        this.rBuffer = new Float32Array(this.order + 1);
+        this.aBuffer = new Float32Array(this.order + 1);
+        this.eBuffer = new Float32Array(this.order + 1);
+        this.kCoeffBuffer = new Float32Array(this.order + 1);
+        this.aPrevBuffer = new Float32Array(this.order + 1);
+        this.magnitudeBuffer = new Float32Array(512); // Assuming 512 points is standard
     }
 
     /**
@@ -45,34 +55,41 @@ export class LPCAnalyzer {
         const formants = this.findPeaks(envelope, this.sampleRate);
 
         return {
-            coefficients: a,
-            envelope,
+            coefficients: a, // a is already a sliced copy from levinsonDurbin
+            // Slice the envelope buffer here once to maintain referential equality safety for React
+            envelope: envelope.slice(0, 512),
             formants
         };
     }
 
     applyPreEmphasis(signal, coeff = 0.97) {
-        const output = new Float32Array(signal.length);
+        if (this.preEmphasisBuffer.length < signal.length) {
+            this.preEmphasisBuffer = new Float32Array(signal.length);
+        }
+        const output = this.preEmphasisBuffer;
         output[0] = signal[0];
         for (let i = 1; i < signal.length; i++) {
             output[i] = signal[i] - coeff * signal[i - 1];
         }
-        return output;
+        return output.subarray(0, signal.length);
     }
 
     applyWindow(signal) {
         const N = signal.length;
-        const output = new Float32Array(N);
+        if (this.windowBuffer.length < N) {
+            this.windowBuffer = new Float32Array(N);
+        }
+        const output = this.windowBuffer;
         for (let i = 0; i < N; i++) {
             // Hamming window
             const w = 0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (N - 1));
             output[i] = signal[i] * w;
         }
-        return output;
+        return output.subarray(0, N);
     }
 
     computeAutocorrelation(signal, order) {
-        const R = new Float32Array(order + 1);
+        const R = this.rBuffer;
         const N = signal.length;
         for (let k = 0; k <= order; k++) {
             let sum = 0;
@@ -85,16 +102,16 @@ export class LPCAnalyzer {
     }
 
     levinsonDurbin(R, order) {
-        const a = new Float32Array(order + 1);
-        const E = new Float32Array(order + 1);
+        const a = this.aBuffer;
+        const E = this.eBuffer;
 
         // Initialization
         E[0] = R[0];
         a[0] = 1; // a[0] is always 1
 
         // Temporary arrays
-        const k_coeff = new Float32Array(order + 1);
-        const a_prev = new Float32Array(order + 1);
+        const k_coeff = this.kCoeffBuffer;
+        const a_prev = this.aPrevBuffer;
 
         for (let i = 1; i <= order; i++) {
             let sum = 0;
@@ -126,7 +143,7 @@ export class LPCAnalyzer {
         // Usually we want the predictor coefficients.
         // Let's stick to the standard definition: A(z) = 1 + sum_{k=1}^p a_k z^{-k}
 
-        return { a: a.slice(1), error: E[order] }; // Return coefficients a1...ap
+        return { a: a.slice(1, order + 1), error: E[order] }; // Return coefficients a1...ap
     }
 
     computeLPCSpectrum(a, error, numPoints) {
@@ -134,11 +151,15 @@ export class LPCAnalyzer {
         // A(z) = 1 + a1*z^-1 + ... + ap*z^-p
         // z = e^(j*omega)
 
-        const magnitude = new Float32Array(numPoints);
+        if (this.magnitudeBuffer.length < numPoints) {
+            this.magnitudeBuffer = new Float32Array(numPoints);
+        }
+        const magnitude = this.magnitudeBuffer;
         const gain = Math.sqrt(error); // Gain G
 
         if (gain < 1e-10) {
-            return new Float32Array(numPoints).fill(-100); // Return low dB floor
+            magnitude.fill(-100, 0, numPoints); // Return low dB floor
+            return magnitude;
         }
 
         for (let i = 0; i < numPoints; i++) {
@@ -157,6 +178,7 @@ export class LPCAnalyzer {
             magnitude[i] = 20 * Math.log10(gain / (magA + 1e-10)); // dB
         }
 
+        // Return the raw buffer and let the caller slice it if needed to save allocations
         return magnitude;
     }
 
