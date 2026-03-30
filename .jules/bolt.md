@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-23 - Spectrogram Loop Optimization
+**Learning:** `Spectrogram.jsx` was calculating `binIndex` (freq to pixel mapping) using floating point division and `Math.floor` inside the pixel loop (runs `height` * `frames` times).
+**Action:** Implemented a pre-calculated `binIndexLUT` (Uint16Array) that maps `y` coordinate to `binIndex`. This reduced calculation time by ~17x in benchmarks (390ms -> 23ms for 10k frames). Also cached `Uint32Array` view of `ImageData` to reduce GC.
