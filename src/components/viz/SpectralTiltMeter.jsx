@@ -3,15 +3,19 @@ import { useSettings } from '../../context/SettingsContext';
 import { Info, TrendingDown } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
-const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -6 } }) => {
+const SpectralTiltMeter = ({ dataRef, targetRange = { min: -12, max: -6 } }) => {
     const { colorBlindMode } = useSettings();
-    const id = useId();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
-    const componentId = useId();
+
+    // Unique component ID for RenderCoordinator
+    const uniqueId = useId();
+    const componentId = `spectral-tilt-meter-${uniqueId}`;
 
     useEffect(() => {
         const loop = () => {
+            if (!dataRef.current) return;
+
             if (indicatorRef.current && valueRef.current) {
                 const tilt = dataRef.current.tilt || 0;
 
@@ -32,9 +36,9 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 const isWithinTarget = tilt >= targetRange.min && tilt <= targetRange.max;
 
                 if (isWithinTarget) {
-                    indicatorRef.current.className = `absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`;
+                    indicatorRef.current.className = `absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] border border-white/50 transition-colors duration-75 ease-out z-10 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`;
                 } else {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-slate-400";
+                    indicatorRef.current.className = "absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] border border-white/50 transition-colors duration-75 ease-out z-10 bg-slate-400";
                 }
 
                 // Update value display
@@ -42,27 +46,15 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
             }
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                `spectral-tilt-meter-${id}`,
-                loop,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
-
         const unsubscribe = renderCoordinator.subscribe(
-            `spectral-tilt-meter-${componentId}`,
+            componentId,
             loop,
             renderCoordinator.PRIORITY.MEDIUM
         );
 
         return () => {
-            unsubscribe();
+            if (unsubscribe) unsubscribe();
         };
-    }, [dataRef, targetRange, colorBlindMode, id]);
     }, [dataRef, targetRange, colorBlindMode, componentId]);
 
     return (
@@ -89,8 +81,14 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 {(() => {
                     const minDisp = -24;
                     const maxDisp = 0;
-                    const left = ((targetRange.min - minDisp) / (maxDisp - minDisp)) * 100;
-                    const width = ((targetRange.max - targetRange.min) / (maxDisp - minDisp)) * 100;
+                    // Calculate left and width percentages for the target range box
+                    // Range: -24 to 0. Target: -12 to -6 (example)
+                    // -12 is 50% of the way from -24 to 0.
+
+                    const totalRange = maxDisp - minDisp;
+                    const left = ((targetRange.min - minDisp) / totalRange) * 100;
+                    const width = ((targetRange.max - targetRange.min) / totalRange) * 100;
+
                     return (
                         <div
                             className={`absolute top-0 bottom-0 border-x ${colorBlindMode ? 'bg-amber-500/20 border-amber-500/30' : 'bg-emerald-500/20 border-emerald-500/30'}`}
