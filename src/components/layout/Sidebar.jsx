@@ -162,12 +162,18 @@ const Sidebar = ({ activeView, onViewChange }) => {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"
+                aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
+                aria-expanded={isOpen}
+                aria-controls="sidebar-menu"
             >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
 
             {/* Sidebar Container */}
-            <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div
+                id="sidebar-menu"
+                className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+            >
                 <div className="flex flex-col h-full">
                     {/* Header */}
                     <div className="p-6 border-b border-slate-800">
