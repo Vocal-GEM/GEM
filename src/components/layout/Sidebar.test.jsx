@@ -2,6 +2,18 @@ import { render, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Sidebar from './Sidebar';
 
+// Mock feature flags to enable all features for testing
+vi.mock('../../config/featureFlags', () => ({
+    FEATURES: {
+        camera: true,
+        spectrogram: true,
+        library: true,
+        analytics: true,
+        // Enable others as needed, or use a proxy to default to true
+    }
+}));
+
+
 // Mock contexts
 const mockLogout = vi.fn();
 const mockUseAuth = vi.fn();
@@ -19,24 +31,7 @@ vi.mock('../../context/ProfileContext', () => ({
 vi.mock('../ui/ProfileManager', () => ({
     default: ({ onClose }) => <div data-testid="profile-manager">Profile Manager <button onClick={onClose}>Close</button></div>
 }));
-vi.mock('../ui/Login', () => ({
-    default: ({ onClose, onSwitchToSignup }) => (
-        <div data-testid="login-modal">
-            Login Modal
-            <button onClick={onClose}>Close</button>
-            <button onClick={onSwitchToSignup}>To Signup</button>
-        </div>
-    )
-}));
-vi.mock('../ui/Signup', () => ({
-    default: ({ onClose, onSwitchToLogin }) => (
-        <div data-testid="signup-modal">
-            Signup Modal
-            <button onClick={onClose}>Close</button>
-            <button onClick={onSwitchToLogin}>To Login</button>
-        </div>
-    )
-}));
+// Login/Signup mocks removed as they are no longer used directly in Sidebar
 
 // Mock NavigationContext
 const mockUseNavigation = vi.fn();
@@ -53,10 +48,11 @@ vi.mock('../../services/SearchService', () => ({
 
 const MockNavigationProvider = ({ children }) => <div>{children}</div>;
 
-describe('Sidebar Auth Integration', () => {
+describe('Sidebar Integration', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockUseProfile.mockReturnValue({ activeProfile: { name: 'LocalUser' } });
+        mockUseAuth.mockReturnValue({ user: { username: 'TestUser' } }); // Default auth state
         mockUseNavigation.mockReturnValue({
             activeView: 'dashboard',
             navigateTo: vi.fn(),
@@ -64,37 +60,15 @@ describe('Sidebar Auth Integration', () => {
         });
     });
 
-    it('shows Sign In button when not logged in', () => {
-        mockUseAuth.mockReturnValue({ user: null });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('Sign In')).toBeInTheDocument();
-    });
-
-    it('shows user info and Sign Out when logged in', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
-        const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('CloudUser')).toBeInTheDocument();
-        expect(getByText('Sign Out')).toBeInTheDocument();
-    });
-
-    it('opens Login modal on Sign In click', () => {
-        mockUseAuth.mockReturnValue({ user: null });
-        const { getByText, getByTestId } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-
-        fireEvent.click(getByText('Sign In'));
-        expect(getByTestId('login-modal')).toBeInTheDocument();
-    });
-
-    it('calls logout on Sign Out click', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
+    it('renders navigation items correctly', () => {
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
-        fireEvent.click(getByText('Sign Out'));
-        expect(mockLogout).toHaveBeenCalled();
+        // Check for standard nav items
+        expect(getByText('Dashboard')).toBeInTheDocument();
+        expect(getByText('Practice')).toBeInTheDocument();
     });
 
     it('opens Camera modal when Mirror button is clicked', () => {
-        mockUseAuth.mockReturnValue({ user: { username: 'TestUser' } });
         const openModalSpy = vi.fn();
         mockUseNavigation.mockReturnValue({
             activeView: 'dashboard',
