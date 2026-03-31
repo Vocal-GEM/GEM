@@ -5,7 +5,6 @@ const STORAGE_KEY = 'gem_welcome_dismissed';
 
 const WelcomeBanner = ({ onStartTutorial, onDismiss }) => {
     const [isVisible, setIsVisible] = useState(false);
-    const [currentStep, setCurrentStep] = useState(0);
 
     useEffect(() => {
         // Check if banner was previously dismissed
@@ -132,9 +131,9 @@ const WelcomeBanner = ({ onStartTutorial, onDismiss }) => {
     );
 };
 
+export default WelcomeBanner;
+
 // Function to reset welcome banner (for testing)
 export const resetWelcomeBanner = () => {
     localStorage.removeItem(STORAGE_KEY);
 };
-
-export default WelcomeBanner;
