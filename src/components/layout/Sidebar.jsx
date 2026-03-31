@@ -161,13 +161,19 @@ const Sidebar = ({ activeView, onViewChange }) => {
             {/* Mobile Toggle */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"
+                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-expanded={isOpen}
+                aria-controls="sidebar-menu"
             >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
 
             {/* Sidebar Container */}
-            <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div
+                id="sidebar-menu"
+                className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+            >
                 <div className="flex flex-col h-full">
                     {/* Header */}
                     <div className="p-6 border-b border-slate-800">
@@ -191,6 +197,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
                             <input
                                 ref={searchInputRef}
                                 type="text"
+                                aria-label="Search navigation and content"
                                 placeholder="Search..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -283,7 +290,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
                                     }
                                     setIsOpen(false);
                                 }}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${item.isModal
+                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset ${item.isModal
                                     ? 'text-violet-400 hover:bg-violet-500/10 hover:text-violet-300 border border-violet-500/20'
                                     : activeView === item.id
                                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
