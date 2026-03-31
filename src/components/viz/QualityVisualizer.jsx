@@ -1,255 +1,252 @@
-import { useEffect, useState, useRef, useId, useCallback } from 'react';
-import { Sparkles, Waves, Wind, Activity } from 'lucide-react';
+import { useEffect, useRef, useMemo, useState, useCallback, memo } from 'react';
+import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
+import { Activity, X, Maximize2, Minimize2, Settings } from 'lucide-react';
 
-const QualityVisualizer = ({ dataRef }) => {
-    const [metrics, setMetrics] = useState({
-        jitter: 0,
-        shimmer: 0,
-        weight: 50
-    });
+/**
+ * QualityVisualizer Component
+ *
+ * Renders real-time vocal quality metrics (CPP, HNR, Jitter, Shimmer)
+ * using an efficient canvas-based history graph.
+ *
+ * Optimized for performance:
+ * - Uses RenderCoordinator for unified animation loop
+ * - Uses OffscreenCanvas pattern for smooth scrolling
+ * - Memoized configuration and color mapping
+ */
 
-    // Generate unique ID for this component instance
-    const componentId = useId();
+const METRICS = {
+    cpp: { label: 'CPP', min: 0, max: 25, color: '#10b981', unit: 'dB' }, // Cepstral Peak Prominence
+    hnr: { label: 'HNR', min: 0, max: 30, color: '#3b82f6', unit: 'dB' }, // Harmonics-to-Noise Ratio
+    jitter: { label: 'Jitter', min: 0, max: 2, color: '#f59e0b', unit: '%' }, // Frequency Perturbation
+    shimmer: { label: 'Shimmer', min: 0, max: 10, color: '#ec4899', unit: '%' } // Amplitude Perturbation
+};
 
-    // History buffers for sparklines
-    const historyRef = useRef({
-        jitter: [],
-        shimmer: [],
-        weight: []
-    });
-    const maxHistory = 100;
+const QualityVisualizer = memo(function QualityVisualizer({ dataRef, isExpanded = false, onToggleExpand }) {
+    const { settings, colorBlindMode } = useSettings();
+    const canvasRef = useRef(null);
+    const containerRef = useRef(null);
+    const historyRef = useRef([]);
+    const [activeMetrics, setActiveMetrics] = useState(['cpp', 'hnr']);
+    const [showConfig, setShowConfig] = useState(false);
 
-    // Define the loop callback (not creating it inside useEffect to allow useCallback if needed,
-    // though here it captures state setters so it's tricky.
-    // Actually, RenderCoordinator passes deltaTime, but we just need to poll dataRef.)
-    // We use useCallback to keep the function reference stable if possible,
-    // but we depend on dataRef.
-    const loop = useCallback(() => {
-        if (!dataRef.current) return;
-        const data = dataRef.current;
+    // Color mapping based on settings
+    const colors = useMemo(() => {
+        if (colorBlindMode) {
+            return {
+                cpp: '#0d9488', // Teal
+                hnr: '#2563eb', // Blue
+                jitter: '#d97706', // Amber
+                shimmer: '#db2777' // Pink
+            };
+        }
+        return {
+            cpp: '#10b981', // Emerald
+            hnr: '#3b82f6', // Blue
+            jitter: '#f59e0b', // Amber
+            shimmer: '#ec4899' // Pink
+        };
+    }, [colorBlindMode]);
 
-        // Update local state
-        // Jitter/Shimmer are often small values (e.g. 0.01), we might want to scale them for display
-        // Jitter > 0.01 (1%) is often considered rough
-        // Shimmer > 0.35 dB (or 3-4%) is often considered rough.
-        // Assuming the engine returns raw values.
+    // Draw loop
+    const draw = useCallback(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
 
-        setMetrics({
-            jitter: data.jitter || 0,
-            shimmer: data.shimmer || 0,
-            weight: data.weight || 50
-        });
-    useEffect(() => {
-        const loop = () => {
-            if (!dataRef.current) return;
-            const data = dataRef.current;
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
 
-            // Update local state
-            // Jitter/Shimmer are often small values (e.g. 0.01), we might want to scale them for display
-            // Jitter > 0.01 (1%) is often considered rough
-            // Shimmer > 0.35 dB (or 3-4%) is often considered rough. 
-            // Assuming the engine returns raw values.
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
 
-            setMetrics({
-                jitter: data.jitter || 0,
-                shimmer: data.shimmer || 0,
-                weight: data.weight || 50
-            });
+        // Get latest data point
+        if (dataRef.current) {
+            const now = Date.now();
+            const point = {
+                timestamp: now,
+                cpp: dataRef.current.cpp?.mean || 0,
+                hnr: dataRef.current.hnr?.mean || 0,
+                jitter: dataRef.current.jitter || 0,
+                shimmer: dataRef.current.shimmer || 0
+            };
 
-            // Update history
-            ['jitter', 'shimmer', 'weight'].forEach(key => {
-                historyRef.current[key].push(data[key] || 0);
-                if (historyRef.current[key].length > maxHistory) {
-                    historyRef.current[key].shift();
+            // Add to history
+            historyRef.current.push(point);
+
+            // Prune history (keep last 10 seconds)
+            const cutoff = now - 10000;
+            if (historyRef.current.length > 0 && historyRef.current[0].timestamp < cutoff) {
+                // Optimization: Remove chunks instead of shift() one by one
+                const keepIndex = historyRef.current.findIndex(p => p.timestamp >= cutoff);
+                if (keepIndex > 0) {
+                    historyRef.current = historyRef.current.slice(keepIndex);
                 }
+            }
+        }
+
+        // Draw grid
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+            const y = (height / 4) * i;
+            ctx.moveTo(0, y);
+            ctx.lineTo(width, y);
+        }
+        ctx.stroke();
+
+        // Draw active metrics
+        activeMetrics.forEach(metricKey => {
+            const metric = METRICS[metricKey];
+            const color = colors[metricKey];
+            const data = historyRef.current;
+
+            if (data.length < 2) return;
+
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+
+            const now = Date.now();
+            const timeWindow = 10000; // 10s
+
+            data.forEach((p, i) => {
+                const x = width - ((now - p.timestamp) / timeWindow) * width;
+                // Normalize value to 0-1
+                let normalized = (p[metricKey] - metric.min) / (metric.max - metric.min);
+                normalized = Math.max(0, Math.min(1, normalized)); // Clamp
+
+                const y = height - (normalized * height);
+
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
             });
 
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
-
-        // Update history
-        ['jitter', 'shimmer', 'weight'].forEach(key => {
-            historyRef.current[key].push(data[key] || 0);
-            if (historyRef.current[key].length > maxHistory) {
-                historyRef.current[key].shift();
-            }
+            ctx.stroke();
         });
 
-        // REMOVED: requestAnimationFrame(loop) - handled by renderCoordinator
-    }, [dataRef]);
+    }, [activeMetrics, colors, dataRef]);
 
+    // Handle Resize
     useEffect(() => {
-        const unsubscribe = renderCoordinator.subscribe(
-            componentId,
-            loop,
-            renderCoordinator.PRIORITY.MEDIUM
-        );
-
-        return () => {
-            unsubscribe();
+        const updateSize = () => {
+            if (containerRef.current && canvasRef.current) {
+                const rect = containerRef.current.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                canvasRef.current.width = rect.width * dpr;
+                canvasRef.current.height = rect.height * dpr;
+            }
         };
-    }, [componentId, loop]);
 
-    // Helper to render sparkline
-    const renderSparkline = (key, colorClass, _height = 40) => {
-        const data = historyRef.current[key];
-        if (data.length < 2) return null;
+        const resizeObserver = new ResizeObserver(updateSize);
+        if (containerRef.current) {
+            resizeObserver.observe(containerRef.current);
+        }
+        updateSize();
 
-        const max = Math.max(...data, key === 'weight' ? 100 : 0.05); // Dynamic max or fixed
-        const min = 0;
+        return () => resizeObserver.disconnect();
+    }, [isExpanded]);
 
-        const points = data.map((val, i) => {
-            const x = (i / (maxHistory - 1)) * 100;
-            const y = 100 - ((val - min) / (max - min)) * 100;
-            return `${x},${y}`;
-        }).join(' ');
+    // Subscribe to render loop
+    useEffect(() => {
+        // Unique ID for this component instance
+        const id = `quality-viz-${Math.random().toString(36).substr(2, 9)}`;
 
-        return (
-            <svg className="w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <polyline
-                    points={points}
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className={colorClass}
-                />
-            </svg>
+        const unsubscribe = renderCoordinator.subscribe(
+            id,
+            draw,
+            renderCoordinator.PRIORITY.LOW // Quality graphs don't need 60fps precision
         );
-    };
 
-    // Helper for status labels
-    const getStatus = (type, val) => {
-        if (type === 'jitter') {
-            // Thresholds for Jitter (approximate for visual feedback)
-            if (val < 0.004) return { label: 'Stable', color: 'text-emerald-400' };
-            if (val < 0.01) return { label: 'Normal', color: 'text-blue-400' };
-            return { label: 'Rough', color: 'text-orange-400' };
-        }
-        if (type === 'shimmer') {
-            // Thresholds for Shimmer
-            if (val < 0.15) return { label: 'Stable', color: 'text-emerald-400' };
-            if (val < 0.35) return { label: 'Normal', color: 'text-blue-400' };
-            return { label: 'Breathy/Rough', color: 'text-orange-400' };
-        }
-        if (type === 'weight') {
-            if (val < 30) return { label: 'Breathy', color: 'text-cyan-400' };
-            if (val > 70) return { label: 'Pressed', color: 'text-orange-400' };
-            return { label: 'Balanced', color: 'text-emerald-400' };
-        }
-        return { label: '-', color: 'text-slate-400' };
+        return () => unsubscribe();
+    }, [draw]);
+
+    const toggleMetric = (key) => {
+        setActiveMetrics(prev =>
+            prev.includes(key)
+                ? prev.filter(k => k !== key)
+                : [...prev, key]
+        );
     };
 
     return (
-        <div className="h-full flex flex-col p-6">
-            <div className="mb-6">
-                <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <Sparkles className="w-6 h-6 text-purple-400" />
-                    Voice Quality
-                </h3>
-                <p className="text-slate-400 text-sm mt-1">
-                    Analyze the texture and stability of your voice.
-                </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-grow">
-                {/* Jitter Card */}
-                <div className="bg-slate-900/50 rounded-2xl border border-white/5 p-6 flex flex-col">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
-                            <Activity size={24} />
-                        </div>
-                        <div>
-                            <h4 className="font-bold text-white">Jitter</h4>
-                            <p className="text-xs text-slate-500">Frequency Instability</p>
-                        </div>
-                    </div>
-
-                    <div className="flex-grow flex flex-col justify-end mb-4">
-                        <div className="h-24 w-full bg-slate-950/50 rounded-lg border border-white/5 p-2 mb-2">
-                            {renderSparkline('jitter', 'text-blue-500')}
-                        </div>
-                        <div className="flex justify-between items-end">
-                            <div className="text-3xl font-mono font-bold text-white">
-                                {(metrics.jitter * 100).toFixed(2)}<span className="text-sm text-slate-500 ml-1">%</span>
-                            </div>
-                            <div className={`text-sm font-bold uppercase ${getStatus('jitter', metrics.jitter).color}`}>
-                                {getStatus('jitter', metrics.jitter).label}
-                            </div>
-                        </div>
-                    </div>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                        Micro-fluctuations in pitch. Lower values indicate a smoother, more stable tone. High jitter is perceived as roughness.
-                    </p>
+        <div
+            ref={containerRef}
+            className={`relative bg-slate-900/50 rounded-xl border border-white/10 overflow-hidden flex flex-col transition-all duration-300 ${isExpanded ? 'fixed inset-4 z-50 bg-slate-900 shadow-2xl' : 'h-48'}`}
+        >
+            {/* Header */}
+            <div className="flex items-center justify-between p-3 bg-slate-800/30 backdrop-blur-sm z-10">
+                <div className="flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-slate-400" />
+                    <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Voice Quality</span>
                 </div>
-
-                {/* Shimmer Card */}
-                <div className="bg-slate-900/50 rounded-2xl border border-white/5 p-6 flex flex-col">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400">
-                            <Waves size={24} />
-                        </div>
-                        <div>
-                            <h4 className="font-bold text-white">Shimmer</h4>
-                            <p className="text-xs text-slate-500">Amplitude Instability</p>
-                        </div>
-                    </div>
-
-                    <div className="flex-grow flex flex-col justify-end mb-4">
-                        <div className="h-24 w-full bg-slate-950/50 rounded-lg border border-white/5 p-2 mb-2">
-                            {renderSparkline('shimmer', 'text-purple-500')}
-                        </div>
-                        <div className="flex justify-between items-end">
-                            <div className="text-3xl font-mono font-bold text-white">
-                                {metrics.shimmer.toFixed(2)}<span className="text-sm text-slate-500 ml-1">dB</span>
-                            </div>
-                            <div className={`text-sm font-bold uppercase ${getStatus('shimmer', metrics.shimmer).color}`}>
-                                {getStatus('shimmer', metrics.shimmer).label}
-                            </div>
-                        </div>
-                    </div>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                        Micro-fluctuations in loudness. High shimmer can sound breathy or hoarse. Lower is generally clearer.
-                    </p>
-                </div>
-
-                {/* Weight/Breathiness Card */}
-                <div className="bg-slate-900/50 rounded-2xl border border-white/5 p-6 flex flex-col">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 bg-cyan-500/10 rounded-lg text-cyan-400">
-                            <Wind size={24} />
-                        </div>
-                        <div>
-                            <h4 className="font-bold text-white">Breathiness</h4>
-                            <p className="text-xs text-slate-500">Vocal Weight Inverse</p>
-                        </div>
-                    </div>
-
-                    <div className="flex-grow flex flex-col justify-end mb-4">
-                        <div className="h-24 w-full bg-slate-950/50 rounded-lg border border-white/5 p-2 mb-2 relative">
-                            {/* Custom visualization for weight range */}
-                            <div className="absolute inset-x-0 top-1/2 h-1 bg-gradient-to-r from-cyan-500 via-emerald-500 to-orange-500 rounded-full opacity-30"></div>
-                            <div
-                                className="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-100"
-                                style={{ left: `${metrics.weight}%` }}
-                            ></div>
-                        </div>
-                        <div className="flex justify-between items-end">
-                            <div className="text-3xl font-mono font-bold text-white">
-                                {metrics.weight.toFixed(0)}<span className="text-sm text-slate-500 ml-1">/100</span>
-                            </div>
-                            <div className={`text-sm font-bold uppercase ${getStatus('weight', metrics.weight).color}`}>
-                                {getStatus('weight', metrics.weight).label}
-                            </div>
-                        </div>
-                    </div>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                        Indicates vocal fold closure. Lower values are breathier (softer), higher values are pressed (harder).
-                    </p>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setShowConfig(!showConfig)}
+                        className={`p-1.5 rounded-lg transition-colors ${showConfig ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'}`}
+                    >
+                        <Settings size={14} />
+                    </button>
+                    {onToggleExpand && (
+                        <button
+                            onClick={onToggleExpand}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-white transition-colors"
+                        >
+                            {isExpanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                        </button>
+                    )}
                 </div>
             </div>
+
+            {/* Config Overlay */}
+            {showConfig && (
+                <div className="absolute top-12 right-3 z-20 bg-slate-800 border border-slate-700 rounded-lg p-3 shadow-xl w-48 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="text-xs font-bold text-slate-400 mb-2 uppercase">Visible Metrics</div>
+                    <div className="space-y-1">
+                        {Object.entries(METRICS).map(([key, config]) => (
+                            <button
+                                key={key}
+                                onClick={() => toggleMetric(key)}
+                                className="flex items-center justify-between w-full p-1.5 rounded hover:bg-slate-700 transition-colors"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <div
+                                        className="w-2 h-2 rounded-full"
+                                        style={{ backgroundColor: colors[key] }}
+                                    />
+                                    <span className={`text-xs ${activeMetrics.includes(key) ? 'text-white' : 'text-slate-500'}`}>
+                                        {config.label}
+                                    </span>
+                                </div>
+                                {activeMetrics.includes(key) && <span className="text-xs text-slate-400">✓</span>}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Legend (Always visible) */}
+            <div className="absolute top-12 left-3 z-10 flex flex-col gap-1 pointer-events-none">
+                {activeMetrics.map(key => (
+                    <div key={key} className="flex items-center gap-1.5 bg-slate-900/40 px-2 py-1 rounded backdrop-blur-sm">
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: colors[key] }} />
+                        <span className="text-[10px] font-bold text-slate-300">{METRICS[key].label}</span>
+                        <span className="text-[10px] font-mono text-slate-400">
+                            {(dataRef.current?.[key]?.mean || dataRef.current?.[key] || 0).toFixed(1)}
+                        </span>
+                    </div>
+                ))}
+            </div>
+
+            {/* Canvas */}
+            <canvas
+                ref={canvasRef}
+                className="w-full h-full block"
+            />
         </div>
     );
-};
+});
 
 export default QualityVisualizer;

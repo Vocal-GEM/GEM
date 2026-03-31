@@ -1,21 +1,15 @@
 import { cloneElement, useState, useEffect } from 'react';
-import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen, Flame, Sparkles, Timer } from 'lucide-react';
+import { Activity, Play, ArrowRight, Mic, Dumbbell, BookOpen, Timer } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import VocalHealthPanel from '../dashboard/VocalHealthPanel';
-import SmartCoachWidget from '../dashboard/SmartCoachWidget';
-import JourneyEntryCard from '../ui/JourneyEntryCard';
 import SessionSummaryCard from '../ui/SessionSummaryCard';
-import RecommendedExercises from '../ui/RecommendedExercises';
-import DailyChallengeCard from '../ui/DailyChallengeCard';
 import SmartPracticeSession from '../ui/SmartPracticeSession';
 import QuickWarmupSession from '../ui/QuickWarmupSession';
 import QuickVoiceCheck from '../ui/QuickVoiceCheck';
 import { useGuidedJourney } from '../../context/GuidedJourneyContext';
 import { useNavigation } from '../../context/NavigationContext';
-import { checkStreakStatus, getStreakMessage } from '../../services/StreakService';
-import RecommendedToolsWidget from '../ui/RecommendedToolsWidget';
+import { checkStreakStatus } from '../../services/StreakService';
 import MoodCheckIn from '../ui/MoodCheckIn';
-import PersonalMilestonesDisplay from '../ui/PersonalMilestonesDisplay';
 import WelcomeBanner from '../ui/WelcomeBanner';
 import ContextualTips from '../ui/ContextualTips';
 
@@ -52,16 +46,12 @@ const ActionCard = ({ title, description, onClick, icon, color }) => (
 const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
     const { t } = useTranslation();
     const {
-        hasInProgressJourney,
-        isJourneyComplete,
-        getProgressPercentage,
-        getCurrentStep,
         resumeJourney
     } = useGuidedJourney();
     const { openModal } = useNavigation();
 
     // Streak tracking
-    const [streakData, setStreakData] = useState({ currentStreak: 0, needsPracticeToday: true });
+    const [_streakData, setStreakData] = useState({ currentStreak: 0, needsPracticeToday: true });
     const [showSmartPractice, setShowSmartPractice] = useState(false);
     const [showQuickWarmup, setShowQuickWarmup] = useState(false);
     const [showVoiceCheck, setShowVoiceCheck] = useState(false);
@@ -71,16 +61,14 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
         setStreakData(status);
     }, []);
 
-    const handleStartJourney = () => {
+    const _handleStartJourney = () => {
         openModal('guidedJourney');
     };
 
-    const handleResumeJourney = () => {
+    const _handleResumeJourney = () => {
         resumeJourney();
         openModal('guidedJourney');
     };
-
-    const currentStep = getCurrentStep();
 
     return (
         <div className="w-full min-h-screen bg-black p-4 sm:p-6 lg:p-12 text-white">
@@ -94,30 +82,10 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                 <ContextualTips context="dashboard" />
             </div>
 
-            {/* Guided Journey Entry - Featured prominently for first-time users */}
-            {/* <div className="mb-8">
-                <JourneyEntryCard
-                    onStart={handleStartJourney}
-                    onResume={handleResumeJourney}
-                    hasInProgress={hasInProgressJourney()}
-                    progressPercentage={getProgressPercentage()}
-                    currentStepTitle={currentStep?.title || ''}
-                    isComplete={isJourneyComplete}
-                />
-            </div> */}
-
             {/* Mood Check In */}
             <div className="mb-8">
                 <MoodCheckIn />
             </div>
-
-            {/* Smart Coach Widget */}
-            {/* <SmartCoachWidget onStartSession={onOpenAdaptiveSession} /> */}
-
-            {/* Recommended Tools */}
-            {/* <div className="mb-8">
-                <RecommendedToolsWidget />
-            </div> */}
 
             {/* Quick Action Buttons */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -139,25 +107,6 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                         <ArrowRight className="text-white group-hover:translate-x-1 transition-transform" size={24} />
                     </div>
                 </button>
-
-                {/* Smart Practice Button */}
-                {/* <button
-                    onClick={() => setShowSmartPractice(true)}
-                    className="p-6 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 rounded-2xl text-left transition-all group"
-                >
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-white/20 rounded-xl">
-                                <Sparkles className="text-white" size={24} />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-white">Smart Practice</h3>
-                                <p className="text-white/80 text-sm">Personalized session based on your weak areas</p>
-                            </div>
-                        </div>
-                        <ArrowRight className="text-white group-hover:translate-x-1 transition-transform" size={24} />
-                    </div>
-                </button> */}
 
                 {/* Quick Voice Check Button */}
                 <button
@@ -200,33 +149,10 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
             {/* Session Summary */}
             <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <SessionSummaryCard />
-                {/* <PersonalMilestonesDisplay /> */}
             </div>
-
-            {/* Recommended Exercises */}
-            {/* <RecommendedExercises onViewCategory={(cat) => onViewChange('training', { category: cat })} /> */}
-
-            {/* Daily Challenges */}
-            {/* <div className="mb-8">
-                <DailyChallengeCard />
-            </div> */}
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
-                {/* <StatCard
-                    label={t('dashboard.stats.dsi.label')}
-                    value="1.2"
-                    subtext={t('dashboard.stats.dsi.subtext')}
-                    icon={<Activity size={24} />}
-                    color="text-teal-400"
-                /> */}
-                {/* <StatCard
-                    label={t('dashboard.stats.streak.label')}
-                    value={streakData.currentStreak}
-                    subtext={streakData.needsPracticeToday ? "Practice today!" : "✓ Done"}
-                    icon={<Flame size={24} />}
-                    color="text-orange-400"
-                /> */}
                 <StatCard
                     label={t('dashboard.stats.practice.label')}
                     value="45m"
@@ -234,12 +160,6 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                     icon={<Play size={24} />}
                     color="text-blue-400"
                 />
-                {/* <StatCard
-                    label={t('dashboard.stats.exercises.label')}
-                    value="12"
-                    icon={<Trophy size={24} />}
-                    color="text-amber-400"
-                /> */}
             </div>
 
             {/* Quick Actions */}
