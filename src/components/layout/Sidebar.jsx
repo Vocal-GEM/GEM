@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, Waves, Search, FileText, HelpCircle, Layers, BookMarked, Camera, Briefcase, ClipboardCheck, Mic } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useNavigation } from '../../context/NavigationContext';
+import { useAuth } from '../../context/AuthContext';
 import ProfileManager from '../ui/ProfileManager';
 import { search, groupResultsByType } from '../../services/SearchService';
 import { FEATURES } from '../../config/featureFlags';
@@ -34,6 +35,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
 
     useProfile(); // Context initialization
     const { openModal } = useNavigation();
+    const { user, logout } = useAuth();
 
     // Consolidated navigation: Frontend-only features
     const navItems = [
@@ -299,8 +301,26 @@ const Sidebar = ({ activeView, onViewChange }) => {
 
                     {/* Footer */}
                     <div className="p-4 border-t border-slate-800">
-                        <div className="text-xs text-slate-500 text-center">
-                            Frontend Demo Mode
+                        {user ? (
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-sm font-bold text-white">
+                                        {user.username?.[0]?.toUpperCase() || 'U'}
+                                    </div>
+                                    <div className="text-sm font-medium text-white">{user.username}</div>
+                                </div>
+                                <button onClick={logout} className="text-xs text-red-400 hover:text-red-300">Sign Out</button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => openModal('login')}
+                                className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors"
+                            >
+                                Sign In
+                            </button>
+                        )}
+                        <div className="text-[10px] text-slate-600 text-center mt-2">
+                            v{APP_VERSION}
                         </div>
                     </div>
                 </div>

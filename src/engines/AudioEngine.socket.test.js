@@ -11,6 +11,7 @@ vi.mock('socket.io-client', () => ({
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)), // Handle alternative spelling
     YIN: vi.fn(() => vi.fn((buffer) => 440))
 }));
 
