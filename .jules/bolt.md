@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-24 - Optimized FFT Calculation
+**Learning:** The FileSpectrogram component manually calculated the Discrete Fourier Transform (DFT) for each frame within an O(N^2) loop, which can severely block the main thread for large audio files.
+**Action:** Replaced the nested loops with a highly efficient Cooley-Tukey Radix-2 FFT algorithm, converting the complexity to O(N log N) using pre-calculated trigonometric and bit-reversal lookup tables to maximize JavaScript execution speed without increasing garbage collection.
