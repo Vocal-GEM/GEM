@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-05-19 - Perfect Reuse of ImageData Buffers in Scrollable Canvas
+**Learning:** In canvas-based visualizations where content continuously scrolls (like a spectrogram), the `ImageData` buffer used to write new columns (`ctx.createImageData(scrollSpeed, height)`) only depends on the scroll speed and internal height. Even when the canvas width dynamically resizes due to `ResizeObserver` (UI reflows), this temporary drawing buffer does not need to be reallocated if the height remains constant.
+**Action:** Do not forcefully clear (`null`) and reallocate `ImageData` or its corresponding `Uint32Array` buffers on canvas width changes. Persist them using refs to completely eliminate `Float32Array` garbage collection churn and prevent micro-stutters during window resizes or mobile orientation shifts.
