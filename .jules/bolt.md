@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - HTML5 Canvas drawImage hardware acceleration
+**Learning:** In continuous canvas rendering loops like the Spectrograms (e.g. `HighResSpectrogram`), shifting pixels left by manipulating `getImageData` and `putImageData` forces a synchronous CPU readback from the GPU, which is extremely expensive and causes layout thrashing/framerate drops.
+**Action:** Replace `getImageData`/`putImageData` shifting loops with `ctx.drawImage(canvas, offset_x, offset_y, ...)` to draw the canvas onto itself. This keeps the operation entirely on the GPU. Also, remove `{ willReadFrequently: true }` from `getContext('2d')` to allow the browser to fully hardware-accelerate the context.
