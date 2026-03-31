@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - Repeated TypedArray allocations in recurring intervals
+**Learning:** Components running data processing loops (`setInterval` or `requestAnimationFrame`) frequently reallocated large structures like `Float32Array`, triggering rapid garbage collection (GC churn). This was identified as a performance bottleneck in components like `CPPMeter.jsx`.
+**Action:** When a buffer needs to be processed continuously at high frequencies, maintain a persistent buffer using `useRef(null)` and allocate/overwrite it (e.g. `!ref.current || ref.current.length !== data.length`) instead of reinstantiating (`new Float32Array()`) inside the loop.
