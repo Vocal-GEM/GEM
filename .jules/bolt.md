@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - Layout Thrashing in HTML5 Canvas
+**Learning:** Calling `canvas.getBoundingClientRect()` inside a `requestAnimationFrame` loop (like `PitchOrb.jsx`) causes severe layout thrashing because it forces a synchronous DOM read on every frame. However, moving `canvas.width = ...` out of the loop removes the implicit side-effect of clearing the canvas and resetting its transform matrix, leading to visual smearing and infinite transform accumulation.
+**Action:** When migrating canvas dimensions to a `ResizeObserver` cache (`dimensionsRef`), explicitly call `ctx.setTransform(dpr, 0, 0, dpr, 0, 0)` and `ctx.clearRect(0, 0, width, height)` at the start of the render loop to safely mimic the removed side-effects.
