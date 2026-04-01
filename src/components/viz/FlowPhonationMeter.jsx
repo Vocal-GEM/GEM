@@ -247,6 +247,7 @@ const FlowPhonationMeter = ({ dataRef, onReset, showDetails = true }) => {
                             </div>
                         </div>
                         <button
+                            aria-label="Reset Flow Phonation Meter"
                             onClick={handleReset}
                             className={`px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors ${colorBlindMode
                                     ? 'bg-pink-500/20 text-pink-300 hover:bg-pink-500/30'
