@@ -11,12 +11,19 @@ const DailyGoalsWidget = ({ goals, compact = false }) => {
                     const isDone = g.completed;
                     return (
                         <div key={g.id} className={`shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border ${isDone ? 'bg-emerald-900/20 border-emerald-500/30' : 'bg-slate-800/50 border-white/5'}`}>
-                            <div className="relative w-8 h-8 flex items-center justify-center">
-                                <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                            <div
+                                className="relative w-8 h-8 flex items-center justify-center"
+                                role="progressbar"
+                                aria-valuenow={Math.round(pct)}
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                                aria-label={g.label}
+                            >
+                                <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36" aria-hidden="true">
                                     <path className="text-slate-700" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="4" />
                                     <path className={isDone ? "text-emerald-500" : "text-blue-500"} strokeDasharray={`${pct}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="4" />
                                 </svg>
-                                {isDone && <Check className="absolute w-4 h-4 text-emerald-500" />}
+                                {isDone && <Check className="absolute w-4 h-4 text-emerald-500" aria-hidden="true" />}
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-[10px] text-slate-400 uppercase font-bold">{g.type}</span>
@@ -52,7 +59,14 @@ const DailyGoalsWidget = ({ goals, compact = false }) => {
                                     {isDone ? <Check className="w-3 h-3" /> : `${Math.floor(g.current)}/${g.target}`}
                                 </span>
                             </div>
-                            <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div
+                                className="h-2 bg-slate-800 rounded-full overflow-hidden"
+                                role="progressbar"
+                                aria-valuenow={Math.round(pct)}
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                                aria-label={g.label}
+                            >
                                 <div
                                     className={`h-full transition-all duration-500 ${isDone ? 'bg-emerald-500' : 'bg-blue-500'}`}
                                     style={{ width: `${pct}%` }}
