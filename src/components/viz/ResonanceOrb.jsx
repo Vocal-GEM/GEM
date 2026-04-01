@@ -34,10 +34,12 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
     const silenceTimer = useRef(0);
 
     // Label stability tracking
-    const labelState = useRef({ current: "Listening...", candidate: "Listening...", count: 0 });
+    const labelState = useRef(null);
+    if (!labelState.current) labelState.current = { current: "Listening...", candidate: "Listening...", count: 0 };
 
     // History for sparklines
-    const historyRef = useRef([]);
+    const historyRef = useRef(null);
+    if (!historyRef.current) historyRef.current = [];
 
     // Determine target zone based on profile
     const getTargetZone = () => {

@@ -12,7 +12,8 @@ const VoiceQualityMeter = ({ dataRef, userMode, showAnalysis = true }) => {
     const { settings: feedbackSettings, setSettings: setFeedbackSettings } = useFeedback(audioEngineRef, dataRef);
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
-    const metricsRef = useRef({ h1: null, h2: null, diff: null, centroid: null });
+    const metricsRef = useRef(null);
+    if (!metricsRef.current) metricsRef.current = { h1: null, h2: null, diff: null, centroid: null };
     const componentId = useId();
 
     const loop = useCallback(() => {
