@@ -21,6 +21,35 @@ export class CPPAnalyzer {
         this.sampleRate = sampleRate;
         this.fftSize = 2048;
         this.hopSize = 512;
+
+        // Pre-allocated buffers to prevent GC churn in real-time analysis
+        this._buffers = {
+            windowed: null,
+            real: null,
+            imag: null,
+            powerSpectrum: null,
+            logSpectrum: null,
+            cepstrum: null,
+            cepstrumImag: null,
+            size: 0
+        };
+    }
+
+    /**
+     * Initialize or resize internal buffers if needed
+     * @param {number} size
+     */
+    _ensureBuffers(size) {
+        if (this._buffers.size === size) return;
+
+        this._buffers.size = size;
+        this._buffers.windowed = new Float32Array(size);
+        this._buffers.real = new Float32Array(size);
+        this._buffers.imag = new Float32Array(size);
+        this._buffers.powerSpectrum = new Float32Array(size / 2);
+        this._buffers.logSpectrum = new Float32Array(size / 2);
+        this._buffers.cepstrum = new Float32Array(size / 2);
+        this._buffers.cepstrumImag = new Float32Array(size / 2);
     }
 
     /**
@@ -37,20 +66,22 @@ export class CPPAnalyzer {
         const startIdx = Math.floor((audioBuffer.length - this.fftSize) / 2);
         const frame = audioBuffer.slice(startIdx, startIdx + this.fftSize);
 
+        this._ensureBuffers(this.fftSize);
+
         // Apply Hamming window
-        const windowedFrame = this.applyHammingWindow(frame);
+        this.applyHammingWindow(frame, this._buffers.windowed);
 
         // Get power spectrum
-        const powerSpectrum = this.getPowerSpectrum(windowedFrame);
+        this.getPowerSpectrum(this._buffers.windowed, this._buffers.real, this._buffers.imag, this._buffers.powerSpectrum);
 
         // Calculate cepstrum (inverse FFT of log spectrum)
-        const cepstrum = this.calculateCepstrum(powerSpectrum);
+        this.calculateCepstrum(this._buffers.powerSpectrum, this._buffers.logSpectrum, this._buffers.cepstrum, this._buffers.cepstrumImag);
 
         // Find cepstral peak in quefrency range (2-20ms for voice)
         const minQuefrency = Math.floor(this.sampleRate / 500); // ~2ms
         const maxQuefrency = Math.floor(this.sampleRate / 50);  // ~20ms
 
-        const cpp = this.findCepstralPeakProminence(cepstrum, minQuefrency, maxQuefrency);
+        const cpp = this.findCepstralPeakProminence(this._buffers.cepstrum, minQuefrency, maxQuefrency);
 
         return cpp;
     }
@@ -98,28 +129,20 @@ export class CPPAnalyzer {
     /**
      * Apply Hamming window to reduce spectral leakage
      */
-    applyHammingWindow(frame) {
+    applyHammingWindow(frame, windowed) {
         const N = frame.length;
-        const windowed = new Float32Array(N);
 
         for (let n = 0; n < N; n++) {
             const window = 0.54 - 0.46 * Math.cos((2 * Math.PI * n) / (N - 1));
             windowed[n] = frame[n] * window;
         }
-
-        return windowed;
     }
 
     /**
      * Calculate power spectrum using FFT
      */
-    getPowerSpectrum(frame) {
+    getPowerSpectrum(frame, real, imag, powerSpectrum) {
         const N = frame.length;
-
-        // Simple DFT for power spectrum (in production, use Web Audio API's AnalyserNode)
-        // For now, we'll use a simplified approach
-        const real = new Float32Array(N);
-        const imag = new Float32Array(N);
 
         // Copy input to real part
         for (let i = 0; i < N; i++) {
@@ -131,30 +154,22 @@ export class CPPAnalyzer {
         this.fft(real, imag);
 
         // Calculate power spectrum
-        const powerSpectrum = new Float32Array(N / 2);
         for (let k = 0; k < N / 2; k++) {
             powerSpectrum[k] = Math.sqrt(real[k] * real[k] + imag[k] * imag[k]);
         }
-
-        return powerSpectrum;
     }
 
     /**
      * Calculate cepstrum (inverse FFT of log spectrum)
      */
-    calculateCepstrum(powerSpectrum) {
+    calculateCepstrum(powerSpectrum, logSpectrum, cepstrum, imag) {
         const N = powerSpectrum.length;
 
         // Take logarithm of power spectrum
-        const logSpectrum = new Float32Array(N);
         for (let i = 0; i < N; i++) {
             // Add small epsilon to avoid log(0)
             logSpectrum[i] = Math.log(powerSpectrum[i] + 1e-10);
         }
-
-        // Perform inverse FFT
-        const cepstrum = new Float32Array(N);
-        const imag = new Float32Array(N);
 
         // Copy log spectrum
         for (let i = 0; i < N; i++) {
@@ -164,8 +179,6 @@ export class CPPAnalyzer {
 
         // Inverse FFT
         this.ifft(cepstrum, imag);
-
-        return cepstrum;
     }
 
     /**
