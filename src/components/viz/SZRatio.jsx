@@ -122,6 +122,7 @@ const SZRatio = ({ dataRef, isActive }) => {
                 <div className="flex items-center gap-2">
                     <span className="text-[10px] text-slate-500">Auto</span>
                     <button
+                        aria-label="Toggle Auto Mode"
                         onClick={() => setAutoMode(!autoMode)}
                         className={`w-8 h-4 rounded-full transition-colors relative ${autoMode ? 'bg-cyan-500' : 'bg-slate-700'}`}
                     >
@@ -183,6 +184,7 @@ const SZRatio = ({ dataRef, isActive }) => {
                 )}
 
                 <button
+                    aria-label="Reset Timers"
                     onClick={reset}
                     className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
                 >
