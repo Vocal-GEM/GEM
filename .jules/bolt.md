@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - TypedArray Methods Cause Severe GC Churn
+**Learning:** Using high-level array methods like `.map()`, `.reduce()`, or spread syntax (`...`) on `Float32Array` buffers inside high-frequency animation loops (like `requestAnimationFrame`) causes severe Garbage Collection (GC) pauses. For example, `Math.max(...audioBuffer.map(Math.abs))` allocates intermediate arrays up to the size of the buffer every frame and easily exceeds the maximum call stack size.
+**Action:** Always process binary audio buffers (`Float32Array`) using standard `for` loops in hot paths to avoid main-thread blocking and frame drops.
