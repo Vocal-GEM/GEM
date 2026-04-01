@@ -1,8 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, Waves, Search, FileText, HelpCircle, Layers, BookMarked, Camera, Briefcase, ClipboardCheck, Mic } from 'lucide-react';
+import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, Waves, Search, FileText, HelpCircle, Layers, BookMarked, Camera, Briefcase, ClipboardCheck, Mic, User, LogIn, LogOut } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useNavigation } from '../../context/NavigationContext';
+import { useAuth } from '../../context/AuthContext';
 import ProfileManager from '../ui/ProfileManager';
+import Login from '../ui/Login';
+import Signup from '../ui/Signup';
 import { search, groupResultsByType } from '../../services/SearchService';
 import { FEATURES } from '../../config/featureFlags';
 
@@ -23,6 +26,10 @@ const TYPE_ICONS = {
 const Sidebar = ({ activeView, onViewChange }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [showProfileManager, setShowProfileManager] = useState(false);
+    const [showLogin, setShowLogin] = useState(false);
+    const [showSignup, setShowSignup] = useState(false);
+
+    const { user, logout } = useAuth();
 
     // Search state
     const [searchQuery, setSearchQuery] = useState('');
@@ -299,7 +306,33 @@ const Sidebar = ({ activeView, onViewChange }) => {
 
                     {/* Footer */}
                     <div className="p-4 border-t border-slate-800">
-                        <div className="text-xs text-slate-500 text-center">
+                        {user ? (
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3 px-2">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold text-white">
+                                        {user.username?.[0]?.toUpperCase() || 'U'}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-sm font-medium text-white truncate">{user.username}</div>
+                                        <div className="text-xs text-slate-500 truncate">Cloud Sync Active</div>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={logout}
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-all text-xs font-medium"
+                                >
+                                    <LogOut size={14} /> Sign Out
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setShowLogin(true)}
+                                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-900/20 hover:shadow-blue-900/40 transition-all font-medium"
+                            >
+                                <LogIn size={18} /> Sign In
+                            </button>
+                        )}
+                        <div className="text-[10px] text-slate-600 text-center mt-4">
                             Frontend Demo Mode
                         </div>
                     </div>
@@ -315,6 +348,18 @@ const Sidebar = ({ activeView, onViewChange }) => {
             )}
 
             {showProfileManager && <ProfileManager onClose={() => setShowProfileManager(false)} />}
+            {showLogin && (
+                <Login
+                    onClose={() => setShowLogin(false)}
+                    onSwitchToSignup={() => { setShowLogin(false); setShowSignup(true); }}
+                />
+            )}
+            {showSignup && (
+                <Signup
+                    onClose={() => setShowSignup(false)}
+                    onSwitchToLogin={() => { setShowSignup(false); setShowLogin(true); }}
+                />
+            )}
         </>
     );
 };

@@ -51,6 +51,16 @@ vi.mock('../../services/SearchService', () => ({
     groupResultsByType: vi.fn(() => []),
 }));
 
+// Mock feature flags to ensure Mirror/Camera is enabled
+vi.mock('../../config/featureFlags', () => ({
+    FEATURES: {
+        dashboard: true,
+        practice: true,
+        camera: true,
+        settings: true
+    }
+}));
+
 const MockNavigationProvider = ({ children }) => <div>{children}</div>;
 
 describe('Sidebar Auth Integration', () => {
@@ -67,21 +77,21 @@ describe('Sidebar Auth Integration', () => {
     it('shows Sign In button when not logged in', () => {
         mockUseAuth.mockReturnValue({ user: null });
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('Sign In')).toBeInTheDocument();
+        expect(getByText(/Sign In/i)).toBeInTheDocument();
     });
 
     it('shows user info and Sign Out when logged in', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
-        expect(getByText('CloudUser')).toBeInTheDocument();
-        expect(getByText('Sign Out')).toBeInTheDocument();
+        expect(getByText(/CloudUser/i)).toBeInTheDocument();
+        expect(getByText(/Sign Out/i)).toBeInTheDocument();
     });
 
     it('opens Login modal on Sign In click', () => {
         mockUseAuth.mockReturnValue({ user: null });
         const { getByText, getByTestId } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
-        fireEvent.click(getByText('Sign In'));
+        fireEvent.click(getByText(/Sign In/i));
         expect(getByTestId('login-modal')).toBeInTheDocument();
     });
 
@@ -89,7 +99,7 @@ describe('Sidebar Auth Integration', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
-        fireEvent.click(getByText('Sign Out'));
+        fireEvent.click(getByText(/Sign Out/i));
         expect(mockLogout).toHaveBeenCalled();
     });
 
@@ -103,7 +113,7 @@ describe('Sidebar Auth Integration', () => {
 
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
-        const mirrorBtn = getByText('Mirror');
+        const mirrorBtn = getByText(/Mirror/i);
         fireEvent.click(mirrorBtn);
 
         expect(openModalSpy).toHaveBeenCalledWith('camera');
