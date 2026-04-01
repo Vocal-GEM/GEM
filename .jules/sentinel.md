@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2026-02-14 - PII Retention and Logic Error in Community Share
+**Vulnerability:** Invalid `try...finally` structure in `share_voice` meant raw PII (audio) was saved *inside* a `finally` block after processing, and potentially never deleted if errors occurred, leaving sensitive user data on disk.
+**Learning:** Merge conflicts can introduce subtle but critical security flaws (like duplicate blocks) that syntactic linters might catch, but logic errors (like saving in finally) require careful review.
+**Prevention:** Always verify file cleanup logic in `finally` blocks ensures resources are *released*, not acquired. Use atomic temporary file handlers where possible.
