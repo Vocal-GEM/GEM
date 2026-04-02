@@ -267,36 +267,66 @@ export class VoiceAnalyzer {
 
         // Ensure power of 2
         const powerOf2 = Math.pow(2, Math.ceil(Math.log2(n)));
-        const padded = new Float32Array(powerOf2);
-        padded.set(samples);
 
-        return this.fftRecursive(Array.from(padded).map(s => ({ real: s, imag: 0 })));
-    }
+        // Use typed arrays to avoid GC churn during computation
+        const real = new Float32Array(powerOf2);
+        const imag = new Float32Array(powerOf2);
+        real.set(samples);
 
-    fftRecursive(x) {
-        const n = x.length;
-        if (n <= 1) return x;
+        this.fftInPlace(real, imag);
 
-        const even = this.fftRecursive(x.filter((_, i) => i % 2 === 0));
-        const odd = this.fftRecursive(x.filter((_, i) => i % 2 === 1));
-
-        const result = new Array(n);
-        for (let k = 0; k < n / 2; k++) {
-            const angle = -2 * Math.PI * k / n;
-            const t = {
-                real: Math.cos(angle) * odd[k].real - Math.sin(angle) * odd[k].imag,
-                imag: Math.cos(angle) * odd[k].imag + Math.sin(angle) * odd[k].real
-            };
-            result[k] = {
-                real: even[k].real + t.real,
-                imag: even[k].imag + t.imag
-            };
-            result[k + n / 2] = {
-                real: even[k].real - t.real,
-                imag: even[k].imag - t.imag
-            };
+        // Format output to match existing signature for backward compatibility
+        const result = new Array(powerOf2);
+        for (let i = 0; i < powerOf2; i++) {
+            result[i] = { real: real[i], imag: imag[i] };
         }
         return result;
+    }
+
+    fftInPlace(real, imag) {
+        const n = real.length;
+
+        // Bit-reversal permutation
+        let j = 0;
+        for (let i = 0; i < n - 1; i++) {
+            if (i < j) {
+                let tempReal = real[i];
+                let tempImag = imag[i];
+                real[i] = real[j];
+                imag[i] = imag[j];
+                real[j] = tempReal;
+                imag[j] = tempImag;
+            }
+            let k = n >> 1;
+            while (k <= j) {
+                j -= k;
+                k >>= 1;
+            }
+            j += k;
+        }
+
+        // Cooley-Tukey FFT
+        for (let size = 2; size <= n; size <<= 1) {
+            const halfSize = size >> 1;
+            const step = -2 * Math.PI / size;
+
+            for (let i = 0; i < n; i += size) {
+                for (let k = 0; k < halfSize; k++) {
+                    const angle = step * k;
+                    const wReal = Math.cos(angle);
+                    const wImag = Math.sin(angle);
+
+                    const tReal = wReal * real[i + k + halfSize] - wImag * imag[i + k + halfSize];
+                    const tImag = wReal * imag[i + k + halfSize] + wImag * real[i + k + halfSize];
+
+                    real[i + k + halfSize] = real[i + k] - tReal;
+                    imag[i + k + halfSize] = imag[i + k] - tImag;
+
+                    real[i + k] += tReal;
+                    imag[i + k] += tImag;
+                }
+            }
+        }
     }
 
     /**

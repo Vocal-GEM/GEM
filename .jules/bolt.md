@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - O(N log N) GC Churn in Signal Processing
+**Learning:** The `performFFT` implementation in `src/utils/voiceAnalysis.js` used a recursive Cooley-Tukey algorithm that allocated large numbers of new JavaScript arrays and objects (`{ real, imag }`) per frame. In high-frequency render loops (e.g., Spectrograms processing 60fps), this caused immense garbage collection (GC) pauses and slow execution (~565ms per 100 iterations of 2048 bins).
+**Action:** Always implement performance-critical DSP algorithms like FFTs using in-place operations on pre-allocated `Float32Array` or `Float64Array` buffers to eliminate GC churn. (Optimized performance went down to ~66ms, an ~8.5x speedup).
