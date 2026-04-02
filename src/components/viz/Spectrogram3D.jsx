@@ -52,9 +52,21 @@ const SpectrogramMesh = ({ dataRef }) => {
         historyRef.current = new Float32Array(numCols * numRows);
     }
 
-    // Reusable color object to prevent GC
-    // Optimization: Reuse Color object to avoid thousands of allocations per frame
-    const tempColor = useMemo(() => new THREE.Color(), []);
+    // Optimization: Pre-calculate Color Look-Up Table (LUT)
+    // Map 0..255 intensity to RGB values to avoid expensive setHSL in the loop
+    const colorLUT = useMemo(() => {
+        const lut = new Float32Array(256 * 3);
+        const tempColor = new THREE.Color();
+        for (let i = 0; i < 256; i++) {
+            const t = i / 255;
+            // Matches original logic: setHSL(0.7 - t * 0.6, 1, 0.5)
+            tempColor.setHSL(0.7 - t * 0.6, 1, 0.5);
+            lut[i * 3] = tempColor.r;
+            lut[i * 3 + 1] = tempColor.g;
+            lut[i * 3 + 2] = tempColor.b;
+        }
+        return lut;
+    }, []);
 
     useFrame(() => {
         if (!meshRef.current || !meshRef.current.geometry || !meshRef.current.geometry.attributes) return;
@@ -113,22 +125,24 @@ const SpectrogramMesh = ({ dataRef }) => {
         }
 
         if (colorsAttribute) {
-            const colors = colorsAttribute;
+            const colors = colorsAttribute.array; // Direct TypedArray access
             for (let i = 0; i < numCols; i++) {
                 for (let j = 0; j < numRows; j++) {
                     const index = i * numRows + j;
                     const val = history[index];
 
                     // Color map: Blue -> Purple -> Red -> Yellow
-                    const t = Math.min(1, val / 2); // Normalize somewhat
+                    // val is roughly 0..2, normalized by /2 in original code
+                    const t = Math.min(1, Math.max(0, val / 2));
+                    const lutIndex = Math.floor(t * 255);
 
-                    // Optimization: Reuse tempColor object to avoid creating 4096 objects per frame
-                    tempColor.setHSL(0.7 - t * 0.6, 1, 0.5); // Blue (0.7) to Orange (0.1)
-
-                    colors.setXYZ(index, tempColor.r, tempColor.g, tempColor.b);
+                    // Optimization: Use LUT to avoid setHSL calls
+                    colors[index * 3] = colorLUT[lutIndex * 3];
+                    colors[index * 3 + 1] = colorLUT[lutIndex * 3 + 1];
+                    colors[index * 3 + 2] = colorLUT[lutIndex * 3 + 2];
                 }
             }
-            colors.needsUpdate = true;
+            colorsAttribute.needsUpdate = true;
         }
     });
 
