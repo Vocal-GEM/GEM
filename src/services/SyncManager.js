@@ -90,7 +90,7 @@ class SyncManager {
 
         // Add to queue with metadata
         const item = {
-            id: Date.now() + Math.random(),
+            id: crypto.randomUUID(),
             type,
             payload,
             timestamp: Date.now(),
