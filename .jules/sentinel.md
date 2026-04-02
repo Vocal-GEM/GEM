@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2025-02-15 - SSRF / Path Traversal risk in external API proxies
+**Vulnerability:** The proxy endpoint for the ElevenLabs TTS API constructed the URL `f'https://api.elevenlabs.io/v1/text-to-speech/{voice_id}'` using an unvalidated user-provided `voice_id` parameter. While the domain was fixed, an attacker could potentially use path traversal characters (`../`) or query parameter injection (`?`) within the `voice_id` to manipulate the final URL path, leading to SSRF or unexpected API behavior.
+**Learning:** Proxy endpoints that construct URLs dynamically using user input must rigorously validate all injected segments to ensure they conform to the expected format (e.g., alphanumeric IDs only), even if the base domain is hardcoded.
+**Prevention:** Always use strict allowlist validation (like regex `^[a-zA-Z0-9_-]+$`) for parameters injected into external URL paths before making the request.
