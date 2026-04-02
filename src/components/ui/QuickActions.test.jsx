@@ -3,20 +3,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import QuickActions from './QuickActions';
 
-describe('QuickActions', () => {
-    const { mockSettings, mockUpdateSettings } = vi.hoisted(() => ({
-        mockSettings: { listenMode: false },
-        mockUpdateSettings: vi.fn(),
-    }));
+const { mockSettings, mockUpdateSettings } = vi.hoisted(() => ({
+    mockSettings: { listenMode: false },
+    mockUpdateSettings: vi.fn(),
+}));
 
+vi.mock('../../context/SettingsContext', () => ({
+    useSettings: () => ({
+        settings: mockSettings,
+        updateSettings: mockUpdateSettings
+    })
+}));
+
+describe('QuickActions', () => {
     beforeEach(() => {
-        vi.mock('../../context/SettingsContext', () => ({
-            useSettings: () => ({
-                settings: mockSettings,
-                updateSettings: mockUpdateSettings
-            })
-        }));
         mockUpdateSettings.mockClear();
+        mockSettings.listenMode = false; // Reset listenMode if needed, though mocking logic might need refinement if state changes persist
     });
 
     it('should render the FAB button', () => {
