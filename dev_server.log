@@ -17,3 +17,6 @@
 7:04:18 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
 7:08:16 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
 7:09:21 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
+7:29:03 AM [vite] page reload src/services/ResearchMode.js
+7:29:44 AM [vite] page reload src/services/PrivacyManager.js
+7:30:24 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
