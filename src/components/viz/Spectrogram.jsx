@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -61,6 +61,14 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const speed = 2; // Pixels per frame
     const MAX_FREQ = 8000;
 
+    // OPTIMIZATION: Pre-calculated LUTs for fast rendering
+    const lutRef = useRef({
+        h: 0,
+        maxBin: 0,
+        binLut: null, // Uint16Array for freq -> bin mapping
+        offsetLut: null // Uint32Array for row memory offsets
+    });
+
     // Pre-calculate colormap as Uint32Array (ABGR) for fast pixel manipulation
     const colormap = useMemo(
         () => generateColormap(settings.spectrogramColorScheme),
@@ -86,6 +94,23 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             const binsTotal = spectrum.length;
             const hzPerBin = contextNyquist / binsTotal;
             const maxBin = Math.min(binsTotal, Math.ceil(MAX_FREQ / hzPerBin));
+
+            // --- OPTIMIZATION: Update LUTs if dimensions change ---
+            // Only recalculate when height or maxBin changes (rare)
+            if (lutRef.current.h !== h || lutRef.current.maxBin !== maxBin) {
+                const binLut = new Uint16Array(h);
+                const offsetLut = new Uint32Array(h);
+
+                for (let y = 0; y < h; y++) {
+                    const freqRatio = 1 - (y / h);
+                    binLut[y] = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                    offsetLut[y] = y * speed;
+                }
+
+                lutRef.current = { h, maxBin, binLut, offsetLut };
+            }
+            const { binLut, offsetLut } = lutRef.current;
+            // -----------------------------------------------------
 
             // --- OPTIMIZATION: History Buffer Management ---
             // Lazy initialization of history buffer
@@ -138,11 +163,8 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                 // y=0 is top (high freq), y=h is bottom (low freq)
                 // Bin mapping: 0 -> maxBin (low -> high)
 
-                // Linear mapping matches the original code: y = h - (i / maxBin) * h
-                // So i / maxBin = (h - y) / h = 1 - y/h
-
-                const freqRatio = 1 - (y / h);
-                const binIndex = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
+                // Use pre-calculated LUT for O(1) bin access
+                const binIndex = binLut[y];
 
                 // Get intensity from spectrum
                 const value = spectrum[binIndex] || 0;
@@ -165,7 +187,8 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
 
                 // Write to all columns in the 'speed' strip
                 // Row y has 'speed' pixels
-                const rowOffset = y * speed;
+                // Use pre-calculated LUT for O(1) offset access
+                const rowOffset = offsetLut[y];
                 for (let x = 0; x < speed; x++) {
                     data32[rowOffset + x] = color;
                 }
@@ -178,7 +201,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             ctx.fillStyle = '#000';
             ctx.fillRect(width - speed, 0, speed, h);
         }
-    }, [isAudioActive, audioContext, colormap]);
+    }, [audioContext, colormap, dataRef]);
 
     useEffect(() => {
         let unsubscribe;
