@@ -12,3 +12,8 @@
 6:57:02 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
 6:57:19 AM [vite] page reload src/components/professional/TaskRecorder.jsx
 6:58:39 AM [vite] page reload src/audio/PitchWorklet.js
+7:03:24 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+7:03:51 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+7:04:21 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:04:49 AM [vite] hmr update /src/components/ui/RecommendedToolsWidget.jsx, /src/index.css
+7:05:22 AM [vite] hmr update /src/components/analytics/WeeklyDigest.jsx, /src/index.css
