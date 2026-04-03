@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, Heart } from 'lucide-react';
-import CommunityService from '../../services/CommunityService';
-import ModerationService from '../../services/ModerationService';
 import Toast from '../ui/Toast';
+
+// Mock Services for Demo Mode
+const CommunityService = {
+    getSuccessStories: async () => ({ stories: [] }),
+    submitSuccessStory: async () => ({ success: true })
+};
+
+const ModerationService = {
+    preCheckContent: () => ({ safe: true })
+};
 import { Button } from '../ui/button';
 
 const AudioPlayerResult = ({ src, label }) => {

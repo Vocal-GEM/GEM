@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Canvas GC Churn in Render Loops
+**Learning:** In HTML5 Canvas visualizers (`HighResSpectrogram`), allocating new `ImageData` and `Uint32Array` on every frame (60 FPS) and using `ctx.putImageData` for the entire scrolling area causes severe garbage collection churn and high CPU usage.
+**Action:** Instead of reallocating buffers and recalculating the entire history grid, use `ctx.drawImage(canvas, scrollSpeed, ...)` to copy the canvas onto itself, shifting it left. Then, only allocate `ImageData` ONCE (for the new 2px column) and reuse it, updating only the newest data. This leverages GPU acceleration and eliminates GC pauses.
