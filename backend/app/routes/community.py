@@ -2,8 +2,6 @@ from flask import Blueprint, request, jsonify, current_app, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from ..extensions import db, limiter
-from ..extensions import db
-from ..extensions import db, limiter
 from ..validators import validate_file_upload, sanitize_html
 from ..models import (
     SharedVoiceSample, SuccessStory, UserConnection,
@@ -14,19 +12,14 @@ from datetime import datetime, timedelta
 import os
 import secrets
 import hashlib
-from ..validators import validate_file_upload
-from werkzeug.utils import secure_filename
-from ..validators import validate_file_upload, sanitize_html
 
 community_bp = Blueprint('community', __name__)
 
 # Helper functions
 
-
 def generate_share_id():
     """Generate a unique share ID"""
     return secrets.token_urlsafe(32)
-
 
 def anonymize_audio(audio_path):
     """
@@ -57,13 +50,13 @@ def anonymize_audio(audio_path):
     except ImportError:
         # If librosa not available, we cannot anonymize.
         # Fail securely - do not copy the raw file.
+        current_app.logger.error("Audio anonymization library (librosa) not available")
         raise ImportError("Audio anonymization library (librosa) not available")
-    except ImportError as e:
+    except Exception as e:
         # Fail securely - do not copy raw file if anonymization fails
         # Log error and raise
-        current_app.logger.error(f"Failed to anonymize audio (librosa missing?): {str(e)}")
+        current_app.logger.error(f"Failed to anonymize audio: {str(e)}")
         raise e
-
 
 def check_moderation(text):
     """
@@ -82,12 +75,12 @@ def check_moderation(text):
 
 # Routes
 
-
 @community_bp.route('/share-voice', methods=['POST'])
 @login_required
 @limiter.limit("5 per hour")
 def share_voice():
     """Share a voice sample anonymously"""
+    filepath = None
     try:
         if 'audio' not in request.files:
             return jsonify({'error': 'No audio file provided'}), 400
@@ -95,15 +88,11 @@ def share_voice():
         audio_file = request.files['audio']
 
         # Security: Validate file type
-        is_valid, error = validate_file_upload(audio_file.filename, allowed_types=['audio'])
+        # We pass file_stream to validate header/magic bytes if supported by validator
         is_valid, error = validate_file_upload(
             audio_file.filename, allowed_types=['audio'], file_stream=audio_file)
         if not is_valid:
             return jsonify({'error': error}), 400
-
-        context = request.form.get('context', '')
-        # Security: Sanitize context
-        context = sanitize_html(context)
 
         context = sanitize_html(request.form.get('context', ''))
         expiration_days = int(request.form.get('expiration_days', 7))
@@ -119,27 +108,11 @@ def share_voice():
 
         filepath = os.path.join(upload_folder, filename)
 
-        try:
-            # Anonymize audio
-            anon_filepath = anonymize_audio(filepath)
-        finally:
-            # Security: Always remove the original raw file to prevent PII retention
-            if os.path.exists(filepath):
-                try:
-                    os.remove(filepath)
-                except OSError:
-                    pass
-            audio_file.save(filepath)
+        # Save the file first
+        audio_file.save(filepath)
 
-            # Anonymize audio
-            anon_filepath = anonymize_audio(filepath)
-        finally:
-            # Security: Always remove the original raw audio file
-            if os.path.exists(filepath):
-                try:
-                    os.remove(filepath)
-                except Exception as e:
-                    current_app.logger.error(f"Failed to delete original file: {e}")
+        # Anonymize audio
+        anon_filepath = anonymize_audio(filepath)
 
         # Create share record
         share_id = generate_share_id()
@@ -166,7 +139,13 @@ def share_voice():
     except Exception as e:
         current_app.logger.error(f"Error sharing voice: {str(e)}")
         return jsonify({'error': 'Failed to share voice sample'}), 500
-
+    finally:
+        # Security: Always remove the original raw audio file
+        if filepath and os.path.exists(filepath):
+            try:
+                os.remove(filepath)
+            except Exception as e:
+                current_app.logger.error(f"Failed to delete original file: {e}")
 
 @community_bp.route('/shared/<share_id>', methods=['GET'])
 def get_shared_voice(share_id):
@@ -194,7 +173,6 @@ def get_shared_voice(share_id):
     except Exception as e:
         current_app.logger.error(f"Error retrieving shared voice: {str(e)}")
         return jsonify({'error': 'Failed to retrieve voice sample'}), 500
-
 
 @community_bp.route('/benchmarks', methods=['GET'])
 def get_benchmarks():
@@ -225,7 +203,6 @@ def get_benchmarks():
     except Exception as e:
         current_app.logger.error(f"Error getting benchmarks: {str(e)}")
         return jsonify({'error': 'Failed to retrieve benchmarks'}), 500
-
 
 @community_bp.route('/success-stories', methods=['GET'])
 def get_success_stories():
@@ -264,7 +241,6 @@ def get_success_stories():
         current_app.logger.error(f"Error getting success stories: {str(e)}")
         return jsonify({'error': 'Failed to retrieve success stories'}), 500
 
-
 @community_bp.route('/success-stories', methods=['POST'])
 @login_required
 @limiter.limit("10 per minute")
@@ -299,26 +275,6 @@ def submit_success_story():
             clean_techniques = [sanitize_html(str(t)) for t in techniques]
 
         # Moderation check
-        title = sanitize_html(data.get('title', ''))
-        story_content = sanitize_html(data.get('story', ''))
-
-        # Sanitize list of strings
-        techniques = data.get('techniques_used', [])
-        if isinstance(techniques, list):
-            techniques = [sanitize_html(t) for t in techniques]
-
-        # Security: Sanitize inputs
-        title = sanitize_html(data.get('title', ''))
-        story_content = sanitize_html(data.get('story', ''))
-
-        # Moderation check
-        is_safe, flagged = check_moderation(
-            title + ' ' + story_content)
-
-        story = SuccessStory(
-            user_id=current_user.id,
-            title=title,
-            story=story_content,
         is_safe, flagged = check_moderation(clean_title + ' ' + clean_story)
 
         story = SuccessStory(
@@ -357,7 +313,6 @@ def submit_success_story():
         current_app.logger.error(f"Error submitting success story: {str(e)}")
         return jsonify({'error': 'Failed to submit success story'}), 500
 
-
 @community_bp.route('/success-stories/<int:story_id>/upvote', methods=['POST'])
 @login_required
 def upvote_story(story_id):
@@ -375,7 +330,6 @@ def upvote_story(story_id):
     except Exception as e:
         current_app.logger.error(f"Error upvoting story: {str(e)}")
         return jsonify({'error': 'Failed to upvote story'}), 500
-
 
 @community_bp.route('/challenges/group', methods=['GET'])
 def get_group_challenges():
@@ -406,7 +360,6 @@ def get_group_challenges():
     except Exception as e:
         current_app.logger.error(f"Error getting group challenges: {str(e)}")
         return jsonify({'error': 'Failed to retrieve group challenges'}), 500
-
 
 @community_bp.route('/challenges/group/<int:challenge_id>/join',
                     methods=['POST'])
@@ -447,7 +400,6 @@ def join_group_challenge(challenge_id):
     except Exception as e:
         current_app.logger.error(f"Error joining group challenge: {str(e)}")
         return jsonify({'error': 'Failed to join challenge'}), 500
-
 
 @community_bp.route('/challenges/group/<int:challenge_id>/progress',
                     methods=['POST'])
@@ -493,7 +445,6 @@ def update_challenge_progress(challenge_id):
             f"Error updating challenge progress: {str(e)}")
         return jsonify({'error': 'Failed to update progress'}), 500
 
-
 @community_bp.route('/connections/request', methods=['POST'])
 @login_required
 def request_connection():
@@ -503,9 +454,6 @@ def request_connection():
         connection_id = data.get('connection_id')
         connection_type = data.get('connection_type', 'pen_pal')
         message = sanitize_html(data.get('message', ''))
-
-        # Security: Sanitize message
-        message = sanitize_html(message)
 
         if not connection_id:
             return jsonify({'error': 'Connection ID required'}), 400
@@ -542,7 +490,6 @@ def request_connection():
         current_app.logger.error(f"Error requesting connection: {str(e)}")
         return jsonify({'error': 'Failed to send connection request'}), 500
 
-
 @community_bp.route('/connections/<int:connection_id>/respond',
                     methods=['POST'])
 @login_required
@@ -576,7 +523,6 @@ def respond_to_connection(connection_id):
     except Exception as e:
         current_app.logger.error(f"Error responding to connection: {str(e)}")
         return jsonify({'error': 'Failed to respond to connection'}), 500
-
 
 @community_bp.route('/connections', methods=['GET'])
 @login_required
@@ -625,7 +571,6 @@ def get_connections():
     except Exception as e:
         current_app.logger.error(f"Error getting connections: {str(e)}")
         return jsonify({'error': 'Failed to retrieve connections'}), 500
-
 
 @community_bp.route('/flag-content', methods=['POST'])
 @login_required
