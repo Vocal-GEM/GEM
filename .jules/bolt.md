@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-04 - React Referential Equality in DSP Services
+**Learning:** When optimizing tight DSP loops (like `LPCAnalyzer.analyze`) to use internal, pre-allocated `Float32Array` buffers to prevent GC churn, directly returning the internal buffer reference (e.g., `return { envelope: this.magnitude }`) completely breaks React. React uses strict equality (`oldState === newState`) to detect changes. If the service mutates the internal array and returns the exact same array instance, React will ignore the state update and drop the render, appearing frozen.
+**Action:** When returning persistent typed array buffers from a generic service to a caller that might be a React component, always return a cloned slice (e.g., `new Float32Array(this.magnitude)`) for the final result object. The micro-overhead of slicing once per frame at the boundary is heavily outweighed by avoiding thousands of tiny allocations during the loop, and it ensures referential safety.
