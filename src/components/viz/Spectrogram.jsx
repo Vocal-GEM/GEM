@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -43,6 +43,10 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const HISTORY_FRAMES = 2500;
     const historyBufferRef = useRef(null); // Float32Array
     const historyMetaRef = useRef(null); // Metadata per frame
+
+    // Reusable buffers to avoid GC churn
+    const imgDataRef = useRef(null);
+    const data32Ref = useRef(null);
 
     if (!historyMetaRef.current) {
         historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
@@ -118,18 +122,19 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             // Instead of thousands of ctx.fillRect calls, we generate the column pixels
             // directly into an ImageData buffer and put it onto the canvas.
 
-            // Reuse ImageData object
-            // Reusable objects to reduce GC
-            if (!canvas.imageDataRef) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
-            }
-            // Ensure size match
-            if (canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
+            // Ensure buffers are ready and match height
+            if (!imgDataRef.current || imgDataRef.current.height !== h || imgDataRef.current.width !== speed) {
+                try {
+                    imgDataRef.current = ctx.createImageData(speed, h);
+                    data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
+                } catch (e) {
+                    console.error("Failed to create image data", e);
+                    return;
+                }
             }
 
-            const imageData = canvas.imageDataRef;
-            const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
+            const imageData = imgDataRef.current;
+            const data32 = data32Ref.current; // View as 32-bit integers (ABGR)
 
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
             // We map pixels (y) to frequency bins.
@@ -178,7 +183,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             ctx.fillStyle = '#000';
             ctx.fillRect(width - speed, 0, speed, h);
         }
-    }, [isAudioActive, audioContext, colormap]);
+    }, [isAudioActive, audioContext, colormap, dataRef]);
 
     useEffect(() => {
         let unsubscribe;
