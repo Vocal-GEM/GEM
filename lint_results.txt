@@ -28,7 +28,7 @@
   5:10  warning  'ArrowUpRight' is defined but never used  no-unused-vars
 
 /app/src/components/community/SuccessStories.test.jsx
-  4:8  error  Parsing error: Identifier 'React' has already been declared
+  1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/marketplace/MarketplaceBrowser.jsx
   1:8   warning  'React' is defined but never used   no-unused-vars
@@ -110,16 +110,13 @@
   8:13  warning  't' is assigned a value but never used                                     no-unused-vars
 
 /app/src/components/ui/JournalForm.test.jsx
-  16:9  error  Parsing error: Unexpected token stopRecording
+  72:3  error  Parsing error: Unexpected token }
 
 /app/src/components/ui/L1ProgressMeter.jsx
   11:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/ui/LoadingSpinner.test.jsx
-  5:10  error  Parsing error: Identifier 'render' has already been declared
-
-/app/src/components/ui/LoadingSpinnerVerification.jsx
-  86:5  error  Parsing error: Unexpected token return
+  21:11  error  Parsing error: Identifier 'srText' has already been declared
 
 /app/src/components/ui/MicroCelebration.jsx
   141:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
@@ -148,7 +145,7 @@
   2:18  warning  'AnimatePresence' is defined but never used  no-unused-vars
 
 /app/src/components/ui/QuickActions.jsx
-  81:19  error  Parsing error: Unexpected token `}`. Did you mean `&rbrace;` or `{"}"}`?
+  80:19  error  Parsing error: Unexpected token `}`. Did you mean `&rbrace;` or `{"}"}`?
 
 /app/src/components/ui/QuickActionsWidget.jsx
   1:8   warning  'React' is defined but never used     no-unused-vars
@@ -171,9 +168,7 @@
   1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/ui/RecommendedToolsWidget.jsx
-    1:8   warning  'React' is defined but never used                                no-unused-vars
-  124:21  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
-  124:64  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/ui/RecordingCountdown.jsx
    1:8   warning  'React' is defined but never used                                                                                               no-unused-vars
@@ -283,7 +278,7 @@
   136:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
 
 /app/src/components/ui/button.test.jsx
-  32:1  error  Parsing error: 'import' and 'export' may only appear at the top level
+  1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/views/BeforeAfterCompare.jsx
   1:8   warning  'React' is defined but never used                   no-unused-vars
@@ -602,9 +597,6 @@
 /app/src/services/LosslessRecorder.js
   59:38  warning  'reject' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
 
-/app/src/services/PrivacyManager.js
-  9:5  error  Duplicate key 'shareProgress'  no-dupe-keys
-
 /app/src/services/ProgressPredictor.js
   55:53  warning  'comparisonTarget' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
 
@@ -621,9 +613,6 @@
 
 /app/src/services/RecommendationService.js
   92:33  warning  'reports' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
-
-/app/src/services/ResearchMode.js
-  62:37  error  'process' is not defined  no-undef
 
 /app/src/services/RoutineBuilder.js
   106:69  warning  'difficulty' is assigned a value but never used  no-unused-vars
@@ -720,5 +709,5 @@
   347:29  warning  'sampleRate' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
   374:15  warning  'minDistance' is assigned a value but never used                              no-unused-vars
 
-✖ 363 problems (10 errors, 353 warnings)
+✖ 358 problems (3 errors, 355 warnings)
 
