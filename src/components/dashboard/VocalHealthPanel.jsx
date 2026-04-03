@@ -92,6 +92,7 @@ const VocalHealthPanel = () => {
                         value={fatigue.level}
                         onChange={(e) => logFatigue(parseInt(e.target.value))}
                         className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                        aria-label="Vocal Fatigue Level"
                     />
                     <div className="flex justify-between text-xs text-slate-400 mt-2">
                         <span>Fresh</span>
