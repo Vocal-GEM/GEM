@@ -4,7 +4,7 @@
  * Runs in dedicated audio thread for <50ms latency
  */
 
-/* global currentTime, currentFrame */
+/* global currentTime */
 class PitchProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
@@ -37,7 +37,7 @@ class PitchProcessor extends AudioWorkletProcessor {
         };
     }
 
-    process(inputs, outputs, parameters) {
+    process(inputs, _outputs, _parameters) {
         const input = inputs[0];
         if (!input || !input[0]) return true;
 
