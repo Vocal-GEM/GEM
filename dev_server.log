@@ -9,3 +9,18 @@
   ➜  Network: use --host to expose
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
 6:20:13 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+6:29:41 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+6:30:33 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+6:30:53 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+6:31:05 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+6:34:21 AM [vite] page reload src/components/viz/QualityVisualizer.jsx
+6:35:54 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+6:38:03 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+6:38:42 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+6:39:09 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
+6:41:52 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+6:43:27 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+6:44:10 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+6:45:04 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+6:47:34 AM [vite] page reload src/audio/PitchWorklet.js
+6:52:15 AM [vite] page reload src/components/viz/BreathinessMeter.jsx

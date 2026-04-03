@@ -42,27 +42,20 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
             }
         };
 
-        let unsubscribe;
+        // No recursive requestAnimationFrame - RenderCoordinator handles this
+
+        let unsubscribeFn;
         import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                `spectral-tilt-meter-${id}`,
+            unsubscribeFn = renderCoordinator.subscribe(
+                `spectral-tilt-meter-${componentId}`,
                 loop,
                 renderCoordinator.PRIORITY.MEDIUM
             );
         });
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `spectral-tilt-meter-${componentId}`,
-            loop,
-            renderCoordinator.PRIORITY.MEDIUM
-        );
 
         return () => {
-            unsubscribe();
+            if (unsubscribeFn) unsubscribeFn();
         };
-    }, [dataRef, targetRange, colorBlindMode, id]);
     }, [dataRef, targetRange, colorBlindMode, componentId]);
 
     return (
