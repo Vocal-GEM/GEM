@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-04-03 - Prevent Reverse Tabnabbing
+**Vulnerability:** External links using `target="_blank"` without `rel="noopener noreferrer"`.
+**Learning:** React elements in `src/components/ui/VoiceDataConsent.jsx` and `src/components/ui/PitchExploration.jsx` included `target="_blank"` attributes but were missing `noopener`. This creates a vector for reverse tabnabbing, where the newly opened window retains a reference to the `window.opener` object and can maliciously redirect the original application page.
+**Prevention:** Ensure that all anchor tags (`<a>`) configured to open in a new tab (`target="_blank"`) always include `rel="noopener noreferrer"`.
