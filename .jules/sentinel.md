@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2026-02-15 - Corrupted Security Logic in Community Routes
+**Vulnerability:** The `backend/app/routes/community.py` file contained invalid Python syntax and duplicated code blocks resulting from a bad merge, rendering the module unusable and its security features (file anonymization, input sanitization) inoperative.
+**Learning:** Logic errors and syntax errors in security-critical paths can be just as dangerous as logic vulnerabilities because they can fail open or crash the application. Code duplication often masks the intended logic flow (e.g., anonymizing a file before it exists).
+**Prevention:** Integrate automated syntax checking (`python -m py_compile`) and linting into the pre-commit or CI pipeline to prevent invalid code from being committed. Refactor duplicate blocks immediately to reduce cognitive load and error surface.
