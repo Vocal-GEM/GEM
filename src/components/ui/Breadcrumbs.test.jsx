@@ -95,4 +95,27 @@ describe('Breadcrumbs', () => {
         expect(screen.getByText('Practice')).toBeInTheDocument();
         expect(screen.getByText('Pitch Tool')).toBeInTheDocument();
     });
+
+    it('should prioritize breadcrumbs from context over history', () => {
+        const history = [{ label: 'History Item', action: null }];
+        const breadcrumbs = [
+            { label: 'Dashboard', action: vi.fn() },
+            { label: 'Learn', action: vi.fn() },
+            { label: 'Custom Module', action: null }
+        ];
+
+        useNavigation.mockReturnValue({
+            history,
+            breadcrumbs,
+            navigate: mockNavigate,
+            activeView: 'learn'
+        });
+
+        render(<Breadcrumbs />);
+
+        expect(screen.queryByText('History Item')).not.toBeInTheDocument();
+        expect(screen.getByText('Dashboard')).toBeInTheDocument();
+        expect(screen.getByText('Learn')).toBeInTheDocument();
+        expect(screen.getByText('Custom Module')).toBeInTheDocument();
+    });
 });
