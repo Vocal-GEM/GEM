@@ -13,6 +13,27 @@ export class LPCAnalyzer {
     constructor(order = 12, sampleRate = 48000) {
         this.order = order; // Typically 10-12 for speech at 8-10kHz, maybe higher for 48kHz
         this.sampleRate = sampleRate;
+
+        // Pre-allocate buffers for analysis to avoid GC churn
+        this.maxBufferLength = 0;
+
+        // Fixed-size buffers (based on order or fixed constants)
+        this.R = new Float32Array(order + 1);
+        this.a = new Float32Array(order + 1);
+        this.E = new Float32Array(order + 1);
+        this.k_coeff = new Float32Array(order + 1);
+        this.a_prev = new Float32Array(order + 1);
+        this.magnitude = new Float32Array(512); // Assuming numPoints is always 512
+        this.lowDbFloor = new Float32Array(512).fill(-100);
+    }
+
+    // Lazy allocation for variable-size buffers
+    ensureBuffers(length) {
+        if (length > this.maxBufferLength) {
+            this.maxBufferLength = length;
+            this.preEmphasisBuffer = new Float32Array(length);
+            this.windowedBuffer = new Float32Array(length);
+        }
     }
 
     /**
@@ -23,14 +44,16 @@ export class LPCAnalyzer {
     analyze(audioBuffer) {
         if (!audioBuffer || audioBuffer.length === 0) return null;
 
+        this.ensureBuffers(audioBuffer.length);
+
         // 1. Pre-emphasis
         const signal = this.applyPreEmphasis(audioBuffer);
 
         // 2. Windowing (Hamming)
-        const windowed = this.applyWindow(signal);
+        const windowed = this.applyWindow(signal, audioBuffer.length);
 
         // 3. Autocorrelation
-        const r = this.computeAutocorrelation(windowed, this.order);
+        const r = this.computeAutocorrelation(windowed, audioBuffer.length, this.order);
 
         // 4. Levinson-Durbin Recursion
         const { a, error } = this.levinsonDurbin(r, this.order);
@@ -42,59 +65,67 @@ export class LPCAnalyzer {
 
         // 6. Find Formants (Roots of the polynomial or Peak picking from envelope)
         // Peak picking from envelope is simpler and often sufficient for visualization
-        const formants = this.findPeaks(envelope, this.sampleRate);
+        const formants = this.findPeaks(envelope, 512, this.sampleRate);
 
         return {
             coefficients: a,
-            envelope,
+            // Return a sliced copy of the envelope to maintain referential equality safety
+            // in React components, while preserving the internal buffer speed
+            envelope: new Float32Array(envelope),
             formants
         };
     }
 
     applyPreEmphasis(signal, coeff = 0.97) {
-        const output = new Float32Array(signal.length);
+        const output = this.preEmphasisBuffer;
+        const len = signal.length;
         output[0] = signal[0];
-        for (let i = 1; i < signal.length; i++) {
+        for (let i = 1; i < len; i++) {
             output[i] = signal[i] - coeff * signal[i - 1];
         }
-        return output;
+        return output; // Return pre-allocated buffer
     }
 
-    applyWindow(signal) {
-        const N = signal.length;
-        const output = new Float32Array(N);
-        for (let i = 0; i < N; i++) {
+    applyWindow(signal, len) {
+        const output = this.windowedBuffer;
+        for (let i = 0; i < len; i++) {
             // Hamming window
-            const w = 0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (N - 1));
+            const w = 0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (len - 1));
             output[i] = signal[i] * w;
         }
-        return output;
+        return output; // Return pre-allocated buffer
     }
 
-    computeAutocorrelation(signal, order) {
-        const R = new Float32Array(order + 1);
-        const N = signal.length;
+    computeAutocorrelation(signal, len, order) {
+        const R = this.R;
         for (let k = 0; k <= order; k++) {
             let sum = 0;
-            for (let i = 0; i < N - k; i++) {
+            for (let i = 0; i < len - k; i++) {
                 sum += signal[i] * signal[i + k];
             }
             R[k] = sum;
         }
-        return R;
+        return R; // Return pre-allocated buffer
     }
 
     levinsonDurbin(R, order) {
-        const a = new Float32Array(order + 1);
-        const E = new Float32Array(order + 1);
+        const a = this.a;
+        const E = this.E;
+        const k_coeff = this.k_coeff;
+        const a_prev = this.a_prev;
 
         // Initialization
         E[0] = R[0];
         a[0] = 1; // a[0] is always 1
 
-        // Temporary arrays
-        const k_coeff = new Float32Array(order + 1);
-        const a_prev = new Float32Array(order + 1);
+        // Reset buffers
+        for (let i = 1; i <= order; i++) {
+            a[i] = 0;
+            E[i] = 0;
+            k_coeff[i] = 0;
+            a_prev[i] = 0;
+        }
+        a_prev[0] = 1; // Since a[0] = 1
 
         for (let i = 1; i <= order; i++) {
             let sum = 0;
@@ -126,7 +157,7 @@ export class LPCAnalyzer {
         // Usually we want the predictor coefficients.
         // Let's stick to the standard definition: A(z) = 1 + sum_{k=1}^p a_k z^{-k}
 
-        return { a: a.slice(1), error: E[order] }; // Return coefficients a1...ap
+        return { a: a.slice(1, order + 1), error: E[order] }; // Return coefficients a1...ap
     }
 
     computeLPCSpectrum(a, error, numPoints) {
@@ -134,11 +165,11 @@ export class LPCAnalyzer {
         // A(z) = 1 + a1*z^-1 + ... + ap*z^-p
         // z = e^(j*omega)
 
-        const magnitude = new Float32Array(numPoints);
+        const magnitude = this.magnitude;
         const gain = Math.sqrt(error); // Gain G
 
         if (gain < 1e-10) {
-            return new Float32Array(numPoints).fill(-100); // Return low dB floor
+            return this.lowDbFloor; // Return low dB floor
         }
 
         for (let i = 0; i < numPoints; i++) {
@@ -157,12 +188,11 @@ export class LPCAnalyzer {
             magnitude[i] = 20 * Math.log10(gain / (magA + 1e-10)); // dB
         }
 
-        return magnitude;
+        return magnitude; // Return pre-allocated buffer
     }
 
-    findPeaks(envelope, sampleRate) {
+    findPeaks(envelope, numPoints, sampleRate) {
         const peaks = [];
-        const numPoints = envelope.length;
 
         // Simple peak picking
         for (let i = 1; i < numPoints - 1; i++) {
