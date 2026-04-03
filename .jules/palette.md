@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-02-18 - Icon Button Accessibility
+**Learning:** Icon-only buttons (like those using `lucide-react` icons) are completely invisible to screen readers unless they have explicit `aria-label` attributes.
+**Action:** When auditing or building components, always ensure that any `<button>` element lacking text content has a descriptive `aria-label` or visually hidden text.
