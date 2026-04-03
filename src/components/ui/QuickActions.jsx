@@ -46,7 +46,6 @@ const QuickActions = ({ onAction }) => {
                     "flex flex-col gap-3 mb-4 transition-all duration-300",
                     isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
                 )}
-                className={`flex flex-col gap-3 mb-4 transition-all duration-300 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
                 aria-hidden={!isOpen}
             >
                 {actions.map((action, index) => (
@@ -55,11 +54,9 @@ const QuickActions = ({ onAction }) => {
                         onClick={() => handleAction(action)}
                         tabIndex={isOpen ? 0 : -1}
                         aria-hidden={!isOpen}
-                        className="flex items-center justify-end gap-3 group focus:outline-none"
                         className="flex items-center justify-end gap-3 group focus-visible:outline-none"
                         style={{ transitionDelay: `${index * 50}ms` }}
                         aria-label={action.label}
-                        aria-hidden={!isOpen}
                     >
                         <span
                             className="bg-slate-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg border border-slate-700 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity"
@@ -67,7 +64,6 @@ const QuickActions = ({ onAction }) => {
                         >
                             {action.label}
                         </span>
-                        <div className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-white transition-transform hover:scale-110 group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-white ${action.color}`}>
                         <div
                             className={twMerge(
                                 "w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-white transition-transform hover:scale-110 group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-white",
