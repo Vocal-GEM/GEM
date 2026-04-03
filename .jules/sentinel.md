@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2023-10-27 - Information Exposure in Exception Handling
+**Vulnerability:** The voice manipulation and audio cleaning endpoints leaked internal error messages (e.g. from exceptions) to the client by casting `Exception as e` to a string: `return jsonify({'error': str(e)}), 500`.
+**Learning:** Returning raw exception strings in API responses is an Information Exposure vulnerability (CWE-200) that can reveal sensitive stack traces, DB connection strings, or system paths to attackers. Additionally, the fallback cleanup logic in Python `except` or `finally` blocks must guard uninitialized variable access with `'var_name' in locals()` (e.g., `if 'tmp_path' in locals() and tmp_path:`) to prevent `UnboundLocalError` crashes if the exception occurs before the variable is successfully assigned.
+**Prevention:** Always catch and log the internal exception `e` securely on the server using `current_app.logger.error()`, and return a generic, safe error message to the client like `"An internal error occurred."`. When performing cleanup in `finally` blocks, safely check if the variable was initialized before using it.

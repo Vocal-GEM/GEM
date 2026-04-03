@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 import os
+import re
 import requests
 from ..extensions import limiter
 
@@ -26,6 +27,9 @@ def synthesize_speech():
     
     if not text:
         return jsonify({"error": "No text provided"}), 400
+
+    if not re.match(r'^[a-zA-Z0-9_-]+$', voice_id):
+        return jsonify({"error": "Invalid voice ID format"}), 400
 
     try:
         # Forward request to ElevenLabs API
