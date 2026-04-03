@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-05-21 - Optimizing HTML5 Canvas Performance
+**Learning:** In HTML5 Canvas rendering loops (e.g., `Spectrogram.jsx`), allocating a new `Uint32Array` view over an `ImageData` buffer inside a `requestAnimationFrame` loop creates severe Garbage Collection (GC) churn and micro-stutters.
+**Action:** Store `ImageData` and its corresponding `Uint32Array` view in persistent React `useRef`s. Only reallocate these buffers when the underlying canvas dimensions (e.g., `width` or `height`) actually change, completely eliminating allocations within the hot path.
