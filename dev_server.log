@@ -8,3 +8,7 @@
   ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+6:43:12 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+6:43:28 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+6:43:47 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+6:44:31 AM [vite] page reload src/audio/PitchWorklet.js
