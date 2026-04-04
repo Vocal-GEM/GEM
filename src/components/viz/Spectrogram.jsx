@@ -61,6 +61,9 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const speed = 2; // Pixels per frame
     const MAX_FREQ = 8000;
 
+    // Cache for ImageData to prevent GC churn
+    const imageDataRef = useRef(null);
+
     // Pre-calculate colormap as Uint32Array (ABGR) for fast pixel manipulation
     const colormap = useMemo(
         () => generateColormap(settings.spectrogramColorScheme),
@@ -120,15 +123,15 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
 
             // Reuse ImageData object
             // Reusable objects to reduce GC
-            if (!canvas.imageDataRef) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
+            if (!imageDataRef.current) {
+                imageDataRef.current = ctx.createImageData(speed, h);
             }
             // Ensure size match
-            if (canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
+            if (imageDataRef.current.height !== h || imageDataRef.current.width !== speed) {
+                imageDataRef.current = ctx.createImageData(speed, h);
             }
 
-            const imageData = canvas.imageDataRef;
+            const imageData = imageDataRef.current;
             const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
 
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
