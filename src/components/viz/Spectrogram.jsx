@@ -61,6 +61,9 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const speed = 2; // Pixels per frame
     const MAX_FREQ = 8000;
 
+    const imgDataRef = useRef(null);
+    const data32Ref = useRef(null);
+
     // Pre-calculate colormap as Uint32Array (ABGR) for fast pixel manipulation
     const colormap = useMemo(
         () => generateColormap(settings.spectrogramColorScheme),
@@ -120,16 +123,18 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
 
             // Reuse ImageData object
             // Reusable objects to reduce GC
-            if (!canvas.imageDataRef) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
+            if (!imgDataRef.current) {
+                imgDataRef.current = ctx.createImageData(speed, h);
+                data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
             }
             // Ensure size match
-            if (canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
+            if (imgDataRef.current.height !== h || imgDataRef.current.width !== speed) {
+                imgDataRef.current = ctx.createImageData(speed, h);
+                data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
             }
 
-            const imageData = canvas.imageDataRef;
-            const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
+            const imageData = imgDataRef.current;
+            const data32 = data32Ref.current; // View as 32-bit integers (ABGR)
 
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
             // We map pixels (y) to frequency bins.

@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - HTML5 Canvas ImageData Allocation in React
+**Learning:** Components mutating `canvas.imageDataRef` natively on the DOM node to cache typed arrays for render loops break React state boundaries and still incur DOM lookup/mutation overhead, leading to GC churn and performance drops during continuous `requestAnimationFrame` updates.
+**Action:** Always wrap persistently allocated canvas buffers (like `ImageData` and `Uint32Array`) within React's `useRef(null)` hook, lazy initializing them only when dimensions physically change or the buffers are empty.
