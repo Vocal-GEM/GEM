@@ -13,13 +13,6 @@ export const TrendLineChart = ({ data, metric, trendInfo }) => {
 
     const dataKey = getDataKey(metric);
 
-    // Create projection line if trend info exists
-    const projectedData = [...data];
-    if (trendInfo && trendInfo.prediction) {
-        // Add a couple of future points for visualization
-        // logic simplified for demo
-    }
-
     return (
         <ResponsiveContainer width="100%" height="100%">
             <LineChart
@@ -53,13 +46,6 @@ export const TrendLineChart = ({ data, metric, trendInfo }) => {
                     dot={{ r: 4, fill: '#8b5cf6' }}
                     activeDot={{ r: 8 }}
                 />
-
-                {/* Render a simple linear trend line if we calculated one */}
-                {trendInfo && trendInfo.rateOfChange !== 0 && (
-                    // visualizing trend line would require generating points y = mx + b
-                    // omitted for brevity, but this is where it would go
-                    <></>
-                )}
             </LineChart>
         </ResponsiveContainer>
     );

@@ -28,6 +28,7 @@ class PitchProcessor extends AudioWorkletProcessor {
         // Listen for configuration updates
         this.port.onmessage = (event) => {
             if (event.data.type === 'config') {
+                /* global currentTime */
                 this.sampleRate = event.data.sampleRate || this.sampleRate;
                 this.threshold = event.data.threshold || this.threshold;
                 this.minFreq = event.data.minFreq || this.minFreq;
@@ -36,7 +37,7 @@ class PitchProcessor extends AudioWorkletProcessor {
         };
     }
 
-    process(inputs, outputs, parameters) {
+    process(inputs, _outputs, _parameters) {
         const input = inputs[0];
         if (!input || !input[0]) return true;
 
