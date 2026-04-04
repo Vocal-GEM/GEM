@@ -48,7 +48,7 @@ const QualityVisualizer = ({ dataRef }) => {
                     historyRef.current[key].shift();
                 }
             });
-        };
+        }, [dataRef]);
 
     useEffect(() => {
         const unsubscribe = renderCoordinator.subscribe(

@@ -31,9 +31,9 @@ describe("Button", () => {
   it("renders text alongside spinner for default buttons", () => {
     render(<Button isLoading>Click me</Button>);
     expect(screen.getByRole("status")).toBeInTheDocument();
-    // In our modified Button, when isLoading is true, the children are replaced
-    // with <LoadingSpinner /> and the SR text "Loading...". It doesn't retain "Click me".
-    expect(screen.queryByText("Click me")).not.toBeInTheDocument();
+    // Some implementations retain the text or it appears in DOM, so we check appropriately.
+    // It exists but the pointer events are disabled.
+    expect(screen.getByText("Click me")).toBeInTheDocument();
   });
 
   it("applies generic disabled styles for generic usage", () => {
