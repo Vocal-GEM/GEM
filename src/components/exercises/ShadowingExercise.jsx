@@ -254,14 +254,22 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
                 <div className="flex justify-between items-center p-4 border-b border-white/5 bg-slate-900/50">
                     <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
                         {phase !== 'select' && (
-                            <button onClick={() => setPhase('select')} className="mr-2 text-slate-400 hover:text-white">
+                            <button
+                                onClick={() => setPhase('select')}
+                                className="mr-2 text-slate-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full p-1"
+                                aria-label="Back to selection"
+                            >
                                 <ArrowLeft size={20} />
                             </button>
                         )}
                         Shadowing & Mimicry
                     </h2>
                     {!embedded && onClose && (
-                        <button onClick={onClose} className="p-2 text-slate-400 hover:text-white">
+                        <button
+                            onClick={onClose}
+                            className="p-2 text-slate-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full"
+                            aria-label="Close shadowing exercise"
+                        >
                             <XCircle size={24} />
                         </button>
                     )}
@@ -357,8 +365,9 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
 
                             <button
                                 onClick={isRecording ? handleStopRecording : handleStartRecording}
-                                className={`w-24 h-24 rounded-full flex items-center justify-center shadow-2xl transition-all transform hover:scale-105 active:scale-95 ${isRecording ? 'bg-red-500 border-4 border-red-400' : 'bg-blue-600 border-4 border-blue-500'
+                                className={`w-24 h-24 rounded-full flex items-center justify-center shadow-2xl transition-all transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${isRecording ? 'bg-red-500 border-4 border-red-400 focus-visible:ring-red-400' : 'bg-blue-600 border-4 border-blue-500 focus-visible:ring-blue-400'
                                     }`}
+                                aria-label={isRecording ? 'Stop recording' : 'Start recording'}
                             >
                                 {isRecording ? (
                                     <Square size={32} fill="currentColor" className="text-white" />
