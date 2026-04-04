@@ -20,18 +20,24 @@ import WelcomeBanner from '../ui/WelcomeBanner';
 import ContextualTips from '../ui/ContextualTips';
 
 
-const StatCard = ({ label, value, subtext, icon, color }) => (
-    <div className="bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
-        <div className="flex justify-between items-start mb-2 sm:mb-4">
-            <div className={`p-2 sm:p-3 rounded-xl ${color} bg-opacity-10`}>
-                {cloneElement(icon, { className: `${color} w-5 h-5 sm:w-6 sm:h-6` })}
+const StatCard = ({ label, value, subtext, icon, color, onClick }) => {
+    const Component = onClick ? 'button' : 'div';
+    return (
+        <Component
+            onClick={onClick}
+            className={`bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors text-left w-full ${onClick ? 'hover:border-teal-500/50 cursor-pointer' : ''}`}
+        >
+            <div className="flex justify-between items-start mb-2 sm:mb-4">
+                <div className={`p-2 sm:p-3 rounded-xl ${color} bg-opacity-10`}>
+                    {cloneElement(icon, { className: `${color} w-5 h-5 sm:w-6 sm:h-6` })}
+                </div>
+                {subtext && <span className="text-[10px] sm:text-xs font-bold text-teal-500 bg-teal-500/10 px-2 py-1 rounded-full">{subtext}</span>}
             </div>
-            {subtext && <span className="text-[10px] sm:text-xs font-bold text-teal-500 bg-teal-500/10 px-2 py-1 rounded-full">{subtext}</span>}
-        </div>
-        <div className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: '#ffffff' }}>{value}</div>
-        <div className="text-xs sm:text-sm text-slate-400">{label}</div>
-    </div>
-);
+            <div className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: '#ffffff' }}>{value}</div>
+            <div className="text-xs sm:text-sm text-slate-400">{label}</div>
+        </Component>
+    );
+};
 
 const ActionCard = ({ title, description, onClick, icon, color }) => (
     <button
@@ -220,13 +226,14 @@ const DashboardView = ({ onViewChange, onOpenAdaptiveSession }) => {
                     icon={<Activity size={24} />}
                     color="text-teal-400"
                 /> */}
-                {/* <StatCard
+                <StatCard
                     label={t('dashboard.stats.streak.label')}
                     value={streakData.currentStreak}
                     subtext={streakData.needsPracticeToday ? "Practice today!" : "✓ Done"}
                     icon={<Flame size={24} />}
                     color="text-orange-400"
-                /> */}
+                    onClick={() => openModal('streak')}
+                />
                 <StatCard
                     label={t('dashboard.stats.practice.label')}
                     value="45m"

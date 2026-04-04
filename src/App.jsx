@@ -71,6 +71,8 @@ import { analyticsService } from './services/AnalyticsService';
 import { useVoiceProfile } from './context/VoiceProfileContext';
 import IntakeQuestionnaire from './components/ui/IntakeQuestionnaire';
 import Breadcrumbs from './components/ui/Breadcrumbs';
+import StreakCalendar from './components/ui/StreakCalendar';
+import { X } from 'lucide-react';
 
 // VoiceTwinDiscovery is not used in App directly, it's a widget in Dashboard
 // But if we want it accessible elsewhere we can import it. 
@@ -476,6 +478,21 @@ const App = () => {
                             <Suspense fallback={<LoadingSpinner />}>
                                 <PracticeCardsPanel onClose={() => closeModal('practiceCards')} />
                             </Suspense>
+                        )}
+
+                        {modals.streak && (
+                            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                                <div className="relative w-full max-w-lg">
+                                    <button
+                                        onClick={() => closeModal('streak')}
+                                        className="absolute -top-10 right-0 p-2 text-slate-400 hover:text-white"
+                                        aria-label="Close Streak Calendar"
+                                    >
+                                        <X size={24} />
+                                    </button>
+                                    <StreakCalendar />
+                                </div>
+                            </div>
                         )}
                     </main>
 
