@@ -1,6 +1,7 @@
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useId } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRecording = false }) => {
     const { colorBlindMode } = useSettings();
@@ -30,6 +31,7 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
     const pointRef = useRef(null);
     const labelRef = useRef(null);
     const canvasRef = useRef(null);
+    const componentId = useId();
 
     const [currentVowel, setCurrentVowel] = useState('');
     const [hitScore, setHitScore] = useState(0);
@@ -39,8 +41,6 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-
-        let animationId;
 
         const render = () => {
             // Clear Canvas
@@ -128,8 +128,6 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
                     pointRef.current.style.opacity = '0.1';
                 }
             }
-
-            animationId = requestAnimationFrame(render);
         };
 
         // Resize handler
@@ -141,13 +139,17 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
         window.addEventListener('resize', resize);
         resize();
 
-        render();
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            render,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
 
         return () => {
-            cancelAnimationFrame(animationId);
+            unsubscribe();
             window.removeEventListener('resize', resize);
         };
-    }, [targetVowel, isMasc, isRecording, colorBlindMode]);
+    }, [targetVowel, isMasc, isRecording, colorBlindMode, componentId]);
 
     return (
         <div className="w-full h-full relative bg-slate-950 rounded-xl overflow-hidden shadow-inner">
