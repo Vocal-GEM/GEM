@@ -1,4 +1,4 @@
-/* global currentTime, currentFrame */
+/* global currentTime */
 
 /**
  * PitchWorklet.js
