@@ -9,6 +9,8 @@ import OrbLegend from './OrbLegend';
 import OrbMetricsOverlay from './OrbMetricsOverlay';
 
 
+import { renderCoordinator } from '../../services/RenderCoordinator';
+
 const MixingBoardView = lazy(() => import('../views/MixingBoardView'));
 
 // Shared Noise Function
@@ -401,7 +403,6 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
   const textRef = useRef(null);
 
   useEffect(() => {
-    let frameId;
     const loop = () => {
       if (dataRef.current) {
         const { pitch, volume } = dataRef.current;
@@ -414,10 +415,22 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
           textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
         }
       }
-      frameId = requestAnimationFrame(loop);
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
+
+    // ⚡ Bolt Optimization: Use RenderCoordinator instead of raw requestAnimationFrame
+    // Expected Impact: Reduces CPU usage by merging multiple standalone
+    // requestAnimationFrame loops into a single batched render cycle,
+    // preventing layout thrashing and micro-stutters when multiple
+    // visualizers are active on screen.
+    const unsubscribe = renderCoordinator.subscribe(
+        'safe-mode-visualizer',
+        loop,
+        renderCoordinator.PRIORITY.MEDIUM
+    );
+
+    return () => {
+        unsubscribe();
+    };
   }, [dataRef]);
 
   return (
