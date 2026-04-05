@@ -75,8 +75,3 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
-
-## 2024-05-24 - SSRF vulnerability in TTS route
-**Vulnerability:** Client-provided `voiceId` parameter was passed unsanitized directly into the ElevenLabs API request URL (`https://api.elevenlabs.io/v1/text-to-speech/{voice_id}`) and `modelId` was passed into the JSON payload.
-**Learning:** External API requests constructed using unsanitized user inputs are susceptible to SSRF and URL manipulation, allowing attackers to manipulate the request path or parameters.
-**Prevention:** Always sanitize client-provided values used in external API requests or URLs using strict regex validation (e.g., `re.match(r'^[a-zA-Z0-9_\-]+$', value)`) to ensure they contain only expected characters.

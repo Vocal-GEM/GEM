@@ -35,6 +35,13 @@ from backend.app.routes import voice_quality
 class TestVoiceQualitySecurity(unittest.TestCase):
     def setUp(self):
         self.test_dir = tempfile.mkdtemp()
+        self.app = Flask(__name__)
+        self.app.config['UPLOAD_FOLDER'] = self.test_dir
+        self.app.config['SECRET_KEY'] = 'test'
+        # Blueprint routes are already absolute paths
+class TestVoiceQualitySecurity(unittest.TestCase):
+    def setUp(self):
+        self.test_dir = tempfile.mkdtemp()
 
         # Prepare mocks using patch.dict to avoid global pollution
         self.modules_patcher = patch.dict(sys.modules, {
@@ -72,6 +79,8 @@ class TestVoiceQualitySecurity(unittest.TestCase):
         if os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir)
         self.modules_patcher.stop()
+        if os.path.exists(self.test_dir):
+            shutil.rmtree(self.test_dir)
         # Clean up the module to prevent side effects on other tests
         if 'backend.app.routes.voice_quality' in sys.modules:
              del sys.modules['backend.app.routes.voice_quality']

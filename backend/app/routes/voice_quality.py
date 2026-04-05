@@ -210,7 +210,10 @@ def manipulate_file():
     finally:
         # Cleanup original temp file immediately
         if tmp_path and os.path.exists(tmp_path):
-            os.remove(tmp_path)
+            try:
+                os.remove(tmp_path)
+            except:
+                pass
 
         # Cleanup processed file on error
         if processed_path and os.path.exists(processed_path):
@@ -218,12 +221,6 @@ def manipulate_file():
              try:
                 os.remove(processed_path)
              except:
-                pass
-        # Cleanup original temp file immediately (always safe as it's not the one being sent)
-        if tmp_path and os.path.exists(tmp_path):
-            try:
-                os.remove(tmp_path)
-            except:
                 pass
 
 @voice_quality_bp.route('/api/voice-quality/goals', methods=['GET'])
