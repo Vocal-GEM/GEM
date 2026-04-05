@@ -1,9 +1,8 @@
-import { render, fireEvent } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Sidebar from './Sidebar';
 
 // Mock contexts
-const mockLogout = vi.fn();
 const mockUseAuth = vi.fn();
 const mockUseProfile = vi.fn();
 
