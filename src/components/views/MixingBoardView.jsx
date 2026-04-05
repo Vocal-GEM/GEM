@@ -1,7 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useId } from 'react';
 import { Gauge, Sliders } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const MixingBoardView = ({ dataRef, calibration, compact = false, viewMode: propViewMode }) => {
+    const componentId = useId();
     const [internalViewMode, setInternalViewMode] = useState('sliders'); // 'sliders' or 'gauges'
     const viewMode = propViewMode || internalViewMode;
     // Removed unused sliderValues state
@@ -97,13 +99,16 @@ const MixingBoardView = ({ dataRef, calibration, compact = false, viewMode: prop
                     }
                 }
             });
-
-            requestAnimationFrame(loop);
         };
 
-        const id = requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(id);
-    }, [dataRef, calibration, viewMode]);
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            loop,
+            renderCoordinator.PRIORITY.HIGH
+        );
+
+        return () => unsubscribe();
+    }, [dataRef, calibration, viewMode, componentId]);
 
 
 
