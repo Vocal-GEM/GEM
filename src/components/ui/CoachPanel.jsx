@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { Activity, AlertTriangle, ChevronRight, Mic } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import RegisterGauge from '../viz/RegisterGauge';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const CoachPanel = ({ dataRef, onNavigate }) => {
+    const componentId = useId();
     const { targetRange, activeProfile } = useProfile();
     const [metrics, setMetrics] = useState({
         pitch: 0,
@@ -30,11 +32,16 @@ const CoachPanel = ({ dataRef, onNavigate }) => {
                     register: register
                 });
             }
-            requestAnimationFrame(updateLoop);
         };
-        const handle = requestAnimationFrame(updateLoop);
-        return () => cancelAnimationFrame(handle);
-    }, [dataRef]);
+
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            updateLoop,
+            renderCoordinator.PRIORITY.HIGH
+        );
+
+        return () => unsubscribe();
+    }, [dataRef, componentId]);
 
     // Derived Advice Logic
     useEffect(() => {
