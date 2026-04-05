@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-23 - Accessibility of Dynamic Settings Controls
+**Learning:** Dynamic settings panels (like collapsible volume controls) and custom preset selectors (like delay times) are often visually obvious but lack programmatic context. Screen reader users need to know if a panel is expanded (`aria-expanded`, `aria-controls`), which toggle state is active (`aria-pressed`), and what unlabeled inputs do (`aria-label`).
+**Action:** When creating or auditing custom UI controls, always map the visual state to corresponding ARIA attributes (e.g., `aria-expanded` for toggles, `aria-pressed` for select buttons) and ensure all native inputs have an accessible name.
