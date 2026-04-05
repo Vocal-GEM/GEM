@@ -15,6 +15,14 @@ vi.mock('../../context/ProfileContext', () => ({
     useProfile: () => mockUseProfile()
 }));
 
+vi.mock('../../context/ToastContext', () => ({
+    useToast: () => ({
+        showError: vi.fn(),
+        showSuccess: vi.fn(),
+        showToast: vi.fn()
+    })
+}));
+
 // Mock child components to avoid deep rendering issues
 vi.mock('../ui/ProfileManager', () => ({
     default: ({ onClose }) => <div data-testid="profile-manager">Profile Manager <button onClick={onClose}>Close</button></div>

@@ -15,6 +15,12 @@ vi.mock('../../context/LanguageContext', () => ({
     })
 }));
 
+vi.mock('../../context/ToastContext', () => ({
+    useToast: () => ({
+        showError: vi.fn()
+    })
+}));
+
 vi.mock('../../context/TourContext', () => ({
     useTour: () => ({
         startTour: vi.fn()
