@@ -12,8 +12,24 @@
 export const validateAudioSignal = (audioBuffer, sampleRate) => {
     const issues = [];
 
+    // Single pass calculation for basic metrics to avoid GC and max call stack issues
+    let maxAmplitude = 0;
+    let sumSquares = 0;
+    let sum = 0;
+    const len = audioBuffer.length;
+
+    for (let i = 0; i < len; i++) {
+        const val = audioBuffer[i];
+        const absVal = Math.abs(val);
+        if (absVal > maxAmplitude) maxAmplitude = absVal;
+        sumSquares += val * val;
+        sum += val;
+    }
+
+    const rms = Math.sqrt(sumSquares / len);
+    const dcOffset = sum / len;
+
     // Check for clipping
-    const maxAmplitude = Math.max(...audioBuffer.map(Math.abs));
     if (maxAmplitude > 0.99) {
         issues.push({
             type: 'clipping',
@@ -23,7 +39,6 @@ export const validateAudioSignal = (audioBuffer, sampleRate) => {
     }
 
     // Check for silence
-    const rms = Math.sqrt(audioBuffer.reduce((sum, s) => sum + s * s, 0) / audioBuffer.length);
     if (rms < 0.001) {
         issues.push({
             type: 'silence',
@@ -33,7 +48,6 @@ export const validateAudioSignal = (audioBuffer, sampleRate) => {
     }
 
     // Check for DC offset
-    const dcOffset = audioBuffer.reduce((sum, s) => sum + s, 0) / audioBuffer.length;
     if (Math.abs(dcOffset) > 0.05) {
         issues.push({
             type: 'dc_offset',
@@ -75,16 +89,32 @@ export const validateAudioSignal = (audioBuffer, sampleRate) => {
  * @returns {number} Estimated SNR in dB
  */
 const estimateSNR = (audioBuffer) => {
-    // Calculate RMS (signal power)
-    const rms = Math.sqrt(audioBuffer.reduce((sum, s) => sum + s * s, 0) / audioBuffer.length);
+    // Calculate RMS (signal power) in a single pass to avoid array allocations
+    let sumSquares = 0;
+    const len = audioBuffer.length;
+
+    // Also copy to regular array for sorting without spreading Float32Array (which can exceed call stack)
+    const absArray = new Array(len);
+
+    for (let i = 0; i < len; i++) {
+        const val = audioBuffer[i];
+        sumSquares += val * val;
+        absArray[i] = Math.abs(val);
+    }
+
+    const rms = Math.sqrt(sumSquares / len);
 
     // Estimate noise floor from quietest 10% of samples
-    const sorted = [...audioBuffer].map(Math.abs).sort((a, b) => a - b);
-    const noiseFloorIndex = Math.floor(sorted.length * 0.1);
-    const noiseFloorSamples = sorted.slice(0, noiseFloorIndex);
-    const noiseFloor = Math.sqrt(
-        noiseFloorSamples.reduce((sum, s) => sum + s * s, 0) / noiseFloorSamples.length
-    );
+    absArray.sort((a, b) => a - b);
+    const noiseFloorIndex = Math.floor(len * 0.1);
+
+    let noiseFloorSumSquares = 0;
+    for (let i = 0; i < noiseFloorIndex; i++) {
+        const val = absArray[i];
+        noiseFloorSumSquares += val * val;
+    }
+
+    const noiseFloor = Math.sqrt(noiseFloorSumSquares / Math.max(1, noiseFloorIndex));
 
     // Avoid division by zero
     if (noiseFloor < 0.00001) {

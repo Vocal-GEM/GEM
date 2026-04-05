@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - Float32Array spread and iteration anti-pattern
+**Learning:** Using high-level array methods (`.map()`, `.reduce()`) or the spread operator (`...`) on `Float32Array` buffers is highly inefficient and dangerous. In `signalValidator.js`, `Math.max(...audioBuffer.map(Math.abs))` was allocating intermediate arrays (causing severe GC churn) and spreading thousands of elements onto the call stack, which can throw `RangeError: Maximum call stack size exceeded` in JavaScript engines.
+**Action:** Always process typed arrays (like audio buffers) using standard, single-pass `for` loops. This avoids intermediate allocations (O(1) memory), prevents stack overflows, and executes in a fraction of the time (O(n) instead of O(3n)).
