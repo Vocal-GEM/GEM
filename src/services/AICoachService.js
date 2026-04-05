@@ -2,7 +2,7 @@
  * AICoachService - Personalized AI coaching and curriculum generation
  */
 
-import { getActivitySummary, getReports } from './SessionReportService';
+import { getReports } from './SessionReportService';
 import { getStreakData } from './StreakService';
 import { generateVoiceFingerprint } from './AdvancedAnalyticsService';
 import { TRAINING_CATEGORIES } from '../data/trainingData';
@@ -358,7 +358,7 @@ Keep responses concise (under 2 sentences) unless asked for a detailed explanati
      */
     async getResponse(userMessage, userState = {}) {
         const context = this.buildContext(userState);
-        const systemPrompt = this.buildSystemPrompt(context);
+        const _systemPrompt = this.buildSystemPrompt(context);
 
         // Add to history
         this.conversationHistory.push({ role: 'user', content: userMessage });

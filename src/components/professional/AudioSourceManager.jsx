@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
 
 const AudioSourceManager = ({ onSourceChange }) => {
@@ -6,11 +6,7 @@ const AudioSourceManager = ({ onSourceChange }) => {
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [permissionGranted, setPermissionGranted] = useState(false);
 
-    useEffect(() => {
-        checkPermissionAndEnumerate();
-    }, []);
-
-    const checkPermissionAndEnumerate = async () => {
+    const checkPermissionAndEnumerate = useCallback(async () => {
         try {
             // Must request permission first to get labels
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -18,6 +14,22 @@ const AudioSourceManager = ({ onSourceChange }) => {
 
             // Stop the temp stream immediately
             stream.getTracks().forEach(track => track.stop());
+
+            const enumerateDevices = async () => {
+                try {
+                    const allDevices = await navigator.mediaDevices.enumerateDevices();
+                    const audioInputs = allDevices.filter(device => device.kind === 'audioinput');
+                    setDevices(audioInputs);
+
+                    // Auto-select first if none selected
+                    if (audioInputs.length > 0 && !selectedDeviceId) {
+                        setSelectedDeviceId(audioInputs[0].deviceId);
+                        if (onSourceChange) onSourceChange(audioInputs[0].deviceId);
+                    }
+                } catch (err) {
+                    console.error("Error enumerating devices:", err);
+                }
+            };
 
             enumerateDevices();
 
@@ -27,23 +39,11 @@ const AudioSourceManager = ({ onSourceChange }) => {
             console.error("Microphone permission denied:", err);
             setPermissionGranted(false);
         }
-    };
+    }, [onSourceChange, selectedDeviceId]);
 
-    const enumerateDevices = async () => {
-        try {
-            const allDevices = await navigator.mediaDevices.enumerateDevices();
-            const audioInputs = allDevices.filter(device => device.kind === 'audioinput');
-            setDevices(audioInputs);
-
-            // Auto-select first if none selected
-            if (audioInputs.length > 0 && !selectedDeviceId) {
-                setSelectedDeviceId(audioInputs[0].deviceId);
-                onSourceChange?.(audioInputs[0].deviceId);
-            }
-        } catch (err) {
-            console.error("Error enumerating devices:", err);
-        }
-    };
+    useEffect(() => {
+        checkPermissionAndEnumerate();
+    }, [checkPermissionAndEnumerate]);
 
     const handleDeviceChange = (e) => {
         const deviceId = e.target.value;
@@ -88,7 +88,7 @@ const AudioSourceManager = ({ onSourceChange }) => {
                             <Volume2 size={12} />
                             <span>Stereo (2ch)</span>
                         </div>
-                        <button onClick={enumerateDevices} className="flex items-center gap-1 hover:text-white transition-colors">
+                        <button onClick={checkPermissionAndEnumerate} className="flex items-center gap-1 hover:text-white transition-colors">
                             <RefreshCw size={12} />
                             <span>Refresh</span>
                         </button>
