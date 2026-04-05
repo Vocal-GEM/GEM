@@ -13,6 +13,14 @@ vi.mock('../services/IndexedDBManager', () => ({
     }
 }));
 
+vi.mock('./ToastContext', () => ({
+    useToast: () => ({
+        showError: vi.fn(),
+        showSuccess: vi.fn(),
+        showToast: vi.fn()
+    })
+}));
+
 // Mock DataSyncService
 vi.mock('../services/DataSyncService', () => ({
     syncToServer: vi.fn().mockResolvedValue(true),

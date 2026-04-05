@@ -8,3 +8,21 @@
   ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+6:35:58 AM [vite] page reload src/audio/PitchWorklet.js
+6:36:51 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+6:37:23 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+6:37:58 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+6:38:32 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+6:42:02 AM [vite] page reload src/components/viz/HighResSpectrogram.jsx
+6:43:52 AM [vite] page reload src/components/viz/PitchOrb.test.jsx
+6:44:41 AM [vite] page reload src/components/viz/Spectrogram3D.test.jsx
+6:45:39 AM [vite] page reload src/components/viz/SpectrumAnalyzer.test.jsx
+6:52:24 AM [vite] page reload src/components/viz/SpectralTiltMeter.jsx
+6:53:39 AM [vite] page reload src/components/viz/BreathinessMeter.jsx
+6:56:12 AM [vite] page reload src/services/PrivacyManager.js
+6:57:56 AM [vite] page reload src/services/ResearchMode.js
+6:59:47 AM [vite] page reload src/components/viz/BrightnessMeter.test.jsx
+7:02:45 AM [vite] page reload src/services/ResearchMode.js
+7:08:59 AM [vite] page reload src/components/ui/HistoryView.test.jsx
+7:11:03 AM [vite] page reload src/components/layout/Sidebar.test.jsx
+7:11:59 AM [vite] page reload src/context/AuthContext.test.jsx
