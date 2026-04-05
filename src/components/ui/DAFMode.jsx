@@ -28,6 +28,29 @@ const DAFMode = ({ onClose }) => {
         { label: '500ms', value: 500, description: 'Maximum' }
     ];
 
+    const stopDAF = useCallback(() => {
+        // Stop microphone stream
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current = null;
+        }
+
+        // Disconnect and close audio context
+        if (sourceRef.current) {
+            sourceRef.current.disconnect();
+            sourceRef.current = null;
+        }
+
+        if (audioContextRef.current) {
+            audioContextRef.current.close();
+            audioContextRef.current = null;
+        }
+
+        delayNodeRef.current = null;
+        gainNodeRef.current = null;
+        setIsActive(false);
+    }, []);
+
     // Cleanup on unmount
     useEffect(() => {
         return () => {
@@ -98,29 +121,6 @@ const DAFMode = ({ onClose }) => {
         }
     };
 
-    const stopDAF = useCallback(() => {
-        // Stop microphone stream
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach(track => track.stop());
-            streamRef.current = null;
-        }
-
-        // Disconnect and close audio context
-        if (sourceRef.current) {
-            sourceRef.current.disconnect();
-            sourceRef.current = null;
-        }
-
-        if (audioContextRef.current) {
-            audioContextRef.current.close();
-            audioContextRef.current = null;
-        }
-
-        delayNodeRef.current = null;
-        gainNodeRef.current = null;
-        setIsActive(false);
-    }, []);
-
     return (
         <div id="daf-modal" className="bg-slate-900 rounded-2xl border border-slate-700 p-6 max-w-md w-full">
             {/* Header */}
@@ -136,6 +136,9 @@ const DAFMode = ({ onClose }) => {
                 </div>
                 <button
                     onClick={() => setShowSettings(!showSettings)}
+                    aria-expanded={showSettings}
+                    aria-controls="daf-settings-panel"
+                    aria-label="Toggle Settings"
                     className={`p-2 rounded-lg transition-colors ${showSettings ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
                         }`}
                 >
@@ -163,6 +166,7 @@ const DAFMode = ({ onClose }) => {
                             key={preset.value}
                             onClick={() => setDelay(preset.value)}
                             disabled={isActive}
+                            aria-pressed={delay === preset.value}
                             className={`p-2 rounded-lg text-center transition-all ${delay === preset.value
                                 ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
                                 : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
@@ -177,11 +181,12 @@ const DAFMode = ({ onClose }) => {
 
             {/* Volume Control */}
             {showSettings && (
-                <div className="mb-6 p-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                <div id="daf-settings-panel" className="mb-6 p-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
                     <div className="flex items-center justify-between mb-2">
                         <label className="text-sm font-bold text-slate-300">Volume</label>
                         <button
                             onClick={() => setIsMuted(!isMuted)}
+                            aria-label={isMuted ? 'Unmute' : 'Mute'}
                             className="p-1.5 rounded hover:bg-slate-700 transition-colors"
                         >
                             {isMuted ? (
@@ -197,6 +202,7 @@ const DAFMode = ({ onClose }) => {
                         max="1"
                         step="0.1"
                         value={volume}
+                        aria-label="Volume"
                         onChange={(e) => setVolume(parseFloat(e.target.value))}
                         className="w-full accent-indigo-500"
                     />
