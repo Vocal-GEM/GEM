@@ -447,10 +447,9 @@
   5:13  warning  'THREE' is defined but never used  no-unused-vars
 
 /app/src/components/viz/SpectrumAnalyzer.test.jsx
-   4:10  warning  'renderCoordinator' is defined but never used  no-unused-vars
-   5:10  warning  'lpcAnalyzer' is defined but never used        no-unused-vars
-   6:8   warning  'React' is defined but never used              no-unused-vars
-  27:1   error    'global' is not defined                        no-undef
+  4:10  warning  'renderCoordinator' is defined but never used  no-unused-vars
+  5:10  warning  'lpcAnalyzer' is defined but never used        no-unused-vars
+  6:8   warning  'React' is defined but never used              no-unused-vars
 
 /app/src/components/viz/VoiceRangeProfile.jsx
    50:12  warning  'hoverInfo' is assigned a value but never used                                                                                                                                                                                         no-unused-vars
@@ -716,4 +715,4 @@
   347:29  warning  'sampleRate' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
   374:15  warning  'minDistance' is assigned a value but never used                              no-unused-vars
 
-✖ 359 problems (11 errors, 348 warnings)
+✖ 358 problems (10 errors, 348 warnings)
