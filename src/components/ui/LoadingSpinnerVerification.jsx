@@ -1,6 +1,8 @@
 import React from 'react';
 import LoadingSpinner from './LoadingSpinner';
 import { Button } from './button';
+import EmptyState from './EmptyState';
+import { Ghost, Search, Plus } from 'lucide-react';
 
 export default function LoadingSpinnerTest() {
   return (
@@ -79,14 +81,6 @@ export default function LoadingSpinnerTest() {
           <Button size="icon" isLoading>
             <span className="sr-only">Icon Button</span>
           </Button>
-import EmptyState from './EmptyState';
-import { Ghost, Search, Plus } from 'lucide-react';
-
-export default function LoadingSpinnerTest() {
-    return (
-        <div className="p-10 space-y-10 bg-slate-900 min-h-screen text-slate-100">
-            <h1 className="text-2xl text-white mb-4">Palette Verification</h1>
-
             <section className="space-y-4">
                 <h2 className="text-xl text-slate-300">LoadingSpinner Sizes</h2>
                 <div className="flex items-center gap-4">
