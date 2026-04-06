@@ -9,10 +9,22 @@ vi.mock('socket.io-client', () => ({
 }));
 
 // Mock pitchfinder
-vi.mock('pitchfinder', () => ({
-    McLeod: vi.fn(() => vi.fn((buffer) => 440)),
-    YIN: vi.fn(() => vi.fn((buffer) => 440))
-}));
+vi.mock('pitchfinder', async (importOriginal) => {
+    const actual = await importOriginal();
+    const mockDetector = vi.fn(() => vi.fn((buffer) => 440));
+    return {
+        ...actual,
+        McLeod: mockDetector,
+        Macleod: mockDetector,
+        YIN: mockDetector,
+        default: {
+            ...actual.default,
+            McLeod: mockDetector,
+            Macleod: mockDetector,
+            YIN: mockDetector
+        }
+    };
+});
 
 // Mock AudioContext and browser APIs
 const mockAudioContext = {
