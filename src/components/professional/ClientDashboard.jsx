@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, UserPlus, Search, FileText, Calendar, ChevronRight, MoreVertical } from 'lucide-react';
+import { Users, UserPlus, Search, FileText, Calendar, ChevronRight, MoreVertical, Activity } from 'lucide-react';
 
 const ClientDashboard = () => {
     const [clients, setClients] = useState([
@@ -105,7 +105,7 @@ const ClientDashboard = () => {
                             </div>
                             <div className="flex items-center gap-2">
                                 <button className="px-4 py-2 bg-pink-600 hover:bg-pink-500 rounded-lg font-medium text-sm transition-colors">Start Session</button>
-                                <button className="p-2 hover:bg-slate-700 rounded-lg transition-colors"><MoreVertical size={20} /></button>
+                                <button aria-label="More options" className="p-2 hover:bg-slate-700 rounded-lg transition-colors"><MoreVertical size={20} /></button>
                             </div>
                         </div>
 
