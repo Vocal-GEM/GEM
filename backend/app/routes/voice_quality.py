@@ -197,17 +197,15 @@ def manipulate_file():
         if processed_path and os.path.exists(processed_path):
              try:
                 os.remove(processed_path)
-             except:
+             except Exception:
                 pass
         if tmp_path and os.path.exists(tmp_path):
              try:
                 os.remove(tmp_path)
-             except:
+             except Exception:
                 pass
-        return jsonify({'error': str(e)}), 500
-        # Cleanup original temp file
         # Security: Do not expose internal error details to client
-        current_app.logger.error(f"Voice manipulation error: {e}")
+        print(f"Voice manipulation error: {e}")
         return jsonify({'error': 'An internal error occurred during voice manipulation.'}), 500
     finally:
         # Cleanup original temp file immediately
@@ -219,12 +217,13 @@ def manipulate_file():
             # Only if we're not sending it (which we aren't if we're in the except block)
              try:
                 os.remove(processed_path)
-             except:
+             except Exception:
+                pass
         # Cleanup original temp file immediately (always safe as it's not the one being sent)
         if tmp_path and os.path.exists(tmp_path):
             try:
                 os.remove(tmp_path)
-            except:
+            except Exception:
                 pass
 
 @voice_quality_bp.route('/api/voice-quality/goals', methods=['GET'])
