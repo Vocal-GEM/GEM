@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-05-18 - [Optimizing DFT inside Spectrogram Visualization]
+**Learning:** Manual DFT calculations loops can suffer from extreme performance bottlenecks due to O(N^2) Math.cos and Math.sin calls on large FFT bins per frame.
+**Action:** When manually computing DFT over many frames and frequency bins, pre-computing standard sine and cosine values in Float32Arrays and accessing them via bitwise masks provides enormous performance speedups by reducing Math function calls inside hot loops.
