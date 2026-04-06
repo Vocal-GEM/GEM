@@ -40,21 +40,31 @@ const ProgressDashboard = () => {
         const days = [];
         const today = new Date();
 
+        // Group reports by date in a single pass
+        const reportsByDate = {};
+        for (let i = 0; i < reports.length; i++) {
+            const r = reports[i];
+            const dateStr = r.timestamp.split('T')[0];
+            if (!reportsByDate[dateStr]) {
+                reportsByDate[dateStr] = { sessions: 0, minutes: 0 };
+            }
+            reportsByDate[dateStr].sessions += 1;
+            reportsByDate[dateStr].minutes += (r.durationMinutes || 0);
+        }
+
         for (let i = 29; i >= 0; i--) {
             const date = new Date(today);
             date.setDate(date.getDate() - i);
             const dateStr = date.toISOString().split('T')[0];
 
-            const dayReports = reports.filter(r =>
-                r.timestamp.split('T')[0] === dateStr
-            );
+            const dayStats = reportsByDate[dateStr] || { sessions: 0, minutes: 0 };
 
             days.push({
                 date: dateStr,
                 day: date.getDate(),
                 weekday: date.toLocaleDateString('en-US', { weekday: 'short' }),
-                sessions: dayReports.length,
-                minutes: dayReports.reduce((sum, r) => sum + (r.durationMinutes || 0), 0)
+                sessions: dayStats.sessions,
+                minutes: dayStats.minutes
             });
         }
         return days;
