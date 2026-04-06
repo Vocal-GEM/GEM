@@ -60,6 +60,16 @@ const FileSpectrogram = ({
             windowFunction[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (FFT_SIZE - 1)));
         }
 
+        // Pre-compute trig tables for DFT to avoid O(N^2) Math.cos/sin calls
+        const cosTable = new Float32Array(FFT_SIZE);
+        const sinTable = new Float32Array(FFT_SIZE);
+        for (let i = 0; i < FFT_SIZE; i++) {
+            const angle = -2 * Math.PI * i / FFT_SIZE;
+            cosTable[i] = Math.cos(angle);
+            sinTable[i] = Math.sin(angle);
+        }
+        const fftMask = FFT_SIZE - 1; // Works because FFT_SIZE (2048) is a power of 2
+
         // Manual FFT processing (since OfflineAudioContext FFT is complex)
         // We'll use a simpler approach: direct DFT for each frame
         for (let frame = 0; frame < numFrames; frame++) {
@@ -81,9 +91,9 @@ const FileSpectrogram = ({
             for (let k = 0; k < maxBin; k++) {
                 let real = 0, imag = 0;
                 for (let n = 0; n < FFT_SIZE; n++) {
-                    const angle = -2 * Math.PI * k * n / FFT_SIZE;
-                    real += fftBuffer[n] * Math.cos(angle);
-                    imag += fftBuffer[n] * Math.sin(angle);
+                    const tableIdx = (k * n) & fftMask;
+                    real += fftBuffer[n] * cosTable[tableIdx];
+                    imag += fftBuffer[n] * sinTable[tableIdx];
                 }
                 // Magnitude in dB
                 const magnitude = Math.sqrt(real * real + imag * imag) / FFT_SIZE;
