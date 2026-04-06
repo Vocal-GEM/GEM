@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Timer, Play, Square, RotateCcw } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const MPTTracker = ({ dataRef, isActive }) => {
     const [isRecording, setIsRecording] = useState(false);
@@ -37,20 +38,16 @@ const MPTTracker = ({ dataRef, isActive }) => {
                     }
                 }
             }
-            animationRef.current = requestAnimationFrame(checkAudio);
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'mpt-tracker',
-                checkAudio,
-                renderCoordinator.PRIORITY.LOW
-            );
-        });
+        const unsubscribe = renderCoordinator.subscribe(
+            'mpt-tracker',
+            checkAudio,
+            renderCoordinator.PRIORITY.LOW
+        );
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
     }, [autoMode, isActive, isRecording, threshold, dataRef]);
 

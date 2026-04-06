@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const LiveMetricsBar = ({ dataRef }) => {
     const [metrics, setMetrics] = useState({ f0: 0, f1: 0, f2: 0, w: 0 });
@@ -14,17 +15,14 @@ const LiveMetricsBar = ({ dataRef }) => {
             }
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'live-metrics-bar',
-                loop,
-                renderCoordinator.PRIORITY.CRITICAL
-            );
-        });
+        const unsubscribe = renderCoordinator.subscribe(
+            'live-metrics-bar',
+            loop,
+            renderCoordinator.PRIORITY.CRITICAL
+        );
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
     }, [dataRef]);
     return (

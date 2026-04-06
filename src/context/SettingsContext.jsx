@@ -6,6 +6,7 @@ import { getAdaptiveFeedbackController } from '../services/AdaptiveFeedback';
 import { HapticFeedback } from '../services/HapticFeedback';
 import { getAudioFeedback } from '../services/AudioFeedback';
 import { getThemeService } from '../services/FeedbackThemes';
+import { renderCoordinator } from '../services/RenderCoordinator';
 
 const SettingsContext = createContext(null);
 
@@ -170,24 +171,22 @@ export const SettingsProvider = ({ children }) => {
 
     // Sync performance mode with RenderCoordinator
     useEffect(() => {
-        import('../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            renderCoordinator.setPerformanceMode(settings.performanceMode);
+        renderCoordinator.setPerformanceMode(settings.performanceMode);
 
-            // Update quality settings based on mode
-            const qualityPresets = {
-                low: { fpsTarget: 30, fftSize: 1024, spectrumDetail: 'low' },
-                medium: { fpsTarget: 45, fftSize: 2048, spectrumDetail: 'medium' },
-                high: { fpsTarget: 60, fftSize: 2048, spectrumDetail: 'high' }
-            };
+        // Update quality settings based on mode
+        const qualityPresets = {
+            low: { fpsTarget: 30, fftSize: 1024, spectrumDetail: 'low' },
+            medium: { fpsTarget: 45, fftSize: 2048, spectrumDetail: 'medium' },
+            high: { fpsTarget: 60, fftSize: 2048, spectrumDetail: 'high' }
+        };
 
-            const newQuality = qualityPresets[settings.performanceMode] || qualityPresets.high;
-            if (JSON.stringify(settings.visualizationQuality) !== JSON.stringify(newQuality)) {
-                setSettings(prev => ({
-                    ...prev,
-                    visualizationQuality: newQuality
-                }));
-            }
-        });
+        const newQuality = qualityPresets[settings.performanceMode] || qualityPresets.high;
+        if (JSON.stringify(settings.visualizationQuality) !== JSON.stringify(newQuality)) {
+            setSettings(prev => ({
+                ...prev,
+                visualizationQuality: newQuality
+            }));
+        }
     }, [settings.performanceMode, settings.visualizationQuality]);
 
     // Sync feedback settings to services
