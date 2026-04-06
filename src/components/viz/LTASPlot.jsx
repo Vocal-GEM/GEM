@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useId } from 'react';
 import { useAudio } from '../../context/AudioContext';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const LTASPlot = ({ width = 600, height = 300 }) => {
     const { dataRef } = useAudio();
@@ -7,6 +8,7 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
     const [isRecording, setIsRecording] = useState(false);
     const accumulatorRef = useRef(null);
     const frameCountRef = useRef(0);
+    const componentId = useId();
 
     // Lazy initialization
     if (!accumulatorRef.current) {
@@ -14,8 +16,6 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
     }
 
     useEffect(() => {
-        let animationId;
-
         const draw = () => {
             if (!canvasRef.current) return;
             const ctx = canvasRef.current.getContext('2d');
@@ -83,13 +83,18 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
                 }
                 ctx.stroke();
             }
-
-            animationId = requestAnimationFrame(draw);
         };
 
-        draw();
-        return () => cancelAnimationFrame(animationId);
-    }, [isRecording, dataRef]);
+        const unsubscribe = renderCoordinator.subscribe(
+            `ltas-${componentId}`,
+            draw,
+            renderCoordinator.PRIORITY.LOW
+        );
+
+        return () => {
+            unsubscribe();
+        };
+    }, [isRecording, dataRef, componentId]);
 
     const reset = () => {
         if (accumulatorRef.current) {
