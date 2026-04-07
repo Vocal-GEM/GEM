@@ -106,14 +106,12 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
         // We only draw lines if they are visible or crossing the view
 
         ctx.beginPath();
-        let isDrawing = false;
 
         for (let i = 1; i < data.length; i++) {
             const p1 = data[i - 1];
             const p2 = data[i];
 
             if (!p1.frequency || !p2.frequency) {
-                isDrawing = false;
                 continue;
             }
 
@@ -181,7 +179,7 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
             ctx.strokeRect(x, y, w, h);
         }
 
-    }, [data, targetRange, currentTime, duration, zoom, selection]);
+    }, [data, targetRange, currentTime, duration, zoom, selection, bounds.fMax, bounds.fMin, bounds.tMax, bounds.tMin]);
 
 
     // Interaction Handlers
