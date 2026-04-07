@@ -214,6 +214,12 @@ def manipulate_file():
         if tmp_path and os.path.exists(tmp_path):
             os.remove(tmp_path)
 
+        # Cleanup processed file on error
+        if processed_path and os.path.exists(processed_path):
+            # Only if we're not sending it (which we aren't if we're in the except block)
+             try:
+                os.remove(processed_path)
+             except:
         # Cleanup original temp file immediately (always safe as it's not the one being sent)
         if tmp_path and os.path.exists(tmp_path):
             try:

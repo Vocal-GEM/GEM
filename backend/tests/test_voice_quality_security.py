@@ -115,10 +115,9 @@ class TestVoiceQualitySecurity(unittest.TestCase):
                 # Since send_file is used, we expect file content
                 # We can't easily check 'get_json()' here as it might be binary
 
-    def test_manipulate_file_error_handling_mock(self):
+    def test_manipulate_file_error_handling(self):
         """
         Test that an internal error returns a generic error message and does NOT leak details.
-        """
         mock_sound = MagicMock()
 
         def side_effect_save(path, format):
@@ -177,6 +176,7 @@ class TestVoiceQualitySecurity(unittest.TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertNotIn("INTERNAL_SECRET_ERROR", response.data.decode(), "Error message leaked internal details!")
         self.assertIn("An internal error occurred", response.data.decode(), "Expected generic error message")
+# ... (imports and mock setup same as before)
 import unittest
 from unittest.mock import MagicMock, patch
 import sys
