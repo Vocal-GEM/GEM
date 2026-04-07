@@ -41,3 +41,11 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Race Condition Memory Leaks in RenderCoordinator Subscriptions
+**Learning:** In React, when replacing raw `requestAnimationFrame` calls with a shared event bus or subscription service (like `RenderCoordinator`), using an asynchronous dynamic import (`import('../../services/RenderCoordinator').then(...)`) inside `useEffect` creates a deadly race condition. If the component unmounts *before* the promise resolves, the `useEffect` cleanup function runs harmlessly. Then, the promise resolves, the subscription is created with a zombie callback, and it is never torn down, causing severe memory leaks and state updates on unmounted components.
+**Action:** Always use static top-level imports (e.g., `import { renderCoordinator } from ...`) when subscribing to shared services inside `useEffect` to ensure synchronous teardown, or implement an explicit `isMounted` flag within the promise chain.
+
+## 2026-01-24 - GPU-Accelerated Canvas Scrolling
+**Learning:** When building scrolling visualizers (like Spectrograms), shifting existing pixel data to the left can be slow if done via `getImageData`/`putImageData` or offscreen temp canvases.
+**Action:** Use `ctx.drawImage(canvas, sourceX, sourceY, sourceW, sourceH, destX, destY, destW, destH)` to draw the canvas directly onto itself. Browsers optimize this heavily on GPU-accelerated contexts, providing a massive performance boost for high-resolution rendering loops.
