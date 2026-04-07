@@ -254,15 +254,25 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
                 <div className="flex justify-between items-center p-4 border-b border-white/5 bg-slate-900/50">
                     <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
                         {phase !== 'select' && (
-                            <button onClick={() => setPhase('select')} className="mr-2 text-slate-400 hover:text-white">
-                                <ArrowLeft size={20} />
+                            <button
+                                onClick={() => setPhase('select')}
+                                className="mr-2 text-slate-400 hover:text-white"
+                                aria-label="Back to selection"
+                                title="Back to selection"
+                            >
+                                <ArrowLeft size={20} aria-hidden="true" />
                             </button>
                         )}
                         Shadowing & Mimicry
                     </h2>
                     {!embedded && onClose && (
-                        <button onClick={onClose} className="p-2 text-slate-400 hover:text-white">
-                            <XCircle size={24} />
+                        <button
+                            onClick={onClose}
+                            className="p-2 text-slate-400 hover:text-white"
+                            aria-label="Close exercise"
+                            title="Close exercise"
+                        >
+                            <XCircle size={24} aria-hidden="true" />
                         </button>
                     )}
                 </div>
@@ -325,8 +335,10 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
                             <button
                                 onClick={() => speakText(selectedClip.text, selectedClip.rate, selectedClip.pitch)}
                                 className="text-sm text-blue-400 hover:text-blue-300 font-medium flex items-center gap-2"
+                                aria-label="Replay Audio"
+                                title="Replay Audio"
                             >
-                                <RefreshCw size={14} /> Replay Audio
+                                <RefreshCw size={14} aria-hidden="true" /> Replay Audio
                             </button>
                         </div>
                     )}
@@ -359,11 +371,13 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
                                 onClick={isRecording ? handleStopRecording : handleStartRecording}
                                 className={`w-24 h-24 rounded-full flex items-center justify-center shadow-2xl transition-all transform hover:scale-105 active:scale-95 ${isRecording ? 'bg-red-500 border-4 border-red-400' : 'bg-blue-600 border-4 border-blue-500'
                                     }`}
+                                aria-label={isRecording ? "Stop recording" : "Start recording"}
+                                title={isRecording ? "Stop recording" : "Start recording"}
                             >
                                 {isRecording ? (
-                                    <Square size={32} fill="currentColor" className="text-white" />
+                                    <Square size={32} fill="currentColor" className="text-white" aria-hidden="true" />
                                 ) : (
-                                    <Mic size={36} className="text-white" />
+                                    <Mic size={36} className="text-white" aria-hidden="true" />
                                 )}
                             </button>
 
@@ -412,15 +426,19 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
                                 <button
                                     onClick={handleTryAgain}
                                     className="p-4 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 text-white font-bold flex flex-col items-center justify-center gap-2 transition-all"
+                                    aria-label="Try Again"
+                                    title="Try Again"
                                 >
-                                    <RefreshCw size={24} className="text-slate-400" />
+                                    <RefreshCw size={24} className="text-slate-400" aria-hidden="true" />
                                     <span>Try Again</span>
                                 </button>
                                 <button
                                     onClick={() => setPhase('select')}
                                     className="p-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold flex flex-col items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/20"
+                                    aria-label="Select a new phrase"
+                                    title="Select a new phrase"
                                 >
-                                    <ArrowLeft size={24} />
+                                    <ArrowLeft size={24} aria-hidden="true" />
                                     <span>New Phrase</span>
                                 </button>
                             </div>
