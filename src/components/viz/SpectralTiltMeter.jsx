@@ -1,14 +1,12 @@
 import { useEffect, useRef, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { Info, TrendingDown } from 'lucide-react';
-import { renderCoordinator } from '../../services/RenderCoordinator';
 
-const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -6 } }) => {
+const SpectralTiltMeter = ({ dataRef, _userMode, targetRange = { min: -12, max: -6 } }) => {
     const { colorBlindMode } = useSettings();
     const id = useId();
     const indicatorRef = useRef(null);
     const valueRef = useRef(null);
-    const componentId = useId();
 
     useEffect(() => {
         const loop = () => {
@@ -50,20 +48,11 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 renderCoordinator.PRIORITY.MEDIUM
             );
         });
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `spectral-tilt-meter-${componentId}`,
-            loop,
-            renderCoordinator.PRIORITY.MEDIUM
-        );
 
         return () => {
-            unsubscribe();
+            if (unsubscribe) unsubscribe();
         };
     }, [dataRef, targetRange, colorBlindMode, id]);
-    }, [dataRef, targetRange, colorBlindMode, componentId]);
 
     return (
         <div className="glass-panel rounded-2xl p-6 h-full flex flex-col justify-center">
