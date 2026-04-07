@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Trash2, Lightbulb, RefreshCw } from 'lucide-react';
+import { Button } from './button';
 import { useAudio } from '../../context/AudioContext';
 import { useJournal } from '../../context/JournalContext';
 import { getRandomPrompt } from '../../data/selfCareJournalPrompts';
@@ -239,22 +240,15 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                 <div>
                     <label htmlFor="journal-confidence" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Confidence (1-10)</label>
                     <input id="journal-confidence" type="range" min="1" max="10" value={confidence} onChange={(e) => setConfidence(parseInt(e.target.value))} className="w-full accent-emerald-500" />
-                    <label htmlFor="effort-slider" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Effort (1-10)</label>
-                    <input id="effort-slider" type="range" min="1" max="10" value={effort} onChange={(e) => setEffort(parseInt(e.target.value))} className="w-full accent-blue-500" />
-                    <div className="text-center text-blue-400 font-bold">{effort}</div>
-                </div>
-                <div>
-                    <label htmlFor="confidence-slider" className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Confidence (1-10)</label>
-                    <input id="confidence-slider" type="range" min="1" max="10" value={confidence} onChange={(e) => setConfidence(parseInt(e.target.value))} className="w-full accent-emerald-500" />
                     <div className="text-center text-emerald-400 font-bold">{confidence}</div>
                 </div>
             </div>
 
             <div className="flex gap-3 pt-2">
-                <button type="button" onClick={onCancel} className="flex-1 py-3 rounded-xl bg-slate-800 text-slate-300 font-bold hover:bg-slate-700 transition-colors">Cancel</button>
-                <button type="submit" disabled={isSubmitting} className={`flex-1 py-3 rounded-xl font-bold transition-colors shadow-lg shadow-blue-500/20 ${isSubmitting ? 'bg-blue-800 text-slate-400 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-500'}`}>
-                    {isSubmitting ? 'Saving...' : 'Save Log'}
-                </button>
+                <Button type="button" variant="secondary" onClick={onCancel} className="flex-1 py-3 rounded-xl bg-slate-800 text-slate-300 font-bold hover:bg-slate-700 hover:text-slate-200 transition-colors border-0">Cancel</Button>
+                <Button type="submit" isLoading={isSubmitting} className="flex-1 py-3 rounded-xl font-bold transition-colors shadow-lg shadow-blue-500/20 bg-blue-600 text-white hover:bg-blue-500">
+                    Save Log
+                </Button>
             </div>
         </form>
     );
