@@ -31,7 +31,11 @@ vi.mock('../../context/NavigationContext', () => ({
         navigationParams: {}
     })
 }));
-vi.mock('../viz/DynamicOrb', () => ({ default: () => <div data-testid="dynamic-orb">Dynamic Orb</div> }));
+vi.mock('../viz/DynamicOrb', () => ({
+    __esModule: true,
+    default: () => <div data-testid="dynamic-orb">Dynamic Orb</div>,
+    DynamicOrb: () => <div data-testid="dynamic-orb">Dynamic Orb</div>
+}));
 vi.mock('../viz/PitchVisualizer', () => ({ default: () => <div data-testid="pitch-visualizer">Pitch Visualizer</div> }));
 vi.mock('../ui/ResizablePanel', () => ({
     default: ({ children, className }) => <div className={className} data-testid="resizable-panel">{children}</div>

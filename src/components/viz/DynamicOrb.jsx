@@ -401,23 +401,38 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
   const textRef = useRef(null);
 
   useEffect(() => {
-    let frameId;
-    const loop = () => {
-      if (dataRef.current) {
-        const { pitch, volume } = dataRef.current;
-        // Update DOM directly
-        if (circleRef.current) {
-          const scale = 1 + (volume || 0); // volume is 0-1
-          circleRef.current.style.transform = `scale(${scale})`;
+    let unsubscribe;
+    let isMounted = true;
+
+    // Lazy import renderCoordinator to match other visualizations
+    import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+      if (!isMounted) return;
+      const loop = () => {
+        if (dataRef.current) {
+          const { pitch, volume } = dataRef.current;
+          // Update DOM directly
+          if (circleRef.current) {
+            const scale = 1 + (volume || 0); // volume is 0-1
+            circleRef.current.style.transform = `scale(${scale})`;
+          }
+          if (textRef.current) {
+            textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
+          }
         }
-        if (textRef.current) {
-          textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
-        }
-      }
-      frameId = requestAnimationFrame(loop);
+      };
+
+      // Use HIGH priority since this is a primary visual feedback element
+      unsubscribe = renderCoordinator.subscribe(
+        'DynamicOrb_animation_loop',
+        loop,
+        renderCoordinator.PRIORITY.HIGH
+      );
+    });
+
+    return () => {
+      isMounted = false;
+      if (unsubscribe) unsubscribe();
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
   }, [dataRef]);
 
   return (
