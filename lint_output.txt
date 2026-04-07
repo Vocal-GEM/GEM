@@ -426,9 +426,6 @@
   116:17  warning  'isDrawing' is assigned a value but never used                                                                                                                     no-unused-vars
   184:8   warning  React Hook useEffect has missing dependencies: 'bounds.fMax', 'bounds.fMin', 'bounds.tMax', and 'bounds.tMin'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
 
-/app/src/components/viz/QualityVisualizer.jsx
-  253:2  error  Parsing error: Unexpected token ;
-
 /app/src/components/viz/QualityVisualizer.test.jsx
   5:8  warning  'React' is defined but never used  no-unused-vars
 
@@ -744,4 +741,4 @@
   347:29  warning  'sampleRate' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
   374:15  warning  'minDistance' is assigned a value but never used                              no-unused-vars
 
-✖ 383 problems (35 errors, 348 warnings)
+✖ 382 problems (34 errors, 348 warnings)
