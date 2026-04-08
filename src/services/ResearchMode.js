@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * Research Mode Controller
  * Manages clinical trials, research studies, and participant data collection
@@ -59,7 +60,11 @@ export class ResearchModeController {
      */
     generateParticipantId(userId) {
         // Use cryptographic hash with study-specific salt
-        const salt = this.studyId + process.env.REACT_APP_RESEARCH_SALT;
+        // Safe access to environment variable
+        const salt = this.studyId + (typeof process !== 'undefined' && process.env && process.env.REACT_APP_RESEARCH_SALT
+            ? process.env.REACT_APP_RESEARCH_SALT
+            : (import.meta.env ? import.meta.env.VITE_RESEARCH_SALT : 'default-salt'));
+
         const hash = CryptoJS.SHA256(userId + salt).toString();
 
         // Take first 16 characters for readability
