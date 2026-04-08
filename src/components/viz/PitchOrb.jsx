@@ -20,6 +20,9 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
+    // Cached dimensions to avoid getBoundingClientRect in loop
+    const dimensionsRef = useRef({ width: 0, height: 0 });
+
     // Default gender ranges if not set in settings
     const defaultRanges = {
         feminine: { min: 165, max: 300 },
@@ -28,6 +31,34 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     };
 
     const genderRanges = settings.genderRanges || defaultRanges;
+
+    // Handle Resize with ResizeObserver
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                if (entry.target === canvas) {
+                    const { width, height } = entry.contentRect;
+                    dimensionsRef.current = { width, height };
+                }
+            }
+        });
+
+        resizeObserver.observe(canvas);
+
+        // Initial setup
+        const rect = canvas.getBoundingClientRect();
+        dimensionsRef.current = {
+            width: rect.width,
+            height: rect.height
+        };
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -67,17 +98,23 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const { width, height } = dimensionsRef.current;
 
-            const width = rect.width;
-            const height = rect.height;
+            // Only update physical canvas dimensions if logical size changes
+            // Round to prevent fractional mismatch triggering constant resets
+            const newWidth = Math.round(width * dpr);
+            const newHeight = Math.round(height * dpr);
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                ctx.scale(dpr, dpr);
+            } else {
+                ctx.clearRect(0, 0, width, height);
+            }
+
             const centerX = width / 2;
             const centerY = height / 2;
-
-            ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
