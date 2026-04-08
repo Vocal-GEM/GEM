@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - RenderCoordinator Fork Bombs
+**Learning:** Components subscribing to a centralized render loop (like `RenderCoordinator`) must not call `requestAnimationFrame` inside their subscribed callback. Doing so creates an exponential "fork bomb" of render loops that ignores cleanup and crashes performance.
+**Action:** When migrating to a centralized coordinator, strictly audit the callback to ensure all raw RAF calls are removed. Additionally, always use an `isMounted` flag when dynamically importing the coordinator to prevent zombie subscriptions.

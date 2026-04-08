@@ -1,11 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useId } from 'react';
 
 const VowelAnalysis = ({ dataRef, colorBlindMode }) => {
     const [currentVowel, setCurrentVowel] = useState('');
     const [currentF1, setCurrentF1] = useState(0);
     const [currentF2, setCurrentF2] = useState(0);
 
+    // Unique ID for RenderCoordinator
+    const componentId = useId();
+
     useEffect(() => {
+        let isMounted = true;
+        let unsubscribe;
+
         const loop = () => {
             if (dataRef.current) {
                 const { f1, f2, vowel } = dataRef.current;
@@ -13,22 +19,22 @@ const VowelAnalysis = ({ dataRef, colorBlindMode }) => {
                 setCurrentF1(f1 || 0);
                 setCurrentF2(f2 || 0);
             }
-            requestAnimationFrame(loop);
         };
 
-        let unsubscribe;
         import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            if (!isMounted) return;
             unsubscribe = renderCoordinator.subscribe(
-                'vowel-analysis',
+                componentId,
                 loop,
                 renderCoordinator.PRIORITY.LOW
             );
         });
 
         return () => {
+            isMounted = false;
             if (unsubscribe) unsubscribe();
         };
-    }, [dataRef]);
+    }, [dataRef, componentId]);
 
     return (
         <div className="flex flex-col gap-4">
