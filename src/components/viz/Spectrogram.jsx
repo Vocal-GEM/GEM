@@ -21,6 +21,8 @@ const hzToNote = (hz) => {
 
 const Spectrogram = ({ height = 200, showLabels = true }) => {
     const canvasRef = useRef(null);
+    const imgDataRef = useRef(null);
+    const data32Ref = useRef(null);
     const { dataRef, isAudioActive, audioContext } = useAudio();
     const { settings } = useSettings();
 
@@ -120,16 +122,13 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
 
             // Reuse ImageData object
             // Reusable objects to reduce GC
-            if (!canvas.imageDataRef) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
-            }
-            // Ensure size match
-            if (canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
+            if (!imgDataRef.current || imgDataRef.current.height !== h || imgDataRef.current.width !== speed) {
+                imgDataRef.current = ctx.createImageData(speed, h);
+                data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
             }
 
-            const imageData = canvas.imageDataRef;
-            const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
+            const imageData = imgDataRef.current;
+            const data32 = data32Ref.current; // Cached 32-bit integer view (ABGR) to prevent per-frame allocations
 
             // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
             // We map pixels (y) to frequency bins.
