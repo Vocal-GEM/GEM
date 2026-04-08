@@ -34,9 +34,9 @@ const SpectrogramComparison = () => {
                     Signal Comparison
                 </h1>
                 <div className="flex items-center gap-2">
-                    <button className="p-2 bg-slate-800 rounded-lg hover:bg-slate-700" onClick={() => setZoomLevel(z => Math.max(1, z - 0.5))}><ZoomOut size={20} /></button>
+                    <button className="p-2 bg-slate-800 rounded-lg hover:bg-slate-700" onClick={() => setZoomLevel(z => Math.max(1, z - 0.5))} aria-label="Zoom Out" title="Zoom Out"><ZoomOut size={20} /></button>
                     <span className="text-sm font-mono text-slate-400">{zoomLevel}x</span>
-                    <button className="p-2 bg-slate-800 rounded-lg hover:bg-slate-700" onClick={() => setZoomLevel(z => Math.min(5, z + 0.5))}><ZoomIn size={20} /></button>
+                    <button className="p-2 bg-slate-800 rounded-lg hover:bg-slate-700" onClick={() => setZoomLevel(z => Math.min(5, z + 0.5))} aria-label="Zoom In" title="Zoom In"><ZoomIn size={20} /></button>
                 </div>
             </div>
 
