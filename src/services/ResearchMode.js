@@ -6,6 +6,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import CryptoJS from 'crypto-js';
 
+
+
 export class ResearchModeController {
     constructor(studyConfig) {
         this.studyId = studyConfig.id;
@@ -59,7 +61,7 @@ export class ResearchModeController {
      */
     generateParticipantId(userId) {
         // Use cryptographic hash with study-specific salt
-        const salt = this.studyId + process.env.REACT_APP_RESEARCH_SALT;
+        const salt = this.studyId + (import.meta.env.VITE_RESEARCH_SALT || 'default_salt');
         const hash = CryptoJS.SHA256(userId + salt).toString();
 
         // Take first 16 characters for readability
