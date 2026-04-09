@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useVoiceProfile } from '../../context/VoiceProfileContext';
 import { useNavigation } from '../../context/NavigationContext';
@@ -121,7 +121,7 @@ const RecommendedToolsWidget = () => {
 
             {recommendations?.rationale && (
                 <div className="mt-4 text-xs text-gray-500 italic border-t border-gray-700 pt-2">
-                    "{recommendations.rationale.split('.')[0]}."
+                    &quot;{recommendations.rationale.split('.')[0]}.&quot;
                 </div>
             )}
         </div>
