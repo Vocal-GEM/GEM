@@ -4,6 +4,7 @@ import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
 import ProgressCard from './ProgressCard';
 import RecordingsList from './RecordingsList';
+import { useToast } from '../../context/ToastContext';
 import { useProfile } from '../../context/ProfileContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSettings } from '../../context/SettingsContext';
@@ -35,6 +36,7 @@ ChartJS.register(
 );
 
 const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
+    const { showError } = useToast();
     const { getSessions } = useProfile();
     const { t } = useLanguage();
     const { settings } = useSettings();
@@ -158,7 +160,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
             doc.save(`voice-therapy-report-${new Date().toISOString().split('T')[0]}.pdf`);
         } catch (error) {
             console.error('Error generating report:', error);
-            alert('Failed to generate report.');
+            showError('Failed to generate report.');
         } finally {
             setIsGenerating(false);
         }
