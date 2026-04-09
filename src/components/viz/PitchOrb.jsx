@@ -64,16 +64,28 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        // Resize observer to update dimensions efficiently without getBoundingClientRect
+        let dimensions = { width: canvas.clientWidth || 300, height: canvas.clientHeight || 300 };
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const { width, height } = entry.contentRect;
+                dimensions = { width, height };
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+            }
+        });
+        resizeObserver.observe(canvas);
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const { width, height } = dimensions;
 
-            const width = rect.width;
-            const height = rect.height;
+            // Reapply scale if width/height has changed? actually scale is tricky with resize observer
+            // if we set canvas.width it resets the transform.
+            // So we need to set scale right after we use it or save/restore.
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -166,6 +178,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
