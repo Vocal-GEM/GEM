@@ -11,11 +11,7 @@ vi.mock('../../context/AudioContext', () => ({
         startRecording: vi.fn(),
         stopRecording: vi.fn().mockResolvedValue('mock-url'),
       }
-    }
-  })
-        stopRecording: vi.fn(),
-      },
-    },
+    };
   }),
 }));
 

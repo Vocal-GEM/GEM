@@ -39,10 +39,9 @@ describe('LoadingSpinner', () => {
 
     // It should have a visually hidden label "Loading..." by default
     const srText = screen.getByText('Loading...');
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
-import LoadingSpinner from "./LoadingSpinner";
-import React from 'react';
+    expect(srText).toBeInTheDocument();
+  });
+});
 
 describe("LoadingSpinner", () => {
   it("renders with default accessibility attributes", () => {
