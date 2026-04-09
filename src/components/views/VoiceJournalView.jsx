@@ -1,15 +1,16 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Mic, Square, Play, Pause, Trash2, Calendar, Clock, Music, Plus, X, Tag, FileText, Search, Filter, TrendingUp, ChevronDown } from 'lucide-react';
 import LoadingSpinner from '../ui/LoadingSpinner';
-import { getRecordings, saveRecording, deleteRecording, updateRecording } from '../../services/VoiceJournalService';
+import { getRecordings, saveRecording, deleteRecording } from '../../services/VoiceJournalService';
 import { recordPractice } from '../../services/StreakService';
-import { JOURNAL_TEMPLATES, getTemplateById, formatTemplateAsEntry } from '../../data/journalTemplates';
+import { JOURNAL_TEMPLATES, formatTemplateAsEntry } from '../../data/journalTemplates';
+import { useToast } from '../../context/ToastContext';
 
 // Waveform Visualization Component
-const WaveformVisualizer = ({ audioBlob, isPlaying, onSeek }) => {
+const WaveformVisualizer = ({ audioBlob, _isPlaying, onSeek }) => {
     const canvasRef = useRef(null);
     const [waveformData, setWaveformData] = useState([]);
-    const [progress, setProgress] = useState(0);
+    const [progress] = useState(0);
 
     useEffect(() => {
         if (!audioBlob) return;
@@ -198,6 +199,7 @@ const AVAILABLE_TAGS = [
 ];
 
 const VoiceJournalView = () => {
+    const { showError } = useToast();
     const [recordings, setRecordings] = useState([]);
     const [isRecording, setIsRecording] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -314,7 +316,7 @@ const VoiceJournalView = () => {
             }, 1000);
         } catch (err) {
             console.error('Failed to start recording:', err);
-            alert('Could not access microphone. Please check permissions.');
+            showError('Could not access microphone. Please check permissions.');
         }
     };
 

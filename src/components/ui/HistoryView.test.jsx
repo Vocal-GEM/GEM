@@ -21,6 +21,14 @@ vi.mock('../../context/TourContext', () => ({
     })
 }));
 
+vi.mock('../../context/ToastContext', () => ({
+    useToast: () => ({
+        showError: vi.fn(),
+        showSuccess: vi.fn(),
+        showToast: vi.fn()
+    })
+}));
+
 // Mock SettingsContext
 const mockUseSettings = vi.fn();
 vi.mock('../../context/SettingsContext', () => ({
