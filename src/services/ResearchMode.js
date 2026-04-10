@@ -58,8 +58,16 @@ export class ResearchModeController {
      * @returns {string} Anonymized participant ID
      */
     generateParticipantId(userId) {
+        // Securely retrieve the salt, failing explicitly if not available
+        // eslint-disable-next-line no-undef
+        const envSalt = process.env.REACT_APP_RESEARCH_SALT;
+
+        if (!envSalt) {
+            throw new Error('Missing cryptographic salt: REACT_APP_RESEARCH_SALT must be defined to securely generate participant IDs.');
+        }
+
         // Use cryptographic hash with study-specific salt
-        const salt = this.studyId + process.env.REACT_APP_RESEARCH_SALT;
+        const salt = this.studyId + envSalt;
         const hash = CryptoJS.SHA256(userId + salt).toString();
 
         // Take first 16 characters for readability
