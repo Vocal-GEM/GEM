@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-04-10 - GPU Render Thrash in Spectrogram Shift
+**Learning:** Re-drawing a web canvas column by column or allocating new ImageDatas inside an active render loop causes massive CPU bottlenecks.
+**Action:** Re-render loops shouldn't rely on complex pixel replacement algorithms if native canvas API allows copying the canvas onto itself efficiently on the GPU. Avoid off-screen canvas rendering paths if they aren't completely necessary to avoid GC churn.
