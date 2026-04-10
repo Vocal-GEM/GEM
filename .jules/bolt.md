@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-12 - Canvas Animation Size Reset
+**Learning:** Reassigning `canvas.width` or `canvas.height` automatically clears the HTML5 canvas, implicitly acting as a `ctx.clearRect()`. When optimizing an animation loop by moving the `getBoundingClientRect()` and `canvas.width = ...` logic out into a `ResizeObserver`, you remove this implicit clear. If you fail to add an explicit `ctx.clearRect(0, 0, width, height)` to the beginning of the optimized loop, the canvas will no longer clear and will permanently smear frames.
+**Action:** Always add an explicit `ctx.clearRect()` to the top of the animation loop when migrating canvas resizing out of the high-frequency path.
