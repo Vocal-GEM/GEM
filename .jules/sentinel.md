@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2024-04-10 - Secure Access to Statically Replaced Environment Variables
+**Vulnerability:** Weak cryptographic hashing caused by `process.env` evaluating to `undefined` when using `typeof process` runtime guards.
+**Learning:** In modern frontend bundlers (Vite/Webpack), environment variables like `process.env.REACT_APP_RESEARCH_SALT` are statically replaced at build time with literal strings. However, the global `process` object is not polyfilled in the browser. Using a standard Node.js guard like `typeof process !== 'undefined'` evaluates to `false` in the browser, skipping the statically replaced string and causing variables to become `null` or `undefined` at runtime.
+**Prevention:** Do NOT use `typeof process` guards when accessing frontend environment variables. Evaluate `process.env.VARIABLE` directly to allow the bundler to string-replace it, and suppress the linter via `// eslint-disable-next-line no-undef`. Throw an explicit error if the evaluated string is falsy.
