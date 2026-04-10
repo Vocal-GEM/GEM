@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 import os
 import requests
+import re
 from ..extensions import limiter
 
 tts_bp = Blueprint('tts', __name__, url_prefix='/api/tts')
@@ -26,6 +27,13 @@ def synthesize_speech():
     
     if not text:
         return jsonify({"error": "No text provided"}), 400
+
+    # Security: Validate inputs to prevent SSRF and URL manipulation
+    if voice_id is None or not isinstance(voice_id, str) or not re.match(r'^[a-zA-Z0-9_\-]+$', voice_id):
+        return jsonify({"error": "Invalid voiceId format"}), 400
+
+    if model_id is None or not isinstance(model_id, str) or not re.match(r'^[a-zA-Z0-9_\-]+$', model_id):
+        return jsonify({"error": "Invalid modelId format"}), 400
 
     try:
         # Forward request to ElevenLabs API
