@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Play, Pause, RotateCcw, Check, Loader2 } from 'lucide-react';
 
 const TaskRecorder = ({ task, onComplete }) => {
