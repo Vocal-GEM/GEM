@@ -1,9 +1,5 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { vi, describe, test, expect, beforeEach } from 'vitest';
-import React from 'react';
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, test } from 'vitest';
 import SuccessStories from './SuccessStories';
 import CommunityService from '../../services/CommunityService';
 import ModerationService from '../../services/ModerationService';
@@ -29,7 +25,7 @@ vi.mock('lucide-react', () => ({
     Heart: () => <div data-testid="heart-icon" />,
     MessageCircle: () => <div data-testid="msg-icon" />,
     Mic: () => <div data-testid="mic-icon" />,
-    Star: () => <div data-testid="star-icon" />
+    Star: () => <div data-testid="star-icon" />, CheckCircle: () => <div data-testid="check-icon" />, AlertTriangle: () => <div data-testid="alert-icon" />, Info: () => <div data-testid="info-icon" />, AlertCircle: () => <div data-testid="alert-circle-icon" />, XCircle: () => <div data-testid="x-circle-icon" />, X: () => <div data-testid="x-icon" />
 }));
 
 // Mock Audio
@@ -49,7 +45,7 @@ const MockAudio = vi.fn(function(src) {
     return new MockAudioImplementation(src);
 });
 
-global.Audio = MockAudio;
+window.Audio = MockAudio;
 
 describe('SuccessStories Optimization Verification', () => {
     beforeEach(() => {
@@ -107,32 +103,7 @@ describe('SuccessStories Optimization Verification', () => {
         // Audio constructor should NOT be called again
         expect(MockAudio.mock.calls.length).toBe(initialCallCount);
     });
-  default: {
-    getSuccessStories: vi.fn(),
-    submitSuccessStory: vi.fn(),
-  },
-}));
-
-vi.mock('../../services/ModerationService', () => ({
-  default: {
-    preCheckContent: vi.fn(),
-  },
-}));
-
-// Mock Toast and Button to avoid issues with their internal dependencies or animations
-vi.mock('../ui/Toast', () => ({
-  default: ({ message, type }) => <div data-testid="toast" data-type={type}>{message}</div>,
-}));
-
-// We can use the real Button if it's simple, but mocking ensures isolation
-// However, the real Button is imported as { Button }
-vi.mock('../ui/button', () => ({
-  Button: ({ children, onClick, isLoading, ...props }) => (
-    <button onClick={onClick} disabled={isLoading} {...props}>
-      {isLoading ? 'Loading...' : children}
-    </button>
-  ),
-}));
+});
 
 describe('SuccessStories', () => {
   beforeEach(() => {
@@ -183,6 +154,6 @@ describe('SuccessStories', () => {
     const submitButton = screen.getByText('Submit Story');
     fireEvent.click(submitButton);
 
-    expect(await screen.findByTestId('toast')).toHaveTextContent('Your story contains flagged words. Please revise.');
+    expect(await screen.findByText('Your story contains flagged words. Please revise.')).toBeInTheDocument();
   });
 });
