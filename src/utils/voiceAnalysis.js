@@ -8,6 +8,17 @@ import { PitchDetector } from './pitch';
 import { lpcAnalyzer } from './lpcAnalysis';
 import { audioCalibrator } from './AudioCalibrator';
 
+// Pre-compute lookup tables for sine and cosine for fast FFT
+const voiceFFT_MAX_FFT_SIZE = 8192;
+const voiceFFT_FFT_MASK = voiceFFT_MAX_FFT_SIZE - 1;
+const voiceFFT_cosTable = new Float32Array(voiceFFT_MAX_FFT_SIZE);
+const voiceFFT_sinTable = new Float32Array(voiceFFT_MAX_FFT_SIZE);
+for (let i = 0; i < voiceFFT_MAX_FFT_SIZE; i++) {
+    const angle = -(Math.PI * 2 * i) / voiceFFT_MAX_FFT_SIZE;
+    voiceFFT_cosTable[i] = Math.cos(angle);
+    voiceFFT_sinTable[i] = Math.sin(angle);
+}
+
 export class VoiceAnalyzer {
     constructor(audioContext) {
         this.audioContext = audioContext;
@@ -258,43 +269,72 @@ export class VoiceAnalyzer {
         return result;
     }
 
+    // Pre-compute lookup tables for sine and cosine for fast FFT
+    // These constants will be added to the class prototype below
+
     /**
      * Simple FFT implementation (Cooley-Tukey)
      */
     performFFT(samples) {
         const n = samples.length;
-        if (n <= 1) return samples.map(s => ({ real: s, imag: 0 }));
+        if (n <= 1) {
+            return Array.from(samples).map(s => ({ real: s, imag: 0 }));
+        }
 
         // Ensure power of 2
         const powerOf2 = Math.pow(2, Math.ceil(Math.log2(n)));
-        const padded = new Float32Array(powerOf2);
-        padded.set(samples);
 
-        return this.fftRecursive(Array.from(padded).map(s => ({ real: s, imag: 0 })));
-    }
+        // Use TypedArrays for zero-allocation performance
+        const real = new Float32Array(powerOf2);
+        const imag = new Float32Array(powerOf2);
+        real.set(samples);
 
-    fftRecursive(x) {
-        const n = x.length;
-        if (n <= 1) return x;
+        const N = powerOf2;
+        // Bit-reversal permutation
+        let j = 0;
+        for (let i = 0; i < N - 1; i++) {
+            if (i < j) {
+                let temp = real[i];
+                real[i] = real[j];
+                real[j] = temp;
+            }
+            let k = N / 2;
+            while (k <= j) {
+                j -= k;
+                k /= 2;
+            }
+            j += k;
+        }
 
-        const even = this.fftRecursive(x.filter((_, i) => i % 2 === 0));
-        const odd = this.fftRecursive(x.filter((_, i) => i % 2 === 1));
+        // Cooley-Tukey iterative FFT
+        for (let size = 2; size <= N; size *= 2) {
+            const halfSize = size / 2;
+            const step = voiceFFT_MAX_FFT_SIZE / size; // Scale for lookup table
 
-        const result = new Array(n);
-        for (let k = 0; k < n / 2; k++) {
-            const angle = -2 * Math.PI * k / n;
-            const t = {
-                real: Math.cos(angle) * odd[k].real - Math.sin(angle) * odd[k].imag,
-                imag: Math.cos(angle) * odd[k].imag + Math.sin(angle) * odd[k].real
-            };
-            result[k] = {
-                real: even[k].real + t.real,
-                imag: even[k].imag + t.imag
-            };
-            result[k + n / 2] = {
-                real: even[k].real - t.real,
-                imag: even[k].imag - t.imag
-            };
+            for (let i = 0; i < N; i += size) {
+                for (let j = 0; j < halfSize; j++) {
+                    const idx = (j * step) & voiceFFT_FFT_MASK;
+                    const wReal = voiceFFT_cosTable[idx];
+                    const wImag = voiceFFT_sinTable[idx];
+
+                    const idx1 = i + j + halfSize;
+                    const idx2 = i + j;
+
+                    const tReal = wReal * real[idx1] - wImag * imag[idx1];
+                    const tImag = wReal * imag[idx1] + wImag * real[idx1];
+
+                    real[idx1] = real[idx2] - tReal;
+                    imag[idx1] = imag[idx2] - tImag;
+                    real[idx2] += tReal;
+                    imag[idx2] += tImag;
+                }
+            }
+        }
+
+        // Convert back to format expected by callers
+        const result = new Array(N);
+        for(let i = 0; i < N; i++){
+            result[i] = { real: real[i], imag: imag[i] };
         }
         return result;
     }
