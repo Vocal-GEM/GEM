@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-04-11 - Canvas Context Reset Side Effect in ResizeObserver Optimizations
+**Learning:** Optimizing `canvas.width` and `canvas.height` assignments out of an animation loop into a `ResizeObserver` causes a severe visual regression (smearing and exponentially scaling transforms) if not handled properly. This occurs because re-assigning width/height on a canvas implicitly clears its pixels and resets its transformation matrix. When this implicit clearing is removed from the hot path, you must manually substitute it with `ctx.clearRect(0, 0, canvas.width, canvas.height)`. Furthermore, if the loop applies relative transformations (like `ctx.scale()`), you must explicitly isolate them using `ctx.save()` / `ctx.restore()` or reset them using `ctx.setTransform(1, 0, 0, 1, 0, 0)` before clearing and redrawing to prevent compounding transforms frame-over-frame.
+**Action:** When migrating canvas resizing out of hot animation loops, strictly follow this clear/draw pattern: `ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.restore();`.
