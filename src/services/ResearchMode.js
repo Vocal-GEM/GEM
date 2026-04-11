@@ -59,7 +59,12 @@ export class ResearchModeController {
      */
     generateParticipantId(userId) {
         // Use cryptographic hash with study-specific salt
-        const salt = this.studyId + process.env.REACT_APP_RESEARCH_SALT;
+        // eslint-disable-next-line no-undef
+        const researchSalt = process.env.REACT_APP_RESEARCH_SALT;
+        if (!researchSalt) {
+            throw new Error("Missing REACT_APP_RESEARCH_SALT environment variable");
+        }
+        const salt = this.studyId + researchSalt;
         const hash = CryptoJS.SHA256(userId + salt).toString();
 
         // Take first 16 characters for readability

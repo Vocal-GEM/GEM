@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Calendar, TrendingUp, Flame, Clock, Trophy, BarChart2 } from 'lucide-react';
-import { getActivitySummary, getReports } from '../../services/SessionReportService';
+import { useState, useEffect, useCallback } from 'react';
+import { Calendar, Flame, Clock, Trophy, BarChart2 } from 'lucide-react';
+import { getReports } from '../../services/SessionReportService';
 import { getStreakData } from '../../services/StreakService';
 import { getXPData } from '../../services/DailyChallengeService';
 
@@ -9,11 +9,7 @@ const MonthlyRecap = () => {
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-    useEffect(() => {
-        generateRecap();
-    }, [selectedMonth, selectedYear]);
-
-    const generateRecap = () => {
+    const generateRecap = useCallback(() => {
         const reports = getReports();
         const streak = getStreakData();
         const xp = getXPData();
@@ -62,7 +58,11 @@ const MonthlyRecap = () => {
             totalXP: xp.totalXP,
             level: xp.level
         });
-    };
+    }, [selectedMonth, selectedYear]);
+
+    useEffect(() => {
+        generateRecap();
+    }, [generateRecap]);
 
     const monthNames = [
         'January', 'February', 'March', 'April', 'May', 'June',
@@ -180,7 +180,7 @@ const MonthlyRecap = () => {
     );
 };
 
-const StatCard = ({ icon, label, value, color }) => (
+const StatCard = ({ icon, label, value, color: _color }) => (
     <div className={`bg-slate-900 border border-slate-800 rounded-xl p-4`}>
         <div className="flex items-center gap-3 mb-2">
             {icon}
