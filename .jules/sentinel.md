@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-04-11 - SSRF Vulnerability in TTS Route
+**Vulnerability:** The `synthesize_speech` endpoint in `backend/app/routes/tts.py` was accepting client-provided `voiceId` and interpolating it directly into an external ElevenLabs API URL (`f'https://api.elevenlabs.io/v1/text-to-speech/{voice_id}'`) without validation.
+**Learning:** Directly interpolating user-provided data into external URLs opens the application to Server-Side Request Forgery (SSRF) and URL manipulation. Attackers could potentially access internal systems or send unexpected parameters (e.g., using path traversal like `../` or query params). Additionally, tests using `pytest` and `requests.post` for endpoints dependent on external services should mock the external request to prevent `ConnectionRefusedError`.
+**Prevention:** Always implement strict regex validation (e.g., `^[a-zA-Z0-9_\-]+$`) for all user-provided variables that are concatenated into URLs. Additionally, when writing tests, mock the external API calls instead of allowing them to execute against real networks during unit testing.
