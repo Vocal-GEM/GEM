@@ -219,12 +219,13 @@ def manipulate_file():
             # Only if we're not sending it (which we aren't if we're in the except block)
              try:
                 os.remove(processed_path)
-             except:
+             except Exception:
+                pass
         # Cleanup original temp file immediately (always safe as it's not the one being sent)
         if tmp_path and os.path.exists(tmp_path):
             try:
                 os.remove(tmp_path)
-            except:
+            except Exception:
                 pass
 
 @voice_quality_bp.route('/api/voice-quality/goals', methods=['GET'])

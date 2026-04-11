@@ -1,11 +1,10 @@
 from flask import Blueprint, request, jsonify
 import os
 import requests
+import re
 from ..extensions import limiter
 
 tts_bp = Blueprint('tts', __name__, url_prefix='/api/tts')
-
-ELEVENLABS_API_KEY = os.environ.get('ELEVENLABS_API_KEY')
 
 @tts_bp.route('/synthesize', methods=['POST'])
 @limiter.limit("5 per minute")
@@ -14,7 +13,8 @@ def synthesize_speech():
     Proxy endpoint for ElevenLabs TTS API.
     Keeps API key secure on backend.
     """
-    if not ELEVENLABS_API_KEY:
+    api_key = os.environ.get('ELEVENLABS_API_KEY')
+    if not api_key:
         return jsonify({
             "error": "ElevenLabs API key not configured on server"
         }), 503
@@ -27,6 +27,13 @@ def synthesize_speech():
     if not text:
         return jsonify({"error": "No text provided"}), 400
 
+    # Security: Validate inputs to prevent SSRF and URL manipulation
+    if voice_id is None or not isinstance(voice_id, str) or not re.match(r'^[a-zA-Z0-9_\-]+$', voice_id):
+        return jsonify({"error": "Invalid voiceId format"}), 400
+
+    if model_id is None or not isinstance(model_id, str) or not re.match(r'^[a-zA-Z0-9_\-]+$', model_id):
+        return jsonify({"error": "Invalid modelId format"}), 400
+
     try:
         # Forward request to ElevenLabs API
         response = requests.post(
@@ -34,7 +41,7 @@ def synthesize_speech():
             headers={
                 'Accept': 'audio/mpeg',
                 'Content-Type': 'application/json',
-                'xi-api-key': ELEVENLABS_API_KEY
+                'xi-api-key': api_key
             },
             json={
                 'text': text,
@@ -72,7 +79,8 @@ def get_voices():
     """
     Fetch available voices from ElevenLabs API.
     """
-    if not ELEVENLABS_API_KEY:
+    api_key = os.environ.get('ELEVENLABS_API_KEY')
+    if not api_key:
         return jsonify({
             "error": "ElevenLabs API key not configured on server",
             "voices": []
@@ -82,7 +90,7 @@ def get_voices():
         response = requests.get(
             'https://api.elevenlabs.io/v1/voices',
             headers={
-                'xi-api-key': ELEVENLABS_API_KEY
+                'xi-api-key': api_key
             },
             timeout=10
         )
