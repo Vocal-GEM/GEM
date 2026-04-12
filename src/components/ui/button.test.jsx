@@ -29,10 +29,11 @@ describe("Button", () => {
 
     // Original text/icon should NOT be present (implementation detail: we conditionally render)
     expect(screen.queryByText("Icon")).not.toBeInTheDocument();
-import React from "react";
+  });
+});
 
-describe("Button", () => {
-  it("renders children correctly", () => {
+/* removed duplicate describe */
+/*
     render(<Button>Click me</Button>);
     expect(screen.getByRole("button", { name: /click me/i })).toBeInTheDocument();
   });
@@ -68,3 +69,4 @@ describe("Button", () => {
       expect(container.firstChild).toHaveClass("opacity-50");
   });
 });
+*/
