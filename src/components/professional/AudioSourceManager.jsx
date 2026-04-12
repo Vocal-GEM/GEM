@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
 
 const AudioSourceManager = ({ onSourceChange }) => {
@@ -6,11 +6,7 @@ const AudioSourceManager = ({ onSourceChange }) => {
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [permissionGranted, setPermissionGranted] = useState(false);
 
-    useEffect(() => {
-        checkPermissionAndEnumerate();
-    }, []);
-
-    const checkPermissionAndEnumerate = async () => {
+    const checkPermissionAndEnumerate = useCallback(async () => {
         try {
             // Must request permission first to get labels
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -27,9 +23,17 @@ const AudioSourceManager = ({ onSourceChange }) => {
             console.error("Microphone permission denied:", err);
             setPermissionGranted(false);
         }
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    const enumerateDevices = async () => {
+    const handleDeviceChange = useCallback((deviceId) => {
+        setSelectedDeviceId(deviceId);
+        if (onSourceChange) {
+            onSourceChange(deviceId);
+        }
+    }, [onSourceChange]);
+
+    const enumerateDevices = useCallback(async () => {
         try {
             const allDevices = await navigator.mediaDevices.enumerateDevices();
             const audioInputs = allDevices.filter(device => device.kind === 'audioinput');
@@ -43,13 +47,12 @@ const AudioSourceManager = ({ onSourceChange }) => {
         } catch (err) {
             console.error("Error enumerating devices:", err);
         }
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedDeviceId, handleDeviceChange]);
 
-    const handleDeviceChange = (e) => {
-        const deviceId = e.target.value;
-        setSelectedDeviceId(deviceId);
-        onSourceChange?.(deviceId);
-    };
+    useEffect(() => {
+        checkPermissionAndEnumerate();
+    }, [checkPermissionAndEnumerate]);
 
     return (
         <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
@@ -71,7 +74,7 @@ const AudioSourceManager = ({ onSourceChange }) => {
                         <Mic size={16} className="absolute left-3 top-2.5 text-slate-400" />
                         <select
                             value={selectedDeviceId}
-                            onChange={handleDeviceChange}
+                            onChange={(e) => handleDeviceChange(e.target.value)}
                             className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500 appearance-none cursor-pointer"
                         >
                             {devices.map(device => (
