@@ -1,7 +1,9 @@
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
 import { useRef, useEffect, useState } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
+// eslint-disable-next-line no-unused-vars
 const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRecording = false }) => {
     const { colorBlindMode } = useSettings();
     const { profile } = useProfile();
@@ -31,6 +33,7 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
     const labelRef = useRef(null);
     const canvasRef = useRef(null);
 
+    // eslint-disable-next-line no-unused-vars
     const [currentVowel, setCurrentVowel] = useState('');
     const [hitScore, setHitScore] = useState(0);
 
@@ -39,8 +42,6 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-
-        let animationId;
 
         const render = () => {
             // Clear Canvas
@@ -128,8 +129,6 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
                     pointRef.current.style.opacity = '0.1';
                 }
             }
-
-            animationId = requestAnimationFrame(render);
         };
 
         // Resize handler
@@ -141,13 +140,19 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
         window.addEventListener('resize', resize);
         resize();
 
-        render();
+        // Optimization: Consolidate requestAnimationFrame into RenderCoordinator to reduce CPU overhead
+        const unsubscribe = renderCoordinator.subscribe(
+            'vowel-space-plot',
+            render,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
 
         return () => {
-            cancelAnimationFrame(animationId);
+            unsubscribe();
             window.removeEventListener('resize', resize);
         };
-    }, [targetVowel, isMasc, isRecording, colorBlindMode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [targetVowel, isMasc, isRecording, colorBlindMode, dataRef]);
 
     return (
         <div className="w-full h-full relative bg-slate-950 rounded-xl overflow-hidden shadow-inner">

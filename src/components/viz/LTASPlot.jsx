@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAudio } from '../../context/AudioContext';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const LTASPlot = ({ width = 600, height = 300 }) => {
     const { dataRef } = useAudio();
@@ -14,8 +15,6 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
     }
 
     useEffect(() => {
-        let animationId;
-
         const draw = () => {
             if (!canvasRef.current) return;
             const ctx = canvasRef.current.getContext('2d');
@@ -83,12 +82,15 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
                 }
                 ctx.stroke();
             }
-
-            animationId = requestAnimationFrame(draw);
         };
 
-        draw();
-        return () => cancelAnimationFrame(animationId);
+        // Optimization: Consolidate requestAnimationFrame into RenderCoordinator to reduce CPU overhead
+        const unsubscribe = renderCoordinator.subscribe(
+            'ltas-plot',
+            draw,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+        return () => unsubscribe();
     }, [isRecording, dataRef]);
 
     const reset = () => {
