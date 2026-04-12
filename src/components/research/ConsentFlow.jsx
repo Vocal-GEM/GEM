@@ -1,9 +1,9 @@
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+
 
 const ConsentFlow = ({ study, onComplete, onCancel }) => {
-    const [step, setStep] = useState(0);
+    const [_step, _setStep] = useState(0);
     const [signature, setSignature] = useState('');
     const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
     const [agreed, setAgreed] = useState(false);
