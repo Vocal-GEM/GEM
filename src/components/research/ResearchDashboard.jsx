@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -11,7 +11,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
-import { Line, Bar } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 
 ChartJS.register(
     CategoryScale,
@@ -31,6 +31,7 @@ const ResearchDashboard = () => {
 
     useEffect(() => {
         // Mock fetching studies
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setStudies([
             { id: 'study-001', title: 'Pitch Accuracy in Early Transition', status: 'active', participants: 42 },
             { id: 'study-002', title: 'Formant Tuning Effectiveness', status: 'recruiting', participants: 15 },
@@ -40,6 +41,7 @@ const ResearchDashboard = () => {
     useEffect(() => {
         if (selectedStudy) {
             // Mock fetching stats for selected study
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setStats({
                 enrollmentRate: [5, 12, 25, 30, 38, 42],
                 pitchImprovement: {
