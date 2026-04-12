@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import AudioWaveform from '../ui/AudioWaveform';
-import { Upload, Play, Pause, ZoomIn, ZoomOut } from 'lucide-react';
+import { Upload, ZoomIn, ZoomOut, Play, Pause } from 'lucide-react';
 import AudioSourceManager from './AudioSourceManager';
 
 const SpectrogramComparison = () => {
@@ -11,7 +11,7 @@ const SpectrogramComparison = () => {
 
     const [isPlaying, setIsPlaying] = useState(false);
     const [zoomLevel, setZoomLevel] = useState(1);
-    const [deviceId, setDeviceId] = useState('');
+    const [_deviceId, setDeviceId] = useState('');
 
     const handleFileUpload = (e, index) => {
         const file = e.target.files[0];
