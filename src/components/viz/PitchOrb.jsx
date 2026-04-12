@@ -34,6 +34,27 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
 
+        // Optimization: Cache dimensions to avoid getBoundingClientRect in loop
+        const dimensionsRef = { width: 0, height: 0 };
+        // We observe the canvas directly, not the parent, to avoid padding/margin layout mismatches
+        const updateSize = (entries) => {
+            const entry = entries[0];
+            if (entry && entry.contentRect) {
+                // Read width/height directly from contentRect to avoid layout reflows
+                dimensionsRef.width = entry.contentRect.width;
+                dimensionsRef.height = entry.contentRect.height;
+            }
+        };
+
+        const resizeObserver = new globalThis.ResizeObserver(updateSize);
+        if (canvas) {
+            resizeObserver.observe(canvas);
+            // Initial read to bootstrap dimensions
+            const rect = canvas.getBoundingClientRect();
+            dimensionsRef.width = rect.width;
+            dimensionsRef.height = rect.height;
+        }
+
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
             if (pitch >= genderRanges.feminine.min) {
@@ -67,17 +88,33 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
+            const width = dimensionsRef.width;
+            const height = dimensionsRef.height;
+
+            const newWidth = Math.round(width * dpr);
+            const newHeight = Math.round(height * dpr);
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                // Implicit transform matrix reset occurs here
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+            } else {
+                // Explicitly clear when dimensions haven't changed to simulate implicit reset
+                ctx.save();
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+            }
+
+            // Reapply scaling explicitly since conditionally clearing doesn't wipe state,
+            // but setting width/height DOES wipe state, ensuring both code paths end up
+            // with exactly the same transform. We must reset it first on the "else" path implicitly
+            // or explicitly, so doing it explicitly guarantees the matrix doesn't compound.
+            ctx.setTransform(1, 0, 0, 1, 0, 0); // Explicitly reset matrix to identity
             ctx.scale(dpr, dpr);
 
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
-
-            ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -166,6 +203,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 

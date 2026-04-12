@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-24 - Layout Thrashing in High-Frequency Canvas Loops
+**Learning:** React state variables or refs for dimensions are often used in `requestAnimationFrame` loops alongside `canvas.getBoundingClientRect()`. This completely breaks the GPU render pipeline by forcing a synchronous layout and style recalculation before every frame is painted.
+**Action:** When working on `requestAnimationFrame` drawing loops, replace synchronous layout lookups with asynchronous `ResizeObserver` tracking directly on the canvas element, caching `entry.contentRect` dimensions.
