@@ -1,9 +1,0 @@
---- src/components/professional/ClientDashboard.jsx
-+++ src/components/professional/ClientDashboard.jsx
-@@ -1,5 +1,5 @@
- import React, { useState, useEffect } from 'react';
--import { Users, UserPlus, Search, FileText, Calendar, ChevronRight, MoreVertical } from 'lucide-react';
-+import { Users, UserPlus, Search, FileText, Calendar, ChevronRight, MoreVertical, Activity } from 'lucide-react';
- import {
-   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-   BarChart, Bar
