@@ -1,0 +1,5 @@
+<<<<<<< SEARCH
+                                <p className="text-slate-400 mb-6">Say "Ahhhh" or count to 5... ({countdown}s)</p>
+=======
+                                <p className="text-slate-400 mb-6">Say &quot;Ahhhh&quot; or count to 5... ({countdown}s)</p>
+>>>>>>> REPLACE
