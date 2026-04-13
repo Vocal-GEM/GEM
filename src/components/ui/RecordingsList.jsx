@@ -154,12 +154,13 @@ const RecordingsList = () => {
                         <button
                             id={index === 0 ? 'recording-play-btn' : undefined}
                             onClick={() => handlePlay(recording)}
-                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${playingId === recording.id
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 ${playingId === recording.id
                                 ? 'bg-violet-500 text-white shadow-lg shadow-violet-500/30'
                                 : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                                 }`}
+                            aria-label={playingId === recording.id ? `Pause ${recording.name || 'Untitled Recording'}` : `Play ${recording.name || 'Untitled Recording'}`}
                         >
-                            {playingId === recording.id ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-0.5" />}
+                            {playingId === recording.id ? <Pause size={18} fill="currentColor" aria-hidden="true" /> : <Play size={18} fill="currentColor" className="ml-0.5" aria-hidden="true" />}
                         </button>
 
                         {/* Info / Edit Input */}
@@ -170,12 +171,25 @@ const RecordingsList = () => {
                                         type="text"
                                         value={editName}
                                         onChange={(e) => setEditName(e.target.value)}
-                                        className="bg-slate-900 border border-violet-500 rounded px-2 py-1 text-sm text-white focus:outline-none w-full"
+                                        className="bg-slate-900 border border-violet-500 rounded px-2 py-1 text-sm text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 w-full"
                                         autoFocus
                                         onKeyDown={(e) => e.key === 'Enter' && saveEdit(recording)}
+                                        aria-label="Edit recording name"
                                     />
-                                    <button onClick={() => saveEdit(recording)} className="p-1 hover:text-green-400 text-slate-400"><Check size={16} /></button>
-                                    <button onClick={cancelEdit} className="p-1 hover:text-red-400 text-slate-400"><X size={16} /></button>
+                                    <button
+                                        onClick={() => saveEdit(recording)}
+                                        className="p-1 hover:text-green-400 text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 rounded"
+                                        aria-label="Save recording name"
+                                    >
+                                        <Check size={16} aria-hidden="true" />
+                                    </button>
+                                    <button
+                                        onClick={cancelEdit}
+                                        className="p-1 hover:text-red-400 text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 rounded"
+                                        aria-label="Cancel editing"
+                                    >
+                                        <X size={16} aria-hidden="true" />
+                                    </button>
                                 </div>
                             ) : (
                                 <div>
@@ -184,15 +198,16 @@ const RecordingsList = () => {
                                         <button
                                             id={index === 0 ? 'recording-edit-btn' : undefined}
                                             onClick={() => startEditing(recording)}
-                                            className="opacity-0 group-hover:opacity-100 p-1 text-slate-500 hover:text-violet-400 transition-opacity"
+                                            className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100 p-1 text-slate-500 hover:text-violet-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 rounded transition-opacity"
+                                            aria-label={`Edit name for ${recording.name || 'Untitled Recording'}`}
                                         >
-                                            <Edit2 size={12} />
+                                            <Edit2 size={12} aria-hidden="true" />
                                         </button>
                                     </div>
                                     <div className="flex gap-3 text-xs text-slate-400 mt-1">
-                                        <span className="flex items-center gap-1"><Calendar size={10} /> {new Date(recording.timestamp).toLocaleDateString()}</span>
-                                        <span className="flex items-center gap-1"><Clock size={10} /> {formatDuration(recording.duration)}</span>
-                                        <span className="bg-slate-700 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider text-slate-300">{recording.type || 'audio'}</span>
+                                        <span className="flex items-center gap-1" aria-label={`Recorded on ${new Date(recording.timestamp).toLocaleDateString()}`}><Calendar size={10} aria-hidden="true" /> {new Date(recording.timestamp).toLocaleDateString()}</span>
+                                        <span className="flex items-center gap-1" aria-label={`Duration ${formatDuration(recording.duration)}`}><Clock size={10} aria-hidden="true" /> {formatDuration(recording.duration)}</span>
+                                        <span className="bg-slate-700 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider text-slate-300" aria-label={`Type ${recording.type || 'audio'}`}>{recording.type || 'audio'}</span>
                                     </div>
                                 </div>
                             )}
@@ -203,16 +218,18 @@ const RecordingsList = () => {
                             <button
                                 onClick={() => handleDownload(recording)}
                                 title="Download"
-                                className="p-2 text-slate-400 hover:text-violet-400 hover:bg-slate-700/50 rounded-lg transition-colors"
+                                aria-label={`Download ${recording.name || 'Untitled Recording'}`}
+                                className="p-2 text-slate-400 hover:text-violet-400 hover:bg-slate-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 rounded-lg transition-colors"
                             >
-                                <Download size={18} />
+                                <Download size={18} aria-hidden="true" />
                             </button>
                             <button
                                 onClick={() => handleDelete(recording.id)}
                                 title="Delete"
-                                className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700/50 rounded-lg transition-colors"
+                                aria-label={`Delete ${recording.name || 'Untitled Recording'}`}
+                                className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 rounded-lg transition-colors"
                             >
-                                <Trash2 size={18} />
+                                <Trash2 size={18} aria-hidden="true" />
                             </button>
                         </div>
                     </div>
