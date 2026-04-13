@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Fingerprint, TrendingUp, Brain, RefreshCw, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Fingerprint, Brain, RefreshCw, Sparkles } from 'lucide-react';
 import {
     generateVoiceFingerprint,
     getFormantTrends,
@@ -43,7 +43,7 @@ const VoiceFingerprint = () => {
                     </div>
                     <h2 className="text-xl font-bold text-white">Voice Analytics</h2>
                 </div>
-                <button onClick={loadData} className="p-2 text-slate-400 hover:text-white">
+                <button onClick={loadData} className="p-2 text-slate-400 hover:text-white" aria-label="Refresh analytics">
                     <RefreshCw size={18} />
                 </button>
             </div>
