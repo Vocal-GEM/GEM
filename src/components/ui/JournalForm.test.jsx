@@ -10,10 +10,6 @@ vi.mock('../../context/AudioContext', () => ({
       current: {
         startRecording: vi.fn(),
         stopRecording: vi.fn().mockResolvedValue('mock-url'),
-      }
-    }
-  })
-        stopRecording: vi.fn(),
       },
     },
   }),
@@ -72,9 +68,7 @@ describe('JournalForm Accessibility', () => {
      render(<JournalForm />);
      expect(screen.getByRole('button', { name: /need a writing prompt/i })).toBeInTheDocument();
   });
-    journalEntryData: null,
-  }),
-}));
+});
 
 // Mock data
 vi.mock('../../data/selfCareJournalPrompts', () => ({
