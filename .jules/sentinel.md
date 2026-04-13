@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-04-13 - Add type validation before RegEx matching
+**Vulnerability:** `TypeError` leading to 500 Internal Server Error when evaluating user inputs (username, password) with `re.match()` and `re.search()`.
+**Learning:** Python's `re` module expects string-like objects. Passing a non-string object (like a list or dict parsed from JSON) directly to `re.match()` raises a `TypeError` rather than failing validation safely. This bypassing of validation logic can lead to 500 errors (DoS risk).
+**Prevention:** Always verify that an input is not `None` and is of type `str` (e.g., `if not isinstance(var, str):`) before calling regex functions on it to fail securely and gracefully.

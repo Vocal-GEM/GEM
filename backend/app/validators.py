@@ -15,6 +15,9 @@ def validate_username(username):
     """
     if not username:
         return False, "Username is required"
+
+    if not isinstance(username, str):
+        return False, "Username must be a string"
     
     if len(username) < 3 or len(username) > 30:
         return False, "Username must be between 3 and 30 characters"
@@ -33,6 +36,9 @@ def validate_password(password):
     if not password:
         return False, "Password is required"
         
+    if not isinstance(password, str):
+        return False, "Password must be a string"
+
     if len(password) < 8:
         return False, "Password must be at least 8 characters long"
         
@@ -63,6 +69,9 @@ def validate_email_address(email):
     if not email:
         return False, "Email is required"
         
+    if not isinstance(email, str):
+        return False, "Email must be a string"
+
     try:
         validate_email(email, check_deliverability=False)
         return True, None
