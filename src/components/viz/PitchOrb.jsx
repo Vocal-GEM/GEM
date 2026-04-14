@@ -29,6 +29,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     const genderRanges = settings.genderRanges || defaultRanges;
 
+    const dimensionsRef = useRef({ width: 0, height: 0 });
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -64,20 +66,40 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        const resizeObserver = new ResizeObserver((entries) => {
+            if (!entries || !entries.length) return;
+            const rect = entries[0].contentRect;
+
+            if (rect.width > 0 && rect.height > 0) {
+                dimensionsRef.current = {
+                    width: rect.width,
+                    height: rect.height
+                };
+
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
+                ctx.scale(dpr, dpr);
+            }
+        });
+
+        if (canvas) {
+            resizeObserver.observe(canvas);
+        }
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const { width, height } = dimensionsRef.current;
+            if (width === 0 || height === 0) return;
 
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
-            ctx.clearRect(0, 0, width, height);
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -165,6 +187,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         );
 
         return () => {
+            resizeObserver.disconnect();
             unsubscribe();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
