@@ -86,6 +86,8 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                     className="text-slate-500 hover:text-white transition-colors"
                     onMouseEnter={() => setShowTooltip(true)}
                     onMouseLeave={() => setShowTooltip(false)}
+                    onFocus={() => setShowTooltip(true)}
+                    onBlur={() => setShowTooltip(false)}
                     aria-label="More info about Laryngeal Register"
                 >
                     <Info size={16} />
