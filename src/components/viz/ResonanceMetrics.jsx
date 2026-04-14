@@ -53,6 +53,9 @@ const ResonanceMetrics = ({ dataRef }) => {
                     className="text-slate-600 hover:text-slate-300 transition-colors"
                     onMouseEnter={() => setShowTooltip(id)}
                     onMouseLeave={() => setShowTooltip(null)}
+                    onFocus={() => setShowTooltip(id)}
+                    onBlur={() => setShowTooltip(null)}
+                    aria-label={`More info about ${label}`}
                 >
                     <Info size={14} />
                 </button>

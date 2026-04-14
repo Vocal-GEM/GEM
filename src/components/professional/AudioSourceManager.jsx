@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
 
 const AudioSourceManager = ({ onSourceChange }) => {
@@ -6,30 +6,7 @@ const AudioSourceManager = ({ onSourceChange }) => {
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [permissionGranted, setPermissionGranted] = useState(false);
 
-    useEffect(() => {
-        checkPermissionAndEnumerate();
-    }, []);
-
-    const checkPermissionAndEnumerate = async () => {
-        try {
-            // Must request permission first to get labels
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            setPermissionGranted(true);
-
-            // Stop the temp stream immediately
-            stream.getTracks().forEach(track => track.stop());
-
-            enumerateDevices();
-
-            // Listen for changes
-            navigator.mediaDevices.ondevicechange = enumerateDevices;
-        } catch (err) {
-            console.error("Microphone permission denied:", err);
-            setPermissionGranted(false);
-        }
-    };
-
-    const enumerateDevices = async () => {
+    const enumerateDevices = useCallback(async () => {
         try {
             const allDevices = await navigator.mediaDevices.enumerateDevices();
             const audioInputs = allDevices.filter(device => device.kind === 'audioinput');
@@ -38,12 +15,40 @@ const AudioSourceManager = ({ onSourceChange }) => {
             // Auto-select first if none selected
             if (audioInputs.length > 0 && !selectedDeviceId) {
                 setSelectedDeviceId(audioInputs[0].deviceId);
-                onSourceChange?.(audioInputs[0].deviceId);
+                if (onSourceChange) {
+                    onSourceChange(audioInputs[0].deviceId);
+                }
             }
         } catch (err) {
             console.error("Error enumerating devices:", err);
         }
-    };
+    }, [selectedDeviceId, onSourceChange]);
+
+    const checkPermissionAndEnumerate = useCallback(async () => {
+        try {
+            // Must request permission first to get labels
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            stream.getTracks().forEach(track => track.stop());
+            setPermissionGranted(true);
+            await enumerateDevices();
+
+            // Listen for changes
+            navigator.mediaDevices.ondevicechange = enumerateDevices;
+        } catch (err) {
+            console.error('Permission denied or error:', err);
+            setPermissionGranted(false);
+            // Still try to enumerate, but names might be blank
+            await enumerateDevices();
+        }
+    }, [enumerateDevices]);
+
+    useEffect(() => {
+        checkPermissionAndEnumerate();
+
+        return () => {
+            navigator.mediaDevices.ondevicechange = null;
+        };
+    }, [checkPermissionAndEnumerate]);
 
     const handleDeviceChange = (e) => {
         const deviceId = e.target.value;
