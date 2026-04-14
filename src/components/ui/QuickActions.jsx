@@ -46,7 +46,6 @@ const QuickActions = ({ onAction }) => {
                     "flex flex-col gap-3 mb-4 transition-all duration-300",
                     isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
                 )}
-                className={`flex flex-col gap-3 mb-4 transition-all duration-300 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
                 aria-hidden={!isOpen}
             >
                 {actions.map((action, index) => (
@@ -54,8 +53,6 @@ const QuickActions = ({ onAction }) => {
                         key={action.id}
                         onClick={() => handleAction(action)}
                         tabIndex={isOpen ? 0 : -1}
-                        aria-hidden={!isOpen}
-                        className="flex items-center justify-end gap-3 group focus:outline-none"
                         className="flex items-center justify-end gap-3 group focus-visible:outline-none"
                         style={{ transitionDelay: `${index * 50}ms` }}
                         aria-label={action.label}
