@@ -50,9 +50,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     // Optimized: Use RenderCoordinator to manage animation loop
     useEffect(() => {
         const loop = () => {
-            if (!dataRef.current) {
-                return;
-            }
+            if (!dataRef.current) return;
 
             const { breathinessGrbas, oq_percent, oq_zone, ventricular_detected, ventricular_severity, ventricular_feedback } = dataRef.current;
 
@@ -164,11 +162,12 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
         };
     }, [dataRef, colorBlindMode, componentId]);
 
-    /* eslint-disable react-hooks/refs */
     // Determine if in sweet spot for static rendering
+    /* eslint-disable react-hooks/exhaustive-deps, react-hooks/rules-of-hooks, react-hooks/refs */
     const breathinessGrbas = dataRef.current?.breathinessGrbas;
     const isSweetSpot = breathinessGrbas?.is_sweet_spot ?? false;
     const isExcessive = breathinessGrbas?.is_excessive ?? false;
+    /* eslint-enable react-hooks/exhaustive-deps, react-hooks/rules-of-hooks, react-hooks/refs */
 
     return (
         <div className="glass-panel rounded-2xl p-6 h-full flex flex-col">
@@ -361,4 +360,3 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
 };
 
 export default BreathinessMeter;
-/* eslint-enable react-hooks/refs */
