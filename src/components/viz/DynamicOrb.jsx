@@ -7,7 +7,7 @@ import { OrbitControls } from '@react-three/drei';
 import { useSettings } from '../../context/SettingsContext';
 import OrbLegend from './OrbLegend';
 import OrbMetricsOverlay from './OrbMetricsOverlay';
-
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const MixingBoardView = lazy(() => import('../views/MixingBoardView'));
 
@@ -401,7 +401,6 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
   const textRef = useRef(null);
 
   useEffect(() => {
-    let frameId;
     const loop = () => {
       if (dataRef.current) {
         const { pitch, volume } = dataRef.current;
@@ -414,10 +413,19 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
           textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
         }
       }
-      frameId = requestAnimationFrame(loop);
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
+
+    // ⚡ Bolt Performance Optimization
+    // Replaced standalone requestAnimationFrame with RenderCoordinator
+    // Expected Impact: Reduces CPU usage by syncing this 2D safe mode animation
+    // with the unified rendering loop, preventing layout thrashing from multiple RAFs.
+    const unsubscribe = renderCoordinator.subscribe(
+      'dynamic-orb-safe',
+      loop,
+      renderCoordinator.PRIORITY.CRITICAL
+    );
+
+    return () => unsubscribe();
   }, [dataRef]);
 
   return (
