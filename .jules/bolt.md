@@ -41,7 +41,3 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
-
-## 2024-05-24 - Canvas Rendering Performance Optimization
-**Learning:** Raw `requestAnimationFrame` calls within individual React components circumvent centralized frame rate control and can lead to exponential loop growth or uncoordinated frame updates. This architectural gap causes significant performance degradation.
-**Action:** Always use the centralized `RenderCoordinator` (`renderCoordinator.subscribe`) service to coordinate animation loops instead of direct `requestAnimationFrame` calls, ensuring unified throttling, lifecycle tracking, and proper cleanup.
