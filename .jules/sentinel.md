@@ -75,3 +75,9 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-23 - Information Leakage in TTS Proxy
+**Vulnerability:** The `/synthesize` and `/voices` endpoints in `backend/app/routes/tts.py` proxy requests to the ElevenLabs API. If the upstream API returned an error, the backend forwarded the raw `response.text` and the `requests.exceptions.RequestException` string (`str(e)`) directly to the client. This exposes upstream service internals, potential tracebacks, and internal system error strings to users.
+**Learning:** Returning `response.text` from third-party APIs or `str(e)` from exception handling can inadvertently leak sensitive infrastructure details, upstream API keys context, or application logic.
+**Prevention:**
+1. Mask external API errors with a generic message for the client (e.g., "ElevenLabs API error: 400" or "Failed to connect to ElevenLabs").
+2. Log the detailed upstream response and the exception string internally using `current_app.logger.error`.
