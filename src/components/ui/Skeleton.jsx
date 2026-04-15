@@ -18,7 +18,11 @@ const Skeleton = ({ className = '', variant = 'default' }) => {
     };
 
     return (
-        <div className={`${baseClasses} ${variants[variant] || variants.default} ${className}`} />
+        <div
+            className={`${baseClasses} ${variants[variant] || variants.default} ${className}`}
+            role="status"
+            aria-label="Loading..."
+        />
     );
 };
 
