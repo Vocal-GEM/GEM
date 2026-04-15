@@ -171,36 +171,6 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
 
         return unsubscribe;
     }, [dataRef, colorBlindMode, componentId]);
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            componentId,
-            updateMeter,
-
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `BreathinessMeter-${componentId}`,
-            loop,
-            renderCoordinator.PRIORITY.MEDIUM
-        );
-
-        return () => unsubscribe();
-    }, [dataRef, colorBlindMode, componentId]);
-            `breathiness-meter-${componentId}`,
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `breathiness-meter-${id}`,
-            loop,
-            renderCoordinator.PRIORITY.CRITICAL
-        );
-
-        return () => {
-            unsubscribe();
-        };
-    }, [dataRef, colorBlindMode, componentId]);
-    }, [dataRef, colorBlindMode, id]);
 
     // Determine if in sweet spot for static rendering
     const breathinessGrbas = dataRef.current?.breathinessGrbas;
