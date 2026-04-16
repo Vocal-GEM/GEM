@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-24 - Pre-compiling RegExp for search
+**Learning:** Instantiating the same `RegExp` object inside a tight inner loop (e.g., iterating over hundreds of items and multiple fields per item) causes severe performance overhead due to repeated regex compilation and garbage collection pressure.
+**Action:** When performing filter/search operations across a collection, ensure that search queries and regex boundaries are normalized and compiled *once* before the iteration loop, then passed as parameters to the inner matching functions.
