@@ -43,8 +43,7 @@ const normalizeText = (text) => {
  * Calculate match score for ranking results
  * Higher score = better match
  */
-const calculateScore = (query, text, isExactField = false) => {
-    const normalizedQuery = normalizeText(query);
+const calculateScore = (normalizedQuery, wordBoundary, text, isExactField = false) => {
     const normalizedText = normalizeText(text);
 
     if (!normalizedText || !normalizedQuery) return 0;
@@ -56,8 +55,7 @@ const calculateScore = (query, text, isExactField = false) => {
     if (normalizedText.startsWith(normalizedQuery)) return isExactField ? 90 : 80;
 
     // Contains query as whole word
-    const wordBoundary = new RegExp(`\\b${normalizedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
-    if (wordBoundary.test(normalizedText)) return isExactField ? 70 : 60;
+    if (wordBoundary && wordBoundary.test(normalizedText)) return isExactField ? 70 : 60;
 
     // Contains query anywhere
     if (normalizedText.includes(normalizedQuery)) return isExactField ? 50 : 40;
@@ -215,6 +213,10 @@ export const search = (query, options = {}) => {
         return [];
     }
 
+    // Pre-calculate normalized query and regex for the search loop
+    const normalizedQuery = normalizeText(query);
+    const wordBoundary = new RegExp(`\\b${normalizedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+
     const items = getSearchableItems();
     const results = [];
 
@@ -226,16 +228,16 @@ export const search = (query, options = {}) => {
 
         // Calculate score based on multiple fields
         let score = 0;
-        score = Math.max(score, calculateScore(query, item.title, true));
-        score = Math.max(score, calculateScore(query, item.subtitle, false));
+        score = Math.max(score, calculateScore(normalizedQuery, wordBoundary, item.title, true));
+        score = Math.max(score, calculateScore(normalizedQuery, wordBoundary, item.subtitle, false));
 
         if (item.description) {
-            score = Math.max(score, calculateScore(query, item.description, false) * 0.8);
+            score = Math.max(score, calculateScore(normalizedQuery, wordBoundary, item.description, false) * 0.8);
         }
 
         if (item.tags) {
             item.tags.forEach(tag => {
-                score = Math.max(score, calculateScore(query, tag, false) * 0.9);
+                score = Math.max(score, calculateScore(normalizedQuery, wordBoundary, tag, false) * 0.9);
             });
         }
 
