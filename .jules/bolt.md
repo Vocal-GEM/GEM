@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-21 - Layout Thrashing Canvas Resizing Edge Case
+**Learning:** Removing continuous `canvas.width` assignments from an animation loop prevents layout thrashing, but also stops the implicit reset of the canvas 2D context. A patch simply using `ctx.clearRect()` clears pixels but leaves accumulated state (transforms, `fillStyle`).
+**Action:** When migrating canvas resize operations out of animation loops to `ResizeObserver`, always wrap the internal loop drawing operations in `ctx.save()` and `ctx.restore()` to prevent style/transform state bleed across frames.
