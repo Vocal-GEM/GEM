@@ -254,15 +254,23 @@ const ShadowingExercise = ({ embedded = false, onClose }) => {
                 <div className="flex justify-between items-center p-4 border-b border-white/5 bg-slate-900/50">
                     <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
                         {phase !== 'select' && (
-                            <button onClick={() => setPhase('select')} className="mr-2 text-slate-400 hover:text-white">
-                                <ArrowLeft size={20} />
+                            <button
+                                onClick={() => setPhase('select')}
+                                className="mr-2 text-slate-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full"
+                                aria-label="Back to selection"
+                            >
+                                <ArrowLeft size={20} aria-hidden="true" />
                             </button>
                         )}
                         Shadowing & Mimicry
                     </h2>
                     {!embedded && onClose && (
-                        <button onClick={onClose} className="p-2 text-slate-400 hover:text-white">
-                            <XCircle size={24} />
+                        <button
+                            onClick={onClose}
+                            className="p-2 text-slate-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full"
+                            aria-label="Close exercise"
+                        >
+                            <XCircle size={24} aria-hidden="true" />
                         </button>
                     )}
                 </div>
