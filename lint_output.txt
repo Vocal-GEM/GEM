@@ -1435,9 +1435,7 @@ React Compiler has skipped optimizing this component because the existing manual
   1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/ui/RecommendedToolsWidget.jsx
-    1:8   warning  'React' is defined but never used                                no-unused-vars
-  124:21  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
-  124:64  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  1:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/ui/RecordingCountdown.jsx
    1:8   warning  'React' is defined but never used                                                                                               no-unused-vars
@@ -5167,9 +5165,7 @@ Components created during render will reset their state each time they are creat
   3:8   warning  'React' is defined but never used    no-unused-vars
 
 /app/src/components/viz/BrightnessMeter.test.jsx
-   4:8   warning  'React' is defined but never used             no-unused-vars
-  17:19  error    'require' is not defined                      no-undef
-  18:34  error    Component definition is missing display name  react/display-name
+  4:8  warning  'React' is defined but never used  no-unused-vars
 
 /app/src/components/viz/DynamicOrb.jsx
   260:12  error  Error: Cannot modify local variables after render completes
@@ -5709,7 +5705,6 @@ To initialize a ref only once, check that the ref is null with the pattern `if (
 
 /app/src/components/viz/PitchOrb.test.jsx
    5:8   warning  'React' is defined but never used        no-unused-vars
-  33:1   error    'global' is not defined                  no-undef
   64:16  warning  'id' is assigned a value but never used  no-unused-vars
 
 /app/src/components/viz/PitchTrace.jsx
@@ -6002,14 +5997,8 @@ React refs are values that are not needed for rendering. Refs should only be acc
 To initialize a ref only once, check that the ref is null with the pattern `if (ref.current == null) { ref.current = ... }`  react-hooks/refs
 
 /app/src/components/viz/Spectrogram3D.test.jsx
-   4:8   warning  'React' is defined but never used  no-unused-vars
-   5:13  warning  'THREE' is defined but never used  no-unused-vars
-  55:9   error    'global' is not defined            no-undef
-  66:1   error    'global' is not defined            no-undef
-  82:16  error    'global' is not defined            no-undef
-  94:16  error    'global' is not defined            no-undef
-  98:13  error    'global' is not defined            no-undef
-  99:26  error    'global' is not defined            no-undef
+  4:8   warning  'React' is defined but never used  no-unused-vars
+  5:13  warning  'THREE' is defined but never used  no-unused-vars
 
 /app/src/components/viz/SpectrumAnalyzer.test.jsx
    4:10  warning  'renderCoordinator' is defined but never used  no-unused-vars
@@ -6664,4 +6653,4 @@ Calling setState synchronously within an effect body causes cascading renders th
   347:29  warning  'sampleRate' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
   374:15  warning  'minDistance' is assigned a value but never used                              no-unused-vars
 
-✖ 673 problems (328 errors, 345 warnings)
+✖ 662 problems (317 errors, 345 warnings)
