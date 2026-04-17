@@ -37,7 +37,7 @@ const MPTTracker = ({ dataRef, isActive }) => {
                     }
                 }
             }
-            animationRef.current = requestAnimationFrame(checkAudio);
+            // Optimization: Removed raw requestAnimationFrame to prevent double-looping; RenderCoordinator handles FPS.
         };
 
         let unsubscribe;
