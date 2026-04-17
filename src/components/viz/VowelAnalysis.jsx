@@ -13,7 +13,7 @@ const VowelAnalysis = ({ dataRef, colorBlindMode }) => {
                 setCurrentF1(f1 || 0);
                 setCurrentF2(f2 || 0);
             }
-            requestAnimationFrame(loop);
+            // Optimization: Removed raw requestAnimationFrame to prevent double-looping; RenderCoordinator handles FPS.
         };
 
         let unsubscribe;

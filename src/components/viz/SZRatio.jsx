@@ -33,7 +33,7 @@ const SZRatio = ({ dataRef, isActive }) => {
                     if (startTimeRef.current) startTimeRef.current.silenceStart = null;
                 }
             }
-            animationRef.current = requestAnimationFrame(checkAudio);
+            // Optimization: Removed raw requestAnimationFrame to prevent double-looping; RenderCoordinator handles FPS.
         };
 
         let unsubscribe;

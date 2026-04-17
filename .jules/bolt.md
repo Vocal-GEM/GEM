@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-18 - Centralized RenderCoordinator Double-Looping
+**Learning:** Found an anti-pattern in visualization components (`MPTTracker`, `SZRatio`, `VowelAnalysis`) where components correctly subscribed to a centralized `RenderCoordinator` service to manage animation frames, but incorrectly included raw `requestAnimationFrame()` calls *inside* their subscribed update callbacks. This defeats the purpose of the coordinator by spawning uncontrolled parallel render loops, leading to high CPU usage and frame drops.
+**Action:** Always ensure that when components are hooked into a global ticker or coordinator (like `RenderCoordinator`), they do not call `requestAnimationFrame` manually.
