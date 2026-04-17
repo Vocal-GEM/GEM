@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-25 - Code Review Tool False Positives for Local Services
+**Learning:** The automated `request_code_review` tool may incorrectly flag valid, locally created modules or services (like `src/services/RenderCoordinator.js`) as "AI hallucinations" or "unverified internal module dependencies," claiming they don't exist and will crash the app.
+**Action:** Always independently verify the existence of files and exports using bash commands (e.g., `ls` or `cat`). Do not abandon a valid, correctly implemented technical approach solely based on a false positive from the automated reviewer if you have manually confirmed the file and API exist in the repository.
