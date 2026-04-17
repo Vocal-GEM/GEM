@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-21 - Canvas Dimensions in Animation Loops
+**Learning:** `canvas.getBoundingClientRect()` and `canvas.width = ...` were being called inside the critical `requestAnimationFrame` loop in `PitchOrb.jsx`. Querying `getBoundingClientRect` forces a synchronous layout calculation, and continually assigning `canvas.width` reallocates the canvas backing store on every frame, causing massive memory churn and layout thrashing.
+**Action:** Use a `ResizeObserver` outside the animation loop to track dimension changes. Store the physical dimensions in a `useRef` (e.g. `dimensionsRef`) and have the animation loop read from the ref. When moving away from `canvas.width` assignments (which implicitly clear canvas 2D context state like transforms), explicitly wrap the loop drawing commands with `ctx.save()` and `ctx.restore()` to prevent state bleed across frames.
