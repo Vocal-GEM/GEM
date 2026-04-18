@@ -1,0 +1,104 @@
+--- src/components/ui/LoadingSpinnerVerification.jsx
++++ src/components/ui/LoadingSpinnerVerification.jsx
+@@ -79,93 +79,6 @@
+           <Button size="icon" isLoading>
+             <span className="sr-only">Icon Button</span>
+           </Button>
+-import EmptyState from './EmptyState';
+-import { Ghost, Search, Plus } from 'lucide-react';
+-
+-export default function LoadingSpinnerTest() {
+-    return (
+-        <div className="p-10 space-y-10 bg-slate-900 min-h-screen text-slate-100">
+-            <h1 className="text-2xl text-white mb-4">Palette Verification</h1>
+-
+-            <section className="space-y-4">
+-                <h2 className="text-xl text-slate-300">LoadingSpinner Sizes</h2>
+-                <div className="flex items-center gap-4">
+-                    <div className="border border-slate-700 p-4 rounded bg-slate-800">
+-                        <p className="text-slate-400 mb-2">Small</p>
+-                        <LoadingSpinner size="sm" />
+-                    </div>
+-                    <div className="border border-slate-700 p-4 rounded bg-slate-800">
+-                        <p className="text-slate-400 mb-2">Medium</p>
+-                        <LoadingSpinner size="md" />
+-                    </div>
+-                    <div className="border border-slate-700 p-4 rounded bg-slate-800">
+-                        <p className="text-slate-400 mb-2">Large</p>
+-                        <LoadingSpinner size="lg" />
+-                    </div>
+-                </div>
+-            </section>
+-
+-            <section className="space-y-4">
+-                <h2 className="text-xl text-slate-300">LoadingSpinner Variants</h2>
+-                <div className="flex items-center gap-4">
+-                    <div className="border border-slate-700 p-4 rounded bg-slate-800 text-pink-500">
+-                        <p className="text-slate-400 mb-2">Current Color (Pink)</p>
+-                        <LoadingSpinner variant="current" />
+-                    </div>
+-                    <div className="border border-slate-700 p-4 rounded bg-blue-500 text-white">
+-                        <p className="text-slate-200 mb-2">Current Color (White)</p>
+-                        <LoadingSpinner variant="current" />
+-                    </div>
+-                </div>
+-            </section>
+-
+-            <section className="space-y-4">
+-                <h2 className="text-xl text-slate-300">Button Integration</h2>
+-                <div className="flex items-center gap-4">
+-                    <Button isLoading>Save Changes</Button>
+-                    <Button variant="secondary" isLoading>Uploading</Button>
+-                    <Button variant="destructive" isLoading>Deleting</Button>
+-                    <Button variant="outline" isLoading>Fetching</Button>
+-                    <Button size="icon" isLoading aria-label="Loading action" />
+-                </div>
+-            </section>
+-
+-            <section className="space-y-4 pt-10">
+-                <h2 className="text-xl text-slate-300 border-b border-slate-700 pb-2">Empty State Variants</h2>
+-
+-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+-                    <div className="border border-slate-700 rounded bg-slate-800 p-4">
+-                        <p className="text-slate-400 mb-4 text-sm font-medium">Standard / Default</p>
+-                        <div className="h-64 border border-dashed border-slate-600 rounded bg-slate-900/50">
+-                            <EmptyState
+-                                title="No practice sessions found"
+-                                description="Start your first practice session to see your progress here."
+-                                icon={Ghost}
+-                                actionLabel="Start Session"
+-                                onAction={() => alert('Start session clicked')}
+-                            />
+-                        </div>
+-                    </div>
+-
+-                    <div className="border border-slate-700 rounded bg-slate-800 p-4">
+-                        <p className="text-slate-400 mb-4 text-sm font-medium">Compact Variant</p>
+-                        <div className="h-48 border border-dashed border-slate-600 rounded bg-slate-900/50 max-w-sm mx-auto">
+-                            <EmptyState
+-                                title="No results"
+-                                description="Try adjusting your filters"
+-                                icon={Search}
+-                                variant="compact"
+-                            />
+-                        </div>
+-                    </div>
+-
+-                    <div className="border border-slate-700 rounded bg-slate-800 p-4">
+-                        <p className="text-slate-400 mb-4 text-sm font-medium">Inline Variant (e.g. inside a small list or combobox)</p>
+-                        <div className="p-2 border border-dashed border-slate-600 rounded bg-slate-900/50 max-w-sm mx-auto">
+-                            <EmptyState
+-                                title="No tags found"
+-                                icon={Plus}
+-                                variant="inline"
+-                                actionLabel="Create tag"
+-                                onAction={() => alert('Create tag clicked')}
+-                            />
+-                        </div>
+-                    </div>
+-                </div>
+-            </section>
+-
+         </div>
+       </section>
+     </div>

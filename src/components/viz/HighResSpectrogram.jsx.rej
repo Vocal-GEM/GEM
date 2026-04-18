@@ -1,0 +1,10 @@
+--- src/components/viz/HighResSpectrogram.jsx
++++ src/components/viz/HighResSpectrogram.jsx
+@@ -27,7 +27,6 @@
+     const ctxRef = useRef(null);
+     const requestRef = useRef(null);
+     const wrapperRef = useRef(null);
+-    const componentId = useId();
+
+     // Reusable buffers to avoid GC
+     // Unique component ID for RenderCoordinator
