@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-25 - Component Corruption During Merges
+**Learning:** Multiple conflicting definitions within a single component file (likely from bad merges) can go unnoticed if the file exports the last definition, but it severely breaks keyboard accessibility by duplicating attributes and event handlers.
+**Action:** Always check the entire file content when fixing a component, not just the function you are editing, to spot and clean up duplicate/conflicting code blocks, and be careful not to strip away core layout styling during the cleanup.

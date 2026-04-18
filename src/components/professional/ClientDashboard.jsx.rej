@@ -1,0 +1,10 @@
+--- src/components/professional/ClientDashboard.jsx
++++ src/components/professional/ClientDashboard.jsx
+@@ -1,6 +1,6 @@
+ import React, { useState } from 'react';
+ import { useSettings } from '../../context/SettingsContext';
+-import { Users, FileAudio, TrendingUp, Calendar, ArrowRight, Video, FileText, CheckCircle2 } from 'lucide-react';
++import { Users, FileAudio, TrendingUp, Calendar, ArrowRight, Video, FileText, CheckCircle2, Activity } from 'lucide-react';
+ import { Button } from '../ui/button';
+
+ const ClientDashboard = ({ onNavigate }) => {

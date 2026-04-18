@@ -251,5 +251,4 @@ const QualityVisualizer = ({ dataRef }) => {
         </div>
     );
 };
-
 export default QualityVisualizer;

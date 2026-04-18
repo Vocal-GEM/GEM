@@ -13,10 +13,6 @@ vi.mock('../../context/AudioContext', () => ({
       }
     }
   })
-        stopRecording: vi.fn(),
-      },
-    },
-  }),
 }));
 
 vi.mock('../../context/JournalContext', () => ({
@@ -73,9 +69,6 @@ describe('JournalForm Accessibility', () => {
      expect(screen.getByRole('button', { name: /need a writing prompt/i })).toBeInTheDocument();
   });
     journalEntryData: null,
-  }),
-}));
-
 // Mock data
 vi.mock('../../data/selfCareJournalPrompts', () => ({
   getRandomPrompt: () => ({
