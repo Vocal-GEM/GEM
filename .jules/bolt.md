@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-05-18 - Optimized Canvas Render Loop in PitchOrb
+**Learning:** Calling `getBoundingClientRect()` and continuously setting `canvas.width` and `canvas.height` on every frame inside a `requestAnimationFrame` loop causes unnecessary synchronous layout thrashing and high CPU/memory usage.
+**Action:** Use a `ResizeObserver` to update canvas dimensions independently of the render loop and cache the dimensions in a `useRef` to be used in the `renderCoordinator` loop. Always use `ctx.save()` and `ctx.restore()` when the canvas state is altered and explicitly mocked in Vitest tests.
