@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-04-20 - Grouped Loading Skeleton Accessibility
+**Learning:** When rendering multiple loading Skeleton components simultaneously, having role="status" on each instance causes severe screen reader noise.
+**Action:** For grouped skeletons (like SkeletonLoader), always add aria-hidden="true" to individual skeleton elements and place a single role="status" and aria-live="polite" on the parent container.

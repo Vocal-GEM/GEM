@@ -5,28 +5,33 @@ import SkeletonLoader from './SkeletonLoader';
 
 describe('SkeletonLoader', () => {
     it('renders correctly with default props', () => {
-        render(<SkeletonLoader />);
-        const skeleton = screen.getByRole('status');
-        expect(skeleton).toBeInTheDocument();
+        const { container } = render(<SkeletonLoader />);
+        const containerEl = screen.getByRole('status');
+        expect(containerEl).toBeInTheDocument();
+
+        const skeleton = container.querySelector('[aria-hidden="true"]');
         expect(skeleton).toHaveClass('animate-pulse');
         expect(skeleton).toHaveClass('rounded-md'); // Default 'text' variant class
     });
 
     it('renders the correct number of items', () => {
-        render(<SkeletonLoader count={3} />);
-        const skeletons = screen.getAllByRole('status');
+        const { container } = render(<SkeletonLoader count={3} />);
+        const containerEl = screen.getByRole('status');
+        expect(containerEl).toBeInTheDocument();
+
+        const skeletons = container.querySelectorAll('[aria-hidden="true"]');
         expect(skeletons).toHaveLength(3);
     });
 
     it('applies the correct class for "circle" variant', () => {
-        render(<SkeletonLoader variant="circle" />);
-        const skeleton = screen.getByRole('status');
+        const { container } = render(<SkeletonLoader variant="circle" />);
+        const skeleton = container.querySelector('[aria-hidden="true"]');
         expect(skeleton).toHaveClass('rounded-full');
     });
 
     it('applies the correct class for "rect" variant', () => {
-        render(<SkeletonLoader variant="rect" />);
-        const skeleton = screen.getByRole('status');
+        const { container } = render(<SkeletonLoader variant="rect" />);
+        const skeleton = container.querySelector('[aria-hidden="true"]');
         expect(skeleton).toHaveClass('rounded-xl');
     });
 
