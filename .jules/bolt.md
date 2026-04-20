@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-04-20 - Migrate VowelSpacePlot to RenderCoordinator
+**Learning:** Using raw `requestAnimationFrame` recursively in individual components leads to multiple loops fighting for the main thread, causing exponential loop growth and CPU/memory degradation when a centralized loop exists.
+**Action:** Always migrate raw RAF loops to `RenderCoordinator.subscribe` in visualization components to consolidate updates into a single synchronized frame.
