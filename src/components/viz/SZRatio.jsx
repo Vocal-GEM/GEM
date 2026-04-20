@@ -120,10 +120,13 @@ const SZRatio = ({ dataRef, isActive }) => {
 
                 {/* Auto Toggle */}
                 <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-slate-500">Auto</span>
+                    <span id="sz-auto-label" className="text-[10px] text-slate-500">Auto</span>
                     <button
+                        role="switch"
+                        aria-checked={autoMode}
+                        aria-labelledby="sz-auto-label"
                         onClick={() => setAutoMode(!autoMode)}
-                        className={`w-8 h-4 rounded-full transition-colors relative ${autoMode ? 'bg-cyan-500' : 'bg-slate-700'}`}
+                        className={`w-8 h-4 rounded-full transition-colors relative focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none ${autoMode ? 'bg-cyan-500' : 'bg-slate-700'}`}
                     >
                         <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${autoMode ? 'left-4.5' : 'left-0.5'}`} />
                     </button>
@@ -184,7 +187,9 @@ const SZRatio = ({ dataRef, isActive }) => {
 
                 <button
                     onClick={reset}
-                    className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                    aria-label="Reset timers"
+                    title="Reset timers"
+                    className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none"
                 >
                     <RotateCcw className="w-4 h-4 text-slate-400" />
                 </button>
