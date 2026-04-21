@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-22 - Layout Thrashing in Animation Loops
+**Learning:** Calling `canvas.getBoundingClientRect()` and continually reassigning `canvas.width`/`height` inside high-frequency animation loops (like `RenderCoordinator` callbacks) causes synchronous layout calculation and layout thrashing (forced reflows/repaints) on every single frame, significantly increasing CPU and GPU overhead and triggering GC pauses.
+**Action:** Move canvas dimension logic out of the render loop. Use a `ResizeObserver` to track the canvas's physical dimensions asynchronously, update `canvas.width`/`height` only when they actually change, and store the calculated dimensions in a lazy `useRef` to be read inside the render loop without blocking the main thread. Always wrap modified draw loops with `ctx.save()` and `ctx.restore()` to prevent style bleeding when the implicit state-clearing effect of `canvas.width` reassignment is removed.
