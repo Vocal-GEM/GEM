@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-04-21 - Fixed Synchronous Reflow in PitchOrb Loop
+**Learning:** In `PitchOrb.jsx`, `canvas.getBoundingClientRect()` was being called inside a high-frequency render loop, causing continuous synchronous reflows and layout thrashing, which leads to memory churn and CPU overhead.
+**Action:** Replaced it with an asynchronous `ResizeObserver` that tracks dimensions outside the loop, updating canvas sizes only when physical dimensions genuinely change, preventing redundant recalculations.
