@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2025-02-18 - ARIA Labels for Icon-Only Action Buttons
+**Learning:** Critical interaction buttons (like play, record, stop, and close) in exercise components are often purely icon-based without proper aria-labels, making them completely inaccessible to screen readers.
+**Action:** When adding or modifying interactive exercises, verify that all icon-only control buttons have descriptive aria-labels that update dynamically if their state changes (e.g., Start vs Stop recording).
