@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { indexedDB } from '../services/IndexedDBManager';
 import { useAuth } from './AuthContext';
 
@@ -145,16 +145,16 @@ export const ProfileProvider = ({ children }) => {
 
     // --- Actions ---
 
-    const updateOnboardingStatus = useCallback((updates) => {
+    const updateOnboardingStatus = async (updates) => {
         setOnboardingStatus(prev => {
             const newStatus = { ...prev, ...updates };
             const userId = user ? user.id : 'guest';
             indexedDB.saveSetting(`onboarding_${userId}`, newStatus);
             return newStatus;
         });
-    }, [user]);
+    };
 
-    const updateTargetRange = useCallback((range) => {
+    const updateTargetRange = (range) => {
         setTargetRange(range);
         if (activeProfile) {
             setVoiceProfiles(prev => {
@@ -164,9 +164,9 @@ export const ProfileProvider = ({ children }) => {
                 return newProfiles;
             });
         }
-    }, [activeProfile]);
+    };
 
-    const updateCalibration = useCallback((dark, bright, metadata = {}) => {
+    const updateCalibration = (dark, bright, metadata = {}) => {
         const newCal = { dark, bright };
         setCalibration(newCal);
 
@@ -188,9 +188,9 @@ export const ProfileProvider = ({ children }) => {
                 return newProfiles;
             });
         }
-    }, [activeProfile]);
+    };
 
-    const updateFilterSettings = useCallback((min, max) => {
+    const updateFilterSettings = (min, max) => {
         const newSettings = { min, max };
         setFilterSettings(newSettings);
         if (activeProfile) {
@@ -201,9 +201,9 @@ export const ProfileProvider = ({ children }) => {
                 return newProfiles;
             });
         }
-    }, [activeProfile]);
+    };
 
-    const switchProfile = useCallback((profileId) => {
+    const switchProfile = (profileId) => {
         const profile = voiceProfiles.find(p => p.id === profileId);
         if (profile) {
             setActiveProfile(profileId);
@@ -215,9 +215,9 @@ export const ProfileProvider = ({ children }) => {
             if (profile.goals) setGoals(profile.goals);
             indexedDB.saveSetting('active_profile', profileId);
         }
-    }, [voiceProfiles]);
+    };
 
-    const updateVocalHealth = useCallback((updates) => {
+    const updateVocalHealth = (updates) => {
         setVocalHealth(prev => {
             const newState = { ...prev, ...updates };
             // Persist to profile
@@ -231,9 +231,9 @@ export const ProfileProvider = ({ children }) => {
             }
             return newState;
         });
-    }, [activeProfile]);
+    };
 
-    const updateHydration = useCallback((amount) => {
+    const updateHydration = (amount) => {
         updateVocalHealth({
             hydration: {
                 ...vocalHealth.hydration,
@@ -241,9 +241,9 @@ export const ProfileProvider = ({ children }) => {
                 lastUpdated: Date.now()
             }
         });
-    }, [vocalHealth.hydration, updateVocalHealth]);
+    };
 
-    const logFatigue = useCallback((level, note = '') => {
+    const logFatigue = (level, note = '') => {
         updateVocalHealth({
             fatigue: {
                 level,
@@ -251,9 +251,9 @@ export const ProfileProvider = ({ children }) => {
                 lastUpdated: Date.now()
             }
         });
-    }, [updateVocalHealth]);
+    };
 
-    const updateUsage = useCallback((seconds) => {
+    const updateUsage = (seconds) => {
         updateVocalHealth({
             usage: {
                 ...vocalHealth.usage,
@@ -261,9 +261,9 @@ export const ProfileProvider = ({ children }) => {
                 lastUpdated: Date.now()
             }
         });
-    }, [vocalHealth.usage, updateVocalHealth]);
+    };
 
-    const value = useMemo(() => ({
+    const value = {
         voiceProfiles,
         activeProfile,
         targetRange,
@@ -286,13 +286,7 @@ export const ProfileProvider = ({ children }) => {
         updateHydration,
         logFatigue,
         updateUsage
-    }), [
-        voiceProfiles, activeProfile, targetRange, calibration,
-        calibrationMetadata, filterSettings, skillLevel, goals,
-        showCalibration, onboardingStatus, vocalHealth,
-        updateTargetRange, updateCalibration, updateFilterSettings,
-        switchProfile, updateOnboardingStatus, updateHydration, logFatigue, updateUsage
-    ]);
+    };
 
     return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>;
 };
