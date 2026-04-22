@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-04-22 - Missing useMemo in Core Contexts
+**Learning:** In a highly interactive app like vocal-gem, core contexts (e.g., ProfileContext) without useMemo on their value prop cause widespread, unnecessary re-renders across the component tree whenever the provider re-renders, impacting performance.
+**Action:** Always wrap context values in useMemo and ensure their dependency arrays accurately reflect state changes to prevent cascading re-renders.
