@@ -64,38 +64,20 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
-        // Use a variable to cache dimensions since we are inside useEffect
-        const dimensionsRef = { width: 0, height: 0 };
-
-        const updateDimensions = () => {
-            if (!canvas) return;
-            const rect = canvas.getBoundingClientRect();
-            dimensionsRef.width = rect.width;
-            dimensionsRef.height = rect.height;
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-        };
-
-        // Initial setup and observer
-        updateDimensions();
-        const observer = new ResizeObserver(updateDimensions);
-        observer.observe(canvas);
-
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const width = dimensionsRef.width;
-            const height = dimensionsRef.height;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
 
-            if (width === 0 || height === 0) return;
+            const width = rect.width;
+            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
-            ctx.save();
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.restore();
+            ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -174,7 +156,6 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('--- Hz', centerX, centerY);
             }
-            ctx.restore();
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -185,7 +166,6 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
-            observer.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
