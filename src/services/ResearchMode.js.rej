@@ -1,0 +1,10 @@
+--- src/services/ResearchMode.js
++++ src/services/ResearchMode.js
+@@ -60,7 +61,7 @@
+      * Helper to check if research features should be exposed
+      */
+     isResearchEnabled() {
+-        return process.env.NODE_ENV === 'development' || localStorage.getItem('GEM_RESEARCH_MODE') === 'true';
++        return typeof process !== 'undefined' && process.env.NODE_ENV === 'development' || localStorage.getItem('GEM_RESEARCH_MODE') === 'true';
+     }
+ }

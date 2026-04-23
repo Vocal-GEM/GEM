@@ -74,12 +74,14 @@ describe('Spectrogram3D', () => {
                 spectrum: new Float32Array(1024).fill(0.5)
             }
         };
+        globalThis.WebGLRenderingContext = {};
     });
 
     afterEach(() => {
         cleanup();
         vi.clearAllMocks();
         delete globalThis.mockUseFrameCallback;
+        delete globalThis.WebGLRenderingContext;
     });
 
     it('renders successfully', () => {
