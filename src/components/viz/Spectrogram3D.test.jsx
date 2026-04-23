@@ -52,7 +52,7 @@ vi.mock('@react-three/fiber', () => ({
     Canvas: ({ children }) => <div>{children}</div>,
     useFrame: (cb) => {
         // Expose callback for testing
-        global.mockUseFrameCallback = cb;
+        globalThis.mockUseFrameCallback = cb;
     }
 }));
 
@@ -63,23 +63,25 @@ vi.mock('@react-three/drei', () => ({
 }));
 
 // Setup global requestAnimationFrame mock
-global.requestAnimationFrame = (cb) => setTimeout(cb, 16);
+globalThis.requestAnimationFrame = (cb) => setTimeout(cb, 16);
 
 describe('Spectrogram3D', () => {
     let dataRef;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         dataRef = {
             current: {
                 spectrum: new Float32Array(1024).fill(0.5)
             }
         };
+        globalThis.WebGLRenderingContext = {};
     });
 
     afterEach(() => {
         cleanup();
         vi.clearAllMocks();
-        delete global.mockUseFrameCallback;
+        delete globalThis.mockUseFrameCallback;
+        delete globalThis.WebGLRenderingContext;
     });
 
     it('renders successfully', () => {
@@ -91,12 +93,12 @@ describe('Spectrogram3D', () => {
         render(<Spectrogram3D dataRef={dataRef} />);
 
         // Ensure useFrame callback was captured
-        expect(global.mockUseFrameCallback).toBeDefined();
+        expect(globalThis.mockUseFrameCallback).toBeDefined();
 
         // Execute the frame callback (simulation)
         // This should not throw even if meshRef is undefined (thanks to our safety checks)
-        if (global.mockUseFrameCallback) {
-            expect(() => global.mockUseFrameCallback()).not.toThrow();
+        if (globalThis.mockUseFrameCallback) {
+            expect(() => globalThis.mockUseFrameCallback()).not.toThrow();
         }
     });
 });
