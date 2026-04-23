@@ -43,20 +43,27 @@ const VoiceFingerprint = () => {
                     </div>
                     <h2 className="text-xl font-bold text-white">Voice Analytics</h2>
                 </div>
-                <button onClick={loadData} className="p-2 text-slate-400 hover:text-white">
+                <button
+                    onClick={loadData}
+                    className="p-2 text-slate-400 hover:text-white transition-colors"
+                    aria-label="Refresh voice analytics data"
+                    title="Refresh data"
+                >
                     <RefreshCw size={18} />
                 </button>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-6">
+            <div className="flex gap-2 mb-6" role="tablist">
                 {['fingerprint', 'trends', 'report'].map(tab => (
                     <button
                         key={tab}
+                        role="tab"
+                        aria-selected={activeTab === tab}
                         onClick={() => setActiveTab(tab)}
                         className={`px-4 py-2 rounded-lg font-medium text-sm capitalize transition-colors ${activeTab === tab
                                 ? 'bg-purple-600 text-white'
-                                : 'bg-slate-800 text-slate-400'
+                                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
                             }`}
                     >
                         {tab}
