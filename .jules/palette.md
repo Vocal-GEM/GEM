@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2024-05-24 - Accessible Tabs & Controls in Voice Analytics
+**Learning:** Custom tab implementations often miss semantic ARIA roles (`role="tablist"`, `role="tab"`) and `aria-selected` attributes, making them opaque to screen readers. Also, icon-only action buttons frequently lack `aria-label`s. Providing hover states for inactive tabs significantly improves discoverability.
+**Action:** When implementing or updating custom tab navigation, always include `role="tablist"` on the container, `role="tab"` and `aria-selected` on the tab buttons, and ensure inactive tabs have clear hover states. Always add `aria-label` to icon-only buttons like refresh controls.
