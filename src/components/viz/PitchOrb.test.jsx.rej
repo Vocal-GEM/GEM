@@ -1,0 +1,11 @@
+--- src/components/viz/PitchOrb.test.jsx
++++ src/components/viz/PitchOrb.test.jsx
+@@ -30,7 +30,7 @@
+         return id;
+     });
+
+-global.requestAnimationFrame = mockRequestAnimationFrame;
++globalThis.requestAnimationFrame = mockRequestAnimationFrame;
+
+ describe('PitchOrb Component', () => {
+     beforeEach(() => {

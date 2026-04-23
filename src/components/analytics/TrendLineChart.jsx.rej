@@ -1,0 +1,9 @@
+--- src/components/analytics/TrendLineChart.jsx
++++ src/components/analytics/TrendLineChart.jsx
+@@ -1,5 +1,5 @@
+ import React, { useMemo } from 'react';
+-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
++import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+ const TrendLineChart = ({ data, config, title }) => {
+     // Ensure data is sorted by date
