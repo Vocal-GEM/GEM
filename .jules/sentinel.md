@@ -75,3 +75,12 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-24 - Cross-Site Scripting (XSS) via `innerHTML` and Open Redirects
+**Vulnerability:** Used `innerHTML` for displaying static strings in React, and missing `rel="noopener noreferrer"` on `target="_blank"` anchor elements.
+**Learning:** React elements should use `textContent` when dealing with static strings. Any links opening in a new window should have `rel="noopener noreferrer"` to prevent the opened page from accessing `window.opener`.
+**Prevention:** Avoid `innerHTML` whenever possible and ensure `rel="noopener noreferrer"` is included for external links.
+
+## 2024-05-24 - Predictable IDs via `Math.random`
+**Vulnerability:** Used `Math.random` to generate unique identifiers (IDs) for objects (e.g. toasts, syncing elements).
+**Learning:** `Math.random()` is not cryptographically secure and can lead to predictable IDs, which is a significant risk for authentication or token-based mechanisms.
+**Prevention:** Use `crypto.randomUUID()` or a secure random generator when identifiers need to be unique or secure.
