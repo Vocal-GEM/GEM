@@ -1,0 +1,10 @@
+--- ClientDashboard.jsx
++++ ClientDashboard.jsx
+@@ -3,7 +3,7 @@
+     Play, FileText, Settings, Calendar, Award,
+     MessageSquare, Clock, TrendingUp, Mic, Download,
+     ChevronDown, Activity, ChevronRight, Bell, Search, Filter, Plus, FileAudio, LayoutDashboard,
+-    Folder
++    Folder, Target, Shield, BookOpen, Star, RefreshCw, Smartphone, List, CheckSquare
+ } from 'lucide-react';
+ import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';

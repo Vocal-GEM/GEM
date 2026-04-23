@@ -1,0 +1,8 @@
+--- src/components/analytics/InsightCard.jsx
++++ src/components/analytics/InsightCard.jsx
+@@ -1,4 +1,4 @@
+-import React from 'react';
++
+ import { Lightbulb, TrendingUp, AlertCircle, Sparkles } from 'lucide-react';
+
+ const InsightCard = ({ insight }) => {

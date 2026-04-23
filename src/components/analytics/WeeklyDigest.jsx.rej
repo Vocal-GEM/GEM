@@ -1,0 +1,8 @@
+--- src/components/analytics/WeeklyDigest.jsx
++++ src/components/analytics/WeeklyDigest.jsx
+@@ -1,5 +1,5 @@
+ import React, { useState, useEffect } from 'react';
+-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
++import { CardHeader, CardTitle, CardContent } from '../ui/card';
+ import { Calendar, TrendingUp, Trophy, Target, Star, Brain, ChevronLeft, ChevronRight } from 'lucide-react';
+ import { generateDigest } from '../../services/DigestGenerator';

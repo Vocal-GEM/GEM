@@ -1,0 +1,15 @@
+--- src/components/analytics/TrendLineChart.jsx
++++ src/components/analytics/TrendLineChart.jsx
+@@ -14,12 +14,6 @@
+
+     const dataKey = getDataKey(metric);
+
+-    // Create projection line if trend info exists
+-    const projectedData = [...data];
+-    if (trendInfo && trendInfo.prediction) {
+-        // Add a couple of future points for visualization
+-        // logic simplified for demo
+-    }
+
+     return (
+         <ResponsiveContainer width="100%" height="100%">
