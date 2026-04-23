@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - Double-Looping Anti-Pattern
+**Learning:** Component was using `requestAnimationFrame` inside a function already being called via a centralized loop manager (RenderCoordinator), leading to exponential callback execution and severe performance degradation.
+**Action:** Audit components subscribing to the render loop for internal `requestAnimationFrame` usages.
