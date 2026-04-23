@@ -1,0 +1,10 @@
+--- src/components/marketplace/MarketplaceBrowser.jsx
++++ src/components/marketplace/MarketplaceBrowser.jsx
+@@ -1,5 +1,5 @@
+-import React, { useState, useEffect } from 'react';
+-import { Search, Filter, Star, Download, Play, Plus, Check } from 'lucide-react';
++import { useState, useEffect } from 'react';
++import { Search, Star, Download, Play, Plus, Check } from 'lucide-react';
+ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+ import { Badge } from '@/components/ui/badge';
+ import { Button } from '@/components/ui/button';

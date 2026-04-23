@@ -1,0 +1,14 @@
+--- src/components/viz/Spectrogram3D.test.jsx
++++ src/components/viz/Spectrogram3D.test.jsx
+@@ -52,7 +52,7 @@
+         camera: { position: { set: vi.fn(), x: 0, y: 0, z: 0 }, lookAt: vi.fn() },
+         scene: { background: null },
+     }),
+-    useFrame: (cb) => {
+-        globalThis.mockUseFrameCallback = cb;
+-    },
+-    OrbitControls: () => <div data-testid="orbit-controls" />
++    useFrame: (cb) => {
++        globalThis.mockUseFrameCallback = cb;
++    },
++    OrbitControls: () => <div data-testid="orbit-controls" />

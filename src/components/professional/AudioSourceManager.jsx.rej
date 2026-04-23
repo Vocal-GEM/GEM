@@ -1,0 +1,20 @@
+--- src/components/professional/AudioSourceManager.jsx
++++ src/components/professional/AudioSourceManager.jsx
+@@ -1,5 +1,5 @@
+-import React, { useState, useEffect } from 'react';
++import { useState, useEffect } from 'react';
+ import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
+
+ const AudioSourceManager = ({ onSourceChange }) => {
+--- src/components/analytics/WeeklyDigest.jsx
++++ src/components/analytics/WeeklyDigest.jsx
+@@ -1,7 +1,7 @@
+
+-import { CardHeader, CardTitle, CardContent } from '@/components/ui/card';
++
+ import { ScrollArea } from '@/components/ui/scroll-area';
+ import { Badge } from '@/components/ui/badge';
+-import { ArrowUpRight, Trophy, Flame, TrendingUp } from 'lucide-react';
++import { Trophy, Flame, TrendingUp } from 'lucide-react';
+
+ export const WeeklyDigest = () => {
