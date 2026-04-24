@@ -37,6 +37,3 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
-## 2024-05-24 - Add ARIA Labels to Dynamic Icon Buttons
-**Learning:** Icon-only buttons (like back/close or record toggles) lack screen-reader context if they don't have explicit `aria-label`s. Dynamically toggling the label text based on state (e.g., recording vs not recording) is crucial for screen reader users.
-**Action:** Always verify that buttons containing only icons (e.g. from Lucide) have an `aria-label` attribute, especially when their function changes dynamically.
