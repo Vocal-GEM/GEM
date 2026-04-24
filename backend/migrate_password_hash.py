@@ -5,10 +5,18 @@ This script connects to your production PostgreSQL database and updates
 the password_hash column from VARCHAR(120) to VARCHAR(255).
 """
 
+import os
 import sys
 import psycopg2
 
-DATABASE_URL = "postgresql://vo_yr7l_user:cX4VWQOuywA0na2qGxonjmljQSgEVTEt@dpg-d4hrdv6mcj7s73c7igu0-a.oregon-postgres.render.com/vo_yr7l"
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if not DATABASE_URL:
+    print("❌ Error: DATABASE_URL environment variable is not set.")
+    sys.exit(1)
+
+# Render.com provides postgres:// but psycopg2 needs postgresql://
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 print(f"Connecting to database...")
 
