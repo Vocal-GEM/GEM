@@ -17,6 +17,7 @@ const getNoteFromSemitone = (semitone) => {
 
 const PitchOrb = ({ dataRef, settings = {} }) => {
     const canvasRef = useRef(null);
+    const dimensionsRef = useRef({ width: 0, height: 0 });
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
@@ -33,6 +34,35 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
+        let rAFId = null;
+
+        const updateSize = () => {
+            if (!canvasRef.current) return;
+            const currentCanvas = canvasRef.current;
+            const rect = currentCanvas.getBoundingClientRect();
+
+            const newWidth = Math.floor(rect.width);
+            const newHeight = Math.floor(rect.height);
+
+            if (dimensionsRef.current.width !== newWidth || dimensionsRef.current.height !== newHeight) {
+                dimensionsRef.current.width = newWidth;
+                dimensionsRef.current.height = newHeight;
+                currentCanvas.width = newWidth * dpr;
+                currentCanvas.height = newHeight * dpr;
+                ctx.scale(dpr, dpr);
+            }
+        };
+
+        updateSize();
+
+        const resizeObserver = new ResizeObserver(() => {
+            if (rAFId) cancelAnimationFrame(rAFId);
+            rAFId = requestAnimationFrame(updateSize);
+        });
+
+        if (canvas) {
+            resizeObserver.observe(canvas);
+        }
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,16 +97,15 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const width = dimensionsRef.current.width;
+            const height = dimensionsRef.current.height;
 
-            const width = rect.width;
-            const height = rect.height;
+            if (width === 0 || height === 0) return;
+
             const centerX = width / 2;
             const centerY = height / 2;
 
+            ctx.save();
             ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
@@ -156,6 +185,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('--- Hz', centerX, centerY);
             }
+
+            ctx.restore();
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -166,6 +197,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
+            if (rAFId) cancelAnimationFrame(rAFId);
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
