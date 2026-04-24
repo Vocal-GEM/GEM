@@ -19,6 +19,7 @@ def synthesize_speech():
             "error": "ElevenLabs API key not configured on server"
         }), 503
 
+    import re
     data = request.json
     text = data.get('text', '')
     voice_id = data.get('voiceId', '21m00Tcm4TlvDq8ikWAM')  # Default Rachel
@@ -26,6 +27,13 @@ def synthesize_speech():
     
     if not text:
         return jsonify({"error": "No text provided"}), 400
+
+    # Security: Validate voice_id and model_id to prevent SSRF and Path Traversal
+    if not re.match(r'^[a-zA-Z0-9_-]+$', str(voice_id)):
+        return jsonify({"error": "Invalid voice ID format"}), 400
+
+    if not re.match(r'^[a-zA-Z0-9_-]+$', str(model_id)):
+        return jsonify({"error": "Invalid model ID format"}), 400
 
     try:
         # Forward request to ElevenLabs API
@@ -48,10 +56,8 @@ def synthesize_speech():
         )
 
         if not response.ok:
-            error_text = response.text
             return jsonify({
-                "error": f"ElevenLabs API error: {response.status_code}",
-                "details": error_text
+                "error": f"ElevenLabs API error: {response.status_code}"
             }), response.status_code
 
         # Return audio data
