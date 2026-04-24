@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-04-24 - Add ARIA Labels to Dynamic Visualizations
+**Learning:** Dynamically rendered icon-only buttons (such as mapped toolbars or debug toggles) that rely solely on `title` attributes lack proper screen-reader visibility. Tooltips alone are insufficient for accessibility.
+**Action:** Always ensure these dynamic UI controls receive an explicit `aria-label` attribute (e.g., `aria-label={m.label}`) to provide proper semantic meaning for screen readers.
