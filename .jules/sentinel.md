@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2024-05-24 - Prevent SSRF in TTS API Proxy
+**Vulnerability:** The proxy endpoint for the ElevenLabs API (`/api/tts/synthesize`) took `voice_id` directly from user input without validation, allowing path traversal and SSRF attacks against the ElevenLabs API. It also leaked raw ElevenLabs API response errors back to the client.
+**Learning:** External API proxies must sanitize and validate all path parameters and query arguments received from the client before forwarding the request. Error responses must also be sanitized to avoid leaking sensitive upstream system information.
+**Prevention:** Use strictly defined regex allowlists (`r'^[a-zA-Z0-9_-]+$'`) for parameters used in API URLs. Return generic error messages instead of raw upstream responses.
