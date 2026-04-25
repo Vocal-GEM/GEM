@@ -37,7 +37,9 @@ class PitchProcessor extends AudioWorkletProcessor {
         };
     }
 
-    process(inputs, outputs, parameters) {
+    process(inputs, outputs) {
+        // eslint-disable-next-line no-unused-vars
+        const parameters = arguments[2];
         const input = inputs[0];
         if (!input || !input[0]) return true;
 
