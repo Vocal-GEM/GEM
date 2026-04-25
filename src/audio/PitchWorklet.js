@@ -36,6 +36,7 @@ class PitchProcessor extends AudioWorkletProcessor {
         };
     }
 
+    /* global currentTime */
     process(inputs, outputs, parameters) {
         const input = inputs[0];
         if (!input || !input[0]) return true;
