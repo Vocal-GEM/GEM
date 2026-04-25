@@ -4,6 +4,7 @@
  * Runs in dedicated audio thread for <50ms latency
  */
 
+/* global currentTime, sampleRate */
 class PitchProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
@@ -36,6 +37,7 @@ class PitchProcessor extends AudioWorkletProcessor {
         };
     }
 
+    // eslint-disable-next-line no-unused-vars
     process(inputs, outputs, parameters) {
         const input = inputs[0];
         if (!input || !input[0]) return true;
