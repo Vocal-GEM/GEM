@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2025-05-24 - Hardcoded Database Credentials in Migration Script
+**Vulnerability:** The script `backend/migrate_password_hash.py` contained hardcoded production database credentials (`DATABASE_URL = "postgresql://vo_yr7l_user:..."`).
+**Learning:** Hardcoding secrets like database URLs directly in source code or migration scripts exposes them to anyone with repository access and risks leaking them if the codebase is made public or compromised.
+**Prevention:** Always use environment variables (e.g., `os.environ.get('DATABASE_URL')`) to manage sensitive credentials, ensuring they are loaded securely from the deployment environment and never checked into version control.
