@@ -41,6 +41,3 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
-## 2026-04-25 - Canvas Rendering Optimization in HighResSpectrogram
-**Learning:** The HighResSpectrogram was utilizing the 'willReadFrequently: true' property, which forced a software rendering path, decreasing performance. Furthermore, iterating through every pixel using intermediate image data arrays causes memory churn.
-**Action:** Utilize '{ alpha: false }' in the getContext method to allow the browser to optimize drawing operations and use native hardware-accelerated drawImage to shift existing canvas content leftward, avoiding manual array copying.
