@@ -8,7 +8,7 @@ const QuickSettings = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[60] flex justify-end">
+        <div className="fixed inset-0 z-[60] flex justify-end" role="dialog" aria-modal="true" aria-label="Quick Settings">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
@@ -50,6 +50,9 @@ const QuickSettings = ({ isOpen, onClose }) => {
                         <div className="space-y-2">
                             <button
                                 onClick={() => updateSettings({ ...settings, listenMode: !settings.listenMode })}
+                                role="switch"
+                                aria-checked={settings.listenMode}
+                                aria-label="Listen Mode"
                                 className={`w-full p-3 rounded-xl border text-left flex items-center justify-between transition-all ${settings.listenMode ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'}`}
                             >
                                 <div className="flex items-center gap-3">
@@ -93,6 +96,9 @@ const QuickSettings = ({ isOpen, onClose }) => {
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Privacy</label>
                         <button
                             onClick={() => updateSettings({ ...settings, analyticsEnabled: !settings.analyticsEnabled })}
+                            role="switch"
+                            aria-checked={settings.analyticsEnabled}
+                            aria-label="Share Usage Data"
                             className={`w-full p-3 rounded-xl border text-left flex items-center justify-between transition-all ${settings.analyticsEnabled ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'}`}
                         >
                             <span className="font-medium">Share Usage Data</span>

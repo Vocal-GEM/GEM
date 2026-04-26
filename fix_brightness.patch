@@ -1,0 +1,32 @@
+--- src/components/viz/BrightnessMeter.test.jsx
++++ src/components/viz/BrightnessMeter.test.jsx
+@@ -13,15 +13,15 @@
+ }));
+
+ // Override global mock for this test to include Smile
+-vi.mock('lucide-react', () => {
+-    const React = require('react');
+-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+-
+-    return {
+-        Sun: createIcon('Sun'),
+-        Moon: createIcon('Moon'),
+-        Info: createIcon('Info'),
+-        Smile: createIcon('Smile')
+-    };
+-});
++vi.mock('lucide-react', async () => {
++    const React = await import('react');
++    const createIcon = (name) => {
++        const MockIcon = (props) => React.createElement('div', { ...props, 'data-testid': name });
++        MockIcon.displayName = `Mock${name}`;
++        return MockIcon;
++    };
++
++    return {
++        Sun: createIcon('Sun'),
++        Moon: createIcon('Moon'),
++        Info: createIcon('Info'),
++        Smile: createIcon('Smile')
++    };
++});

@@ -1,0 +1,11 @@
+--- src/audio/PitchWorklet.js
++++ src/audio/PitchWorklet.js
+@@ -4,6 +4,8 @@
+  * Runs in dedicated audio thread for <50ms latency
+  */
+
++/* global currentTime, sampleRate */
++
+ class PitchProcessor extends AudioWorkletProcessor {
+     constructor() {
+         super();
