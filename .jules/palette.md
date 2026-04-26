@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-27 - Icon-Only Button Accessibility
+**Learning:** The InsightCard component featured an icon-only dismiss button (a common pattern) that was missing an `aria-label`, making it impossible for screen reader users to understand its function. Even when using a custom `Button` component, accessibility attributes must be explicitly provided.
+**Action:** Ensure all icon-only buttons, especially those using `size="icon"`, explicitly include an `aria-label` or `aria-labelledby` property.
