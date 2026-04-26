@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-05-24 - Information Leakage in Voice Quality Endpoints
+**Vulnerability:** The `clean_audio` and `manipulate_file` endpoints in `backend/app/routes/voice_quality.py` caught exceptions and returned the raw error string `str(e)` in the JSON response, exposing sensitive internal details (e.g., file paths, module errors) to the client.
+**Learning:** Developers often insert early `return jsonify({'error': str(e)})` during debugging and fail to remove them before production.
+**Prevention:** Always ensure that exception handlers log the raw error securely using `current_app.logger.error()` and return a generic, non-descriptive error message to the client.
