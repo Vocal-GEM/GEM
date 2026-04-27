@@ -19,7 +19,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     const canvasRef = useRef(null);
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
-    const dimensionsRef = useRef({ width: 0, height: 0 });
+    const dimensionsRef = useRef({ width: 0, height: 0, dpr: 1 });
 
     // Monitor canvas size with ResizeObserver
     useEffect(() => {
@@ -34,9 +34,9 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             canvas.height = rect.height * dpr;
 
             dimensionsRef.current = {
-                width: rect.width, // Store logical width
-                height: rect.height, // Store logical height
-                dpr: dpr // Store DPR for scale
+                width: rect.width, // logical width
+                height: rect.height, // logical height
+                dpr: dpr // scaling factor
             };
         };
 
@@ -59,7 +59,6 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -98,13 +97,11 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             if (width === 0 || height === 0) return;
 
             ctx.save();
-            // Scale by DPR to handle high-DPI displays
             ctx.scale(dpr, dpr);
 
             const centerX = width / 2;
             const centerY = height / 2;
 
-            // Clear physical canvas, keeping logical bounds
             ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
