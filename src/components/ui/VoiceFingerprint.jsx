@@ -43,7 +43,12 @@ const VoiceFingerprint = () => {
                     </div>
                     <h2 className="text-xl font-bold text-white">Voice Analytics</h2>
                 </div>
-                <button onClick={loadData} className="p-2 text-slate-400 hover:text-white">
+                <button
+                    onClick={loadData}
+                    className="p-2 text-slate-400 hover:text-white"
+                    aria-label="Refresh voice analytics"
+                    title="Refresh voice analytics"
+                >
                     <RefreshCw size={18} />
                 </button>
             </div>
