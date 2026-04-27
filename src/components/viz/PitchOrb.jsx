@@ -17,6 +17,7 @@ const getNoteFromSemitone = (semitone) => {
 
 const PitchOrb = ({ dataRef, settings = {} }) => {
     const canvasRef = useRef(null);
+    const dimensionsRef = useRef({ width: 0, height: 0 });
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
@@ -64,20 +65,41 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        const updateDimensions = () => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+
+            // Update dimensionsRef only if changed
+            if (dimensionsRef.current.width !== rect.width || dimensionsRef.current.height !== rect.height) {
+                dimensionsRef.current = { width: rect.width, height: rect.height };
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                ctx.scale(dpr, dpr);
+            }
+        };
+
+        const resizeObserver = new ResizeObserver(updateDimensions);
+        resizeObserver.observe(canvas);
+        updateDimensions();
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            ctx.save();
 
-            const width = rect.width;
-            const height = rect.height;
+            const width = dimensionsRef.current.width;
+            const height = dimensionsRef.current.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
-            ctx.clearRect(0, 0, width, height);
+            // Since we use scale(dpr, dpr) during resize, we need to clear using physical dimensions
+            // but the context is scaled, so clearing logical width/height is correct, however,
+            // sometimes floating point scaling causes edge artifacts.
+            // A safer clear when scaled is to temporarily reset transform.
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -156,6 +178,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('--- Hz', centerX, centerY);
             }
+
+            ctx.restore();
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -166,6 +190,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
