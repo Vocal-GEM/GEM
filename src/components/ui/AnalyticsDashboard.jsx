@@ -33,10 +33,10 @@ const AnalyticsDashboard = ({ onClose }) => {
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        <button onClick={refreshData} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                        <button aria-label="Refresh analytics data" onClick={refreshData} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
                             <RefreshCw className="w-5 h-5" />
                         </button>
-                        <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                        <button aria-label="Close analytics dashboard" onClick={onClose} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
                             <X className="w-5 h-5" />
                         </button>
                     </div>
