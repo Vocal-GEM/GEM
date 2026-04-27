@@ -41,3 +41,11 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-04-27 - Layout Thrashing in PitchOrb
+**Learning:** PitchOrb was continuously calling `getBoundingClientRect()` and resetting `canvas.width` inside its high-frequency render loop, causing significant layout thrashing.
+**Action:** Replaced synchronous layout reads with `ResizeObserver` and a `dimensionsRef` to store and reuse physical canvas dimensions inside the loop, adding `ctx.save()` and `ctx.restore()` to manage state without dimension reassignment.
+
+## 2026-04-27 - Layout Thrashing Refactoring Side-effects
+**Learning:** When moving canvas sizing out of a render loop into a `ResizeObserver`, doing so blindly removes the implicit `ctx.clearRect()` and `ctx.scale(dpr, dpr)` that occur when assigning `canvas.width`. This breaks high-DPI rendering (making elements tiny) and causes canvas smearing.
+**Action:** Always maintain logical vs physical dimension separation in the `dimensionsRef` (e.g., store `dpr`, logical `width`, and logical `height`), and explicitly use `ctx.save()`, `ctx.scale(dpr, dpr)`, `ctx.clearRect(0, 0, width, height)`, and `ctx.restore()` in the optimized loop to replicate the original rendering context.
