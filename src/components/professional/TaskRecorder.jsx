@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Play, Pause, RotateCcw, Check, Loader2 } from 'lucide-react';
 
 const TaskRecorder = ({ task, onComplete }) => {
     const [state, setState] = useState('idle'); // idle, recording, processing, done
     const [recordingTime, setRecordingTime] = useState(0);
     const [audioUrl, setAudioUrl] = useState(null);
-    const [audioBlob, setAudioBlob] = useState(null);
+    const [, setAudioBlob] = useState(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [error, setError] = useState(null);
 
