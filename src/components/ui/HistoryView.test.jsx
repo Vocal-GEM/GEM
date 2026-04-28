@@ -28,6 +28,10 @@ vi.mock('../../context/SettingsContext', () => ({
     SettingsProvider: ({ children }) => <div>{children}</div>
 }));
 
+vi.mock('../../context/ToastContext', () => ({
+    useToast: () => ({ showError: vi.fn() })
+}));
+
 // Mock PracticeCardsContext
 const mockUsePracticeCards = vi.fn();
 vi.mock('../../context/PracticeCardsContext', () => ({
