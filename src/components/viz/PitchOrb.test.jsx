@@ -13,6 +13,13 @@ vi.mock('../../services/RenderCoordinator', () => ({
     }
 }));
 
+// Mock global ResizeObserver
+globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
+
 // Mock Canvas getContext
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     clearRect: vi.fn(),
@@ -22,6 +29,8 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     stroke: vi.fn(),
     fillText: vi.fn(),
     scale: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
