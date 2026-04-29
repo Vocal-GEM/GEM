@@ -41,3 +41,4 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-04-29 - HighResSpectrogram redundant drawing logic\n**Learning:** Merge conflict artifacts in HighResSpectrogram caused duplicate variables and double canvas drawing. This degraded performance by executing ctx.drawImage twice per frame.\n**Action:** Audit git merges for duplicate variables and redundant render logic to preserve framerate stability and prevent crashes.
