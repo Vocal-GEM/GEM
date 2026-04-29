@@ -1,3 +1,5 @@
+/* global currentTime */
+
 /**
  * PitchWorklet.js
  * AudioWorklet processor for ultra-low-latency pitch detection
@@ -36,7 +38,7 @@ class PitchProcessor extends AudioWorkletProcessor {
         };
     }
 
-    process(inputs, outputs, parameters) {
+    process(inputs, _outputs, _parameters) {
         const input = inputs[0];
         if (!input || !input[0]) return true;
 
@@ -62,7 +64,7 @@ class PitchProcessor extends AudioWorkletProcessor {
                     type: 'pitch',
                     pitch: result.pitch,
                     confidence: result.confidence,
-                    timestamp: currentTime,
+                    timestamp: typeof currentTime !== 'undefined' ? currentTime : 0,
                     latency: processingTime,
                     avgLatency: this.totalProcessTime / this.processCount
                 });
