@@ -4,6 +4,12 @@ import PitchOrb from './PitchOrb';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import React from 'react';
 
+globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
+
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
     renderCoordinator: {
@@ -22,6 +28,8 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     stroke: vi.fn(),
     fillText: vi.fn(),
     scale: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
