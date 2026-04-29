@@ -12,7 +12,6 @@ vi.mock('../../services/RenderCoordinator', () => ({
     }
 }));
 
-import React from 'react';
 
 // Override global mock for this test to include Smile
 vi.mock('lucide-react', () => {
