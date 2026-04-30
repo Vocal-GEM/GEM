@@ -1,3 +1,4 @@
+/* global currentTime, sampleRate */
 /**
  * PitchWorklet.js
  * AudioWorklet processor for ultra-low-latency pitch detection
