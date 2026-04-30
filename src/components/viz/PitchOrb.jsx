@@ -35,7 +35,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const ctx = canvas.getContext('2d');
 
         const updateSize = () => {
-            if (!canvas) return;
+            if (!canvas || !canvas.parentElement) return;
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.parentElement.getBoundingClientRect();
             dimensionsRef.current = {
