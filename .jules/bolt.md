@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - Layout Thrashing in PitchOrb
+**Learning:** Querying `getBoundingClientRect()` and re-assigning `canvas.width` inside the `PitchOrb` `loop` function caused continuous layout thrashing and reflows.
+**Action:** Cache the element's dimensions asynchronously using `ResizeObserver` and a `dimensionsRef`. Use explicit `ctx.save()`, `ctx.scale(dpr, dpr)`, and `ctx.restore()` when drawing to maintain high-DPI scaling.
