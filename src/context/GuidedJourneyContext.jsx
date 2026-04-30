@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { FEMINIZATION_JOURNEY } from '../data/guidedJourneyData';
 import { recordPractice } from '../services/StreakService';
 import { generateJourneyReport } from '../services/SessionReportService';
@@ -256,7 +256,9 @@ export const GuidedJourneyProvider = ({ children }) => {
         return Math.round((state.completedSteps.length / journeyData.steps.length) * 100);
     }, [state, getJourneyData]);
 
-    const value = {
+    // Memoize the context value to prevent unnecessary re-renders of consuming
+    // components when the provider's parent re-renders but the underlying state is unchanged.
+    const value = useMemo(() => ({
         // State
         currentJourneyId: state.currentJourneyId,
         currentStepIndex: state.currentStepIndex,
@@ -288,7 +290,13 @@ export const GuidedJourneyProvider = ({ children }) => {
         saveProgressRecording,
         exitJourney,
         resetJourney
-    };
+    }), [
+        state.currentJourneyId, state.currentStepIndex, state.completedSteps, state.stepProgress,
+        state.baselineRecording, state.voiceBaseline, state.progressRecording, isJourneyActive, state.completedAt, state.startedAt,
+        getCurrentStep, getJourneyData, hasInProgressJourney, getProgressPercentage,
+        startJourney, resumeJourney, advanceStep, goToPreviousStep, goToStep, completeStep,
+        saveBaselineRecording, saveVoiceBaseline, saveProgressRecording, exitJourney, resetJourney
+    ]);
 
     return (
         <GuidedJourneyContext.Provider value={value}>
