@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { TrendAnalyzer } from '../../services/TrendAnalyzer';
 import { InsightGenerator } from '../../services/InsightGenerator';
@@ -22,6 +21,7 @@ const mockSessions = Array.from({ length: 30 }, (_, i) => ({
 const analyzer = new TrendAnalyzer();
 const insightGen = new InsightGenerator();
 
+import { useState } from 'react';
 export const AnalyticsDashboardV2 = () => {
     const [timeframe, setTimeframe] = useState('month');
     const [metric, setMetric] = useState('pitch');
