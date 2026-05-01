@@ -53,7 +53,7 @@ vi.mock('../../services/SearchService', () => ({
 
 const MockNavigationProvider = ({ children }) => <div>{children}</div>;
 
-describe.skip('Sidebar Auth Integration', () => {
+describe('Sidebar Auth Integration', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockUseProfile.mockReturnValue({ activeProfile: { name: 'LocalUser' } });
