@@ -201,6 +201,9 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
+        // Try to use parent's dimensions if possible to avoid getBoundingClientRect
+        // For click handling, it's unavoidable, but we can cache it temporarily
+        // if this was inside a loop (it's not, it's just on click)
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
