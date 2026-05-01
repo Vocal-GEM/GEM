@@ -3,6 +3,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import HistoryView from './HistoryView';
 
 // Mock dependencies
+vi.mock('../../context/ToastContext', () => ({
+    useToast: () => ({
+        showError: vi.fn()
+    })
+}));
+
 vi.mock('../../context/ProfileContext', () => ({
     useProfile: () => ({
         getSessions: vi.fn().mockResolvedValue([])
