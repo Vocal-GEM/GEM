@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - Context Provider value memoization
+**Learning:** `NavigationContext` was creating its `value` object on every render. Because context consumers re-render whenever the context `value` changes (by reference), this caused widespread unnecessary re-renders across the app.
+**Action:** Always wrap context provider `value` objects in `useMemo`, and ensure all callback functions included in the value are wrapped in `useCallback` to maintain referential equality.

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { analyticsService } from '../services/AnalyticsService';
 
 const NavigationContext = createContext();
@@ -53,6 +53,15 @@ export const NavigationProvider = ({ children }) => {
         analyticsService.init();
     }, []);
 
+    const [navigationParams, setNavigationParams] = useState({});
+    const [modalParams, setModalParams] = useState({});
+
+    const openModal = useCallback((modalName, params = {}) => {
+        setModalParams(prev => ({ ...prev, [modalName]: params }));
+        setModals(prev => ({ ...prev, [modalName]: true }));
+        analyticsService.trackModalOpen(modalName, params);
+    }, []);
+
     // Global Event Listeners (moved from App.jsx)
     useEffect(() => {
         const handleOpenVocalHealth = () => openModal('vocalHealth');
@@ -71,58 +80,46 @@ export const NavigationProvider = ({ children }) => {
             window.removeEventListener('openWarmUp', handleOpenWarmUp);
             window.removeEventListener('openForwardFocus', handleOpenForwardFocus);
         };
-    }, []);
-
-    const [navigationParams, setNavigationParams] = useState({});
-    const [modalParams, setModalParams] = useState({});
+    }, [openModal]);
 
     // Navigation Actions
-    const navigate = (view, params = {}) => {
+    const navigate = useCallback((view, params = {}) => {
         if (view !== activeView || Object.keys(params).length > 0) {
             setNavigationParams(params);
             setActiveView(view);
             analyticsService.trackView(view, params);
         }
-    };
+    }, [activeView]);
 
-    const switchPracticeTab = (tab) => {
+    const switchPracticeTab = useCallback((tab) => {
         if (tab !== practiceTab) {
             setPracticeTab(tab);
             analyticsService.logEvent('practice_tab_change', { tab });
         }
-    };
+    }, [practiceTab]);
 
-    const openModal = (modalName, params = {}) => {
-        setModalParams(prev => ({ ...prev, [modalName]: params }));
-        setModals(prev => ({ ...prev, [modalName]: true }));
-        analyticsService.trackModalOpen(modalName, params);
-    };
-
-    const closeModal = (modalName) => {
+    const closeModal = useCallback((modalName) => {
         setModals(prev => ({ ...prev, [modalName]: false }));
-        // Optional: clear params on close? Keeping them might be safer for animations.
-    };
+    }, []);
 
-    const closeAllModals = () => {
+    const closeAllModals = useCallback(() => {
         setModals(prev => {
             const closed = {};
             Object.keys(prev).forEach(key => closed[key] = false);
             return closed;
         });
-    };
+    }, []);
 
-    const addToHistory = (label, action) => {
+    const addToHistory = useCallback((label, action) => {
         setHistory(prev => {
-            // Prevent duplicates if clicking the same thing twice
             if (prev.length > 0 && prev[prev.length - 1].label === label) return prev;
-            // Keep history manageable (max 5 items)
             const newHistory = [...prev, { label, action }];
             if (newHistory.length > 5) return newHistory.slice(newHistory.length - 5);
             return newHistory;
         });
-    };
+    }, []);
 
-    const value = {
+    const value = useMemo(() => ({
         activeView,
         practiceTab,
         modals,
@@ -135,7 +132,20 @@ export const NavigationProvider = ({ children }) => {
         closeModal,
         closeAllModals,
         addToHistory
-    };
+    }), [
+        activeView,
+        practiceTab,
+        modals,
+        history,
+        navigationParams,
+        modalParams,
+        navigate,
+        switchPracticeTab,
+        openModal,
+        closeModal,
+        closeAllModals,
+        addToHistory
+    ]);
 
     return <NavigationContext.Provider value={value}>{children}</NavigationContext.Provider>;
 };
