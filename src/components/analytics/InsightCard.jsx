@@ -1,8 +1,9 @@
-import React from 'react';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
 
 export const InsightCard = ({ insight, onDismiss }) => {
     if (!insight) return null;
