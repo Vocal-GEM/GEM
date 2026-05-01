@@ -136,6 +136,7 @@ const DAFMode = ({ onClose }) => {
                 </div>
                 <button
                     onClick={() => setShowSettings(!showSettings)}
+                    aria-label={showSettings ? 'Hide Settings' : 'Show Settings'}
                     className={`p-2 rounded-lg transition-colors ${showSettings ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
                         }`}
                 >
@@ -182,6 +183,7 @@ const DAFMode = ({ onClose }) => {
                         <label className="text-sm font-bold text-slate-300">Volume</label>
                         <button
                             onClick={() => setIsMuted(!isMuted)}
+                            aria-label={isMuted ? 'Unmute' : 'Mute'}
                             className="p-1.5 rounded hover:bg-slate-700 transition-colors"
                         >
                             {isMuted ? (
