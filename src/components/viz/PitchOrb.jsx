@@ -33,7 +33,6 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
 
         // ResizeObserver to handle dimensions without reflows
         const resizeObserver = new ResizeObserver(entries => {
