@@ -14,7 +14,7 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Mock Canvas getContext
-HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+const mockContext = {
     clearRect: vi.fn(),
     beginPath: vi.fn(),
     arc: vi.fn(),
@@ -22,54 +22,81 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     stroke: vi.fn(),
     fillText: vi.fn(),
     scale: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
     canvas: { width: 300, height: 300 }
-}));
+};
 
-// Mock requestAnimationFrame to detect recursion
-const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext);
+
+globalThis.ResizeObserver = class ResizeObserver {
+    constructor(callback) {
+        this.callback = callback;
+    }
+    observe(element) {
+        // Immediately trigger the callback with mock dimensions to simulate layout
+        this.callback([{
+            contentRect: { width: 300, height: 300 }
+        }]);
+    }
+    unobserve() {}
+    disconnect() {}
+};
 
 describe('PitchOrb', () => {
     let dataRef;
 
     beforeEach(() => {
         dataRef = { current: { pitch: 200 } };
-        // Add getBoundingClientRect mock
-        Element.prototype.getBoundingClientRect = vi.fn(() => ({
+        // Spy on getBoundingClientRect to allow assertions
+        vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({
             width: 300,
             height: 300,
             top: 0,
             left: 0,
             right: 300,
             bottom: 300,
-        }));
+        });
         vi.clearAllMocks();
+
+        // Reset the mockContext's spies
+        for(let key in mockContext) {
+            if (typeof mockContext[key] === 'function' && mockContext[key].mockClear) {
+                mockContext[key].mockClear();
+            }
+        }
     });
 
     afterEach(() => {
         cleanup();
-        vi.clearAllMocks();
+        vi.restoreAllMocks();
     });
 
-    it('should not call requestAnimationFrame recursively in the draw loop', async () => {
+    it('should not call getBoundingClientRect recursively in the draw loop', async () => {
         render(<PitchOrb dataRef={dataRef} />);
 
         // Wait for potential dynamic import resolution
         await new Promise(resolve => setTimeout(resolve, 0));
 
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
-        const [id, callback] = renderCoordinator.subscribe.mock.calls[0];
+        const [, callback] = renderCoordinator.subscribe.mock.calls[0];
 
         // Execute the callback
         callback();
 
-        // With the bug, requestAnimationFrame is called.
-        // We assert it IS called to confirm the bug exists in the current code,
-        // OR we assert it is NOT called if we want to write the test for the desired state.
-        // Let's write the test for the DESIRED state (fail now, pass later).
-        expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+        // Ensure we actually drew something (proving early return wasn't hit)
+        expect(mockContext.clearRect).toHaveBeenCalled();
+
+        // Ensure getBoundingClientRect was NOT called during the draw loop
+        // It might be called during initial render by other hooks, but shouldn't be called by the draw callback
+        const getBoundingClientRectCalls = Element.prototype.getBoundingClientRect.mock.calls.length;
+
+        callback();
+        callback();
+
+        expect(Element.prototype.getBoundingClientRect.mock.calls.length).toBe(getBoundingClientRectCalls);
     });
 });
