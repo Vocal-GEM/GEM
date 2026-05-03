@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-05-03 - HighResSpectrogram CPU & Memory Thrashing Optimization
+**Learning:** In `HighResSpectrogram.jsx`, the rendering loop was manually shifting pixels by using `ctx.getImageData` and a `new Uint32Array` on every frame, which caused severe memory churn and bypassed GPU acceleration. Additionally, an inner loop was re-evaluating layout boundaries continuously.
+**Action:** Always prefer `ctx.drawImage(canvas, ...)` onto itself for shifting visual content, as this leverages browser GPU acceleration and avoids creating new array allocations in hot paths.
