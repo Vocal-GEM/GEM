@@ -43,17 +43,21 @@ const VoiceFingerprint = () => {
                     </div>
                     <h2 className="text-xl font-bold text-white">Voice Analytics</h2>
                 </div>
-                <button onClick={loadData} className="p-2 text-slate-400 hover:text-white">
+                <button onClick={loadData} className="p-2 text-slate-400 hover:text-white" aria-label="Refresh voice analytics data">
                     <RefreshCw size={18} />
                 </button>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-6">
+            <div className="flex gap-2 mb-6" role="tablist" aria-label="Analytics Views">
                 {['fingerprint', 'trends', 'report'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
+                        role="tab"
+                        aria-selected={activeTab === tab}
+                        aria-controls={`${tab}-panel`}
+                        id={`${tab}-tab`}
                         className={`px-4 py-2 rounded-lg font-medium text-sm capitalize transition-colors ${activeTab === tab
                                 ? 'bg-purple-600 text-white'
                                 : 'bg-slate-800 text-slate-400'
@@ -66,7 +70,7 @@ const VoiceFingerprint = () => {
 
             {/* Voice Fingerprint */}
             {activeTab === 'fingerprint' && (
-                <div>
+                <div id="fingerprint-panel" role="tabpanel" aria-labelledby="fingerprint-tab">
                     {fingerprint ? (
                         <div className="space-y-6">
                             {/* Visual Fingerprint */}
@@ -138,7 +142,7 @@ const VoiceFingerprint = () => {
 
             {/* Formant Trends */}
             {activeTab === 'trends' && (
-                <div>
+                <div id="trends-panel" role="tabpanel" aria-labelledby="trends-tab">
                     {trends.length > 0 ? (
                         <div className="space-y-2">
                             {trends.slice(-7).map((day, idx) => (
@@ -166,7 +170,7 @@ const VoiceFingerprint = () => {
 
             {/* AI Report */}
             {activeTab === 'report' && (
-                <div>
+                <div id="report-panel" role="tabpanel" aria-labelledby="report-tab">
                     {report?.available ? (
                         <div className="space-y-4">
                             <div className="p-4 bg-gradient-to-r from-purple-900/30 to-slate-900 border border-purple-500/20 rounded-xl">
