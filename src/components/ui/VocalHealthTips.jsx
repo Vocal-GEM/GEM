@@ -16,13 +16,13 @@ const VocalHealthTips = ({ onClose }) => {
                         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                             <HeartPulse className="text-emerald-400" /> Vocal Health
                         </h2>
-                        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                            <X className="w-5 h-5 text-slate-400" />
+                        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors" aria-label="Close tips">
+                            <X className="w-5 h-5 text-slate-400" aria-hidden="true" />
                         </button>
                     </div>
 
                     <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-                        {vocalHealthTips.map((tip, i) => (
+                        {vocalHealthTips.map((tip) => (
                             <div key={tip.id} className={`bg-slate-800/50 p-4 rounded-xl border border-${tip.color || 'emerald'}-500/20 hover:border-${tip.color || 'emerald'}-500/50 transition-colors`}>
                                 <div className="flex items-start gap-3">
                                     <div className={`p-2 rounded-lg bg-${tip.color || 'emerald'}-500/10`}>
