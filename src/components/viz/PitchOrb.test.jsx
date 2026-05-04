@@ -2,6 +2,13 @@ import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import PitchOrb from './PitchOrb';
 import { renderCoordinator } from '../../services/RenderCoordinator';
+
+// Mock ResizeObserver
+globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
 import React from 'react';
 
 // Mock dependencies
@@ -15,6 +22,8 @@ vi.mock('../../services/RenderCoordinator', () => ({
 
 // Mock Canvas getContext
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+    save: vi.fn(),
+    restore: vi.fn(),
     clearRect: vi.fn(),
     beginPath: vi.fn(),
     arc: vi.fn(),
