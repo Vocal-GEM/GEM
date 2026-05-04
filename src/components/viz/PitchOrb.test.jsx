@@ -32,6 +32,13 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 const mockRequestAnimationFrame = vi.fn();
 global.requestAnimationFrame = mockRequestAnimationFrame;
 
+// Mock ResizeObserver
+globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
+
 describe('PitchOrb', () => {
     let dataRef;
 
