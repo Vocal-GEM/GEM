@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-25 - Accessibility of Specialized View Controls
+**Learning:** Utility buttons (like zoom controls) in specialized or professional views (e.g., Spectrogram Comparison) often rely purely on icons (`ZoomIn`, `ZoomOut`), making them inaccessible to screen reader users who need to adjust these settings.
+**Action:** Always ensure that icon-only utility controls in technical/specialized views have descriptive `aria-label` attributes to maintain accessibility across all application features.
