@@ -1,8 +1,10 @@
 import React from 'react';
 import LoadingSpinner from './LoadingSpinner';
+import { useToast } from '../../context/ToastContext';
 import { Button } from './button';
 
 export default function LoadingSpinnerTest() {
+  const { showInfo } = useToast();
   return (
     <div className="p-10 space-y-10 bg-slate-900 min-h-screen">
       <h1 className="text-3xl font-bold text-white mb-8">
@@ -136,7 +138,7 @@ export default function LoadingSpinnerTest() {
                         title="No ghosts found"
                         description="It seems we are completely ghost-free at the moment. Try summoning one?"
                         actionLabel="Summon Ghost"
-                        onAction={() => alert('Boo!')}
+                        onAction={() => showInfo('Boo!')}
                     />
                 </div>
             </section>
