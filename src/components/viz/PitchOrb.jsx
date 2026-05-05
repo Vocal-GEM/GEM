@@ -64,19 +64,39 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        const dimensionsRef = { width: 0, height: 0, dpr: 1 };
+
+        const updateSize = () => {
+            const rect = canvas.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+            if (dimensionsRef.width !== width || dimensionsRef.height !== height || dimensionsRef.dpr !== dpr) {
+                dimensionsRef.width = width;
+                dimensionsRef.height = height;
+                dimensionsRef.dpr = dpr;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+            }
+        };
+
+        updateSize();
+
+        const resizeObserver = new ResizeObserver(() => {
+            updateSize();
+        });
+
+        resizeObserver.observe(canvas);
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const { width, height, dpr } = dimensionsRef;
 
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
+            ctx.save();
+            ctx.scale(dpr, dpr);
             ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
@@ -156,6 +176,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('--- Hz', centerX, centerY);
             }
+            ctx.restore();
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -166,6 +187,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
