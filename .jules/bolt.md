@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## $(date +%Y-%m-%d) - Prevent layout thrashing in requestAnimationFrame
+**Learning:** Continuously calling `getBoundingClientRect()` and resetting `canvas.width` inside a requestAnimationFrame loop forces the browser to recalculate layout and redraw synchronously, severely impacting performance in React components like `PitchOrb`.
+**Action:** Use a `ResizeObserver` inside `useEffect` to track dimensions asynchronously, store physical sizes in a `useRef`, and use `ctx.save()`, `ctx.scale(dpr, dpr)`, and `ctx.restore()` to manage the coordinate system efficiently inside the render loop.
