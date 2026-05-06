@@ -1,3 +1,4 @@
+/* global currentTime */
 /**
  * PitchWorklet.js
  * AudioWorklet processor for ultra-low-latency pitch detection
@@ -36,7 +37,8 @@ class PitchProcessor extends AudioWorkletProcessor {
         };
     }
 
-    process(inputs, outputs, parameters) {
+    // eslint-disable-next-line no-unused-vars
+        process(inputs, outputs, parameters) {
         const input = inputs[0];
         if (!input || !input[0]) return true;
 
