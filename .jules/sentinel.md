@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-03-05 - Information Leakage & Logic Error in Try/Except Block
+**Vulnerability:** A `return jsonify({'error': str(e)}), 500` statement in a `except` block in `backend/app/routes/voice_quality.py` was leaking raw exception strings when an error occurred. It also prevented the correct secure fallback message from executing.
+**Learning:** Returning `str(e)` in JSON responses exposes sensitive details (e.g., internal application paths or configurations) to the client. This is a dangerous anti-pattern in Python.
+**Prevention:** Always use a generic error message for the client and log the full exception details on the server.
