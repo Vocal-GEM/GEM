@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-07 - Add ARIA label to OrbLegend toggle
+**Learning:** Icon-only buttons like the visual key toggle need an ARIA label to be accessible to screen readers, especially when their function changes dynamically.
+**Action:** Always verify icon-only interactive elements possess an `aria-label` indicating their current function or state.
