@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-07 - Canvas Reset Side-Effects
+**Learning:** Removing `canvas.width = ...` assignments from inside the animation loop successfully prevents layout thrashing, but it also eliminates the implicit canvas state reset. Since the context was no longer being cleared and scaling was not being reset, subsequent draws accumulated state leading to visual bugs and huge canvas scaling issues.
+**Action:** When migrating canvas loops to use ResizeObserver and dimensions refs, ALWAYS add `ctx.save()`, `ctx.scale(dpr, dpr)`, `ctx.clearRect(0, 0, width, height)`, and `ctx.restore()` inside the render loop to explicitly manage the state that was previously being reset implicitly by `canvas.width`. Ensure test mocks include `save` and `restore`.
