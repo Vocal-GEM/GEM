@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-12 - Layout Thrashing in Animation Loops
+**Learning:** `PitchOrb.jsx` had a `getBoundingClientRect()` and `canvas.width = rect.width * dpr` call inside a `requestAnimationFrame` loop, which caused synchronous reflows and layout thrashing, hurting performance.
+**Action:** Relocated the canvas dimension querying and setting out of the loop and into a `ResizeObserver`, storing logical dimensions in a `useRef` to be used in the optimized loop with explicit `ctx.save()`, `ctx.scale()`, and `ctx.restore()` calls. Ensure Vitest canvas mocks include `save` and `restore`.
