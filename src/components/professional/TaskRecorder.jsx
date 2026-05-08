@@ -5,7 +5,7 @@ const TaskRecorder = ({ task, onComplete }) => {
     const [state, setState] = useState('idle'); // idle, recording, processing, done
     const [recordingTime, setRecordingTime] = useState(0);
     const [audioUrl, setAudioUrl] = useState(null);
-    const [, setAudioBlob] = useState(null);
+    const [audioBlob, setAudioBlob] = useState(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [error, setError] = useState(null);
 

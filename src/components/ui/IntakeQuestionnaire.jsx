@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVoiceProfile } from '../../context/VoiceProfileContext';
-import {  } from 'react-i18next'; // Assuming i18n is available, or remove if not
+import { useTranslation } from 'react-i18next'; // Assuming i18n is available, or remove if not
 
 const IntakeQuestionnaire = ({ onComplete, _onClose }) => {
     const { updateGoals, updateHealth } = useVoiceProfile();

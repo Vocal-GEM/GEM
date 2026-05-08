@@ -2,7 +2,6 @@ import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import PitchOrb from './PitchOrb';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import React from 'react';
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
@@ -61,7 +60,7 @@ describe('PitchOrb', () => {
         await new Promise(resolve => setTimeout(resolve, 0));
 
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
-        const [id, callback] = renderCoordinator.subscribe.mock.calls[0];
+        const [, callback] = renderCoordinator.subscribe.mock.calls[0];
 
         // Execute the callback
         callback();
