@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Mic, Square, Play, Pause, Trash2, Calendar, Clock, Music, Plus, X, Tag, FileText, Search, Filter, TrendingUp, ChevronDown } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import { getRecordings, saveRecording, deleteRecording, updateRecording } from '../../services/VoiceJournalService';
 import { recordPractice } from '../../services/StreakService';
@@ -207,6 +208,7 @@ const VoiceJournalView = () => {
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [currentBlob, setCurrentBlob] = useState(null);
     const [recordingTime, setRecordingTime] = useState(0);
+    const { showError } = useToast();
     const [selectedTags, setSelectedTags] = useState([]);
 
     // Search and Filter State
@@ -314,7 +316,7 @@ const VoiceJournalView = () => {
             }, 1000);
         } catch (err) {
             console.error('Failed to start recording:', err);
-            alert('Could not access microphone. Please check permissions.');
+            showError('Could not access microphone. Please check permissions.');
         }
     };
 

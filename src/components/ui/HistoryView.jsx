@@ -5,6 +5,7 @@ import SkeletonLoader from './SkeletonLoader';
 import ProgressCard from './ProgressCard';
 import RecordingsList from './RecordingsList';
 import { useProfile } from '../../context/ProfileContext';
+import { useToast } from '../../context/ToastContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSettings } from '../../context/SettingsContext';
 import { useTour } from '../../context/TourContext';
@@ -37,6 +38,7 @@ ChartJS.register(
 const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
     const { getSessions } = useProfile();
     const { t } = useLanguage();
+    const { showError } = useToast();
     const { settings } = useSettings();
     const { startTour } = useTour();
     const { cardSets } = usePracticeCards();
@@ -158,7 +160,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
             doc.save(`voice-therapy-report-${new Date().toISOString().split('T')[0]}.pdf`);
         } catch (error) {
             console.error('Error generating report:', error);
-            alert('Failed to generate report.');
+            showError('Failed to generate report.');
         } finally {
             setIsGenerating(false);
         }
