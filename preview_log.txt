@@ -1,3 +1,9 @@
-  ➜  Local:   http://localhost:4173/
-  ➜  Network: http://192.168.0.2:4173/
-[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+
+> vocal-gem@0.1.0 preview /app
+> vite preview
+
+error when starting preview server:
+Error: The directory "dist" does not exist. Did you build your project?
+    at preview (file:///app/node_modules/.pnpm/vite@5.4.21_@types+node@25.0.3_terser@5.44.1/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:66233:11)
+    at async CAC.<anonymous> (file:///app/node_modules/.pnpm/vite@5.4.21_@types+node@25.0.3_terser@5.44.1/node_modules/vite/dist/node/cli.js:883:22)
+ ELIFECYCLE  Command failed with exit code 1.
