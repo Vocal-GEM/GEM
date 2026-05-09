@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Fixed Duplicate Context and Draw Logic in HighResSpectrogram
+**Learning:** During exploration of `HighResSpectrogram.jsx`, I found that unresolved merge conflicts had left behind duplicate code blocks, including redundant `getContext('2d')` calls, a duplicate `drawImage` section in the animation loop, and duplicate `requestAnimationFrame` loop assignments. This caused severe performance degradation as it unnecessarily created multiple canvas contexts and attempted to copy canvas data onto itself redundantly on every single frame. This was not caught by ESLint or tests originally.
+**Action:** When inspecting component rendering logic, specifically ones handling high-frequency updates via `requestAnimationFrame`, always check for duplicated logic from bad merges. Re-verify the file syntax by running Vitest on the targeted component file after stripping redundant blocks. Use precise Javascript scripts with regex/replace to cleanly strip duplicate block regions instead of naive string replacements.
