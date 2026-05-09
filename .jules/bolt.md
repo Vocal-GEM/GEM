@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-05-23 - Removed sync layout thrashing inside custom render loops
+**Learning:** Even if components don't recursively call `requestAnimationFrame` directly, relying on a `renderCoordinator` or any continuous loop that calls `getBoundingClientRect()` and reassigns `canvas.width` on every tick forces the browser into a synchronous style recalculation loop (layout thrashing). This results in elevated CPU usage and dropped frames.
+**Action:** Always maintain element dimensions explicitly in a `useRef` when writing loop logic, relying on `ResizeObserver` to asynchronously listen to sizing events and populate that reference, freeing the render loop to purely handle drawing operations using `ctx.save()` and `ctx.restore()`.
