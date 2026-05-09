@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-25 - Native Dialog Replacements
+**Learning:** React state-driven feedback mechanisms like Toast notifications offer vastly improved user experiences and better screen reader support compared to native \`window.alert()\`, which freezes the application thread and frequently lacks semantic meaning.
+**Action:** Always replace \`alert()\` calls in UI components with \`useToast()\` context hooks to ensure notifications do not interrupt application flow while maintaining high accessibility standards.
