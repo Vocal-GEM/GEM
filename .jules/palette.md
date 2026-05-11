@@ -37,3 +37,23 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-25 - Replacing Native Alerts
+**Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
+**Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-05-11 - Duplicate Code Correction
+**Learning:** Foundational components can sometimes have syntax errors or incorrectly copied lines (like duplicate component IDs or unused variables) that break production builds.
+**Action:** When errors like "Parsing error: Identifier X has already been declared" or "Parsing error: Unexpected token ;" occur, carefully review the specific line in the referenced file and remove the duplication or syntax error.
+## 2026-05-11 - Duplicate Test Error Corrections
+**Learning:** React component display names are critical in testing, especially when dynamically importing components or overriding module mocks. A missing display name or invalid test environments can cause build/CI failures.
+**Action:** When overriding mocks that return components (e.g. `lucide-react` icons), always ensure you add a `.displayName` property to the component before returning it. Replace global variables that don't exist in the test environment (like `global`) with `globalThis`.
+## 2026-01-03 - Component Corruption
+**Learning:** Multiple conflicting definitions within a single component file (likely from bad merges) can go unnoticed if the file exports the last definition, but it creates a maintainability nightmare and breaks tools.
+**Action:** Always check the entire file content when fixing a component, not just the function you are editing, to spot and clean up duplicate/conflicting code blocks.
+## 2026-05-11 - Test Component Display Names
+**Learning:** Some test suites explicitly depend on the `displayName` property of mocked components to generate snapshots or identify elements. Leaving them undefined will cause generic `<Unknown />` component names in test failure logs and break tests that expect specific component names.
+**Action:** When creating a mock functional component using `vi.mock`, always attach a `displayName` to the function:
+```javascript
+const MockComponent = (props) => <div {...props} />;
+MockComponent.displayName = 'MockComponentName';
+return MockComponent;
+```
