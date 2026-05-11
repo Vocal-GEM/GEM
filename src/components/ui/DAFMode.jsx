@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Headphones, Volume2, VolumeX, Play, Square, Settings } from 'lucide-react';
+import Toast from './Toast';
 
 /**
  * DAFMode - Delayed Auditory Feedback
@@ -7,6 +8,7 @@ import { Headphones, Volume2, VolumeX, Play, Square, Settings } from 'lucide-rea
  * Used for fluency training and modifying speech patterns
  */
 const DAFMode = ({ onClose }) => {
+    const [toast, setToast] = useState(null);
     const [isActive, setIsActive] = useState(false);
     const [delay, setDelay] = useState(150); // ms
     const [volume, setVolume] = useState(0.8);
@@ -94,7 +96,7 @@ const DAFMode = ({ onClose }) => {
             setIsActive(true);
         } catch (err) {
             console.error('Failed to start DAF:', err);
-            alert('Could not access microphone. Please check permissions.');
+            setToast({ message: 'Could not access microphone. Please check permissions.', type: 'error' });
         }
     };
 
@@ -123,6 +125,13 @@ const DAFMode = ({ onClose }) => {
 
     return (
         <div id="daf-modal" className="bg-slate-900 rounded-2xl border border-slate-700 p-6 max-w-md w-full">
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
