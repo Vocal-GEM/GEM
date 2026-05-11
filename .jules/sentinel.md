@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2026-02-14 - Information Leakage in TTS and Voice Quality APIs
+**Vulnerability:** The `/api/tts/synthesize`, `/api/tts/voices`, `/api/voice-quality/clean`, and `/api/voice-quality/manipulate` endpoints caught exceptions and returned the raw `str(e)` in their JSON responses (e.g., ElevenLabs HTTP connection errors, file processing stack trace errors), leaking internal backend network layout, API behaviors, or stack paths to the client.
+**Learning:** Exposing detailed exception strings (like `requests.exceptions.RequestException` details or internal file processing stack traces) directly back to clients can unintentionally assist an attacker in mapping backend services and finding other exploit vectors. Additionally, some `except` blocks in `voice_quality.py` printed errors, lacking robust persistent logging.
+**Prevention:** Always log exceptions server-side using `current_app.logger.error(f"Error: {str(e)}")` and return a generic error message (e.g., "Failed to connect to ElevenLabs", "An internal error occurred during voice manipulation.") to the client.
