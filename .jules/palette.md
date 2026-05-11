@@ -40,3 +40,6 @@
 ## 2024-05-25 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-05-11 - Duplicate Code Correction
+**Learning:** Foundational components can sometimes have syntax errors or incorrectly copied lines (like duplicate component IDs or unused variables) that break production builds.
+**Action:** When errors like "Parsing error: Identifier X has already been declared" or "Parsing error: Unexpected token ;" occur, carefully review the specific line in the referenced file and remove the duplication or syntax error.
