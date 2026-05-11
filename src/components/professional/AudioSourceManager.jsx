@@ -1,14 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
 
 const AudioSourceManager = ({ onSourceChange }) => {
     const [devices, setDevices] = useState([]);
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [permissionGranted, setPermissionGranted] = useState(false);
-
-    useEffect(() => {
-        checkPermissionAndEnumerate();
-    }, []);
 
     const checkPermissionAndEnumerate = async () => {
         try {
@@ -50,6 +46,11 @@ const AudioSourceManager = ({ onSourceChange }) => {
         setSelectedDeviceId(deviceId);
         onSourceChange?.(deviceId);
     };
+
+    useEffect(() => {
+        checkPermissionAndEnumerate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
