@@ -36,12 +36,9 @@ class PitchProcessor extends AudioWorkletProcessor {
         };
     }
 
-    process(inputs, outputs, parameters) {
+    process(inputs, _outputs, _parameters) {
         // eslint-disable-next-line no-undef
-        const timeNow = typeof currentTime !== 'undefined' ? timeNow : 0;
-        // 'now' is available in the AudioWorkletGlobalScope
-        // If ESLint complains, we might need to ignore it or use `globalThis.now`
-        const now = globalThis.now || 0;
+        const now = typeof currentTime !== 'undefined' ? currentTime : 0;
         const input = inputs[0];
         if (!input || !input[0]) return true;
 
