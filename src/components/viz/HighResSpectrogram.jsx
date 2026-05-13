@@ -26,6 +26,10 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const lastFormantsRef = useRef({ f1: 0, f2: 0 });
     const { settings } = useSettings();
 
+    // Component ID for RenderCoordinator
+    const componentId = useId();
+
+    // Reusable buffers to avoid GC
     // Unique component ID for RenderCoordinator
     const uniqueId = useId();
     const componentId = `spectrogram-highres-${uniqueId}`;
@@ -74,14 +78,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
                 // Optimization: Create ImageData with 'scrollSpeed' width
                 imgDataRef.current = ctx.createImageData(scrollSpeed, height);
                 data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
-
-                // Create an offscreen canvas to avoid putImageData on the main canvas (keeps GPU accel)
-                if (!canvas.offscreenCanvas) {
-                    canvas.offscreenCanvas = document.createElement('canvas');
-                }
-                canvas.offscreenCanvas.width = scrollSpeed;
-                canvas.offscreenCanvas.height = height;
-                canvas.offscreenCtx = canvas.offscreenCanvas.getContext('2d', { alpha: false });
             } catch (e) {
                 console.error("Failed to create image data", e);
                 return;
@@ -127,9 +123,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         }
 
         // Put the new strip on the right edge
-        // Optimization: putImageData to offscreen canvas, then drawImage to main canvas
-        canvas.offscreenCtx.putImageData(imgData, 0, 0);
-        ctx.drawImage(canvas.offscreenCanvas, width - scrollSpeed, 0);
+        ctx.putImageData(imgData, width - scrollSpeed, 0);
 
         // 3. Draw Formant Overlay (F1 & F2)
         const { f1, f2 } = dataRef.current;
@@ -160,6 +154,9 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         lastFormantsRef.current = { f1, f2 };
 
+    }, [dataRef, colormap]);
+
+    // Initial canvas setup & ResizeObserver
     }, [dataRef, colormap, componentId]);
 
     // Initial canvas setup
@@ -221,6 +218,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             unsubscribe();
         };
     }, [draw, componentId]);
+    }, [componentId, draw]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position

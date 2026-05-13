@@ -122,19 +122,10 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             // Reusable objects to reduce GC
             if (!canvas.imageDataRef) {
                 canvas.imageDataRef = ctx.createImageData(speed, h);
-                canvas.offscreenCanvas = document.createElement('canvas');
-                canvas.offscreenCanvas.width = speed;
-                canvas.offscreenCanvas.height = h;
-                canvas.offscreenCtx = canvas.offscreenCanvas.getContext('2d', { alpha: false });
             }
             // Ensure size match
             if (canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
                 canvas.imageDataRef = ctx.createImageData(speed, h);
-                if (canvas.offscreenCanvas) {
-                    canvas.offscreenCanvas.width = speed;
-                    canvas.offscreenCanvas.height = h;
-                    canvas.offscreenCtx = canvas.offscreenCanvas.getContext('2d', { alpha: false });
-                }
             }
 
             const imageData = canvas.imageDataRef;
@@ -180,9 +171,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                 }
             }
 
-            // Optimization: putImageData to offscreen canvas, then drawImage to main canvas
-            canvas.offscreenCtx.putImageData(imageData, 0, 0);
-            ctx.drawImage(canvas.offscreenCanvas, width - speed, 0);
+            ctx.putImageData(imageData, width - speed, 0);
             // -----------------------------------------------
         } else {
             // Clear the new strip if no data

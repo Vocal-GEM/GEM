@@ -41,6 +41,3 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
-## 2024-05-24 - Canvas GPU Acceleration Churn
-**Learning:** Using `ctx.putImageData` directly on a large animated canvas forces a GPU readback/sync, breaking hardware acceleration and causing performance churn.
-**Action:** When updating small portions of a scrolling canvas (like a spectrogram), apply `putImageData` to a small offscreen `<canvas>` first, then use `ctx.drawImage(offscreenCanvas, ...)` onto the main canvas to maintain full GPU acceleration.
