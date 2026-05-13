@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Render Loop putImageData bypassing hardware acceleration
+**Learning:** `putImageData` bypasses GPU acceleration, which causes performance degradation inside high-frequency animation loops (e.g., `requestAnimationFrame`) used in components like spectrograms that involve shifting visual content.
+**Action:** Replace `ctx.putImageData` calls with creating an offscreen canvas, writing the pixels onto that offscreen canvas using `offscreenCtx.putImageData`, and then rendering the offscreen canvas back to the main canvas using `ctx.drawImage`. This forces the operation into the GPU.

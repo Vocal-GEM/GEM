@@ -118,14 +118,16 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             // Instead of thousands of ctx.fillRect calls, we generate the column pixels
             // directly into an ImageData buffer and put it onto the canvas.
 
-            // Reuse ImageData object
+            // Reuse ImageData object and Offscreen Canvas for GPU-accelerated drawing
             // Reusable objects to reduce GC
-            if (!canvas.imageDataRef) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
+            if (!canvas.offscreenCanvas) {
+                canvas.offscreenCanvas = document.createElement('canvas');
+                canvas.offscreenCtx = canvas.offscreenCanvas.getContext('2d', { alpha: false });
             }
-            // Ensure size match
-            if (canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
+            if (canvas.offscreenCanvas.width !== speed || canvas.offscreenCanvas.height !== h) {
+                canvas.offscreenCanvas.width = speed;
+                canvas.offscreenCanvas.height = h;
+                canvas.imageDataRef = canvas.offscreenCtx.createImageData(speed, h);
             }
 
             const imageData = canvas.imageDataRef;
@@ -171,7 +173,9 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                 }
             }
 
-            ctx.putImageData(imageData, width - speed, 0);
+            // GPU acceleration optimization: Write to offscreen canvas then drawImage
+            canvas.offscreenCtx.putImageData(imageData, 0, 0);
+            ctx.drawImage(canvas.offscreenCanvas, width - speed, 0);
             // -----------------------------------------------
         } else {
             // Clear the new strip if no data
