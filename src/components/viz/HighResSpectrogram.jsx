@@ -56,13 +56,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         if (!canvas) return;
         if (!dataRef.current || !dataRef.current.spectrum) return;
 
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
-
-        // Optimization: Use alpha: false for better performance
-        const ctx = canvas.getContext('2d', { alpha: false });
-
         // Optimization: Use alpha: false for better performance
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
@@ -123,7 +116,9 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         }
 
         // Put the new strip on the right edge
-        ctx.putImageData(imgData, width - scrollSpeed, 0);
+        // Optimization: putImageData to offscreen canvas, then drawImage to main canvas
+        canvas.offscreenCtx.putImageData(imgData, 0, 0);
+        ctx.drawImage(canvas.offscreenCanvas, width - scrollSpeed, 0);
 
         // 3. Draw Formant Overlay (F1 & F2)
         const { f1, f2 } = dataRef.current;
