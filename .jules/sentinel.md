@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2024-05-13 - Exception Data Leakage in API Responses
+**Vulnerability:** API endpoints returned raw exception strings (e.g. `str(e)`) to the client on error, leaking internal system details.
+**Learning:** Returning `str(e)` directly in a JSON response for a 500 error leaks stack traces, database schema details, or other sensitive infrastructure details that could be exploited by an attacker. The internal details should be logged to the server, and a generic error message returned to the user.
+**Prevention:** Catch exceptions and log `str(e)` using a logger, but always return a generic error message to the client like `{'error': 'An internal error occurred'}`.
