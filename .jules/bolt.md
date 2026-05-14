@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-21 - Duplicate Canvas Context Acquisition
+**Learning:** Unresolved merge conflicts introduced duplicated `canvas.getContext` and `ctx.drawImage` calls inside a `requestAnimationFrame` loop in `HighResSpectrogram.jsx`. This caused double processing per frame, significantly impacting performance.
+**Action:** Always verify rendering loops for duplicated operations, especially after resolving large merge conflicts.
