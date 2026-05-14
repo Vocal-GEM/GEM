@@ -35,6 +35,36 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const [cursorData, setCursorData] = useState(null);
     const [showControls, setShowControls] = useState(false);
 
+    // Cached dimensions to avoid getBoundingClientRect
+    const dimensionsRef = useRef({ width: 0, height: 0, top: 0, left: 0 });
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const updateDimensions = () => {
+            const rect = canvas.getBoundingClientRect();
+            dimensionsRef.current = {
+                width: rect.width,
+                height: rect.height,
+                top: rect.top,
+                left: rect.left
+            };
+        };
+
+        const observer = new ResizeObserver(updateDimensions);
+        observer.observe(canvas);
+        updateDimensions();
+
+        // Also update on scroll to keep top/left accurate
+        window.addEventListener('scroll', updateDimensions, { passive: true });
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('scroll', updateDimensions);
+        };
+    }, []);
+
     // Optimized History Buffer (Circular Buffer)
     // We allocate a large flat array to store history instead of pushing/shifting objects.
     // Each frame stores 'maxBin' floats.
@@ -201,7 +231,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const rect = canvas.getBoundingClientRect();
+        const rect = dimensionsRef.current;
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
