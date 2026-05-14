@@ -17,6 +17,35 @@ const FileSpectrogram = ({
     const spectrogramDataRef = useRef(null);
     const { settings } = useSettings();
 
+    // Cached dimensions to avoid getBoundingClientRect
+    const dimensionsRef = useRef({ width: 0, height: 0, top: 0, left: 0 });
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const updateDimensions = () => {
+            const rect = canvas.getBoundingClientRect();
+            dimensionsRef.current = {
+                width: rect.width,
+                height: rect.height,
+                top: rect.top,
+                left: rect.left
+            };
+        };
+
+        const observer = new ResizeObserver(updateDimensions);
+        observer.observe(canvas);
+        updateDimensions();
+
+        window.addEventListener('scroll', updateDimensions, { passive: true });
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('scroll', updateDimensions);
+        };
+    }, []);
+
     // Dynamic colormap based on settings
     const colormap = useMemo(
         () => generateColormap(settings.spectrogramColorScheme),
@@ -232,8 +261,7 @@ const FileSpectrogram = ({
     const handleCanvasClick = useCallback((e) => {
         if (!onSeek || !duration) return;
 
-        const canvas = canvasRef.current;
-        const rect = canvas.getBoundingClientRect();
+        const rect = dimensionsRef.current;
         const x = e.clientX - rect.left;
         const seekTime = (x / rect.width) * duration;
 
