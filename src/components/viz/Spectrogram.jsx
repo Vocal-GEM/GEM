@@ -341,6 +341,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                     <button
                         className="absolute -top-2 -right-2 w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center text-slate-500 hover:text-white pointer-events-auto"
                         onClick={(e) => { e.stopPropagation(); setCursorData(null); }}
+                        aria-label="Close details"
                     >
                         <X size={12} />
                     </button>
@@ -353,6 +354,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                     onClick={handleScreenshot}
                     className="absolute top-2 right-2 p-2 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-white/70 hover:text-white transition-all z-10 animate-in fade-in duration-200"
                     title="Save Screenshot"
+                    aria-label="Save screenshot"
                 >
                     <Camera size={16} />
                 </button>

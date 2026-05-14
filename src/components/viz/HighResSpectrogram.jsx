@@ -27,9 +27,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const { settings } = useSettings();
 
     // Component ID for RenderCoordinator
-    const componentId = useId();
-
-    // Reusable buffers to avoid GC
     // Unique component ID for RenderCoordinator
     const uniqueId = useId();
     const componentId = `spectrogram-highres-${uniqueId}`;
@@ -55,13 +52,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const canvas = canvasRef.current;
         if (!canvas) return;
         if (!dataRef.current || !dataRef.current.spectrum) return;
-
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
-
-        // Optimization: Use alpha: false for better performance
-        const ctx = canvas.getContext('2d', { alpha: false });
 
         // Optimization: Use alpha: false for better performance
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
@@ -320,6 +310,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
                     <button
                         className="absolute -top-2 -right-2 w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center text-slate-500 hover:text-white pointer-events-auto"
                         onClick={(e) => { e.stopPropagation(); setCursorData(null); }}
+                        aria-label="Close details"
                     >
                         <X size={12} />
                     </button>
@@ -331,6 +322,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
                     onClick={handleScreenshot}
                     className="absolute top-2 right-2 p-2 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-white/70 hover:text-white transition-all z-10 animate-in fade-in duration-200"
                     title="Save Screenshot"
+                    aria-label="Save screenshot"
                 >
                     <Camera size={16} />
                 </button>
