@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-26 - Icon-Only Button Accessibility
+**Learning:** Icon-only buttons (like back buttons or close buttons) frequently omit `aria-label`s, causing screen readers to announce them as just "button" or by their generic wrapper name. This is a common pattern in custom UI components.
+**Action:** Always include an `aria-label` or visually hidden text when a button's purpose is entirely communicated through an icon, ensuring it describes the specific action (e.g., "Close exercise").
