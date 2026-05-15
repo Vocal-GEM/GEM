@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## $(date +%Y-%m-%d) - AudioContext Memory Leaks
+**Learning:** Instantiating `new AudioContext()` in callbacks or effects without calling `.close()` creates a severe memory leak. Browsers limit the number of hardware contexts (usually 6), so repeated unclosed creations will eventually cause the application to crash with a "hardware contexts provided is greater than or equal to the maximum bound" error.
+**Action:** Always call `.close()` on temporary `AudioContext` instances after use, or reuse a single global `AudioContext` instance. For oscillators playing over time, use `setTimeout` or `onended` events to close the context after the audio finishes playing.

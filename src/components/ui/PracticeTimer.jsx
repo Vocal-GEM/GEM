@@ -73,6 +73,13 @@ const PracticeTimer = ({ onComplete, onClose, compact = false }) => {
             gain.connect(ctx.destination);
             osc.start();
             osc.stop(ctx.currentTime + 0.5);
+
+            // Clean up context after sound completes
+            setTimeout(() => {
+                if (ctx.state !== 'closed') {
+                    ctx.close().catch(console.error);
+                }
+            }, 600);
         } catch (e) {
             console.warn('Could not play completion sound', e);
         }

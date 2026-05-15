@@ -1,6 +1,6 @@
 
 import { describe, it, expect, beforeAll } from 'vitest';
-import { PitchEnsemble } from '../../utils/pitchEnsemble';
+import { detectPitchEnsemble } from '../../utils/pitchEnsemble';
 import { FormantTracker } from '../../utils/formantTracker';
 import praatReferences from './praatReferences.json';
 
@@ -60,7 +60,7 @@ describe('Algorithm Validation against PRAAT', () => {
     let formantTracker;
 
     beforeAll(() => {
-        pitchEnsemble = new PitchEnsemble();
+        pitchEnsemble = { detectPitch: detectPitchEnsemble };
         formantTracker = new FormantTracker(44100);
     });
 
