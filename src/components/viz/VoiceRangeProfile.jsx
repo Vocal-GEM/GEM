@@ -225,6 +225,7 @@ const VoiceRangeProfile = ({ sessions = [], targetRange }) => {
                 </div>
                 <button
                     onClick={() => setShowInfo(!showInfo)}
+                    aria-label={showInfo ? 'Hide info' : 'Show info'}
                     className="text-slate-400 hover:text-white transition-colors"
                 >
                     <Info size={16} />
