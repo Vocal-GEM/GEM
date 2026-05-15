@@ -312,13 +312,13 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
                 </div>
 
                 <div className="flex gap-2">
-                    <button onClick={() => setShowHistory(!showHistory)} className={`p-1.5 rounded hover:bg-slate-800 ${showHistory ? 'text-blue-400' : 'text-slate-400'}`}>
+                    <button onClick={() => setShowHistory(!showHistory)} className={`p-1.5 rounded hover:bg-slate-800 ${showHistory ? 'text-blue-400' : 'text-slate-400'}`} aria-label={showHistory ? "Hide History" : "Show History"} title={showHistory ? "Hide History" : "Show History"}>
                         <History size={16} />
                     </button>
-                    <div className="flex items-center bg-slate-800 rounded px-1">
-                        <button onClick={prevPattern} className="p-1 hover:bg-slate-700 rounded"><ChevronLeft className="w-4 h-4 text-slate-400" /></button>
-                        <span className="text-xs text-slate-300 font-mono w-4 text-center">{selectedPattern + 1}</span>
-                        <button onClick={nextPattern} className="p-1 hover:bg-slate-700 rounded"><ChevronRight className="w-4 h-4 text-slate-400" /></button>
+                    <div className="flex items-center bg-slate-800 rounded px-1" role="group" aria-label="Pattern navigation">
+                        <button onClick={prevPattern} className="p-1 hover:bg-slate-700 rounded" aria-label="Previous pattern" title="Previous pattern"><ChevronLeft className="w-4 h-4 text-slate-400" /></button>
+                        <span className="text-xs text-slate-300 font-mono w-4 text-center" aria-live="polite" aria-atomic="true">{selectedPattern + 1}</span>
+                        <button onClick={nextPattern} className="p-1 hover:bg-slate-700 rounded" aria-label="Next pattern" title="Next pattern"><ChevronRight className="w-4 h-4 text-slate-400" /></button>
                     </div>
                 </div>
             </div>
@@ -382,6 +382,7 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
                     <button
                         onClick={playTarget}
                         className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors group"
+                        aria-label="Play Target Tone"
                         title="Play Target Tone"
                     >
                         <Volume2 className="w-4 h-4 text-slate-400 group-hover:text-blue-400" />
@@ -391,6 +392,7 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
                     <button
                         onClick={() => setDuration(d => d === 2.0 ? 4.0 : 2.0)}
                         className="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-mono text-slate-400 min-w-[30px]"
+                        aria-label="Toggle Duration"
                         title="Toggle Duration"
                     >
                         {duration}s
@@ -399,6 +401,7 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
                     <button
                         onClick={reset}
                         className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                        aria-label="Reset Trace"
                         title="Reset Trace"
                     >
                         <RefreshCw className="w-4 h-4 text-slate-400" />
