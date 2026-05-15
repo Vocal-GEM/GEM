@@ -47,7 +47,6 @@ const calculatePolygonArea = (points) => {
 
 const VoiceRangeProfile = ({ sessions = [], targetRange }) => {
     const canvasRef = useRef(null);
-    const [hoverInfo, setHoverInfo] = useState(null);
     const [showInfo, setShowInfo] = useState(false);
 
     // Configuration
@@ -61,7 +60,7 @@ const VoiceRangeProfile = ({ sessions = [], targetRange }) => {
     };
 
     // 1. Process Data into 2D Histogram
-    const { grid, points, bounds, hull } = useMemo(() => {
+    const { grid, bounds, hull } = useMemo(() => {
         const grid = new Array(config.pitchBins).fill(0).map(() => new Array(config.intensityBins).fill(0));
         const points = [];
         let minP = Infinity, maxP = -Infinity, minI = Infinity, maxI = -Infinity;
@@ -103,7 +102,7 @@ const VoiceRangeProfile = ({ sessions = [], targetRange }) => {
             bounds: { minP, maxP, minI, maxI },
             hull
         };
-    }, [sessions]);
+    }, [sessions, config.intensityBins, config.maxIntensity, config.maxPitch, config.minIntensity, config.minPitch, config.pitchBins]);
 
     // 2. Draw Visualization
     useEffect(() => {
@@ -209,7 +208,7 @@ const VoiceRangeProfile = ({ sessions = [], targetRange }) => {
             ctx.fillText('Voice Range', mapX(topPoint[0]), mapY(topPoint[1]) - 10);
         }
 
-    }, [grid, hull, targetRange]);
+    }, [grid, hull, targetRange, config.intensityBins, config.maxIntensity, config.maxPitch, config.minIntensity, config.minPitch, config.pitchBins]);
 
     // Metrics
     const area = useMemo(() => calculatePolygonArea(hull), [hull]);
@@ -225,6 +224,7 @@ const VoiceRangeProfile = ({ sessions = [], targetRange }) => {
                 </div>
                 <button
                     onClick={() => setShowInfo(!showInfo)}
+                    aria-label={showInfo ? 'Hide info' : 'Show info'}
                     className="text-slate-400 hover:text-white transition-colors"
                 >
                     <Info size={16} />
