@@ -95,6 +95,7 @@ const VoiceQualityView = () => {
                 const decoded = await audioCtx.decodeAudioData(arrayBuffer);
                 setAudioBuffer(decoded);
                 setFileDuration(decoded.duration);
+                audioCtx.close();
 
                 // Create audio element for playback
                 const url = URL.createObjectURL(selectedFile);
