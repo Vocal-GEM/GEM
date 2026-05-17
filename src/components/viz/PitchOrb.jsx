@@ -29,10 +29,32 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     const genderRanges = settings.genderRanges || defaultRanges;
 
+    const containerRef = useRef(null);
+
     useEffect(() => {
         const canvas = canvasRef.current;
+        const container = containerRef.current;
+        if (!canvas || !container) return;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
+
+        let logicalWidth = 0;
+        let logicalHeight = 0;
+
+        const updateDimensions = () => {
+            const rect = canvas.getBoundingClientRect();
+            logicalWidth = rect.width;
+            logicalHeight = rect.height;
+            canvas.width = logicalWidth * dpr;
+            canvas.height = logicalHeight * dpr;
+        };
+
+        updateDimensions();
+
+        const resizeObserver = new ResizeObserver(() => {
+            requestAnimationFrame(updateDimensions);
+        });
+        resizeObserver.observe(canvas);
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -65,19 +87,16 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         };
 
         const loop = () => {
-            if (!canvas) return; // Guard against cleanup
+            if (!canvas || logicalWidth === 0) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
             ctx.scale(dpr, dpr);
 
-            const width = rect.width;
-            const height = rect.height;
+            const width = logicalWidth;
+            const height = logicalHeight;
             const centerX = width / 2;
             const centerY = height / 2;
-
-            ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -156,6 +175,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('--- Hz', centerX, centerY);
             }
+
+            ctx.restore();
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -166,11 +187,12 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
     return (
-        <div className="glass-panel-dark rounded-2xl p-6 relative overflow-hidden shadow-lg">
+        <div ref={containerRef} className="glass-panel-dark rounded-2xl p-6 relative overflow-hidden shadow-lg">
             <div className="flex justify-between items-center mb-4">
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                     Pitch

@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-17 - Canvas Dimension Reassignment in requestAnimationFrame
+**Learning:** Reassigning `canvas.width` or `canvas.height` inside a `requestAnimationFrame` loop (even if the values haven't changed logically from the developer's perspective) forces the browser to synchronously clear the canvas drawing buffer and reset the context state (including transforms like `ctx.scale`). This causes severe layout thrashing and performance degradation, turning a simple render loop into a major CPU bottleneck.
+**Action:** Always cache logical canvas dimensions using a `ResizeObserver` on the canvas element. Update the physical `canvas.width` and `canvas.height` only within the `ResizeObserver` callback. Inside the render loop, rely on the cached dimensions to determine drawing boundaries, and explicitly clear the canvas (`ctx.clearRect`) instead of relying on the implicit dimension-reassignment clear. Use `ctx.save()` and `ctx.restore()` if global transforms are applied.
