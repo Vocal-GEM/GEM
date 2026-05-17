@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2026-05-17 - Missing global exception handler
+**Vulnerability:** Unhandled exceptions in Flask (like DB connection failures) could result in Flask leaking stack traces and sensitive information to the client if not caught or properly configured in production environments.
+**Learning:** Individual routes had `except Exception:` blocks, but some internal errors might skip those or arise from middleware.
+**Prevention:** Always implement a global `@app.errorhandler(Exception)` that catches all non-HTTP exceptions, logs them internally, and returns a generic secure JSON response to the user.
