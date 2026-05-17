@@ -64,20 +64,26 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
-        const loop = () => {
-            if (!canvas) return; // Guard against cleanup
-
+        // Monitor canvas size with ResizeObserver
+        const resizeObserver = new ResizeObserver(() => {
+            if (!canvas) return;
             const rect = canvas.getBoundingClientRect();
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
             ctx.scale(dpr, dpr);
+        });
+        resizeObserver.observe(canvas);
 
-            const width = rect.width;
-            const height = rect.height;
+        const loop = () => {
+            if (!canvas) return; // Guard against cleanup
+
+            const width = canvas.width / dpr;
+            const height = canvas.height / dpr;
             const centerX = width / 2;
             const centerY = height / 2;
 
-            ctx.clearRect(0, 0, width, height);
+            // Clear explicit area, since width/height assignment isn't resetting implicitly anymore
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -165,6 +171,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         );
 
         return () => {
+            resizeObserver.disconnect();
             unsubscribe();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
