@@ -109,6 +109,16 @@ def create_app():
             return jsonify(error=str(e)), 400
         return jsonify(error="Bad Request"), 400
 
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        from werkzeug.exceptions import HTTPException
+        if isinstance(e, HTTPException):
+            return e
+
+        # Security: Do not leak internal error details to the client
+        app.logger.error(f"Unhandled Exception: {str(e)}")
+        return jsonify(error="An internal server error occurred."), 500
+
 
     # Register Blueprints
     from .routes.auth import auth_bp
