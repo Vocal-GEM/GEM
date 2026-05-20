@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-20 - Cache canvas dimensions in PitchOrb
+**Learning:** Querying `canvas.getBoundingClientRect()` inside a `requestAnimationFrame` loop causes severe layout thrashing.
+**Action:** Cache dimensions using a `ResizeObserver` on the canvas element, updating only when actual resizes occur. Remember to explicitly clear the canvas `ctx.clearRect(0, 0, width, height)` before drawing, since avoiding `canvas.width` reassignments removes the implicit clear.
