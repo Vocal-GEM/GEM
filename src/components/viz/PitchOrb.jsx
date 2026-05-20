@@ -64,20 +64,33 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        let cachedRect = { width: canvas.width / dpr || 0, height: canvas.height / dpr || 0 };
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                const { width, height } = entry.contentRect;
+                if (width > 0 && height > 0) {
+                    cachedRect = { width, height };
+                    if (canvas) {
+                        canvas.width = width * dpr;
+                        canvas.height = height * dpr;
+                        ctx.scale(dpr, dpr);
+                    }
+                }
+            }
+        });
+
+        // Use ResizeObserver on the canvas to cache dimensions
+        resizeObserver.observe(canvas);
+
         const loop = () => {
-            if (!canvas) return; // Guard against cleanup
+            if (!canvas || cachedRect.width === 0) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            const width = cachedRect.width;
+            const height = cachedRect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
-            ctx.clearRect(0, 0, width, height);
+            ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -165,6 +178,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         );
 
         return () => {
+            resizeObserver.disconnect();
             unsubscribe();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
