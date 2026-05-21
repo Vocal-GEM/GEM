@@ -42,6 +42,7 @@ const TargetVoicePlayer = ({ text, label = "Target Voice" }) => {
                         value={rate}
                         onChange={(e) => setRate(parseFloat(e.target.value))}
                         className="w-16 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:bg-pink-500 [&::-webkit-slider-thumb]:rounded-full"
+                        aria-label="Playback speed"
                     />
                 </div>
             </div>
@@ -49,6 +50,7 @@ const TargetVoicePlayer = ({ text, label = "Target Voice" }) => {
             <div className="flex gap-3 items-center">
                 <button
                     onClick={handlePlay}
+                    aria-label={speaking ? "Stop playback" : "Play target voice"}
                     className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${speaking
                         ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
                         : 'bg-pink-500 hover:bg-pink-400 text-white shadow-lg shadow-pink-500/20'
