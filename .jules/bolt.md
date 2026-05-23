@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-18 - Avoid layout thrashing in Canvas Render Loops
+**Learning:** Reassigning `canvas.width` and `canvas.height` or calling `getBoundingClientRect()` inside a high-frequency render loop (like `requestAnimationFrame`) causes severe layout thrashing, as the browser recalculates styles synchronously.
+**Action:** Cache canvas dimensions and use a `ResizeObserver` to update them dynamically. Since removing `canvas.width` reassignments also removes the implicit state reset, always explicitly call `ctx.clearRect` on the entire canvas dimension, and wrap dynamic transformations (like scaling) with `ctx.save()` and `ctx.restore()`.
