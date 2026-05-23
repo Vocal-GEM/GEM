@@ -13,11 +13,20 @@ vi.mock('../../services/RenderCoordinator', () => ({
     }
 }));
 
+// Mock ResizeObserver
+globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
+
 // Mock Canvas getContext
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     clearRect: vi.fn(),
     beginPath: vi.fn(),
     arc: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
     fill: vi.fn(),
     stroke: vi.fn(),
     fillText: vi.fn(),
