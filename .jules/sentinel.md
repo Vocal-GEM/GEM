@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-23 - Information disclosure via dead code blocks
+**Vulnerability:** Raw exception messages (`str(e)`) were being leaked to users in 500 responses because a redundant error handling block was executed before the safe, generic error message could be reached.
+**Learning:** Duplicate error handling logic can create dead code that overrides secure implementations. Just because safe error handling exists further down the function doesn't mean it will be executed.
+**Prevention:** Ensure that error handling blocks are singular and do not contain unreachable code. Always verify that the final HTTP response for exceptions does not include raw traceback or exception string interpolation.
