@@ -64,20 +64,34 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        let dimensions = { width: canvas.clientWidth || 300, height: canvas.clientHeight || 300 };
+
+        // Use ResizeObserver instead of getBoundingClientRect in loop
+        const resizeObserver = new ResizeObserver((entries) => {
+            if (entries.length === 0) return;
+            const entry = entries[0];
+            dimensions = { width: entry.contentRect.width, height: entry.contentRect.height };
+            canvas.width = dimensions.width * dpr;
+            canvas.height = dimensions.height * dpr;
+        });
+
+        resizeObserver.observe(canvas);
+
+        // Initial setup
+        canvas.width = dimensions.width * dpr;
+        canvas.height = dimensions.height * dpr;
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            const { width, height } = dimensions;
             const centerX = width / 2;
             const centerY = height / 2;
 
-            ctx.clearRect(0, 0, width, height);
+            // Use explicit clean and transform bounds without reflows
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.scale(dpr, dpr);
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -156,6 +170,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('--- Hz', centerX, centerY);
             }
+
+            ctx.restore();
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -166,6 +182,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
