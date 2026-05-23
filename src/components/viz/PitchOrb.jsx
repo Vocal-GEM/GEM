@@ -64,16 +64,35 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        const dimensionsRef = { width: 0, height: 0 };
+
+        const updateDimensions = () => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            const newWidth = rect.width * dpr;
+            const newHeight = rect.height * dpr;
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                dimensionsRef.width = rect.width;
+                dimensionsRef.height = rect.height;
+                ctx.scale(dpr, dpr);
+            }
+        };
+
+        const resizeObserver = new ResizeObserver(updateDimensions);
+        resizeObserver.observe(canvas);
+        updateDimensions();
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const width = dimensionsRef.width;
+            const height = dimensionsRef.height;
 
-            const width = rect.width;
-            const height = rect.height;
+            if (width === 0 || height === 0) return;
+
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -166,6 +185,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
