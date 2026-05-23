@@ -49,6 +49,7 @@ const TargetVoicePlayer = ({ text, label = "Target Voice" }) => {
             <div className="flex gap-3 items-center">
                 <button
                     onClick={handlePlay}
+                    aria-label={speaking ? "Stop playback" : "Play target voice"}
                     className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${speaking
                         ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
                         : 'bg-pink-500 hover:bg-pink-400 text-white shadow-lg shadow-pink-500/20'
