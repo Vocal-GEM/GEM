@@ -146,8 +146,9 @@ const SuccessStories = () => {
                     <h3 className="text-lg font-medium text-white mb-4">Share Your Journey</h3>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="block text-sm text-slate-400 mb-1">Title</label>
+                            <label htmlFor="story-title" className="block text-sm text-slate-400 mb-1">Title</label>
                             <input
+                                id="story-title"
                                 type="text"
                                 className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-purple-500"
                                 placeholder="e.g., My 6-month progress update"
@@ -157,8 +158,9 @@ const SuccessStories = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm text-slate-400 mb-1">Your Story</label>
+                            <label htmlFor="story-content" className="block text-sm text-slate-400 mb-1">Your Story</label>
                             <textarea
+                                id="story-content"
                                 className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white h-32 focus:ring-2 focus:ring-purple-500"
                                 placeholder="Share your experience, tips, and encouragement..."
                                 value={formData.story}
@@ -168,8 +170,9 @@ const SuccessStories = () => {
                         </div>
                         <div className="flex gap-4">
                             <div>
-                                <label className="block text-sm text-slate-400 mb-1">Timeline (Months)</label>
+                                <label htmlFor="story-timeline" className="block text-sm text-slate-400 mb-1">Timeline (Months)</label>
                                 <input
+                                    id="story-timeline"
                                     type="number"
                                     className="w-24 bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white"
                                     value={formData.timeline_months}
@@ -177,8 +180,9 @@ const SuccessStories = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm text-slate-400 mb-1">Goal</label>
+                                <label htmlFor="story-goal" className="block text-sm text-slate-400 mb-1">Goal</label>
                                 <select
+                                    id="story-goal"
                                     className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white"
                                     value={formData.voice_goal}
                                     onChange={e => setFormData({ ...formData, voice_goal: e.target.value })}
