@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2025-05-24 - Cross-Site Scripting (XSS) via innerHTML and Missing Security Headers
+**Vulnerability:** A fallback error handler for an image in `WarmUpModule.jsx` directly set the `innerHTML` of the parent element, posing a potential XSS vulnerability if fallback logic is ever manipulated. Also, several external links using `target="_blank"` were missing complete `rel="noopener noreferrer"` attributes, leading to reverse tabnabbing and performance risks.
+**Learning:** `innerHTML` should never be used in React without `dangerouslySetInnerHTML`, and even then only when absolutely necessary with sanitized data. A safer alternative is to use `textContent` for string fallbacks. Also, all `target="_blank"` links must include `rel="noopener noreferrer"`.
+**Prevention:** Always use safe DOM APIs like `textContent` over `innerHTML` and ensure automated linters catch missing security attributes on `a` tags.
