@@ -79,6 +79,7 @@ const StreakCalendar = () => {
                 <button
                     onClick={prevMonth}
                     className="p-2 text-slate-400 hover:text-white"
+                    aria-label="Previous month"
                 >
                     <ChevronLeft size={20} />
                 </button>
@@ -88,6 +89,7 @@ const StreakCalendar = () => {
                 <button
                     onClick={nextMonth}
                     className="p-2 text-slate-400 hover:text-white"
+                    aria-label="Next month"
                 >
                     <ChevronRight size={20} />
                 </button>
