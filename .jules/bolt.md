@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-18 - Avoid getBoundingClientRect in requestAnimationFrame
+**Learning:** Calling `canvas.getBoundingClientRect()` or resetting `canvas.width`/`height` inside an animation loop like `requestAnimationFrame` forces synchronous layout calculations and implicitly clears canvas state, leading to severe layout thrashing and FPS drops.
+**Action:** Cache the canvas dimensions using a `ResizeObserver` and remove the dynamic width/height assignments from the inner loop. Manually call `ctx.clearRect()` and wrap draw calls in `ctx.save()` and `ctx.restore()` for transforms.
