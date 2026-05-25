@@ -17,6 +17,7 @@ const getNoteFromSemitone = (semitone) => {
 
 const PitchOrb = ({ dataRef, settings = {} }) => {
     const canvasRef = useRef(null);
+    const dimensionsRef = useRef({ width: 0, height: 0 });
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
@@ -28,6 +29,32 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     };
 
     const genderRanges = settings.genderRanges || defaultRanges;
+
+    // Monitor canvas size with ResizeObserver to prevent layout thrashing
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const updateDimensions = () => {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+
+            dimensionsRef.current = {
+                width: rect.width,
+                height: rect.height
+            };
+        };
+
+        const observer = new ResizeObserver(updateDimensions);
+        observer.observe(canvas);
+
+        updateDimensions();
+
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -67,17 +94,16 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            // Use cached dimensions to avoid layout thrashing
+            const { width, height } = dimensionsRef.current;
             const centerX = width / 2;
             const centerY = height / 2;
 
-            ctx.clearRect(0, 0, width, height);
+            // Clear absolute canvas bounds before scaling
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.scale(dpr, dpr);
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -156,6 +182,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('--- Hz', centerX, centerY);
             }
+
+            ctx.restore();
         };
 
         const unsubscribe = renderCoordinator.subscribe(
