@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-05-28 - Keyboard Accessibility on Custom Buttons
+**Learning:** Using `div` elements with `onClick` handlers for interactive elements creates "mouse-only" traps. Users navigating via keyboard cannot focus or activate them.
+**Action:** Always add `role="button"`, `tabIndex={0}`, and an `onKeyDown` handler (for Enter/Space) to non-native interactive elements, along with `focus-visible` styles for visual feedback.
