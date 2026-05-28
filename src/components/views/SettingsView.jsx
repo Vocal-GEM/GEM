@@ -318,6 +318,8 @@ const SettingsView = () => {
                                 onClick={() => updateSettings({ ...settings, showBaselineComparison: !settings.showBaselineComparison })}
                                 className={`w-14 h-8 rounded-full transition-colors relative ${settings.showBaselineComparison ? 'bg-purple-500' : 'bg-slate-700'}`}
                                 aria-label="Toggle Baseline Comparison"
+                                role="switch"
+                                aria-checked={settings.showBaselineComparison || false}
                             >
                                 <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.showBaselineComparison ? 'left-7' : 'left-1'}`} />
                             </button>
@@ -380,6 +382,8 @@ const SettingsView = () => {
                                 onClick={() => updateSettings({ ...settings, showNorms: !settings.showNorms })}
                                 className={`w-14 h-8 rounded-full transition-colors relative ${settings.showNorms ? 'bg-blue-500' : 'bg-slate-700'}`}
                                 aria-label="Toggle Standardized Norms"
+                                role="switch"
+                                aria-checked={settings.showNorms || false}
                             >
                                 <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.showNorms ? 'left-7' : 'left-1'}`} />
                             </button>
@@ -435,6 +439,8 @@ const SettingsView = () => {
                                 })}
                                 className={`w-14 h-8 rounded-full transition-colors relative ${settings.accessibility?.highContrast ? 'bg-purple-500' : 'bg-slate-700'}`}
                                 aria-label="Toggle High Contrast Mode"
+                                role="switch"
+                                aria-checked={settings.accessibility?.highContrast || false}
                             >
                                 <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.accessibility?.highContrast ? 'left-7' : 'left-1'}`} />
                             </button>
@@ -518,6 +524,9 @@ const SettingsView = () => {
                                     accessibility: { ...settings.accessibility, reduceMotion: !settings.accessibility?.reduceMotion }
                                 })}
                                 className={`w-14 h-8 rounded-full transition-colors relative ${settings.accessibility?.reduceMotion ? 'bg-indigo-500' : 'bg-slate-700'}`}
+                                aria-label="Toggle Reduce Motion"
+                                role="switch"
+                                aria-checked={settings.accessibility?.reduceMotion || false}
                             >
                                 <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.accessibility?.reduceMotion ? 'left-7' : 'left-1'}`} />
                             </button>
@@ -548,6 +557,9 @@ const SettingsView = () => {
                                     notifications: { ...settings.notifications, dailyReminder: !settings.notifications?.dailyReminder }
                                 })}
                                 className={`w-14 h-8 rounded-full transition-colors relative ${settings.notifications?.dailyReminder ? 'bg-amber-500' : 'bg-slate-700'}`}
+                                aria-label="Toggle Daily Practice Reminder"
+                                role="switch"
+                                aria-checked={settings.notifications?.dailyReminder || false}
                             >
                                 <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.notifications?.dailyReminder ? 'left-7' : 'left-1'}`} />
                             </button>
@@ -587,6 +599,9 @@ const SettingsView = () => {
                                     notifications: { ...settings.notifications, streakAlerts: !settings.notifications?.streakAlerts }
                                 })}
                                 className={`w-14 h-8 rounded-full transition-colors relative ${settings.notifications?.streakAlerts ? 'bg-amber-500' : 'bg-slate-700'}`}
+                                aria-label="Toggle Streak Alerts"
+                                role="switch"
+                                aria-checked={settings.notifications?.streakAlerts || false}
                             >
                                 <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.notifications?.streakAlerts ? 'left-7' : 'left-1'}`} />
                             </button>
@@ -604,6 +619,9 @@ const SettingsView = () => {
                                     notifications: { ...settings.notifications, milestoneCelebrations: settings.notifications?.milestoneCelebrations !== false }
                                 })}
                                 className={`w-14 h-8 rounded-full transition-colors relative ${settings.notifications?.milestoneCelebrations !== false ? 'bg-amber-500' : 'bg-slate-700'}`}
+                                aria-label="Toggle Milestone Celebrations"
+                                role="switch"
+                                aria-checked={settings.notifications?.milestoneCelebrations !== false}
                             >
                                 <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.notifications?.milestoneCelebrations !== false ? 'left-7' : 'left-1'}`} />
                             </button>
@@ -634,6 +652,9 @@ const SettingsView = () => {
                                     audio: { ...settings.audio, coachingSounds: !settings.audio?.coachingSounds }
                                 })}
                                 className={`w-14 h-8 rounded-full transition-colors relative ${settings.audio?.coachingSounds ? 'bg-cyan-500' : 'bg-slate-700'}`}
+                                aria-label="Toggle Coaching Sound Cues"
+                                role="switch"
+                                aria-checked={settings.audio?.coachingSounds || false}
                             >
                                 <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.audio?.coachingSounds ? 'left-7' : 'left-1'}`} />
                             </button>
@@ -651,6 +672,9 @@ const SettingsView = () => {
                                     audio: { ...settings.audio, targetHitSounds: !settings.audio?.targetHitSounds }
                                 })}
                                 className={`w-14 h-8 rounded-full transition-colors relative ${settings.audio?.targetHitSounds ? 'bg-cyan-500' : 'bg-slate-700'}`}
+                                aria-label="Toggle Target Hit Sounds"
+                                role="switch"
+                                aria-checked={settings.audio?.targetHitSounds || false}
                             >
                                 <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.audio?.targetHitSounds ? 'left-7' : 'left-1'}`} />
                             </button>
@@ -671,6 +695,9 @@ const SettingsView = () => {
                                     audio: { ...settings.audio, hapticFeedback: !settings.audio?.hapticFeedback }
                                 })}
                                 className={`w-14 h-8 rounded-full transition-colors relative ${settings.audio?.hapticFeedback ? 'bg-cyan-500' : 'bg-slate-700'}`}
+                                aria-label="Toggle Haptic Feedback"
+                                role="switch"
+                                aria-checked={settings.audio?.hapticFeedback || false}
                             >
                                 <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform ${settings.audio?.hapticFeedback ? 'left-7' : 'left-1'}`} />
                             </button>
