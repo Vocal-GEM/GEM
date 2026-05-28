@@ -35,8 +35,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         if (!canvas) return;
 
         const updateDimensions = () => {
-            const rect = canvas.getBoundingClientRect();
             const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
 
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
@@ -64,7 +64,6 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
