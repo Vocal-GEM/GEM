@@ -13,13 +13,6 @@ vi.mock('../../services/RenderCoordinator', () => ({
     }
 }));
 
-// Mock ResizeObserver
-globalThis.ResizeObserver = class ResizeObserver {
-    constructor(cb) { this.cb = cb; }
-    observe() { this.cb([{ contentRect: { width: 300, height: 300 } }]); }
-    disconnect() {}
-};
-
 // Mock Canvas getContext
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     clearRect: vi.fn(),
@@ -29,8 +22,6 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     stroke: vi.fn(),
     fillText: vi.fn(),
     scale: vi.fn(),
-    save: vi.fn(),
-    restore: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
@@ -39,7 +30,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-globalThis.requestAnimationFrame = mockRequestAnimationFrame;
+global.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('PitchOrb', () => {
     let dataRef;
@@ -70,7 +61,7 @@ describe('PitchOrb', () => {
         await new Promise(resolve => setTimeout(resolve, 0));
 
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
-        const [, callback] = renderCoordinator.subscribe.mock.calls[0];
+        const [id, callback] = renderCoordinator.subscribe.mock.calls[0];
 
         // Execute the callback
         callback();
@@ -79,6 +70,6 @@ describe('PitchOrb', () => {
         // We assert it IS called to confirm the bug exists in the current code,
         // OR we assert it is NOT called if we want to write the test for the desired state.
         // Let's write the test for the DESIRED state (fail now, pass later).
-        expect(mockRequestAnimationFrame).toHaveBeenCalledTimes(1);
+        expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
     });
 });
