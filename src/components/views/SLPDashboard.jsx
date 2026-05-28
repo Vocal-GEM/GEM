@@ -113,12 +113,18 @@ const SLPDashboard = ({ dataRef, audioEngine }) => {
                                     Quick Tools
                                 </h3>
                                 <div className="flex-1 grid grid-cols-2 gap-2">
-                                    <div className="bg-slate-800/50 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-800 transition-colors"
+                                    <div className="bg-slate-800/50 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTool('mpt'); } }}
                                         onClick={() => setActiveTool('mpt')}>
                                         <div className="text-blue-400 font-bold text-lg">MPT</div>
                                         <div className="text-[10px] text-slate-500">Timer</div>
                                     </div>
-                                    <div className="bg-slate-800/50 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-800 transition-colors"
+                                    <div className="bg-slate-800/50 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:outline-none"
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTool('sz'); } }}
                                         onClick={() => setActiveTool('sz')}>
                                         <div className="text-purple-400 font-bold text-lg">S/Z</div>
                                         <div className="text-[10px] text-slate-500">Ratio</div>
