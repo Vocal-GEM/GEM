@@ -49,8 +49,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 loop,
                 renderCoordinator.PRIORITY.MEDIUM
             );
-        });
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
+        // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
         const unsubscribe = renderCoordinator.subscribe(
