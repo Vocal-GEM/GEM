@@ -28,6 +28,35 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     };
 
     const genderRanges = settings.genderRanges || defaultRanges;
+    const dimensionsRef = useRef({ width: 0, height: 0 });
+
+    // Monitor canvas size with ResizeObserver
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const updateDimensions = () => {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+
+            dimensionsRef.current = {
+                width: rect.width,
+                height: rect.height
+            };
+
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+        };
+
+        const observer = new ResizeObserver(updateDimensions);
+        observer.observe(canvas);
+        updateDimensions();
+
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -67,17 +96,13 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            const { width, height } = dimensionsRef.current;
             const centerX = width / 2;
             const centerY = height / 2;
 
+            // Clear frame without resetting transform
             ctx.clearRect(0, 0, width, height);
+            ctx.save();
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -126,6 +151,9 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             ctx.strokeStyle = pitch > 0 ? colorData.primary : '#334155';
             ctx.lineWidth = 3;
             ctx.stroke();
+
+            // Restore context to avoid cumulative transforms if any were added
+            ctx.restore();
 
             // Text
             if (pitch > 0) {
