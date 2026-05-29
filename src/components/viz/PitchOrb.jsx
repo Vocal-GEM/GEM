@@ -17,8 +17,37 @@ const getNoteFromSemitone = (semitone) => {
 
 const PitchOrb = ({ dataRef, settings = {} }) => {
     const canvasRef = useRef(null);
+    const dimensionsRef = useRef({ width: 0, height: 0 });
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const updateDimensions = () => {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+
+            dimensionsRef.current = {
+                width: rect.width,
+                height: rect.height
+            };
+
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+        };
+
+        const observer = new ResizeObserver(updateDimensions);
+        observer.observe(canvas);
+
+        updateDimensions();
+
+        return () => observer.disconnect();
+    }, []);
 
     // Default gender ranges if not set in settings
     const defaultRanges = {
@@ -67,17 +96,14 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const { width, height } = dimensionsRef.current;
+            if (width === 0 || height === 0) return;
 
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
             ctx.clearRect(0, 0, width, height);
+            ctx.save();
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -156,6 +182,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('--- Hz', centerX, centerY);
             }
+
+            ctx.restore();
         };
 
         const unsubscribe = renderCoordinator.subscribe(
