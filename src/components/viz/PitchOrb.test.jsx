@@ -15,6 +15,8 @@ vi.mock('../../services/RenderCoordinator', () => ({
 
 // Mock Canvas getContext
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+    save: vi.fn(),
+    restore: vi.fn(),
     clearRect: vi.fn(),
     beginPath: vi.fn(),
     arc: vi.fn(),
@@ -31,6 +33,14 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
 global.requestAnimationFrame = mockRequestAnimationFrame;
+
+// Mock ResizeObserver
+global.ResizeObserver = class ResizeObserver {
+    constructor(cb) { this.cb = cb; }
+    observe() { this.cb([{ contentRect: { width: 300, height: 300 } }]); }
+    unobserve() {}
+    disconnect() {}
+};
 
 describe('PitchOrb', () => {
     let dataRef;
