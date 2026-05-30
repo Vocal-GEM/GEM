@@ -64,20 +64,36 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
-        const loop = () => {
-            if (!canvas) return; // Guard against cleanup
+        let dimensions = { width: 0, height: 0 };
+        let observer = null;
 
+        const updateDimensions = () => {
+            if (!canvas) return;
             const rect = canvas.getBoundingClientRect();
+            dimensions = { width: rect.width, height: rect.height };
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
             ctx.scale(dpr, dpr);
+        };
 
-            const width = rect.width;
-            const height = rect.height;
+        if (canvas) {
+            observer = new ResizeObserver(updateDimensions);
+            observer.observe(canvas);
+
+            // Initial setup
+            updateDimensions();
+        }
+
+        const loop = () => {
+            if (!canvas) return; // Guard against cleanup
+
+            const width = dimensions.width;
+            const height = dimensions.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
             ctx.clearRect(0, 0, width, height);
+            ctx.save();
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -156,6 +172,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('--- Hz', centerX, centerY);
             }
+
+            ctx.restore();
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -166,6 +184,9 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            if (observer) {
+                observer.disconnect();
+            }
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 

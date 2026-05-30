@@ -25,12 +25,26 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
-    canvas: { width: 300, height: 300 }
+    canvas: { width: 300, height: 300 },
+    save: vi.fn(),
+    restore: vi.fn()
 }));
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
 global.requestAnimationFrame = mockRequestAnimationFrame;
+
+// Mock ResizeObserver
+class ResizeObserver {
+    constructor(cb) {
+        this.cb = cb;
+    }
+    observe() {
+        this.cb([{ contentRect: { width: 300, height: 300 } }]);
+    }
+    disconnect() {}
+}
+globalThis.ResizeObserver = ResizeObserver;
 
 describe('PitchOrb', () => {
     let dataRef;
