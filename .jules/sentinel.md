@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-05-23 - Stored XSS / Duplicate Variables Overwriting Clean Data
+**Vulnerability:** In `submit_success_story`, user input (title, story) was properly sanitized but then accidentally overwritten by a duplicate block fetching raw/unclean data from the request again, rendering the sanitization useless. Similarly, redundant duplicate validation lines existed in `share_voice`.
+**Learning:** Duplicate code blocks (often from bad merges) can accidentally overwrite sanitized/validated variables with unsafe input right before usage.
+**Prevention:** Remove redundant code blocks and ensure variables passed to database models (e.g. `clean_title`, `clean_story`) or downstream functions are definitively the output of the sanitization functions, not re-fetched from the request object.
