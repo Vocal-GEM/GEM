@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-31 - Canvas Dimensions in Animation Loops
+**Learning:** Checking elements' physical dimensions inside an animation loop frame causes layout thrashing and poor performance. In addition, resetting dimensions resets the canvas context, so removing the reset required introducing explicit context saves and restores.
+**Action:** Use ResizeObserver to cache changes to physical elements and update variables, which can then be referenced by the loop without causing a reflow. Add explicit `ctx.save()`/`ctx.restore()` to the loop.
