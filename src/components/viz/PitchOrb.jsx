@@ -64,19 +64,39 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        // Initial dimensions
+        const initialRect = canvas.getBoundingClientRect();
+        let cachedWidth = initialRect.width;
+        let cachedHeight = initialRect.height;
+
+        canvas.width = cachedWidth * dpr;
+        canvas.height = cachedHeight * dpr;
+        ctx.scale(dpr, dpr);
+
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const { width, height } = entry.contentRect;
+                cachedWidth = width;
+                cachedHeight = height;
+                if (canvas) {
+                    canvas.width = width * dpr;
+                    canvas.height = height * dpr;
+                    ctx.scale(dpr, dpr);
+                }
+            }
+        });
+
+        resizeObserver.observe(canvas);
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            const width = cachedWidth;
+            const height = cachedHeight;
             const centerX = width / 2;
             const centerY = height / 2;
 
+            ctx.save();
             ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
@@ -156,6 +176,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('--- Hz', centerX, centerY);
             }
+
+            ctx.restore();
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -166,6 +188,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 

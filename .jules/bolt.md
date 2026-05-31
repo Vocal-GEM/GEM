@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-31 - Fix Layout Thrashing in High-Frequency Canvas Rendering
+**Learning:** Using `getBoundingClientRect()` or resetting `canvas.width` inside a high-frequency `requestAnimationFrame` loop (like `PitchOrb`) causes continuous layout thrashing ("forced synchronous layout"), destroying frame rates. Also, removing the per-frame `canvas.width` reassignment means the canvas transform state (like `scale`) and content are no longer implicitly cleared each frame.
+**Action:** Use a `ResizeObserver` to asynchronously cache dimensions outside the render loop. Inside the loop, read the cached dimensions. Additionally, explicitly use `ctx.save()`, `ctx.clearRect()`, and `ctx.restore()` to safely clear the frame without accumulating transforms. Ensure Vitest tests are updated with `globalThis.ResizeObserver` and mock context methods like `save` and `restore`.
