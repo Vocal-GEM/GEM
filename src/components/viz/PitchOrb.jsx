@@ -31,8 +31,24 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
+
+        const dimensionsRef = { width: 0, height: 0 };
+
+        const updateDimensions = () => {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            dimensionsRef.width = rect.width;
+            dimensionsRef.height = rect.height;
+            ctx.scale(dpr, dpr);
+        };
+
+        const observer = new ResizeObserver(updateDimensions);
+        observer.observe(canvas);
+        updateDimensions();
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,17 +83,13 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            const width = dimensionsRef.width;
+            const height = dimensionsRef.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
             ctx.clearRect(0, 0, width, height);
+            ctx.save();
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -156,6 +168,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('--- Hz', centerX, centerY);
             }
+            ctx.restore();
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -165,6 +178,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         );
 
         return () => {
+            observer.disconnect();
             unsubscribe();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
