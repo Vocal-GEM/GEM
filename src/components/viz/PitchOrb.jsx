@@ -34,6 +34,25 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
 
+        // Resize observer to handle canvas resizing without layout thrashing
+        const updateSize = () => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+        };
+
+        // Initial sizing
+        updateSize();
+
+        const resizeObserver = new globalThis.ResizeObserver(() => {
+            requestAnimationFrame(updateSize);
+        });
+
+        if (canvas.parentElement) {
+            resizeObserver.observe(canvas.parentElement);
+        }
+
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
             if (pitch >= genderRanges.feminine.min) {
@@ -67,17 +86,15 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const width = canvas.width / dpr;
+            const height = canvas.height / dpr;
 
-            const width = rect.width;
-            const height = rect.height;
+            ctx.save();
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, width, height);
+
             const centerX = width / 2;
             const centerY = height / 2;
-
-            ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -156,6 +173,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('--- Hz', centerX, centerY);
             }
+
+            ctx.restore();
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -166,6 +185,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
