@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-25 - Missing aria-labels on icon-only buttons
+**Learning:** Found several icon-only buttons (like ArrowLeft for back, XCircle for close, Mic/Square for record/stop) in `ShadowingExercise.jsx` that lack `aria-label` attributes, making them inaccessible to screen reader users.
+**Action:** When auditing exercises, always verify that icon-only buttons have descriptive `aria-label` attributes to ensure they announce their purpose to screen readers.
