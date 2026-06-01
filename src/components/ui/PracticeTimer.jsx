@@ -118,6 +118,7 @@ const PracticeTimer = ({ onComplete, onClose, compact = false }) => {
                 <button
                     onClick={toggleTimer}
                     className="p-1 rounded-full hover:bg-slate-700 transition-colors"
+                    aria-label={isRunning ? "Pause timer" : "Start timer"}
                 >
                     {isRunning ? <Pause size={12} /> : <Play size={12} fill="currentColor" />}
                 </button>
@@ -125,6 +126,7 @@ const PracticeTimer = ({ onComplete, onClose, compact = false }) => {
                     <button
                         onClick={onClose}
                         className="p-1 rounded-full hover:bg-slate-700 text-slate-500 hover:text-white transition-colors"
+                        aria-label="Close timer"
                     >
                         <X size={12} />
                     </button>
@@ -145,6 +147,7 @@ const PracticeTimer = ({ onComplete, onClose, compact = false }) => {
                     <button
                         onClick={onClose}
                         className="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+                        aria-label="Close timer"
                     >
                         <X size={18} />
                     </button>
@@ -221,6 +224,7 @@ const PracticeTimer = ({ onComplete, onClose, compact = false }) => {
                     onClick={resetTimer}
                     className="p-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white transition-all"
                     title="Reset"
+                    aria-label="Reset timer"
                 >
                     <RotateCcw size={20} />
                 </button>
@@ -249,6 +253,7 @@ const PracticeTimer = ({ onComplete, onClose, compact = false }) => {
                     onClick={() => addTime(5 * 60)}
                     className="p-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white transition-all flex items-center gap-1"
                     title="Add 5 minutes"
+                    aria-label="Add 5 minutes"
                 >
                     <Plus size={16} />
                     <span className="text-xs">5m</span>
