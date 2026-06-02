@@ -142,7 +142,7 @@ const CoachView = () => {
 
             {/* Quick Actions / Modules */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                <div onClick={() => navigate('assessment')} className="bg-slate-800/50 hover:bg-slate-800 border border-white/5 hover:border-blue-500/30 rounded-2xl p-6 cursor-pointer transition-all group">
+                <div role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('assessment'); } }} onClick={() => navigate('assessment')} className="bg-slate-800/50 hover:bg-slate-800 border border-white/5 hover:border-blue-500/30 rounded-2xl p-6 cursor-pointer transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
                     <div className="p-3 bg-purple-500/20 rounded-xl w-fit mb-4 group-hover:scale-110 transition-transform">
                         <Target className="text-purple-400" />
                     </div>
@@ -150,7 +150,7 @@ const CoachView = () => {
                     <p className="text-sm text-slate-400">Check your baseline pitch and resonance.</p>
                 </div>
 
-                <div onClick={() => navigate('training')} className="bg-slate-800/50 hover:bg-slate-800 border border-white/5 hover:border-emerald-500/30 rounded-2xl p-6 cursor-pointer transition-all group">
+                <div role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('training'); } }} onClick={() => navigate('training')} className="bg-slate-800/50 hover:bg-slate-800 border border-white/5 hover:border-emerald-500/30 rounded-2xl p-6 cursor-pointer transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
                     <div className="p-3 bg-emerald-500/20 rounded-xl w-fit mb-4 group-hover:scale-110 transition-transform">
                         <Trophy className="text-emerald-400" />
                     </div>
@@ -158,7 +158,7 @@ const CoachView = () => {
                     <p className="text-sm text-slate-400">Practice specific skills with targeted exercises.</p>
                 </div>
 
-                <div onClick={() => setShowAchievements(true)} className="bg-slate-800/50 hover:bg-slate-800 border border-white/5 hover:border-amber-500/30 rounded-2xl p-6 cursor-pointer transition-all group">
+                <div role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShowAchievements(true); } }} onClick={() => setShowAchievements(true)} className="bg-slate-800/50 hover:bg-slate-800 border border-white/5 hover:border-amber-500/30 rounded-2xl p-6 cursor-pointer transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
                     <div className="p-3 bg-amber-500/20 rounded-xl w-fit mb-4 group-hover:scale-110 transition-transform">
                         <Star className="text-amber-400" />
                     </div>
@@ -166,7 +166,7 @@ const CoachView = () => {
                     <p className="text-sm text-slate-400">Track your milestones and streaks.</p>
                 </div>
 
-                <div onClick={() => navigate('glossary')} className="bg-slate-800/50 hover:bg-slate-800 border border-white/5 hover:border-cyan-500/30 rounded-2xl p-6 cursor-pointer transition-all group">
+                <div role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('glossary'); } }} onClick={() => navigate('glossary')} className="bg-slate-800/50 hover:bg-slate-800 border border-white/5 hover:border-cyan-500/30 rounded-2xl p-6 cursor-pointer transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500">
                     <div className="p-3 bg-cyan-500/20 rounded-xl w-fit mb-4 group-hover:scale-110 transition-transform">
                         <Book className="text-cyan-400" />
                     </div>
@@ -174,7 +174,7 @@ const CoachView = () => {
                     <p className="text-sm text-slate-400">Definitions for all course terms.</p>
                 </div>
 
-                <div onClick={() => setShowCustomCards(true)} className="bg-slate-800/50 hover:bg-slate-800 border border-white/5 hover:border-pink-500/30 rounded-2xl p-6 cursor-pointer transition-all group">
+                <div role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShowCustomCards(true); } }} onClick={() => setShowCustomCards(true)} className="bg-slate-800/50 hover:bg-slate-800 border border-white/5 hover:border-pink-500/30 rounded-2xl p-6 cursor-pointer transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500">
                     <div className="p-3 bg-pink-500/20 rounded-xl w-fit mb-4 group-hover:scale-110 transition-transform">
                         <Edit3 className="text-pink-400" />
                     </div>
