@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-06-02 - [Error Handling Data Leak]
+**Vulnerability:** Exception details (str(e)) were directly returned to the user in JSON error responses in voice manipulation, cleaning, and settings routes.
+**Learning:** The initial intent to hide internal details was present (comments indicated "Do not expose internal error details") but earlier `return jsonify({'error': str(e)}), 500` statements were never removed, leading to dead code and active leaks.
+**Prevention:** Ensure that when refactoring error handlers, old return statements are removed and exception messages are exclusively logged using `logger.error()`, returning only static, generic messages to the client.
