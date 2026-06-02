@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-01-25 - Avoid getBoundingClientRect in RenderCoordinator loops
+**Learning:** Found `getBoundingClientRect()` inside a `RenderCoordinator` animation loop in `PitchOrb.jsx`. Even though it's managed by the coordinator, querying DOM rects directly in a draw loop forces immediate layout calculations, causing layout thrashing and severe performance degradation.
+**Action:** Use a `ResizeObserver` to track changes asynchronously and cache dimensions in a closure. Update canvas size only on resize events, and read from the cache inside the `RenderCoordinator` loop. Remember to `ctx.save()`/`ctx.restore()` since removing the dimension reassignment prevents the implicit transform reset.
