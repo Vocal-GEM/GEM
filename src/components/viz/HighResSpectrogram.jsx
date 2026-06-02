@@ -32,7 +32,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     // Reusable buffers to avoid GC
     // Unique component ID for RenderCoordinator
     const uniqueId = useId();
-    const componentId = `spectrogram-highres-${uniqueId}`;
+
 
     // Reusable buffers to avoid garbage collection churn
     const imgDataRef = useRef(null);
@@ -154,12 +154,8 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         lastFormantsRef.current = { f1, f2 };
 
-    }, [dataRef, colormap]);
-
-    // Initial canvas setup & ResizeObserver
     }, [dataRef, colormap, componentId]);
 
-    // Initial canvas setup
     // Handle Resize with ResizeObserver
     useEffect(() => {
         const container = containerRef.current;

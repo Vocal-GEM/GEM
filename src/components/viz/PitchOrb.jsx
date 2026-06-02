@@ -64,16 +64,34 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        // Cache dimensions to avoid layout thrashing
+        let logicalWidth = 0;
+        let logicalHeight = 0;
+
+        const updateDimensions = () => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            logicalWidth = rect.width;
+            logicalHeight = rect.height;
+            canvas.width = logicalWidth * dpr;
+            canvas.height = logicalHeight * dpr;
+        };
+
+        updateDimensions();
+
+        const resizeObserver = new ResizeObserver(() => {
+            updateDimensions();
+        });
+        resizeObserver.observe(canvas);
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
+            ctx.save();
             ctx.scale(dpr, dpr);
 
-            const width = rect.width;
-            const height = rect.height;
+            const width = logicalWidth;
+            const height = logicalHeight;
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -156,6 +174,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('--- Hz', centerX, centerY);
             }
+            ctx.restore();
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -166,6 +185,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
