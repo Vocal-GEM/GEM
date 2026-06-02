@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## YYYY-MM-DD - [XSS via innerHTML]
+**Vulnerability:** Found use of innerHTML in an onError handler which can lead to XSS.
+**Learning:** Found that an onerror handler had e.target.parentElement.innerHTML = '📷', which is a vector for DOM-based XSS if the fallback element is manipulated or attacker can influence the parent element structure.
+**Prevention:** Always use textContent instead of innerHTML when setting text, particularly inside event handlers like onError.

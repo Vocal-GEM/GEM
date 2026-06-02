@@ -106,7 +106,7 @@ const WarmUpModule = ({ onComplete, onSkip, embedded = false }) => {
                                     src={`/assets/warmups/${item.filename}`}
                                     alt={item.title}
                                     className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                                    onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('flex', 'items-center', 'justify-center'); e.target.parentElement.innerHTML = '📷' }}
+                                    onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('flex', 'items-center', 'justify-center'); e.target.parentElement.textContent = '📷' }}
                                 />
                             </div>
                             <div>
