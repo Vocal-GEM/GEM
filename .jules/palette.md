@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-25 - Icon-only Action Buttons
+**Learning:** Icon-only action buttons in list or table views (like edit, delete, download, play) often lack explicit `aria-label` attributes and rely solely on visual icons or tooltip `title` attributes. This makes them inaccessible to screen readers.
+**Action:** When auditing or building list components with action rows, always ensure every icon-only button has a descriptive `aria-label` (e.g., "Delete recording" rather than just "Delete"). If the button state changes (like Play/Pause), make the `aria-label` dynamic.
