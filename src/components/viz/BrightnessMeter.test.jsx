@@ -20,6 +20,13 @@ vi.mock('../../services/RenderCoordinator', () => ({
   }
 }));
 /*
+  renderCoordinator: {
+    subscribe: vi.fn(),
+    unsubscribe: vi.fn(),
+    PRIORITY: { CRITICAL: 0 }
+  }
+}));
+/*
     renderCoordinator: {
         subscribe: vi.fn(() => vi.fn()), // Returns unsubscribe fn
         PRIORITY: { MEDIUM: 2 }
