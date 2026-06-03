@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-06-03 - Consolidated RAF in SafeModeVisualizer
+**Learning:** The fallback component SafeModeVisualizer was circumventing the RenderCoordinator and running its own independent requestAnimationFrame loop. This defeats the purpose of centralizing loops to prevent layout thrashing and high CPU usage.
+**Action:** Always verify fallback components and edge cases to ensure they use the globally centralized renderCoordinator service.
