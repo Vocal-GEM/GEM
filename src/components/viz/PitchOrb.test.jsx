@@ -22,6 +22,8 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     stroke: vi.fn(),
     fillText: vi.fn(),
     scale: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
@@ -46,6 +48,15 @@ describe('PitchOrb', () => {
             right: 300,
             bottom: 300,
         }));
+
+        // Mock ResizeObserver
+        globalThis.ResizeObserver = class ResizeObserver {
+            constructor(cb) { this.cb = cb; }
+            observe() { this.cb([{ contentRect: { width: 300, height: 300 } }]); }
+            unobserve() {}
+            disconnect() {}
+        };
+
         vi.clearAllMocks();
     });
 
@@ -63,13 +74,21 @@ describe('PitchOrb', () => {
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
         const [id, callback] = renderCoordinator.subscribe.mock.calls[0];
 
-        // Execute the callback
-        callback();
-
         // With the bug, requestAnimationFrame is called.
         // We assert it IS called to confirm the bug exists in the current code,
         // OR we assert it is NOT called if we want to write the test for the desired state.
         // Let's write the test for the DESIRED state (fail now, pass later).
+        // Since we moved updateDimensions to a ResizeObserver which is called immediately
+        // in our mock, mockRequestAnimationFrame will be called once on mount.
+        // The test was originally meant to check if it's called in the DRAW LOOP recursively.
+
+        // Reset the mock to clear the initial mount call
+        mockRequestAnimationFrame.mockClear();
+
+        // Execute the draw loop callback
+        callback();
+
+        // Ensure it is NOT called within the draw loop itself
         expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
     });
 });
