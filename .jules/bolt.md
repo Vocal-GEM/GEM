@@ -1,5 +1,9 @@
 # BOLT'S JOURNAL - CRITICAL LEARNINGS ONLY
 
+## 2025-05-22 - Layout Thrashing in Animation Loops (PitchOrb)
+**Learning:** In `PitchOrb.jsx`, `getBoundingClientRect()` was called inside a high-frequency `requestAnimationFrame` loop, causing synchronous reflows and layout thrashing (~60 times per second). Along with setting `canvas.width` and `canvas.height` unconditionally on each frame, this forced a full repaint and cleared the canvas transform state implicitly.
+**Action:** Used `ResizeObserver` to track element dimensions asynchronously. Updated canvas physical dimensions only when a resize event occurred and saved them in a ref for the animation loop. Explicitly used `ctx.clearRect()` and `ctx.save()` / `ctx.restore()` since setting canvas dimensions was no longer clearing the transform state.
+
 ## 2025-05-21 - React Audio instantiation anti-pattern
 **Learning:** Multiple components were using `const audioRef = useRef(new Audio())`. This constructor runs on *every render*, creating detached DOM elements that are immediately discarded by React's hook reconciliation, causing significant memory churn and CPU overhead.
 **Action:** Always use `useRef(null)` combined with `useEffect` for lazy initialization of expensive objects like `Audio`, `Worker`, or `MediaRecorder`.
