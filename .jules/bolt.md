@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-12 - Canvas explicit clearRect after dimensions refactor
+**Learning:** In HTML5 Canvas, resetting `canvas.width` or `canvas.height` has the implicit side effect of completely clearing the context state, including pixel data. When moving dimension assignment out of an animation loop (e.g., to a `ResizeObserver`) to prevent layout thrashing, you must explicitly call `ctx.clearRect(0, 0, width, height)` within the loop. Otherwise, frames will draw on top of each other, creating an infinite smearing effect.
+**Action:** When refactoring canvas animation loops to cache dimensions, always ensure there is an explicit `ctx.clearRect()` call, typically immediately before `ctx.save()`.
