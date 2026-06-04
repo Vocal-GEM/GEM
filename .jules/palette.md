@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## $(date +%Y-%m-%d) - Accessible Icon Buttons in Visualizations
+**Learning:** Icon-only interactive elements used within complex data visualizations (like toggles in the DynamicOrb or info triggers in BrightnessMeter) are often overlooked during accessibility audits compared to standard form elements. This results in "silent" controls for screen reader users trying to configure the visualization.
+**Action:** Always ensure that icon-only `button` elements, regardless of how deep they are embedded in canvas or visualization wrappers, have descriptive `aria-label`s. Do not rely solely on the `title` attribute, as it is often ignored or poorly announced by screen readers.
