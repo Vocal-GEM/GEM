@@ -61,6 +61,7 @@ const VocalHealthPanel = () => {
                         <button
                             onClick={() => setShowAllTips(true)}
                             className="w-full mt-3 py-2 flex items-center justify-center gap-1 text-xs font-bold text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700"
+                            aria-label="See All Vocal Health Tips"
                         >
                             <Lightbulb size={14} />
                             See All Tips
