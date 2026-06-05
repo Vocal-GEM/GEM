@@ -31,7 +31,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 }));
 
 // Mock ResizeObserver
-globalThis.ResizeObserver = class ResizeObserver {
+global.ResizeObserver = class ResizeObserver {
     constructor(cb) {
         this.cb = cb;
     }
@@ -44,7 +44,7 @@ globalThis.ResizeObserver = class ResizeObserver {
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-globalThis.requestAnimationFrame = mockRequestAnimationFrame;
+global.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('PitchOrb', () => {
     let dataRef;
