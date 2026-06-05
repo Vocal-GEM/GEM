@@ -1,7 +1,7 @@
 import { render, screen, cleanup, act } from '@testing-library/react';
+import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import BrightnessMeter from './BrightnessMeter';
-import React from 'react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
 // Mock RenderCoordinator
@@ -14,8 +14,14 @@ vi.mock('../../services/RenderCoordinator', () => ({
 
 // Override global mock for this test to include Smile
 vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+    // Cannot use React here easily in ESM, let's just use string mapping or dummy object
+    const createIcon = (name) => {
+        const Icon = (props) => {
+            return <div data-testid={name} {...props} />;
+        };
+        Icon.displayName = name;
+        return Icon;
+    };
 
     return {
         Sun: createIcon('Sun'),
