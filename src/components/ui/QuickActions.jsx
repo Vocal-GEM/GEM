@@ -67,13 +67,6 @@ const QuickActions = ({ onAction }) => {
                         >
                             {action.label}
                         </span>
-                        <div className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-white transition-transform hover:scale-110 group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-white ${action.color}`}>
-                        <div
-                            className={twMerge(
-                                "w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-white transition-transform hover:scale-110 group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-white",
-                                action.color
-                            )}
-                        >
                         <div className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-white transition-transform hover:scale-110 group-focus-visible:scale-110 group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-black ${action.color}`}>
                             <action.icon size={20} />
                         </div>
