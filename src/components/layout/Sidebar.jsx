@@ -161,6 +161,8 @@ const Sidebar = ({ activeView, onViewChange }) => {
             {/* Mobile Toggle */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
+                aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
+                aria-expanded={isOpen}
                 className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"
             >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -224,6 +226,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
                                                 <button
                                                     key={result.id}
                                                     onClick={() => handleSelectResult(result)}
+                                                    aria-label={`Select ${result.title}`}
                                                     onMouseEnter={() => setSelectedIndex(resultIndex)}
                                                     className={`w-full px-3 py-2 flex items-center gap-3 text-left transition-colors ${isSelected
                                                         ? 'bg-blue-600 text-white'
@@ -275,6 +278,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
                         {navItems.map((item) => (
                             <button
                                 key={item.id}
+                                aria-current={!item.isModal && activeView === item.id ? "page" : undefined}
                                 onClick={() => {
                                     if (item.isModal) {
                                         openModal(item.id);
