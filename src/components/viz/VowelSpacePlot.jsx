@@ -1,6 +1,7 @@
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useId } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRecording = false }) => {
     const { colorBlindMode } = useSettings();
@@ -33,6 +34,7 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
 
     const [currentVowel, setCurrentVowel] = useState('');
     const [hitScore, setHitScore] = useState(0);
+    const componentId = useId();
 
     // Animation Loop
     useEffect(() => {
@@ -40,8 +42,8 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
 
-        let animationId;
-
+        // ⚡ Bolt Optimization: Use centralized RenderCoordinator instead of direct requestAnimationFrame
+        // Impact: Reduces CPU usage and prevents layout thrashing by consolidating independent RAF loops
         const render = () => {
             // Clear Canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -129,7 +131,6 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
                 }
             }
 
-            animationId = requestAnimationFrame(render);
         };
 
         // Resize handler
@@ -141,10 +142,14 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
         window.addEventListener('resize', resize);
         resize();
 
-        render();
+        const unsubscribe = renderCoordinator.subscribe(
+            `vowel-plot-${componentId}`,
+            render,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
 
         return () => {
-            cancelAnimationFrame(animationId);
+            unsubscribe();
             window.removeEventListener('resize', resize);
         };
     }, [targetVowel, isMasc, isRecording, colorBlindMode]);

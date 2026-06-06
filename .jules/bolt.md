@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-06-06 - Missing RenderCoordinator Subscriptions
+**Learning:** Some components like `VowelSpacePlot.jsx` were still using standard `requestAnimationFrame(render)` for animation loops. This circumvents the `RenderCoordinator` singleton designed to batch render operations across the app, leading to multiple independent RAF loops running simultaneously and increasing CPU overhead/layout thrashing.
+**Action:** Always verify that components with animation loops import and use `renderCoordinator.subscribe(id, render)` instead of `requestAnimationFrame()`. Remember to `unsubscribe()` in the cleanup effect.
