@@ -49,7 +49,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
 
     // Optimized: Use RenderCoordinator to manage animation loop
     useEffect(() => {
-        const update = (delta, currentTime) => {
+        const update = () => {
             if (!dataRef.current) {
                 return;
             }
