@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2026-06-06 - Dynamic ARIA Labels and Focus Styles on Floating Legend
+**Learning:** Floating utility buttons (like the info legend) need dynamic `aria-label` attributes reflecting their toggle state and `aria-expanded` properties to communicate their purpose correctly to screen readers. They also need explicit `focus-visible` styles as they are typically overlay elements that might lack default focus outlines.
+**Action:** Always ensure icon-only toggle buttons include a dynamic `aria-label`, `aria-expanded`, and visible focus styles like `focus-visible:ring-2 focus-visible:outline-none`.
