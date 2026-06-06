@@ -50,7 +50,7 @@ class PitchProcessor extends AudioWorkletProcessor {
             if (this.bufferIndex >= this.bufferSize) {
                 // In AudioWorkletProcessor, currentTime is available globally
                 // For safety in test environments, fallback to performance.now()
-                const cTime = typeof currentTime !== 'undefined' ? currentTime : (globalThis.performance ? globalThis.performance.now() / 1000 : 0);
+                const cTime = typeof globalThis.currentTime !== 'undefined' ? globalThis.currentTime : (globalThis.performance ? globalThis.performance.now() / 1000 : 0);
                 const startTime = cTime;
 
                 // Detect pitch using YIN algorithm
