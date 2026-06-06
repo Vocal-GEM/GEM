@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-06-06 - Layout Thrashing in Animation Loops
+**Learning:** Moving canvas dimension assignments and `getBoundingClientRect()` into a `ResizeObserver` instead of calculating them per-frame fixes layout thrashing. However, since modifying `canvas.width` and `canvas.height` automatically resets the canvas graphics state, you must immediately re-apply any base transformations (like `ctx.scale(dpr, dpr)`) inside the `ResizeObserver` callback right after setting the dimensions to avoid losing high-DPI scaling upon resize.
+**Action:** When refactoring high-frequency animation loops to cache dimensions, verify that the canvas transform stack is correctly re-applied in the observer, and that the main loop properly clears itself since the implicit clear from dimension assignment is removed.
