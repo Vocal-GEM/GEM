@@ -151,6 +151,7 @@ const AnalysisHub = ({ dataRef, targetRange }) => {
                             <button
                                 key={section.id}
                                 onClick={() => setActiveSection(section.id)}
+                                aria-label={section.title}
                                 className={`
                                     ${style.bg} ${style.border} ${style.hoverBorder}
                                     border rounded-xl sm:rounded-2xl p-4 sm:p-6 text-left 
