@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## $(date +%Y-%m-%d) - Canvas Animation Resize Optimization Anti-Pattern
+**Learning:** Optimizing a `requestAnimationFrame` loop by extracting `canvas.width` and `canvas.height` dimension assignments into an asynchronous `ResizeObserver` eliminates the browser's implicit per-frame canvas clearing and transform state reset.
+**Action:** When extracting canvas resizing logic to prevent layout thrashing, you must explicitly restore the lost implicit behaviors inside the animation loop by calling `ctx.resetTransform()`, re-applying base scaling (e.g., `ctx.scale(dpr, dpr)`), and calling `ctx.clearRect()`. Ensure any newly utilized context methods (like `resetTransform`) are also added to the canvas context mocks in the associated test files.
