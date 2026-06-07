@@ -7,7 +7,7 @@ const ErrorRecovery = ({ error, onRetry, onDismiss }) => {
     const isAudioError = error.toLowerCase().includes('audio') || error.toLowerCase().includes('microphone');
 
     return (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 animate-in slide-in-from-top-4 duration-300">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 animate-in slide-in-from-top-4 duration-300" role="alert" aria-live="assertive">
             <div className="bg-red-500/10 backdrop-blur-md border border-red-500/30 rounded-xl p-4 shadow-xl flex items-start gap-4">
                 <div className="p-2 bg-red-500/20 rounded-lg text-red-400 shrink-0">
                     {isAudioError ? <MicOff size={20} /> : <AlertTriangle size={20} />}
