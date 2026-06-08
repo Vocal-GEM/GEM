@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-06-08 - Replaced requestAnimationFrame with renderCoordinator in SafeModeVisualizer
+**Learning:** React components running high-frequency 2D fallback visualizations like `SafeModeVisualizer` (inside `DynamicOrb.jsx`) were creating raw `requestAnimationFrame` loops. These bypass the central `renderCoordinator`, which manages global FPS budgets, pause/resume behavior, and priorities, leading to resource leaks when mixed with other visualizers.
+**Action:** Replaced the independent `requestAnimationFrame` and `cancelAnimationFrame` in `DynamicOrb.jsx` with `renderCoordinator.subscribe()` using `PRIORITY.CRITICAL`, ensuring the 2D fallback mode conforms to the global visualization loop architecture.
