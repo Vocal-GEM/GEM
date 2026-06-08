@@ -3,6 +3,7 @@ import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo } from 'reac
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Diamond, Bug, Activity, Sliders, Gauge } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { OrbitControls } from '@react-three/drei';
 import { useSettings } from '../../context/SettingsContext';
 import OrbLegend from './OrbLegend';
@@ -397,11 +398,11 @@ const VisualizerCanvas = memo(({ isVisible, mode, setMode, dataRef, externalData
 VisualizerCanvas.displayName = 'VisualizerCanvas';
 
 const SafeModeVisualizer = memo(({ dataRef }) => {
+  const componentId = useRef('safe-mode-orb-' + Math.random().toString(36).substring(2, 9)).current;
   const circleRef = useRef(null);
   const textRef = useRef(null);
 
   useEffect(() => {
-    let frameId;
     const loop = () => {
       if (dataRef.current) {
         const { pitch, volume } = dataRef.current;
@@ -414,11 +415,16 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
           textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
         }
       }
-      frameId = requestAnimationFrame(loop);
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
-  }, [dataRef]);
+
+    const unsubscribe = renderCoordinator.subscribe(
+      componentId,
+      loop,
+      renderCoordinator.PRIORITY.HIGH
+    );
+
+    return () => unsubscribe();
+  }, [dataRef, componentId]);
 
   return (
     <div className="w-full h-full flex items-center justify-center">
@@ -472,7 +478,7 @@ const DynamicOrb = memo(({ dataRef, calibration, externalDataRef, audioEngine, t
   }, []);
 
   return (
-    <div ref={containerRef} className="w-full h-full relative group flex flex-col items-center justify-center">
+    <div ref={containerRef} data-testid="dynamic-orb" className="w-full h-full relative group flex flex-col items-center justify-center">
 
       <div className="absolute top-2 text-xs font-bold text-slate-300 uppercase tracking-widest z-10 w-full text-center">
         Dynamic Orb - Pitch, Resonance, Weight, & Volume
