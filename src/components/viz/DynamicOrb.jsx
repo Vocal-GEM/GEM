@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { Diamond, Bug, Activity, Sliders, Gauge } from 'lucide-react';
 import { OrbitControls } from '@react-three/drei';
 import { useSettings } from '../../context/SettingsContext';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import OrbLegend from './OrbLegend';
 import OrbMetricsOverlay from './OrbMetricsOverlay';
 
@@ -401,8 +402,7 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
   const textRef = useRef(null);
 
   useEffect(() => {
-    let frameId;
-    const loop = () => {
+    const loop = (_delta, _time) => {
       if (dataRef.current) {
         const { pitch, volume } = dataRef.current;
         // Update DOM directly
@@ -414,10 +414,11 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
           textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
         }
       }
-      frameId = requestAnimationFrame(loop);
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
+
+    const unsubscribe = renderCoordinator.subscribe('safemode-viz', loop, renderCoordinator.PRIORITY.CRITICAL);
+
+    return () => unsubscribe();
   }, [dataRef]);
 
   return (
