@@ -41,3 +41,11 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## $(date +%Y-%m-%d) - Layout Thrashing in PitchOrb loop
+**Learning:** `PitchOrb.jsx` was calling `canvas.getBoundingClientRect()` and continually resetting `canvas.width` and `canvas.height` synchronously inside the CRITICAL priority render loop (~60 times a second). This triggers forced synchronous layouts (layout thrashing) and re-initializes the canvas graphics state on every single frame, causing significant CPU overhead and dropped frames.
+**Action:** Decouple canvas dimension calculations from the render loop. Use a `ResizeObserver` to track layout changes asynchronously, store the dimensions in a `useRef`, and read from the ref inside the loop. When removing per-frame dimension assignments, ensure you explicitly call `ctx.resetTransform()`, `ctx.scale(dpr, dpr)`, and `ctx.clearRect()` to maintain correct scaling and prevent visual smearing.
+
+## $(date +%Y-%m-%d) - Vitest Global Mocking ReferenceErrors
+**Learning:** In Vitest environment, testing mocks using `global.requestAnimationFrame = ...` fail with `ReferenceError: global is not defined` because Vitest uses ESM modules, meaning `global` is not implicitly available.
+**Action:** Use `globalThis` instead of `global` when mocking standard environment globals like `requestAnimationFrame` or `ResizeObserver`.
