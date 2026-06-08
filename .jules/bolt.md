@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Layout Thrashing in React Component Updates
+**Learning:** `requestAnimationFrame` was being used manually inside a `useEffect` loop in `RegisterGauge.jsx` to process high-frequency stream data. Because this component frequently triggers state updates based on that loop, having it disjointed from the main visualizer frame loop increases the risk of layout thrashing and redundant react render passes.
+**Action:** Always prefer hooking into the centralized `RenderCoordinator` service for continuous data processing in UI components. This ensures updates are batched properly, throttled by the coordinator's target FPS, and properly paused when the component is inactive or the user changes tabs.
