@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-06-08 - RenderCoordinator React 18 Suspense Timeout
+**Learning:** Moving a component's visualization update logic to `RenderCoordinator` can subtly change rendering timing, potentially causing React Testing Library's `findByTestId` (wrapped in Suspense) to time out with `Warning: An update to ... inside a test was not wrapped in act(...)` if the test id isn't rendered immediately. This happens because the custom loop bypasses React's normal render cycle.
+**Action:** Always ensure the top-level parent container of the optimized component still renders synchronously with the expected `data-testid` before the animation loop takes over, or adjust the test mock.
