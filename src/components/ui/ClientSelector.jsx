@@ -78,6 +78,7 @@ const ClientSelector = () => {
                                         </div>
                                     </div>
                                     <button
+                                        aria-label="Delete client"
                                         onClick={(e) => handleDeleteClient(e, client.id)}
                                         className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-md opacity-0 group-hover:opacity-100 transition-all"
                                     >
