@@ -93,9 +93,11 @@ const TouchDetector = ({ dataRef, showFeedback = true }) => {
                     </div>
                 </div>
                 <button
-                    className="text-slate-600 hover:text-slate-300 transition-colors"
+                    className="text-slate-600 hover:text-slate-300 transition-colors focus-visible:ring-2 focus-visible:outline-none rounded-full"
                     onMouseEnter={() => setShowTooltip(true)}
                     onMouseLeave={() => setShowTooltip(false)}
+                    aria-label="More info about Touch Detector"
+                    aria-expanded={showTooltip}
                 >
                     <Info size={16} />
                 </button>
