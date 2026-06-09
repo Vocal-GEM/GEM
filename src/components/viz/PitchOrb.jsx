@@ -64,20 +64,44 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        // Cache dimensions to avoid layout thrashing in loop
+        const dimensionsRef = { current: { width: 0, height: 0 } };
+
+        const updateSize = () => {
+            if (!canvas) return;
+            const parent = canvas.parentElement;
+            if (!parent) return;
+            const rect = parent.getBoundingClientRect();
+            const newWidth = rect.width * dpr;
+            const newHeight = rect.height * dpr;
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                dimensionsRef.current = { width: rect.width, height: rect.height };
+            }
+        };
+
+        updateSize();
+
+        const resizeObserver = new ResizeObserver(() => {
+             requestAnimationFrame(updateSize);
+        });
+
+        if (canvas.parentElement) {
+            resizeObserver.observe(canvas.parentElement);
+        }
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            const width = dimensionsRef.current.width;
+            const height = dimensionsRef.current.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
-            ctx.clearRect(0, 0, width, height);
+            ctx.resetTransform();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.scale(dpr, dpr);
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -165,6 +189,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         );
 
         return () => {
+            resizeObserver.disconnect();
             unsubscribe();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
