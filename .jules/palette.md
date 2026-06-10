@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-02-18 - Accessibility Refactoring with Component Cleanups
+**Learning:** Duplicate prop definitions (`className`, `aria-controls`) and redundant hidden states due to bad merges can cause React warnings and screen reader confusion. A parent component with `aria-hidden` properly hides children, making explicit `aria-hidden` on conditionally visible children redundant or sometimes conflicting.
+**Action:** When fixing malformed or conflicted components, strip out duplicate attributes and ensure visibility bindings like `aria-hidden` are managed purely at the container level unless specific child overrides are needed. Always prefer modern `focus-visible` over standard `focus`.
