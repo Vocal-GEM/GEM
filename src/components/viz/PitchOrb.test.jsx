@@ -25,6 +25,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
+    resetTransform: vi.fn(),
     canvas: { width: 300, height: 300 }
 }));
 
