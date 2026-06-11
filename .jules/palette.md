@@ -37,3 +37,9 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-06-11 - InfoTooltip Accessibility
+**Learning:** Tooltip components in this codebase frequently use non-interactive `div` elements to capture hover and click events. This prevents keyboard focus and leaves screen reader users unaware of supplementary information.
+**Action:** When implementing or updating tooltips, always use a `<button type="button">` wrapper with `aria-expanded`, a clear `aria-label`, and explicit keyboard focus styles (`focus-visible`).
+## 2026-06-11 - Component Mocking in Tests
+**Learning:** Vitest tests in ESM environments using `global` to mock global browser APIs (like `requestAnimationFrame`) or set callback variables will fail with ReferenceErrors if `global` isn't defined explicitly.
+**Action:** Always use `globalThis` instead of `global` when mocking or storing variables in test environments to ensure compatibility across Node and browser-like runtimes.
