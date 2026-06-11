@@ -22,6 +22,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     stroke: vi.fn(),
     fillText: vi.fn(),
     scale: vi.fn(),
+    resetTransform: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
@@ -59,6 +60,9 @@ describe('PitchOrb', () => {
 
         // Wait for potential dynamic import resolution
         await new Promise(resolve => setTimeout(resolve, 0));
+
+        // Clear the mock because ResizeObserver will trigger rAF synchronously on mount
+        mockRequestAnimationFrame.mockClear();
 
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
         const [id, callback] = renderCoordinator.subscribe.mock.calls[0];

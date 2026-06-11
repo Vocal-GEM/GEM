@@ -67,26 +67,7 @@ const QualityVisualizer = ({ dataRef }) => {
 
             // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
-
-        // Update history
-        ['jitter', 'shimmer', 'weight'].forEach(key => {
-            historyRef.current[key].push(data[key] || 0);
-            if (historyRef.current[key].length > maxHistory) {
-                historyRef.current[key].shift();
-            }
-        });
-
-        // REMOVED: requestAnimationFrame(loop) - handled by renderCoordinator
     }, [dataRef]);
-
-    useEffect(() => {
-        const unsubscribe = renderCoordinator.subscribe(
-            componentId,
-            loop,
-            renderCoordinator.PRIORITY.MEDIUM
-        );
-
-        return () => {
             unsubscribe();
         };
     }, [componentId, loop]);
