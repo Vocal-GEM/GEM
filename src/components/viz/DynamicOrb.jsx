@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import * as THREE from 'three';
 import { Diamond, Bug, Activity, Sliders, Gauge } from 'lucide-react';
 import { OrbitControls } from '@react-three/drei';
@@ -401,7 +402,6 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
   const textRef = useRef(null);
 
   useEffect(() => {
-    let frameId;
     const loop = () => {
       if (dataRef.current) {
         const { pitch, volume } = dataRef.current;
@@ -414,10 +414,19 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
           textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
         }
       }
-      frameId = requestAnimationFrame(loop);
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
+
+    // ⚡ Bolt Performance Optimization:
+    // Replaced uncoordinated recursive `requestAnimationFrame` with `renderCoordinator.subscribe`.
+    // Expected impact: Reduces layout thrashing and synchronizes visual updates with the
+    // global animation loop, improving frame stability and lowering CPU usage.
+    const unsubscribe = renderCoordinator.subscribe(
+      'DynamicOrbOverlay',
+      loop,
+      renderCoordinator.PRIORITY.MEDIUM
+    );
+
+    return () => unsubscribe();
   }, [dataRef]);
 
   return (

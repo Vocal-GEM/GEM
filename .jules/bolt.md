@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-06-11 - RenderCoordinator for DynamicOrb
+**Learning:** Some components were bypassing the project's centralized `RenderCoordinator` and using raw, isolated `requestAnimationFrame` loops. This causes uncoordinated repaints, unmanaged frame lifetimes, and layout thrashing, specifically in components updating DOM styles frequently like `DynamicOrb.jsx`.
+**Action:** Always prefer importing and subscribing to the global `renderCoordinator` service for high-frequency update loops rather than calling `requestAnimationFrame` directly to ensure optimized scheduling and resource management.
