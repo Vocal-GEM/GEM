@@ -28,7 +28,11 @@ const ExerciseList = ({ category, onBack }) => {
     return (
         <div className="h-full flex flex-col">
             <div className="flex items-center gap-2 mb-6">
-                <button onClick={onBack} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                <button
+                    onClick={onBack}
+                    className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                    aria-label="Back to categories"
+                >
                     <ArrowLeft size={20} />
                 </button>
                 <div>
@@ -63,8 +67,9 @@ const ExerciseList = ({ category, onBack }) => {
                                 {isPerformanceCategory && supported && (
                                     <button
                                         onClick={() => handleSpeak(ex.content)}
-                                        className={`p-2 rounded-lg transition-colors ${speaking ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
+                                        className={`p-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${speaking ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
                                         title={speaking ? 'Stop' : 'Hear Example'}
+                                        aria-label={speaking ? 'Stop speaking' : 'Hear example'}
                                     >
                                         {speaking ? <VolumeX size={16} /> : <Volume2 size={16} />}
                                     </button>
@@ -161,7 +166,7 @@ const TrainingView = () => {
                     (!activeModule.component || activeModule.id.startsWith('pitch') || activeModule.id.startsWith('intonation')) && (
                         <button
                             onClick={() => setActiveModule(null)}
-                            className="flex items-center gap-2 text-slate-400 hover:text-white mb-4 transition-colors"
+                            className="flex items-center gap-2 text-slate-400 hover:text-white mb-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded"
                         >
                             <ArrowLeft size={20} /> Back to Gym
                         </button>
@@ -200,7 +205,7 @@ const TrainingView = () => {
                                     <button
                                         key={module.id}
                                         onClick={() => setActiveModule(module)}
-                                        className="bg-slate-900 border border-slate-800 p-4 rounded-2xl text-left hover:border-teal-500/50 hover:bg-slate-800 transition-all group relative overflow-hidden"
+                                        className="bg-slate-900 border border-slate-800 p-4 rounded-2xl text-left hover:border-teal-500/50 hover:bg-slate-800 transition-all group relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                                     >
                                         <div className="mb-3 p-3 bg-slate-950 rounded-xl w-fit group-hover:scale-110 transition-transform">
                                             {module.icon}
@@ -222,7 +227,7 @@ const TrainingView = () => {
                                     <button
                                         key={category.id}
                                         onClick={() => setActiveModule(category)}
-                                        className={`bg-slate-900 border border-slate-800 p-6 rounded-2xl text-left hover:border-${category.color}-500/50 hover:bg-slate-800 transition-all group`}
+                                        className={`bg-slate-900 border border-slate-800 p-6 rounded-2xl text-left hover:border-${category.color}-500/50 hover:bg-slate-800 transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-${category.color}-500`}
                                     >
                                         <div className="flex items-start justify-between mb-4">
                                             <div className={`p-3 bg-${category.color}-500/10 rounded-xl text-${category.color}-400 group-hover:scale-110 transition-transform`}>
