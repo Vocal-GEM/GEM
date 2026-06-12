@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * RegisterGauge - Visualize Laryngeal Mechanisms (M0-M3)
@@ -19,7 +20,6 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     });
     const [f0, setF0] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);
-    const animationRef = useRef();
 
     useEffect(() => {
         const update = () => {
@@ -42,11 +42,11 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                 }
                 setF0(currentF0);
             }
-            animationRef.current = requestAnimationFrame(update);
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
+        // ⚡ Bolt: Subscribing to central RenderCoordinator loop instead of creating an independent requestAnimationFrame loop. Impact: Reduces redundant layout recalculations.
+        const unsubscribe = renderCoordinator.subscribe('register-gauge', update, renderCoordinator.PRIORITY.MEDIUM);
+        return () => unsubscribe();
     }, [dataRef]);
 
     // Helpers
