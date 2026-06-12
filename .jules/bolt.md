@@ -41,3 +41,11 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## $(date +%Y-%m-%d) - RenderCoordinator Subscription Memory Leak
+**Learning:** Having multiple independent components call `requestAnimationFrame` manually causes severe layout thrashing and high CPU usage in complex React apps, as each component schedules its own repaint independently.
+**Action:** Always utilize the central singleton `RenderCoordinator` service. Call `renderCoordinator.subscribe(id, loop, priority)` inside a `useEffect` and ensure the cleanup function calls the returned `unsubscribe` method to prevent exponential loop spawning.
+
+## 2026-06-12 - RenderCoordinator Subscription Memory Leak
+**Learning:** Having multiple independent components call `requestAnimationFrame` manually causes severe layout thrashing and high CPU usage in complex React apps, as each component schedules its own repaint independently.
+**Action:** Always utilize the central singleton `RenderCoordinator` service. Call `renderCoordinator.subscribe(id, loop, priority)` inside a `useEffect` and ensure the cleanup function calls the returned `unsubscribe` method to prevent exponential loop spawning.

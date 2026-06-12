@@ -10,7 +10,6 @@ const SZRatio = ({ dataRef, isActive }) => {
     const [threshold, setThreshold] = useState(0.02);
 
     const startTimeRef = useRef(null);
-    const animationRef = useRef(null);
 
     // Auto-detection logic (similar to MPT)
     useEffect(() => {
@@ -33,7 +32,7 @@ const SZRatio = ({ dataRef, isActive }) => {
                     if (startTimeRef.current) startTimeRef.current.silenceStart = null;
                 }
             }
-            animationRef.current = requestAnimationFrame(checkAudio);
+            // ⚡ Bolt: Removed redundant requestAnimationFrame call inside RenderCoordinator callback which was causing exponential loop spawning and CPU spikes.
         };
 
         let unsubscribe;
