@@ -33,25 +33,25 @@ const AccessibilityPanel = () => {
             id: 'highContrast',
             label: 'High Contrast',
             description: 'Increase contrast for better visibility',
-            icon: <Eye size={20} />
+            icon: <Eye size={20} aria-hidden="true" />
         },
         {
             id: 'largeText',
             label: 'Large Text',
             description: 'Increase base text size',
-            icon: <Type size={20} />
+            icon: <Type size={20} aria-hidden="true" />
         },
         {
             id: 'reducedMotion',
             label: 'Reduce Motion',
             description: 'Minimize animations and transitions',
-            icon: <Zap size={20} />
+            icon: <Zap size={20} aria-hidden="true" />
         },
         {
             id: 'screenReaderMode',
             label: 'Screen Reader Mode',
             description: 'Optimize for screen readers',
-            icon: <Volume2 size={20} />
+            icon: <Volume2 size={20} aria-hidden="true" />
         }
     ];
 
@@ -61,9 +61,10 @@ const AccessibilityPanel = () => {
                 <h2 className="text-xl font-bold text-white">Accessibility</h2>
                 <button
                     onClick={resetSettings}
-                    className="text-sm text-slate-400 hover:text-white flex items-center gap-1"
+                    aria-label="Reset accessibility settings"
+                    className="text-sm text-slate-400 hover:text-white flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 rounded-md p-1"
                 >
-                    <RotateCcw size={14} /> Reset
+                    <RotateCcw size={14} aria-hidden="true" /> Reset
                 </button>
             </div>
 
@@ -82,8 +83,11 @@ const AccessibilityPanel = () => {
                             </div>
                         </div>
                         <button
+                            role="switch"
+                            aria-checked={settings[option.id]}
+                            aria-label={`Toggle ${option.label}`}
                             onClick={() => toggleSetting(option.id)}
-                            className={`w-12 h-6 rounded-full transition-colors relative ${settings[option.id] ? 'bg-blue-600' : 'bg-slate-600'
+                            className={`w-12 h-6 rounded-full transition-colors relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 ${settings[option.id] ? 'bg-blue-600' : 'bg-slate-600'
                                 }`}
                         >
                             <div
@@ -99,7 +103,7 @@ const AccessibilityPanel = () => {
             <div className="p-4 bg-slate-800 border border-slate-700 rounded-xl">
                 <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                        <Type size={20} className="text-slate-400" />
+                        <Type size={20} className="text-slate-400" aria-hidden="true" />
                         <span className="font-medium text-white">Font Size</span>
                     </div>
                     <span className="text-sm text-slate-400">{settings.fontSize}%</span>
@@ -108,9 +112,10 @@ const AccessibilityPanel = () => {
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => adjustFontSize(-10)}
-                        className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white"
+                        aria-label="Decrease font size"
+                        className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800"
                     >
-                        <Minus size={16} />
+                        <Minus size={16} aria-hidden="true" />
                     </button>
 
                     <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
@@ -122,9 +127,10 @@ const AccessibilityPanel = () => {
 
                     <button
                         onClick={() => adjustFontSize(10)}
-                        className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white"
+                        aria-label="Increase font size"
+                        className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800"
                     >
-                        <Plus size={16} />
+                        <Plus size={16} aria-hidden="true" />
                     </button>
                 </div>
             </div>
