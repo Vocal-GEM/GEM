@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## $(date +%Y-%m-%d) - Optimization of Canvas Animation Loop
+**Learning:** `VowelSpacePlot.jsx` was creating individual `requestAnimationFrame` render loops which increases main thread load.
+**Action:** Migrated `VowelSpacePlot.jsx` to use the project's centralized `RenderCoordinator` service. Also optimized component ID generation using `useId()` to avoid recalculating `Math.random()` string strings during every render inside `useRef()`.
