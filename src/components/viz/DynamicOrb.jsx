@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unknown-property */
-import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo } from 'react';
+import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo, useId } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import * as THREE from 'three';
 import { Diamond, Bug, Activity, Sliders, Gauge } from 'lucide-react';
 import { OrbitControls } from '@react-three/drei';
@@ -399,26 +400,30 @@ VisualizerCanvas.displayName = 'VisualizerCanvas';
 const SafeModeVisualizer = memo(({ dataRef }) => {
   const circleRef = useRef(null);
   const textRef = useRef(null);
+  const renderId = useId();
 
   useEffect(() => {
-    let frameId;
-    const loop = () => {
-      if (dataRef.current) {
-        const { pitch, volume } = dataRef.current;
-        // Update DOM directly
-        if (circleRef.current) {
-          const scale = 1 + (volume || 0); // volume is 0-1
-          circleRef.current.style.transform = `scale(${scale})`;
+    // ⚡ Bolt: Use RenderCoordinator instead of direct requestAnimationFrame to prevent layout thrashing and high CPU usage.
+    const unsubscribe = renderCoordinator.subscribe(
+      `dynamicOrb_safe_${renderId}`,
+      () => {
+        if (dataRef.current) {
+          const { pitch, volume } = dataRef.current;
+          // Update DOM directly
+          if (circleRef.current) {
+            const scale = 1 + (volume || 0); // volume is 0-1
+            circleRef.current.style.transform = `scale(${scale})`;
+          }
+          if (textRef.current) {
+            textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
+          }
         }
-        if (textRef.current) {
-          textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
-        }
-      }
-      frameId = requestAnimationFrame(loop);
-    };
-    loop();
-    return () => cancelAnimationFrame(frameId);
-  }, [dataRef]);
+      },
+      renderCoordinator.PRIORITY.CRITICAL
+    );
+
+    return () => unsubscribe();
+  }, [dataRef, renderId]);
 
   return (
     <div className="w-full h-full flex items-center justify-center">
