@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
 
 const AudioSourceManager = ({ onSourceChange }) => {
@@ -6,11 +6,33 @@ const AudioSourceManager = ({ onSourceChange }) => {
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [permissionGranted, setPermissionGranted] = useState(false);
 
+    const checkPermissionAndEnumerate = useCallback(async () => {
+        try {
+            // Must request permission first to get labels
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            setPermissionGranted(true);
+
+            // Stop the temp stream immediately
+            stream.getTracks().forEach(track => track.stop());
+
+            const allDevices = await navigator.mediaDevices.enumerateDevices();
+            const audioInputDevices = allDevices.filter(d => d.kind === 'audioinput');
+            setDevices(audioInputDevices);
+
+            if (audioInputDevices.length > 0 && !selectedDeviceId) {
+                setSelectedDeviceId(audioInputDevices[0].deviceId);
+            }
+        } catch (err) {
+            console.error('Error enumerating devices:', err);
+            setPermissionGranted(false);
+        }
+    }, [selectedDeviceId]);
+
     useEffect(() => {
         checkPermissionAndEnumerate();
-    }, []);
+    }, [checkPermissionAndEnumerate]);
 
-    const checkPermissionAndEnumerate = async () => {
+    const handleEnumerateClick = async () => {
         try {
             // Must request permission first to get labels
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });

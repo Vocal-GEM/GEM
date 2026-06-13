@@ -96,7 +96,10 @@ const GenderPerceptionBadge = ({ dataRef, showDetails = false, size = 'normal' }
                 {/* Info button */}
                 <button
                     onClick={() => setShowTooltip(!showTooltip)}
-                    className="text-slate-400 hover:text-white transition-colors"
+                    className="text-slate-400 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:outline-none rounded-full p-0.5"
+                    aria-label="Toggle perception details"
+                    aria-expanded={showTooltip}
+                    aria-controls="gender-perception-tooltip"
                 >
                     <Info size={14} />
                 </button>
@@ -127,10 +130,15 @@ const GenderPerceptionBadge = ({ dataRef, showDetails = false, size = 'normal' }
 
             {/* Tooltip */}
             {showTooltip && (
-                <div className="absolute z-50 top-full left-0 right-0 mt-2 p-3 rounded-lg bg-slate-900 border border-slate-700 shadow-xl text-xs text-slate-300 animate-in fade-in duration-200">
+                <div
+                    id="gender-perception-tooltip"
+                    role="tooltip"
+                    className="absolute z-50 top-full left-0 right-0 mt-2 p-3 rounded-lg bg-slate-900 border border-slate-700 shadow-xl text-xs text-slate-300 animate-in fade-in duration-200"
+                >
                     <button
                         onClick={() => setShowTooltip(false)}
-                        className="absolute top-1 right-1 text-slate-500 hover:text-white"
+                        className="absolute top-1 right-1 text-slate-500 hover:text-white focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:outline-none rounded-full p-0.5"
+                        aria-label="Close perception details"
                     >
                         ✕
                     </button>
