@@ -1,13 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Upload, Check, Share2, Download } from 'lucide-react';
-
+import Toast from './Toast';
 
 const ClipReviewModal = ({ clip, onClose }) => {
     // const { user } = useAuth(); // unused
     const [isPlaying, setIsPlaying] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [shareUrl, setShareUrl] = useState(null);
+    const [toast, setToast] = useState(null);
     const audioRef = useRef(null);
+
+    const showToast = (message, type = 'info') => {
+        setToast({ message, type });
+    };
 
     useEffect(() => {
         if (audioRef.current && clip) {
@@ -52,7 +57,7 @@ const ClipReviewModal = ({ clip, onClose }) => {
             setShareUrl(data.url);
         } catch (e) {
             console.error("Upload error:", e);
-            alert("Failed to upload clip.");
+            showToast("Failed to upload clip.", 'error');
         } finally {
             setUploading(false);
         }
@@ -158,6 +163,14 @@ const ClipReviewModal = ({ clip, onClose }) => {
                     Close
                 </button>
             </div>
+
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </div>
     );
 };
