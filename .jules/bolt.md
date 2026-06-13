@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-06-13 - Layout Thrashing with requestAnimationFrame in React Three Fiber
+**Learning:** Components wrapping or layered over 3D canvases (like `@react-three/fiber`) should not manage their own `requestAnimationFrame` loops if a centralized render loop (like `RenderCoordinator`) exists. In `DynamicOrb.jsx`'s `SafeModeVisualizer`, an independent `requestAnimationFrame` loop was triggering DOM reflows unsynchronized with the main WebGL render loop, causing unnecessary CPU strain.
+**Action:** Always replace direct `requestAnimationFrame` usages with the centralized `renderCoordinator.subscribe(id, callback, priority)` to batch updates efficiently.
