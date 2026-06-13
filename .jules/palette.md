@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-05-23 - Info Tooltip Accessibility
+**Learning:** Foundational informative components (like the `Info` button inside badges) often rely solely on visual cues, lacking `aria-label`, `aria-expanded`, `aria-controls` attributes and keyboard focus states, making them invisible or unusable for screen reader and keyboard users.
+**Action:** When adding or auditing info tooltips, ensure the toggle button has a descriptive `aria-label`, `aria-expanded` reflecting state, `aria-controls` pointing to the tooltip's `id`, and explicit `focus-visible` styling. The tooltip itself should have `role="tooltip"` and a matching `id`.
