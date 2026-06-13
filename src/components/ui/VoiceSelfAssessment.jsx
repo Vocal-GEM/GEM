@@ -303,9 +303,10 @@ const VoiceSelfAssessment = ({ onClose }) => {
                 {recordingState === 'idle' && (
                     <button
                         onClick={startRecording}
+                        aria-label="Start recording"
                         className="w-full py-4 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 !text-white font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-pink-500/20 transition-all"
                     >
-                        <Mic className="w-5 h-5" />
+                        <Mic className="w-5 h-5" aria-hidden="true" />
                         Start Recording
                     </button>
                 )}
@@ -314,9 +315,10 @@ const VoiceSelfAssessment = ({ onClose }) => {
                     <div className="text-center">
                         <button
                             onClick={stopRecording}
+                            aria-label="Stop recording"
                             className="w-20 h-20 mx-auto rounded-full bg-red-500 animate-pulse flex items-center justify-center mb-3"
                         >
-                            <Square className="w-8 h-8 text-white" fill="white" />
+                            <Square className="w-8 h-8 text-white" fill="white" aria-hidden="true" />
                         </button>
                         <div className="text-red-400 font-mono text-lg">{formatTime(recordingTime)}</div>
                         <div className="text-sm text-slate-400">Recording... Tap to stop</div>
@@ -327,16 +329,18 @@ const VoiceSelfAssessment = ({ onClose }) => {
                     <div className="flex items-center justify-center gap-3">
                         <button
                             onClick={togglePlayback}
+                            aria-label={isPlaying ? 'Pause recording' : 'Play recording'}
                             className="p-3 rounded-full bg-gradient-to-r from-green-500 to-emerald-500"
                         >
-                            {isPlaying ? <Pause className="w-5 h-5 text-white" /> : <Play className="w-5 h-5 text-white ml-0.5" />}
+                            {isPlaying ? <Pause className="w-5 h-5 text-white" aria-hidden="true" /> : <Play className="w-5 h-5 text-white ml-0.5" aria-hidden="true" />}
                         </button>
                         <span className="text-slate-400 font-mono">{formatTime(recordingTime)}</span>
                         <button
                             onClick={resetRecording}
+                            aria-label="Reset recording"
                             className="p-3 rounded-full bg-slate-700 hover:bg-slate-600"
                         >
-                            <RotateCcw className="w-5 h-5 text-slate-300" />
+                            <RotateCcw className="w-5 h-5 text-slate-300" aria-hidden="true" />
                         </button>
                     </div>
                 )}
