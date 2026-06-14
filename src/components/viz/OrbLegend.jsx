@@ -23,7 +23,9 @@ const OrbLegend = ({ mode = 'gem' }) => {
         <div className="absolute bottom-4 right-4 z-30">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`p-2 rounded-full backdrop-blur-md border transition-all ${isOpen ? 'bg-teal-500 text-white border-teal-400' : 'bg-slate-800/50 border-white/10 text-white/70 hover:bg-slate-700/50'}`}
+                aria-label={isOpen ? 'Close visual key' : 'Open visual key'}
+                aria-expanded={isOpen}
+                className={`p-2 rounded-full backdrop-blur-md border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${isOpen ? 'bg-teal-500 text-white border-teal-400' : 'bg-slate-800/50 border-white/10 text-white/70 hover:bg-slate-700/50'}`}
             >
                 {isOpen ? <X size={20} /> : <Info size={20} />}
             </button>
