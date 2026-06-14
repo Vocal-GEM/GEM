@@ -17,6 +17,7 @@ const getNoteFromSemitone = (semitone) => {
 
 const PitchOrb = ({ dataRef, settings = {} }) => {
     const canvasRef = useRef(null);
+    const dimensionsRef = useRef({ width: 0, height: 0 }); // ⚡ Bolt: Cache dimensions to avoid getBoundingClientRect layout thrashing
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
@@ -33,6 +34,21 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
+
+        // ⚡ Bolt: Update dimensions asynchronously via ResizeObserver
+        const observer = new ResizeObserver((entries) => {
+            if (!entries.length) return;
+            const rect = entries[0].contentRect;
+            dimensionsRef.current = { width: rect.width, height: rect.height };
+
+            // Only resize canvas when physical dimensions change
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+
+            // Re-apply scale after canvas reset
+            ctx.scale(dpr, dpr);
+        });
+        observer.observe(canvas);
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -65,18 +81,18 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         };
 
         const loop = () => {
-            if (!canvas) return; // Guard against cleanup
+            if (!canvas || !dimensionsRef.current.width) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            // ⚡ Bolt: Removed getBoundingClientRect() and canvas dimension resetting to prevent layout thrashing and implicit clears
 
-            const width = rect.width;
-            const height = rect.height;
+            const width = dimensionsRef.current.width;
+            const height = dimensionsRef.current.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
+            // ⚡ Bolt: Explicitly clear graphics state inside the loop
+            ctx.resetTransform();
+            ctx.scale(dpr, dpr);
             ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
@@ -166,6 +182,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            observer.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
