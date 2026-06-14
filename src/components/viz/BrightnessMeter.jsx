@@ -113,9 +113,11 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
                     </div>
                 </div>
                 <button
-                    className="text-slate-600 hover:text-slate-300 transition-colors"
+                    className="text-slate-600 hover:text-slate-300 transition-colors focus-visible:ring-2 focus-visible:outline-none"
                     onMouseEnter={() => setShowTooltip(true)}
                     onMouseLeave={() => setShowTooltip(false)}
+                    aria-label="More info about Brightness Meter"
+                    aria-expanded={showTooltip}
                 >
                     <Info size={16} />
                 </button>
