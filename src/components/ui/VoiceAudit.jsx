@@ -146,8 +146,8 @@ const VoiceAudit = ({ onComplete }) => {
                                 autoFocus
                                 onKeyDown={(e) => e.key === 'Enter' && handleAddMode()}
                             />
-                            <button onClick={handleAddMode} className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500"><Save size={16} /></button>
-                            <button onClick={() => setIsAddingMode(false)} className="p-2 text-slate-400 hover:text-white"><Trash2 size={16} /></button>
+                            <button onClick={handleAddMode} aria-label="Save mode" className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500"><Save size={16} /></button>
+                            <button onClick={() => setIsAddingMode(false)} aria-label="Cancel" className="p-2 text-slate-400 hover:text-white"><Trash2 size={16} /></button>
                         </div>
                     ) : (
                         <button
