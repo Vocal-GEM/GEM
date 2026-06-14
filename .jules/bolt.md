@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-01-24 - Centralized Animation Loops
+**Learning:** Individual components running their own `requestAnimationFrame` loops (like `DynamicOrb`) cause uncoordinated DOM updates, layout thrashing, and high CPU usage.
+**Action:** Always use `renderCoordinator.subscribe()` for any animation or continuous polling needs. It centralizes the loops, batches updates, and throttles based on performance settings.
