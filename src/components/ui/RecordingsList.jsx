@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Trash2, Download, Edit2, Check, X, Mic, Calendar, Clock, Loader2 } from 'lucide-react';
+import { Play, Pause, Trash2, Download, Edit2, Check, X, Mic, Calendar, Clock, Loader2, AlertTriangle } from 'lucide-react';
 import { indexedDB } from '../../services/IndexedDBManager';
 
 const RecordingsList = () => {
@@ -7,6 +7,7 @@ const RecordingsList = () => {
     const [loading, setLoading] = useState(true);
     const [playingId, setPlayingId] = useState(null);
     const [editingId, setEditingId] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
     const [editName, setEditName] = useState('');
 
     // Audio playback refs
@@ -65,8 +66,6 @@ const RecordingsList = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this recording?')) return;
-
         try {
             await indexedDB.deleteRecording(id);
             if (playingId === id) {
@@ -200,20 +199,43 @@ const RecordingsList = () => {
 
                         {/* Actions */}
                         <div className="flex items-center gap-1">
-                            <button
-                                onClick={() => handleDownload(recording)}
-                                title="Download"
-                                className="p-2 text-slate-400 hover:text-violet-400 hover:bg-slate-700/50 rounded-lg transition-colors"
-                            >
-                                <Download size={18} />
-                            </button>
-                            <button
-                                onClick={() => handleDelete(recording.id)}
-                                title="Delete"
-                                className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700/50 rounded-lg transition-colors"
-                            >
-                                <Trash2 size={18} />
-                            </button>
+                            {deletingId === recording.id ? (
+                                <div className="flex items-center gap-2 px-2 py-1 bg-red-500/10 rounded-lg border border-red-500/20">
+                                    <AlertTriangle className="w-4 h-4 text-red-400" />
+                                    <span className="text-xs text-red-200 font-medium hidden sm:inline">Delete?</span>
+                                    <button
+                                        onClick={() => handleDelete(recording.id)}
+                                        className="p-1 hover:text-white text-red-400 bg-red-500/20 hover:bg-red-500/40 rounded transition-colors"
+                                        aria-label="Confirm delete"
+                                    >
+                                        <Check size={14} />
+                                    </button>
+                                    <button
+                                        onClick={() => setDeletingId(null)}
+                                        className="p-1 hover:text-white text-slate-400 hover:bg-slate-700 rounded transition-colors"
+                                        aria-label="Cancel delete"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={() => handleDownload(recording)}
+                                        title="Download"
+                                        className="p-2 text-slate-400 hover:text-violet-400 hover:bg-slate-700/50 rounded-lg transition-colors"
+                                    >
+                                        <Download size={18} />
+                                    </button>
+                                    <button
+                                        onClick={() => setDeletingId(recording.id)}
+                                        title="Delete"
+                                        className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700/50 rounded-lg transition-colors"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
