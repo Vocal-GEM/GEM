@@ -41,7 +41,3 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
-
-## 2026-06-15 - RenderCoordinator adoption
-**Learning:** Independent `requestAnimationFrame` loops cause layout thrashing and higher CPU usage. Using a centralized `RenderCoordinator` eliminates duplicate render cycles.
-**Action:** Audit all new visualizations to ensure they import and subscribe to `RenderCoordinator` instead of managing their own RAF loops.
