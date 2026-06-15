@@ -33,6 +33,21 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
+        const dimensionsRef = { current: { width: 0, height: 0 } };
+
+        const observer = new ResizeObserver((entries) => {
+            if (entries[0] && canvas) {
+                const { width, height } = entries[0].contentRect;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                ctx.scale(dpr, dpr);
+                dimensionsRef.current = { width, height };
+            }
+        });
+
+        if (canvas) {
+            observer.observe(canvas);
+        }
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,94 +82,92 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const { width, height } = dimensionsRef.current;
+            if (width > 0 && height > 0) {
+                const centerX = width / 2;
+                const centerY = height / 2;
 
-            const width = rect.width;
-            const height = rect.height;
-            const centerX = width / 2;
-            const centerY = height / 2;
+                ctx.resetTransform();
+                ctx.scale(dpr, dpr);
+                ctx.clearRect(0, 0, width, height);
 
-            ctx.clearRect(0, 0, width, height);
+                const pitch = dataRef.current?.pitch || 0;
+                const colorData = getGenderColor(pitch);
 
-            const pitch = dataRef.current?.pitch || 0;
-            const colorData = getGenderColor(pitch);
+                // Draw orb
+                const baseRadius = Math.min(width, height) * 0.35;
+                const pulseAmount = pitch > 0 ? Math.sin(Date.now() / 300) * 5 : 0;
+                const radius = baseRadius + pulseAmount;
 
-            // Draw orb
-            const baseRadius = Math.min(width, height) * 0.35;
-            const pulseAmount = pitch > 0 ? Math.sin(Date.now() / 300) * 5 : 0;
-            const radius = baseRadius + pulseAmount;
-
-            // Outer glow
-            if (pitch > 0) {
-                const gradient = ctx.createRadialGradient(centerX, centerY, radius * 0.5, centerX, centerY, radius * 1.5);
-                gradient.addColorStop(0, colorData.glow);
-                gradient.addColorStop(1, 'transparent');
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius * 1.5, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Main orb
-            const orbGradient = ctx.createRadialGradient(
-                centerX - radius * 0.3,
-                centerY - radius * 0.3,
-                radius * 0.1,
-                centerX,
-                centerY,
-                radius
-            );
-
-            if (pitch > 0) {
-                orbGradient.addColorStop(0, `${colorData.primary}aa`);
-                orbGradient.addColorStop(0.7, colorData.primary);
-                orbGradient.addColorStop(1, `${colorData.primary}66`);
-            } else {
-                orbGradient.addColorStop(0, '#475569');
-                orbGradient.addColorStop(1, '#1e293b');
-            }
-
-            ctx.fillStyle = orbGradient;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Border
-            ctx.strokeStyle = pitch > 0 ? colorData.primary : '#334155';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-
-            // Text
-            if (pitch > 0) {
-                const displayValue = showSemitones ? hzToSemitones(pitch) : Math.round(pitch);
-                const displayUnit = showSemitones ? '' : ' Hz';
-                const noteName = showSemitones ? getNoteFromSemitone(hzToSemitones(pitch)) : '';
-
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 48px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(displayValue + displayUnit, centerX, centerY - 10);
-
-                if (showSemitones && noteName) {
-                    ctx.font = 'bold 24px sans-serif';
-                    ctx.fillStyle = '#ffffff99';
-                    ctx.fillText(noteName, centerX, centerY + 25);
+                // Outer glow
+                if (pitch > 0) {
+                    const gradient = ctx.createRadialGradient(centerX, centerY, radius * 0.5, centerX, centerY, radius * 1.5);
+                    gradient.addColorStop(0, colorData.glow);
+                    gradient.addColorStop(1, 'transparent');
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius * 1.5, 0, Math.PI * 2);
+                    ctx.fill();
                 }
 
-                // Gender label
-                ctx.font = 'bold 14px sans-serif';
-                ctx.fillStyle = colorData.primary;
-                ctx.fillText(colorData.label, centerX, centerY + (showSemitones ? 50 : 35));
-            } else {
-                ctx.fillStyle = '#64748b';
-                ctx.font = 'bold 20px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('--- Hz', centerX, centerY);
+                // Main orb
+                const orbGradient = ctx.createRadialGradient(
+                    centerX - radius * 0.3,
+                    centerY - radius * 0.3,
+                    radius * 0.1,
+                    centerX,
+                    centerY,
+                    radius
+                );
+
+                if (pitch > 0) {
+                    orbGradient.addColorStop(0, `${colorData.primary}aa`);
+                    orbGradient.addColorStop(0.7, colorData.primary);
+                    orbGradient.addColorStop(1, `${colorData.primary}66`);
+                } else {
+                    orbGradient.addColorStop(0, '#475569');
+                    orbGradient.addColorStop(1, '#1e293b');
+                }
+
+                ctx.fillStyle = orbGradient;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Border
+                ctx.strokeStyle = pitch > 0 ? colorData.primary : '#334155';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Text
+                if (pitch > 0) {
+                    const displayValue = showSemitones ? hzToSemitones(pitch) : Math.round(pitch);
+                    const displayUnit = showSemitones ? '' : ' Hz';
+                    const noteName = showSemitones ? getNoteFromSemitone(hzToSemitones(pitch)) : '';
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 48px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(displayValue + displayUnit, centerX, centerY - 10);
+
+                    if (showSemitones && noteName) {
+                        ctx.font = 'bold 24px sans-serif';
+                        ctx.fillStyle = '#ffffff99';
+                        ctx.fillText(noteName, centerX, centerY + 25);
+                    }
+
+                    // Gender label
+                    ctx.font = 'bold 14px sans-serif';
+                    ctx.fillStyle = colorData.primary;
+                    ctx.fillText(colorData.label, centerX, centerY + (showSemitones ? 50 : 35));
+                } else {
+                    ctx.fillStyle = '#64748b';
+                    ctx.font = 'bold 20px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('--- Hz', centerX, centerY);
+                }
             }
         };
 
@@ -166,6 +179,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            observer.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
