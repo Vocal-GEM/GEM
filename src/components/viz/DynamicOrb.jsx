@@ -400,24 +400,40 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
   const circleRef = useRef(null);
   const textRef = useRef(null);
 
+  // ⚡ Bolt Optimization:
+  // Replaced direct requestAnimationFrame loop with RenderCoordinator subscription.
+  // Direct rAF loops outside of RenderCoordinator cause multiple disconnected animation loops,
+  // leading to layout thrashing and increased CPU usage. RenderCoordinator synchronizes all
+  // updates into a single centralized animation frame.
+
   useEffect(() => {
-    let frameId;
-    const loop = () => {
-      if (dataRef.current) {
-        const { pitch, volume } = dataRef.current;
-        // Update DOM directly
-        if (circleRef.current) {
-          const scale = 1 + (volume || 0); // volume is 0-1
-          circleRef.current.style.transform = `scale(${scale})`;
-        }
-        if (textRef.current) {
-          textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
-        }
-      }
-      frameId = requestAnimationFrame(loop);
+    let unsubscribe;
+    let isMounted = true;
+
+    import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+        if (!isMounted) return;
+        unsubscribe = renderCoordinator.subscribe(
+            'DynamicOrb-SafeMode',
+            () => {
+              if (dataRef.current) {
+                const { pitch, volume } = dataRef.current;
+                // Update DOM directly
+                if (circleRef.current) {
+                  const scale = 1 + (volume || 0); // volume is 0-1
+                  circleRef.current.style.transform = `scale(${scale})`;
+                }
+                if (textRef.current) {
+                  textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
+                }
+              }
+            },
+            renderCoordinator.PRIORITY.NORMAL
+        );
+    });
+    return () => {
+      isMounted = false;
+      if (unsubscribe) unsubscribe();
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
   }, [dataRef]);
 
   return (

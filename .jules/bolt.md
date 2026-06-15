@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Layout Thrashing in Animation Loops Again
+**Learning:** Found another component (\`DynamicOrb.jsx\`) that was calling \`requestAnimationFrame\` directly instead of using \`RenderCoordinator\`, and \`PitchOrb.jsx\` calling \`getBoundingClientRect()\` on every animation frame (causing layout thrashing).
+**Action:** Replaced \`requestAnimationFrame\` with \`renderCoordinator.subscribe\` in \`DynamicOrb.jsx\` (SafeMode fallback) and replaced \`getBoundingClientRect()\` with a \`ResizeObserver\` in \`PitchOrb.jsx\` to cache dimensions and prevent forced reflows during the animation loop.
