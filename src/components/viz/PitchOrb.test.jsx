@@ -22,11 +22,25 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     stroke: vi.fn(),
     fillText: vi.fn(),
     scale: vi.fn(),
+    resetTransform: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
     canvas: { width: 300, height: 300 }
 }));
+
+// Mock ResizeObserver
+global.ResizeObserver = class ResizeObserver {
+    constructor(callback) {
+        this.callback = callback;
+    }
+    observe() {
+        // Trigger immediately with mock dimensions
+        this.callback([{ contentRect: { width: 300, height: 300 } }]);
+    }
+    unobserve() {}
+    disconnect() {}
+};
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
