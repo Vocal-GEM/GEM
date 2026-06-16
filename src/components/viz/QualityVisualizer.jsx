@@ -250,6 +250,7 @@ const QualityVisualizer = ({ dataRef }) => {
             </div>
         </div>
     );
-};
+});
+QualityVisualizer.displayName = 'QualityVisualizer';
 
 export default QualityVisualizer;
