@@ -48,10 +48,11 @@ def synthesize_speech():
         )
 
         if not response.ok:
-            error_text = response.text
+            from flask import current_app
+            current_app.logger.error(f"ElevenLabs API error: {response.status_code} - {response.text}")
             return jsonify({
                 "error": f"ElevenLabs API error: {response.status_code}",
-                "details": error_text
+                "details": "An error occurred with the external TTS service."
             }), response.status_code
 
         # Return audio data
