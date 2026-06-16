@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-21 - Removed Independent RAF from 2D Fallback
+**Learning:** Even fallback or "safe mode" components (like `SafeModeVisualizer`) can cause layout thrashing and high CPU usage if they implement their own `requestAnimationFrame` loops.
+**Action:** Always use the centralized `RenderCoordinator` for animation loops, even in simplified 2D fallback modes, to ensure all animations are batched correctly.
