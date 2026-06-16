@@ -24,7 +24,11 @@ const ProfileManager = ({ onClose }) => {
                         <User className="text-blue-400" />
                         Select Profile
                     </h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-white">
+                    <button
+                        onClick={onClose}
+                        className="text-slate-400 hover:text-white rounded-full p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+                        aria-label="Close profile manager"
+                    >
                         <X size={20} />
                     </button>
                 </div>
