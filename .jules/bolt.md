@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-06-17 - Uncoordinated RAF in Fallback Visualizers
+**Learning:** The fallback `SafeModeVisualizer` inside `DynamicOrb.jsx` was using a raw `requestAnimationFrame` loop. Independent RAF calls in components cause layout thrashing and high CPU usage because they desync from the main animation pipeline.
+**Action:** Always use the `renderCoordinator.subscribe()` singleton service for centralized animation loops, even in fallback or safe mode components, using `renderCoordinator.PRIORITY.CRITICAL` for core visualizations.
