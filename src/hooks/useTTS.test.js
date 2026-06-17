@@ -18,7 +18,7 @@ describe('useTTS', () => {
             onerror: null
         };
 
-        global.SpeechSynthesisUtterance = vi.fn(function () { return mockUtterance; });
+        globalThis.SpeechSynthesisUtterance = vi.fn(function () { return mockUtterance; });
 
         mockSpeechSynthesis = {
             getVoices: vi.fn().mockReturnValue([
@@ -31,7 +31,7 @@ describe('useTTS', () => {
             onvoiceschanged: null
         };
 
-        global.window.speechSynthesis = mockSpeechSynthesis;
+        globalThis.window.speechSynthesis = mockSpeechSynthesis;
     });
 
     afterEach(() => {
@@ -66,7 +66,7 @@ describe('useTTS', () => {
         });
 
         expect(mockSpeechSynthesis.speak).toHaveBeenCalled();
-        expect(global.SpeechSynthesisUtterance).toHaveBeenCalledWith('Hello');
+        expect(globalThis.SpeechSynthesisUtterance).toHaveBeenCalledWith('Hello');
     });
 
     it('should cancel speech', () => {
