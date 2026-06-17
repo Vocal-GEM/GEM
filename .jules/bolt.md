@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-06-17 - Optimize Visualizations with RenderCoordinator
+**Learning:** Centralizing `requestAnimationFrame` loops into a singleton `RenderCoordinator` service significantly reduces CPU usage and layout thrashing compared to having individual components run their own uncoordinated `requestAnimationFrame` loops.
+**Action:** When implementing new visual components that require continuous animation or metric updates, use `renderCoordinator.subscribe()` instead of raw `requestAnimationFrame`.
