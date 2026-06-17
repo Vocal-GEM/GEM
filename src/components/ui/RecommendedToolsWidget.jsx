@@ -78,21 +78,21 @@ const RecommendedToolsWidget = () => {
     }, [profile, learningStyle, loading]);
 
     if (loading || !profile) {
-        return <div className="animate-pulse h-32 bg-gray-800 rounded-xl" />;
+        return <div className=&quot;animate-pulse h-32 bg-gray-800 rounded-xl&quot; />;
     }
 
     return (
-        <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700">
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+        <div className=&quot;bg-gray-800/50 rounded-xl p-5 border border-gray-700&quot;>
+            <div className=&quot;flex justify-between items-center mb-4&quot;>
+                <h3 className=&quot;text-lg font-bold text-white flex items-center gap-2&quot;>
                     <span>💡</span> Recommended for You
                 </h3>
-                <span className="text-xs text-purple-400 bg-purple-900/30 px-2 py-1 rounded">
+                <span className=&quot;text-xs text-purple-400 bg-purple-900/30 px-2 py-1 rounded&quot;>
                     AI Curated
                 </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className=&quot;grid grid-cols-1 md:grid-cols-3 gap-3&quot;>
                 {recommendedTools.map(toolId => {
                     const tool = TOOL_METADATA[toolId] || TOOL_METADATA['pitch_visualizer'];
                     return (
@@ -101,18 +101,18 @@ const RecommendedToolsWidget = () => {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => navigate(tool.view)}
-                            className="relative overflow-hidden group rounded-lg p-3 text-left border border-gray-700 bg-gray-900 hover:border-gray-500 transition-all"
+                            className=&quot;relative overflow-hidden group rounded-lg p-3 text-left border border-gray-700 bg-gray-900 hover:border-gray-500 transition-all&quot;
                         >
                             <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 bg-gradient-to-br ${tool.color} transition-opacity`} />
 
-                            <div className="relative z-10 flex items-start justify-between">
-                                <span className="text-2xl mb-2 block">{tool.icon}</span>
-                                <span className="text-xs text-gray-500">Go &rarr;</span>
+                            <div className=&quot;relative z-10 flex items-start justify-between&quot;>
+                                <span className=&quot;text-2xl mb-2 block&quot;>{tool.icon}</span>
+                                <span className=&quot;text-xs text-gray-500&quot;>Go &rarr;</span>
                             </div>
 
-                            <div className="relative z-10">
-                                <div className="font-bold text-gray-200 text-sm">{tool.name}</div>
-                                <div className="text-xs text-gray-500 line-clamp-1">{tool.description}</div>
+                            <div className=&quot;relative z-10&quot;>
+                                <div className=&quot;font-bold text-gray-200 text-sm&quot;>{tool.name}</div>
+                                <div className=&quot;text-xs text-gray-500 line-clamp-1&quot;>{tool.description}</div>
                             </div>
                         </motion.button>
                     );
@@ -120,8 +120,8 @@ const RecommendedToolsWidget = () => {
             </div>
 
             {recommendations?.rationale && (
-                <div className="mt-4 text-xs text-gray-500 italic border-t border-gray-700 pt-2">
-                    "{recommendations.rationale.split('.')[0]}."
+                <div className=&quot;mt-4 text-xs text-gray-500 italic border-t border-gray-700 pt-2&quot;>
+                    &quot;{recommendations.rationale.split('.')[0]}.&quot;
                 </div>
             )}
         </div>

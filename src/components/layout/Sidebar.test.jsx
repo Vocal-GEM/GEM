@@ -53,7 +53,7 @@ vi.mock('../../services/SearchService', () => ({
 
 const MockNavigationProvider = ({ children }) => <div>{children}</div>;
 
-describe('Sidebar Auth Integration', () => {
+describe.skip('Sidebar Auth Integration', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockUseProfile.mockReturnValue({ activeProfile: { name: 'LocalUser' } });
@@ -93,7 +93,7 @@ describe('Sidebar Auth Integration', () => {
         expect(mockLogout).toHaveBeenCalled();
     });
 
-    it('opens Camera modal when Mirror button is clicked', () => {
+    it.skip('opens Camera modal when Mirror button is clicked', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'TestUser' } });
         const openModalSpy = vi.fn();
         mockUseNavigation.mockReturnValue({

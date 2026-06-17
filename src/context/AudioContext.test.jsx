@@ -15,7 +15,7 @@ const mockGetUserMedia = vi.fn().mockResolvedValue({
     getTracks: () => [{ stop: vi.fn() }]
 });
 
-global.navigator.mediaDevices = {
+globalThis.navigator.mediaDevices = {
     enumerateDevices: mockEnumerateDevices,
     getUserMedia: mockGetUserMedia,
     addEventListener: vi.fn(),

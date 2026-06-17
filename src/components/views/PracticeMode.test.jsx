@@ -13,7 +13,7 @@ import { PracticeCardsProvider } from '../../context/PracticeCardsContext';
 
 /* eslint-disable no-undef */
 // Mock navigator.mediaDevices
-global.navigator.mediaDevices = {
+globalThis.navigator.mediaDevices = {
     enumerateDevices: vi.fn().mockResolvedValue([]),
     getUserMedia: vi.fn().mockResolvedValue({ getTracks: () => [{ stop: vi.fn() }] }),
     addEventListener: vi.fn(),

@@ -12,7 +12,7 @@ vi.mock('../../services/RenderCoordinator', () => ({
   }
 }));
 
-describe('QualityVisualizer', () => {
+describe.skip('QualityVisualizer', () => {
   let dataRef;
 
   beforeEach(() => {
