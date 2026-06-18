@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-06-18 - Tooltip Keyboard Accessibility
+**Learning:** Icon buttons with custom tooltips triggered only by `onMouseEnter`/`onMouseLeave` are completely inaccessible to keyboard users and lack context for screen readers if missing `aria-label` and `aria-expanded`.
+**Action:** Always pair mouse hover events with `onFocus` and `onBlur` for keyboard accessibility, and ensure the button has a descriptive `aria-label`.
