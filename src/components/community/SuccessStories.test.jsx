@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, test, expect, vi, beforeEach } from 'vitest';
 import SuccessStories from './SuccessStories';
-import CommunityService from '../../services/CommunityService';
-import ModerationService from '../../services/ModerationService';
+import CommunityService from '../../services/CommunityService.js';
+import ModerationService from '../../services/ModerationService.js';
 
 // Mock services
 vi.mock('../../services/CommunityService', () => ({
