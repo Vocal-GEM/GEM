@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-06-18 - Redundant requestAnimationFrame inside RenderCoordinator loops
+**Learning:** Components subscribed to the centralized `RenderCoordinator` (like `VowelAnalysis.jsx`) should not use recursive `requestAnimationFrame` calls inside their render loops. This creates an exponential explosion of render cycles, leading to severe layout thrashing and CPU overhead.
+**Action:** Always verify that components using `RenderCoordinator.subscribe()` do not contain rogue `requestAnimationFrame` calls inside the subscribed callback.
