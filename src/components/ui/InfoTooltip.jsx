@@ -5,15 +5,26 @@ const InfoTooltip = ({ content, icon: Icon = HelpCircle, size = 16, className = 
     const [isVisible, setIsVisible] = useState(false);
 
     return (
-        <div className={`relative inline-flex items-center ${className}`}
-            onMouseEnter={() => setIsVisible(true)}
-            onMouseLeave={() => setIsVisible(false)}
-            onClick={() => setIsVisible(!isVisible)}
-        >
-            <Icon size={size} className="text-slate-500 hover:text-blue-400 cursor-pointer transition-colors" />
+        <div className={`relative inline-flex items-center ${className}`}>
+            <button
+                type="button"
+                className="text-slate-500 hover:text-blue-400 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded-full flex items-center justify-center"
+                onMouseEnter={() => setIsVisible(true)}
+                onMouseLeave={() => setIsVisible(false)}
+                onFocus={() => setIsVisible(true)}
+                onBlur={() => setIsVisible(false)}
+                onClick={() => setIsVisible(!isVisible)}
+                aria-label="More information"
+                aria-expanded={isVisible}
+            >
+                <Icon size={size} />
+            </button>
 
             {isVisible && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 border border-white/10 rounded-xl shadow-xl z-50 animate-in fade-in zoom-in duration-200">
+                <div
+                    role="tooltip"
+                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 border border-white/10 rounded-xl shadow-xl z-50 animate-in fade-in zoom-in duration-200"
+                >
                     <div className="text-xs text-slate-300 leading-relaxed">
                         {content}
                     </div>
