@@ -1,7 +1,15 @@
-with open("src/components/professional/ClientDashboard.jsx", "r") as f:
+with open("src/components/viz/BrightnessMeter.test.jsx", "r") as f:
     content = f.read()
 
-content = content.replace("import { Users, UserPlus, Search, FileText, Calendar, ChevronRight, MoreVertical } from 'lucide-react';", "import { Users, UserPlus, Search, FileText, Calendar, ChevronRight, MoreVertical, Activity } from 'lucide-react';")
+# Add display name to the second component too
+search = "const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });"
+replace = """const createIcon = (name) => {
+        const IconComponent = (props) => React.createElement('div', { ...props, 'data-testid': name });
+        IconComponent.displayName = name;
+        return IconComponent;
+    };"""
 
-with open("src/components/professional/ClientDashboard.jsx", "w") as f:
+content = content.replace(search, replace)
+
+with open("src/components/viz/BrightnessMeter.test.jsx", "w") as f:
     f.write(content)
