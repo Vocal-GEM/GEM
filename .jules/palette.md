@@ -37,6 +37,3 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
-## 2025-02-18 - Tooltip Keyboard Accessibility
-**Learning:** Purely visual tooltips that rely solely on `onMouseEnter`/`onMouseLeave` are inaccessible to keyboard users, trapping important contextual information behind mouse interactions.
-**Action:** Always pair mouse hover events with `onFocus`/`onBlur` for tooltip triggers, ensure the trigger is focusable (e.g., `<button>`), and add `focus-visible` styles to indicate the focused state to keyboard users.
