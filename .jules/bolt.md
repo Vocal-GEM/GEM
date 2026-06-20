@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-24 - Unconsolidated RAF Loops in Visualizations
+**Learning:** Several visualization components (`DynamicOrb`, `RegisterGauge`) were using raw `requestAnimationFrame` loops for polling or animating data independently. This circumvents the `RenderCoordinator` singleton designed to batch renders and prevent layout thrashing and high CPU usage.
+**Action:** Always use `renderCoordinator.subscribe(useId(), callback, renderCoordinator.PRIORITY.HIGH)` instead of `requestAnimationFrame` in React components to centralize the animation loop.

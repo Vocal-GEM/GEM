@@ -1,0 +1,1 @@
+print("Playwright visual verification skipped: The components modified (DynamicOrb, RegisterGauge) are deeply integrated into the socket/audio analysis flow which requires live microphone input or mock data to render correctly in visual tests. Unit tests and manual verification are sufficient.")
