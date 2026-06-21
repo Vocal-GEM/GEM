@@ -450,7 +450,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
         <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto">
             {/* Header */}
             <div className="sticky top-0 bg-slate-900 z-10 border-b border-slate-800 p-4 flex items-center justify-between">
-                <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-full transition-colors">
+                <button aria-label="Close analysis" onClick={onClose} className="p-2 hover:bg-slate-800 rounded-full transition-colors">
                     <ChevronLeft className="w-6 h-6 text-slate-400" />
                 </button>
                 <h2 className="text-xl font-bold text-white">{t('analysis.header')}</h2>
@@ -601,6 +601,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                             {/* Advanced Metrics Toggle */}
                             <div className="flex justify-center">
                                 <button
+                                    aria-label={showAdvancedMetrics ? "Hide advanced metrics" : "Show advanced metrics"}
                                     onClick={() => setShowAdvancedMetrics(!showAdvancedMetrics)}
                                     className="flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors bg-slate-800/50 hover:bg-slate-800 px-4 py-2 rounded-full border border-white/5"
                                 >
@@ -813,6 +814,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
                             {/* Play/Pause */}
                             <button
+                                aria-label={isPlaying ? "Pause audio" : "Play audio"}
                                 onClick={() => {
                                     if (audioRef.current) {
                                         if (isPlaying) {
@@ -848,6 +850,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
 
                             {/* Loop Toggle */}
                             <button
+                                aria-label={isLooping ? "Disable looping" : "Enable looping"}
                                 onClick={() => setIsLooping(!isLooping)}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${isLooping
                                     ? 'bg-green-500/20 border-green-500/50 text-green-400'
@@ -860,6 +863,7 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
 
                             {/* Clean Audio Button */}
                             <button
+                                aria-label="Clean audio"
                                 onClick={handleCleanAudio}
                                 disabled={isCleaning || !currentBlobRef.current}
                                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/50 text-purple-400 hover:bg-purple-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
