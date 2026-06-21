@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 import os
 import requests
 from ..extensions import limiter
@@ -49,9 +49,9 @@ def synthesize_speech():
 
         if not response.ok:
             error_text = response.text
+            current_app.logger.error(f"ElevenLabs API error {response.status_code}: {error_text}")
             return jsonify({
-                "error": f"ElevenLabs API error: {response.status_code}",
-                "details": error_text
+                "error": f"ElevenLabs API error: {response.status_code}"
             }), response.status_code
 
         # Return audio data
