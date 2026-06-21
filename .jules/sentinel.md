@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-02-24 - [MEDIUM] Fix information disclosure in TTS API
+**Vulnerability:** External API error details (from ElevenLabs) were being leaked directly to the client in the response payload.
+**Learning:** Returning raw responses from third party APIs in our error payloads exposes our backend integrations, third-party API specifics, and potentially sensitive error context to end users, facilitating reconnaissance.
+**Prevention:** Remove external error details from the JSON response and log the downstream error securely on the server side instead using `current_app.logger.error`.
