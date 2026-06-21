@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-06-21 - Prevent Layout Thrashing in React Three Fiber Overlays
+**Learning:** When layering 2D React components (like fallback visualizers) over 3D canvases, using independent `requestAnimationFrame` loops for the 2D layer causes severe layout thrashing and high CPU usage because it desyncs from the main render cycle.
+**Action:** Always use the centralized `RenderCoordinator` (e.g., `renderCoordinator.subscribe(useId(), callback)`) instead of raw `requestAnimationFrame` for any continuous DOM updates or 2D canvas drawing to batch repaints effectively.
