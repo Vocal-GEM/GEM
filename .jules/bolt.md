@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-02-24 - Layout Thrashing in Animation Loops
+**Learning:** `SafeModeVisualizer` directly uses `requestAnimationFrame` which may lead to unoptimized rendering loops.
+**Action:** Subscribed to `renderCoordinator` instead to manage layout thrashing and centralized animation loops.
