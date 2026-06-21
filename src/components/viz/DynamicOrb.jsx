@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unknown-property */
-import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo } from 'react';
+import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo, useId } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import * as THREE from 'three';
 import { Diamond, Bug, Activity, Sliders, Gauge } from 'lucide-react';
 import { OrbitControls } from '@react-three/drei';
@@ -399,9 +400,12 @@ VisualizerCanvas.displayName = 'VisualizerCanvas';
 const SafeModeVisualizer = memo(({ dataRef }) => {
   const circleRef = useRef(null);
   const textRef = useRef(null);
+  const componentId = useId();
 
   useEffect(() => {
-    let frameId;
+    // ⚡ Bolt: Subscribing to renderCoordinator to prevent layout thrashing
+    // This optimization centralizes the animation loop and reduces CPU overhead
+    // by coordinating RAF calls instead of running an isolated loop.
     const loop = () => {
       if (dataRef.current) {
         const { pitch, volume } = dataRef.current;
@@ -414,11 +418,11 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
           textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
         }
       }
-      frameId = requestAnimationFrame(loop);
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
-  }, [dataRef]);
+
+    const unsubscribe = renderCoordinator.subscribe(`SafeModeVisualizer-${componentId}`, loop);
+    return () => unsubscribe();
+  }, [dataRef, componentId]);
 
   return (
     <div className="w-full h-full flex items-center justify-center">
