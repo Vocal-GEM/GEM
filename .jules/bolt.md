@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Consolidated Animation Loops
+**Learning:** Multiple visualization components were using independent `requestAnimationFrame` loops alongside each other, causing high CPU usage and potential layout thrashing.
+**Action:** Centralized all visualization animation loops to use the `RenderCoordinator` singleton via `renderCoordinator.subscribe()`. Prevented recursive RAF calls inside subscriber callbacks.

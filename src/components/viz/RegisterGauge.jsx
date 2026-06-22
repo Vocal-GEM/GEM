@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * RegisterGauge - Visualize Laryngeal Mechanisms (M0-M3)
@@ -19,7 +20,7 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     });
     const [f0, setF0] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);
-    const animationRef = useRef();
+    const componentId = useId();
 
     useEffect(() => {
         const update = () => {
@@ -42,12 +43,17 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                 }
                 setF0(currentF0);
             }
-            animationRef.current = requestAnimationFrame(update);
+            // Optimized: Removed recursive requestAnimationFrame, handled by RenderCoordinator
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
-    }, [dataRef]);
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            update,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+
+        return unsubscribe;
+    }, [dataRef, componentId]);
 
     // Helpers
     const getIcon = () => {
