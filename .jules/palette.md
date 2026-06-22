@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-18 - Add aria-labels to Icon Buttons
+**Learning:** React component files (`src/components/ui/*.jsx`) contain `button` elements featuring only an icon, but lack descriptive `aria-label`s. Screen readers will read the button tag or inner SVG markup without adequate context, impacting users relying on assistive technology.
+**Action:** Always provide descriptive text inside the button, or an `aria-label` attribute if the text is not meant to be visibly rendered.
