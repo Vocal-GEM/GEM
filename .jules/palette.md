@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-06-22 - Missing ARIA labels in custom visualization toolbars
+**Learning:** Custom interactive components like `DynamicOrb` and `OrbLegend` often use floating icon-only buttons for mode switching and information toggles. Because these are built outside standard form/button library constraints, they frequently lack `aria-label` attributes, making them inaccessible to screen readers.
+**Action:** Always verify floating, icon-only control toolbars over visualizers for proper `aria-label` and `aria-expanded` attributes.
