@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { AudioWaveform, DoorOpen, Info } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * FlowFinisher - Phrase ending decay analysis
@@ -15,7 +16,7 @@ const FlowFinisher = ({ dataRef, showFeedback = true }) => {
     });
     const [showTooltip, setShowTooltip] = useState(false);
     const [envelope, setEnvelope] = useState([]);
-    const animationRef = useRef();
+    const componentId = useId();
 
     useEffect(() => {
         const update = () => {
@@ -34,12 +35,17 @@ const FlowFinisher = ({ dataRef, showFeedback = true }) => {
                     setEnvelope(amplitudeEnvelope.slice(-30));
                 }
             }
-            animationRef.current = requestAnimationFrame(update);
+            // Optimized: Removed recursive requestAnimationFrame, handled by RenderCoordinator
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
-    }, [dataRef]);
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            update,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+
+        return unsubscribe;
+    }, [dataRef, componentId]);
 
     const getQualityConfig = () => {
         switch (ending.quality) {
