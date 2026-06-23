@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2024-06-23 - DOM XSS in React via innerHTML
+**Vulnerability:** A React component (`WarmUpModule.jsx`) used `.innerHTML` directly on a DOM element in an `onError` event handler, bypassing React's built-in XSS protections.
+**Learning:** React's security model protects against XSS when rendering typical JSX. However, directly accessing the DOM using event handlers (`e.target.parentElement.innerHTML = ...`) completely circumvents these protections and creates DOM-based XSS vulnerabilities.
+**Prevention:** Always use `.textContent` instead of `.innerHTML` when dynamically inserting plain text into the DOM. Never use `.innerHTML` unless absolutely necessary, and if so, sanitize the input using a library like DOMPurify.
