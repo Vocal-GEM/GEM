@@ -13,3 +13,7 @@ Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
 7:49:03 AM [vite] page reload src/audio/PitchWorklet.js
 7:49:17 AM [vite] page reload src/services/PrivacyManager.js
 7:49:41 AM [vite] page reload src/services/ResearchMode.js
+8:10:30 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+8:11:05 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+8:11:44 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+8:12:20 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
