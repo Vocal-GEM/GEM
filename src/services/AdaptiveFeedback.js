@@ -29,14 +29,21 @@ export class AdaptiveFeedbackController {
         }
 
         // Calculate skill from recent accuracy
-        const avgAccuracy = this.recentPerformance.reduce((sum, p) => sum + p.accuracy, 0)
-            / this.recentPerformance.length;
+        let sumAccuracy = 0;
+        let sumTargetHitRate = 0;
+        let sumConsistency = 0;
+        const len = this.recentPerformance.length;
 
-        const avgTargetHitRate = this.recentPerformance.reduce((sum, p) => sum + (p.targetHitRate || 0), 0)
-            / this.recentPerformance.length;
+        for (let i = 0; i < len; i++) {
+            const p = this.recentPerformance[i];
+            sumAccuracy += p.accuracy;
+            sumTargetHitRate += (p.targetHitRate || 0);
+            sumConsistency += (p.consistency || 0);
+        }
 
-        const avgConsistency = this.recentPerformance.reduce((sum, p) => sum + (p.consistency || 0), 0)
-            / this.recentPerformance.length;
+        const avgAccuracy = sumAccuracy / len;
+        const avgTargetHitRate = sumTargetHitRate / len;
+        const avgConsistency = sumConsistency / len;
 
         // Weighted skill calculation
         const calculatedSkill = (
@@ -144,10 +151,18 @@ export class AdaptiveFeedbackController {
             return ['Complete more sessions to get personalized recommendations'];
         }
 
-        const avgAccuracy = this.recentPerformance.reduce((sum, p) => sum + p.accuracy, 0)
-            / this.recentPerformance.length;
-        const avgConsistency = this.recentPerformance.reduce((sum, p) => sum + (p.consistency || 0), 0)
-            / this.recentPerformance.length;
+        let sumAccuracy = 0;
+        let sumConsistency = 0;
+        const len = this.recentPerformance.length;
+
+        for (let i = 0; i < len; i++) {
+            const p = this.recentPerformance[i];
+            sumAccuracy += p.accuracy;
+            sumConsistency += (p.consistency || 0);
+        }
+
+        const avgAccuracy = sumAccuracy / len;
+        const avgConsistency = sumConsistency / len;
 
         const recommendations = [];
 
