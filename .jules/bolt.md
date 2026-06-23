@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Optimizing Fallback Animations
+**Learning:** Fallback visualizers (like SafeModeVisualizer) sometimes still use raw `requestAnimationFrame` directly while main 3D meshes use `useFrame`. This leads to uncoordinated rendering and higher CPU usage.
+**Action:** Always migrate raw `requestAnimationFrame` calls to the centralized `RenderCoordinator` service.
