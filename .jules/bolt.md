@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-01-24 - Layout Thrashing in Animation Loops (DynamicOrb)
+**Learning:** In `DynamicOrb.jsx`, an independent `requestAnimationFrame` was being used for DOM updates, which bypasses the centralized `RenderCoordinator` service. Multiple uncoordinated animation loops can cause layout thrashing and high CPU usage.
+**Action:** Always use `renderCoordinator.subscribe(useId(), callback, priority)` for component-level animation loops instead of raw `requestAnimationFrame`.
