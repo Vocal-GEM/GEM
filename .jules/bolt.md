@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## $(date +%Y-%m-%d) - Optimization of array iterations and unthrottled animations
+**Learning:** Found multiple distinct performance issues. 1) Raw `requestAnimationFrame` in `SafeModeVisualizer` bypassed the app's `RenderCoordinator`, causing unthrottled renders on low-end devices that need the fallback the most. 2) Chained `reduce()` calls on hot paths evaluating history arrays multiply iteration overhead.
+**Action:** 1) Always route animation loops through the centralized `RenderCoordinator` singleton for consistent FPS throttling. 2) Consolidate chained `reduce()` calls into single `for` loops when aggregating metrics from history arrays.
