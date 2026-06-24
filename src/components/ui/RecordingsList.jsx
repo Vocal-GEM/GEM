@@ -8,6 +8,7 @@ const RecordingsList = () => {
     const [playingId, setPlayingId] = useState(null);
     const [editingId, setEditingId] = useState(null);
     const [editName, setEditName] = useState('');
+    const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
     // Audio playback refs
     // ⚡ Bolt: Use useRef(null) and lazy init to avoid creating Audio objects on every render
@@ -65,8 +66,6 @@ const RecordingsList = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this recording?')) return;
-
         try {
             await indexedDB.deleteRecording(id);
             if (playingId === id) {
@@ -75,6 +74,7 @@ const RecordingsList = () => {
             }
             // Optimistic update
             setRecordings(prev => prev.filter(r => r.id !== id));
+            setConfirmDeleteId(null);
         } catch (error) {
             console.error("Failed to delete recording:", error);
         }
@@ -207,13 +207,34 @@ const RecordingsList = () => {
                             >
                                 <Download size={18} />
                             </button>
-                            <button
-                                onClick={() => handleDelete(recording.id)}
-                                title="Delete"
-                                className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700/50 rounded-lg transition-colors"
-                            >
-                                <Trash2 size={18} />
-                            </button>
+                            {confirmDeleteId === recording.id ? (
+                                <div className="flex items-center gap-1 bg-red-500/10 rounded-lg p-1 border border-red-500/20">
+                                    <span className="text-xs text-red-400 px-2 font-medium">Delete?</span>
+                                    <button
+                                        onClick={() => handleDelete(recording.id)}
+                                        aria-label="Confirm delete"
+                                        className="p-1 text-red-400 hover:bg-red-500/20 rounded transition-colors"
+                                    >
+                                        <Check size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => setConfirmDeleteId(null)}
+                                        aria-label="Cancel delete"
+                                        className="p-1 text-slate-400 hover:bg-slate-700/50 rounded transition-colors"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => setConfirmDeleteId(recording.id)}
+                                    title="Delete"
+                                    aria-label="Delete recording"
+                                    className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700/50 rounded-lg transition-colors"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
