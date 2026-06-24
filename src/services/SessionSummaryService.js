@@ -80,21 +80,36 @@ const analyzeMetrics = (metricsHistory) => {
         };
     }
 
-    const pitches = metricsHistory.filter(m => m.pitch > 0).map(m => m.pitch);
-    const resonances = metricsHistory.filter(m => m.resonance).map(m => m.resonance);
-    const weights = metricsHistory.filter(m => m.weight).map(m => m.weight);
+    // Optimized: Consolidate chained filter, map, and reduce into a single loop
+    let pitchSum = 0;
+    let pitchCount = 0;
+    let resSum = 0;
+    let resCount = 0;
+    let weightSum = 0;
+    let weightCount = 0;
 
-    const avgPitch = pitches.length > 0
-        ? Math.round(pitches.reduce((a, b) => a + b, 0) / pitches.length)
-        : 0;
+    const pitches = [];
 
-    const avgResonance = resonances.length > 0
-        ? Math.round(resonances.reduce((a, b) => a + b, 0) / resonances.length)
-        : 50;
+    for (let i = 0; i < metricsHistory.length; i++) {
+        const m = metricsHistory[i];
+        if (m.pitch > 0) {
+            pitches.push(m.pitch);
+            pitchSum += m.pitch;
+            pitchCount++;
+        }
+        if (m.resonance) {
+            resSum += m.resonance;
+            resCount++;
+        }
+        if (m.weight) {
+            weightSum += m.weight;
+            weightCount++;
+        }
+    }
 
-    const avgWeight = weights.length > 0
-        ? Math.round(weights.reduce((a, b) => a + b, 0) / weights.length)
-        : 50;
+    const avgPitch = pitchCount > 0 ? Math.round(pitchSum / pitchCount) : 0;
+    const avgResonance = resCount > 0 ? Math.round(resSum / resCount) : 50;
+    const avgWeight = weightCount > 0 ? Math.round(weightSum / weightCount) : 50;
 
     // Calculate pitch stability (inverse of variance)
     let pitchStability = 100;
