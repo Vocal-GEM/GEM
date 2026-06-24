@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-11-20 - Ensure Sensitive PII File Cleanup Using Finally Blocks
+**Vulnerability:** Original user audio uploads containing Personally Identifiable Information (PII) were not guaranteed to be deleted if the anonymization processing function (`anonymize_audio`) threw an exception before the cleanup code was reached.
+**Learning:** Processing sensitive files carries a risk of exceptions. If cleanup logic is placed after the processing function without structural guarantees, unhandled exceptions will skip the cleanup, leaving sensitive raw data exposed on the server.
+**Prevention:** Always wrap sensitive data processing in a `try` block and place the raw file deletion logic inside a `finally` block to guarantee it executes regardless of processing success or failure.
