@@ -44,3 +44,6 @@
 ## 2025-06-24 - Chained Array Iterations Overhead
 **Learning:** Consolidating chained `.filter()`, `.map()`, and `.reduce()` calls on metric histories into a single `for` loop significantly eliminates redundant array traversals and reduces CPU iteration overhead, performing nearly 4x faster on large datasets.
 **Action:** On hot paths (e.g., aggregations in metrics histories), refactor chained array iterations into a single `for` loop to compute sums, counts, and filtered results simultaneously.
+## 2026-06-24 - AudioWorklet Scope and React Hooks Warnings
+**Learning:** In `AudioWorkletProcessor` environments, `currentTime` is not globally available by default unless explicitly accessed via `globalThis.currentTime`. Also, React hooks and variables imported but never used trigger CI failures.
+**Action:** Access `currentTime` via `globalThis.currentTime` in audio worklets, prefix unused function arguments with `_`, and remove unused imports to ensure CI passes.
