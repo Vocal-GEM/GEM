@@ -42,14 +42,27 @@ export class DigestGenerator {
     }
 
     generateSummary(sessions) {
-        const totalDuration = sessions.reduce((t, s) => t + (s.duration || 0), 0);
+        let totalDuration = 0;
+        let sumPitch = 0;
+        let countPitch = 0;
+        let sumResonance = 0;
+        let countResonance = 0;
 
-        // safe averages
-        const validPitch = sessions.filter(s => s.avgPitch).map(s => s.avgPitch);
-        const avgPitch = validPitch.length ? validPitch.reduce((a, b) => a + b, 0) / validPitch.length : 0;
+        for (let i = 0; i < sessions.length; i++) {
+            const s = sessions[i];
+            totalDuration += (s.duration || 0);
+            if (s.avgPitch) {
+                sumPitch += s.avgPitch;
+                countPitch++;
+            }
+            if (s.avgResonance) {
+                sumResonance += s.avgResonance;
+                countResonance++;
+            }
+        }
 
-        const validRes = sessions.filter(s => s.avgResonance).map(s => s.avgResonance);
-        const avgResonance = validRes.length ? validRes.reduce((a, b) => a + b, 0) / validRes.length : 0;
+        const avgPitch = countPitch > 0 ? sumPitch / countPitch : 0;
+        const avgResonance = countResonance > 0 ? sumResonance / countResonance : 0;
 
         return {
             totalPracticeTimeSeconds: totalDuration,

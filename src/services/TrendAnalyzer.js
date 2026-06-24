@@ -34,10 +34,16 @@ export class TrendAnalyzer {
 
         // group data points
         const values = {
-            pitch: sortedSessions.map(s => s.avgPitch).filter(v => v != null),
-            resonance: sortedSessions.map(s => s.avgResonance).filter(v => v != null),
-            dates: sortedSessions.map(s => new Date(s.date))
+            pitch: [],
+            resonance: [],
+            dates: []
         };
+        for (let i = 0; i < sortedSessions.length; i++) {
+            const s = sortedSessions[i];
+            if (s.avgPitch != null) values.pitch.push(s.avgPitch);
+            if (s.avgResonance != null) values.resonance.push(s.avgResonance);
+            values.dates.push(new Date(s.date));
+        }
 
         return {
             pitch: this.analyzeTrend(values.pitch),
@@ -121,11 +127,22 @@ export class TrendAnalyzer {
 
         // calculate variance in session duration and frequency
         // for this example, we'll look at pitch stability across sessions
-        const pitches = sessions.map(s => s.avgPitch).filter(p => p != null);
+        const pitches = [];
+        let sumPitch = 0;
+        for (let i = 0; i < sessions.length; i++) {
+            if (sessions[i].avgPitch != null) {
+                pitches.push(sessions[i].avgPitch);
+                sumPitch += sessions[i].avgPitch;
+            }
+        }
         if (pitches.length < 2) return 50;
 
-        const mean = pitches.reduce((a, b) => a + b, 0) / pitches.length;
-        const variance = pitches.reduce((a, b) => a + (b - mean) ** 2, 0) / pitches.length;
+        const mean = sumPitch / pitches.length;
+        let sumVariance = 0;
+        for (let i = 0; i < pitches.length; i++) {
+            sumVariance += Math.pow(pitches[i] - mean, 2);
+        }
+        const variance = sumVariance / pitches.length;
         const stdDev = Math.sqrt(variance);
 
         // coefficient of variation (cv) = stdDev / mean
