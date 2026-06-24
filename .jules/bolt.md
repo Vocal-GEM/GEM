@@ -47,3 +47,6 @@
 ## 2026-06-24 - AudioWorklet Scope and React Hooks Warnings
 **Learning:** In `AudioWorkletProcessor` environments, `currentTime` is not globally available by default unless explicitly accessed via `globalThis.currentTime`. Also, React hooks and variables imported but never used trigger CI failures.
 **Action:** Access `currentTime` via `globalThis.currentTime` in audio worklets, prefix unused function arguments with `_`, and remove unused imports to ensure CI passes.
+## 2026-06-24 - Fix remaining CI errors part 2
+**Learning:** Mocks in vitest should use `vi.importActual` and provide proper displayNames. Also `globalThis` is preferred over `global` to prevent reference errors in tests. Entities like quotes should be escaped in JSX strings.
+**Action:** Use `vi.importActual` and assign displayNames to mock components. Use `globalThis` instead of `global` for modifying environment scopes. Escape quotes properly.
