@@ -312,14 +312,29 @@ class LiveCoachingServiceClass {
     analyzePatterns() {
         if (this.patternHistory.length < 10) return null;
 
-        const pitches = this.patternHistory.filter(p => p.pitch > 0).map(p => p.pitch);
+        const pitches = [];
+        let sumPitch = 0;
+        let sumResonance = 0;
+        let countResonance = 0;
+
+        for (let i = 0; i < this.patternHistory.length; i++) {
+            const p = this.patternHistory[i];
+            if (p.pitch > 0) {
+                pitches.push(p.pitch);
+                sumPitch += p.pitch;
+            }
+            if (p.resonance != null) {
+                sumResonance += p.resonance;
+                countResonance++;
+            }
+        }
+
         const avgPitch = pitches.length > 0
-            ? pitches.reduce((a, b) => a + b, 0) / pitches.length
+            ? sumPitch / pitches.length
             : 0;
 
-        const resonances = this.patternHistory.filter(p => p.resonance).map(p => p.resonance);
-        const avgResonance = resonances.length > 0
-            ? resonances.reduce((a, b) => a + b, 0) / resonances.length
+        const avgResonance = countResonance > 0
+            ? sumResonance / countResonance
             : 0;
 
         return {

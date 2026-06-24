@@ -80,35 +80,61 @@ const analyzeMetrics = (metricsHistory) => {
         };
     }
 
-    const pitches = metricsHistory.filter(m => m.pitch > 0).map(m => m.pitch);
-    const resonances = metricsHistory.filter(m => m.resonance).map(m => m.resonance);
-    const weights = metricsHistory.filter(m => m.weight).map(m => m.weight);
+    const pitches = [];
+    let sumPitch = 0;
+    let sumResonance = 0;
+    let countResonance = 0;
+    let sumWeight = 0;
+    let countWeight = 0;
+    let inTargetCount = 0;
+    const targetMin = 160, targetMax = 260;
+
+    for (let i = 0; i < metricsHistory.length; i++) {
+        const m = metricsHistory[i];
+        if (m.pitch > 0) {
+            pitches.push(m.pitch);
+            sumPitch += m.pitch;
+            if (m.pitch >= targetMin && m.pitch <= targetMax) {
+                inTargetCount++;
+            }
+        }
+        if (m.resonance != null) {
+            sumResonance += m.resonance;
+            countResonance++;
+        }
+        if (m.weight != null) {
+            sumWeight += m.weight;
+            countWeight++;
+        }
+    }
 
     const avgPitch = pitches.length > 0
-        ? Math.round(pitches.reduce((a, b) => a + b, 0) / pitches.length)
+        ? Math.round(sumPitch / pitches.length)
         : 0;
 
-    const avgResonance = resonances.length > 0
-        ? Math.round(resonances.reduce((a, b) => a + b, 0) / resonances.length)
+    const avgResonance = countResonance > 0
+        ? Math.round(sumResonance / countResonance)
         : 50;
 
-    const avgWeight = weights.length > 0
-        ? Math.round(weights.reduce((a, b) => a + b, 0) / weights.length)
+    const avgWeight = countWeight > 0
+        ? Math.round(sumWeight / countWeight)
         : 50;
 
     // Calculate pitch stability (inverse of variance)
     let pitchStability = 100;
     if (pitches.length > 5) {
         const mean = avgPitch;
-        const variance = pitches.reduce((sum, p) => sum + Math.pow(p - mean, 2), 0) / pitches.length;
+        let sumVariance = 0;
+        for (let i = 0; i < pitches.length; i++) {
+            sumVariance += Math.pow(pitches[i] - mean, 2);
+        }
+        const variance = sumVariance / pitches.length;
         pitchStability = Math.max(0, Math.round(100 - Math.sqrt(variance)));
     }
 
     // Estimate time in target (rough calculation)
-    const targetMin = 160, targetMax = 260;
-    const inTarget = pitches.filter(p => p >= targetMin && p <= targetMax);
     const timeInTarget = pitches.length > 0
-        ? Math.round((inTarget.length / pitches.length) * 100)
+        ? Math.round((inTargetCount / pitches.length) * 100)
         : 0;
 
     // Determine trend based on first half vs second half
