@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useClient } from '../../context/ClientContext';
-import { Users, Plus, Trash2, User, ChevronDown, X } from 'lucide-react';
+import { Users, Plus, Trash2, User, ChevronDown, X, Check } from 'lucide-react';
 
 const ClientSelector = () => {
     const { clients, activeClient, setActiveClient, addClient, deleteClient } = useClient();
@@ -8,6 +8,7 @@ const ClientSelector = () => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [newClientName, setNewClientName] = useState('');
     const [newClientGoals, setNewClientGoals] = useState('');
+    const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
     const handleAddClient = async (e) => {
         e.preventDefault();
@@ -29,9 +30,8 @@ const ClientSelector = () => {
 
     const handleDeleteClient = (e, id) => {
         e.stopPropagation();
-        if (window.confirm('Are you sure you want to delete this client? This cannot be undone.')) {
-            deleteClient(id);
-        }
+        deleteClient(id);
+        setConfirmDeleteId(null);
     };
 
     return (
@@ -77,12 +77,32 @@ const ClientSelector = () => {
                                             <div className="text-[10px] text-slate-500">{new Date(client.createdAt).toLocaleDateString()}</div>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={(e) => handleDeleteClient(e, client.id)}
-                                        className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-md opacity-0 group-hover:opacity-100 transition-all"
-                                    >
-                                        <Trash2 size={14} />
-                                    </button>
+                                    {confirmDeleteId === client.id ? (
+                                        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                            <button
+                                                onClick={(e) => handleDeleteClient(e, client.id)}
+                                                className="p-1 text-red-400 hover:bg-red-500/20 rounded-md transition-colors"
+                                                aria-label="Confirm delete"
+                                            >
+                                                <Check size={14} />
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(null); }}
+                                                className="p-1 text-slate-400 hover:bg-slate-700 rounded-md transition-colors"
+                                                aria-label="Cancel delete"
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(client.id); }}
+                                            className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-md opacity-0 group-hover:opacity-100 transition-all"
+                                            aria-label="Delete client"
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                    )}
                                 </div>
                             ))}
                         </div>

@@ -14,6 +14,7 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
     const [knowledgeBaseData, setKnowledgeBaseData] = useState(null);
     const [showDirectory, setShowDirectory] = useState(false);
     const [isLoadingDirectory, setIsLoadingDirectory] = useState(false);
+    const [confirmClearData, setConfirmClearData] = useState(false);
     const [showVoiceDataConsent, setShowVoiceDataConsent] = useState(false);
 
     useEffect(() => {
@@ -741,20 +742,44 @@ const FeedbackSettings = ({ settings, setSettings, isOpen, onClose, onOpenTutori
                                 </div>
                             </div>
 
-                            <button
-                                onClick={async () => {
-                                    if (window.confirm('Are you sure you want to clear all local data? This cannot be undone.')) {
-                                        await indexedDB.clear(STORES.JOURNALS);
-                                        await indexedDB.clear(STORES.STATS);
-                                        await indexedDB.clear(STORES.GOALS);
-                                        window.location.reload();
-                                    }
-                                }}
-                                className="w-full p-4 bg-red-900/20 hover:bg-red-900/40 border border-red-500/30 rounded-xl text-left flex items-center gap-3 transition-colors"
-                            >
-                                <Trash2 className="w-5 h-5 text-red-400" />
-                                <span className="text-sm font-bold text-red-200">Clear Local Data</span>
-                            </button>
+                            {confirmClearData ? (
+                                <div className="w-full p-4 bg-red-900/40 border border-red-500 rounded-xl text-left flex items-center justify-between gap-3 animate-in fade-in">
+                                    <div>
+                                        <div className="font-bold text-red-400">Are you absolutely sure?</div>
+                                        <div className="text-xs text-red-400/70 mt-1">This will permanently delete all your data.</div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => setConfirmClearData(false)}
+                                            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-bold rounded-lg transition-colors"
+                                            aria-label="Cancel clear data"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={async () => {
+                                                await indexedDB.clear(STORES.JOURNALS);
+                                                await indexedDB.clear(STORES.STATS);
+                                                await indexedDB.clear(STORES.GOALS);
+                                                window.location.reload();
+                                            }}
+                                            className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-sm font-bold rounded-lg transition-colors"
+                                            aria-label="Confirm clear data"
+                                        >
+                                            Yes, Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => setConfirmClearData(true)}
+                                    className="w-full p-4 bg-red-900/20 hover:bg-red-900/40 border border-red-500/30 rounded-xl text-left flex items-center gap-3 transition-colors"
+                                    aria-label="Clear all local data"
+                                >
+                                    <Trash2 className="w-5 h-5 text-red-400" />
+                                    <span className="text-sm font-bold text-red-200">Clear Local Data</span>
+                                </button>
+                            )}
                         </div>
                     </section>
 
