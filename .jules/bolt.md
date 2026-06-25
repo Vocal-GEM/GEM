@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-06-25 - [Array Iteration Optimization]
+**Learning:** Chained array methods like `.map().filter()` and repeated `.reduce()` calls introduce significant iteration overhead on hot paths, such as data aggregation loops in `TrendAnalyzer.js`.
+**Action:** Replace chained array methods with unified `for` loops to minimize CPU iteration overhead.

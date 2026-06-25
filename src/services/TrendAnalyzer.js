@@ -32,19 +32,28 @@ export class TrendAnalyzer {
 
         // filter by timeframe if needed (omitted for brevity, assume pre-filtered or handled)
 
-        // group data points
-        const values = {
-            pitch: sortedSessions.map(s => s.avgPitch).filter(v => v != null),
-            resonance: sortedSessions.map(s => s.avgResonance).filter(v => v != null),
-            dates: sortedSessions.map(s => new Date(s.date))
-        };
+        // group data points optimized iteration
+        const pitchValues = [];
+        const resonanceValues = [];
+        let totalDuration = 0;
+
+        for (let i = 0; i < sortedSessions.length; i++) {
+            const s = sortedSessions[i];
+            if (s.avgPitch != null) pitchValues.push(s.avgPitch);
+            if (s.avgResonance != null) resonanceValues.push(s.avgResonance);
+            totalDuration += (s.duration || 0);
+        }
 
         return {
-            pitch: this.analyzeTrend(values.pitch),
-            resonance: this.analyzeTrend(values.resonance),
-            consistency: this.analyzeConsistency(sortedSessions),
-            plateau: this.detectPlateau(values.pitch), // primary metric for plateau usually pitch
-            practiceVolume: this.analyzePracticePatterns(sortedSessions)
+            pitch: this.analyzeTrend(pitchValues),
+            resonance: this.analyzeTrend(resonanceValues),
+            consistency: this.analyzeConsistency(pitchValues),
+            plateau: this.detectPlateau(pitchValues), // primary metric for plateau usually pitch
+            practiceVolume: {
+                totalDurationMinutes: Math.round(totalDuration / 60),
+                sessionCount: sortedSessions.length,
+                avgDurationMinutes: sortedSessions.length ? Math.round((totalDuration / 60) / sortedSessions.length) : 0
+            }
         };
     }
 
@@ -67,7 +76,9 @@ export class TrendAnalyzer {
         // x values are just indices 0 to n-1 for simple linear regression over time
         // using indices assumes uniform spacing, which might not be true, but is a decent approximation for "sessions over time"
         const xMean = (n - 1) / 2;
-        const yMean = values.reduce((a, b) => a + b, 0) / n;
+        let sum = 0;
+        for (let i = 0; i < n; i++) sum += values[i];
+        const yMean = sum / n;
 
         let numerator = 0;
         let denominator = 0;
@@ -80,7 +91,7 @@ export class TrendAnalyzer {
         const slope = denominator === 0 ? 0 : numerator / denominator;
         const intercept = yMean - (slope * xMean);
 
-        const rSquared = this.calculateRSquared(values, slope, intercept);
+        const rSquared = this.calculateRSquared(values, yMean, slope, intercept);
 
         return {
             direction: slope > 0.5 ? 'improving' : slope < -0.5 ? 'declining' : 'stable', // threshold depends on metric
@@ -96,10 +107,8 @@ export class TrendAnalyzer {
     /**
      * calculate r-squared value for goodness of fit
      */
-    calculateRSquared(values, slope, intercept) {
+    calculateRSquared(values, yMean, slope, intercept) {
         const n = values.length;
-        const yMean = values.reduce((a, b) => a + b, 0) / n;
-
         let ssTot = 0; // total sum of squares
         let ssRes = 0; // residual sum of squares
 
@@ -116,16 +125,16 @@ export class TrendAnalyzer {
     /**
      * analyze consistency based on variance across sessions
      */
-    analyzeConsistency(sessions) {
-        if (sessions.length < 3) return 50; // default medium consistency
+    analyzeConsistency(pitches) {
+        if (!pitches || pitches.length < 2) return 50; // default medium consistency
 
-        // calculate variance in session duration and frequency
-        // for this example, we'll look at pitch stability across sessions
-        const pitches = sessions.map(s => s.avgPitch).filter(p => p != null);
-        if (pitches.length < 2) return 50;
+        let sum = 0;
+        for (let i = 0; i < pitches.length; i++) sum += pitches[i];
+        const mean = sum / pitches.length;
 
-        const mean = pitches.reduce((a, b) => a + b, 0) / pitches.length;
-        const variance = pitches.reduce((a, b) => a + (b - mean) ** 2, 0) / pitches.length;
+        let sumSquaredDiffs = 0;
+        for (let i = 0; i < pitches.length; i++) sumSquaredDiffs += (pitches[i] - mean) ** 2;
+        const variance = sumSquaredDiffs / pitches.length;
         const stdDev = Math.sqrt(variance);
 
         // coefficient of variation (cv) = stdDev / mean
@@ -149,8 +158,18 @@ export class TrendAnalyzer {
         if (!values || values.length < 8) return { detected: false };
 
         const recent = values.slice(-8); // last 8 sessions
-        const range = Math.max(...recent) - Math.min(...recent);
-        const avgValue = recent.reduce((a, b) => a + b, 0) / recent.length;
+        let max = recent[0];
+        let min = recent[0];
+        let sum = recent[0];
+
+        for (let i = 1; i < recent.length; i++) {
+            if (recent[i] > max) max = recent[i];
+            if (recent[i] < min) min = recent[i];
+            sum += recent[i];
+        }
+
+        const range = max - min;
+        const avgValue = sum / recent.length;
 
         // if variation is very small over last 8 sessions, it's a plateau
         // absolute growth check: compare first vs last of recent
@@ -179,15 +198,5 @@ export class TrendAnalyzer {
         ];
     }
 
-    analyzePracticePatterns(sessions) {
-        // simple frequency analysis
-        const totalDuration = sessions.reduce((sum, s) => sum + (s.duration || 0), 0);
-        const count = sessions.length;
-
-        return {
-            totalDurationMinutes: Math.round(totalDuration / 60),
-            sessionCount: count,
-            avgDurationMinutes: count ? Math.round((totalDuration / 60) / count) : 0
-        };
-    }
+    // analyzePracticePatterns is replaced by logic in analyzeProgress
 }

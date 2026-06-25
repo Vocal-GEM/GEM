@@ -66,8 +66,14 @@ export class DigestGenerator {
 
         if (sessions.length === 0) return highlights;
 
+        // Extract pitch values for consistency check
+        const pitchValues = [];
+        for (let i = 0; i < sessions.length; i++) {
+            if (sessions[i].avgPitch != null) pitchValues.push(sessions[i].avgPitch);
+        }
+
         // Check consistency
-        const consistency = this.trendAnalyzer.analyzeConsistency(sessions);
+        const consistency = this.trendAnalyzer.analyzeConsistency(pitchValues);
         if (consistency > 80) {
             highlights.push({
                 type: 'consistency',
@@ -88,8 +94,18 @@ export class DigestGenerator {
         }
 
         // Personal bests (simplified logic)
-        const maxPitch = Math.max(...sessions.map(s => s.maxPitch || 0));
-        const prevMax = prevSessions ? Math.max(...prevSessions.map(s => s.maxPitch || 0)) : 0;
+        let maxPitch = 0;
+        for (let i = 0; i < sessions.length; i++) {
+            if ((sessions[i].maxPitch || 0) > maxPitch) maxPitch = sessions[i].maxPitch || 0;
+        }
+
+        let prevMax = 0;
+        if (prevSessions) {
+            for (let i = 0; i < prevSessions.length; i++) {
+                if ((prevSessions[i].maxPitch || 0) > prevMax) prevMax = prevSessions[i].maxPitch || 0;
+            }
+        }
+
         if (maxPitch > prevMax && maxPitch > 0) {
             highlights.push({
                 type: 'personal_best',
