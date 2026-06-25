@@ -9,11 +9,48 @@
  * @param {number} sampleRate - Sample rate in Hz
  * @returns {Object} Validation result with issues and confidence score
  */
-export const validateAudioSignal = (audioBuffer, sampleRate) => {
-    const issues = [];
+export const validateAudioSignal = (audioBuffer, _sampleRate) => {
+    // Optimized: Single pass loop for computing metrics to reduce CPU overhead and garbage collection
+    const len = audioBuffer.length;
+    let maxAmplitude = 0;
+    let sumSquares = 0;
+    let sum = 0;
 
-    // Check for clipping
-    const maxAmplitude = Math.max(...audioBuffer.map(Math.abs));
+    const absBuffer = new Float32Array(len);
+
+    for (let i = 0; i < len; i++) {
+        const val = audioBuffer[i];
+        let absVal = val;
+        if (absVal < 0) absVal = -absVal;
+
+        absBuffer[i] = absVal;
+
+        if (absVal > maxAmplitude) maxAmplitude = absVal;
+        sumSquares += val * val;
+        sum += val;
+    }
+
+    const rms = Math.sqrt(sumSquares / len);
+    const dcOffset = sum / len;
+
+    // Optimized: Inline SNR estimation without massive array cloning
+    absBuffer.sort();
+    const noiseFloorIndex = Math.floor(len * 0.1);
+    let nfSumSquares = 0;
+    for (let i = 0; i < noiseFloorIndex; i++) {
+        const val = absBuffer[i];
+        nfSumSquares += val * val;
+    }
+    const noiseFloor = Math.sqrt(nfSumSquares / noiseFloorIndex);
+
+    let snr = 50;
+    if (noiseFloor >= 0.00001) {
+        snr = 20 * Math.log10(rms / noiseFloor);
+        if (snr < 0) snr = 0;
+        else if (snr > 60) snr = 60;
+    }
+
+    const issues = [];
     if (maxAmplitude > 0.99) {
         issues.push({
             type: 'clipping',
@@ -22,8 +59,6 @@ export const validateAudioSignal = (audioBuffer, sampleRate) => {
         });
     }
 
-    // Check for silence
-    const rms = Math.sqrt(audioBuffer.reduce((sum, s) => sum + s * s, 0) / audioBuffer.length);
     if (rms < 0.001) {
         issues.push({
             type: 'silence',
@@ -32,9 +67,9 @@ export const validateAudioSignal = (audioBuffer, sampleRate) => {
         });
     }
 
-    // Check for DC offset
-    const dcOffset = audioBuffer.reduce((sum, s) => sum + s, 0) / audioBuffer.length;
-    if (Math.abs(dcOffset) > 0.05) {
+    let absDcOffset = dcOffset;
+    if (absDcOffset < 0) absDcOffset = -absDcOffset;
+    if (absDcOffset > 0.05) {
         issues.push({
             type: 'dc_offset',
             severity: 'medium',
@@ -42,8 +77,6 @@ export const validateAudioSignal = (audioBuffer, sampleRate) => {
         });
     }
 
-    // Check for excessive noise (estimate SNR)
-    const snr = estimateSNR(audioBuffer);
     if (snr < 10) {
         issues.push({
             type: 'low_snr',
@@ -52,50 +85,19 @@ export const validateAudioSignal = (audioBuffer, sampleRate) => {
         });
     }
 
-    // Calculate confidence score (0-1)
-    // Based on SNR: 5dB = 0, 35dB = 1
-    const confidence = Math.max(0, Math.min(1, (snr - 5) / 30));
+    let confidence = (snr - 5) / 30;
+    if (confidence < 0) confidence = 0;
+    else if (confidence > 1) confidence = 1;
 
-    return {
-        isValid: issues.filter(i => i.severity === 'high').length === 0,
-        issues,
-        confidence,
-        metrics: {
-            maxAmplitude,
-            rms,
-            dcOffset,
-            snr
+    let isValid = true;
+    for (let i = 0; i < issues.length; i++) {
+        if (issues[i].severity === 'high') {
+            isValid = false;
+            break;
         }
-    };
-};
-
-/**
- * Estimate Signal-to-Noise Ratio
- * @param {Float32Array} audioBuffer - Audio samples
- * @returns {number} Estimated SNR in dB
- */
-const estimateSNR = (audioBuffer) => {
-    // Calculate RMS (signal power)
-    const rms = Math.sqrt(audioBuffer.reduce((sum, s) => sum + s * s, 0) / audioBuffer.length);
-
-    // Estimate noise floor from quietest 10% of samples
-    const sorted = [...audioBuffer].map(Math.abs).sort((a, b) => a - b);
-    const noiseFloorIndex = Math.floor(sorted.length * 0.1);
-    const noiseFloorSamples = sorted.slice(0, noiseFloorIndex);
-    const noiseFloor = Math.sqrt(
-        noiseFloorSamples.reduce((sum, s) => sum + s * s, 0) / noiseFloorSamples.length
-    );
-
-    // Avoid division by zero
-    if (noiseFloor < 0.00001) {
-        // Very quiet noise floor, assume excellent SNR
-        return 50;
     }
 
-    // SNR in dB
-    const snr = 20 * Math.log10(rms / noiseFloor);
-
-    return Math.max(0, Math.min(60, snr)); // Clamp to reasonable range
+    return { isValid, issues, confidence, metrics: {maxAmplitude, rms, dcOffset, snr}};
 };
 
 /**
