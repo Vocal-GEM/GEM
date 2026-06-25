@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-21 - Array iterators in hot loops
+**Learning:** Using chained array methods (`.map()`, `.reduce()`, `.filter()`) and spreading arrays (`[...audioBuffer].sort()`) inside high-frequency paths like `validateAudioSignal` creates significant CPU iteration overhead and severe garbage collection pressure.
+**Action:** Consolidate multiple passes over Float32Arrays into a single `for` loop to compute min/max/sums concurrently, and avoid array spreading. Use pre-allocated TypedArrays for inline algorithms.
