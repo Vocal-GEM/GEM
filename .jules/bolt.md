@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-06-25 - Layout Thrashing in Animation Loops
+**Learning:** Using raw `requestAnimationFrame` independently across multiple visualization components causes significant CPU overhead, layout thrashing, and uncoordinated repaints. Components like `RegisterGauge.jsx`, `SZRatio.jsx`, and `DynamicOrb.jsx` were each spinning up their own recursive animation loops.
+**Action:** Always refactor independent `requestAnimationFrame` loops to use the centralized `RenderCoordinator` singleton via `renderCoordinator.subscribe(useId(), callback, priority)` to consolidate repaints into a single coordinated loop.
