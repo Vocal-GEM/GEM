@@ -48,11 +48,11 @@ def synthesize_speech():
         )
 
         if not response.ok:
-            error_text = response.text
+            from flask import current_app
+            current_app.logger.error(f"ElevenLabs API error: {response.status_code} - {response.text}")
             return jsonify({
-                "error": f"ElevenLabs API error: {response.status_code}",
-                "details": error_text
-            }), response.status_code
+                "error": "Failed to synthesize speech due to an internal error."
+            }), 500
 
         # Return audio data
         return response.content, 200, {

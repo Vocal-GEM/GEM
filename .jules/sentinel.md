@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## $(date +%Y-%m-%d) - Information Disclosure in TTS Error Handling
+**Vulnerability:** Upstream API error details (ElevenLabs) were exposed directly to the client in the JSON response payload.
+**Learning:** Returning raw upstream error responses (`response.text`) can leak internal configuration, API key constraints, or system architecture details to attackers.
+**Prevention:** Always log detailed external API errors internally using `current_app.logger.error()` and return sanitized, generic error messages (e.g., "Internal error occurred") to the client.
