@@ -1,0 +1,10 @@
+--- src/components/professional/ClientDashboard.jsx
++++ src/components/professional/ClientDashboard.jsx
+@@ -1,6 +1,6 @@
+ import React, { useState, useEffect } from 'react';
+ import {
+-    Users, Calendar, FileText, Activity,
++    Users, Calendar, FileText,
+     TrendingUp, Clock, AlertCircle, ChevronRight,
+     Search, Filter, Plus, Mic, Settings, UserPlus
+ } from 'lucide-react';

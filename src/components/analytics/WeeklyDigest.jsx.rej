@@ -1,0 +1,9 @@
+--- src/components/analytics/WeeklyDigest.jsx
++++ src/components/analytics/WeeklyDigest.jsx
+@@ -1,5 +1,4 @@
+-import React, { useState, useEffect } from 'react';
+-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
++import { useState, useEffect } from 'react';
+ import {
+     TrendingUp, TrendingDown, Minus,
+     Mic, Clock, Target, Calendar

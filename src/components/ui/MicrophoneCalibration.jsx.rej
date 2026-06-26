@@ -1,0 +1,11 @@
+--- src/components/ui/MicrophoneCalibration.jsx
++++ src/components/ui/MicrophoneCalibration.jsx
+@@ -297,7 +297,7 @@
+                                 A low score means your microphone might be picking up echo, background noise, or processing the audio heavily.
+                                 <br /><br />
+                                 <strong>Tip:</strong> Ensure you are in a quiet room and using a headset or external microphone if possible. Avoid using
+-                                browser extensions that "enhance" audio.
++                                browser extensions that &quot;enhance&quot; audio.
+                             </p>
+                         </div>
+                     </div>

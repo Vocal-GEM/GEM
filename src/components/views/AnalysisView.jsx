@@ -220,43 +220,46 @@ const AnalysisView = ({ analysisResults: propResults, onClose, targetRange }) =>
                                 m.timestamp >= startMs && m.timestamp <= endMs
                             );
 
-                            // Calculate average pitch, weight, and modal label in a single pass to reduce overhead
-                            let sumPitch = 0, countPitch = 0;
-                            let sumWeight = 0, countWeight = 0;
-                            const labelCounts = {};
-                            let maxLabelCount = 0;
+                            // Calculate average pitch (filtering out silence/unvoiced < 50Hz)
+                            const pitches = relevantMetrics
+                                .map(m => m.metrics?.pitch)
+                                .filter(p => p && p > 50);
 
-                            for (let i = 0; i < relevantMetrics.length; i++) {
-                                const metrics = relevantMetrics[i].metrics;
-                                if (!metrics) continue;
+                            // Calculate average weight metrics
+                            const weights = relevantMetrics
+                                .map(m => m.metrics?.weight)
+                                .filter(w => w !== undefined);
 
-                                if (metrics.pitch && metrics.pitch > 50) {
-                                    sumPitch += metrics.pitch;
-                                    countPitch++;
-                                }
+                            // Determine modal label
+                            const labels = relevantMetrics
+                                .map(m => m.metrics?.weightLabel)
+                                .filter(l => l && l !== 'Unknown');
 
-                                if (metrics.weight !== undefined) {
-                                    sumWeight += metrics.weight;
-                                    countWeight++;
-                                }
-
-                                if (metrics.weightLabel && metrics.weightLabel !== 'Unknown') {
-                                    const label = metrics.weightLabel;
-                                    labelCounts[label] = (labelCounts[label] || 0) + 1;
-                                    if (labelCounts[label] > maxLabelCount) {
-                                        maxLabelCount = labelCounts[label];
-                                        avgLabel = label;
+                            // Simple mode function
+                            const getMode = (arr) => {
+                                if (arr.length === 0) return null;
+                                const counts = {};
+                                let maxCount = 0;
+                                let mode = null;
+                                arr.forEach(val => {
+                                    counts[val] = (counts[val] || 0) + 1;
+                                    if (counts[val] > maxCount) {
+                                        maxCount = counts[val];
+                                        mode = val;
                                     }
-                                }
+                                });
+                                return mode;
                             }
 
-                            if (countPitch > 0) {
-                                avgPitch = sumPitch / countPitch;
+                            if (pitches.length > 0) {
+                                avgPitch = pitches.reduce((a, b) => a + b, 0) / pitches.length;
                             }
 
-                            if (countWeight > 0) {
-                                avgWeight = sumWeight / countWeight;
+                            if (weights.length > 0) {
+                                avgWeight = weights.reduce((a, b) => a + b, 0) / weights.length;
                             }
+
+                            avgLabel = getMode(labels);
                         }
 
                         // Calculate deviation for coloring
