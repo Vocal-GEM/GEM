@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-06-26 - Max Call Stack Size Exceeded with Spread Operator
+**Learning:** Using `Math.min(...array)` or `Math.max(...array)` on large arrays throws a `RangeError: Maximum call stack size exceeded` because the JS engine attempts to push all array elements onto the function argument stack. In `SessionAnalyzer.js`, this was causing crashes for long sessions.
+**Action:** Replace `Math.min(...array)` and chained array methods (`.filter().map().reduce()`) with a single `for` loop for high-performance data processing.
