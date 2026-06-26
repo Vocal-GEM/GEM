@@ -258,10 +258,26 @@ function extractSpectralFeatures(samples, sampleRate) {
             spectralCentroidSum += numerator / denominator;
         }
 
+        // Optimized: Consolidated reduce and slice calls into a single loop to avoid intermediate array allocations and redundant iterations.
+        let totalEnergy = 0;
+        let lowEnergy = 0;
+        let highEnergy = 0;
+        const midBin = frameSize / 4;
+        const halfFrame = frameSize / 2;
+
+        for (let bin = 0; bin < halfFrame; bin++) {
+            const energy = spectrum[bin];
+            totalEnergy += energy;
+            if (bin < midBin) {
+                lowEnergy += energy;
+            } else {
+                highEnergy += energy;
+            }
+        }
+
         // Spectral rolloff (frequency below which 85% of energy is contained)
-        const totalEnergy = spectrum.reduce((a, b) => a + b, 0);
         let cumEnergy = 0;
-        for (let bin = 0; bin < frameSize / 2; bin++) {
+        for (let bin = 0; bin < halfFrame; bin++) {
             cumEnergy += spectrum[bin];
             if (cumEnergy >= 0.85 * totalEnergy) {
                 spectralRolloffSum += bin * freqBinWidth;
@@ -270,8 +286,6 @@ function extractSpectralFeatures(samples, sampleRate) {
         }
 
         // Spectral tilt (ratio of low to high frequency energy)
-        const lowEnergy = spectrum.slice(0, frameSize / 4).reduce((a, b) => a + b, 0);
-        const highEnergy = spectrum.slice(frameSize / 4).reduce((a, b) => a + b, 0);
         if (highEnergy > 0) {
             spectralTiltSum += Math.log10((lowEnergy + 1e-10) / (highEnergy + 1e-10));
         }

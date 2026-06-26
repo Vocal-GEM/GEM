@@ -124,8 +124,18 @@ export class TrendAnalyzer {
         const pitches = sessions.map(s => s.avgPitch).filter(p => p != null);
         if (pitches.length < 2) return 50;
 
-        const mean = pitches.reduce((a, b) => a + b, 0) / pitches.length;
-        const variance = pitches.reduce((a, b) => a + (b - mean) ** 2, 0) / pitches.length;
+        // Optimized: Combined mean and variance calculations into single loops to eliminate redundant array traversals via reduce.
+        let sum = 0;
+        for (let i = 0; i < pitches.length; i++) {
+            sum += pitches[i];
+        }
+        const mean = sum / pitches.length;
+
+        let sumVariance = 0;
+        for (let i = 0; i < pitches.length; i++) {
+            sumVariance += (pitches[i] - mean) ** 2;
+        }
+        const variance = sumVariance / pitches.length;
         const stdDev = Math.sqrt(variance);
 
         // coefficient of variation (cv) = stdDev / mean
@@ -149,8 +159,21 @@ export class TrendAnalyzer {
         if (!values || values.length < 8) return { detected: false };
 
         const recent = values.slice(-8); // last 8 sessions
-        const range = Math.max(...recent) - Math.min(...recent);
-        const avgValue = recent.reduce((a, b) => a + b, 0) / recent.length;
+
+        // Optimized: Replaced Math.max/min spread and reduce with a single loop to avoid multiple traversals and spread operator overhead.
+        let minVal = Infinity;
+        let maxVal = -Infinity;
+        let sum = 0;
+
+        for (let i = 0; i < recent.length; i++) {
+            const val = recent[i];
+            if (val < minVal) minVal = val;
+            if (val > maxVal) maxVal = val;
+            sum += val;
+        }
+
+        const range = maxVal - minVal;
+        const avgValue = sum / recent.length;
 
         // if variation is very small over last 8 sessions, it's a plateau
         // absolute growth check: compare first vs last of recent

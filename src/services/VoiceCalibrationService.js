@@ -138,12 +138,20 @@ class VoiceCalibrationServiceClass {
         const sorted = [...values].sort((a, b) => a - b);
         const min = sorted[0];
         const max = sorted[sorted.length - 1];
-        const mean = values.reduce((a, b) => a + b, 0) / values.length;
+        // Optimized: Replaced map().reduce() chain with a single loop to prevent intermediate array creation and reduce CPU iteration overhead.
+        let sum = 0;
+        for (let i = 0; i < values.length; i++) {
+            sum += values[i];
+        }
+        const mean = sum / values.length;
         const median = DSP.median(values);
 
         // Standard deviation
-        const squaredDiffs = values.map(v => Math.pow(v - mean, 2));
-        const avgSquaredDiff = squaredDiffs.reduce((a, b) => a + b, 0) / values.length;
+        let sumSquaredDiffs = 0;
+        for (let i = 0; i < values.length; i++) {
+            sumSquaredDiffs += Math.pow(values[i] - mean, 2);
+        }
+        const avgSquaredDiff = sumSquaredDiffs / values.length;
         const stdDev = Math.sqrt(avgSquaredDiff);
 
         return { min, max, mean, median, stdDev };
