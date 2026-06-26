@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-06-26 - Consolidating Array Operations on Hot Paths
+**Learning:** Using chained array methods like `slice().reduce()` or `map().reduce()` on hot paths (e.g., inside loops or frequent analysis functions) creates intermediate garbage-collected arrays and forces multiple redundant traversals of the same data, leading to unnecessary CPU iteration overhead and GC pauses.
+**Action:** Consolidate chained `.reduce()`, `.map()`, or `.filter()` iterations into single `for` loops to eliminate redundant array traversals and minimize CPU iteration overhead.
