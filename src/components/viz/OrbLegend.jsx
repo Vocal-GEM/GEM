@@ -23,13 +23,19 @@ const OrbLegend = ({ mode = 'gem' }) => {
         <div className="absolute bottom-4 right-4 z-30">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`p-2 rounded-full backdrop-blur-md border transition-all ${isOpen ? 'bg-teal-500 text-white border-teal-400' : 'bg-slate-800/50 border-white/10 text-white/70 hover:bg-slate-700/50'}`}
+                aria-label="Toggle visual key"
+                aria-expanded={isOpen}
+                aria-controls="orb-legend-panel"
+                className={`p-2 rounded-full backdrop-blur-md border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${isOpen ? 'bg-teal-500 text-white border-teal-400' : 'bg-slate-800/50 border-white/10 text-white/70 hover:bg-slate-700/50'}`}
             >
-                {isOpen ? <X size={20} /> : <Info size={20} />}
+                {isOpen ? <X size={20} aria-hidden="true" /> : <Info size={20} aria-hidden="true" />}
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 bottom-12 w-80 sm:w-96 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl p-5 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200">
+                <div
+                    id="orb-legend-panel"
+                    className="absolute right-0 bottom-12 w-80 sm:w-96 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl p-5 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200"
+                >
                     <div className="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
                         <h3 className="text-sm font-bold text-white uppercase tracking-wider">
                             Visual Key
