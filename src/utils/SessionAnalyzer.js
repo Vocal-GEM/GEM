@@ -13,10 +13,30 @@ export class SessionAnalyzer {
     static analyze(history) {
         if (!history || history.length === 0) return null;
 
-        // Filter for valid voiced frames (pitch > 0)
-        const voicedFrames = history.filter(h => h.pitch > 50 && h.pitch < 1000);
+        let minF0 = Infinity;
+        let maxF0 = -Infinity;
+        let sumF0 = 0;
+        let voicedCount = 0;
+        let sumSPL = 0;
 
-        if (voicedFrames.length === 0) {
+        for (let i = 0; i < history.length; i++) {
+            const h = history[i];
+
+            // Pitch stats
+            if (h.pitch > 50 && h.pitch < 1000) {
+                if (h.pitch < minF0) minF0 = h.pitch;
+                if (h.pitch > maxF0) maxF0 = h.pitch;
+                sumF0 += h.pitch;
+                voicedCount++;
+            }
+
+            // Intensity Stats (SPL)
+            const vol = Math.max(0.0001, h.volume || 0); // Avoid log(0)
+            const db = 20 * Math.log10(vol) + 90; // Normalize so 1.0 = 90dB
+            sumSPL += db;
+        }
+
+        if (voicedCount === 0) {
             return {
                 minF0: 0,
                 maxF0: 0,
@@ -26,23 +46,9 @@ export class SessionAnalyzer {
             };
         }
 
-        // Pitch Stats
-        const pitches = voicedFrames.map(f => f.pitch);
-        const minF0 = Math.min(...pitches);
-        const maxF0 = Math.max(...pitches);
-        const avgF0 = pitches.reduce((a, b) => a + b, 0) / pitches.length;
-
-        // Semitone Range
+        const avgF0 = sumF0 / voicedCount;
+        const avgSPL = sumSPL / history.length;
         const rangeST = 12 * Math.log2(maxF0 / minF0);
-
-        // Intensity Stats (SPL)
-        // Assuming volume is 0-1 RMS. Converting to approx dB SPL.
-        // This is relative, not calibrated absolute SPL, but useful for comparison.
-        // 0.00002 is standard reference pressure, but here we just use a baseline.
-        // Let's assume 1.0 RMS = ~90dB (loud singing) for a web mic context.
-        const volumes = history.map(h => Math.max(0.0001, h.volume)); // Avoid log(0)
-        const dbValues = volumes.map(v => 20 * Math.log10(v) + 90); // Normalize so 1.0 = 90dB
-        const avgSPL = dbValues.reduce((a, b) => a + b, 0) / dbValues.length;
 
         return {
             minF0: Math.round(minF0),
