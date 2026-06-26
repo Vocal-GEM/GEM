@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-21 - Eliminating redundant array iterations
+**Learning:** Chained `.map()`, `.filter()`, and `.reduce()` calls create multiple intermediate arrays and iterate over the data multiple times, which adds measurable CPU overhead in hot paths like animation loops (e.g., `GenderTimeline.jsx`) and data aggregation (e.g., `AnalysisView.jsx`).
+**Action:** Consolidate these operations into a single `for` loop to compute sums, counts, and other metrics simultaneously, significantly reducing memory allocations and CPU cycles.

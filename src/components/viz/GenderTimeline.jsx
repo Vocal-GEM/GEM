@@ -82,8 +82,14 @@ const GenderTimeline = ({ dataRef, duration = 10 }) => {
                 lastWindowTime = now;
 
                 // Calculate average gender score for this window
-                const avgScore = currentWindowData.reduce((sum, d) => sum + d.genderScore, 0) / currentWindowData.length;
-                const avgPitch = currentWindowData.reduce((sum, d) => sum + d.pitch, 0) / currentWindowData.length;
+                let sumScore = 0;
+                let sumPitch = 0;
+                for (let i = 0; i < currentWindowData.length; i++) {
+                    sumScore += currentWindowData[i].genderScore;
+                    sumPitch += currentWindowData[i].pitch;
+                }
+                const avgScore = sumScore / currentWindowData.length;
+                const avgPitch = sumPitch / currentWindowData.length;
 
                 // Add window summary to history (separate from point data)
                 historyRef.current.push({
@@ -200,8 +206,14 @@ const GenderTimeline = ({ dataRef, duration = 10 }) => {
 
             // Calculate and display stats
             if (pitchPoints.length > 10) {
-                const avgGender = pitchPoints.reduce((sum, p) => sum + p.genderScore, 0) / pitchPoints.length;
-                const avgPitch = pitchPoints.reduce((sum, p) => sum + p.pitch, 0) / pitchPoints.length;
+                let sumGender = 0;
+                let sumPitch = 0;
+                for (let i = 0; i < pitchPoints.length; i++) {
+                    sumGender += pitchPoints[i].genderScore;
+                    sumPitch += pitchPoints[i].pitch;
+                }
+                const avgGender = sumGender / pitchPoints.length;
+                const avgPitch = sumPitch / pitchPoints.length;
                 setStats({ avgGender, avgPitch });
             }
         };
