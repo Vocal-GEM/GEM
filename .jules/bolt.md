@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-06-27 - Array Iterators in Animation Loops
+**Learning:** Chained array methods (`.slice().filter().reduce()`) inside `requestAnimationFrame` or `renderCoordinator` callbacks create unnecessary temporary arrays and multiple iteration passes, leading to increased GC pressure and CPU overhead per frame.
+**Action:** Replace chained array iterators with simple `for` loops in hot animation paths. A two-pass `for` loop for mean/variance is significantly faster and allocates zero temporary arrays compared to `.filter().reduce()`.
