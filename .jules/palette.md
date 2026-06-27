@@ -37,6 +37,3 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
-## 2024-05-18 - Missing ARIA labels on dynamic icon buttons
-**Learning:** Icon-only buttons that appear dynamically (like when adding a new item to a list) often miss accessibility attributes because they are nested in conditional rendering blocks.
-**Action:** When reviewing dynamic or "add new" flows, specifically check the inline action buttons (Save, Cancel, Delete) for proper `aria-label`s.
