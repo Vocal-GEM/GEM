@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVoiceProfile } from '../../context/VoiceProfileContext';
 import { useTranslation } from 'react-i18next'; // Assuming i18n is available, or remove if not
@@ -163,7 +163,7 @@ const WelcomeStep = () => (
         </ul>
         <div className="mt-6 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg">
             <p className="text-sm text-purple-300">
-                🔒 Your data is stored locally and private to you. We only capture what's needed to help you find your voice.
+                🔒 Your data is stored locally and private to you. We only capture what&apos;s needed to help you find your voice.
             </p>
         </div>
     </div>
@@ -398,7 +398,7 @@ const SummaryStep = ({ data }) => (
         </div>
 
         <p className="text-center text-gray-400 mt-4">
-            Click "Complete Profile" to generate your personalized roadmap.
+            Click &quot;Complete Profile&quot; to generate your personalized roadmap.
         </p>
     </div>
 );
