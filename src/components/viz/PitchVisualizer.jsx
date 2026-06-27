@@ -509,10 +509,31 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             }
 
             if (history.length > 10 && currentP > 0) {
-                const recent = history.slice(-10).filter(p => p > 0);
-                if (recent.length > 5) {
-                    const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
-                    const variance = recent.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / recent.length;
+                // Optimized: Replace chained array iterators (.slice, .filter, .reduce)
+                // with simple loops to minimize GC pressure and iteration overhead in animation loop.
+                let recentSum = 0;
+                let recentCount = 0;
+                const startIndex = Math.max(0, history.length - 10);
+
+                for (let i = startIndex; i < history.length; i++) {
+                    if (history[i] > 0) {
+                        recentSum += history[i];
+                        recentCount++;
+                    }
+                }
+
+                if (recentCount > 5) {
+                    const avg = recentSum / recentCount;
+                    let varianceSum = 0;
+
+                    for (let i = startIndex; i < history.length; i++) {
+                        if (history[i] > 0) {
+                            const diff = history[i] - avg;
+                            varianceSum += diff * diff;
+                        }
+                    }
+
+                    const variance = varianceSum / recentCount;
                     const stdDev = Math.sqrt(variance);
                     const stability = Math.max(0, Math.min(100, 100 - (stdDev * 5)));
 
