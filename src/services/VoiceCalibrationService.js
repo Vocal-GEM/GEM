@@ -99,6 +99,19 @@ class VoiceCalibrationServiceClass {
             if (formants.f2 > 0) f2Values.push(formants.f2);
         }
 
+        // Pre-calculate sums for performance
+        let rmsSum = 0;
+        const rmsLen = rmsValues.length;
+        for (let i = 0; i < rmsLen; i++) {
+            rmsSum += rmsValues[i];
+        }
+
+        let confSum = 0;
+        const confLen = confidenceValues.length;
+        for (let i = 0; i < confLen; i++) {
+            confSum += confidenceValues[i];
+        }
+
         // Calculate statistics
         const metrics = {
             pitch: this._calculateStats(pitchValues),
@@ -107,17 +120,11 @@ class VoiceCalibrationServiceClass {
                 f2: this._calculateStats(f2Values)
             },
             spl: {
-                meanRms: rmsValues.length > 0
-                    ? rmsValues.reduce((a, b) => a + b, 0) / rmsValues.length
-                    : 0,
-                meanDb: rmsValues.length > 0
-                    ? DSP.calculateDB(rmsValues.reduce((a, b) => a + b, 0) / rmsValues.length)
-                    : -100
+                meanRms: rmsLen > 0 ? rmsSum / rmsLen : 0,
+                meanDb: rmsLen > 0 ? DSP.calculateDB(rmsSum / rmsLen) : -100
             },
             confidence: {
-                mean: confidenceValues.length > 0
-                    ? confidenceValues.reduce((a, b) => a + b, 0) / confidenceValues.length
-                    : 0,
+                mean: confLen > 0 ? confSum / confLen : 0,
                 sampleCount: pitchValues.length
             },
             analyzedAt: new Date().toISOString(),
@@ -131,20 +138,28 @@ class VoiceCalibrationServiceClass {
      * Calculate statistical summary for an array of values
      */
     _calculateStats(values) {
-        if (values.length === 0) {
+        const len = values.length;
+        if (len === 0) {
             return { min: 0, max: 0, mean: 0, median: 0, stdDev: 0 };
         }
 
+        let sum = 0;
+        for (let i = 0; i < len; i++) {
+            sum += values[i];
+        }
+        const mean = sum / len;
+
+        let sqDiffSum = 0;
+        for (let i = 0; i < len; i++) {
+            const diff = values[i] - mean;
+            sqDiffSum += diff * diff;
+        }
+        const stdDev = Math.sqrt(sqDiffSum / len);
+
         const sorted = [...values].sort((a, b) => a - b);
         const min = sorted[0];
-        const max = sorted[sorted.length - 1];
-        const mean = values.reduce((a, b) => a + b, 0) / values.length;
-        const median = DSP.median(values);
-
-        // Standard deviation
-        const squaredDiffs = values.map(v => Math.pow(v - mean, 2));
-        const avgSquaredDiff = squaredDiffs.reduce((a, b) => a + b, 0) / values.length;
-        const stdDev = Math.sqrt(avgSquaredDiff);
+        const max = sorted[len - 1];
+        const median = DSP.median(values); // median still needs the sorted array logic internally
 
         return { min, max, mean, median, stdDev };
     }

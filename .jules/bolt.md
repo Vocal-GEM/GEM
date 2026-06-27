@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-06-27 - Array method overhead on hot paths
+**Learning:** Using chained `.reduce()` and `.map()` for math aggregations (like calculating standard deviation or means) on large arrays (e.g., audio frame data) causes significant callback overhead and unnecessary memory allocations. It can be up to 40x slower than a standard `for` loop.
+**Action:** Consolidate chained array iterations into single `for` loops on hot paths to eliminate redundant traversals and minimize CPU iteration overhead.
