@@ -60,3 +60,7 @@
 
 ## 2026-06-28 - Test Execution
 **Learning:** Some tests (like `PracticeMode.test.jsx`) still fail occasionally due to unresolved merge conflicts and complex nested component structures, but the changes to fix ESLint errors did not introduce any *new* test failures or regressions.
+
+## 2026-06-28 - Test Mock Globals Fix
+**Learning:** `src/components/viz/Spectrogram3D.test.jsx` and `PitchOrb.test.jsx` failed with `'global' is not defined` because Vitest in browser/JSDOM mode uses `globalThis` instead of the Node-specific `global` object.
+**Action:** Always use `globalThis` instead of `global` when setting up test environment mocks in Vitest, especially for DOM APIs like `requestAnimationFrame`.
