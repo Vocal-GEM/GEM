@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-06-28 - Optimized calculatePitchStatistics iterations
+**Learning:** Using chained array methods like `.map()` and `.reduce()` is significantly slower than standard `for` loops, especially on hot paths or large arrays in JavaScript.
+**Action:** Consolidate chained `.reduce()`, `.map()`, or `.filter()` array iterations into single `for` loops on hot paths (e.g., aggregating metrics) to eliminate redundant array traversals and minimize CPU iteration overhead.
