@@ -45,3 +45,11 @@
 ## 2024-06-28 - Chart.js Optimization
 **Learning:** Passing unmemoized configuration objects (`data` or `options`) to React wrapper components (like `react-chartjs-2`) causes expensive, unnecessary re-renders of the underlying canvas element on every render cycle.
 **Action:** Always wrap static or derived chart configurations in `useMemo` or `useCallback` to preserve identity across renders, preventing layout thrashing.
+
+## 2026-06-28 - ESlint Failures Fixes
+**Learning:** Certain files had merge conflict artifacts that resulted in syntax and logic errors, causing the CI to fail:
+- `src/audio/PitchWorklet.js`: `currentTime` was used instead of `globalThis.currentTime`.
+- `src/services/PrivacyManager.js`: Duplicate key `shareProgress` in the `DEFAULT_SETTINGS` object.
+- `src/services/ResearchMode.js`: Used `process.env` instead of `import.meta.env` in a Vite project.
+- Three components (`RecommendedToolsWidget.jsx`, `IntakeQuestionnaire.jsx`, `TaskRecorder.jsx`) had unescaped quotes in JSX text.
+**Action:** Always run `npx eslint@8 .` before submitting to catch syntax and syntax-like errors that are not caught by standard test runs. Use `--fix` to handle simple formatting issues like unescaped quotes.
