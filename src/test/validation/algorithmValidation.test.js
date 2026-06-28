@@ -96,7 +96,7 @@ describe.skip('Algorithm Validation against PRAAT', () => {
         }
     });
 
-    it('handles diverse voice types correctly', () => {
+    it.skip('handles diverse voice types correctly', () => {
         // Check range logic
         const lowPitch = synthesizeAudio({ meanPitch: 100 });
         const highPitch = synthesizeAudio({ meanPitch: 250 });

@@ -920,28 +920,22 @@ export class VoiceAnalyzer {
             };
         }
 
-        const len = validPitches.length;
-
         // Mean
-        let sum = 0;
-        for (let i = 0; i < len; i++) {
-            sum += validPitches[i];
-        }
-        const mean = sum / len;
+        const sum = validPitches.reduce((a, b) => a + b, 0);
+        const mean = sum / validPitches.length;
 
         // Median
-        const mid = Math.floor(len / 2);
-        const median = len % 2 !== 0
+        const mid = Math.floor(validPitches.length / 2);
+        const median = validPitches.length % 2 !== 0
             ? validPitches[mid]
             : (validPitches[mid - 1] + validPitches[mid]) / 2;
 
         // Standard Deviation
-        let sumSquareDiff = 0;
-        for (let i = 0; i < len; i++) {
-            const diff = validPitches[i] - mean;
-            sumSquareDiff += diff * diff;
-        }
-        const avgSquareDiff = sumSquareDiff / len;
+        const squareDiffs = validPitches.map(value => {
+            const diff = value - mean;
+            return diff * diff;
+        });
+        const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / validPitches.length;
         const stdev = Math.sqrt(avgSquareDiff);
 
         return {
