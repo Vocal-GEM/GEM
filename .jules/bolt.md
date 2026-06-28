@@ -41,3 +41,26 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-06-28 - Chart.js Optimization
+**Learning:** Passing unmemoized configuration objects (`data` or `options`) to React wrapper components (like `react-chartjs-2`) causes expensive, unnecessary re-renders of the underlying canvas element on every render cycle.
+**Action:** Always wrap static or derived chart configurations in `useMemo` or `useCallback` to preserve identity across renders, preventing layout thrashing.
+
+## 2026-06-28 - ESlint Failures Fixes
+**Learning:** Certain files had merge conflict artifacts that resulted in syntax and logic errors, causing the CI to fail:
+- `src/audio/PitchWorklet.js`: `currentTime` was used instead of `globalThis.currentTime`.
+- `src/services/PrivacyManager.js`: Duplicate key `shareProgress` in the `DEFAULT_SETTINGS` object.
+- `src/services/ResearchMode.js`: Used `process.env` instead of `import.meta.env` in a Vite project.
+- Three components (`RecommendedToolsWidget.jsx`, `IntakeQuestionnaire.jsx`, `TaskRecorder.jsx`) had unescaped quotes in JSX text.
+**Action:** Always run `npx eslint@8 .` before submitting to catch syntax and syntax-like errors that are not caught by standard test runs. Use `--fix` to handle simple formatting issues like unescaped quotes.
+
+## 2026-06-28 - Test Mock Fixes
+**Learning:** `src/components/viz/BrightnessMeter.test.jsx` failed with `require is not defined` and `react/display-name` ESLint errors because the mock factory was using commonJS `require` inside an ESM module, and returning functional React components without `displayName` properties.
+**Action:** When mocking external UI libraries like `lucide-react`, use an async factory with `await vi.importActual` to preserve exports and avoid `require`. Always assign a `displayName` to dynamically created React component mocks.
+
+## 2026-06-28 - Test Execution
+**Learning:** Some tests (like `PracticeMode.test.jsx`) still fail occasionally due to unresolved merge conflicts and complex nested component structures, but the changes to fix ESLint errors did not introduce any *new* test failures or regressions.
+
+## 2026-06-28 - Test Mock Globals Fix
+**Learning:** `src/components/viz/Spectrogram3D.test.jsx` and `PitchOrb.test.jsx` failed with `'global' is not defined` because Vitest in browser/JSDOM mode uses `globalThis` instead of the Node-specific `global` object.
+**Action:** Always use `globalThis` instead of `global` when setting up test environment mocks in Vitest, especially for DOM APIs like `requestAnimationFrame`.
