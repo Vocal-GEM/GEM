@@ -53,3 +53,10 @@
 - `src/services/ResearchMode.js`: Used `process.env` instead of `import.meta.env` in a Vite project.
 - Three components (`RecommendedToolsWidget.jsx`, `IntakeQuestionnaire.jsx`, `TaskRecorder.jsx`) had unescaped quotes in JSX text.
 **Action:** Always run `npx eslint@8 .` before submitting to catch syntax and syntax-like errors that are not caught by standard test runs. Use `--fix` to handle simple formatting issues like unescaped quotes.
+
+## 2026-06-28 - Test Mock Fixes
+**Learning:** `src/components/viz/BrightnessMeter.test.jsx` failed with `require is not defined` and `react/display-name` ESLint errors because the mock factory was using commonJS `require` inside an ESM module, and returning functional React components without `displayName` properties.
+**Action:** When mocking external UI libraries like `lucide-react`, use an async factory with `await vi.importActual` to preserve exports and avoid `require`. Always assign a `displayName` to dynamically created React component mocks.
+
+## 2026-06-28 - Test Execution
+**Learning:** Some tests (like `PracticeMode.test.jsx`) still fail occasionally due to unresolved merge conflicts and complex nested component structures, but the changes to fix ESLint errors did not introduce any *new* test failures or regressions.
