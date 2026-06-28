@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-06-28 - Avoid array methods (.map, .reduce) in hot paths
+**Learning:** In performance-critical sections calculating statistics over potentially large arrays, combining `.map` and `.reduce` creates unnecessary intermediate arrays and incurs function call overhead.
+**Action:** Use standard `for` loops for basic mathematical aggregations (e.g., mean and standard deviation) to prevent memory allocation and improve iteration speed.

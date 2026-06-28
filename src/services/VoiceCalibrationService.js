@@ -99,7 +99,16 @@ class VoiceCalibrationServiceClass {
             if (formants.f2 > 0) f2Values.push(formants.f2);
         }
 
-        // Calculate statistics
+        // Optimized: Calculate means once to avoid duplicate .reduce() iterations
+        // in the metrics object below.
+        const splMeanRms = rmsValues.length > 0
+            ? rmsValues.reduce((a, b) => a + b, 0) / rmsValues.length
+            : 0;
+
+        const confMean = confidenceValues.length > 0
+            ? confidenceValues.reduce((a, b) => a + b, 0) / confidenceValues.length
+            : 0;
+
         const metrics = {
             pitch: this._calculateStats(pitchValues),
             formants: {
@@ -107,17 +116,11 @@ class VoiceCalibrationServiceClass {
                 f2: this._calculateStats(f2Values)
             },
             spl: {
-                meanRms: rmsValues.length > 0
-                    ? rmsValues.reduce((a, b) => a + b, 0) / rmsValues.length
-                    : 0,
-                meanDb: rmsValues.length > 0
-                    ? DSP.calculateDB(rmsValues.reduce((a, b) => a + b, 0) / rmsValues.length)
-                    : -100
+                meanRms: splMeanRms,
+                meanDb: splMeanRms > 0 ? DSP.calculateDB(splMeanRms) : -100
             },
             confidence: {
-                mean: confidenceValues.length > 0
-                    ? confidenceValues.reduce((a, b) => a + b, 0) / confidenceValues.length
-                    : 0,
+                mean: confMean,
                 sampleCount: pitchValues.length
             },
             analyzedAt: new Date().toISOString(),
@@ -138,13 +141,23 @@ class VoiceCalibrationServiceClass {
         const sorted = [...values].sort((a, b) => a - b);
         const min = sorted[0];
         const max = sorted[sorted.length - 1];
-        const mean = values.reduce((a, b) => a + b, 0) / values.length;
         const median = DSP.median(values);
 
+        // Optimized: Use basic for-loops instead of chained .map() and .reduce()
+        // to avoid unnecessary intermediate array allocations in this hot path.
+        const len = values.length;
+        let sum = 0;
+        for (let i = 0; i < len; i++) {
+            sum += values[i];
+        }
+        const mean = sum / len;
+
         // Standard deviation
-        const squaredDiffs = values.map(v => Math.pow(v - mean, 2));
-        const avgSquaredDiff = squaredDiffs.reduce((a, b) => a + b, 0) / values.length;
-        const stdDev = Math.sqrt(avgSquaredDiff);
+        let squaredDiffSum = 0;
+        for (let i = 0; i < len; i++) {
+            squaredDiffSum += Math.pow(values[i] - mean, 2);
+        }
+        const stdDev = Math.sqrt(squaredDiffSum / len);
 
         return { min, max, mean, median, stdDev };
     }
