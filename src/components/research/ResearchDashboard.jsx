@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -54,7 +54,8 @@ const ResearchDashboard = () => {
         }
     }, [selectedStudy]);
 
-    const enrollmentData = {
+    // Optimized: Memoize chart data to prevent expensive re-renders of the Chart.js canvas
+    const enrollmentData = useMemo(() => ({
         labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
         datasets: [
             {
@@ -64,9 +65,9 @@ const ResearchDashboard = () => {
                 tension: 0.1,
             },
         ],
-    };
+    }), [stats?.enrollmentRate]);
 
-    const effectivenessData = {
+    const effectivenessData = useMemo(() => ({
         labels: ['Baseline', 'Month 1', 'Month 2', 'Month 3', 'Month 4'],
         datasets: [
             {
@@ -82,7 +83,7 @@ const ResearchDashboard = () => {
                 backgroundColor: 'rgba(53, 162, 235, 0.5)',
             },
         ],
-    };
+    }), [stats?.pitchImprovement.control, stats?.pitchImprovement.intervention]);
 
     return (
         <div className="research-dashboard p-6 bg-gray-900 text-white min-h-screen">

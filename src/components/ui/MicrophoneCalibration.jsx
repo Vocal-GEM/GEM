@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Mic, Volume2, VolumeX, RefreshCw, CheckCircle, AlertCircle, Activity, BarChart2 } from 'lucide-react';
 import { analyzeMicrophoneQuality } from '../../utils/MicrophoneQualityAnalyzer';
 import {
@@ -186,7 +186,8 @@ const MicrophoneCalibration = ({ audioEngine }) => {
     };
 
     // Chart Data
-    const getChartData = () => {
+    // Optimized: Memoize chart data to prevent expensive re-renders of the Chart.js canvas
+    const chartData = useMemo(() => {
         if (!qualityResult) return null;
 
         const { frequencyResponse } = qualityResult;
@@ -207,9 +208,10 @@ const MicrophoneCalibration = ({ audioEngine }) => {
                 },
             ],
         };
-    };
+    }, [qualityResult]);
 
-    const chartOptions = {
+    // Optimized: Memoize chart options to prevent layout thrashing and canvas re-draws
+    const chartOptions = useMemo(() => ({
         responsive: true,
         plugins: {
             legend: { display: false },
@@ -223,7 +225,7 @@ const MicrophoneCalibration = ({ audioEngine }) => {
             y: { display: false, min: 0, max: 100 },
             x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.5)' } }
         }
-    };
+    }), []);
 
     const getScoreColor = (score) => {
         if (score >= 80) return 'text-emerald-400';
@@ -262,7 +264,7 @@ const MicrophoneCalibration = ({ audioEngine }) => {
                         </div>
 
                         <div className="h-24 w-full">
-                            <Line options={chartOptions} data={getChartData()} />
+                            <Line options={chartOptions} data={chartData} />
                         </div>
 
                         <div className="text-xs text-slate-400 p-2 bg-slate-800/30 rounded border border-white/5">
@@ -297,7 +299,7 @@ const MicrophoneCalibration = ({ audioEngine }) => {
                             <div className="text-center animate-in fade-in zoom-in duration-300">
                                 <Volume2 className="w-16 h-16 text-emerald-400 mx-auto mb-6 animate-pulse" />
                                 <h4 className="text-xl font-bold text-white mb-2">Speak Clearly</h4>
-                                <p className="text-slate-400 mb-6">Say "Ahhhh" or count to 5... ({countdown}s)</p>
+                                <p className="text-slate-400 mb-6">Say &quot;Ahhhh&quot; or count to 5... ({countdown}s)</p>
                                 <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
                                     <div className="h-full bg-emerald-500 transition-all duration-1000" style={{ width: `${((3 - countdown) / 3) * 100}%` }} />
                                 </div>

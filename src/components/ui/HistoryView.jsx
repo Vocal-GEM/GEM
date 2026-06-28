@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Book, FileText, TrendingUp, Calendar, Clock, Activity, BarChart2, Mic, Settings, X, Share2 } from 'lucide-react';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
@@ -165,7 +165,8 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
     };
 
     // Chart Data Preparation
-    const chartData = {
+    // Optimized: Memoize chart data to prevent expensive re-renders of the Chart.js canvas
+    const chartData = useMemo(() => ({
         labels: sessions.slice().reverse().map(s => new Date(s.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })),
         datasets: [
             {
@@ -183,9 +184,10 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
                 yAxisID: 'y1',
             },
         ],
-    };
+    }), [sessions, t]);
 
-    const chartOptions = {
+    // Optimized: Memoize chart options to prevent layout thrashing and canvas re-draws
+    const chartOptions = useMemo(() => ({
         responsive: true,
         interaction: { mode: 'index', intersect: false },
         stacked: false,
@@ -212,7 +214,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
                 title: { display: true, text: t('history.resonance'), color: '#ec4899' }
             },
         },
-    };
+    }), [t]);
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-24">
