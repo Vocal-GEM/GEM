@@ -75,7 +75,3 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
-## 2023-10-25 - [Fix Server-Side Request Forgery (SSRF) in TTS API]
-**Vulnerability:** The proxy endpoint for the ElevenLabs API (/api/tts/synthesize) directly appends the user-supplied `voice_id` to the external URL without validation (`f'https://api.elevenlabs.io/v1/text-to-speech/{voice_id}'`). An attacker could provide a value like `../history` to traverse the ElevenLabs API path and execute unauthorized actions with the server's API key.
-**Learning:** Even when making requests to trusted external APIs, all path parameters derived from user input must be sanitized. Leaving them unchecked can turn a proxy endpoint into an SSRF or API abuse vector.
-**Prevention:** Always validate and sanitize user input using strict allowlists or regex (e.g., `^[a-zA-Z0-9_-]+$`) before appending them to URLs in outbound server-to-server requests.

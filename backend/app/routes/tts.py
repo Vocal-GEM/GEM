@@ -19,16 +19,11 @@ def synthesize_speech():
             "error": "ElevenLabs API key not configured on server"
         }), 503
 
-    import re
     data = request.json
     text = data.get('text', '')
     voice_id = data.get('voiceId', '21m00Tcm4TlvDq8ikWAM')  # Default Rachel
     model_id = data.get('modelId', 'eleven_turbo_v2_5')
     
-    # Security: Validate voice_id to prevent SSRF/Path Traversal
-    if not isinstance(voice_id, str) or not re.match(r'^[a-zA-Z0-9_-]+$', voice_id):
-        return jsonify({"error": "Invalid voice ID format"}), 400
-
     if not text:
         return jsonify({"error": "No text provided"}), 400
 
