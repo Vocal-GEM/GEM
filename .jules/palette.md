@@ -37,3 +37,9 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-06-28 - Corrupted Component Tests
+**Learning:** Corrupt or duplicated code blocks in test files can silently break test suites. These are often the result of bad merges or copy-paste errors.
+**Action:** Always check the entire file content when repairing a component or its test, not just the function being edited, to ensure no duplicate or conflicting code remains.
+## 2024-06-28 - Missing ARIA Labels on Close Buttons
+**Learning:** Across multiple modal and panel components (`CelebrationModal`, `ProfileManager`, `NotificationSettingsPanel`), the close buttons were missing `aria-label` attributes and keyboard focus styles, making them difficult to interact with using screen readers and keyboards.
+**Action:** When implementing or reviewing any modal or panel, ensure that icon-only action buttons, especially "close" buttons, have explicit `aria-label`s and `focus-visible` styles to ensure full accessibility.
