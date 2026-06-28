@@ -108,7 +108,7 @@ const ProgressCharts = () => {
         };
     }, [filteredData]);
 
-    const chartOptions = {
+    const chartOptions = useMemo(() => ({
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -135,7 +135,7 @@ const ProgressCharts = () => {
                 ticks: { color: '#94a3b8' }
             }
         }
-    };
+    }), []);
 
     if (loading) return <div className="text-slate-400 text-center py-8">Loading progress...</div>;
     if (entries.length === 0) return <div className="text-slate-400 text-center py-8">No practice data yet. Complete a session to see your progress!</div>;

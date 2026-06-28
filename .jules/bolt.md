@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-06-28 - Chart.js Memoization
+**Learning:** Found multiple instances where `chartOptions` and `chartData` were declared as plain objects in the component body. This causes `react-chartjs-2` components to re-render excessively on every parent render cycle, degrading performance.
+**Action:** Always wrap `chartData` and `chartOptions` in `useMemo` when passing them to Chart.js components to prevent unnecessary layout thrashing.

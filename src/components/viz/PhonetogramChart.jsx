@@ -63,7 +63,7 @@ const PhonetogramChart = ({ data }) => {
         };
     }, [data]);
 
-    const options = {
+    const options = useMemo(() => ({
         responsive: true,
         maintainAspectRatio: false,
         scales: {
@@ -108,7 +108,7 @@ const PhonetogramChart = ({ data }) => {
                 intersect: false
             }
         }
-    };
+    }), []);
 
     return (
         <div className="w-full h-full bg-slate-900/50 rounded-xl p-4 border border-slate-800">
