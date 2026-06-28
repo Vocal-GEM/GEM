@@ -24,7 +24,7 @@ const ProfileManager = ({ onClose }) => {
                         <User className="text-blue-400" />
                         Select Profile
                     </h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-white">
+                    <button onClick={onClose} className="text-slate-400 hover:text-white focus-visible:ring-2 focus-visible:ring-blue-500 rounded" aria-label="Close Profile Manager">
                         <X size={20} />
                     </button>
                 </div>
@@ -80,7 +80,8 @@ const ProfileManager = ({ onClose }) => {
                             <button
                                 type="button"
                                 onClick={() => setIsCreating(false)}
-                                className="text-slate-400 hover:text-white px-2"
+                                className="text-slate-400 hover:text-white px-2 focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+                                aria-label="Cancel Profile Creation"
                             >
                                 <X size={20} />
                             </button>
