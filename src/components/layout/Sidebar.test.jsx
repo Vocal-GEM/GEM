@@ -64,20 +64,20 @@ describe('Sidebar Auth Integration', () => {
         });
     });
 
-    it.skip('shows Sign In button when not logged in', () => {
+    it('shows Sign In button when not logged in', () => {
         mockUseAuth.mockReturnValue({ user: null });
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
         expect(getByText('Sign In')).toBeInTheDocument();
     });
 
-    it.skip('shows user info and Sign Out when logged in', () => {
+    it('shows user info and Sign Out when logged in', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
         expect(getByText('CloudUser')).toBeInTheDocument();
         expect(getByText('Sign Out')).toBeInTheDocument();
     });
 
-    it.skip('opens Login modal on Sign In click', () => {
+    it('opens Login modal on Sign In click', () => {
         mockUseAuth.mockReturnValue({ user: null });
         const { getByText, getByTestId } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
@@ -85,7 +85,7 @@ describe('Sidebar Auth Integration', () => {
         expect(getByTestId('login-modal')).toBeInTheDocument();
     });
 
-    it.skip('calls logout on Sign Out click', () => {
+    it('calls logout on Sign Out click', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
@@ -93,7 +93,7 @@ describe('Sidebar Auth Integration', () => {
         expect(mockLogout).toHaveBeenCalled();
     });
 
-    it.skip('opens Camera modal when Mirror button is clicked', () => {
+    it('opens Camera modal when Mirror button is clicked', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'TestUser' } });
         const openModalSpy = vi.fn();
         mockUseNavigation.mockReturnValue({

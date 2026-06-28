@@ -631,9 +631,8 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     </div>
                     <button
                         onClick={handleResetAverage}
-                        className="w-7 h-7 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-slate-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
+                        className="w-7 h-7 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-slate-700/50"
                         title="Reset Average"
-                        aria-label="Reset average pitch"
                     >
                         <RotateCcw size={14} />
                     </button>
@@ -643,17 +642,15 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                     onClick={handleZoomIn}
-                    className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-white flex items-center justify-center backdrop-blur-sm border border-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
+                    className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-white flex items-center justify-center backdrop-blur-sm border border-slate-700"
                     title="Zoom In"
-                    aria-label="Zoom in"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
                 </button>
                 <button
                     onClick={handleZoomOut}
-                    className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-white flex items-center justify-center backdrop-blur-sm border border-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
+                    className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-white flex items-center justify-center backdrop-blur-sm border border-slate-700"
                     title="Zoom Out"
-                    aria-label="Zoom out"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
                 </button>
@@ -671,13 +668,11 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             {/* Gender Timeline Toggle */}
             <button
                 onClick={() => setShowGenderTimeline(!showGenderTimeline)}
-                className={`absolute top-3 left-28 z-20 p-2 rounded-lg backdrop-blur-sm border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 ${showGenderTimeline
+                className={`absolute top-3 left-28 z-20 p-2 rounded-lg backdrop-blur-sm border transition-all ${showGenderTimeline
                     ? 'bg-purple-500/30 border-purple-500/50 text-purple-300'
                     : 'bg-slate-800/80 border-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-700'
                     }`}
                 title="Toggle Gender Timeline"
-                aria-label="Toggle gender timeline"
-                aria-expanded={showGenderTimeline}
             >
                 <BarChart2 size={16} />
             </button>
@@ -693,8 +688,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                             </div>
                             <button
                                 onClick={() => setShowGenderTimeline(false)}
-                                className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
-                                aria-label="Close gender timeline"
+                                className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white"
                             >
                                 <X size={16} />
                             </button>
@@ -713,8 +707,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                         <span className="text-xs font-bold">UNSTABLE SIGNAL</span>
                         <button
                             onClick={() => setShowUnstableHelp(true)}
-                            className="ml-1 hover:bg-white/20 rounded-full p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
-                            aria-label="Help with unstable signal"
+                            className="ml-1 hover:bg-white/20 rounded-full p-0.5 transition-colors"
                         >
                             <HelpCircle size={14} />
                         </button>
@@ -768,8 +761,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl relative">
                         <button
                             onClick={() => setShowUnstableHelp(false)}
-                            className="absolute top-4 right-4 text-slate-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
-                            aria-label="Close unstable signal help"
+                            className="absolute top-4 right-4 text-slate-400 hover:text-white"
                         >
                             <X size={20} />
                         </button>

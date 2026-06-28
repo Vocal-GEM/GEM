@@ -37,6 +37,3 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
-## 2026-06-28 - Visualization Controls Accessibility
-**Learning:** Icon-only toggle buttons in complex visualization components (like graphs, trainers, legends) often lack explicit screen reader labels (`aria-label`), state tracking (`aria-expanded`), and keyboard focus rings, making critical analysis and control tools inaccessible to non-mouse users.
-**Action:** When updating or creating data visualization controls, systematically ensure all icon-only buttons include `aria-label`, explicitly track open/closed states with `aria-expanded` (if they toggle overlays), and apply `focus-visible` utility classes (e.g., `focus-visible:ring-2`) to support keyboard navigation.

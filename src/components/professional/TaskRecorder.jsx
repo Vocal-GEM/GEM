@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Play, Pause, RotateCcw, Check, Loader2 } from 'lucide-react';
 
 const TaskRecorder = ({ task, onComplete }) => {
@@ -113,7 +113,7 @@ const TaskRecorder = ({ task, onComplete }) => {
                     <h3 className="text-white font-medium text-lg">{task.prompt}</h3>
                     {task.text && (
                         <div className="mt-2 p-3 bg-slate-900/50 rounded border border-slate-700 text-slate-300 italic">
-                            &quot;{task.prompt.replace('Read: "', '').replace('"', '')}&quot;
+                            "{task.prompt.replace('Read: "', '').replace('"', '')}"
                         </div>
                     )}
                     {task.duration && (
