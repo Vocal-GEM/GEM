@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-06-29 - Fixed RAF leak in SafeModeVisualizer
+**Learning:** Using raw `requestAnimationFrame` causes performance degradation and thrashing when a global `RenderCoordinator` is available.
+**Action:** Always use `renderCoordinator.subscribe()` in this project instead of raw RAF loops, and never call RAF recursively inside a subscription callback.
