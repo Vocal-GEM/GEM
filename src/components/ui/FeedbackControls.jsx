@@ -25,6 +25,7 @@ const FeedbackControls = ({ settings, setSettings }) => {
                     : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-white'
                     }`}
                 title="Feedback Settings"
+                    aria-label="Open feedback settings"
             >
                 <Settings size={16} />
             </button>
@@ -35,7 +36,7 @@ const FeedbackControls = ({ settings, setSettings }) => {
         <div ref={menuRef} className="absolute top-12 right-0 z-50 bg-slate-900 border border-slate-700 rounded-xl p-4 shadow-2xl w-64 animate-in fade-in zoom-in-95 origin-top-right">
             <div className="flex justify-between items-center mb-4 pb-2 border-b border-white/5">
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider">Feedback Config</h3>
-                <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white">
+                <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white" aria-label="Close feedback settings">
                     <X size={14} />
                 </button>
             </div>
