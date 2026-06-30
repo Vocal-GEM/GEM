@@ -40,3 +40,6 @@
 ## 2025-06-30 - Floating Panel Accessibility
 **Learning:** Floating informational panels (like legends or tooltips) often use icon-only toggle buttons without proper ARIA labels, `aria-expanded` state, or `aria-controls` bindings. This makes them inaccessible to screen reader users and keyboard users without `focus-visible` styles.
 **Action:** When creating or fixing icon-only toggle buttons for floating panels, always include dynamic `aria-label` (e.g., "Open/Close..."), `aria-expanded`, and `aria-controls` linked to the panel's `id`, along with `focus-visible` styles (e.g., Tailwind's `focus-visible:ring-2`) and `aria-hidden="true"` on the icon itself.
+## 2026-06-30 - Fix Global Mocking for Test files
+**Learning:** During Vitest tests, using `require('react')` inside `vi.mock` modules causes a `require is not defined` error when running tests inside ESM environments. Additionally, functional components mock need a `.displayName` assigned to suppress eslint warnings for missing display names.
+**Action:** When mocking modules like `lucide-react` using `vi.mock`, use `await vi.importActual` and `const React = await import('react')` dynamically. Always assign `.displayName` to functional component mock elements.
