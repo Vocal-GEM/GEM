@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-21 - Array allocations in Animation Loops
+**Learning:** Chaining array methods like `slice()`, `filter()`, and `reduce()` inside a `requestAnimationFrame` loop creates new array instances on every frame (60 times per second). In `PitchVisualizer.jsx`, this caused unnecessary garbage collection pressure and CPU overhead.
+**Action:** Replace array method chains in hot paths with standard `for` loops. Iterate directly over the source array using indices to compute aggregates without allocating intermediate arrays.
