@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-06-30 - Floating Panel Accessibility
+**Learning:** Floating informational panels (like legends or tooltips) often use icon-only toggle buttons without proper ARIA labels, `aria-expanded` state, or `aria-controls` bindings. This makes them inaccessible to screen reader users and keyboard users without `focus-visible` styles.
+**Action:** When creating or fixing icon-only toggle buttons for floating panels, always include dynamic `aria-label` (e.g., "Open/Close..."), `aria-expanded`, and `aria-controls` linked to the panel's `id`, along with `focus-visible` styles (e.g., Tailwind's `focus-visible:ring-2`) and `aria-hidden="true"` on the icon itself.
