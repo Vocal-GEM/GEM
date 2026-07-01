@@ -30,6 +30,8 @@ const HelpTooltip = ({ content, position = 'top' }) => {
                 onBlur={() => setShow(false)}
                 className="ml-1 text-slate-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full"
                 aria-label="Help information"
+                aria-expanded={show}
+                aria-controls="help-tooltip-content"
                 type="button"
             >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,6 +40,7 @@ const HelpTooltip = ({ content, position = 'top' }) => {
             </button>
             {show && (
                 <div
+                    id="help-tooltip-content"
                     className={`absolute z-50 ${positionStyles[position]} w-64 p-3 bg-slate-800 border border-slate-700 rounded-lg shadow-xl text-sm text-slate-300 animate-in fade-in zoom-in-95 duration-200`}
                     role="tooltip"
                 >

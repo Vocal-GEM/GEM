@@ -110,9 +110,14 @@ const FlowFinisher = ({ dataRef, showFeedback = true }) => {
                     </div>
                 </div>
                 <button
-                    className="text-slate-600 hover:text-slate-300 transition-colors"
+                    className="text-slate-600 hover:text-slate-300 transition-colors focus-visible:ring-2 focus-visible:outline-none rounded-full"
                     onMouseEnter={() => setShowTooltip(true)}
                     onMouseLeave={() => setShowTooltip(false)}
+                    onFocus={() => setShowTooltip(true)}
+                    onBlur={() => setShowTooltip(false)}
+                    aria-label="More info about Flow Finisher"
+                    aria-expanded={showTooltip}
+                    aria-controls="flow-finisher-tooltip"
                 >
                     <Info size={16} />
                 </button>
@@ -120,7 +125,7 @@ const FlowFinisher = ({ dataRef, showFeedback = true }) => {
 
             {/* Tooltip */}
             {showTooltip && (
-                <div className="absolute z-50 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg text-xs text-slate-300 max-w-xs shadow-xl">
+                <div id="flow-finisher-tooltip" role="tooltip" className="absolute z-50 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg text-xs text-slate-300 max-w-xs shadow-xl">
                     Analyzes how you end phrases. Keeping mouth open creates resonant &quot;alive&quot; endings.
                     Closing too early = abrupt, cave-like cutoff.
                 </div>

@@ -50,9 +50,14 @@ const ResonanceMetrics = ({ dataRef }) => {
             <div className="flex justify-between items-start mb-2">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{label}</span>
                 <button
-                    className="text-slate-600 hover:text-slate-300 transition-colors"
+                    className="text-slate-600 hover:text-slate-300 transition-colors focus-visible:ring-2 focus-visible:outline-none rounded-full"
                     onMouseEnter={() => setShowTooltip(id)}
                     onMouseLeave={() => setShowTooltip(null)}
+                    onFocus={() => setShowTooltip(id)}
+                    onBlur={() => setShowTooltip(null)}
+                    aria-label={`More info about ${label}`}
+                    aria-expanded={showTooltip === id}
+                    aria-controls={`resonance-tooltip-${id}`}
                 >
                     <Info size={14} />
                 </button>
@@ -62,7 +67,7 @@ const ResonanceMetrics = ({ dataRef }) => {
             </div>
 
             {showTooltip === id && (
-                <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg z-50 text-xs text-slate-300 shadow-xl">
+                <div id={`resonance-tooltip-${id}`} role="tooltip" className="absolute top-full left-0 right-0 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg z-50 text-xs text-slate-300 shadow-xl">
                     {tooltip}
                 </div>
             )}
