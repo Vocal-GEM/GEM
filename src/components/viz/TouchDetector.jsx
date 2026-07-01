@@ -93,9 +93,14 @@ const TouchDetector = ({ dataRef, showFeedback = true }) => {
                     </div>
                 </div>
                 <button
-                    className="text-slate-600 hover:text-slate-300 transition-colors"
+                    className="text-slate-600 hover:text-slate-300 transition-colors focus-visible:ring-2 focus-visible:outline-none rounded-full"
                     onMouseEnter={() => setShowTooltip(true)}
                     onMouseLeave={() => setShowTooltip(false)}
+                    onFocus={() => setShowTooltip(true)}
+                    onBlur={() => setShowTooltip(false)}
+                    aria-label="More info about Touch Detector"
+                    aria-expanded={showTooltip}
+                    aria-controls="touch-detector-tooltip"
                 >
                     <Info size={16} />
                 </button>
@@ -103,7 +108,7 @@ const TouchDetector = ({ dataRef, showFeedback = true }) => {
 
             {/* Tooltip */}
             {showTooltip && (
-                <div className="absolute z-50 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg text-xs text-slate-300 max-w-xs shadow-xl">
+                <div id="touch-detector-tooltip" role="tooltip" className="absolute z-50 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg text-xs text-slate-300 max-w-xs shadow-xl">
                     Detects how hard you&apos;re pressing consonants like B, D, G, M, N.
                     Light touch = bright, forward sound. Hard press = dark, masculine sound.
                 </div>

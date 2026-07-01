@@ -83,9 +83,13 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                     </div>
                 </div>
                 <button
-                    className="text-slate-500 hover:text-white transition-colors"
+                    className="text-slate-500 hover:text-white transition-colors focus-visible:ring-2 focus-visible:outline-none rounded-full"
                     onMouseEnter={() => setShowTooltip(true)}
                     onMouseLeave={() => setShowTooltip(false)}
+                    onFocus={() => setShowTooltip(true)}
+                    onBlur={() => setShowTooltip(false)}
+                    aria-expanded={showTooltip}
+                    aria-controls="register-gauge-tooltip"
                     aria-label="More info about Laryngeal Register"
                 >
                     <Info size={16} />
@@ -94,7 +98,7 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
 
             {/* Tooltip */}
             {showTooltip && (
-                <div className="absolute z-50 mt-2 p-3 bg-slate-900 border border-slate-700/50 rounded-lg text-xs text-slate-200 max-w-xs shadow-xl ring-1 ring-black">
+                <div id="register-gauge-tooltip" role="tooltip" className="absolute z-50 mt-2 p-3 bg-slate-900 border border-slate-700/50 rounded-lg text-xs text-slate-200 max-w-xs shadow-xl ring-1 ring-black">
                     <p className="font-bold mb-1">Detects vocal fold vibration mechanism.</p>
                     <ul className="space-y-1 opacity-90">
                         <li>• <strong className="text-amber-400">M1 (Chest)</strong>: Thick folds.</li>
