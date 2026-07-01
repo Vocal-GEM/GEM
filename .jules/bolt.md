@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-07-01 - React-ChartJS-2 Unmemoized Config Anti-pattern
+**Learning:** Multiple chart components (`HistoryView`, `ProgressCharts`, `PhonetogramChart`) were passing unmemoized `chartOptions` and `chartData` objects directly to `Line` and `Bar` components from `react-chartjs-2`. This causes expensive chart canvas re-renders on every React render cycle. Additionally, `HistoryView` was calling `sessions.slice().reverse()` 3 times per render.
+**Action:** Always wrap `chartData` and `chartOptions` passed to `react-chartjs-2` components in `useMemo`. Consolidate expensive array operations like `.slice().reverse()` before mapping over them.
