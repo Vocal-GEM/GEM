@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-07-01 - Consolidate chained array iteration methods
+**Learning:** Chained `.filter()`, `.map()`, and `.reduce()` iterations cause multiple O(n) passes over arrays, accumulating memory pressure and execution time especially in large datasets. In `SessionAnalyzer.js`, combining operations into a single for-loop reduced iteration overhead significantly.
+**Action:** Always prefer a single for-loop for multiple reductions or aggregations on hot paths.
