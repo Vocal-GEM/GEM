@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-03-22 - Unmanaged requestAnimationFrame anti-pattern
+**Learning:** Found a component (`VowelAnalysis.jsx`) that explicitly called `requestAnimationFrame(loop)` while also registering the exact same loop function with the `RenderCoordinator`. This creates an unmanaged double loop, defeating the central `RenderCoordinator`'s purpose of managing frames to save CPU.
+**Action:** When migrating components to use `RenderCoordinator.subscribe`, completely remove the old manual `requestAnimationFrame` and `cancelAnimationFrame` boilerplate. Let the coordinator handle calling the render function.
