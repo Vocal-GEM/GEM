@@ -165,27 +165,41 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
     };
 
     // Chart Data Preparation
-    const chartData = {
-        labels: sessions.slice().reverse().map(s => new Date(s.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })),
-        datasets: [
-            {
-                label: t('history.avgPitch'),
-                data: sessions.slice().reverse().map(s => s.pitch),
-                borderColor: 'rgb(99, 102, 241)',
-                backgroundColor: 'rgba(99, 102, 241, 0.5)',
-                yAxisID: 'y',
-            },
-            {
-                label: t('history.resonance'),
-                data: sessions.slice().reverse().map(s => s.resonance),
-                borderColor: 'rgb(236, 72, 153)',
-                backgroundColor: 'rgba(236, 72, 153, 0.5)',
-                yAxisID: 'y1',
-            },
-        ],
-    };
+    const chartData = useMemo(() => {
+        const reversedSessions = sessions.slice().reverse();
+        const labels = [];
+        const pitchData = [];
+        const resonanceData = [];
 
-    const chartOptions = {
+        for (let i = 0; i < reversedSessions.length; i++) {
+            const s = reversedSessions[i];
+            labels.push(new Date(s.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+            pitchData.push(s.pitch);
+            resonanceData.push(s.resonance);
+        }
+
+        return {
+            labels,
+            datasets: [
+                {
+                    label: t('history.avgPitch'),
+                    data: pitchData,
+                    borderColor: 'rgb(99, 102, 241)',
+                    backgroundColor: 'rgba(99, 102, 241, 0.5)',
+                    yAxisID: 'y',
+                },
+                {
+                    label: t('history.resonance'),
+                    data: resonanceData,
+                    borderColor: 'rgb(236, 72, 153)',
+                    backgroundColor: 'rgba(236, 72, 153, 0.5)',
+                    yAxisID: 'y1',
+                },
+            ],
+        };
+    }, [sessions, t]);
+
+    const chartOptions = useMemo(() => ({
         responsive: true,
         interaction: { mode: 'index', intersect: false },
         stacked: false,
@@ -212,7 +226,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
                 title: { display: true, text: t('history.resonance'), color: '#ec4899' }
             },
         },
-    };
+    }), [t]);
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-24">
