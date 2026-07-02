@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -54,7 +54,7 @@ const ResearchDashboard = () => {
         }
     }, [selectedStudy]);
 
-    const enrollmentData = {
+    const enrollmentData = useMemo(() => ({
         labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
         datasets: [
             {
@@ -64,9 +64,9 @@ const ResearchDashboard = () => {
                 tension: 0.1,
             },
         ],
-    };
+    }), [stats]);
 
-    const effectivenessData = {
+    const effectivenessData = useMemo(() => ({
         labels: ['Baseline', 'Month 1', 'Month 2', 'Month 3', 'Month 4'],
         datasets: [
             {
@@ -82,7 +82,12 @@ const ResearchDashboard = () => {
                 backgroundColor: 'rgba(53, 162, 235, 0.5)',
             },
         ],
-    };
+    }), [stats]);
+
+    const chartOptions = useMemo(() => ({
+        responsive: true,
+        maintainAspectRatio: false
+    }), []);
 
     return (
         <div className="research-dashboard p-6 bg-gray-900 text-white min-h-screen">
@@ -123,14 +128,14 @@ const ResearchDashboard = () => {
                                 <div className="bg-gray-800 p-4 rounded-lg">
                                     <h3 className="text-lg font-medium mb-4">Recruitment Progress</h3>
                                     <div className="h-64">
-                                        <Line options={{ responsive: true, maintainAspectRatio: false }} data={enrollmentData} />
+                                        <Line options={chartOptions} data={enrollmentData} />
                                     </div>
                                 </div>
 
                                 <div className="bg-gray-800 p-4 rounded-lg">
                                     <h3 className="text-lg font-medium mb-4">Intervention Effectiveness (Avg Pitch)</h3>
                                     <div className="h-64">
-                                        <Line options={{ responsive: true, maintainAspectRatio: false }} data={effectivenessData} />
+                                        <Line options={chartOptions} data={effectivenessData} />
                                     </div>
                                 </div>
                             </div>
