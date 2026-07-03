@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -54,7 +54,8 @@ const ResearchDashboard = () => {
         }
     }, [selectedStudy]);
 
-    const enrollmentData = {
+    // Bolt Optimization: Memoize chart configuration to prevent expensive re-renders
+    const enrollmentData = useMemo(() => ({
         labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
         datasets: [
             {
@@ -64,25 +65,26 @@ const ResearchDashboard = () => {
                 tension: 0.1,
             },
         ],
-    };
+    }), [stats]);
 
-    const effectivenessData = {
+    // Bolt Optimization: Memoize chart configuration to prevent expensive re-renders
+    const effectivenessData = useMemo(() => ({
         labels: ['Baseline', 'Month 1', 'Month 2', 'Month 3', 'Month 4'],
         datasets: [
             {
                 label: 'Control Arm (Hz)',
-                data: stats?.pitchImprovement.control || [],
+                data: stats?.pitchImprovement?.control || [],
                 borderColor: 'rgb(255, 99, 132)',
                 backgroundColor: 'rgba(255, 99, 132, 0.5)',
             },
             {
                 label: 'Intervention Arm (Hz)',
-                data: stats?.pitchImprovement.intervention || [],
+                data: stats?.pitchImprovement?.intervention || [],
                 borderColor: 'rgb(53, 162, 235)',
                 backgroundColor: 'rgba(53, 162, 235, 0.5)',
             },
         ],
-    };
+    }), [stats]);
 
     return (
         <div className="research-dashboard p-6 bg-gray-900 text-white min-h-screen">
