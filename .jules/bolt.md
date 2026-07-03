@@ -45,3 +45,7 @@
 ## 2026-05-18 - Chart.js Configuration Memoization
 **Learning:** Passing unmemoized configuration objects (`chartOptions`) or data arrays (`chartData`) directly to `react-chartjs-2` components (like `<Line>` or `<Bar>`) causes the chart canvas to be completely destroyed and re-rendered on every React component update, even if the underlying data hasn't changed. This is a significant source of main thread blocking and layout thrashing, especially in views with multiple charts or frequent state updates (like tab switching).
 **Action:** Always wrap `chartData` and `chartOptions` objects passed to Chart.js components in `useMemo` hooks with appropriate dependency arrays. Ensure that functions returning chart data are also converted to memoized values.
+
+## 2026-05-18 - CI Build Breakages
+**Learning:** CI failures for `react/no-unescaped-entities` will break builds, as will test files invoking `require` when tests run via an ESM framework like Vitest. Also, `no-undef` errors in tests (`global is not defined`) result from Vitest tests running in isolated environments where `global` is replaced by `globalThis`.
+**Action:** When fixing CI issues, always ensure JSX uses escaped quotes (`&quot;`). For tests, utilize `vi.importActual` over `require`, and correctly assign `globalThis` instead of `global` when mocking globals or properties on the window/environment object.
