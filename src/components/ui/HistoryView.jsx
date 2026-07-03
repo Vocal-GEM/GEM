@@ -164,9 +164,8 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
         }
     };
 
-    // Bolt Optimization: Memoize chart configuration objects
     // Chart Data Preparation
-    const chartData = useMemo(() => ({
+    const chartData = {
         labels: sessions.slice().reverse().map(s => new Date(s.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })),
         datasets: [
             {
@@ -184,9 +183,9 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
                 yAxisID: 'y1',
             },
         ],
-    }), [sessions, t]);
+    };
 
-    const chartOptions = useMemo(() => ({
+    const chartOptions = {
         responsive: true,
         interaction: { mode: 'index', intersect: false },
         stacked: false,
@@ -213,7 +212,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
                 title: { display: true, text: t('history.resonance'), color: '#ec4899' }
             },
         },
-    }), [t]);
+    };
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-24">
