@@ -312,13 +312,13 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
                 </div>
 
                 <div className="flex gap-2">
-                    <button onClick={() => setShowHistory(!showHistory)} className={`p-1.5 rounded hover:bg-slate-800 ${showHistory ? 'text-blue-400' : 'text-slate-400'}`}>
+                    <button aria-label="Toggle History" aria-expanded={showHistory} onClick={() => setShowHistory(!showHistory)} className={`p-1.5 rounded hover:bg-slate-800 focus-visible:ring-2 focus-visible:outline-none ${showHistory ? 'text-blue-400' : 'text-slate-400'}`}>
                         <History size={16} />
                     </button>
                     <div className="flex items-center bg-slate-800 rounded px-1">
-                        <button onClick={prevPattern} className="p-1 hover:bg-slate-700 rounded"><ChevronLeft className="w-4 h-4 text-slate-400" /></button>
+                        <button aria-label="Previous Pattern" onClick={prevPattern} className="p-1 hover:bg-slate-700 rounded focus-visible:ring-2 focus-visible:outline-none"><ChevronLeft className="w-4 h-4 text-slate-400" /></button>
                         <span className="text-xs text-slate-300 font-mono w-4 text-center">{selectedPattern + 1}</span>
-                        <button onClick={nextPattern} className="p-1 hover:bg-slate-700 rounded"><ChevronRight className="w-4 h-4 text-slate-400" /></button>
+                        <button aria-label="Next Pattern" onClick={nextPattern} className="p-1 hover:bg-slate-700 rounded focus-visible:ring-2 focus-visible:outline-none"><ChevronRight className="w-4 h-4 text-slate-400" /></button>
                     </div>
                 </div>
             </div>
@@ -380,8 +380,9 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
 
                 <div className="flex gap-2">
                     <button
+                        aria-label="Play Target Tone"
                         onClick={playTarget}
-                        className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors group"
+                        className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors group focus-visible:ring-2 focus-visible:outline-none"
                         title="Play Target Tone"
                     >
                         <Volume2 className="w-4 h-4 text-slate-400 group-hover:text-blue-400" />
@@ -389,16 +390,18 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
 
                     {/* Duration Toggle */}
                     <button
+                        aria-label={`Toggle Duration. Current duration ${duration} seconds`}
                         onClick={() => setDuration(d => d === 2.0 ? 4.0 : 2.0)}
-                        className="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-mono text-slate-400 min-w-[30px]"
+                        className="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-mono text-slate-400 min-w-[30px] focus-visible:ring-2 focus-visible:outline-none"
                         title="Toggle Duration"
                     >
                         {duration}s
                     </button>
 
                     <button
+                        aria-label="Reset Trace"
                         onClick={reset}
-                        className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                        className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors focus-visible:ring-2 focus-visible:outline-none"
                         title="Reset Trace"
                     >
                         <RefreshCw className="w-4 h-4 text-slate-400" />
