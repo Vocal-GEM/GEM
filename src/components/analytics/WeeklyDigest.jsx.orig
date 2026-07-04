@@ -1,4 +1,4 @@
-import { Trophy, Clock, Target, Flame, Activity, TrendingUp, Calendar, ChevronRight } from 'lucide-react';
+import { Card, Trophy, Clock, Target, Flame, Activity, TrendingUp, Calendar, ChevronRight } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
