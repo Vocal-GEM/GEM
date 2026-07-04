@@ -1,0 +1,9 @@
+--- src/components/analytics/WeeklyDigest.jsx
++++ src/components/analytics/WeeklyDigest.jsx
+@@ -1,5 +1,5 @@
+ import React, { useState } from 'react';
+-import { Card, Trophy, Clock, Target, Flame, Activity, TrendingUp, Calendar, ChevronRight } from 'lucide-react';
++import { Trophy, Clock, Target, Flame, Activity, TrendingUp, Calendar, ChevronRight } from 'lucide-react';
+
+ const WeeklyDigest = ({ digestData, onResume }) => {
+     const [activeTab, setActiveTab] = useState('overview');

@@ -1,0 +1,11 @@
+--- src/audio/PitchWorklet.js
++++ src/audio/PitchWorklet.js
+@@ -36,7 +36,7 @@
+         this.port.postMessage({ type: 'init_complete', bufferSize: this.bufferSize });
+     }
+
+-    process(inputs, outputs, parameters) {
++    process(inputs, _outputs, _parameters) {
+         if (!this.initialized) return true;
+
+         const input = inputs[0];

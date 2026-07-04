@@ -1,0 +1,10 @@
+--- src/components/professional/ClientDashboard.jsx
++++ src/components/professional/ClientDashboard.jsx
+@@ -4,6 +4,7 @@
+     Play, Search, TrendingUp, Settings, ChevronRight, FileText,
+     Download, Share2, Printer, Plus
+ } from 'lucide-react';
++import { Activity } from 'lucide-react';
+ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+
+ // --- MOCK DATA ---
