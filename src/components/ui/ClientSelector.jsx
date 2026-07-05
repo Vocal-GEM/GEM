@@ -79,7 +79,8 @@ const ClientSelector = () => {
                                     </div>
                                     <button
                                         onClick={(e) => handleDeleteClient(e, client.id)}
-                                        className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-md opacity-0 group-hover:opacity-100 transition-all"
+                                        className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-md opacity-0 group-hover:opacity-100 transition-all focus-visible:ring-2 focus-visible:outline-none"
+                                        aria-label={`Delete client ${client.name}`}
                                     >
                                         <Trash2 size={14} />
                                     </button>
@@ -108,7 +109,11 @@ const ClientSelector = () => {
                                 <Users className="text-blue-400" />
                                 Add New Client
                             </h3>
-                            <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-white">
+                            <button
+                                onClick={() => setShowAddModal(false)}
+                                className="text-slate-400 hover:text-white focus-visible:ring-2 focus-visible:outline-none rounded-md"
+                                aria-label="Close modal"
+                            >
                                 <X size={24} />
                             </button>
                         </div>
