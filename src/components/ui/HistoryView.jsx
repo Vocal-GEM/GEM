@@ -165,7 +165,9 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
     };
 
     // Chart Data Preparation
-    const chartData = {
+    // Bolt Optimization: Memoize chart configurations to prevent unnecessary re-renders of the chart component.
+    // Expected impact: Reduces main thread blocking by avoiding expensive Chart.js canvas redraws on parent renders.
+    const chartData = useMemo(() => ({
         labels: sessions.slice().reverse().map(s => new Date(s.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })),
         datasets: [
             {
@@ -183,9 +185,9 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
                 yAxisID: 'y1',
             },
         ],
-    };
+    }), [sessions, t]);
 
-    const chartOptions = {
+    const chartOptions = useMemo(() => ({
         responsive: true,
         interaction: { mode: 'index', intersect: false },
         stacked: false,
@@ -212,7 +214,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
                 title: { display: true, text: t('history.resonance'), color: '#ec4899' }
             },
         },
-    };
+    }), [t]);
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-24">
