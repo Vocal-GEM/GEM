@@ -10,8 +10,13 @@ vi.mock('socket.io-client', () => ({
 
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)),
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
-    YIN: vi.fn(() => vi.fn((buffer) => 440))
+    YIN: vi.fn(() => vi.fn((buffer) => 440)),
+    default: {
+        Macleod: vi.fn(() => vi.fn((buffer) => 440)),
+        McLeod: vi.fn(() => vi.fn((buffer) => 440))
+    }
 }));
 
 // Mock AudioContext and browser APIs
