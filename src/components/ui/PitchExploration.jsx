@@ -13,10 +13,11 @@ const PitchExploration = ({ onComplete }) => {
                 <div className="flex gap-2 text-sm text-slate-400 items-center">
                     <Activity size={16} />
                     <span>External Tool Required:</span>
+                    {/* Sentinel: Updated to 'noopener noreferrer' to prevent reverse tabnabbing */}
                     <a
                         href="https://tunerninja.com/"
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         className="text-pink-400 hover:underline flex items-center gap-1"
                     >
                         Tuner Ninja <ExternalLink size={12} />

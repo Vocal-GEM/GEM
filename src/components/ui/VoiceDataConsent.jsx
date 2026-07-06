@@ -240,9 +240,11 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
 
                 {/* Footer */}
                 <div className="p-4 border-t border-slate-700 flex items-center justify-between">
+                    {/* Sentinel: Added 'noopener noreferrer' to prevent reverse tabnabbing */}
                     <a
                         href="/privacy-policy"
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="flex items-center gap-1 text-xs text-slate-400 hover:text-white"
                     >
                         Privacy Policy
