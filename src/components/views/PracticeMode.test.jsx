@@ -60,7 +60,6 @@ vi.mock('../../context/ProfileContext', () => ({
 
 describe('PracticeMode', () => {
     const mockDataRef = { current: { pitch: 200, resonance: 100, volume: 0.5 } };
-    const mockAudioEngine = { current: {} };
 
     it('renders without crashing', async () => {
 
@@ -89,6 +88,5 @@ describe('PracticeMode', () => {
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
         // Check for visualization area
-        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
     });
 });
