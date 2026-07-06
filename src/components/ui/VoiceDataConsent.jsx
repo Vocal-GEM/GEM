@@ -243,6 +243,7 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                     <a
                         href="/privacy-policy"
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="flex items-center gap-1 text-xs text-slate-400 hover:text-white"
                     >
                         Privacy Policy
