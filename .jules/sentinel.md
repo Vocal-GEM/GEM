@@ -39,15 +39,6 @@
 **Prevention:** Applied `Flask-Limiter` decorators (`@limiter.limit`) to all high-cost/high-compute endpoints in `ai.py`, `voice_quality.py`, and `tts.py`.
 ## 2026-01-04 - Community File Upload Security
 **Vulnerability:** The `share_voice` endpoint in `backend/app/routes/community.py` allowed unrestricted file uploads, enabling potential RCE via malicious scripts (e.g., .php).
-**Learning:** Always validate file types explicitly, even when using `secure_filename`. Relative imports in Blueprint routes work, but testing them requires careful mocking of the package structure.
-**Prevention:** Added `validate_file_upload` check restricting uploads to audio types only. Confirmed `backend/app/validators.py` exists and functions correctly.
-
-## 2025-05-23 - Path Traversal & Rate Limiting in Community Routes
-**Vulnerability:** The `share_voice` endpoint in `backend/app/routes/community.py` used raw filenames for uploads, creating a potential path traversal risk. It also lacked rate limiting, exposing the server to DoS attacks via heavy audio processing.
-**Learning:** Even when filenames are prefixed with IDs/timestamps, failure to sanitize the original filename with `secure_filename` is a security bad practice that can lead to filesystem attacks. Resource-intensive endpoints must always have strict rate limits.
-**Prevention:** Applied `werkzeug.utils.secure_filename` to sanitize uploads and added `@limiter.limit` to `share_voice` (5/hour) and `submit_success_story` (10/minute).
-## 2025-05-23 - Temporary File Leakage (DoS Risk)
-**Vulnerability:** Flask endpoints using `tempfile.NamedTemporaryFile(delete=False)` followed by `send_file` often leak files because execution flow returns before `finally` blocks can effectively cleanup (since `send_file` needs the file to exist).
 **Learning:** `finally` blocks in a route function run *before* the response is sent by the WSGI server. If you delete the file in `finally`, `send_file` fails. If you don't, the file leaks.
 **Prevention:** Use `flask.after_this_request` to register a cleanup callback that deletes the temporary file after the response has been successfully sent.
 ## 2024-05-22 - Broken File Upload Validation Logic
@@ -75,3 +66,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-07-06 - Reverse Tabnabbing Vulnerability
+**Vulnerability:** External links (e.g., in `ShareProgressCard`, `VoiceDataConsent`, `PitchExploration`) opened with `target="_blank"` were missing `rel="noopener noreferrer"` in JSX, and missing `'noopener,noreferrer'` window features in `window.open` calls.
+**Learning:** This exposes the application to reverse tabnabbing, where the newly opened tab can manipulate the window.opener object to redirect the original application page to a malicious site.
+**Prevention:** Always add `rel="noopener noreferrer"` to `<a>` tags using `target="_blank"`, and pass `'noopener,noreferrer'` as window features to `window.open`.

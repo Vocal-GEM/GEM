@@ -16,7 +16,7 @@ const PitchExploration = ({ onComplete }) => {
                     <a
                         href="https://tunerninja.com/"
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         className="text-pink-400 hover:underline flex items-center gap-1"
                     >
                         Tuner Ninja <ExternalLink size={12} />
