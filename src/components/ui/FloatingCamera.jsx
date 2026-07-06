@@ -130,8 +130,8 @@ const FloatingCamera = ({ onClose }) => {
                     <button onClick={() => handleZoom(0.2)} className="p-1 bg-white/10 rounded hover:bg-white/20 text-white text-[10px]"><Plus className="w-3 h-3" /></button>
                 </div>
                 <div className="flex gap-1">
-                    <button onClick={toggleSize} className="p-1 bg-white/10 rounded hover:bg-white/20 text-white"><Maximize2 className="w-3 h-3" /></button>
-                    <button onClick={onClose} className="p-1 bg-red-500/80 rounded hover:bg-red-500 text-white"><X className="w-3 h-3" /></button>
+                    <button onClick={toggleSize} className="p-1 bg-white/10 rounded hover:bg-white/20 text-white focus-visible:ring-2 focus-visible:outline-none" aria-label="Toggle camera size"><Maximize2 className="w-3 h-3" /></button>
+                    <button onClick={onClose} className="p-1 bg-red-500/80 rounded hover:bg-red-500 text-white focus-visible:ring-2 focus-visible:outline-none" aria-label="Close camera"><X className="w-3 h-3" /></button>
                 </div>
             </div>
         </div>
