@@ -262,10 +262,9 @@ const PracticeMode = ({
     const [coachingPrompt, setCoachingPrompt] = useState(null);
     const coachingEngineRef = useRef(null);
 
-    useEffect(() => {
-        coachingEngineRef.current = new CoachingEngine();
-    }, []);
-    // Lazy initialization
+    // Bolt Optimization: Strict lazy initialization in render phase.
+    // Removes the redundant useEffect that caused multiple instantiations.
+    // Expected impact: Eliminates unnecessary object creation, reducing GC overhead and memory churn during PracticeMode initial renders.
     if (!coachingEngineRef.current) {
         coachingEngineRef.current = new CoachingEngine();
     }

@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - PracticeMode.jsx lazy initialization flaw
+**Learning:** Found an anti-pattern in `PracticeMode.jsx` where `new CoachingEngine()` was called both in a `useEffect` and conditionally in the render body (`if (!coachingEngineRef.current)`). Because the component renders before the `useEffect` runs, the conditional block always executed, defeating lazy initialization and instantiating `CoachingEngine` on every initial render pass, causing unnecessary memory allocation.
+**Action:** Use strict lazy initialization (`if (!ref.current) ref.current = new Class()`) during the render phase without a redundant `useEffect`, or purely inside a `useEffect` if it requires DOM access.
