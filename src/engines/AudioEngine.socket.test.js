@@ -11,7 +11,17 @@ vi.mock('socket.io-client', () => ({
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
-    YIN: vi.fn(() => vi.fn((buffer) => 440))
+    YIN: vi.fn(() => vi.fn((buffer) => 440)),
+    default: {
+        Macleod: vi.fn(() => vi.fn((buffer) => 440)),
+        YIN: vi.fn(() => vi.fn((buffer) => 440))
+    },
+    Macleod: vi.fn(() => vi.fn((buffer) => 440))
+}));
+
+vi.mock('../../config/runtime', () => ({
+    isBackendEnabled: () => true,
+    getBackendUrl: () => 'http://localhost:5000'
 }));
 
 // Mock AudioContext and browser APIs
@@ -81,6 +91,12 @@ Object.defineProperty(global.navigator, 'mediaDevices', {
 });
 
 describe('AudioEngine Socket Integration', () => {
+    beforeEach(() => {
+        vi.mock('../../config/runtime', () => ({
+            isBackendEnabled: () => true,
+            getBackendUrl: () => 'http://localhost:5000'
+        }));
+    });
     let engine;
     let mockSocket;
     let socketCallbacks = {};
