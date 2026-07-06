@@ -66,7 +66,7 @@ const QualityVisualizer = ({ dataRef }) => {
             });
 
             // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
+        }
 
         // Update history
         ['jitter', 'shimmer', 'weight'].forEach(key => {
@@ -88,7 +88,7 @@ const QualityVisualizer = ({ dataRef }) => {
 
         return () => {
             unsubscribe();
-        };
+        }
     }, [componentId, loop]);
 
     // Helper to render sparkline
@@ -116,29 +116,29 @@ const QualityVisualizer = ({ dataRef }) => {
                 />
             </svg>
         );
-    };
+    }
 
     // Helper for status labels
     const getStatus = (type, val) => {
         if (type === 'jitter') {
             // Thresholds for Jitter (approximate for visual feedback)
-            if (val < 0.004) return { label: 'Stable', color: 'text-emerald-400' };
-            if (val < 0.01) return { label: 'Normal', color: 'text-blue-400' };
-            return { label: 'Rough', color: 'text-orange-400' };
+            if (val < 0.004) return { label: 'Stable', color: 'text-emerald-400' }
+            if (val < 0.01) return { label: 'Normal', color: 'text-blue-400' }
+            return { label: 'Rough', color: 'text-orange-400' }
         }
         if (type === 'shimmer') {
             // Thresholds for Shimmer
-            if (val < 0.15) return { label: 'Stable', color: 'text-emerald-400' };
-            if (val < 0.35) return { label: 'Normal', color: 'text-blue-400' };
-            return { label: 'Breathy/Rough', color: 'text-orange-400' };
+            if (val < 0.15) return { label: 'Stable', color: 'text-emerald-400' }
+            if (val < 0.35) return { label: 'Normal', color: 'text-blue-400' }
+            return { label: 'Breathy/Rough', color: 'text-orange-400' }
         }
         if (type === 'weight') {
-            if (val < 30) return { label: 'Breathy', color: 'text-cyan-400' };
-            if (val > 70) return { label: 'Pressed', color: 'text-orange-400' };
-            return { label: 'Balanced', color: 'text-emerald-400' };
+            if (val < 30) return { label: 'Breathy', color: 'text-cyan-400' }
+            if (val > 70) return { label: 'Pressed', color: 'text-orange-400' }
+            return { label: 'Balanced', color: 'text-emerald-400' }
         }
-        return { label: '-', color: 'text-slate-400' };
-    };
+        return { label: '-', color: 'text-slate-400' }
+    }
 
     return (
         <div className="h-full flex flex-col p-6">
@@ -250,5 +250,6 @@ const QualityVisualizer = ({ dataRef }) => {
             </div>
         </div>
     );
+}
 
 export default QualityVisualizer;
