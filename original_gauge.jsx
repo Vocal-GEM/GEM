@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
-import { renderCoordinator } from '../../services/RenderCoordinator';
+import { useState, useEffect, useRef } from 'react';
 import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
 
 /**
  * RegisterGauge - Visualize Laryngeal Mechanisms (M0-M3)
- * 
+ *
  * Based on "Registers—The Snake Pit of Voice Pedagogy" logic.
  * Classifies mechanics based on F0 and Spectral Slope.
  */
@@ -20,11 +19,9 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     });
     const [f0, setF0] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);
-
+    const animationRef = useRef();
 
     useEffect(() => {
-        // Bolt Optimization: Use centralized RenderCoordinator instead of separate requestAnimationFrame loop
-        // Expected impact: Reduces CPU usage and browser main thread blocking by batching frame updates
         const update = () => {
             if (dataRef?.current) {
                 // Get register data from socket stream
@@ -45,19 +42,11 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                 }
                 setF0(currentF0);
             }
+            animationRef.current = requestAnimationFrame(update);
         };
 
-        const unsubscribe = renderCoordinator.subscribe(
-            'register-gauge',
-            update,
-            renderCoordinator.PRIORITY.HIGH
-        );
-
-        // F0 Threshold Check (300 Hz)
-    // eslint-disable-next-line no-unused-vars
-    const showChestWarning = f0 > 300 && registerData.mechanism === 'M1';
-
-    return () => unsubscribe();
+        animationRef.current = requestAnimationFrame(update);
+        return () => cancelAnimationFrame(animationRef.current);
     }, [dataRef]);
 
     // Helpers
@@ -78,11 +67,6 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     };
 
     // F0 Threshold Check (300 Hz)
-        // F0 Threshold Check (300 Hz)
-
-
-    // F0 Threshold Check (300 Hz)
-    // eslint-disable-next-line no-unused-vars
     const showChestWarning = f0 > 300 && registerData.mechanism === 'M1';
 
     return (
@@ -165,7 +149,7 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
             {showHint && (
                 <div className="space-y-2">
                     {/* Chest Vibration Limit Warning */}
-                    {showChestWarning && (
+                    {f0 > 290 && (
                         <div className="flex items-start gap-2 p-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-xs text-blue-300">
                             <Info className="w-3 h-3 mt-0.5 shrink-0" />
                             <p>
