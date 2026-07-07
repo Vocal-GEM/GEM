@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
 
 /**
@@ -19,9 +20,11 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     });
     const [f0, setF0] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);
-    const animationRef = useRef();
+
 
     useEffect(() => {
+        // Bolt Optimization: Use centralized RenderCoordinator instead of separate requestAnimationFrame loop
+        // Expected impact: Reduces CPU usage and browser main thread blocking by batching frame updates
         const update = () => {
             if (dataRef?.current) {
                 // Get register data from socket stream
@@ -42,11 +45,15 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                 }
                 setF0(currentF0);
             }
-            animationRef.current = requestAnimationFrame(update);
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
+        const unsubscribe = renderCoordinator.subscribe(
+            'register-gauge',
+            update,
+            renderCoordinator.PRIORITY.HIGH
+        );
+
+    return () => unsubscribe();
     }, [dataRef]);
 
     // Helpers
@@ -149,7 +156,7 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
             {showHint && (
                 <div className="space-y-2">
                     {/* Chest Vibration Limit Warning */}
-                    {f0 > 290 && (
+                    {showChestWarning && (
                         <div className="flex items-start gap-2 p-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-xs text-blue-300">
                             <Info className="w-3 h-3 mt-0.5 shrink-0" />
                             <p>
