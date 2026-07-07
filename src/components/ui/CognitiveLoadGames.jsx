@@ -101,9 +101,11 @@ const CognitiveLoadGames = ({ onComplete }) => {
                             <div className="flex justify-between items-start mb-1">
                                 <h4 className="font-bold text-white">{game.title}</h4>
                                 {game.link && (
-                                    <a href={game.link} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">
-                                        <ExternalLink size={16} />
-                                    </a>
+                                    <>
+                                        <a href={game.link} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline" aria-label={`Play ${game.title}`}>
+                                            <ExternalLink size={16} />
+                                        </a>
+                                    </>
                                 )}
                             </div>
                             <p className="text-sm text-slate-400">{game.desc}</p>
