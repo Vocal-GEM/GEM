@@ -53,10 +53,6 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
             renderCoordinator.PRIORITY.HIGH
         );
 
-        // F0 Threshold Check (300 Hz)
-    // eslint-disable-next-line no-unused-vars
-    const showChestWarning = f0 > 300 && registerData.mechanism === 'M1';
-
     return () => unsubscribe();
     }, [dataRef]);
 
@@ -78,11 +74,6 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     };
 
     // F0 Threshold Check (300 Hz)
-        // F0 Threshold Check (300 Hz)
-
-
-    // F0 Threshold Check (300 Hz)
-    // eslint-disable-next-line no-unused-vars
     const showChestWarning = f0 > 300 && registerData.mechanism === 'M1';
 
     return (
