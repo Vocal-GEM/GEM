@@ -511,8 +511,9 @@ const DynamicOrb = memo(({ dataRef, calibration, externalDataRef, audioEngine, t
             <button
               key={m.id}
               onClick={() => setMode(m.id)}
-              className={`p-2 rounded-full transition-all ${isActive ? 'bg-teal-500 text-white shadow-[0_0_10px_rgba(20,184,166,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
+              className={`p-2 rounded-full transition-all focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-teal-400 ${isActive ? 'bg-teal-500 text-white shadow-[0_0_10px_rgba(20,184,166,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
               title={m.label}
+              aria-label={`Switch to ${m.label} mode`}
             >
               <Icon size={18} />
             </button>
@@ -522,8 +523,10 @@ const DynamicOrb = memo(({ dataRef, calibration, externalDataRef, audioEngine, t
         {!beginnerMode && (
           <button
             onClick={() => setShowDebug(!showDebug)}
-            className={`p-2 rounded-full transition-all ${showDebug ? 'bg-amber-500 text-white shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
+            className={`p-2 rounded-full transition-all focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-amber-400 ${showDebug ? 'bg-amber-500 text-white shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
             title="Toggle Debug Panel"
+            aria-label={showDebug ? "Hide Debug Panel" : "Show Debug Panel"}
+            aria-expanded={showDebug}
           >
             <Bug size={18} />
           </button>
