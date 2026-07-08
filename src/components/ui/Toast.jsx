@@ -60,7 +60,7 @@ const Toast = ({ message, type = 'success', onClose, duration = 3000 }) => {
       <span className={`font-medium ${style.text}`}>{message}</span>
       <button
         onClick={onClose}
-        className={`ml-2 hover:opacity-70 ${style.text} p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-current transition-opacity`}
+        className={`ml-2 hover:opacity-70 ${style.text} p-1 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 focus-visible:ring-current transition-opacity`}
         aria-label="Close notification"
       >
         <X className="w-4 h-4" aria-hidden="true" />
