@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-07-08 - Reverse Tabnabbing Vulnerability
+**Vulnerability:** External links created with `window.open` or `<a target="_blank">` were missing `rel="noopener noreferrer"` or the equivalent window feature string, exposing the application to reverse tabnabbing attacks where the newly opened tab can gain a reference to the opening window (via `window.opener`) and maliciously redirect it.
+**Learning:** Developers frequently overlook the security implications of opening links in new tabs, especially when using programmatic methods like `window.open`.
+**Prevention:** Always include `'noopener,noreferrer'` as the window features string in `window.open` calls, and `rel="noopener noreferrer"` in HTML anchor tags using `target="_blank"`.
