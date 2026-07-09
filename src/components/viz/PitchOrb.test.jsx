@@ -16,6 +16,7 @@ vi.mock('../../services/RenderCoordinator', () => ({
 // Mock Canvas getContext
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     clearRect: vi.fn(),
+    resetTransform: vi.fn(),
     beginPath: vi.fn(),
     arc: vi.fn(),
     fill: vi.fn(),
