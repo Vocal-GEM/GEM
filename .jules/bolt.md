@@ -41,3 +41,11 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Canvas Animation Refactoring Hazards
+**Learning:** When optimizing canvas animation loops (e.g., removing `canvas.width = rect.width` assignments), you must be aware of implicit side effects. Reassigning canvas dimensions implicitly clears the entire canvas and resets the transformation matrix. If you extract this assignment (e.g., to a `ResizeObserver`) to prevent layout thrashing, you must explicitly replace the side effects inside the loop using `ctx.clearRect(0, 0, w, h)` and `ctx.resetTransform()` followed by `ctx.scale(dpr, dpr)`, otherwise the animation will smear and transformations will accumulate infinitely.
+**Action:** When extracting canvas resize logic out of a rendering loop, always ensure explicit state resets (`clearRect`, `resetTransform`) are added to the beginning of the loop.
+
+## 2026-01-24 - Global variable scoping in Vitest
+**Learning:** Some test suites were failing with "'global' is not defined" because `global` was used to mock objects like `mockUseFrameCallback` or `requestAnimationFrame`. In Vitest ESM environments, `globalThis` should be used instead of `global`.
+**Action:** Always use `globalThis` when setting or mocking global properties in test files to ensure compatibility across different environment setups.
