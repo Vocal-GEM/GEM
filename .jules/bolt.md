@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-24 - RenderCoordinator and requestAnimationFrame recursion
+**Learning:** When using the custom `RenderCoordinator` singleton to manage animation loops, calling `requestAnimationFrame` directly inside the loop callback creates a recursive loop that bypasses the coordinator's throttling and prioritization, leading to high CPU usage.
+**Action:** Always verify that components subscribing to `RenderCoordinator` do not contain residual `requestAnimationFrame` calls inside their update callbacks.
