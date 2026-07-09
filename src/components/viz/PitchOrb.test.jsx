@@ -1,3 +1,5 @@
+/* global globalThis */
+/* eslint-disable no-undef */
 import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import PitchOrb from './PitchOrb';
