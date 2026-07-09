@@ -28,7 +28,7 @@ const ShareProgressCard = () => {
 
     const handleTwitterShare = () => {
         const text = encodeURIComponent(generateShareText());
-        window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank', 'noopener,noreferrer');
+        window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
     };
 
     return (
