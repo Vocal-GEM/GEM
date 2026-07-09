@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Mic, Volume2, VolumeX, RefreshCw, CheckCircle, AlertCircle, Activity, BarChart2 } from 'lucide-react';
+import { Volume2, VolumeX, RefreshCw, CheckCircle, AlertCircle, Activity } from 'lucide-react';
 import { analyzeMicrophoneQuality } from '../../utils/MicrophoneQualityAnalyzer';
 import {
     Chart as ChartJS,
@@ -27,12 +27,12 @@ ChartJS.register(
 
 const MicrophoneCalibration = ({ audioEngine }) => {
     const [calibrationStatus, setCalibrationStatus] = useState('idle'); // idle, measuring-silence, measuring-voice, complete
-    const [detectedEnvironment, setDetectedEnvironment] = useState('normal');
+    const [_detectedEnvironment, setDetectedEnvironment] = useState('normal');
     const [adaptiveThreshold, setAdaptiveThreshold] = useState(0.005);
     const [countdown, setCountdown] = useState(3);
     const [manualThreshold, setManualThreshold] = useState(null);
     const [qualityResult, setQualityResult] = useState(null);
-    const [voiceLevel, setVoiceLevel] = useState(0);
+    const [_voiceLevel, setVoiceLevel] = useState(0);
 
     const calibrationDataRef = useRef([]);
     const intervalRef = useRef(null);
