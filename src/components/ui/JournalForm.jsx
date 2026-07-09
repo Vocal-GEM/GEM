@@ -142,12 +142,11 @@ const JournalForm = ({ onSubmit, onCancel }) => {
                         <button
                             type="button"
                             onClick={() => setAudioBlobUrl(null)}
-                            className="p-2 text-red-400 hover:text-red-300"
+                            className="p-2 text-red-400 hover:text-red-300 focus-visible:ring-2 focus-visible:outline-none"
                             aria-label="Delete recording"
                         >
                             <Trash2 />
                         </button>
-                        <button type="button" onClick={() => setAudioBlobUrl(null)} className="p-2 text-red-400 hover:text-red-300" aria-label="Delete recording"><Trash2 /></button>
                     </div>
                 )}
                 <p className="text-xs text-slate-500">{isRecording ? 'Recording... Read your script!' : 'Tap to record your voice'}</p>
