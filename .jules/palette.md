@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-07-09 - Adding accessibility attributes to tooltips
+**Learning:** When implementing custom tooltips triggered by mouse events (onMouseEnter/onMouseLeave) on interactive elements, we must also attach keyboard focus events (onFocus/onBlur). The trigger button must also include a descriptive aria-label, an aria-expanded attribute, and explicit focus styles to ensure proper keyboard and screen reader accessibility.
+**Action:** Always add focus-visible styles, onFocus, onBlur, aria-label, and aria-expanded to any tooltip trigger button.
