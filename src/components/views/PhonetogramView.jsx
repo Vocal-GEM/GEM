@@ -94,15 +94,17 @@ const PhonetogramView = () => {
                 <div className="flex gap-3">
                     <button
                         onClick={handleClear}
-                        className="p-3 rounded-xl bg-slate-800 text-slate-400 hover:text-red-400 hover:bg-slate-700 transition-colors"
+                        className="p-3 rounded-xl bg-slate-800 text-slate-400 hover:text-red-400 hover:bg-slate-700 transition-colors focus-visible:ring-2 focus-visible:outline-none"
                         title={t('phonetogram.controls.clear')}
+                        aria-label={t('phonetogram.controls.clear')}
                     >
                         <Trash2 size={20} />
                     </button>
                     <button
                         onClick={handleSave}
-                        className="p-3 rounded-xl bg-slate-800 text-slate-400 hover:text-green-400 hover:bg-slate-700 transition-colors"
+                        className="p-3 rounded-xl bg-slate-800 text-slate-400 hover:text-green-400 hover:bg-slate-700 transition-colors focus-visible:ring-2 focus-visible:outline-none"
                         title={t('phonetogram.controls.save')}
+                        aria-label={t('phonetogram.controls.save')}
                     >
                         <Save size={20} />
                     </button>
