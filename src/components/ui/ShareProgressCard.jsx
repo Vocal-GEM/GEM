@@ -28,7 +28,8 @@ const ShareProgressCard = () => {
 
     const handleTwitterShare = () => {
         const text = encodeURIComponent(generateShareText());
-        window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+        // Sentinel: Added 'noopener,noreferrer' window features to prevent reverse tabnabbing vulnerabilities
+        window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank', 'noopener,noreferrer');
     };
 
     return (
