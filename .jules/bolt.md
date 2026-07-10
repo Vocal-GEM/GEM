@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+# BOLT'S JOURNAL - CRITICAL LEARNINGS ONLY
+## 2025-05-21 - Fix requestAnimationFrame Anti-Pattern
+**Learning:** Many components still use raw `requestAnimationFrame`, causing unnecessary layouts and high CPU usage. The centralized `RenderCoordinator` singleton should be used via `renderCoordinator.subscribe(id, callback, priority)` to reduce CPU overhead during high-frequency parent component updates.
+**Action:** Replaced raw `requestAnimationFrame` in visualizer components (`RegisterGauge`, `TouchDetector`, `FlowFinisher`, `LTASPlot`, `VowelSpacePlot`, `MPTTracker`, `SZRatio`, `VowelAnalysis`, `HighResSpectrogram`, `DynamicOrb`) with `renderCoordinator.subscribe` to batch animations.

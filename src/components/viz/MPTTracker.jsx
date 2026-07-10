@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Timer, Play, Square, RotateCcw } from 'lucide-react';
 
 const MPTTracker = ({ dataRef, isActive }) => {
@@ -9,7 +10,7 @@ const MPTTracker = ({ dataRef, isActive }) => {
     const [autoMode, setAutoMode] = useState(true);
 
     const startTimeRef = useRef(null);
-    const animationRef = useRef(null);
+    const componentId = useId();
 
     useEffect(() => {
         if (!autoMode || !isActive) return;
@@ -37,22 +38,18 @@ const MPTTracker = ({ dataRef, isActive }) => {
                     }
                 }
             }
-            animationRef.current = requestAnimationFrame(checkAudio);
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'mpt-tracker',
-                checkAudio,
-                renderCoordinator.PRIORITY.LOW
-            );
-        });
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            checkAudio,
+            renderCoordinator.PRIORITY.LOW
+        );
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
-    }, [autoMode, isActive, isRecording, threshold, dataRef]);
+    }, [autoMode, isActive, isRecording, threshold, dataRef, componentId]);
 
     useEffect(() => {
         let interval;
