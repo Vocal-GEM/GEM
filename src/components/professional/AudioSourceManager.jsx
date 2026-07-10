@@ -8,6 +8,7 @@ const AudioSourceManager = ({ onSourceChange }) => {
 
     useEffect(() => {
         checkPermissionAndEnumerate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const checkPermissionAndEnumerate = async () => {
