@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-21 - Unmemoized Static UI Components
+**Learning:** Pure UI components like `MetricCard` that take scalar props (`label`, `value`, `unit`, etc.) were frequently re-rendering when their parent components (like `AcousticAnalysisView`) re-rendered due to unrelated state updates or polling.
+**Action:** Always wrap static/pure leaf components with `React.memo` (and explicitly set `displayName`) to short-circuit the virtual DOM reconciliation process and reduce unnecessary CPU overhead in dashboard views.
