@@ -16,7 +16,8 @@ const PitchExploration = ({ onComplete }) => {
                     <a
                         href="https://tunerninja.com/"
                         target="_blank"
-                        rel="noreferrer"
+                        /* Sentinel: Added rel="noopener noreferrer" to prevent reverse tabnabbing vulnerabilities */
+                        rel="noopener noreferrer"
                         className="text-pink-400 hover:underline flex items-center gap-1"
                     >
                         Tuner Ninja <ExternalLink size={12} />
