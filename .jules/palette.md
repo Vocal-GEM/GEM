@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-07-10 - Keyboard Navigation in IntonationTrainer
+**Learning:** Found that custom media control buttons (like History toggle, Next/Prev, Play target, and Reset) in the IntonationTrainer visualization lacked proper ARIA labels and focus visibility states. Since these tools rely on repetitive testing, robust keyboard focus and labels are essential for users relying on assistive technologies or keyboard shortcuts.
+**Action:** Added `aria-label`, `aria-expanded`, `aria-live`, and explicit `focus-visible:ring-2 focus-visible:outline-none` classes to these icon-only and compact buttons. Moving forward, will ensure that all custom control panels in visualization components include these accessibility attributes.
