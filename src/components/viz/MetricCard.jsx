@@ -1,7 +1,9 @@
 
+import { memo } from 'react';
 import { Info } from 'lucide-react';
 
-const MetricCard = ({ label, value, unit, status = 'neutral', description, details }) => {
+// Bolt Optimization: Added React.memo to prevent unnecessary virtual DOM reconciliation and reduce CPU overhead during high-frequency updates.
+const MetricCard = memo(({ label, value, unit, status = 'neutral', description, details }) => {
     const statusColors = {
         good: 'bg-green-500/10 border-green-500/50 text-green-400',
         warning: 'bg-yellow-500/10 border-yellow-500/50 text-yellow-400',
@@ -41,6 +43,8 @@ const MetricCard = ({ label, value, unit, status = 'neutral', description, detai
             </div>
         </div>
     );
-};
+});
+
+MetricCard.displayName = 'MetricCard';
 
 export default MetricCard;
