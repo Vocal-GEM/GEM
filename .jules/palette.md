@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-05-20 - Icon-Only Button Accessibility
+**Learning:** Icon-only buttons (like Zoom In/Out, Minimize/Maximize) in overlay controls are visually clear to sighted users but completely opaque to screen readers without ARIA labels. They also often lack focus rings, making keyboard navigation difficult.
+**Action:** When adding icon-only buttons, always include descriptive `aria-label` attributes and explicit focus styles (e.g., `focus-visible:ring-2 focus-visible:outline-none`) to ensure accessibility for all users.
