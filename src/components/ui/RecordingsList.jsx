@@ -174,8 +174,8 @@ const RecordingsList = () => {
                                         autoFocus
                                         onKeyDown={(e) => e.key === 'Enter' && saveEdit(recording)}
                                     />
-                                    <button onClick={() => saveEdit(recording)} className="p-1 hover:text-green-400 text-slate-400 focus-visible:ring-2 focus-visible:outline-none" aria-label="Save edit"><Check size={16} /></button>
-                                    <button onClick={cancelEdit} className="p-1 hover:text-red-400 text-slate-400 focus-visible:ring-2 focus-visible:outline-none" aria-label="Cancel edit"><X size={16} /></button>
+                                    <button onClick={() => saveEdit(recording)} className="p-1 hover:text-green-400 text-slate-400"><Check size={16} /></button>
+                                    <button onClick={cancelEdit} className="p-1 hover:text-red-400 text-slate-400"><X size={16} /></button>
                                 </div>
                             ) : (
                                 <div>
