@@ -1,21 +1,24 @@
 
+import React from 'react';
 import { Info } from 'lucide-react';
 
-const MetricCard = ({ label, value, unit, status = 'neutral', description, details }) => {
-    const statusColors = {
-        good: 'bg-green-500/10 border-green-500/50 text-green-400',
-        warning: 'bg-yellow-500/10 border-yellow-500/50 text-yellow-400',
-        bad: 'bg-red-500/10 border-red-500/50 text-red-400',
-        neutral: 'bg-slate-800/50 border-slate-700 text-slate-300'
-    };
+const statusColors = {
+    good: 'bg-green-500/10 border-green-500/50 text-green-400',
+    warning: 'bg-yellow-500/10 border-yellow-500/50 text-yellow-400',
+    bad: 'bg-red-500/10 border-red-500/50 text-red-400',
+    neutral: 'bg-slate-800/50 border-slate-700 text-slate-300'
+};
 
-    const statusDots = {
-        good: 'bg-green-500',
-        warning: 'bg-yellow-500',
-        bad: 'bg-red-500',
-        neutral: 'bg-slate-500'
-    };
+const statusDots = {
+    good: 'bg-green-500',
+    warning: 'bg-yellow-500',
+    bad: 'bg-red-500',
+    neutral: 'bg-slate-500'
+};
 
+const MetricCard = React.memo(({ label, value, unit, status = 'neutral', description, details }) => {
+    // Bolt Optimization: Wrapped static leaf component in React.memo and moved constant objects outside render.
+    // Expected impact: Prevents unnecessary virtual DOM reconciliation during high-frequency parent updates (e.g., live analysis views).
     return (
         <div className={`rounded-xl p-4 border transition-colors ${statusColors[status]}`}>
             <div className="flex items-start justify-between mb-2">
@@ -41,6 +44,8 @@ const MetricCard = ({ label, value, unit, status = 'neutral', description, detai
             </div>
         </div>
     );
-};
+});
+
+MetricCard.displayName = 'MetricCard';
 
 export default MetricCard;
