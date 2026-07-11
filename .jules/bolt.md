@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-07-11 - Memoization of High-Frequency Leaf Components
+**Learning:** Components like `MetricCard` are used heavily in complex views (like `AnalysisView` and `ClinicalAssessmentView`) which re-render frequently (e.g., during playback or analysis updates). Without memoization, these scalar-prop leaf components unnecessarily reconcile the virtual DOM on every parent update, causing CPU overhead.
+**Action:** Use `React.memo` (with `displayName`) for static UI leaf components that only take scalar props to prevent unnecessary re-renders.
