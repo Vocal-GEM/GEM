@@ -154,7 +154,8 @@ const RecordingsList = () => {
                         <button
                             id={index === 0 ? 'recording-play-btn' : undefined}
                             onClick={() => handlePlay(recording)}
-                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${playingId === recording.id
+                            aria-label={playingId === recording.id ? "Pause recording" : "Play recording"}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors flex-shrink-0 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-violet-500 ${playingId === recording.id
                                 ? 'bg-violet-500 text-white shadow-lg shadow-violet-500/30'
                                 : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                                 }`}
@@ -174,8 +175,8 @@ const RecordingsList = () => {
                                         autoFocus
                                         onKeyDown={(e) => e.key === 'Enter' && saveEdit(recording)}
                                     />
-                                    <button onClick={() => saveEdit(recording)} className="p-1 hover:text-green-400 text-slate-400"><Check size={16} /></button>
-                                    <button onClick={cancelEdit} className="p-1 hover:text-red-400 text-slate-400"><X size={16} /></button>
+                                    <button onClick={() => saveEdit(recording)} aria-label="Save recording name" className="p-1 hover:text-green-400 text-slate-400 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-violet-500 rounded"><Check size={16} /></button>
+                                    <button onClick={cancelEdit} aria-label="Cancel editing" className="p-1 hover:text-red-400 text-slate-400 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-violet-500 rounded"><X size={16} /></button>
                                 </div>
                             ) : (
                                 <div>
@@ -184,7 +185,8 @@ const RecordingsList = () => {
                                         <button
                                             id={index === 0 ? 'recording-edit-btn' : undefined}
                                             onClick={() => startEditing(recording)}
-                                            className="opacity-0 group-hover:opacity-100 p-1 text-slate-500 hover:text-violet-400 transition-opacity"
+                                            aria-label="Edit recording name"
+                                            className="opacity-0 group-hover:opacity-100 p-1 text-slate-500 hover:text-violet-400 transition-opacity focus-visible:opacity-100 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-violet-500 rounded"
                                         >
                                             <Edit2 size={12} />
                                         </button>
@@ -203,14 +205,16 @@ const RecordingsList = () => {
                             <button
                                 onClick={() => handleDownload(recording)}
                                 title="Download"
-                                className="p-2 text-slate-400 hover:text-violet-400 hover:bg-slate-700/50 rounded-lg transition-colors"
+                                aria-label="Download recording"
+                                className="p-2 text-slate-400 hover:text-violet-400 hover:bg-slate-700/50 rounded-lg transition-colors focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-violet-500"
                             >
                                 <Download size={18} />
                             </button>
                             <button
                                 onClick={() => handleDelete(recording.id)}
                                 title="Delete"
-                                className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700/50 rounded-lg transition-colors"
+                                aria-label="Delete recording"
+                                className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700/50 rounded-lg transition-colors focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-violet-500"
                             >
                                 <Trash2 size={18} />
                             </button>
