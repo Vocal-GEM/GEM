@@ -29,6 +29,33 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     const genderRanges = settings.genderRanges || defaultRanges;
 
+    // Bolt Optimization: Cached dimensions using ResizeObserver to prevent layout thrashing in animation loop
+    const dimensionsRef = useRef({ width: 0, height: 0 });
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const updateDimensions = () => {
+            const parent = canvas.parentElement || canvas;
+            const rect = parent.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+
+            // Only update if dimensions changed
+            if (dimensionsRef.current.width !== rect.width || dimensionsRef.current.height !== rect.height) {
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                dimensionsRef.current = { width: rect.width, height: rect.height };
+            }
+        };
+
+        const observer = new ResizeObserver(updateDimensions);
+        observer.observe(canvas.parentElement || canvas);
+        updateDimensions(); // Initial call
+
+        return () => observer.disconnect();
+    }, []);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -67,13 +94,13 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
+            const { width, height } = dimensionsRef.current;
+            if (width === 0 || height === 0) return; // Wait for initial resize
+
+            // Reset transform before clearing
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.scale(dpr, dpr);
 
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
