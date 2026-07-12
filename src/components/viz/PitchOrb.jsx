@@ -29,10 +29,31 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     const genderRanges = settings.genderRanges || defaultRanges;
 
+    const rectRef = useRef(null);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
+
+        // Bolt Optimization: Use ResizeObserver to track dimensions and avoid getBoundingClientRect layout thrashing
+        // Expected impact: Prevents synchronous reflows inside the renderCoordinator loop, reducing main thread blocking
+        const observer = new ResizeObserver((entries) => {
+            if (entries[0]) {
+                // target provides the actual bounds similar to getBoundingClientRect (without offsets)
+                // Using borderBoxSize or contentRect directly doesn't give us viewport position, but
+                // PitchOrb doesn't use left/top in its render loop anyway. It only uses width/height.
+                // We observe the canvas itself.
+                rectRef.current = {
+                    width: entries[0].contentRect.width,
+                    height: entries[0].contentRect.height
+                };
+            }
+        });
+
+        if (canvas) {
+            observer.observe(canvas);
+        }
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -65,11 +86,17 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         };
 
         const loop = () => {
-            if (!canvas) return; // Guard against cleanup
+            if (!canvas || !rectRef.current) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
+            const rect = rectRef.current;
+            const expectedWidth = Math.round(rect.width * dpr);
+            const expectedHeight = Math.round(rect.height * dpr);
+
+            // Setting canvas dimensions automatically clears the canvas and resets context state.
+            // Even if dimensions haven't changed, we must do this to maintain parity with the old behavior
+            // which relied on setting width/height every frame to clear state.
+            canvas.width = expectedWidth;
+            canvas.height = expectedHeight;
             ctx.scale(dpr, dpr);
 
             const width = rect.width;
@@ -77,7 +104,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             const centerX = width / 2;
             const centerY = height / 2;
 
-            ctx.clearRect(0, 0, width, height);
+            ctx.clearRect(0, 0, width, height); // clearRect operates in scaled space
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -166,6 +193,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            observer.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 

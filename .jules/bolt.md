@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-24 - Layout Thrashing in PitchOrb loop
+**Learning:** Calling `getBoundingClientRect()` inside `renderCoordinator` high-frequency animation loops causes synchronous reflows (layout thrashing). Replacing it with a `ResizeObserver` that caches dimensions avoids this. However, setting `canvas.width` automatically clears the context state, so even if the dimensions haven't changed, setting it every frame is necessary if the old loop relied on this implicit clear (otherwise visuals smear). Also, `ResizeObserverEntry.contentRect` provides padding-relative dimensions without viewport offsets, so it can only be used for raw width/height, not viewport-relative coordinates. And always use `Math.round()` on scaled dimensions to avoid floating point truncation errors.
+**Action:** Use `ResizeObserver` for canvas dimension caching, but be careful to maintain implicit canvas clears and be aware of coordinate differences compared to `getBoundingClientRect()`.
