@@ -86,12 +86,14 @@ const InspirationBoard = ({ onComplete }) => {
                                         onClick={() => toggleTopPick(voice.id)}
                                         className={`p-2 rounded-full transition-all ${voice.isTopPick ? 'bg-yellow-500/20 text-yellow-400' : 'text-slate-600 hover:text-yellow-400 hover:bg-slate-800'}`}
                                         title="Mark as Top Pick for imitation"
+                                        aria-label={voice.isTopPick ? `Remove ${voice.name} from top picks` : `Add ${voice.name} to top picks`}
                                     >
                                         <Star size={20} fill={voice.isTopPick ? "currentColor" : "none"} />
                                     </button>
                                     <button
                                         onClick={() => setVoices(prev => prev.filter(v => v.id !== voice.id))}
                                         className="p-2 text-slate-600 hover:text-red-400 transition-colors"
+                                        aria-label={`Remove ${voice.name}`}
                                     >
                                         <Trash2 size={16} />
                                     </button>
