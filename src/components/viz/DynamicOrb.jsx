@@ -4,6 +4,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Diamond, Bug, Activity, Sliders, Gauge } from 'lucide-react';
 import { OrbitControls } from '@react-three/drei';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { useSettings } from '../../context/SettingsContext';
 import OrbLegend from './OrbLegend';
 import OrbMetricsOverlay from './OrbMetricsOverlay';
@@ -401,7 +402,6 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
   const textRef = useRef(null);
 
   useEffect(() => {
-    let frameId;
     const loop = () => {
       if (dataRef.current) {
         const { pitch, volume } = dataRef.current;
@@ -414,10 +414,14 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
           textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
         }
       }
-      frameId = requestAnimationFrame(loop);
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
+
+    // Bolt Optimization: Replaced raw requestAnimationFrame with RenderCoordinator
+    // Expected impact: Reduces CPU overhead by consolidating rendering loops
+    const componentId = `safe-mode-${Math.random().toString(36).substr(2, 9)}`;
+    const unsubscribe = renderCoordinator.subscribe(componentId, loop, renderCoordinator.PRIORITY.HIGH);
+
+    return () => unsubscribe();
   }, [dataRef]);
 
   return (
