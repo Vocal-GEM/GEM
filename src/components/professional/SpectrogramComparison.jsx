@@ -10,7 +10,6 @@ const SpectrogramComparison = () => {
     const [audioUrl2, setAudioUrl2] = useState(null);
 
         const [zoomLevel, setZoomLevel] = useState(1);
-    const [deviceId, setDeviceId] = useState('');
 
     const handleFileUpload = (e, index) => {
         const file = e.target.files[0];

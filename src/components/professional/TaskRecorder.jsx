@@ -5,8 +5,7 @@ const TaskRecorder = ({ task, onComplete }) => {
     const [state, setState] = useState('idle'); // idle, recording, processing, done
     const [recordingTime, setRecordingTime] = useState(0);
     const [audioUrl, setAudioUrl] = useState(null);
-    const [audioBlob, setAudioBlob] = useState(null);
-    const [isPlaying, setIsPlaying] = useState(false);
+        const [isPlaying, setIsPlaying] = useState(false);
     const [error, setError] = useState(null);
 
     const mediaRecorderRef = useRef(null);
@@ -65,7 +64,7 @@ const TaskRecorder = ({ task, onComplete }) => {
                 const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
                 const url = URL.createObjectURL(blob);
                 setAudioUrl(url);
-                setAudioBlob(blob);
+
                 setState('done');
                 onComplete(task.id, blob); // Notify parent immediately
             };
@@ -91,7 +90,7 @@ const TaskRecorder = ({ task, onComplete }) => {
     const resetRecording = () => {
         if (audioUrl) URL.revokeObjectURL(audioUrl);
         setAudioUrl(null);
-        setAudioBlob(null);
+
         setState('idle');
         setRecordingTime(0);
     };
