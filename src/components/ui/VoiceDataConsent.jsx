@@ -76,6 +76,7 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                     </div>
                     <button
                         onClick={onClose}
+                        aria-label="Close voice data consent dialog"
                         className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
                     >
                         <X size={20} />
@@ -133,6 +134,9 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                                     <span className="text-sm font-medium text-white">Enable data collection</span>
                                 </div>
                                 <button
+                                    role="switch"
+                                    aria-checked={currentConsent.enabled}
+                                    aria-label="Enable data collection"
                                     onClick={() => handleToggle('enabled')}
                                     className={`w-12 h-6 rounded-full transition-colors relative ${currentConsent.enabled ? 'bg-green-500' : 'bg-slate-700'
                                         }`}
@@ -162,6 +166,9 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                                             <span className="text-sm text-white">Allow anonymous upload</span>
                                         </div>
                                         <button
+                                            role="switch"
+                                            aria-checked={currentConsent.anonymousUpload}
+                                            aria-label="Allow anonymous upload"
                                             onClick={() => handleToggle('anonymousUpload')}
                                             className={`w-12 h-6 rounded-full transition-colors relative ${currentConsent.anonymousUpload ? 'bg-blue-500' : 'bg-slate-700'
                                                 }`}
@@ -186,12 +193,17 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                                             <span className="text-sm text-white">Include self-reported gender</span>
                                             <button
                                                 onClick={() => setShowDetails(!showDetails)}
+                                                aria-label={showDetails ? "Hide information about gender label" : "Show information about gender label"}
+                                                aria-expanded={showDetails}
                                                 className="text-slate-400 hover:text-white"
                                             >
                                                 <HelpCircle size={14} />
                                             </button>
                                         </div>
                                         <button
+                                            role="switch"
+                                            aria-checked={currentConsent.includeGenderLabel}
+                                            aria-label="Include self-reported gender"
                                             onClick={() => handleToggle('includeGenderLabel')}
                                             className={`w-12 h-6 rounded-full transition-colors relative ${currentConsent.includeGenderLabel ? 'bg-purple-500' : 'bg-slate-700'
                                                 }`}
