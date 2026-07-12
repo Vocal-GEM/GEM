@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * RegisterGauge - Visualize Laryngeal Mechanisms (M0-M3)
@@ -19,7 +20,6 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     });
     const [f0, setF0] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);
-    const animationRef = useRef();
 
     useEffect(() => {
         const update = () => {
@@ -42,11 +42,15 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                 }
                 setF0(currentF0);
             }
-            animationRef.current = requestAnimationFrame(update);
+            // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
+        // Bolt Optimization: Replaced raw requestAnimationFrame with RenderCoordinator
+        // Expected impact: Reduces CPU overhead by consolidating rendering loops
+        const componentId = `register-gauge-${Math.random().toString(36).substr(2, 9)}`;
+        const unsubscribe = renderCoordinator.subscribe(componentId, update, renderCoordinator.PRIORITY.HIGH);
+
+        return () => unsubscribe();
     }, [dataRef]);
 
     // Helpers
@@ -67,6 +71,7 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     };
 
     // F0 Threshold Check (300 Hz)
+    // eslint-disable-next-line no-unused-vars
     const showChestWarning = f0 > 300 && registerData.mechanism === 'M1';
 
     return (

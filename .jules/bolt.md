@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-12 - Replaced raw requestAnimationFrame with RenderCoordinator
+**Learning:** Found scattered usages of `requestAnimationFrame` for visualization loops (`RegisterGauge.jsx`, `DynamicOrb.jsx` `SafeModeVisualizer`). This causes multiple independent reflows and repaints, increasing CPU overhead and thrashing the layout, negating the benefits of the `RenderCoordinator` singleton.
+**Action:** Replaced these standalone `requestAnimationFrame` loops with `renderCoordinator.subscribe()` to centralize scheduling, enforce priority levels, and reduce overhead.
