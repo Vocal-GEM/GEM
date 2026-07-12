@@ -31,8 +31,9 @@ export const InsightCard = ({ insight, onDismiss }) => {
                                     size="icon"
                                     className="h-6 w-6 -mr-2 -mt-2 text-blue-400 hover:text-blue-600 hover:bg-blue-100/50"
                                     onClick={onDismiss}
+                                    aria-label="Dismiss insight"
                                 >
-                                    <X size={16} />
+                                    <X size={16} aria-hidden="true" />
                                 </Button>
                             </div>
 
