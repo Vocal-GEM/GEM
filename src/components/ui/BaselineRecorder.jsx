@@ -213,6 +213,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                 {/* Mic Quality Tips Button */}
                 <button
                     onClick={() => setShowMicTips(true)}
+                    aria-label="View recording tips"
                     className="absolute top-0 right-0 p-1.5 text-slate-400 hover:text-pink-400 hover:bg-slate-700/50 rounded-lg transition-colors"
                     title="Recording Tips"
                 >
@@ -243,6 +244,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                 {state === 'idle' && (
                     <button
                         onClick={startRecording}
+                        aria-label="Start recording baseline"
                         className="w-20 h-20 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 
                                    flex items-center justify-center shadow-lg shadow-pink-500/20 
                                    hover:shadow-pink-500/40 hover:scale-105 transition-all group"
@@ -256,6 +258,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                         <div className="relative">
                             <button
                                 onClick={stopRecording}
+                                aria-label="Stop recording baseline"
                                 className="w-20 h-20 rounded-full bg-red-500 animate-pulse
                                            flex items-center justify-center shadow-lg shadow-red-500/30 
                                            hover:bg-red-600 transition-colors relative z-10"
@@ -290,6 +293,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={togglePlayback}
+                                aria-label={isPlaying ? "Pause playback" : "Play recording"}
                                 className="w-14 h-14 rounded-full bg-gradient-to-r from-green-500 to-emerald-500
                                            flex items-center justify-center shadow-lg shadow-green-500/20 
                                            hover:shadow-green-500/40 hover:scale-105 transition-all"
@@ -302,6 +306,7 @@ const BaselineRecorder = ({ instruction, promptText, onRecordingComplete }) => {
                             </button>
                             <button
                                 onClick={resetRecording}
+                                aria-label="Discard and record again"
                                 className="w-12 h-12 rounded-full bg-slate-700 
                                            flex items-center justify-center 
                                            hover:bg-slate-600 transition-colors"
