@@ -31,7 +31,8 @@ const HealthItem = ({ icon: Icon, label, status, message, onFix, isFixing }) => 
                 <button
                     onClick={onFix}
                     disabled={isFixing}
-                    className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-white transition-colors disabled:opacity-50"
+                    className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:outline-none rounded-lg text-xs font-bold text-white transition-colors disabled:opacity-50"
+                    aria-label={`Fix ${label} issue`}
                 >
                     {isFixing ? <RefreshCw className="w-3 h-3 animate-spin" /> : 'Fix'}
                 </button>
