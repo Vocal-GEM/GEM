@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-07-13 - Best Practice: Secure Logging
+**Vulnerability:** Several backend API routes (e.g., in `data.py`) were using `print(f"Error: {e}")` instead of proper application logging framework. While the endpoints correctly returned generic error messages (`{"error": "Sync failed"}`) to the client (meaning there was no active client-side information leakage), relying on standard output for exceptions bypasses centralized log management and monitoring tools.
+**Learning:** Even when client-side responses are sanitized, server-side exceptions must be properly routed through the application's logging framework (e.g., `current_app.logger`) to ensure security events, database failures, and potential attacks are reliably captured, formatted, and monitored by production infrastructure.
+**Prevention:** Always use `current_app.logger.error(f"Error: {str(e)}")` rather than `print()` in Flask exception handlers to ensure all errors are properly recorded and actionable for security audits.
