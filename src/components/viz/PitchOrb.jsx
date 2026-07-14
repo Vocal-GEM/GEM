@@ -29,10 +29,51 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     const genderRanges = settings.genderRanges || defaultRanges;
 
+    // Cache dimensions to avoid layout thrashing
+    const dimensionsRef = useRef({ width: 0, height: 0 });
+
+    // Handle resize efficiently
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const updateDimensions = () => {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+
+            // Update physical dimensions only if changed
+            const newWidth = Math.round(rect.width * dpr);
+            const newHeight = Math.round(rect.height * dpr);
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+
+                // Update logical dimensions for the loop
+                dimensionsRef.current = {
+                    width: rect.width,
+                    height: rect.height
+                };
+
+                // Restore scale after resize clears canvas
+                const ctx = canvas.getContext('2d');
+                ctx.scale(dpr, dpr);
+            }
+        };
+
+        const observer = new ResizeObserver(() => {
+            requestAnimationFrame(updateDimensions);
+        });
+        observer.observe(canvas);
+        updateDimensions();
+
+        return () => observer.disconnect();
+    }, []);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
+        // dpr is no longer needed here as scaling is handled in the ResizeObserver
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,13 +108,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            const { width, height } = dimensionsRef.current;
+            if (width === 0 || height === 0) return;
             const centerX = width / 2;
             const centerY = height / 2;
 
