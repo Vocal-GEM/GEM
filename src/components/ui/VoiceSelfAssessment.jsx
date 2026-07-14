@@ -314,6 +314,7 @@ const VoiceSelfAssessment = ({ onClose }) => {
                     <div className="text-center">
                         <button
                             onClick={stopRecording}
+                            aria-label="Stop recording"
                             className="w-20 h-20 mx-auto rounded-full bg-red-500 animate-pulse flex items-center justify-center mb-3"
                         >
                             <Square className="w-8 h-8 text-white" fill="white" />
@@ -327,6 +328,7 @@ const VoiceSelfAssessment = ({ onClose }) => {
                     <div className="flex items-center justify-center gap-3">
                         <button
                             onClick={togglePlayback}
+                            aria-label={isPlaying ? "Pause playback" : "Play recording"}
                             className="p-3 rounded-full bg-gradient-to-r from-green-500 to-emerald-500"
                         >
                             {isPlaying ? <Pause className="w-5 h-5 text-white" /> : <Play className="w-5 h-5 text-white ml-0.5" />}
@@ -334,6 +336,7 @@ const VoiceSelfAssessment = ({ onClose }) => {
                         <span className="text-slate-400 font-mono">{formatTime(recordingTime)}</span>
                         <button
                             onClick={resetRecording}
+                            aria-label="Reset recording"
                             className="p-3 rounded-full bg-slate-700 hover:bg-slate-600"
                         >
                             <RotateCcw className="w-5 h-5 text-slate-300" />
