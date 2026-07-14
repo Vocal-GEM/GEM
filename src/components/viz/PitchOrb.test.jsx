@@ -2,7 +2,7 @@ import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import PitchOrb from './PitchOrb';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import React from 'react';
+
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
@@ -22,6 +22,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     stroke: vi.fn(),
     fillText: vi.fn(),
     scale: vi.fn(),
+    setTransform: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
@@ -30,7 +31,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+globalThis.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('PitchOrb', () => {
     let dataRef;
@@ -61,7 +62,7 @@ describe('PitchOrb', () => {
         await new Promise(resolve => setTimeout(resolve, 0));
 
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
-        const [id, callback] = renderCoordinator.subscribe.mock.calls[0];
+        const [_id, callback] = renderCoordinator.subscribe.mock.calls[0];
 
         // Execute the callback
         callback();
