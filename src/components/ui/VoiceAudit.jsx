@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Mic, Square, Play, Plus, Trash2, Save, FileText } from 'lucide-react';
 import { useAudio } from '../../context/AudioContext';
 
@@ -146,8 +146,8 @@ const VoiceAudit = ({ onComplete }) => {
                                 autoFocus
                                 onKeyDown={(e) => e.key === 'Enter' && handleAddMode()}
                             />
-                            <button onClick={handleAddMode} className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500"><Save size={16} /></button>
-                            <button onClick={() => setIsAddingMode(false)} className="p-2 text-slate-400 hover:text-white"><Trash2 size={16} /></button>
+                            <button onClick={handleAddMode} className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500" aria-label="Save mode"><Save size={16} /></button>
+                            <button onClick={() => setIsAddingMode(false)} className="p-2 text-slate-400 hover:text-white" aria-label="Cancel adding mode"><Trash2 size={16} /></button>
                         </div>
                     ) : (
                         <button
