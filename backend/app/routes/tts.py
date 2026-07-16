@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 import os
+import re
 import requests
 from ..extensions import limiter
 
@@ -24,6 +25,10 @@ def synthesize_speech():
     voice_id = data.get('voiceId', '21m00Tcm4TlvDq8ikWAM')  # Default Rachel
     model_id = data.get('modelId', 'eleven_turbo_v2_5')
     
+    # Security: Prevent SSRF/Path Traversal
+    if not re.match(r'^[a-zA-Z0-9_-]+$', voice_id):
+        return jsonify({"error": "Invalid voiceId format"}), 400
+
     if not text:
         return jsonify({"error": "No text provided"}), 400
 
