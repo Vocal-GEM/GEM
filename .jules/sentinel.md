@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-07-20 - Server-Side Request Forgery in TTS API
+**Vulnerability:** The `/api/tts/synthesize` endpoint in `backend/app/routes/tts.py` interpolated the user-provided `voiceId` directly into an outgoing URL to the ElevenLabs API, allowing SSRF and path traversal (e.g. `../../../admin`).
+**Learning:** Never trust user input when constructing backend requests to external APIs. Path traversal applies not just to local filesystems but also to remote API URLs.
+**Prevention:** Apply a strict regex allowlist (e.g., `^[a-zA-Z0-9_-]+$`) to any path segment derived from user input before incorporating it into a URL.
