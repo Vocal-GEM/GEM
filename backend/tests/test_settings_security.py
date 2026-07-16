@@ -23,7 +23,6 @@ class TestSettingsSecurity(unittest.TestCase):
         self.app = Flask(__name__)
         self.app.config['SECRET_KEY'] = 'test'
         self.app.register_blueprint(settings.settings_bp, url_prefix='/api/settings')
-        self.app.register_blueprint(settings.settings_bp)
 
         self.login_manager = LoginManager()
         self.login_manager.init_app(self.app)
@@ -85,7 +84,7 @@ class TestSettingsSecurity(unittest.TestCase):
 
             # Security Check: The sensitive info should NOT be in the response
             # Currently this assertion is expected to FAIL until we fix the code
-            self.assertNotIn(sensitive_info, response.get_json()['error'])
+            self.assertNotIn(secret_db_error, response.get_json()['error'])
             self.assertEqual(response.get_json()['error'], "An error occurred while saving settings")
             data = json.loads(response.data)
 
@@ -94,7 +93,7 @@ class TestSettingsSecurity(unittest.TestCase):
             self.assertNotIn(secret_db_error, data['error'], "Security Vulnerability: Exception details leaked!")
 
             # 2. The response should be the generic error message
-            self.assertEqual(data['error'], "Failed to update settings")
+            self.assertEqual(data['error'], "An error occurred while saving settings")
 
 if __name__ == '__main__':
     unittest.main()

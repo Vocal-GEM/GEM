@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2026-02-15 - Information Leakage in Settings API
+**Vulnerability:** The `update_settings` endpoint in `backend/app/routes/settings.py` was returning the raw exception string `str(e)` in the JSON response when a database error occurred, which could leak sensitive internal details.
+**Learning:** Returning raw exception messages to the client is a common security anti-pattern that can expose database structure, IP addresses, or stack traces.
+**Prevention:** Catch exceptions, log them securely on the server using `current_app.logger.error()`, and return a generic, user-friendly error message (e.g., "An error occurred while saving settings") to the client. Ensure no duplicate logger definitions exist that might cause NameErrors that circumvent exception handling.
