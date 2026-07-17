@@ -93,16 +93,16 @@ export default function LoadingSpinnerTest() {
                     <div className="border border-slate-700 p-4 rounded bg-slate-800">
                         <p className="text-slate-400 mb-2">Small</p>
                         <LoadingSpinner size="sm" />
-                    </div>
+                    </div>)
                     <div className="border border-slate-700 p-4 rounded bg-slate-800">
                         <p className="text-slate-400 mb-2">Medium</p>
                         <LoadingSpinner size="md" />
-                    </div>
+                    </div>)
                     <div className="border border-slate-700 p-4 rounded bg-slate-800">
                         <p className="text-slate-400 mb-2">Large</p>
                         <LoadingSpinner size="lg" />
-                    </div>
-                </div>
+                    </div>)
+                </div>)
             </section>
 
              <section className="space-y-4">
@@ -114,18 +114,18 @@ export default function LoadingSpinnerTest() {
                     <Button variant="outline">Outline</Button>
                     <Button variant="ghost">Ghost</Button>
                     <Button variant="link">Link</Button>
-                </div>
+                </div>)
                 <div className="flex items-center gap-4 flex-wrap mt-4">
                     <Button isLoading>Loading Default</Button>
                     <Button variant="secondary" isLoading>Loading Secondary</Button>
                     <Button variant="destructive" isLoading>Loading Destructive</Button>
                     <Button variant="outline" isLoading>Loading Outline</Button>
                     <Button size="icon" isLoading><Plus /></Button>
-                </div>
+                </div>)
                 <div className="flex items-center gap-4 flex-wrap mt-4">
                      <Button disabled>Disabled</Button>
                      <Button variant="secondary" disabled>Disabled Secondary</Button>
-                </div>
+                </div>)
             </section>
 
             <section className="space-y-4">
@@ -138,7 +138,7 @@ export default function LoadingSpinnerTest() {
                         actionLabel="Summon Ghost"
                         onAction={() => alert('Boo!')}
                     />
-                </div>
+                </div>)
             </section>
         </div>
       </section>
