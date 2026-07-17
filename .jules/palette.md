@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2024-11-14 - ShadowingExercise Screen Reader Experience
+**Learning:** Found that complex interactable components (like recording widgets) often contain multiple icon-only buttons without text fallbacks. In stateful components, dynamic ARIA labels (e.g., `aria-label={isRecording ? "Stop" : "Start"}`) are critical for screen readers to understand changing actions.
+**Action:** When adding ARIA labels to components with boolean states, ensure the label text dynamically reflects the action the button will perform if clicked.
