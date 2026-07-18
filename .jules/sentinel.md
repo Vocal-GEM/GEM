@@ -75,3 +75,11 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-07-18 - Remove Hardcoded Database Credentials
+**Vulnerability:** Found a hardcoded PostgreSQL production database connection string (including username and password) in `backend/migrate_password_hash.py`.
+**Learning:** Migration scripts or ad-hoc admin scripts are often created quickly and can accidentally include hardcoded secrets instead of relying on environment variables like the main application.
+**Prevention:** Always use environment variables (`os.environ.get()`) for sensitive credentials, even in temporary, ad-hoc, or migration scripts.
+## 2024-07-18 - SSRF Vulnerability in TTS Endpoint
+**Vulnerability:** The `/synthesize` endpoint in `backend/app/routes/tts.py` constructed an external API URL (`f'https://api.elevenlabs.io/v1/text-to-speech/{voice_id}'`) directly from the user-provided `voiceId` parameter without sanitization. An attacker could potentially provide a `voiceId` containing path traversal characters (e.g., `../../`) to manipulate the request path, potentially leading to Server-Side Request Forgery (SSRF) or bypassing intended API restrictions.
+**Learning:** Constructing URLs with un-sanitized user input is a common vector for SSRF or path traversal attacks, even when communicating with trusted third-party APIs.
+**Prevention:** Always URL-encode user-provided input when interpolating it into a URL path, using functions like `urllib.parse.quote(..., safe='')`, to ensure it is treated strictly as a single path segment.

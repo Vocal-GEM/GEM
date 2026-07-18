@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 import os
 import requests
+import urllib.parse
 from ..extensions import limiter
 
 tts_bp = Blueprint('tts', __name__, url_prefix='/api/tts')
@@ -30,7 +31,7 @@ def synthesize_speech():
     try:
         # Forward request to ElevenLabs API
         response = requests.post(
-            f'https://api.elevenlabs.io/v1/text-to-speech/{voice_id}',
+            f'https://api.elevenlabs.io/v1/text-to-speech/{urllib.parse.quote(voice_id, safe="")}',
             headers={
                 'Accept': 'audio/mpeg',
                 'Content-Type': 'application/json',
