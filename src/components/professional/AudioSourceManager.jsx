@@ -28,9 +28,9 @@ const AudioSourceManager = ({ onSourceChange }) => {
             console.error("Microphone permission denied:", err);
             setPermissionGranted(false);
         }
-    }, []);
+    }, [enumerateDevices]);
 
-    const enumerateDevices = async () => {
+    const enumerateDevices = useCallback(async () => {
         try {
             const allDevices = await navigator.mediaDevices.enumerateDevices();
             const audioInputs = allDevices.filter(device => device.kind === 'audioinput');
@@ -44,7 +44,7 @@ const AudioSourceManager = ({ onSourceChange }) => {
         } catch (err) {
             console.error("Error enumerating devices:", err);
         }
-    };
+    }, [selectedDeviceId, onSourceChange]);
 
     const handleDeviceChange = (e) => {
         const deviceId = e.target.value;
