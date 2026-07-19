@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-07-19 - Canvas Animation Thrashing
+**Learning:** Avoid resetting `canvas.width` and `canvas.height` inside `requestAnimationFrame` loops or high-frequency render functions like `PitchOrb` and `PitchVisualizer`. This implicitly clears the canvas buffer and resets the transform matrix, causing synchronous layout thrashing and severe performance degradation.
+**Action:** Use `ResizeObserver` (with debouncing or `requestAnimationFrame`) to update canvas dimensions only when the container size actually changes. Explicitly use `ctx.clearRect()` in the draw loop instead of relying on the resize side-effect.
