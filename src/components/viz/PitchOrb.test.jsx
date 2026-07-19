@@ -21,6 +21,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     fill: vi.fn(),
     stroke: vi.fn(),
     fillText: vi.fn(),
+    setTransform: vi.fn(),
     scale: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
@@ -46,6 +47,20 @@ describe('PitchOrb', () => {
             right: 300,
             bottom: 300,
         }));
+        globalThis.ResizeObserver = class {
+            constructor(callback) {
+                this.callback = callback;
+            }
+            observe(element) {
+                // Immediately trigger callback with mocked dimensions so component renders in test
+                const rect = element.getBoundingClientRect();
+                this.callback([{
+                    contentRect: { width: rect.width, height: rect.height }
+                }]);
+            }
+            unobserve() {}
+            disconnect() {}
+        };
         vi.clearAllMocks();
     });
 
