@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-24 - Accessibility of Exercise Controls
+**Learning:** Icon-heavy exercise interfaces (like back buttons, close buttons, replay audio buttons, or mic recording toggles) often lack `aria-label` attributes, making it impossible for screen reader users to navigate the exercise flows effectively.
+**Action:** When auditing or implementing interactive exercises, systematically verify that all icon-only buttons or dynamic state buttons (e.g., start/stop recording toggles) have descriptive `aria-label`s.
