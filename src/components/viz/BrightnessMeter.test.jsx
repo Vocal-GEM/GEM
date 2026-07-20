@@ -13,9 +13,13 @@ vi.mock('../../services/RenderCoordinator', () => ({
 }));
 
 // Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+vi.mock('lucide-react', async () => {
+    const React = await import('react');
+    const createIcon = (name) => {
+        const Icon = (props) => React.createElement('div', { ...props, 'data-testid': name });
+        Icon.displayName = name;
+        return Icon;
+    };
 
     return {
         Sun: createIcon('Sun'),
@@ -25,31 +29,32 @@ vi.mock('lucide-react', () => {
     };
 });
 
+
 describe('BrightnessMeter', () => {
     let dataRef;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         dataRef = { current: { f2: 0 } };
     });
 
-    afterEach(() => {
+    afterEach(async () => {
         cleanup();
         vi.clearAllMocks();
     });
 
-    it('renders successfully', () => {
+    it('renders successfully', async () => {
         render(<BrightnessMeter dataRef={dataRef} />);
         expect(screen.getByText('Brightness Meter')).toBeDefined();
     });
 
-    it('subscribes to RenderCoordinator', () => {
+    it('subscribes to RenderCoordinator', async () => {
         render(<BrightnessMeter dataRef={dataRef} />);
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
         const [, , priority] = renderCoordinator.subscribe.mock.calls[0];
         expect(priority).toBe(renderCoordinator.PRIORITY.MEDIUM);
     });
 
-    it('updates based on dataRef via coordinator callback', () => {
+    it('updates based on dataRef via coordinator callback', async () => {
         render(<BrightnessMeter dataRef={dataRef} />);
 
         // Get the callback passed to subscribe
@@ -65,6 +70,6 @@ describe('BrightnessMeter', () => {
         });
 
         // The status label becomes "Bright ✓"
-        expect(screen.getByText('Bright ✓')).toBeDefined();
+        const el = await screen.findByText(/Bright.*✓/); expect(el).toBeInTheDocument();
     });
 });
