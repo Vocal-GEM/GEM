@@ -635,10 +635,10 @@ def flag_content():
         data = request.get_json()
 
         flag = ModerationFlag(
-            content_type=data.get('content_type'),
+            content_type=sanitize_html(data.get('content_type', '')),
             content_id=data.get('content_id'),
             flagged_by=current_user.id,
-            reason=data.get('reason'),
+            reason=sanitize_html(data.get('reason', '')),
             status='pending'
         )
 
