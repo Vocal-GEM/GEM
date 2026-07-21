@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-03-24 - Layout Thrashing in Animation Loops
+**Learning:** High-frequency layout thrashing in custom animation loops (like `renderCoordinator`) using synchronous DOM methods like `getBoundingClientRect` causes severe UI lag.
+**Action:** Always cache dimensions and use `ResizeObserver` in canvas or WebGL requestAnimationFrame loops instead of synchronous layout queries.
