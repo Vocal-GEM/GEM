@@ -1,8 +1,8 @@
 import { render, cleanup, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Spectrogram3D from './Spectrogram3D';
-import React from 'react';
-import * as THREE from 'three';
+
+
 
 // Mock Three.js to avoid WebGL context issues in tests
 vi.mock('three', async () => {
