@@ -1,0 +1,49 @@
+/app/src/components/community/SuccessStories.test.jsx
+  4:8  error  Parsing error: Identifier 'React' has already been declared
+
+--
+/app/src/components/ui/JournalForm.test.jsx
+  16:9  error  Parsing error: Unexpected token stopRecording
+
+--
+/app/src/components/ui/LoadingSpinner.test.jsx
+  5:10  error  Parsing error: Identifier 'render' has already been declared
+
+/app/src/components/ui/LoadingSpinnerVerification.jsx
+  86:5  error  Parsing error: Unexpected token return
+
+--
+/app/src/components/ui/QuickActions.jsx
+  81:19  error  Parsing error: Unexpected token `}`. Did you mean `&rbrace;` or `{"}"}`?
+
+--
+/app/src/components/ui/button.test.jsx
+  71:1  error  Parsing error: Unexpected token
+
+--
+/app/src/components/viz/BreathinessMeter.jsx
+  50:11  error  Parsing error: Identifier 'componentId' has already been declared
+
+--
+/app/src/components/viz/BrightnessMeter.test.jsx
+  16:39  error  Parsing error: Expecting Unicode escape sequence \uXXXX
+
+--
+/app/src/components/viz/HighResSpectrogram.jsx
+  62:15  error  Parsing error: Identifier 'ctx' has already been declared
+
+--
+/app/src/components/viz/QualityVisualizer.jsx
+  253:2  error  Parsing error: Unexpected token ;
+
+--
+/app/src/components/viz/SpectralTiltMeter.jsx
+  58:59  error  Parsing error: Unexpected token )
+
+--
+   5:13  warning  'THREE' is defined but never used  no-unused-vars
+  55:9   error    'global' is not defined            no-undef
+  82:16  error    'global' is not defined            no-undef
+  94:16  error    'global' is not defined            no-undef
+  98:13  error    'global' is not defined            no-undef
+  99:26  error    'global' is not defined            no-undef

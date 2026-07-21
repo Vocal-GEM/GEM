@@ -27,9 +27,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const { settings } = useSettings();
 
     // Component ID for RenderCoordinator
-
-    // Reusable buffers to avoid GC
-    // Unique component ID for RenderCoordinator
     const uniqueId = useId();
     const componentId = `spectrogram-highres-${uniqueId}`;
 
@@ -60,9 +57,13 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         // Optimization: Use alpha: false for better performance
         const ctx = canvas.getContext('2d', { alpha: false });
 
+        // Optimization: Use alpha: false for better performance
+        // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
+        const ctx = canvas.getContext('2d', { alpha: false });
 
         const width = canvas.width;
         const height = canvas.height;
+        const scrollSpeed = 2; // px per frame
         const spectrum = dataRef.current.spectrum;
 
         // Ensure buffers are ready and match height
