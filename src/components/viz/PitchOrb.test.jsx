@@ -22,6 +22,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     stroke: vi.fn(),
     fillText: vi.fn(),
     scale: vi.fn(),
+    setTransform: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
@@ -46,6 +47,11 @@ describe('PitchOrb', () => {
             right: 300,
             bottom: 300,
         }));
+        globalThis.ResizeObserver = class {
+            observe() {}
+            unobserve() {}
+            disconnect() {}
+        };
         vi.clearAllMocks();
     });
 
