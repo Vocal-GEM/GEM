@@ -127,7 +127,7 @@ const ClientDashboard = () => {
 
                             <div className="bg-slate-800 p-4 rounded-xl border border-slate-700/50">
                                 <div className="flex items-center gap-2 text-slate-400 mb-2">
-                                    <Activity size={18} /> Progress
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> Progress
                                 </div>
                                 <div className="text-xl font-bold text-green-400">+12% Pitch</div>
                             </div>
