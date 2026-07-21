@@ -27,6 +27,10 @@ def synthesize_speech():
     if not text:
         return jsonify({"error": "No text provided"}), 400
 
+    import re
+    if not isinstance(voice_id, str) or not re.match(r'^[a-zA-Z0-9_-]+$', voice_id):
+        return jsonify({"error": "Invalid voiceId format"}), 400
+
     try:
         # Forward request to ElevenLabs API
         response = requests.post(
