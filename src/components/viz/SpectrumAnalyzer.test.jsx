@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import SpectrumAnalyzer from './SpectrumAnalyzer';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import { lpcAnalyzer } from '../../utils/lpcAnalysis';
-
+import React from 'react';
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
@@ -24,7 +24,7 @@ vi.mock('../../utils/lpcAnalysis', () => ({
 }));
 
 // Mock ResizeObserver
-globalThis.ResizeObserver = vi.fn(function() {
+global.ResizeObserver = vi.fn(function() {
   this.observe = vi.fn();
   this.unobserve = vi.fn();
   this.disconnect = vi.fn();

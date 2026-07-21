@@ -2,7 +2,7 @@ import { render, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import PitchOrb from './PitchOrb';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-
+import React from 'react';
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({

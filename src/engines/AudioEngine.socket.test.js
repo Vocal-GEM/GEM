@@ -80,7 +80,7 @@ Object.defineProperty(global.navigator, 'mediaDevices', {
     writable: true
 });
 
-describe.skip('AudioEngine Socket Integration', () => {
+describe('AudioEngine Socket Integration', () => {
     let engine;
     let mockSocket;
     let socketCallbacks = {};

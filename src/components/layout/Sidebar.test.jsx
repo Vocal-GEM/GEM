@@ -74,7 +74,7 @@ describe('Sidebar Auth Integration', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
         expect(getByText('CloudUser')).toBeInTheDocument();
-        expect(screen.getByTestId('icon-activity')).toBeInTheDocument();
+        expect(getByText('Sign Out')).toBeInTheDocument();
     });
 
     it.skip('opens Login modal on Sign In click', () => {
@@ -89,7 +89,7 @@ describe('Sidebar Auth Integration', () => {
         mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' }, logout: mockLogout });
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
-        fireEvent.click(screen.getByTestId('icon-activity'));
+        fireEvent.click(getByText('Sign Out'));
         expect(mockLogout).toHaveBeenCalled();
     });
 
@@ -103,7 +103,7 @@ describe('Sidebar Auth Integration', () => {
 
         const { getByText } = render(<Sidebar activeView="dashboard" onViewChange={() => { }} />, { wrapper: MockNavigationProvider });
 
-        const mirrorBtn = screen.getByTestId('icon-activity');
+        const mirrorBtn = getByText('Mirror');
         fireEvent.click(mirrorBtn);
 
         expect(openModalSpy).toHaveBeenCalledWith('camera');
