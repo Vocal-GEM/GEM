@@ -4,6 +4,7 @@ import LoadingSpinner from '../ui/LoadingSpinner';
 import { getRecordings, saveRecording, deleteRecording, updateRecording } from '../../services/VoiceJournalService';
 import { recordPractice } from '../../services/StreakService';
 import { JOURNAL_TEMPLATES, getTemplateById, formatTemplateAsEntry } from '../../data/journalTemplates';
+import Toast from '../ui/Toast';
 
 // Waveform Visualization Component
 const WaveformVisualizer = ({ audioBlob, isPlaying, onSeek }) => {
@@ -201,6 +202,7 @@ const VoiceJournalView = () => {
     const [recordings, setRecordings] = useState([]);
     const [isRecording, setIsRecording] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [toast, setToast] = useState(null);
     const [playingId, setPlayingId] = useState(null);
     const [showRecordModal, setShowRecordModal] = useState(false);
     const [notes, setNotes] = useState('');
@@ -314,7 +316,7 @@ const VoiceJournalView = () => {
             }, 1000);
         } catch (err) {
             console.error('Failed to start recording:', err);
-            alert('Could not access microphone. Please check permissions.');
+            setToast({ message: 'Could not access microphone. Please check permissions.', type: 'error' });
         }
     };
 
@@ -754,6 +756,15 @@ const VoiceJournalView = () => {
                         )}
                     </div>
                 </div>
+            )}
+
+            {/* Toast Notification */}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
             )}
         </div>
     );

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import Toast from './Toast';
 import { Headphones, Volume2, VolumeX, Play, Square, Settings } from 'lucide-react';
 
 /**
@@ -12,6 +13,7 @@ const DAFMode = ({ onClose }) => {
     const [volume, setVolume] = useState(0.8);
     const [isMuted, setIsMuted] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
+    const [toast, setToast] = useState(null);
 
     const audioContextRef = useRef(null);
     const streamRef = useRef(null);
@@ -27,6 +29,29 @@ const DAFMode = ({ onClose }) => {
         { label: '300ms', value: 300, description: 'Strong' },
         { label: '500ms', value: 500, description: 'Maximum' }
     ];
+
+    const stopDAF = useCallback(() => {
+        // Stop microphone stream
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current = null;
+        }
+
+        // Disconnect and close audio context
+        if (sourceRef.current) {
+            sourceRef.current.disconnect();
+            sourceRef.current = null;
+        }
+
+        if (audioContextRef.current) {
+            audioContextRef.current.close();
+            audioContextRef.current = null;
+        }
+
+        delayNodeRef.current = null;
+        gainNodeRef.current = null;
+        setIsActive(false);
+    }, []);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -94,32 +119,11 @@ const DAFMode = ({ onClose }) => {
             setIsActive(true);
         } catch (err) {
             console.error('Failed to start DAF:', err);
-            alert('Could not access microphone. Please check permissions.');
+            setToast({ message: 'Could not access microphone. Please check permissions.', type: 'error' });
         }
     };
 
-    const stopDAF = useCallback(() => {
-        // Stop microphone stream
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach(track => track.stop());
-            streamRef.current = null;
-        }
 
-        // Disconnect and close audio context
-        if (sourceRef.current) {
-            sourceRef.current.disconnect();
-            sourceRef.current = null;
-        }
-
-        if (audioContextRef.current) {
-            audioContextRef.current.close();
-            audioContextRef.current = null;
-        }
-
-        delayNodeRef.current = null;
-        gainNodeRef.current = null;
-        setIsActive(false);
-    }, []);
 
     return (
         <div id="daf-modal" className="bg-slate-900 rounded-2xl border border-slate-700 p-6 max-w-md w-full">
@@ -248,6 +252,15 @@ const DAFMode = ({ onClose }) => {
                 >
                     Close
                 </button>
+            )}
+
+            {/* Toast Notification */}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
             )}
         </div>
     );
