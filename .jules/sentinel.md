@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-05-24 - Stored XSS in Moderation Flag
+**Vulnerability:** The `flag_content` endpoint in `backend/app/routes/community.py` accepted user input for the `reason` field and stored it directly in the database without sanitization. An attacker could inject malicious scripts (e.g., `<script>`) that would execute when administrators view the moderation dashboard.
+**Learning:** Even internal-facing administrative dashboards are vulnerable to Stored XSS if user-provided content is not properly sanitized before being stored or rendered.
+**Prevention:** Apply `sanitize_html` (using `bleach`) to all user-submitted text fields before saving them, even for moderation or admin-only records.

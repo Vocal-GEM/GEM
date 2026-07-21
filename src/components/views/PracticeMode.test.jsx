@@ -89,6 +89,6 @@ describe('PracticeMode', () => {
         expect(screen.getByText('Overview')).toBeInTheDocument();
         expect(screen.getByText('Pitch')).toBeInTheDocument();
         // Check for visualization area
-        expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
+        expect(screen.getByText(/The orb shows your overall voice characteristics/i)).toBeInTheDocument();
     });
 });
