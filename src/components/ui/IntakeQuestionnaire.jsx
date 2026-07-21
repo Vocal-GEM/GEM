@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVoiceProfile } from '../../context/VoiceProfileContext';
 import { useTranslation } from 'react-i18next'; // Assuming i18n is available, or remove if not
