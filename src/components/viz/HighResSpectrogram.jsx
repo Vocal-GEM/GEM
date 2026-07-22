@@ -27,12 +27,10 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const { settings } = useSettings();
 
     // Component ID for RenderCoordinator
-    const componentId = useId();
-
-    // Reusable buffers to avoid GC
-    // Unique component ID for RenderCoordinator
     const uniqueId = useId();
     const componentId = `spectrogram-highres-${uniqueId}`;
+
+    // Reusable buffers to avoid GC
 
     // Reusable buffers to avoid garbage collection churn
     const imgDataRef = useRef(null);
@@ -88,8 +86,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         // 2. Draw new column
         // Optimized: Reuse pre-allocated TypedArray
         const maxBin = Math.floor(spectrum.length / 3); // 8kHz cutoff
-
-        for (let y = 0; y < height; y++) {
 
         for (let y = 0; y < height; y++) {
             const freqRatio = (height - 1 - y) / height;
@@ -204,7 +200,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             unsubscribe();
         };
     }, [draw, componentId]);
-    }, [componentId, draw]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position
