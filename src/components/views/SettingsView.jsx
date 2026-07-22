@@ -559,11 +559,12 @@ const SettingsView = () => {
                                 <div className="flex items-center gap-3">
                                     <Clock size={20} className="text-amber-400" />
                                     <div>
-                                        <h3 className="font-bold text-white">Reminder Time</h3>
+                                        <h3 className="font-bold text-white" id="reminder-time-label">Reminder Time</h3>
                                         <p className="text-sm text-slate-400">When should we remind you?</p>
                                     </div>
                                 </div>
                                 <input
+                                    aria-labelledby="reminder-time-label"
                                     type="time"
                                     value={settings.notifications?.reminderTime || '09:00'}
                                     onChange={(e) => updateSettings({
@@ -680,12 +681,13 @@ const SettingsView = () => {
                         <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
                             <div className="flex items-center justify-between mb-3">
                                 <div>
-                                    <h3 className="font-bold text-white">Feedback Volume</h3>
+                                    <h3 className="font-bold text-white" id="feedback-volume-label">Feedback Volume</h3>
                                     <p className="text-sm text-slate-400">Volume level for sound cues.</p>
                                 </div>
                                 <span className="text-cyan-400 font-mono">{Math.round((settings.audio?.feedbackVolume || 0.5) * 100)}%</span>
                             </div>
                             <input
+                                aria-labelledby="feedback-volume-label"
                                 type="range"
                                 min="0"
                                 max="1"

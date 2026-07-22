@@ -423,6 +423,7 @@ const VoiceJournalView = () => {
                         <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
                         <input
                             type="text"
+                            aria-label="Search recordings"
                             placeholder="Search recordings..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
