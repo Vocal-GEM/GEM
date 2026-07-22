@@ -354,10 +354,11 @@ const VocalFoldsView = ({ onClose }) => {
                             {/* Length Control */}
                             <div className="mb-8">
                                 <div className="flex justify-between mb-2">
-                                    <label className="text-sm font-bold text-slate-300">{t('vocalFolds.params.elongation.label')}</label>
+                                    <label id="elongation-label" className="text-sm font-bold text-slate-300">{t('vocalFolds.params.elongation.label')}</label>
                                     <span className="text-xs font-mono text-slate-500">{length}%</span>
                                 </div>
                                 <input
+                                    aria-labelledby="elongation-label"
                                     type="range"
                                     min="0"
                                     max="100"
