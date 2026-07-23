@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-07-23 - Keyboard Accessibility for Tooltips
+**Learning:** Custom tooltip components that rely on `div` wrappers often miss native keyboard events, leaving keyboard-only and screen-reader users unable to access the informational text inside them.
+**Action:** When implementing custom tooltips, always add `tabIndex={0}`, `role="button"`, ARIA properties (`aria-expanded`, `aria-label`), keyboard handlers (Enter, Space, Escape), and visible focus rings (`focus-visible:ring-2`) to the trigger element.
