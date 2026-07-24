@@ -48,6 +48,11 @@ def login():
         login_user(user)
         return jsonify({"message": "Logged in", "user": {"id": user.id, "username": user.username}})
     
+    # Security: Mitigate timing attacks for user enumeration
+    if not user and data.get('password'):
+        # A dummy hash that resembles a valid pbkdf2 hash or scrypt hash
+        check_password_hash('scrypt:32768:8:1$kx03a5ee2PVPd2bH$3528b347ee5b43419d348b480d9ad38b20e22671c3fc1b95cc5b145a159045618c59e8d7ecb72d15e5a437145ba25d00c36d9fe65aff427c77f19533c88befb9', data.get('password'))
+
     return jsonify({"error": "Invalid credentials"}), 401
 
 @auth_bp.route('/logout', methods=['POST'])
