@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2023-10-27 - SSRF Vulnerability in TTS endpoint
+**Vulnerability:** The `synthesize_speech` endpoint in `backend/app/routes/tts.py` accepted an arbitrary `voice_id` parameter directly from the client without any format validation, passing it into the URL of an outgoing `requests.post` call to ElevenLabs.
+**Learning:** This pattern poses a significant Server-Side Request Forgery (SSRF) and Path Traversal risk because malicious actors could potentially inject directory traversal strings (`../`) or other malicious payloads into the path to access unintended internal resources or external URLs if the URL construction was broader.
+**Prevention:** Always validate parameters that are appended to URLs for external requests. Ensure they conform to the expected format (e.g., alphanumeric, specific lengths) using strict regex patterns before appending them to the base URL.
