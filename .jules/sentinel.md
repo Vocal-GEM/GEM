@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-07-24 - Timing Attack Mitigation via Dummy Hash
+**Vulnerability:** User enumeration through timing differences on the login endpoint.
+**Learning:** Found a missing mitigation in `backend/app/routes/auth.py`. If a username doesn't exist, the endpoint returns instantly. By adding a computationally expensive dummy hash comparison, the time difference is eliminated.
+**Prevention:** For any endpoint handling authentication or secret validation, always ensure the response time does not leak the validity of the identifier (e.g. username). Use a properly formatted dummy hash (e.g. `scrypt:32768:8:1$...`) to match the latency of a real password check.
