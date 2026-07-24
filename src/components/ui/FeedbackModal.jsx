@@ -42,7 +42,7 @@ const FeedbackModal = ({ isOpen, onClose, initialType = 'feedback', errorDetails
                         {type === 'bug' ? <Bug className="w-5 h-5 text-red-400" /> : <MessageSquare className="w-5 h-5 text-teal-400" />}
                         {type === 'bug' ? 'Report a Bug' : 'Send Feedback'}
                     </h2>
-                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500" aria-label="Close modal">
                         <X className="w-5 h-5 text-slate-400" />
                     </button>
                 </div>
@@ -61,14 +61,14 @@ const FeedbackModal = ({ isOpen, onClose, initialType = 'feedback', errorDetails
                             <button
                                 type="button"
                                 onClick={() => setType('feedback')}
-                                className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${type === 'feedback' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                                className={`flex-1 py-2 text-sm font-bold rounded-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${type === 'feedback' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                             >
                                 Feedback
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setType('bug')}
-                                className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${type === 'bug' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                                className={`flex-1 py-2 text-sm font-bold rounded-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${type === 'bug' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
                             >
                                 Bug Report
                             </button>
@@ -109,7 +109,7 @@ const FeedbackModal = ({ isOpen, onClose, initialType = 'feedback', errorDetails
                         <button
                             type="submit"
                             disabled={isSubmitting || !message.trim()}
-                            className="w-full py-3 bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-400 hover:to-blue-500 text-white font-bold rounded-xl shadow-lg shadow-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                            className="w-full py-3 bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-400 hover:to-blue-500 text-white font-bold rounded-xl shadow-lg shadow-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
                         >
                             {isSubmitting ? (
                                 <><Loader2 className="w-5 h-5 animate-spin" /> Sending...</>
