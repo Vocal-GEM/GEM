@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-05-18 - Centralizing RAF loops for performance
+**Learning:** Found multiple files maintaining separate independent `requestAnimationFrame` loops (e.g., `AudioEngine`, `DynamicOrb.jsx` (SafeMode), `RegisterGauge.jsx`). This leads to layout thrashing, increased CPU use, and uncoordinated DOM updates causing jank on lower-end devices.
+**Action:** Always migrate independent `requestAnimationFrame` loops to the centralized `renderCoordinator.subscribe()` which handles FPS throttling, priority management, and coordinates all updates into a single tick.
