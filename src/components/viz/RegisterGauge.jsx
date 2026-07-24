@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
+
 import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
 
 /**
@@ -21,8 +23,9 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     const [showTooltip, setShowTooltip] = useState(false);
     const animationRef = useRef();
 
+    const componentId = useId();
     useEffect(() => {
-        const update = () => {
+        const update = (delta, currentTime) => {
             if (dataRef?.current) {
                 // Get register data from socket stream
                 const reg = dataRef.current.register; // dataRef.current.register from sockets.py
@@ -42,12 +45,15 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                 }
                 setF0(currentF0);
             }
-            animationRef.current = requestAnimationFrame(update);
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
-    }, [dataRef]);
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            update,
+            renderCoordinator.PRIORITY.LOW
+        );
+        return () => unsubscribe();
+    }, [dataRef, componentId]);
 
     // Helpers
     const getIcon = () => {
