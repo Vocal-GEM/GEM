@@ -116,7 +116,7 @@ const FeatureUnlockPanel = ({ onClose }) => {
                             </p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-white">
+                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-white" aria-label="Close">
                         <X size={20} />
                     </button>
                 </div>
