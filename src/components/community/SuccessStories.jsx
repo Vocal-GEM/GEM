@@ -130,6 +130,8 @@ const SuccessStories = () => {
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-white">Community Success Stories</h2>
                 <button
+                    aria-expanded={showForm}
+                    aria-controls="share-story-form"
                     onClick={() => setShowForm(!showForm)}
                     className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
@@ -139,6 +141,7 @@ const SuccessStories = () => {
 
             {showForm && (
                 <motion.div
+                    id="share-story-form"
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     className="bg-slate-800 p-6 rounded-xl border border-slate-700 mb-6"
@@ -232,7 +235,7 @@ const SuccessStories = () => {
 
                         <div className="flex justify-between items-center text-xs text-slate-500 border-t border-slate-700/50 pt-3">
                             <span>Goal: {story.voice_goal}</span>
-                            <button className="flex items-center gap-1 hover:text-pink-400 transition-colors">
+                            <button aria-label={`Upvote ${story.title} (${story.upvotes} upvotes)`} className="flex items-center gap-1 hover:text-pink-400 transition-colors">
                                 <Heart size={14} />
                                 {story.upvotes}
                             </button>

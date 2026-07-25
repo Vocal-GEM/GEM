@@ -59,6 +59,7 @@ const VocalHealthPanel = () => {
                         </div>
 
                         <button
+                            aria-expanded={showAllTips}
                             onClick={() => setShowAllTips(true)}
                             className="w-full mt-3 py-2 flex items-center justify-center gap-1 text-xs font-bold text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700"
                         >

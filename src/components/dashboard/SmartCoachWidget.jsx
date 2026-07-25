@@ -51,6 +51,7 @@ const SmartCoachWidget = ({ onStartSession }) => {
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
                     <button
+                        aria-label="Start smart practice session"
                         onClick={onStartSession}
                         className="flex items-center justify-center gap-3 px-8 py-4 bg-white !text-indigo-600 rounded-2xl font-bold text-lg hover:bg-indigo-50 transition-all shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 group"
                     >
