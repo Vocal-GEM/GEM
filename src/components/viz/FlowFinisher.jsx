@@ -113,6 +113,7 @@ const FlowFinisher = ({ dataRef, showFeedback = true }) => {
                     className="text-slate-600 hover:text-slate-300 transition-colors"
                     onMouseEnter={() => setShowTooltip(true)}
                     onMouseLeave={() => setShowTooltip(false)}
+                    aria-label="More information about Flow Finisher"
                 >
                     <Info size={16} />
                 </button>

@@ -181,6 +181,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
 
             {/* Controls */}
             <button
+                aria-label={isAudioActive ? "Stop Audio Analysis" : "Start Audio Analysis"}
                 onClick={toggleAudio}
                 className={`w-full mt-6 py-3 rounded-xl text-sm font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg ${isAudioActive
                     ? 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'

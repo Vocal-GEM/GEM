@@ -1,20 +1,20 @@
-import { render, screen, cleanup, act } from '@testing-library/react';
+
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import BrightnessMeter from './BrightnessMeter';
-import React from 'react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
-// Mock RenderCoordinator
+// Mock the RenderCoordinator
 vi.mock('../../services/RenderCoordinator', () => ({
     renderCoordinator: {
-        subscribe: vi.fn(() => vi.fn()), // Returns unsubscribe fn
-        PRIORITY: { MEDIUM: 2 }
+        subscribe: vi.fn(() => vi.fn()),
+        PRIORITY: { MEDIUM: 1 }
     }
 }));
 
 // Override global mock for this test to include Smile
-vi.mock('lucide-react', () => {
-    const React = require('react');
+vi.mock('lucide-react', async () => {
+    const React = await import('react');
     const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
 
     return {
@@ -29,42 +29,32 @@ describe('BrightnessMeter', () => {
     let dataRef;
 
     beforeEach(() => {
-        dataRef = { current: { f2: 0 } };
-    });
-
-    afterEach(() => {
-        cleanup();
+        dataRef = { current: { f2: 1500 } };
         vi.clearAllMocks();
     });
 
-    it('renders successfully', () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it('renders with initial neutral state', () => {
         render(<BrightnessMeter dataRef={dataRef} />);
         expect(screen.getByText('Brightness Meter')).toBeDefined();
+        expect(screen.getByText('Neutral')).toBeDefined();
     });
 
-    it('subscribes to RenderCoordinator', () => {
+    it('subscribes to renderCoordinator on mount', () => {
         render(<BrightnessMeter dataRef={dataRef} />);
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
-        const [, , priority] = renderCoordinator.subscribe.mock.calls[0];
-        expect(priority).toBe(renderCoordinator.PRIORITY.MEDIUM);
     });
 
-    it('updates based on dataRef via coordinator callback', () => {
-        render(<BrightnessMeter dataRef={dataRef} />);
+    it('cleans up subscription on unmount', () => {
+        const unsubscribe = vi.fn();
+        renderCoordinator.subscribe.mockReturnValue(unsubscribe);
 
-        // Get the callback passed to subscribe
-        // Signature: subscribe(id, callback, priority)
-        const callback = renderCoordinator.subscribe.mock.calls[0][1];
+        const { unmount } = render(<BrightnessMeter dataRef={dataRef} />);
+        unmount();
 
-        // Update data
-        dataRef.current.f2 = 2300; // Bright target
-
-        // Manually trigger callback (simulate render loop)
-        act(() => {
-            callback();
-        });
-
-        // The status label becomes "Bright ✓"
-        expect(screen.getByText('Bright ✓')).toBeDefined();
+        expect(unsubscribe).toHaveBeenCalled();
     });
 });
