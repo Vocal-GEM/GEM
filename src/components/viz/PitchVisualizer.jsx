@@ -123,6 +123,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
         const canvas = canvasRef.current;
         if (!canvas) return;
 
+
         const updateDimensions = () => {
             const rect = canvas.getBoundingClientRect();
             const dpr = window.devicePixelRatio || 1;
@@ -130,6 +131,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             // Update physical dimensions
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
+            dimensionsRef.current = { width: rect.width, height: rect.height };
 
             // Update ref for the loop
             dimensionsRef.current = {
@@ -142,7 +144,9 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             ctx.scale(dpr, dpr);
         };
 
-        const observer = new ResizeObserver(updateDimensions);
+        const observer = new ResizeObserver(() => {
+            globalThis.requestAnimationFrame(updateDimensions);
+        });
         observer.observe(canvas);
 
         // Initial setup
@@ -576,6 +580,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [targetRange, exercise, zoomRange, voiceProfiles, settings, colorBlindMode, activeProfile, dataRef, onScore]);
 

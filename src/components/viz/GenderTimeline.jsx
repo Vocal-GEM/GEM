@@ -35,11 +35,24 @@ const GenderTimeline = ({ dataRef, duration = 10 }) => {
         const dpr = window.devicePixelRatio || 1;
 
         // Set canvas size
-        const width = canvas.offsetWidth;
-        const height = canvas.offsetHeight;
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-        ctx.scale(dpr, dpr);
+        const updateDimensions = () => {
+            const width = canvas.offsetWidth || 1;
+            const height = canvas.offsetHeight || 1;
+
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        };
+
+        updateDimensions();
+
+        const resizeObserver = new ResizeObserver(() => {
+            globalThis.requestAnimationFrame(updateDimensions);
+        });
+        resizeObserver.observe(canvas);
+
+        const width = canvas.width / dpr;
+        const height = canvas.height / dpr;
 
         // Layout
         const genderBarHeight = 30;
@@ -51,6 +64,9 @@ const GenderTimeline = ({ dataRef, duration = 10 }) => {
         let lastWindowTime = 0;
 
         const loop = () => {
+            const width = canvas.width / dpr;
+            const height = canvas.height / dpr;
+            const pitchChartHeight = height - genderBarHeight - 30;
             const now = Date.now();
 
             // Sample data
