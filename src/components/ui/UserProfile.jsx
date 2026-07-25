@@ -43,7 +43,7 @@ const UserProfile = ({ user, onClose, onLogout }) => {
                 {/* Header */}
                 <div className="sticky top-0 bg-slate-900/95 backdrop-blur-md p-6 border-b border-white/5 flex justify-between items-center z-10">
                     <h2 className="text-2xl font-bold text-white">Profile</h2>
-                    <button onClick={onClose} className="p-3 bg-slate-800 rounded-full text-slate-400 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors">
+                    <button onClick={onClose} className="p-3 bg-slate-800 rounded-full text-slate-400 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors" aria-label="Close profile">
                         <X className="w-5 h-5" />
                     </button>
                 </div>

@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2026-07-25 - Icon-Only Button Accessibility Pattern
+**Learning:** I discovered a widespread pattern across the app's UI components (e.g., FloatingCamera, VoiceAudit, VoiceFingerprint) where icon-only buttons frequently omit `aria-label` attributes. This renders critical controls (like zooming, closing modals, saving, and refreshing) invisible and unusable for screen reader users, as the buttons have no readable text content.
+**Action:** Whenever creating or modifying icon-only buttons within the UI components, always enforce the inclusion of a descriptive `aria-label` that clearly indicates the button's action.
