@@ -45,3 +45,7 @@
 ## 2026-02-09 - Fixed Layout Thrashing in Spectrograms and Orbs
 **Learning:** Calling `getBoundingClientRect()` or accessing `offsetWidth`/`offsetHeight` directly inside `requestAnimationFrame()` loops forces a synchronous layout calculation in the browser before the frame can be rendered. This causes massive layout thrashing ("jank") when running multiple visualizations (e.g., PitchOrb, HighResSpectrogram, GenderTimeline) concurrently.
 **Action:** Move dimension checks out of the drawing loop. Observe element resizing with a `ResizeObserver`, execute the callback within `globalThis.requestAnimationFrame()` to avoid 'resize observer loop limit exceeded' errors, update the physical dimensions on the canvas, and cache those dimensions in a variable or `useRef`. In the main drawing loop, use the cached variables.
+
+## 2026-02-09 - Fixed CI Build Failures and Lint Errors
+**Learning:** During optimization of visualization canvas components, several global objects (`global`, `requestAnimationFrame`) were referenced directly which caused build and test failures. Additionally, there were numerous parsing errors from unescaped quotes in JSX and undeclared components from bad git merges.
+**Action:** When working in ES Modules or React, always explicitly use `globalThis` when referencing variables implicitly available in AudioWorklets, or referencing globally mocked test functions (like `globalThis.requestAnimationFrame`). Use strict ESLint fixes for escaping quotes in JSX. Check for duplicate key errors in configurations (e.g. `PrivacyManager.js`).

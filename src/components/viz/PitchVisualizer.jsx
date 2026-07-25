@@ -580,7 +580,6 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
         return () => {
             unsubscribe();
-            resizeObserver.disconnect();
         };
     }, [targetRange, exercise, zoomRange, voiceProfiles, settings, colorBlindMode, activeProfile, dataRef, onScore]);
 
