@@ -54,7 +54,7 @@ const GraduationReflection = ({ onComplete }) => {
                                         type="checkbox"
                                         checked={readiness[i] || false}
                                         onChange={() => setReadiness(prev => ({ ...prev, [i]: !prev[i] }))}
-                                        className="w-5 h-5 rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-blue-500/50"
+                                        className="w-5 h-5 rounded border-slate-600 bg-slate-800 text-blue-500 focus-visible:ring-blue-500/50 focus-visible:outline-none"
                                     />
                                     <span className="text-slate-200">{item}</span>
                                 </label>
@@ -87,7 +87,7 @@ const GraduationReflection = ({ onComplete }) => {
                                         type="checkbox"
                                         checked={glossary[concept] || false}
                                         onChange={() => setGlossary(prev => ({ ...prev, [concept]: !prev[concept] }))}
-                                        className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-indigo-500 focus:ring-indigo-500/50"
+                                        className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-indigo-500 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
                                     />
                                     <span className="text-sm text-slate-300 font-medium">{concept}</span>
                                 </label>
@@ -117,7 +117,7 @@ const GraduationReflection = ({ onComplete }) => {
                             <div>
                                 <label className="block text-sm font-bold text-pink-300 mb-2">My Vocal Affirmation</label>
                                 <textarea
-                                    className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-white focus:border-pink-500 outline-none"
+                                    className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-white focus-visible:border-pink-500 focus-visible:outline-none"
                                     placeholder="e.g., My voice deserves to be heard..."
                                     rows={2}
                                     value={reflection.affirmation || ''}
@@ -127,7 +127,7 @@ const GraduationReflection = ({ onComplete }) => {
                             <div>
                                 <label className="block text-sm font-bold text-pink-300 mb-2">Advice to Future Students</label>
                                 <textarea
-                                    className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-white focus:border-pink-500 outline-none"
+                                    className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-white focus-visible:border-pink-500 focus-visible:outline-none"
                                     placeholder="What do you wish you knew on Day 1?"
                                     rows={3}
                                     value={reflection.advice || ''}
@@ -159,7 +159,7 @@ const GraduationReflection = ({ onComplete }) => {
                             <div>
                                 <label className="block text-sm font-bold text-teal-300 mb-2">My &quot;Go-To&quot; Warmup</label>
                                 <textarea
-                                    className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-white focus:border-teal-500 outline-none"
+                                    className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-white focus-visible:border-teal-500 focus-visible:outline-none"
                                     placeholder="e.g., Lip trills -> Sirens -> Reading"
                                     rows={2}
                                     value={reflection.warmup || ''}
@@ -169,7 +169,7 @@ const GraduationReflection = ({ onComplete }) => {
                             <div>
                                 <label className="block text-sm font-bold text-teal-300 mb-2">My Recovery Move</label>
                                 <textarea
-                                    className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-white focus:border-teal-500 outline-none"
+                                    className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-white focus-visible:border-teal-500 focus-visible:outline-none"
                                     placeholder="What do you do when you dip?"
                                     rows={2}
                                     value={reflection.recovery || ''}
