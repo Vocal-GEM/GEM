@@ -42,9 +42,19 @@ def signup():
 @limiter.limit("5 per minute")
 def login():
     data = request.json
+    password = data.get('password', '')
     user = User.query.filter_by(username=data.get('username')).first()
     
-    if user and check_password_hash(user.password_hash, data.get('password')):
+    # Mitigate timing attacks by always performing a hash check
+    dummy_hash = "pbkdf2:sha256:260000$salt$hash"
+
+    if user:
+        is_valid = check_password_hash(user.password_hash, password)
+    else:
+        is_valid = False
+        check_password_hash(dummy_hash, password)
+
+    if user and is_valid:
         login_user(user)
         return jsonify({"message": "Logged in", "user": {"id": user.id, "username": user.username}})
     
