@@ -64,16 +64,47 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        const canvasSizeRef = { width: 0, height: 0, scaledWidth: 0, scaledHeight: 0 };
+
+        const updateSize = () => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+
+            // Only update if dimensions actually changed
+            const newWidth = Math.round(rect.width * dpr);
+            const newHeight = Math.round(rect.height * dpr);
+
+            if (canvasSizeRef.scaledWidth !== newWidth || canvasSizeRef.scaledHeight !== newHeight) {
+                canvasSizeRef.width = rect.width;
+                canvasSizeRef.height = rect.height;
+                canvasSizeRef.scaledWidth = newWidth;
+                canvasSizeRef.scaledHeight = newHeight;
+
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                // scale needs to be re-applied after changing canvas width/height
+                ctx.scale(dpr, dpr);
+            }
+        };
+
+        let rafId;
+        const resizeObserver = new ResizeObserver(() => {
+            if (rafId) globalThis.cancelAnimationFrame(rafId);
+            rafId = globalThis.requestAnimationFrame(updateSize);
+        });
+
+        if (canvas) {
+            updateSize();
+            resizeObserver.observe(canvas);
+        }
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const width = canvasSizeRef.width;
+            const height = canvasSizeRef.height;
+            if (width === 0 || height === 0) return;
 
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -165,6 +196,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         );
 
         return () => {
+            resizeObserver.disconnect();
+            if (rafId) globalThis.cancelAnimationFrame(rafId);
             unsubscribe();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
