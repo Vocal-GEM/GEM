@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-24 - [Server-Side Request Forgery via URL Interpolation]
+**Vulnerability:** In `backend/app/routes/tts.py`, the `voiceId` parameter taken from user input is directly interpolated into the request URL (`https://api.elevenlabs.io/v1/text-to-speech/{voice_id}`) without validation. This allows an attacker to input `../` to manipulate the URL path, potentially reaching other endpoints on the API while utilizing the server's API key.
+**Learning:** External API wrappers that construct URLs using user input must validate that input to prevent path traversal / SSRF against the third-party API.
+**Prevention:** Always validate and sanitize user input before incorporating it into outbound request URLs. Use explicit allowlists or strict regex pattern matching (e.g., alphanumeric only) for identifiers like IDs.
