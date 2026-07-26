@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-02-18 - A11y on Icon-Only Buttons and Keyboard Focus States
+**Learning:** Found multiple instances where icon-only buttons (like Save/Delete in modes) lack `aria-label`s, making them invisible to screen readers. In addition, the use of `focus:` instead of `focus-visible:` on items like Toast notification buttons and form inputs causes lingering focus rings after a mouse click, reducing the visual polish and confusing users about the active state.
+**Action:** When creating or auditing components, always explicitly add `aria-label`s to icon-only buttons. Prefer `focus-visible:` over `focus:` for focus rings to ensure keyboard accessibility without degrading the mouse user experience.
