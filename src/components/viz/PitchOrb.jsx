@@ -34,6 +34,37 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
 
+        let width = canvas.clientWidth;
+        let height = canvas.clientHeight;
+        let resizeRafId = null;
+
+        const updateSize = () => {
+            if (!canvas) return;
+            width = canvas.clientWidth;
+            height = canvas.clientHeight;
+
+            const scaledWidth = Math.round(width * dpr);
+            const scaledHeight = Math.round(height * dpr);
+
+            if (canvas.width !== scaledWidth || canvas.height !== scaledHeight) {
+                canvas.width = scaledWidth;
+                canvas.height = scaledHeight;
+                ctx.scale(dpr, dpr);
+            }
+        };
+
+        const resizeObserver = new globalThis.ResizeObserver(() => {
+            if (resizeRafId !== null) {
+                globalThis.cancelAnimationFrame(resizeRafId);
+            }
+            resizeRafId = globalThis.requestAnimationFrame(updateSize);
+        });
+
+        if (canvas) {
+            resizeObserver.observe(canvas);
+            updateSize();
+        }
+
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
             if (pitch >= genderRanges.feminine.min) {
@@ -65,18 +96,12 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         };
 
         const loop = () => {
-            if (!canvas) return; // Guard against cleanup
+            if (!canvas || width === 0 || height === 0) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
+            // Clear using unscaled logical pixels because context is scaled
             ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
@@ -166,6 +191,10 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
+            if (resizeRafId !== null) {
+                globalThis.cancelAnimationFrame(resizeRafId);
+            }
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
