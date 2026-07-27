@@ -84,16 +84,19 @@ const InspirationBoard = ({ onComplete }) => {
                                 <div className="flex flex-col items-center gap-2">
                                     <button
                                         onClick={() => toggleTopPick(voice.id)}
-                                        className={`p-2 rounded-full transition-all ${voice.isTopPick ? 'bg-yellow-500/20 text-yellow-400' : 'text-slate-600 hover:text-yellow-400 hover:bg-slate-800'}`}
+                                        className={`p-2 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 ${voice.isTopPick ? 'bg-yellow-500/20 text-yellow-400' : 'text-slate-600 hover:text-yellow-400 hover:bg-slate-800'}`}
                                         title="Mark as Top Pick for imitation"
+                                        aria-label={voice.isTopPick ? `Remove ${voice.name} from top picks` : `Mark ${voice.name} as top pick`}
+                                        aria-pressed={voice.isTopPick}
                                     >
-                                        <Star size={20} fill={voice.isTopPick ? "currentColor" : "none"} />
+                                        <Star size={20} fill={voice.isTopPick ? "currentColor" : "none"} aria-hidden="true" />
                                     </button>
                                     <button
                                         onClick={() => setVoices(prev => prev.filter(v => v.id !== voice.id))}
-                                        className="p-2 text-slate-600 hover:text-red-400 transition-colors"
+                                        className="p-2 text-slate-600 hover:text-red-400 transition-colors rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                                        aria-label={`Remove ${voice.name} from list`}
                                     >
-                                        <Trash2 size={16} />
+                                        <Trash2 size={16} aria-hidden="true" />
                                     </button>
                                 </div>
                             </div>

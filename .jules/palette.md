@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-02-18 - Missing ARIA Labels on Icon-only Buttons
+**Learning:** Across the codebase, many icon-only buttons (like `Camera`, `X`, `Bug`, `Star`, `Trash2`) lack `aria-label` attributes and focus-visible outlines. This creates an inaccessible experience for screen reader users and keyboard navigators.
+**Action:** Systematically add `aria-label`, `aria-pressed` (if applicable), `focus-visible` styles, and `aria-hidden="true"` to the inner icons for all icon-only buttons.
