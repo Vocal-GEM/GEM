@@ -84,7 +84,7 @@ const GoalTrackerPanel = ({ embedded = false, onClose }) => {
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        <button
+                        <button aria-label="Refresh"
                             onClick={loadGoals}
                             className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
                         >

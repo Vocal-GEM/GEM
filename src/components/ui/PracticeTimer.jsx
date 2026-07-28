@@ -122,7 +122,7 @@ const PracticeTimer = ({ onComplete, onClose, compact = false }) => {
                     {isRunning ? <Pause size={12} /> : <Play size={12} fill="currentColor" />}
                 </button>
                 {onClose && (
-                    <button
+                    <button aria-label="Close"
                         onClick={onClose}
                         className="p-1 rounded-full hover:bg-slate-700 text-slate-500 hover:text-white transition-colors"
                     >
@@ -142,7 +142,7 @@ const PracticeTimer = ({ onComplete, onClose, compact = false }) => {
                     <span className="text-white font-bold">Practice Timer</span>
                 </div>
                 {onClose && (
-                    <button
+                    <button aria-label="Close"
                         onClick={onClose}
                         className="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
                     >

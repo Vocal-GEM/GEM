@@ -38,7 +38,7 @@ const ClientDashboard = () => {
                         <h2 className="text-lg font-bold flex items-center gap-2">
                             <Users size={20} className="text-pink-500" /> Clients
                         </h2>
-                        <button
+                        <button aria-label="Add"
                             onClick={handleAddClient}
                             className="p-1.5 bg-pink-600 hover:bg-pink-500 rounded-lg transition-colors"
                             title="Add Client"

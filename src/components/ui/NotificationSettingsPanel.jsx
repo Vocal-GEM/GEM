@@ -66,7 +66,7 @@ const NotificationSettingsPanel = ({ onClose, embedded = false }) => {
                         </div>
                     </div>
                     {!embedded && (
-                        <button onClick={onClose} className="text-slate-400 hover:text-white">
+                        <button aria-label="Close" onClick={onClose} className="text-slate-400 hover:text-white">
                             <X size={20} />
                         </button>
                     )}

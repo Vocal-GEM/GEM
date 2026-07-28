@@ -76,7 +76,7 @@ const PostSessionSummary = ({ sessionData, onClose, onStartRecommended }) => {
             <div className="w-full max-w-lg bg-slate-900 rounded-3xl border border-slate-700 overflow-hidden shadow-2xl my-8">
                 {/* Header */}
                 <div className="relative p-6 bg-gradient-to-br from-purple-600/30 to-pink-600/30 border-b border-slate-700">
-                    <button
+                    <button aria-label="Close"
                         onClick={onClose}
                         className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white"
                     >

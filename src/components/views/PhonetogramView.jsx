@@ -92,7 +92,7 @@ const PhonetogramView = () => {
                     <p className="text-slate-400">{t('phonetogram.subtitle')}</p>
                 </div>
                 <div className="flex gap-3">
-                    <button
+                    <button aria-label="Clear"
                         onClick={handleClear}
                         className="p-3 rounded-xl bg-slate-800 text-slate-400 hover:text-red-400 hover:bg-slate-700 transition-colors"
                         title={t('phonetogram.controls.clear')}

@@ -68,7 +68,7 @@ const SkillAssessmentPanel = ({ embedded = false, onClose }) => {
                             </div>
                         </div>
                         {!embedded && onClose && (
-                            <button onClick={onClose} className="text-slate-400 hover:text-white">×</button>
+                            <button aria-label="Close" onClick={onClose} className="text-slate-400 hover:text-white">×</button>
                         )}
                     </div>
                 </div>

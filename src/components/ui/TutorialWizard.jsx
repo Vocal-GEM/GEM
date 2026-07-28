@@ -117,7 +117,7 @@ const TutorialWizard = ({ onComplete, onSkip }) => {
 
                 {/* Right Panel (Content) */}
                 <div className="w-full md:w-2/3 p-8 flex flex-col relative">
-                    <button onClick={onSkip} className="absolute top-6 right-6 text-slate-400 hover:text-white transition-colors">
+                    <button aria-label="Close" onClick={onSkip} className="absolute top-6 right-6 text-slate-400 hover:text-white transition-colors">
                         <X size={24} />
                     </button>
 

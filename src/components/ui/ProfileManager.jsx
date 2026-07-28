@@ -24,7 +24,7 @@ const ProfileManager = ({ onClose }) => {
                         <User className="text-blue-400" />
                         Select Profile
                     </h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-white">
+                    <button aria-label="Close" onClick={onClose} className="text-slate-400 hover:text-white">
                         <X size={20} />
                     </button>
                 </div>

@@ -40,7 +40,7 @@ const PersonalizedCurriculumView = () => {
                     <h1 className="text-3xl font-bold text-white mb-2">Your Training Plan</h1>
                     <p className="text-slate-400">AI-generated weekly curriculum based on your progress</p>
                 </div>
-                <button
+                <button aria-label="Refresh"
                     onClick={loadCurriculum}
                     className="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-400"
                 >

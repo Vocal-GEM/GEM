@@ -76,7 +76,7 @@ const StreakCalendar = () => {
 
             {/* Month Navigator */}
             <div className="flex items-center justify-between mb-4">
-                <button
+                <button aria-label="Back"
                     onClick={prevMonth}
                     className="p-2 text-slate-400 hover:text-white"
                 >
@@ -85,7 +85,7 @@ const StreakCalendar = () => {
                 <span className="font-bold text-white">
                     {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
                 </span>
-                <button
+                <button aria-label="Next"
                     onClick={nextMonth}
                     className="p-2 text-slate-400 hover:text-white"
                 >

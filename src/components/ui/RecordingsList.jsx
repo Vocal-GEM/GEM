@@ -175,7 +175,7 @@ const RecordingsList = () => {
                                         onKeyDown={(e) => e.key === 'Enter' && saveEdit(recording)}
                                     />
                                     <button onClick={() => saveEdit(recording)} className="p-1 hover:text-green-400 text-slate-400"><Check size={16} /></button>
-                                    <button onClick={cancelEdit} className="p-1 hover:text-red-400 text-slate-400"><X size={16} /></button>
+                                    <button aria-label="Close" onClick={cancelEdit} className="p-1 hover:text-red-400 text-slate-400"><X size={16} /></button>
                                 </div>
                             ) : (
                                 <div>

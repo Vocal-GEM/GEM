@@ -12,7 +12,7 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
                     <p className="text-slate-400">Personalized feedback based on your voice analysis</p>
                 </div>
                 {onClose && (
-                    <button
+                    <button aria-label="Close"
                         onClick={onClose}
                         className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
                     >

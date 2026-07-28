@@ -41,7 +41,7 @@ const SmartPracticeSession = ({ onClose }) => {
             <div className="max-w-2xl mx-auto p-6 min-h-screen flex flex-col">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
-                    <button
+                    <button aria-label="Close"
                         onClick={onClose}
                         className="p-2 hover:bg-slate-800 rounded-lg text-slate-400"
                     >

@@ -105,7 +105,7 @@ const TooltipOverlay = ({
                 <div className="flex justify-between items-center">
                     <div className="flex gap-1">
                         {!isFirstStep && (
-                            <button
+                            <button aria-label="Back"
                                 onClick={onPrev}
                                 className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
                             >
