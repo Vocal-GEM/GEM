@@ -72,7 +72,7 @@ const AdaptiveCurriculumPanel = ({ onStartSession, embedded = false, onClose }) 
                             </p>
                         </div>
                     </div>
-                    <button
+                    <button aria-label="Refresh"
                         onClick={regenerateCurriculum}
                         disabled={isGenerating}
                         className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"

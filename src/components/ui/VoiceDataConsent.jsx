@@ -74,7 +74,7 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                             <p className="text-xs text-slate-400">Help improve gender classification</p>
                         </div>
                     </div>
-                    <button
+                    <button aria-label="Close"
                         onClick={onClose}
                         className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
                     >

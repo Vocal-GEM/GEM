@@ -207,7 +207,7 @@ const ClipAnalysisModal = ({ audioBlob, audioUrl, onClose }) => {
                             <p className="text-xs text-slate-400">Genderfluent-style visualization</p>
                         </div>
                     </div>
-                    <button
+                    <button aria-label="Close"
                         onClick={onClose}
                         className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
                     >

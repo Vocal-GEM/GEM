@@ -152,7 +152,7 @@ const FeminizationCourse = ({ onClose }) => {
         <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col animate-in slide-in-from-bottom-10 duration-300">
             {/* Header */}
             <div className="p-4 border-b border-white/10 flex items-center gap-4 bg-slate-950/90 backdrop-blur-xl">
-                <button
+                <button aria-label="Close"
                     onClick={onClose}
                     className="p-2 hover:bg-white/10 rounded-full transition-colors"
                 >

@@ -208,7 +208,7 @@ const VocalFoldsView = ({ onClose }) => {
             {/* Header */}
             <div className="p-4 border-b border-white/10 flex items-center justify-between bg-slate-900/50 backdrop-blur-md">
                 <div className="flex items-center gap-3">
-                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <button aria-label="Close" onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
                         <ArrowLeft className="w-6 h-6 text-slate-400" />
                     </button>
                     <h2 className="text-xl font-bold text-white">{t('vocalFolds.title')}</h2>

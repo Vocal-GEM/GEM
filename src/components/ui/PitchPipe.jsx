@@ -51,7 +51,7 @@ const PitchPipe = ({ audioEngine }) => {
                     onChange={(e) => setFreq(parseInt(e.target.value))}
                     className="w-16 bg-slate-800 border border-slate-600 rounded px-2 py-1 text-xs text-white focus:outline-none text-center"
                 />
-                <button
+                <button aria-label="Play"
                     onMouseDown={startPlaying}
                     onMouseUp={stopPlaying}
                     onMouseLeave={stopPlaying}

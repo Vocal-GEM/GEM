@@ -86,7 +86,7 @@ const CardSetEditor = ({ existingSet, onClose, onSave }) => {
                     <h3 className="text-lg font-bold text-white">
                         {isEditing ? t('practiceCards.editSet') : t('practiceCards.createSet')}
                     </h3>
-                    <button
+                    <button aria-label="Close"
                         onClick={onClose}
                         className="p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
                     >

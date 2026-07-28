@@ -71,7 +71,7 @@ const CardActivityModal = ({ cardId, onClose }) => {
                             <p className="text-xs text-slate-400">{t('practiceCards.activity.subtitle')}</p>
                         </div>
                     </div>
-                    <button
+                    <button aria-label="Close"
                         onClick={onClose}
                         className="p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
                     >

@@ -107,7 +107,7 @@ const VocalStatsSummary = ({ sessionData, onClose, previousSession }) => {
                             </p>
                         </div>
                     </div>
-                    <button
+                    <button aria-label="Close"
                         onClick={onClose}
                         className="p-2 rounded-lg hover:bg-slate-700/50 transition-colors"
                     >

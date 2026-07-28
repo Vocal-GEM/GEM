@@ -102,7 +102,7 @@ const BreathVisualizer = ({ type = 'square' }) => {
                 >
                     {isActive ? <><Pause size={18} /> Pause</> : <><Play size={18} /> Start</>}
                 </button>
-                <button
+                <button aria-label="Refresh"
                     onClick={handleReset}
                     className="p-2 text-slate-500 hover:text-white rounded-full hover:bg-slate-800"
                 >

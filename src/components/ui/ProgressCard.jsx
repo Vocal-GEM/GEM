@@ -84,7 +84,7 @@ const ProgressCard = ({ stats, onClose }) => {
                         <Sparkles className="text-amber-400" size={20} />
                         Share Your Progress
                     </h3>
-                    <button
+                    <button aria-label="Close"
                         onClick={onClose}
                         className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
                     >

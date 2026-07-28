@@ -41,7 +41,7 @@ const DailyTipWidget = () => {
                 <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-bold text-slate-400 uppercase">Daily Tip</span>
-                        <button
+                        <button aria-label="Refresh"
                             onClick={getRandomTip}
                             className="p-1 text-slate-500 hover:text-white transition-colors"
                             title="Get another tip"

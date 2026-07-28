@@ -71,7 +71,7 @@ const BeforeAfterCompare = () => {
                     <h1 className="text-3xl font-bold text-white mb-2">Before & After</h1>
                     <p className="text-slate-400">Compare your voice progress over time</p>
                 </div>
-                <button
+                <button aria-label="Refresh"
                     onClick={loadSessions}
                     className="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-400"
                 >

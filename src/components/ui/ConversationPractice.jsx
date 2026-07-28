@@ -632,7 +632,7 @@ const ConversationPractice = ({ onClose }) => {
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/50 bg-slate-900/50 backdrop-blur-md">
                 <div className="flex items-center gap-3">
                     {view !== 'selection' && (
-                        <button
+                        <button aria-label="Back"
                             onClick={view === 'conversation' ? endConversation : handleNewScenario}
                             className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
                         >
@@ -680,7 +680,7 @@ const ConversationPractice = ({ onClose }) => {
                             </button>
                         </>
                     )}
-                    <button
+                    <button aria-label="Close"
                         onClick={onClose}
                         className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
                     >
