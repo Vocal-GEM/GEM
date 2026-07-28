@@ -191,6 +191,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
         }
         return () => {
             if (unsubscribe) unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [isAudioActive, draw, componentId]);
 
