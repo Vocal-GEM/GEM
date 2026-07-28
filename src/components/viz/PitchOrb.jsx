@@ -64,16 +64,36 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        // Avoid getBoundingClientRect in loop
+        let cachedWidth = canvas.clientWidth || 300;
+        let cachedHeight = canvas.clientHeight || 300;
+        canvas.width = cachedWidth * dpr;
+        canvas.height = cachedHeight * dpr;
+        ctx.scale(dpr, dpr);
+
+        const resizeObserver = new ResizeObserver(entries => {
+            if (!entries.length) return;
+            const entry = entries[0];
+            cachedWidth = entry.contentRect.width;
+            cachedHeight = entry.contentRect.height;
+            canvas.width = cachedWidth * dpr;
+            canvas.height = cachedHeight * dpr;
+            ctx.scale(dpr, dpr);
+        });
+
+        if (canvas.parentElement) {
+            resizeObserver.observe(canvas.parentElement);
+        }
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const width = cachedWidth;
+            const height = cachedHeight;
+            if (width === 0 || height === 0) return;
 
-            const width = rect.width;
-            const height = rect.height;
+            // Explicitly clear the canvas now that we aren't resetting dimensions
+            ctx.clearRect(0, 0, width, height);
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -166,6 +186,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
