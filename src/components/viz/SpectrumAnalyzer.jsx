@@ -150,6 +150,9 @@ const SpectrumAnalyzer = ({ dataRef, userMode }) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
+        // Optimization: Use clientWidth/clientHeight instead of getBoundingClientRect when possible
+        // Since we need relative mouse coordinates, getBoundingClientRect is unavoidable here,
+        // but we only call it on click events, not in render loops, so it's already optimized.
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;

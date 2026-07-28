@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2023-11-20 - [Avoid synchronous layout thrashing in animation loops]
+**Learning:** Calling getBoundingClientRect() inside requestAnimationFrame or continuous render loops forces the browser to synchronously recalculate layout, leading to severe performance bottlenecks (layout thrashing) especially on high-refresh canvases like PitchOrb.
+**Action:** Use ResizeObserver to cache logical dimensions (clientWidth/clientHeight) conditionally, and rely on those cached values in the render loop rather than recalculating them on every frame.
