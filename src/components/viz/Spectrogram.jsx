@@ -351,10 +351,11 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             {showControls && (
                 <button
                     onClick={handleScreenshot}
-                    className="absolute top-2 right-2 p-2 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-white/70 hover:text-white transition-all z-10 animate-in fade-in duration-200"
+                    className="absolute top-2 right-2 p-2 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-white/70 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 transition-all z-10 animate-in fade-in duration-200"
                     title="Save Screenshot"
+                    aria-label="Save Screenshot"
                 >
-                    <Camera size={16} />
+                    <Camera size={16} aria-hidden="true" />
                 </button>
             )}
 

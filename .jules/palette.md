@@ -37,3 +37,9 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-07-29 - Floating Camera & Spectrogram Accessibility
+**Learning:** Found several icon-only buttons in the FloatingCamera, Spectrogram, and HighResSpectrogram components that lacked `aria-label`s and proper keyboard focus states, making them inaccessible to screen readers and difficult to use via keyboard navigation.
+**Action:** Always add explicit `aria-label`s and `aria-hidden="true"` to icon children, along with `focus-visible:` utility classes, to ensure accessibility and keyboard support on all icon-only interactive controls.
+## 2024-07-29 - Floating Camera & Spectrogram Accessibility
+**Learning:** Found several icon-only buttons in the FloatingCamera, Spectrogram, and HighResSpectrogram components that lacked `aria-label`s and proper keyboard focus states, making them inaccessible to screen readers and difficult to use via keyboard navigation.
+**Action:** Always add explicit `aria-label`s and `aria-hidden="true"` to icon children, along with `focus-visible:` utility classes, to ensure accessibility and keyboard support on all icon-only interactive controls.
