@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-10-24 - Layout Thrashing with getBoundingClientRect
+**Learning:** Calling `getBoundingClientRect()` within a high-frequency animation loop like `requestAnimationFrame` causes a synchronous reflow (layout thrashing), which severely damages framerates. This happened in `PitchOrb.jsx`. Attempting to optimize `getBoundingClientRect()` out of pointer event handlers by replacing it with static properties like `clientWidth` or `offsetTop` is incorrect and breaks coordinate mapping because standard pointer events (`e.clientX`) require viewport-relative measurements.
+**Action:** Use `ResizeObserver` to track element dimensions asynchronously to cache logical dimensions specifically for rendering updates within canvas animation loops. Keep using `getBoundingClientRect()` in user-initiated interaction handlers since it correctly calculates viewport offsets and executes at a lower frequency without causing layout thrashing.
