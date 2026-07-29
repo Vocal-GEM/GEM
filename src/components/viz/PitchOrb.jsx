@@ -29,13 +29,42 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     const genderRanges = settings.genderRanges || defaultRanges;
 
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
 
+        let logicalWidth = 0;
+        let logicalHeight = 0;
+
+        const updateDimensions = () => {
+            if (!canvas) return;
+            logicalWidth = canvas.clientWidth;
+            logicalHeight = canvas.clientHeight;
+
+            const newWidth = Math.round(logicalWidth * dpr);
+            const newHeight = Math.round(logicalHeight * dpr);
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                ctx.scale(dpr, dpr);
+            }
+        };
+
+        const resizeObserver = new ResizeObserver(() => {
+            requestAnimationFrame(updateDimensions);
+        });
+
+        if (canvas) {
+            resizeObserver.observe(canvas);
+            updateDimensions();
+        }
+
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
+
             if (pitch >= genderRanges.feminine.min) {
                 return {
                     primary: '#ec4899',
@@ -64,23 +93,24 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            // Avoid getBoundingClientRect in loop
+            const width = logicalWidth;
+            const height = logicalHeight;
 
-            const width = rect.width;
-            const height = rect.height;
-            const centerX = width / 2;
-            const centerY = height / 2;
+            if (width === 0 || height === 0) return;
 
             ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
+
+            const centerX = width / 2;
+            const centerY = height / 2;
+
 
             // Draw orb
             const baseRadius = Math.min(width, height) * 0.35;
@@ -165,6 +195,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         );
 
         return () => {
+            resizeObserver.disconnect();
             unsubscribe();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
