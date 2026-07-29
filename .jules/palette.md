@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-05-18 - Missing ARIA Labels on Icon Buttons
+**Learning:** Icon-only buttons (like the `Play` and `Stop` buttons in `TargetVoicePlayer` or `Info` tooltips in visualizations) often lack explicit `aria-label` attributes, making them inaccessible to screen readers. They also frequently miss explicit `focus-visible:` outlines, making keyboard navigation difficult.
+**Action:** When working with or creating icon-only buttons, always add descriptive `aria-label`s and `focus-visible:ring-*` Tailwind classes to ensure they are accessible to both screen readers and keyboard users. Also, implement `onFocus`/`onBlur` for custom tooltips so they appear for keyboard navigators, not just mouse hover.
