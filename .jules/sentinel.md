@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2024-05-27 - User Enumeration via Timing Attack
+**Vulnerability:** The login endpoint checked `if user and check_password_hash(...)`. If `user` was None (username not found), the expensive `check_password_hash` function was short-circuited and not executed. This allowed an attacker to determine if a username exists in the database by measuring the response time (timing attack).
+**Learning:** Security functions with variable execution times dependent on user input can leak information. In this case, skipping the password hash check leaked the existence of the username. The dummy hash needs to be perfectly formatted including a valid salt (e.g. `scrypt:32768:8:1$salt$hash` or `pbkdf2:sha256:260000$salt$hash`) otherwise the hash algorithm fails immediately, bypassing the computational delay entirely.
+**Prevention:** Always ensure that time-consuming security checks (like hashing) are executed regardless of whether the user exists, typically by checking against a dummy hash when the user is not found.
