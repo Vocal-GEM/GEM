@@ -40,3 +40,6 @@
 ## 2024-07-29 - Floating Camera & Spectrogram Accessibility
 **Learning:** Found several icon-only buttons in the FloatingCamera, Spectrogram, and HighResSpectrogram components that lacked `aria-label`s and proper keyboard focus states, making them inaccessible to screen readers and difficult to use via keyboard navigation.
 **Action:** Always add explicit `aria-label`s and `aria-hidden="true"` to icon children, along with `focus-visible:` utility classes, to ensure accessibility and keyboard support on all icon-only interactive controls.
+## 2024-07-29 - Floating Camera & Spectrogram Accessibility
+**Learning:** Found several icon-only buttons in the FloatingCamera, Spectrogram, and HighResSpectrogram components that lacked `aria-label`s and proper keyboard focus states, making them inaccessible to screen readers and difficult to use via keyboard navigation.
+**Action:** Always add explicit `aria-label`s and `aria-hidden="true"` to icon children, along with `focus-visible:` utility classes, to ensure accessibility and keyboard support on all icon-only interactive controls.
