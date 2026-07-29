@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2024-05-30 - [CRITICAL] SSRF via Unsanitized Path Interpolation in API Proxy
+**Vulnerability:** The `/api/tts/synthesize` endpoint acted as a proxy to the ElevenLabs API, interpolating the user-provided `voiceId` directly into the target URL (`https://api.elevenlabs.io/v1/text-to-speech/{voice_id}`) without validation. This allowed Path Traversal (e.g., `voice_id = "../user"`) which resulted in Server-Side Request Forgery (SSRF), enabling an attacker to make arbitrary requests to the ElevenLabs API using the server's API key.
+**Learning:** API proxy endpoints that construct target URLs using user input must strictly validate the input to ensure it only contains expected characters (e.g., alphanumeric and hyphens). Relying on the external API to return a 404 is insufficient, as attackers can traverse to other valid, sensitive endpoints.
+**Prevention:** Always validate and sanitize user input before interpolating it into URLs, especially in proxy endpoints. Use strict regex matching (e.g., `re.match(r'^[a-zA-Z0-9_-]+$', voice_id)`) to enforce the expected format and prevent path traversal sequences like `../`.
