@@ -44,7 +44,17 @@ def login():
     data = request.json
     user = User.query.filter_by(username=data.get('username')).first()
     
-    if user and check_password_hash(user.password_hash, data.get('password')):
+    password = data.get('password', '')
+
+    # Timing attack mitigation
+    if user:
+        is_valid = check_password_hash(user.password_hash, password)
+    else:
+        # Dummy check to maintain constant time
+        check_password_hash("scrypt:32768:8:1$dummy$dummyhash", password)
+        is_valid = False
+
+    if user and is_valid:
         login_user(user)
         return jsonify({"message": "Logged in", "user": {"id": user.id, "username": user.username}})
     

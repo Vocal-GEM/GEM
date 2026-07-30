@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-07-30 - User Enumeration via Timing Attack
+**Vulnerability:** The login endpoint at `backend/app/routes/auth.py` was vulnerable to a timing attack. It only checked the password hash if the user existed in the database, allowing attackers to measure response times to determine if a username is registered.
+**Learning:** Checking a hash (`check_password_hash`) takes a measurable amount of time. Skipping it when a user is not found creates a noticeable discrepancy in response time, enabling user enumeration. Dummy hashes must be properly formatted (e.g., `scrypt:32768:8:1$dummy$dummyhash`) for Werkzeug to process them rather than immediately returning `False`.
+**Prevention:** Always perform a dummy hash check using a properly formatted dummy hash if a user is not found, ensuring that the login operation takes roughly constant time regardless of whether the username exists.
