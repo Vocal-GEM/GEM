@@ -64,19 +64,54 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+
+        // Cache dimensions to avoid layout thrashing in animation loop
+        let cachedWidth = 0;
+        let cachedHeight = 0;
+
+        const updateDimensions = () => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            // Use CSS pixels for logic, scaled pixels for rendering
+            cachedWidth = rect.width;
+            cachedHeight = rect.height;
+
+            const newWidth = Math.round(rect.width * dpr);
+            const newHeight = Math.round(rect.height * dpr);
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                ctx.scale(dpr, dpr);
+            }
+        };
+
+        let rafId = null;
+        const resizeObserver = new ResizeObserver(() => {
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(updateDimensions);
+        });
+
+        // Initial setup
+        updateDimensions();
+        if (canvas) {
+            resizeObserver.observe(canvas);
+        }
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const width = cachedWidth;
+            const height = cachedHeight;
 
-            const width = rect.width;
-            const height = rect.height;
+            if (width === 0 || height === 0) return; // Not yet initialized or zero size
+
             const centerX = width / 2;
             const centerY = height / 2;
 
+            // Explicitly reset transform before clearing because we no longer
+            // implicitly clear canvas state by setting width/height every frame
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
@@ -166,6 +201,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
+            if (rafId) cancelAnimationFrame(rafId);
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
