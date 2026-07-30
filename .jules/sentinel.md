@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-24 - [Timing Attack Mitigation]
+**Vulnerability:** A timing attack vulnerability existed in the `/api/login` endpoint where the execution time differed significantly between existing and non-existing usernames due to the expensive `check_password_hash` function only being called for valid users. This allowed attackers to enumerate valid usernames.
+**Learning:** Security functions that involve heavy computation (like password hashing) must be executed regardless of the primary condition's truth value to maintain a constant-time execution profile and prevent timing attacks.
+**Prevention:** Always include a dummy computation (e.g., checking a valid hash of a dummy string) in the `else` branch of an authentication check to ensure the total response time remains roughly the same. Ensure the dummy hash uses a perfectly formatted string with a valid salt to properly simulate the computational delay.

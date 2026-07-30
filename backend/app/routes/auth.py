@@ -44,10 +44,16 @@ def login():
     data = request.json
     user = User.query.filter_by(username=data.get('username')).first()
     
-    if user and check_password_hash(user.password_hash, data.get('password')):
-        login_user(user)
-        return jsonify({"message": "Logged in", "user": {"id": user.id, "username": user.username}})
-    
+    if user:
+        if check_password_hash(user.password_hash, data.get('password')):
+            login_user(user)
+            return jsonify({"message": "Logged in", "user": {"id": user.id, "username": user.username}})
+    else:
+        # Prevent timing attacks for user enumeration
+        # Use a dummy hash that takes roughly the same time to compute
+        dummy_hash = 'scrypt:32768:8:1$0T36pJbPl7AIV2kd$05cd7763784254cb24edf6c22ef7a86295ee6c64547f4b768833a51b0a64b90b05e523f84bfdb933b4806d37ff1c2da3d887dcb01b68daf0de2efd14d16bf441'
+        check_password_hash(dummy_hash, data.get('password', ''))
+
     return jsonify({"error": "Invalid credentials"}), 401
 
 @auth_bp.route('/logout', methods=['POST'])
