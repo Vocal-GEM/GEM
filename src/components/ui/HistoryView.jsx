@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Book, FileText, TrendingUp, Calendar, Clock, Activity, BarChart2, Mic, Settings, X, Share2 } from 'lucide-react';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
+import Toast from './Toast';
 import ProgressCard from './ProgressCard';
 import RecordingsList from './RecordingsList';
 import { useProfile } from '../../context/ProfileContext';
@@ -42,6 +43,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
     const { cardSets } = usePracticeCards();
     const [sessions, setSessions] = useState([]);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [toast, setToast] = useState(null);
     const [activeTab, setActiveTab] = useState('overview'); // overview, sessions, journals, recordings
     const [cardFilter, setCardFilter] = useState(null); // Filter sessions by card set
     const [showProgressCard, setShowProgressCard] = useState(false);
@@ -158,7 +160,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
             doc.save(`voice-therapy-report-${new Date().toISOString().split('T')[0]}.pdf`);
         } catch (error) {
             console.error('Error generating report:', error);
-            alert('Failed to generate report.');
+            setToast({ message: 'Failed to generate report.', type: 'error' });
         } finally {
             setIsGenerating(false);
         }
@@ -216,6 +218,13 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-24">
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
             {/* Header / Tabs */}
             <div id="history-tabs" className="flex gap-2 mb-6 overflow-x-auto pb-2" role="tablist" aria-label="History Views">
                 <button
