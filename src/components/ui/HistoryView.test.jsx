@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import HistoryView from './HistoryView';
+import { ToastProvider } from '../../context/ToastContext';
 
 // Mock dependencies
 vi.mock('../../context/ProfileContext', () => ({
@@ -35,7 +36,7 @@ vi.mock('../../context/PracticeCardsContext', () => ({
     PracticeCardsProvider: ({ children }) => <div>{children}</div>
 }));
 
-const MockPracticeCardsProvider = ({ children }) => <div>{children}</div>;
+const MockPracticeCardsProvider = ({ children }) => <ToastProvider><div>{children}</div></ToastProvider>;
 
 // Mock Chart.js components
 vi.mock('react-chartjs-2', () => ({
@@ -81,7 +82,7 @@ describe('HistoryView Personalization', () => {
             }
         });
 
-        render(<HistoryView stats={{ totalSeconds: 600 }} journals={[]} />);
+        render(<HistoryView stats={{ totalSeconds: 600 }} journals={[]} />, { wrapper: MockPracticeCardsProvider });
 
         expect(screen.queryByText('history.streak')).not.toBeInTheDocument();
         expect(screen.queryByText('history.totalPractice')).not.toBeInTheDocument();
@@ -91,7 +92,7 @@ describe('HistoryView Personalization', () => {
 
     it('should dispatch openDashboardConfig event', () => {
         const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-        render(<HistoryView stats={{ totalSeconds: 600 }} journals={[]} />);
+        render(<HistoryView stats={{ totalSeconds: 600 }} journals={[]} />, { wrapper: MockPracticeCardsProvider });
 
         const customizeBtn = screen.getByText('Customize Dashboard');
         fireEvent.click(customizeBtn);
