@@ -1,10 +1,14 @@
 import React from 'react';
 import LoadingSpinner from './LoadingSpinner';
 import { Button } from './button';
+import EmptyState from './EmptyState';
+import { Ghost, Search, Plus } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
 
 export default function LoadingSpinnerTest() {
+  const { showToast } = useToast();
   return (
-    <div className="p-10 space-y-10 bg-slate-900 min-h-screen">
+    <div className="p-10 space-y-10 bg-slate-900 min-h-screen text-slate-100">
       <h1 className="text-3xl font-bold text-white mb-8">
         Palette 🎨 UX Verification
       </h1>
@@ -79,31 +83,9 @@ export default function LoadingSpinnerTest() {
           <Button size="icon" isLoading>
             <span className="sr-only">Icon Button</span>
           </Button>
-import EmptyState from './EmptyState';
-import { Ghost, Search, Plus } from 'lucide-react';
+        </div>
+      </section>
 
-export default function LoadingSpinnerTest() {
-    return (
-        <div className="p-10 space-y-10 bg-slate-900 min-h-screen text-slate-100">
-            <h1 className="text-2xl text-white mb-4">Palette Verification</h1>
-
-            <section className="space-y-4">
-                <h2 className="text-xl text-slate-300">LoadingSpinner Sizes</h2>
-                <div className="flex items-center gap-4">
-                    <div className="border border-slate-700 p-4 rounded bg-slate-800">
-                        <p className="text-slate-400 mb-2">Small</p>
-                        <LoadingSpinner size="sm" />
-                    </div>
-                    <div className="border border-slate-700 p-4 rounded bg-slate-800">
-                        <p className="text-slate-400 mb-2">Medium</p>
-                        <LoadingSpinner size="md" />
-                    </div>
-                    <div className="border border-slate-700 p-4 rounded bg-slate-800">
-                        <p className="text-slate-400 mb-2">Large</p>
-                        <LoadingSpinner size="lg" />
-                    </div>
-                </div>
-            </section>
 
              <section className="space-y-4">
                 <h2 className="text-xl text-slate-300">Button States</h2>
@@ -128,18 +110,16 @@ export default function LoadingSpinnerTest() {
                 </div>
             </section>
 
-            <section className="space-y-4">
-                <h2 className="text-xl text-slate-300">Empty State</h2>
-                <div className="border border-slate-700 rounded-xl overflow-hidden h-[400px] bg-slate-800">
-                    <EmptyState
-                        icon={Ghost}
-                        title="No ghosts found"
-                        description="It seems we are completely ghost-free at the moment. Try summoning one?"
-                        actionLabel="Summon Ghost"
-                        onAction={() => alert('Boo!')}
-                    />
-                </div>
-            </section>
+      <section className="space-y-4">
+        <h2 className="text-xl text-slate-300 border-b border-slate-700 pb-2">Empty State</h2>
+        <div className="border border-slate-700 rounded-xl overflow-hidden h-[400px] bg-slate-800">
+            <EmptyState
+                icon={Ghost}
+                title="No ghosts found"
+                description="It seems we are completely ghost-free at the moment. Try summoning one?"
+                actionLabel="Summon Ghost"
+                onAction={() => showToast('Boo!')}
+            />
         </div>
       </section>
     </div>

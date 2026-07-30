@@ -22,6 +22,7 @@ import {
     BarElement,
 } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
+import { useToast } from '../../context/ToastContext';
 
 ChartJS.register(
     CategoryScale,
@@ -35,6 +36,7 @@ ChartJS.register(
 );
 
 const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
+    const { showToast } = useToast();
     const { getSessions } = useProfile();
     const { t } = useLanguage();
     const { settings } = useSettings();
@@ -158,7 +160,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
             doc.save(`voice-therapy-report-${new Date().toISOString().split('T')[0]}.pdf`);
         } catch (error) {
             console.error('Error generating report:', error);
-            alert('Failed to generate report.');
+            showToast('Failed to generate report.');
         } finally {
             setIsGenerating(false);
         }
