@@ -1,4 +1,12 @@
-import React from "react";
+import os
+
+f = "src/components/ui/button.test.jsx"
+if os.path.exists(f):
+    with open(f, 'r') as file:
+        content = file.read()
+
+    # We have duplicated describe blocks and an import in the middle
+    new_content = """import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { Button } from "./button";
@@ -43,3 +51,6 @@ describe("Button", () => {
       expect(container.firstChild).toHaveClass("opacity-50");
   });
 });
+"""
+    with open(f, 'w') as file:
+        file.write(new_content)
