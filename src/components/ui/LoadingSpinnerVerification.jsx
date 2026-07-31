@@ -1,3 +1,4 @@
+import { useToast } from '../../context/ToastContext';
 import React from 'react';
 import LoadingSpinner from './LoadingSpinner';
 import { Button } from './button';
@@ -83,6 +84,7 @@ import EmptyState from './EmptyState';
 import { Ghost, Search, Plus } from 'lucide-react';
 
 export default function LoadingSpinnerTest() {
+  const { showInfo } = useToast();
     return (
         <div className="p-10 space-y-10 bg-slate-900 min-h-screen text-slate-100">
             <h1 className="text-2xl text-white mb-4">Palette Verification</h1>
@@ -136,7 +138,7 @@ export default function LoadingSpinnerTest() {
                         title="No ghosts found"
                         description="It seems we are completely ghost-free at the moment. Try summoning one?"
                         actionLabel="Summon Ghost"
-                        onAction={() => alert('Boo!')}
+                        onAction={() => showInfo('Boo!')}
                     />
                 </div>
             </section>
