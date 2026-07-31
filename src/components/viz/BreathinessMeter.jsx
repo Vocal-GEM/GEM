@@ -1,8 +1,8 @@
 import { useEffect, useRef, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
-import { renderCoordinator } from '../../services/RenderCoordinator';
+import { renderCoordinatorInstance } from '../../services/RenderCoordinator';
 import { Wind, CheckCircle2, AlertTriangle, Info, Sparkles, Activity, HelpCircle } from 'lucide-react';
-import { renderCoordinator } from '../../services/RenderCoordinator';
+import { renderCoordinatorInstance } from '../../services/RenderCoordinator';
 
 /**
  * BreathinessMeter Component
@@ -163,26 +163,26 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
             }
         };
 
-        const unsubscribe = renderCoordinator.subscribe(
+        const unsubscribe = renderCoordinatorInstance.subscribe(
             componentId,
             update,
-            renderCoordinator.PRIORITY.MEDIUM
+            renderCoordinatorInstance.PRIORITY.MEDIUM
         );
 
         return unsubscribe;
     }, [dataRef, colorBlindMode, componentId]);
         };
 
-        const unsubscribe = renderCoordinator.subscribe(
+        const unsubscribe = renderCoordinatorInstance.subscribe(
             componentId,
             updateMeter,
 
         };
 
-        const unsubscribe = renderCoordinator.subscribe(
+        const unsubscribe = renderCoordinatorInstance.subscribe(
             `BreathinessMeter-${componentId}`,
             loop,
-            renderCoordinator.PRIORITY.MEDIUM
+            renderCoordinatorInstance.PRIORITY.MEDIUM
         );
 
         return () => unsubscribe();
@@ -190,10 +190,10 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
             `breathiness-meter-${componentId}`,
         };
 
-        const unsubscribe = renderCoordinator.subscribe(
+        const unsubscribe = renderCoordinatorInstance.subscribe(
             `breathiness-meter-${id}`,
             loop,
-            renderCoordinator.PRIORITY.CRITICAL
+            renderCoordinatorInstance.PRIORITY.CRITICAL
         );
 
         return () => {

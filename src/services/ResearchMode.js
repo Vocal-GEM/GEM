@@ -59,7 +59,7 @@ export class ResearchModeController {
      */
     generateParticipantId(userId) {
         // Use cryptographic hash with study-specific salt
-        const salt = this.studyId + process.env.REACT_APP_RESEARCH_SALT;
+        const salt = this.studyId + import.meta.env.env.REACT_APP_RESEARCH_SALT;
         const hash = CryptoJS.SHA256(userId + salt).toString();
 
         // Take first 16 characters for readability
@@ -264,7 +264,7 @@ export class ResearchModeController {
         };
 
         // Process withdrawal (backend call)
-        await this.processWithdrawal(withdrawal);
+        await this.import.meta.envWithdrawal(withdrawal);
 
         return withdrawal;
     }
@@ -316,7 +316,7 @@ export class ResearchModeController {
         return data;
     }
 
-    async processWithdrawal(withdrawal) {
+    async import.meta.envWithdrawal(withdrawal) {
         // TODO: Implement backend API call
         console.log('Processing withdrawal:', withdrawal);
         return withdrawal;
