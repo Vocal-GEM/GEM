@@ -75,3 +75,10 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2026-02-14 - Information Leakage & Logic Error in Voice Quality Endpoints
+**Vulnerability:** The `clean_audio` and `manipulate_file` endpoints in `backend/app/routes/voice_quality.py` were returning `str(e)` in the JSON response when an exception occurred. Furthermore, in `manipulate_file`, an empty `except:` block in a duplicated `finally` clause caused a `SyntaxError`, and the early return bypassed proper cleanup, leading to file leakage (DoS risk).
+**Learning:** Returning exception strings during development for debugging is common but dangerous in production as it exposes sensitive server details. Syntax errors in error-handling blocks can break the entire module.
+**Prevention:**
+1. Always use a generic error message for the client and log the full exception details on the server using `current_app.logger.error()`.
+2. Ensure `finally` blocks handle all cleanup and do not contain syntax errors.

@@ -27,12 +27,12 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const { settings } = useSettings();
 
     // Component ID for RenderCoordinator
-    const componentId = useId();
+    const componentIdValue = useId();
 
     // Reusable buffers to avoid GC
     // Unique component ID for RenderCoordinator
     const uniqueId = useId();
-    const componentId = `spectrogram-highres-${uniqueId}`;
+    const componentIdValue = `spectrogram-highres-${uniqueId}`;
 
     // Reusable buffers to avoid garbage collection churn
     const imgDataRef = useRef(null);
@@ -157,7 +157,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     }, [dataRef, colormap]);
 
     // Initial canvas setup & ResizeObserver
-    }, [dataRef, colormap, componentId]);
+    }, [dataRef, colormap, componentIdValue]);
 
     // Initial canvas setup
     // Handle Resize with ResizeObserver
@@ -209,7 +209,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     // Render loop subscription
     useEffect(() => {
         const unsubscribe = renderCoordinator.subscribe(
-            componentId,
+            componentIdValue,
             draw,
             renderCoordinator.PRIORITY.MEDIUM
         );
@@ -217,8 +217,8 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         return () => {
             unsubscribe();
         };
-    }, [draw, componentId]);
-    }, [componentId, draw]);
+    }, [draw, componentIdValue]);
+    }, [componentIdValue, draw]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position
