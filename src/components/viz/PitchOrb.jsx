@@ -34,7 +34,32 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
 
+        // Dimensions cache
+        const dimensionsRef = { width: 0, height: 0, canvasWidth: 0, canvasHeight: 0 };
+
+        const updateSize = () => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            dimensionsRef.width = rect.width;
+            dimensionsRef.height = rect.height;
+            dimensionsRef.canvasWidth = Math.round(rect.width * dpr);
+            dimensionsRef.canvasHeight = Math.round(rect.height * dpr);
+
+            canvas.width = dimensionsRef.canvasWidth;
+            canvas.height = dimensionsRef.canvasHeight;
+        };
+
+        const resizeObserver = new ResizeObserver(() => {
+            requestAnimationFrame(updateSize);
+        });
+
+        if (canvas) {
+            resizeObserver.observe(canvas);
+            updateSize();
+        }
+
         // Determine color based on pitch and gender ranges
+
         const getGenderColor = (pitch) => {
             if (pitch >= genderRanges.feminine.min) {
                 return {
@@ -67,13 +92,13 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            // Re-apply scale every frame before clearRect to ensure correct clearing
+            // and drawing on high-DPI displays. The scale needs to be reset so clearRect
+            // can use logical dimensions, but then we scale for drawing.
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-            const width = rect.width;
-            const height = rect.height;
+            const width = dimensionsRef.width;
+            const height = dimensionsRef.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -166,6 +191,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
