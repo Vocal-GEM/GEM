@@ -49,7 +49,7 @@ const DebugOverlay = ({ audioEngine, dataRef }) => {
                     <Activity className="text-teal-400" />
                     Audio Debugger
                 </h2>
-                <button onClick={() => setIsOpen(false)} className="p-2 rounded-full bg-white/10 text-white">
+                <button onClick={() => setIsOpen(false)} className="p-2 rounded-full bg-white/10 text-white" aria-label="Close debug overlay">
                     <X size={24} />
                 </button>
             </div>
