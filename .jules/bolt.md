@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-08-01 - [Avoid getBoundingClientRect in Animation Loops]
+**Learning:** Found `getBoundingClientRect()` inside a `requestAnimationFrame` render loop (`loop` inside `renderCoordinator`) in `src/components/viz/PitchOrb.jsx`. Calling `getBoundingClientRect()` synchronously triggers layout/reflow calculations, causing layout thrashing when executed 60 times a second. It significantly impacts canvas rendering performance.
+**Action:** When a canvas needs to dynamically resize, always cache dimensions inside a `ResizeObserver` update function and only apply those cached logic dimensions (e.g. `const { width, height } = dimensionsRef.current`) during the main animation loop.
