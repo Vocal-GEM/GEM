@@ -27,7 +27,7 @@ class DSP {
         return output;
     }
 
-    static calculatePitchYIN(buffer, globalThis.sampleRate, adaptiveThreshold = 0.15) {
+    static calculatePitchYIN(buffer, sampleRate, adaptiveThreshold = 0.15) {
         const bufferSize = buffer.length;
         const halfSize = Math.floor(bufferSize / 2);
         const yinBuffer = new Float32Array(halfSize);
@@ -79,7 +79,7 @@ class DSP {
         return { pitch, confidence };
     }
 
-    static getMagnitudeAtFrequency(buffer, freq, globalThis.sampleRate) {
+    static getMagnitudeAtFrequency(buffer, freq, sampleRate) {
         const omega = 2 * Math.PI * freq / globalThis.sampleRate;
         let real = 0;
         let imag = 0;
@@ -171,7 +171,7 @@ class DSP {
         return magnitude;
     }
 
-    static findPeaks(envelope, globalThis.sampleRate) {
+    static findPeaks(envelope, sampleRate) {
         const peaks = [];
         const numPoints = envelope.length;
 
