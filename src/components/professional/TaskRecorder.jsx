@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React, { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Play, Pause, RotateCcw, Check, Loader2 } from 'lucide-react';
 

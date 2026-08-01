@@ -189,3 +189,5 @@ const Spectrogram3D = ({ dataRef }) => {
 };
 
 export default Spectrogram3D;
+
+SpectrogramMesh.displayName = 'SpectrogramMesh';
