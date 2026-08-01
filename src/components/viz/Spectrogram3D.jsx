@@ -190,4 +190,4 @@ const Spectrogram3D = ({ dataRef }) => {
 
 export default Spectrogram3D;
 
-Spectrogram3DContent.displayName = 'Spectrogram3DContent';
+SpectrogramMesh.displayName = 'SpectrogramMesh';

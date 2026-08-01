@@ -443,7 +443,7 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
 });
 SafeModeVisualizer.displayName = 'SafeModeVisualizer';
 
-const DynamicOrb = memo(({ dataRef, calibration, externalDataRef, audioEngine, targetRange }) => {
+const DynamicOrb = memo(function DynamicOrb({ dataRef, calibration, externalDataRef, audioEngine, targetRange }) {
   const { settings } = useSettings();
   const beginnerMode = settings?.beginnerMode;
   const [mode, setMode] = useState('gem');
