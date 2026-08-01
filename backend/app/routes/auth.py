@@ -42,12 +42,18 @@ def signup():
 @limiter.limit("5 per minute")
 def login():
     data = request.json
+    password = data.get('password', '')
     user = User.query.filter_by(username=data.get('username')).first()
     
-    if user and check_password_hash(user.password_hash, data.get('password')):
-        login_user(user)
-        return jsonify({"message": "Logged in", "user": {"id": user.id, "username": user.username}})
-    
+    if user:
+        if check_password_hash(user.password_hash, password):
+            login_user(user)
+            return jsonify({"message": "Logged in", "user": {"id": user.id, "username": user.username}})
+    else:
+        # Security: Mitigate timing attack for user enumeration by performing a dummy hash comparison
+        dummy_hash = 'scrypt:32768:8:1$A6oInvNzrmnuF5qV$5dd6c72a1b06842b6bfb6e87ccba8c883b9eba182d3a20b6516529b61445ba903a4cfd0af9d851f6de744cdd8116b5f383989b566a840e956f16c3603ff895b1'
+        check_password_hash(dummy_hash, password)
+
     return jsonify({"error": "Invalid credentials"}), 401
 
 @auth_bp.route('/logout', methods=['POST'])
