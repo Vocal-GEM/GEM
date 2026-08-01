@@ -15,3 +15,16 @@ Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
 6:55:09 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
 6:55:09 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
 6:55:09 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:06:47 AM [vite] page reload src/components/ui/RecommendedToolsWidget.jsx
+7:11:45 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:11:45 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:11:45 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:13:19 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:13:19 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:13:19 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+7:13:19 AM [vite] page reload src/services/PrivacyManager.js
+7:13:19 AM [vite] page reload src/services/ResearchMode.js
+7:16:21 AM [vite] page reload src/components/professional/TaskRecorder.jsx
+7:16:21 AM [vite] page reload src/services/PrivacyManager.js
+7:18:27 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+7:18:27 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
