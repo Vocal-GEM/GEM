@@ -89,7 +89,7 @@ const QualityVisualizer = ({ dataRef }) => {
         return () => {
             unsubscribe();
         };
-    }, [componentId, loop]);
+    }, [componentId, dataRef]);
 
     // Helper to render sparkline
     const renderSparkline = (key, colorClass, _height = 40) => {
