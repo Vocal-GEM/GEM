@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - Layout Thrashing with getBoundingClientRect
+**Learning:** High frequency render loops (like RenderCoordinator handlers) shouldn't invoke layout queries such as `getBoundingClientRect()` synchronously. In `Spectrogram`, `HighResSpectrogram`, and `PitchOrb`, these queries caused layout thrashing, hurting FPS, and scaling visual artifacts.
+**Action:** Use `ResizeObserver` combined with `requestAnimationFrame` debouncing, and properties like `clientWidth`/`clientHeight` on target container elements to cache sizes and update canvas dimensions asynchronously, independently from the main animation loop.
