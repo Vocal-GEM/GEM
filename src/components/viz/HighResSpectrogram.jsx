@@ -47,7 +47,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     /**
      * Main rendering loop called by RenderCoordinator
      */
-    const draw = useCallback((deltaTime, currentTime) => {
+    const draw = useCallback(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         if (!dataRef.current || !dataRef.current.spectrum) return;
@@ -134,7 +134,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         lastFormantsRef.current = { f1, f2 };
     }, [dataRef, colormap, componentId]);
-
 
     // Initial canvas setup
     // Handle Resize with ResizeObserver
