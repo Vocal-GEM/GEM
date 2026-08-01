@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
 
 const AudioSourceManager = ({ onSourceChange }) => {
@@ -10,7 +10,7 @@ const AudioSourceManager = ({ onSourceChange }) => {
         checkPermissionAndEnumerate();
     }, [checkPermissionAndEnumerate]);
 
-    const checkPermissionAndEnumerate = async () => {
+    const checkPermissionAndEnumerate = useCallback(async () => {
         try {
             // Must request permission first to get labels
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -27,7 +27,8 @@ const AudioSourceManager = ({ onSourceChange }) => {
             console.error("Microphone permission denied:", err);
             setPermissionGranted(false);
         }
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const enumerateDevices = async () => {
         try {
