@@ -136,7 +136,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
                 if (currFreq > 0 && lastFreq > 0) {
                     const currY = height * (1 - currFreq / MAX_FREQ);
                     const lastY = height * (1 - lastFreq / MAX_FREQ);
-                    context.beginPath();
+                    ctx.beginPath();
                     ctx.strokeStyle = color;
                     // Draw from previous frame's position (shifted left by scrollSpeed)
                     // Previous point was at 'width - scrollSpeed', now at 'width - scrollSpeed * 2'
