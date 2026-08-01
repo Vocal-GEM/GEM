@@ -11,3 +11,7 @@
 Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
   npx update-browserslist-db@latest
   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+6:55:09 AM [vite] page reload src/audio/PitchWorklet.js
+6:55:09 AM [vite] hmr update /src/components/ui/MicrophoneCalibration.jsx, /src/index.css
+6:55:09 AM [vite] hmr update /src/components/ui/IntakeQuestionnaire.jsx, /src/index.css
+6:55:09 AM [vite] page reload src/components/professional/TaskRecorder.jsx
