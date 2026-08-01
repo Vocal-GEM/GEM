@@ -167,14 +167,13 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         if (!container || !canvas) return;
 
+        let rafId;
+
         const updateSize = () => {
             const dpr = window.devicePixelRatio || 1;
-            const rect = container.getBoundingClientRect();
 
-            // Only update if dimensions actually changed
-            const newWidth = Math.floor(rect.width * dpr);
-            const newHeight = 512; // Fixed high vertical resolution
-            const newWidth = Math.round(rect.width * dpr);
+            // Optimization: Only update if dimensions actually changed
+            const newWidth = Math.round(container.clientWidth * dpr);
             const newHeight = 512; // Fixed internal height for vertical resolution
 
             if (canvas.width !== newWidth || canvas.height !== newHeight) {
@@ -189,11 +188,10 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         updateSize();
 
         const resizeObserver = new ResizeObserver(() => {
-            // Use RAF to debounce
-
-        const resizeObserver = new ResizeObserver(() => {
-            // Run in animation frame to avoid resize loops/tearing
-            requestAnimationFrame(updateSize);
+            if (rafId) {
+                globalThis.cancelAnimationFrame(rafId);
+            }
+            rafId = globalThis.requestAnimationFrame(updateSize);
         });
 
         resizeObserver.observe(container);
@@ -203,6 +201,9 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         return () => {
             resizeObserver.disconnect();
+            if (rafId) {
+                globalThis.cancelAnimationFrame(rafId);
+            }
         };
     }, []);
 
