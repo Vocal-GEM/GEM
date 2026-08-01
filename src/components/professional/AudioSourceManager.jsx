@@ -27,7 +27,7 @@ const AudioSourceManager = ({ onSourceChange }) => {
             console.error("Microphone permission denied:", err);
             setPermissionGranted(false);
         }
-    }, []);
+    }, [enumerateDevices]);
 
     const enumerateDevices = useCallback(async () => {
         try {
