@@ -29,10 +29,36 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     const genderRanges = settings.genderRanges || defaultRanges;
 
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
+        let width = 0;
+        let height = 0;
         const dpr = window.devicePixelRatio || 1;
+
+        // ResizeObserver to avoid layout thrashing in loop
+        const resizeObserver = new ResizeObserver((entries) => {
+            if (!entries.length) return;
+            const entry = entries[0];
+            const rect = entry.contentRect;
+
+            width = Math.round(rect.width);
+            height = Math.round(rect.height);
+
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+
+            // Note: ctx scale must be re-applied after resizing
+            ctx.scale(dpr, dpr);
+        });
+
+        // The parent element handles the dimensions
+        if (canvas.parentElement) {
+            resizeObserver.observe(canvas.parentElement);
+        }
+
+
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -65,15 +91,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         };
 
         const loop = () => {
-            if (!canvas) return; // Guard against cleanup
-
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            if (!canvas || width === 0 || height === 0) return; // Guard against cleanup/uninitialized
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -166,6 +184,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
