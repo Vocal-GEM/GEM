@@ -1,7 +1,7 @@
 /**
  * Resonance Processor v6.0 - Synced with Main Thread DSP & Optimized
  */
-/* global sampleRate */
+/* global globalThis.sampleRate */
 
 class DSP {
     static decimate(buffer, inputRate, targetRate) {
@@ -27,7 +27,7 @@ class DSP {
         return output;
     }
 
-    static calculatePitchYIN(buffer, sampleRate, adaptiveThreshold = 0.15) {
+    static calculatePitchYIN(buffer, globalThis.sampleRate, adaptiveThreshold = 0.15) {
         const bufferSize = buffer.length;
         const halfSize = Math.floor(bufferSize / 2);
         const yinBuffer = new Float32Array(halfSize);
@@ -69,7 +69,7 @@ class DSP {
             betterTau += adjustment;
         }
 
-        const pitch = sampleRate / betterTau;
+        const pitch = globalThis.sampleRate / betterTau;
         const confidence = 1 - yinBuffer[tau];
 
         if (pitch < 50 || pitch > 800) {
@@ -79,8 +79,8 @@ class DSP {
         return { pitch, confidence };
     }
 
-    static getMagnitudeAtFrequency(buffer, freq, sampleRate) {
-        const omega = 2 * Math.PI * freq / sampleRate;
+    static getMagnitudeAtFrequency(buffer, freq, globalThis.sampleRate) {
+        const omega = 2 * Math.PI * freq / globalThis.sampleRate;
         let real = 0;
         let imag = 0;
         for (let i = 0; i < buffer.length; i++) {
@@ -171,13 +171,13 @@ class DSP {
         return magnitude;
     }
 
-    static findPeaks(envelope, sampleRate) {
+    static findPeaks(envelope, globalThis.sampleRate) {
         const peaks = [];
         const numPoints = envelope.length;
 
         for (let i = 1; i < numPoints - 1; i++) {
             if (envelope[i] > envelope[i - 1] && envelope[i] > envelope[i + 1]) {
-                const freq = (i / (numPoints - 1)) * (sampleRate / 2);
+                const freq = (i / (numPoints - 1)) * (globalThis.sampleRate / 2);
                 if (freq > 200) {
                     peaks.push({ freq, amp: envelope[i] });
                 }
@@ -272,7 +272,7 @@ class ResonanceProcessor extends AudioWorkletProcessor {
     }
 
     analyze() {
-        const fs = (typeof sampleRate !== 'undefined' ? sampleRate : 44100);
+        const fs = (typeof globalThis.sampleRate !== 'undefined' ? globalThis.sampleRate : 44100);
         const buffer = this.buffer;
 
         let rms = 0;

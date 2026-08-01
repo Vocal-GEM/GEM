@@ -11,15 +11,15 @@ import { SettingsProvider } from '../../context/SettingsContext';
 import { TourProvider } from '../../context/TourContext';
 import { PracticeCardsProvider } from '../../context/PracticeCardsContext';
 
-/* eslint-disable no-undef */
+
 // Mock navigator.mediaDevices
-global.navigator.mediaDevices = {
+globalThis.navigator.mediaDevices = {
     enumerateDevices: vi.fn().mockResolvedValue([]),
     getUserMedia: vi.fn().mockResolvedValue({ getTracks: () => [{ stop: vi.fn() }] }),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn()
 };
-/* eslint-enable no-undef */
+
 
 // Mock dependencies
 vi.mock('../../context/NavigationContext', () => ({
