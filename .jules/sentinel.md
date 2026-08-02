@@ -75,7 +75,3 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
-## 2026-02-14 - Information Leakage in API Responses
-**Vulnerability:** The application was catching exceptions and returning the raw exception string `str(e)` in JSON responses (e.g., in `__init__.py`, `voice_quality.py`, `tts.py`). This can leak sensitive internal details (like database constraints, API request URIs, etc.) to users.
-**Learning:** Returning `str(e)` directly to the client is a common anti-pattern that exposes internal architecture and state, increasing the risk of reconnaissance.
-**Prevention:** Catch exceptions and log them internally, but always return a generic error message (like "Internal server error") to the client. Ensure no route exposes `str(e)` or `repr(e)` via `jsonify`.

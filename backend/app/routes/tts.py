@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
 import os
 import requests
 from ..extensions import limiter
@@ -63,8 +63,7 @@ def synthesize_speech():
     except requests.exceptions.Timeout:
         return jsonify({"error": "Request to ElevenLabs timed out"}), 504
     except requests.exceptions.RequestException as e:
-        current_app.logger.error(f"ElevenLabs connection error: {e}")
-        return jsonify({"error": "Internal server error"}), 502
+        return jsonify({"error": f"Failed to connect to ElevenLabs: {str(e)}"}), 502
 
 
 @tts_bp.route('/voices', methods=['GET'])
@@ -100,5 +99,4 @@ def get_voices():
     except requests.exceptions.Timeout:
         return jsonify({"error": "Request timed out", "voices": []}), 504
     except requests.exceptions.RequestException as e:
-        current_app.logger.error(f"ElevenLabs connection error: {e}")
-        return jsonify({"error": "Internal server error", "voices": []}), 502
+        return jsonify({"error": f"Failed to connect: {str(e)}", "voices": []}), 502
