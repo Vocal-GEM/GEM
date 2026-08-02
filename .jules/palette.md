@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2024-05-25 - Accessibility of Visualization Controls
+**Learning:** Foundational visualization components (e.g., DynamicOrb, BrightnessMeter, SZRatio) often contain icon-only buttons (like info, modes, play/stop) without `aria-label` attributes, creating a barrier for screen reader users trying to interact with or understand these visualizations.
+**Action:** When implementing or modifying visualization components with interactive elements, always explicitly add an `aria-label` to icon-only buttons or interactive toggles to ensure full accessibility.
