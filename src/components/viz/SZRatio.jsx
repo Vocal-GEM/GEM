@@ -183,6 +183,7 @@ const SZRatio = ({ dataRef, isActive }) => {
                 )}
 
                 <button
+                    aria-label="Reset capture"
                     onClick={reset}
                     className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
                 >
