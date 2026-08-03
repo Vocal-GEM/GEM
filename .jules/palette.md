@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-08-03 - [Missing ARIA Labels on Icon-only Buttons]
+**Learning:** Found several icon-only buttons across multiple components (e.g. Spectrogram close/screenshot, ShadowingExercise recording/navigation controls, Community success stories like buttons) that lacked accessibility metadata. Without `aria-label`, screen readers have no context for what the button does since there's no visible text inside it.
+**Action:** When adding new icon-only buttons (especially those containing just `lucide-react` icons like `<X>`, `<Heart>`, or `<Camera>`), always explicitly include an `aria-label` attribute (e.g., `aria-label="Close modal"`). Additionally, adding focus-visible styles ensures they are keyboard accessible and visually distinguishable when tabbed to.
