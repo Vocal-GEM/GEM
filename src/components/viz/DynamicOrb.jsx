@@ -216,7 +216,10 @@ void main() {
 }
 `;
 
-const VisualizerMesh = ({ mode, setMode, dataRef, externalDataRef, calibration, targetRange }) => {
+// Optimization: Wrapped VisualizerMesh in memo() to prevent unnecessary
+// React re-evaluations of the complex mesh tree during parent component re-renders.
+// useFrame handles internal animations efficiently.
+const VisualizerMesh = memo(({ mode, setMode, dataRef, externalDataRef, calibration, targetRange }) => {
   const mesh = useRef();
   const material = useRef();
   const { gl } = useThree();
@@ -359,7 +362,14 @@ const VisualizerMesh = ({ mode, setMode, dataRef, externalDataRef, calibration, 
       />
     </mesh>
   );
-};
+}, (prevProps, nextProps) => {
+  return prevProps.mode === nextProps.mode &&
+         prevProps.calibration?.dark === nextProps.calibration?.dark &&
+         prevProps.calibration?.bright === nextProps.calibration?.bright &&
+         prevProps.targetRange?.min === nextProps.targetRange?.min &&
+         prevProps.targetRange?.max === nextProps.targetRange?.max;
+});
+VisualizerMesh.displayName = 'VisualizerMesh';
 
 // Simple Intersection Observer Hook
 const useIntersectionObserver = (ref) => {
