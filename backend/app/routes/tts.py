@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 import os
 import requests
 from ..extensions import limiter
@@ -49,10 +49,8 @@ def synthesize_speech():
 
         if not response.ok:
             error_text = response.text
-            return jsonify({
-                "error": f"ElevenLabs API error: {response.status_code}",
-                "details": error_text
-            }), response.status_code
+            current_app.logger.error(f"ElevenLabs API error: {response.status_code}, details: {error_text}")
+            return jsonify({"error": "An internal error occurred with the TTS service."}), 502
 
         # Return audio data
         return response.content, 200, {
@@ -63,7 +61,8 @@ def synthesize_speech():
     except requests.exceptions.Timeout:
         return jsonify({"error": "Request to ElevenLabs timed out"}), 504
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Failed to connect to ElevenLabs: {str(e)}"}), 502
+        current_app.logger.error(f"Failed to connect to ElevenLabs: {e}")
+        return jsonify({"error": "Failed to connect to TTS service"}), 502
 
 
 @tts_bp.route('/voices', methods=['GET'])
@@ -88,10 +87,8 @@ def get_voices():
         )
 
         if not response.ok:
-            return jsonify({
-                "error": f"Failed to fetch voices: {response.status_code}",
-                "voices": []
-            }), response.status_code
+            current_app.logger.error(f"ElevenLabs API voices error: {response.status_code}")
+            return jsonify({"error": "Failed to fetch voices from TTS service", "voices": []}), 502
 
         data = response.json()
         return jsonify(data), 200
@@ -99,4 +96,5 @@ def get_voices():
     except requests.exceptions.Timeout:
         return jsonify({"error": "Request timed out", "voices": []}), 504
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Failed to connect: {str(e)}", "voices": []}), 502
+        current_app.logger.error(f"Failed to fetch voices: {e}")
+        return jsonify({"error": "Failed to connect to TTS service", "voices": []}), 502
