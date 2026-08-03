@@ -22,6 +22,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     stroke: vi.fn(),
     fillText: vi.fn(),
     scale: vi.fn(),
+    setTransform: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
@@ -64,12 +65,10 @@ describe('PitchOrb', () => {
         const [id, callback] = renderCoordinator.subscribe.mock.calls[0];
 
         // Execute the callback
+        const prevCallCount = mockRequestAnimationFrame.mock.calls.length;
         callback();
 
-        // With the bug, requestAnimationFrame is called.
-        // We assert it IS called to confirm the bug exists in the current code,
-        // OR we assert it is NOT called if we want to write the test for the desired state.
-        // Let's write the test for the DESIRED state (fail now, pass later).
-        expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+        // The draw loop should NOT call requestAnimationFrame recursively
+        expect(mockRequestAnimationFrame.mock.calls.length).toBe(prevCallCount);
     });
 });
