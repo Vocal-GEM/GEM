@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState, useCallback, memo, useId } from 'react';
+import { useEffect, useRef, useMemo, useState, useCallback, memo } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { generateColormap } from '../../utils/colormaps';
 import { renderCoordinator } from '../../services/RenderCoordinator';
@@ -25,9 +25,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const containerRef = useRef(null);
     const lastFormantsRef = useRef({ f1: 0, f2: 0 });
     const { settings } = useSettings();
-
-    // Component ID for RenderCoordinator
-    const componentId = useId();
 
     // Reusable buffers to avoid GC
     // Unique component ID for RenderCoordinator
@@ -154,10 +151,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         lastFormantsRef.current = { f1, f2 };
 
-    }, [dataRef, colormap]);
-
-    // Initial canvas setup & ResizeObserver
-    }, [dataRef, colormap, componentId]);
 
     // Initial canvas setup
     // Handle Resize with ResizeObserver
@@ -218,7 +211,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             unsubscribe();
         };
     }, [draw, componentId]);
-    }, [componentId, draw]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position
