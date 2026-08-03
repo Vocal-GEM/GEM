@@ -232,7 +232,10 @@ const SuccessStories = () => {
 
                         <div className="flex justify-between items-center text-xs text-slate-500 border-t border-slate-700/50 pt-3">
                             <span>Goal: {story.voice_goal}</span>
-                            <button className="flex items-center gap-1 hover:text-pink-400 transition-colors">
+                            <button
+                                className="flex items-center gap-1 hover:text-pink-400 transition-colors focus-visible:ring-2 focus-visible:ring-pink-400 rounded outline-none"
+                                aria-label={`Like story by ${story.author} (${story.upvotes} likes)`}
+                            >
                                 <Heart size={14} />
                                 {story.upvotes}
                             </button>
