@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-12 - Missing memoization on React Three Fiber Components
+**Learning:** `VisualizerMesh` in `DynamicOrb.jsx` was defined as a standard functional component but passed into `Canvas` and `VisualizerCanvas` without `memo`. Since `useFrame` updates are handled internally by Three Fiber, standard React re-renders on the wrapper component caused unnecessary re-evaluations of the mesh tree.
+**Action:** Wrap complex inner Three.js components (like meshes with custom shaders) in `memo()` to isolate them from parent UI state changes, preventing unnecessary React reconciliation while `useFrame` handles the animation loop natively.
