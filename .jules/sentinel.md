@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-10-24 - [Information Disclosure via Error Messages]
+**Vulnerability:** Several backend API routes (`voice_quality.py` and `tts.py`) were catching generic exceptions and returning their string representations directly in the JSON response payload (`jsonify({'error': str(e)})`).
+**Learning:** This pattern exposes internal implementation details (and potentially sensitive stack trace information, library versions, or file paths) to external users. It was likely introduced for easier debugging without realizing the security implications for production endpoints.
+**Prevention:** Always log exceptions internally (`current_app.logger.error(e)`) and return generic, safe error messages to clients (e.g., `'error': 'An internal error occurred.'`).
