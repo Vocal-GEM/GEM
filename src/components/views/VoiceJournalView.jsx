@@ -1,3 +1,4 @@
+import { useToast } from '../../context/ToastContext';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Mic, Square, Play, Pause, Trash2, Calendar, Clock, Music, Plus, X, Tag, FileText, Search, Filter, TrendingUp, ChevronDown } from 'lucide-react';
 import LoadingSpinner from '../ui/LoadingSpinner';
@@ -198,6 +199,8 @@ const AVAILABLE_TAGS = [
 ];
 
 const VoiceJournalView = () => {
+    const { showError } = useToast();
+
     const [recordings, setRecordings] = useState([]);
     const [isRecording, setIsRecording] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -314,7 +317,7 @@ const VoiceJournalView = () => {
             }, 1000);
         } catch (err) {
             console.error('Failed to start recording:', err);
-            alert('Could not access microphone. Please check permissions.');
+            showError('Could not access microphone. Please check permissions.');
         }
     };
 

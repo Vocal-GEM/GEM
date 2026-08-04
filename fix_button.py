@@ -1,4 +1,14 @@
-import React from "react";
+import sys
+
+def fix_file(filepath):
+    with open(filepath, 'r') as f:
+        content = f.read()
+
+    # The file has a duplicate describe block and a missing closing brace on the first one
+    # Let's just fix it by keeping the second one which is more comprehensive,
+    # but the imports are scattered.
+
+    fixed_content = """import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { Button } from "./button";
@@ -39,3 +49,10 @@ describe("Button", () => {
       expect(container.firstChild).toHaveClass("opacity-50");
   });
 });
+"""
+
+    with open(filepath, 'w') as f:
+        f.write(fixed_content)
+
+if __name__ == "__main__":
+    fix_file("src/components/ui/button.test.jsx")
