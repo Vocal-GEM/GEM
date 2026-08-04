@@ -204,6 +204,7 @@ const GuidedJourney = ({ onClose }) => {
                     {/* Exit button */}
                     <button
                         onClick={() => setShowExitConfirm(true)}
+                        aria-label="Exit Journey"
                         className="p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-white"
                         title="Exit Journey"
                     >

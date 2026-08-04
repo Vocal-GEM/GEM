@@ -107,6 +107,7 @@ const TooltipOverlay = ({
                         {!isFirstStep && (
                             <button
                                 onClick={onPrev}
+                                aria-label="Previous step"
                                 className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
                             >
                                 <ChevronLeft size={20} />
