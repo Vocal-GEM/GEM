@@ -48,3 +48,11 @@
 ## 2026-01-25 - React ESLint unescaped entities
 **Learning:** React JSX requires explicit escaping for quotes like `'` and `"` within text nodes. This is often caught by the `react/no-unescaped-entities` rule.
 **Action:** Use `&apos;` for `'` and `&quot;` for `"` when writing text in JSX to satisfy lint rules.
+
+## 2026-01-25 - Vitest Global mocking
+**Learning:** `global` is not defined in the browser-like environment of Vitest/jsdom. Test files were throwing `ReferenceError: global is not defined` when trying to set `global.requestAnimationFrame` or `global.ResizeObserver`.
+**Action:** Use `globalThis` instead of `global` for modifying the global scope in tests to maintain compatibility across Node and jsdom test environments.
+
+## 2026-01-25 - React Test Environment requires specific module loading
+**Learning:** Overriding global module mocks like `lucide-react` with `require('react')` inside `vi.mock` factory functions doesn't work out of the box in some strict module environments, causing `ReferenceError: require is not defined`.
+**Action:** Always import required modules normally at the top of the file, or mock the ES module correctly by returning a functional mock component instead of relying on `require` within the factory closure. Also ensure functional mock components have a `displayName` set to satisfy ESLint `react/display-name`.
