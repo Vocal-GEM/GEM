@@ -44,3 +44,7 @@
 ## 2026-01-25 - Layout Thrashing in PitchOrb loop
 **Learning:** `getBoundingClientRect()` was being called inside the animation loop for `PitchOrb`, similar to `PitchVisualizer`. This caused synchronous layout thrashing up to 60 times a second.
 **Action:** Replaced it with a `ResizeObserver` tracking `canvas.clientWidth/Height` in a local variable which is then consumed efficiently by the drawing loop. This follows the pattern already applied elsewhere and eliminates main thread blocking.
+
+## 2026-01-25 - React ESLint unescaped entities
+**Learning:** React JSX requires explicit escaping for quotes like `'` and `"` within text nodes. This is often caught by the `react/no-unescaped-entities` rule.
+**Action:** Use `&apos;` for `'` and `&quot;` for `"` when writing text in JSX to satisfy lint rules.
