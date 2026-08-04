@@ -31,8 +31,32 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
+
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
+        let logicalWidth = 0;
+        let logicalHeight = 0;
+
+        const updateSize = () => {
+            if (!canvas) return;
+            logicalWidth = canvas.clientWidth;
+            logicalHeight = canvas.clientHeight;
+            canvas.width = Math.round(logicalWidth * dpr);
+            canvas.height = Math.round(logicalHeight * dpr);
+            ctx.scale(dpr, dpr);
+        };
+
+        // Initial size
+        updateSize();
+
+        let rafId;
+        const resizeObserver = new ResizeObserver(() => {
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(updateSize);
+        });
+
+        resizeObserver.observe(canvas);
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -65,15 +89,10 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         };
 
         const loop = () => {
-            if (!canvas) return; // Guard against cleanup
+            if (!canvas || logicalWidth === 0 || logicalHeight === 0) return; // Guard against cleanup or uninitialized size
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            const width = logicalWidth;
+            const height = logicalHeight;
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -166,6 +185,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
+            if (rafId) cancelAnimationFrame(rafId);
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
