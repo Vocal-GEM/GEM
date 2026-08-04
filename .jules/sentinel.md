@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-18 - [Prevent User Enumeration Timing Attack in Login Endpoint]
+**Vulnerability:** The `/login` endpoint returned immediately when a username was not found but took significantly longer to process valid usernames due to the computationally expensive `check_password_hash` function.
+**Learning:** This discrepancy in response time allows an attacker to enumerate valid usernames by measuring the time it takes for the server to respond.
+**Prevention:** Always ensure authentication endpoints take roughly the same amount of time regardless of whether a username is found by using a dummy hash computation as a fallback for invalid usernames.
