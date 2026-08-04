@@ -44,10 +44,17 @@ def login():
     data = request.json
     user = User.query.filter_by(username=data.get('username')).first()
     
-    if user and check_password_hash(user.password_hash, data.get('password')):
-        login_user(user)
-        return jsonify({"message": "Logged in", "user": {"id": user.id, "username": user.username}})
+    password = data.get('password', '')
     
+    if user:
+        if check_password_hash(user.password_hash, password):
+            login_user(user)
+            return jsonify({"message": "Logged in", "user": {"id": user.id, "username": user.username}})
+    else:
+        # Prevent user enumeration timing attack by verifying a dummy hash
+        # Use pbkdf2:sha256 as it's the default werkzeug method now
+        check_password_hash('pbkdf2:sha256:600000$salt$dummyhash', password)
+
     return jsonify({"error": "Invalid credentials"}), 401
 
 @auth_bp.route('/logout', methods=['POST'])
