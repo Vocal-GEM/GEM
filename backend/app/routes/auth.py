@@ -7,6 +7,9 @@ from ..extensions import limiter
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api')
 
+# Pre-compute a dummy hash to use for mitigating timing attacks
+DUMMY_PASSWORD_HASH = generate_password_hash('dummy')
+
 @auth_bp.route('/signup', methods=['POST'])
 @limiter.limit("10 per hour")
 def signup():
@@ -44,7 +47,15 @@ def login():
     data = request.json
     user = User.query.filter_by(username=data.get('username')).first()
     
-    if user and check_password_hash(user.password_hash, data.get('password')):
+    password = data.get('password', '')
+    if user:
+        is_valid = check_password_hash(user.password_hash, password)
+    else:
+        # Mitigate timing attacks for user enumeration
+        is_valid = False
+        check_password_hash(DUMMY_PASSWORD_HASH, password)
+
+    if user and is_valid:
         login_user(user)
         return jsonify({"message": "Logged in", "user": {"id": user.id, "username": user.username}})
     
