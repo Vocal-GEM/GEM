@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-30 - [Layout Thrashing in Canvas Render Loops]
+**Learning:** Calling `getBoundingClientRect()` or modifying canvas dimensions (`canvas.width`/`canvas.height`) inside high-frequency animation loops (like `PitchOrb.jsx`) causes synchronous layout thrashing.
+**Action:** Move canvas dimension updates to a `ResizeObserver` callback, cache the dimensions in a `useRef`, and use the cached values in the render loop. Always apply `Math.round()` to scaled canvas dimensions and use `requestAnimationFrame` for resize callbacks to avoid 'loop limit exceeded' errors.
