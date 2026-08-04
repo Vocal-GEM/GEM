@@ -1,6 +1,15 @@
+import { ToastProvider } from '../../context/ToastContext';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import HistoryView from './HistoryView';
+
+vi.mock('../../context/ToastContext', () => ({
+    useToast: () => ({
+        showError: vi.fn(),
+        showSuccess: vi.fn()
+    }),
+    ToastProvider: ({ children }) => <div>{children}</div>
+}));
 
 // Mock dependencies
 vi.mock('../../context/ProfileContext', () => ({

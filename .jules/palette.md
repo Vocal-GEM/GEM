@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2024-05-25 - Replacing Native Alerts with Toast
+**Learning:** Native `window.alert()` calls interrupt the user flow, block the main thread, and are visually jarring, leading to poor UX and accessibility for screen readers.
+**Action:** Replaced all `alert()` calls across components (`DAFMode`, `VoiceJournalView`, `ClipReviewModal`, `HistoryView`) with the `Toast` notification system (`useToast().showError()`), which provides non-blocking feedback and maintains context while correctly using ARIA roles.
