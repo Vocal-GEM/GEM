@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-08-05 - Avoid layout thrashing in canvas rendering loops
+**Learning:** Calling `canvas.width = ...` inside a `requestAnimationFrame` loop creates performance issues by repeatedly clearing and re-initializing the canvas state even if the dimensions haven't changed. Also, calling `getBoundingClientRect()` forces a synchronous layout calculation which causes Layout Thrashing and significantly degrades frame rates.
+**Action:** Use a variables or React ref to track current dimensions and only update `canvas.width` and `canvas.height` (and apply `ctx.scale`) when they actually change. Avoid `getBoundingClientRect()` in hot paths; defer to a ResizeObserver to update dimensions or cache them.
