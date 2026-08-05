@@ -64,16 +64,25 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        // ResizeObserver is better but for now let's just avoid re-assigning width/height in the animation loop if they haven't changed to avoid Layout Thrashing
+        let currentWidth = 0;
+        let currentHeight = 0;
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
             const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
             const width = rect.width;
             const height = rect.height;
+
+            if (currentWidth !== width || currentHeight !== height) {
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                ctx.scale(dpr, dpr);
+                currentWidth = width;
+                currentHeight = height;
+            }
+
             const centerX = width / 2;
             const centerY = height / 2;
 
