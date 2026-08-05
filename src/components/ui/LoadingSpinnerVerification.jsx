@@ -3,8 +3,7 @@ import LoadingSpinner from './LoadingSpinner';
 import { Button } from './button';
 
 export default function LoadingSpinnerTest() {
-  return (
-    <div className="p-10 space-y-10 bg-slate-900 min-h-screen">
+  return ( <div className="p-10 space-y-10 bg-slate-900 min-h-screen">
       <h1 className="text-3xl font-bold text-white mb-8">
         Palette 🎨 UX Verification
       </h1>
@@ -83,8 +82,7 @@ import EmptyState from './EmptyState';
 import { Ghost, Search, Plus } from 'lucide-react';
 
 export default function LoadingSpinnerTest() {
-    return (
-        <div className="p-10 space-y-10 bg-slate-900 min-h-screen text-slate-100">
+    return ( <div className="p-10 space-y-10 bg-slate-900 min-h-screen text-slate-100">
             <h1 className="text-2xl text-white mb-4">Palette Verification</h1>
 
             <section className="space-y-4">
