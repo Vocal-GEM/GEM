@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-08-05 - [LiveMetricsBar Render Optimization]
+**Learning:** The application uses `RenderCoordinator` to trigger updates for high-frequency audio visualizers. In `LiveMetricsBar`, the subscription to `renderCoordinator` was setting React state on *every single audio frame* (typically 60+ times per second). This triggers a full React render cycle for the component continuously, causing unnecessary CPU load and potential layout thrashing in high-frequency paths.
+**Action:** Always replace `useState` with `useRef` directly manipulating DOM element properties (`textContent`, `style`, etc.) for high-frequency real-time metrics visualizations fed by animation frames or audio processing loops. Do not drive 60 FPS updates through React's state tree. Also, wrap components driven by external data refs in `React.memo` to prevent parent updates from unnecessarily re-rendering them.
