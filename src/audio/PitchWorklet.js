@@ -1,4 +1,4 @@
-/* global currentTime, currentFrame, sampleRate */
+/* global currentTime */
 /**
  * PitchWorklet.js
  * AudioWorklet processor for ultra-low-latency pitch detection

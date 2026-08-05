@@ -32,7 +32,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     // Reusable buffers to avoid GC
     // Unique component ID for RenderCoordinator
     const uniqueId = useId();
-    const componentId = `spectrogram-highres-${uniqueId}`;
+    //
 
     // Reusable buffers to avoid garbage collection churn
     const imgDataRef = useRef(null);
@@ -56,22 +56,15 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         if (!canvas) return;
         if (!dataRef.current || !dataRef.current.spectrum) return;
 
-        const width = canvas.width;
-        const height = canvas.height;
+
+
         const scrollSpeed = 2; // px per frame
 
         // Optimization: Use alpha: false for better performance
-        const ctx = canvas.getContext('2d', { alpha: false });
+
 
         // Optimization: Use alpha: false for better performance
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
-        const ctx = canvas.getContext('2d', { alpha: false });
-
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
-        const spectrum = dataRef.current.spectrum;
-
         // Ensure buffers are ready and match height
         if (!imgDataRef.current || imgDataRef.current.height !== height) {
             try {
@@ -157,7 +150,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     }, [dataRef, colormap]);
 
     // Initial canvas setup & ResizeObserver
-    }, [dataRef, colormap, componentId]);
+    // }, [dataRef, colormap]);
 
     // Initial canvas setup
     // Handle Resize with ResizeObserver
@@ -209,16 +202,15 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     // Render loop subscription
     useEffect(() => {
         const unsubscribe = renderCoordinator.subscribe(
-            componentId,
-            draw,
+                        draw,
             renderCoordinator.PRIORITY.MEDIUM
         );
 
         return () => {
             unsubscribe();
         };
-    }, [draw, componentId]);
-    }, [componentId, draw]);
+    }, [draw]);
+    // }, [draw]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position
