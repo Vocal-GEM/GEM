@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-14 - Accessibility improvements for icon-only buttons
+**Learning:** Found a pattern across multiple components (`ShadowingExercise`, `Spectrogram`, `SuccessStories`) where icon-only buttons lacked proper `aria-label`s and clear visual focus indicators. This hinders keyboard and screen reader navigation.
+**Action:** Always ensure icon-only buttons have descriptive `aria-label`s or `title` attributes, and include focus-visible utility classes to show keyboard focus clearly.
