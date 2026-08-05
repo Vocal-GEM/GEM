@@ -389,7 +389,7 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
 
                     {/* Duration Toggle */}
                     <button
-                        onClick={() => setDuration(d => d === 2.0 ? 4.0 : 2.0)}
+                        aria-label="Toggle Duration" onClick={() => setDuration(d => d === 2.0 ? 4.0 : 2.0)}
                         className="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-mono text-slate-400 min-w-[30px]"
                         title="Toggle Duration"
                     >
