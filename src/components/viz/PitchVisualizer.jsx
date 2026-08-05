@@ -630,6 +630,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                         )}
                     </div>
                     <button
+                        aria-label="Reset Average"
                         onClick={handleResetAverage}
                         className="w-7 h-7 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-slate-700/50"
                         title="Reset Average"
@@ -641,6 +642,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
+                    aria-label="Zoom In"
                     onClick={handleZoomIn}
                     className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-white flex items-center justify-center backdrop-blur-sm border border-slate-700"
                     title="Zoom In"
@@ -648,6 +650,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
                 </button>
                 <button
+                    aria-label="Zoom Out"
                     onClick={handleZoomOut}
                     className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-white flex items-center justify-center backdrop-blur-sm border border-slate-700"
                     title="Zoom Out"
@@ -667,6 +670,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
 
             {/* Gender Timeline Toggle */}
             <button
+                aria-label="Toggle Gender Timeline"
                 onClick={() => setShowGenderTimeline(!showGenderTimeline)}
                 className={`absolute top-3 left-28 z-20 p-2 rounded-lg backdrop-blur-sm border transition-all ${showGenderTimeline
                     ? 'bg-purple-500/30 border-purple-500/50 text-purple-300'
@@ -687,6 +691,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                                 Gender Estimation Timeline
                             </div>
                             <button
+                                aria-label="Close Gender Timeline"
                                 onClick={() => setShowGenderTimeline(false)}
                                 className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white"
                             >
@@ -706,6 +711,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                         <AlertTriangle size={14} />
                         <span className="text-xs font-bold">UNSTABLE SIGNAL</span>
                         <button
+                            aria-label="Help with Unstable Signal"
                             onClick={() => setShowUnstableHelp(true)}
                             className="ml-1 hover:bg-white/20 rounded-full p-0.5 transition-colors"
                         >
@@ -760,6 +766,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
                     <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl relative">
                         <button
+                            aria-label="Close Help"
                             onClick={() => setShowUnstableHelp(false)}
                             className="absolute top-4 right-4 text-slate-400 hover:text-white"
                         >
