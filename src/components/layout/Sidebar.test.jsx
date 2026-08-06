@@ -2,6 +2,14 @@ import { render, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Sidebar from './Sidebar';
 
+vi.mock('lucide-react', () => new Proxy({}, {
+    get: (target, prop) => {
+        const MockIcon = () => <div data-testid={`icon-${prop.toLowerCase()}`} />;
+        MockIcon.displayName = `Mock${prop}`;
+        return MockIcon;
+    }
+}));
+
 // Mock contexts
 const mockLogout = vi.fn();
 const mockUseAuth = vi.fn();
@@ -50,6 +58,8 @@ vi.mock('../../services/SearchService', () => ({
     search: vi.fn(() => []),
     groupResultsByType: vi.fn(() => []),
 }));
+
+vi.mock('../../config/featureFlags', () => ({ FEATURES: { camera: true } }));
 
 const MockNavigationProvider = ({ children }) => <div>{children}</div>;
 
