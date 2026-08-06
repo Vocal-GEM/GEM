@@ -943,7 +943,9 @@ def validate_u_vowel(y, sr, f1_target=300, f2_target=800, tolerance=0.25):
         }
         
     except Exception as e:
-        return {"is_valid": False, "error": str(e)}
+        import logging
+        logging.getLogger(__name__).error(f"Error in validate_vowel_u: {e}")
+        return {"is_valid": False, "error": "An internal error occurred during vowel validation"}
 
 def classify_phonation_state(spectral_tilt, h1_h2, hnr, jitter, shimmer):
     """
@@ -1408,7 +1410,9 @@ def analyze_file(path, goal_name="transfem_soft_slightly_breathy"):
                 "speech_rate": rate_result
             }
         except Exception as e:
-            voicelab_data = {"error": str(e)}
+            import logging
+            logging.getLogger(__name__).error(f"Error in voicelab analysis: {e}")
+            voicelab_data = {"error": "An internal error occurred during voicelab analysis"}
     
     # Mean RBI (ignoring Nones)
     valid_rbis = [x for x in rbi_series if x is not None]
