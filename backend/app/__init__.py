@@ -105,8 +105,9 @@ def create_app():
 
     @app.errorhandler(400)
     def bad_request(e):
+        app.logger.error(f"Bad request: {e}")
         if request.accept_mimetypes.accept_json and not request.accept_mimetypes.accept_html:
-            return jsonify(error=str(e)), 400
+            return jsonify(error="Bad Request"), 400
         return jsonify(error="Bad Request"), 400
 
 
