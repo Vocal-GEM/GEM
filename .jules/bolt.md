@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-18 - AudioEngine Standalone RAF Anti-Pattern
+**Learning:** Found a specific anti-pattern where `AudioEngine.js` maintained its own recursive `requestAnimationFrame` loop alongside `RenderCoordinator`, defeating the purpose of the singleton coordinator intended to lower CPU usage across all visualization metrics.
+**Action:** Always search for standalone `requestAnimationFrame` calls in services/engines and route them through `RenderCoordinator` with appropriate priority to ensure centralized frame management.
