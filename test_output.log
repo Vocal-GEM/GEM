@@ -1,0 +1,1904 @@
+
+> vocal-gem@0.1.0 test
+> vitest
+
+6:37:38 AM [vite] warning: `esbuild` option was specified by "vite:react-babel" plugin. This option is deprecated, please use `oxc` instead.
+6:37:38 AM [vite] warning: `optimizeDeps.esbuildOptions` option was specified by "vite:react-babel" plugin. This option is deprecated, please use `optimizeDeps.rolldownOptions` instead.
+Both esbuild and oxc options were set. oxc options will be used and esbuild options will be ignored. The following esbuild options were set: `{ jsx: 'automatic', jsxImportSource: undefined }`
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90m/app[39m
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ [31m❯[39m src/engines/AudioEngine.socket.test.js [2m([22m[2m5 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[32m 19[2mms[22m[39m
+[31m     [31m×[31m should initialize socket on start[39m[32m 14[2mms[22m[39m
+[31m     [31m×[31m should handle socket connection events[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should emit audio_chunk when connected[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should buffer chunks when disconnected and flush on connect[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should update latestBackendAnalysis on analysis_update[39m[32m 1[2mms[22m[39m
+ [31m❯[39m src/components/layout/Sidebar.test.jsx [2m([22m[2m5 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[32m 138[2mms[22m[39m
+[31m     [31m×[31m shows Sign In button when not logged in[39m[32m 77[2mms[22m[39m
+[31m     [31m×[31m shows user info and Sign Out when logged in[39m[32m 15[2mms[22m[39m
+[31m     [31m×[31m opens Login modal on Sign In click[39m[32m 13[2mms[22m[39m
+[31m     [31m×[31m calls logout on Sign Out click[39m[32m 13[2mms[22m[39m
+[31m     [31m×[31m opens Camera modal when Mirror button is clicked[39m[32m 17[2mms[22m[39m
+ [31m❯[39m src/components/community/SuccessStories.test.jsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/test/validation/algorithmValidation.test.js [2m([22m[2m6 tests[22m[2m | [22m[33m6 skipped[39m[2m)[22m[32m 9[2mms[22m[39m
+     [2m[90m↓[39m[22m accurately estimates pitch for Sustained /a/ vowel, cisgender female speaker
+     [2m[90m↓[39m[22m accurately estimates formants for Sustained /a/ vowel, cisgender female speaker
+     [2m[90m↓[39m[22m accurately estimates pitch for Sustained /a/ vowel, cisgender male speaker
+     [2m[90m↓[39m[22m accurately estimates formants for Sustained /a/ vowel, cisgender male speaker
+     [2m[90m↓[39m[22m accurately estimates pitch for Pitch glide up, transgender female speaker
+     [2m[90m↓[39m[22m handles diverse voice types correctly
+ [31m❯[39m src/context/AuthContext.test.jsx [2m([22m[2m4 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 2096[2mms[22m[39m
+     [32m✓[39m initializes with null user if /me fails[32m 43[2mms[22m[39m
+[31m     [31m×[31m logs in successfully[39m[33m 1028[2mms[22m[39m
+     [32m✓[39m handles login failure[32m 8[2mms[22m[39m
+[31m     [31m×[31m clears local data on logout[39m[33m 1012[2mms[22m[39m
+ [31m❯[39m src/components/viz/BreathinessMeter.test.jsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/components/viz/HighResSpectrogram.test.jsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/components/ui/JournalForm.test.jsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/components/viz/QualityVisualizer.test.jsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/components/ui/LoadingSpinner.test.jsx [2m([22m[2m0 test[22m[2m)[22m
+Warning: A vi.hoisted() call in "/app/src/components/ui/QuickActions.test.jsx" is not at the top level of the module. Although it appears nested, it will be hoisted and executed before any tests run. Move it to the top level to reflect its actual execution order. This will become an error in a future version.
+See: https://vitest.dev/guide/mocking/modules#how-it-works
+Warning: A vi.mock("../../context/SettingsContext") call in "/app/src/components/ui/QuickActions.test.jsx" is not at the top level of the module. Although it appears nested, it will be hoisted and executed before any tests run. Move it to the top level to reflect its actual execution order. This will become an error in a future version.
+See: https://vitest.dev/guide/mocking/modules#how-it-works
+ [31m❯[39m src/components/ui/button.test.jsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/components/ui/QuickActions.test.jsx [2m([22m[2m0 test[22m[2m)[22m
+ [32m✓[39m src/components/tools/PitchFeedbackTool/PitchFeedbackTool.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[33m 545[2mms[22m[39m
+     [33m[2m✓[22m[39m renders start listening state and toggles microphone on click [33m 394[2mms[22m[39m
+[90mstderr[2m | src/components/ui/HistoryView.test.jsx[2m > [22m[2mHistoryView Personalization[2m > [22m[2mshould render all widgets by default
+[22m[39mWarning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (/app/src/components/ui/HistoryView.jsx:34:24)
+    at div
+    at MockPracticeCardsProvider (/app/src/components/ui/HistoryView.test.jsx:46:38)
+
+[90mstderr[2m | src/components/ui/HistoryView.test.jsx[2m > [22m[2mHistoryView Personalization[2m > [22m[2mshould hide widgets based on config
+[22m[39mWarning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (/app/src/components/ui/HistoryView.jsx:34:24)
+
+[90mstderr[2m | src/components/ui/HistoryView.test.jsx[2m > [22m[2mHistoryView Personalization[2m > [22m[2mshould dispatch openDashboardConfig event
+[22m[39mWarning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (/app/src/components/ui/HistoryView.jsx:34:24)
+
+[90mstderr[2m | src/components/ui/HistoryView.test.jsx[2m > [22m[2mHistoryView Personalization[2m > [22m[2mshould dispatch openDashboardConfig event
+[22m[39mWarning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (/app/src/components/ui/HistoryView.jsx:34:24)
+
+[90mstderr[2m | src/components/ui/HistoryView.test.jsx[2m > [22m[2mHistoryView Personalization[2m > [22m[2mshould dispatch openDashboardConfig event
+[22m[39mWarning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (/app/src/components/ui/HistoryView.jsx:34:24)
+
+[90mstderr[2m | src/components/ui/HistoryView.test.jsx[2m > [22m[2mHistoryView Personalization[2m > [22m[2mshould dispatch openDashboardConfig event
+[22m[39mWarning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (/app/src/components/ui/HistoryView.jsx:34:24)
+
+[90mstderr[2m | src/components/ui/HistoryView.test.jsx[2m > [22m[2mHistoryView Personalization[2m > [22m[2mshould dispatch openDashboardConfig event
+[22m[39mWarning: An update to HistoryView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HistoryView (/app/src/components/ui/HistoryView.jsx:34:24)
+
+ [32m✓[39m src/components/ui/HistoryView.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 145[2mms[22m[39m
+ [32m✓[39m src/components/ui/Toast.test.jsx [2m([22m[2m7 tests[22m[2m)[22m[33m 389[2mms[22m[39m
+ [32m✓[39m src/components/ui/SkeletonLoader.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[33m 377[2mms[22m[39m
+ [32m✓[39m src/components/ui/OfflineIndicator.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[33m 304[2mms[22m[39m
+ [32m✓[39m src/components/ui/EmptyState.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[33m 363[2mms[22m[39m
+ [32m✓[39m src/components/ui/TourOverlay.test.jsx [2m([22m[2m4 tests[22m[2m)[22m[32m 104[2mms[22m[39m
+ [32m✓[39m src/test/SmartCoachWidget.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[32m 108[2mms[22m[39m
+ [32m✓[39m src/test/VocalHealthPanel.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[32m 96[2mms[22m[39m
+ [32m✓[39m src/context/TourContext.test.jsx [2m([22m[2m6 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+[90mstdout[2m | src/components/views/PracticeMode.test.jsx[2m > [22m[2mPracticeMode[2m > [22m[2mrenders without crashing
+[22m[39mMcLeodPitchDetector: Successfully initialized.
+
+ [32m✓[39m src/components/views/PracticeMode.test.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 291[2mms[22m[39m
+ [32m✓[39m src/components/ui/CommandPalette.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[32m 162[2mms[22m[39m
+[90mstderr[2m | src/test/ProfileContext.test.jsx[2m > [22m[2mProfileContext Integration[2m > [22m[2mshould provide default values
+[22m[39mWarning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:21:28)
+    at wrapper (/app/src/test/ProfileContext.test.jsx:36:21)
+
+[90mstderr[2m | src/test/ProfileContext.test.jsx[2m > [22m[2mProfileContext Integration[2m > [22m[2mshould update hydration
+[22m[39mWarning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:21:28)
+    at wrapper (/app/src/test/ProfileContext.test.jsx:36:21)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:21:28)
+    at wrapper (/app/src/test/ProfileContext.test.jsx:36:21)
+
+[90mstderr[2m | src/test/ProfileContext.test.jsx[2m > [22m[2mProfileContext Integration[2m > [22m[2mshould log fatigue
+[22m[39mWarning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:21:28)
+    at wrapper (/app/src/test/ProfileContext.test.jsx:36:21)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:21:28)
+    at wrapper (/app/src/test/ProfileContext.test.jsx:36:21)
+
+[90mstderr[2m | src/test/ProfileContext.test.jsx[2m > [22m[2mProfileContext Integration[2m > [22m[2mwith multiple profiles[2m > [22m[2mshould switch profile
+[22m[39mWarning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:21:28)
+    at wrapper (/app/src/test/ProfileContext.test.jsx:36:21)
+
+ [32m✓[39m src/test/ProfileContext.test.jsx [2m([22m[2m4 tests[22m[2m)[22m[32m 106[2mms[22m[39m
+ [32m✓[39m src/components/ui/TooltipOverlay.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[32m 122[2mms[22m[39m
+[90mstderr[2m | src/components/viz/Spectrogram3D.test.jsx[2m > [22m[2mSpectrogram3D[2m > [22m[2mrenders successfully
+[22m[39mWarning: <ambientLight /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at ambientLight
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: The tag <ambientLight> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter.
+    at ambientLight
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: <pointLight /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at pointLight
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: The tag <pointLight> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter.
+    at pointLight
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: <bufferAttribute /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: The tag <bufferAttribute> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: React does not recognize the `itemSize` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `itemsize` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: <bufferAttribute /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: <bufferAttribute /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: <bufferGeometry /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: The tag <bufferGeometry> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter.
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: <meshStandardMaterial /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at meshStandardMaterial
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: The tag <meshStandardMaterial> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter.
+    at meshStandardMaterial
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: React does not recognize the `vertexColors` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `vertexcolors` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+    at meshStandardMaterial
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: Received `true` for a non-boolean attribute `wireframe`.
+
+If you want to write it to the DOM, pass a string instead: wireframe="true" or wireframe={value.toString()}.
+    at meshStandardMaterial
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: The tag <mesh> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter.
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: <gridHelper /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at gridHelper
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: The tag <gridHelper> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter.
+    at gridHelper
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+
+[90mstderr[2m | src/components/viz/Spectrogram3D.test.jsx[2m > [22m[2mSpectrogram3D[2m > [22m[2mruns the animation loop safely
+[22m[39mWarning: <ambientLight /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at ambientLight
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: <pointLight /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at pointLight
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: <bufferAttribute /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: <bufferAttribute /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: <bufferAttribute /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferAttribute
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: <bufferGeometry /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at bufferGeometry
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: <meshStandardMaterial /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at meshStandardMaterial
+    at mesh
+    at SpectrogramMesh (/app/src/components/viz/Spectrogram3D.jsx:13:28)
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+Warning: <gridHelper /> is using incorrect casing. Use PascalCase for React components, or lowercase for HTML elements.
+    at gridHelper
+    at div
+    at Canvas (/app/src/components/viz/Spectrogram3D.test.jsx:43:13)
+    at div
+    at Spectrogram3D (/app/src/components/viz/Spectrogram3D.jsx:176:26)
+
+ [32m✓[39m src/components/viz/Spectrogram3D.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[32m 102[2mms[22m[39m
+ [32m✓[39m src/components/viz/BrightnessMeter.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 105[2mms[22m[39m
+ [32m✓[39m src/components/ui/CelebrationModal.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 86[2mms[22m[39m
+ [32m✓[39m src/components/ui/Breadcrumbs.test.jsx [2m([22m[2m5 tests[22m[2m)[22m[32m 80[2mms[22m[39m
+ [32m✓[39m src/components/viz/ResonanceMetrics.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 76[2mms[22m[39m
+ [32m✓[39m src/components/viz/FlowPhonationMeter.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 91[2mms[22m[39m
+[90mstderr[2m | src/components/ui/CoachView.test.jsx[2m > [22m[2mCoachView Component[2m > [22m[2mrenders empty state when messages are cleared or initial
+[22m[39mWarning: An update to CoachView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CoachView (/app/src/components/ui/CoachView.jsx:41:68)
+    at div
+    at MockNavigationProvider (/app/src/components/ui/CoachView.test.jsx:32:35)
+
+ [32m✓[39m src/components/ui/CoachView.test.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 75[2mms[22m[39m
+ [32m✓[39m src/context/LanguageContext.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 66[2mms[22m[39m
+ [32m✓[39m src/components/viz/ProgressCharts.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 76[2mms[22m[39m
+[90mstderr[2m | src/context/AudioContext.test.jsx[2m > [22m[2mAudioContext Integration[2m > [22m[2mshould initialize AudioEngine on mount
+[22m[39mWarning: An update to AudioProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at AudioProvider (/app/src/context/AudioContext.jsx:16:26)
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:21:28)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:31:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:84:20)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:21:28)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:31:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:84:20)
+Warning: An update to SettingsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:31:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:84:20)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:21:28)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:31:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:84:20)
+Warning: An update to SettingsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:31:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:84:20)
+
+[90mstderr[2m | src/context/AudioContext.test.jsx[2m > [22m[2mAudioContext Integration[2m > [22m[2mshould update dataRef when AudioEngine sends updates
+[22m[39mWarning: An update to AudioProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at AudioProvider (/app/src/context/AudioContext.jsx:16:26)
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:21:28)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:31:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:84:20)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:21:28)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:31:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:84:20)
+Warning: An update to SettingsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:31:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:84:20)
+Warning: An update to ProfileProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileProvider (/app/src/context/ProfileContext.jsx:21:28)
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:31:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:84:20)
+Warning: An update to SettingsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at SettingsProvider (/app/src/context/SettingsContext.jsx:31:29)
+    at wrapper (/app/src/context/AudioContext.test.jsx:84:20)
+
+ [32m✓[39m src/context/AudioContext.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 55[2mms[22m[39m
+ [32m✓[39m src/components/ui/AudioLibrary.test.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 73[2mms[22m[39m
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mCustom Card Sets[2m > [22m[2mshould create a custom card set and return an ID
+[22m[39m[PracticeCardsService] Created custom set: custom-1785998277495-141
+
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mCustom Card Sets[2m > [22m[2mshould retrieve all custom card sets
+[22m[39m[PracticeCardsService] Created custom set: custom-1785998277501-430
+
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mCustom Card Sets[2m > [22m[2mshould retrieve all custom card sets
+[22m[39m[PracticeCardsService] Created custom set: custom-1785998277502-305
+
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mCustom Card Sets[2m > [22m[2mshould update a custom card set
+[22m[39m[PracticeCardsService] Created custom set: custom-1785998277519-567
+
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mCustom Card Sets[2m > [22m[2mshould delete a custom card set
+[22m[39m[PracticeCardsService] Created custom set: custom-1785998277523-657
+
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mCustom Card Sets[2m > [22m[2mshould delete a custom card set
+[22m[39m[PracticeCardsService] Deleted custom set: custom-1785998277523-657
+
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mCustom Card Sets[2m > [22m[2mshould generate unique IDs for each card in a set
+[22m[39m[PracticeCardsService] Created custom set: custom-1785998277526-332
+
+[90mstdout[2m | src/services/practiceCardsService.test.js[2m > [22m[2mpracticeCardsService[2m > [22m[2mEdge Cases[2m > [22m[2mshould handle empty card set gracefully
+[22m[39m[PracticeCardsService] Created custom set: custom-1785998277540-974
+
+ [32m✓[39m src/services/practiceCardsService.test.js [2m([22m[2m15 tests[22m[2m)[22m[32m 57[2mms[22m[39m
+ [32m✓[39m src/components/viz/PitchOrb.test.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 36[2mms[22m[39m
+ [32m✓[39m src/utils/PitchDetector.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 49[2mms[22m[39m
+ [32m✓[39m src/components/viz/SpectrumAnalyzer.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[32m 48[2mms[22m[39m
+ [32m✓[39m src/services/SearchService.test.js [2m([22m[2m19 tests[22m[2m)[22m[32m 45[2mms[22m[39m
+[90mstderr[2m | src/services/SyncManager.test.js[2m > [22m[2mSyncManager[2m > [22m[2mOffline Behavior[2m > [22m[2mshould forceSyncNow returning false when offline
+[22m[39mCannot sync: offline
+
+ [32m✓[39m src/services/SyncManager.test.js [2m([22m[2m7 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m src/hooks/useTTS.test.js [2m([22m[2m5 tests[22m[2m)[22m[32m 41[2mms[22m[39m
+ [32m✓[39m src/context/SettingsContext.test.js [2m([22m[2m2 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+ [32m✓[39m src/hooks/useCourseProgress.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 35[2mms[22m[39m
+ [32m✓[39m src/hooks/useFeedback.test.jsx [2m([22m[2m2 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+ [32m✓[39m src/utils/cppAnalysis.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m src/test/IndexedDBManager.test.js [2m([22m[2m8 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m src/utils/pitch.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 36[2mms[22m[39m
+ [32m✓[39m src/utils/signalValidator.test.js [2m([22m[2m9 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m src/data/genderPerceptionMetrics.test.js [2m([22m[2m17 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m src/data/vvdReferenceData.test.js [2m([22m[2m16 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m src/services/IndexedDBManager.test.js [2m([22m[2m2 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32m✓[39m src/utils/PitchSmoother.test.js [2m([22m[2m19 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m src/services/AnalyticsService.test.js [2m([22m[2m5 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/utils/DSP.test.js [2m([22m[2m10 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/services/RenderCoordinator.test.js [2m([22m[2m2 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/test/PhonetogramService.test.js [2m([22m[2m6 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/data/SingingCourse.test.js [2m([22m[2m6 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/test/PracticeRoutineGenerator.test.js [2m([22m[2m6 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m src/services/ProgramService.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/services/BiofeedbackService.test.js [2m([22m[2m7 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/utils/FormantAnalyzer.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/test/gavt_enhancements.test.js [2m([22m[2m7 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/utils/lpcAnalysis.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/test/NormsService.test.js [2m([22m[2m5 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/components/ui/VoicePlot2D.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/test/advanced_signal_analysis.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m src/utils/ResonanceCalculator.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/utils/coachEngine.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 9 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/community/SuccessStories.test.jsx[2m [ src/components/community/SuccessStories.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 1 error:
+
+[31m[PARSE_ERROR] [0mUnexpected token
+     [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/community/SuccessStories.test.jsx:110:3 [38;5;246m][0m
+     [38;5;246m│[0m
+ [38;5;246m110 │[0m [38;5;249m [0m[38;5;249m [0mdefault[38;5;249m:[0m[38;5;249m [0m[38;5;249m{[0m
+ [38;5;240m    │[0m   ───┬───
+ [38;5;240m    │[0m      ╰─────
+[38;5;246m─────╯[0m
+[39m
+  Plugin: [35mvite:oxc[39m
+  File: [36m/app/src/components/community/SuccessStories.test.jsx[39m
+[90m [2m❯[22m transformWithOxc node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4090:19[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4161:26[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m30796:51[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m20594:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/viz/BreathinessMeter.test.jsx[2m [ src/components/viz/BreathinessMeter.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 2 errors:
+
+[31m[PARSE_ERROR] [0mMissing initializer in destructuring declaration
+     [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/viz/BreathinessMeter.jsx:173:8 [38;5;246m][0m
+     [38;5;246m│[0m
+ [38;5;246m173 │[0m [38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m}[0m[38;5;249m,[0m[38;5;249m [0m[dataRef, colorBlindMode, componentId][38;5;249m)[0m[38;5;249m;[0m
+ [38;5;240m    │[0m        ───────────────────┬──────────────────
+ [38;5;240m    │[0m                           ╰────────────────────
+ [38;5;240m    │[0m
+ [38;5;240m    │[0m [38;5;115mHelp[0m: Add an initializer (e.g. ` = undefined`) here
+[38;5;246m─────╯[0m
+
+[31m[PARSE_ERROR] [0mExpected a semicolon or an implicit semicolon after a statement, but found none
+     [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/viz/BreathinessMeter.jsx:173:46 [38;5;246m][0m
+     [38;5;246m│[0m
+ [38;5;246m173 │[0m [38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m}[0m[38;5;249m,[0m[38;5;249m [0m[38;5;249m[[0m[38;5;249md[0m[38;5;249ma[0m[38;5;249mt[0m[38;5;249ma[0m[38;5;249mR[0m[38;5;249me[0m[38;5;249mf[0m[38;5;249m,[0m[38;5;249m [0m[38;5;249mc[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mB[0m[38;5;249ml[0m[38;5;249mi[0m[38;5;249mn[0m[38;5;249md[0m[38;5;249mM[0m[38;5;249mo[0m[38;5;249md[0m[38;5;249me[0m[38;5;249m,[0m[38;5;249m [0m[38;5;249mc[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249me[0m[38;5;249mn[0m[38;5;249mt[0m[38;5;249mI[0m[38;5;249md[0m[38;5;249m][0m[38;5;249m)[0m[38;5;249m;[0m
+ [38;5;240m    │[0m                                              │
+ [38;5;240m    │[0m                                              ╰─
+ [38;5;240m    │[0m
+ [38;5;240m    │[0m [38;5;115mHelp[0m: Try inserting a semicolon here
+[38;5;246m─────╯[0m
+[39m
+  Plugin: [35mvite:oxc[39m
+  File: [36m/app/src/components/viz/BreathinessMeter.jsx[39m
+[90m [2m❯[22m transformWithOxc node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4090:19[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4161:26[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m30796:51[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m20594:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/viz/HighResSpectrogram.test.jsx[2m [ src/components/viz/HighResSpectrogram.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 1 error:
+
+[31m[PARSE_ERROR] [0mUnexpected token
+     [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/viz/HighResSpectrogram.jsx:157:6 [38;5;246m][0m
+     [38;5;246m│[0m
+ [38;5;246m157 │[0m [38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m}[0m,[38;5;249m [0m[38;5;249m[[0m[38;5;249md[0m[38;5;249ma[0m[38;5;249mt[0m[38;5;249ma[0m[38;5;249mR[0m[38;5;249me[0m[38;5;249mf[0m[38;5;249m,[0m[38;5;249m [0m[38;5;249mc[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mm[0m[38;5;249ma[0m[38;5;249mp[0m[38;5;249m][0m[38;5;249m)[0m[38;5;249m;[0m
+ [38;5;240m    │[0m      ┬
+ [38;5;240m    │[0m      ╰──
+[38;5;246m─────╯[0m
+[39m
+  Plugin: [35mvite:oxc[39m
+  File: [36m/app/src/components/viz/HighResSpectrogram.jsx[39m
+[90m [2m❯[22m transformWithOxc node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4090:19[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4161:26[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m30796:51[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m20594:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/viz/QualityVisualizer.test.jsx[2m [ src/components/viz/QualityVisualizer.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 1 error:
+
+[31m[PARSE_ERROR] [0mExpected `,` or `)` but found `;`
+     [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/viz/QualityVisualizer.jsx:253:2 [38;5;246m][0m
+     [38;5;246m│[0m
+ [38;5;246m 28 │[0m [38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249mc[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249ml[0m[38;5;249mo[0m[38;5;249mo[0m[38;5;249mp[0m[38;5;249m [0m[38;5;249m=[0m[38;5;249m [0m[38;5;249mu[0m[38;5;249ms[0m[38;5;249me[0m[38;5;249mC[0m[38;5;249ma[0m[38;5;249ml[0m[38;5;249ml[0m[38;5;249mb[0m[38;5;249ma[0m[38;5;249mc[0m[38;5;249mk[0m([38;5;249m([0m[38;5;249m)[0m[38;5;249m [0m[38;5;249m=[0m[38;5;249m>[0m[38;5;249m [0m[38;5;249m{[0m
+ [38;5;240m    │[0m                             ┬
+ [38;5;240m    │[0m                             ╰── Opened here
+ [38;5;240m    │[0m
+ [38;5;246m253 │[0m [38;5;249m}[0m;
+ [38;5;240m    │[0m  ┬
+ [38;5;240m    │[0m  ╰── `,` or `)` expected
+[38;5;246m─────╯[0m
+[39m
+  Plugin: [35mvite:oxc[39m
+  File: [36m/app/src/components/viz/QualityVisualizer.jsx[39m
+[90m [2m❯[22m transformWithOxc node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4090:19[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4161:26[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m30796:51[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m20594:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/ui/JournalForm.test.jsx[2m [ src/components/ui/JournalForm.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 1 error:
+
+[31m[PARSE_ERROR] [0mExpected `,` or `}` but found `Identifier`
+    [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/ui/JournalForm.test.jsx:16:9 [38;5;246m][0m
+    [38;5;246m│[0m
+ [38;5;246m 7 │[0m [38;5;249mv[0m[38;5;249mi[0m[38;5;249m.[0m[38;5;249mm[0m[38;5;249mo[0m[38;5;249mc[0m[38;5;249mk[0m[38;5;249m([0m[38;5;249m'[0m[38;5;249m.[0m[38;5;249m.[0m[38;5;249m/[0m[38;5;249m.[0m[38;5;249m.[0m[38;5;249m/[0m[38;5;249mc[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249mt[0m[38;5;249me[0m[38;5;249mx[0m[38;5;249mt[0m[38;5;249m/[0m[38;5;249mA[0m[38;5;249mu[0m[38;5;249md[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mC[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249mt[0m[38;5;249me[0m[38;5;249mx[0m[38;5;249mt[0m[38;5;249m'[0m[38;5;249m,[0m[38;5;249m [0m[38;5;249m([0m[38;5;249m)[0m[38;5;249m [0m[38;5;249m=[0m[38;5;249m>[0m[38;5;249m [0m[38;5;249m([0m{
+ [38;5;240m   │[0m                                              ┬
+ [38;5;240m   │[0m                                              ╰── Opened here
+ [38;5;240m   │[0m
+ [38;5;246m16 │[0m [38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0mstopRecording[38;5;249m:[0m[38;5;249m [0m[38;5;249mv[0m[38;5;249mi[0m[38;5;249m.[0m[38;5;249mf[0m[38;5;249mn[0m[38;5;249m([0m[38;5;249m)[0m[38;5;249m,[0m
+ [38;5;240m   │[0m         ──────┬──────
+ [38;5;240m   │[0m               ╰──────── `,` or `}` expected
+[38;5;246m────╯[0m
+[39m
+  Plugin: [35mvite:oxc[39m
+  File: [36m/app/src/components/ui/JournalForm.test.jsx[39m
+[90m [2m❯[22m transformWithOxc node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4090:19[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4161:26[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m30796:51[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m20594:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/ui/LoadingSpinner.test.jsx[2m [ src/components/ui/LoadingSpinner.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 1 error:
+
+[31m[PARSE_ERROR] [0mExpected `}` but found `EOF`
+     [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/ui/LoadingSpinner.test.jsx:193:5 [38;5;246m][0m
+     [38;5;246m│[0m
+ [38;5;246m110 │[0m [38;5;249m [0m[38;5;249m [0m[38;5;249mi[0m[38;5;249mt[0m[38;5;249m([0m[38;5;249m'[0m[38;5;249mr[0m[38;5;249me[0m[38;5;249mn[0m[38;5;249md[0m[38;5;249me[0m[38;5;249mr[0m[38;5;249ms[0m[38;5;249m [0m[38;5;249mw[0m[38;5;249mi[0m[38;5;249mt[0m[38;5;249mh[0m[38;5;249m [0m[38;5;249mc[0m[38;5;249mu[0m[38;5;249mr[0m[38;5;249mr[0m[38;5;249me[0m[38;5;249mn[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249mc[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249m [0m[38;5;249mv[0m[38;5;249ma[0m[38;5;249mr[0m[38;5;249mi[0m[38;5;249ma[0m[38;5;249mn[0m[38;5;249mt[0m[38;5;249m'[0m[38;5;249m,[0m[38;5;249m [0m[38;5;249m([0m[38;5;249m)[0m[38;5;249m [0m[38;5;249m=[0m[38;5;249m>[0m[38;5;249m [0m{
+ [38;5;240m    │[0m                                                  ┬
+ [38;5;240m    │[0m                                                  ╰── Opened here
+ [38;5;240m    │[0m
+ [38;5;246m193 │[0m [38;5;249m}[0m[38;5;249m)[0m[38;5;249m;[0m
+ [38;5;240m    │[0m     │
+ [38;5;240m    │[0m     ╰─ `}` expected
+[38;5;246m─────╯[0m
+[39m
+  Plugin: [35mvite:oxc[39m
+  File: [36m/app/src/components/ui/LoadingSpinner.test.jsx[39m
+[90m [2m❯[22m transformWithOxc node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4090:19[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4161:26[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m30796:51[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m20594:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/ui/QuickActions.test.jsx[2m [ src/components/ui/QuickActions.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 2 errors:
+
+[31m[PARSE_ERROR] [0mExpected corresponding JSX closing tag for 'div'.
+    [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/ui/QuickActions.jsx:80:23 [38;5;246m][0m
+    [38;5;246m│[0m
+ [38;5;246m71 │[0m [38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m<[0mdiv
+ [38;5;240m   │[0m                          ─┬─
+ [38;5;240m   │[0m                           ╰─── Opened here
+ [38;5;240m   │[0m
+ [38;5;246m80 │[0m [38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m<[0m[38;5;249m/[0mbutton[38;5;249m>[0m
+ [38;5;240m   │[0m                       ───┬──
+ [38;5;240m   │[0m                          ╰──── Expected `</div>`
+[38;5;246m────╯[0m
+
+[31m[PARSE_ERROR] [0mUnexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/ui/QuickActions.jsx:81:19 [38;5;246m][0m
+    [38;5;246m│[0m
+ [38;5;246m81 │[0m [38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m)[0m[38;5;249m)[0m[38;5;249m}[0m
+ [38;5;240m   │[0m                   │
+ [38;5;240m   │[0m                   ╰─
+[38;5;246m────╯[0m
+[39m
+  Plugin: [35mvite:oxc[39m
+  File: [36m/app/src/components/ui/QuickActions.jsx[39m
+[90m [2m❯[22m transformWithOxc node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4090:19[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4161:26[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m30796:51[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m20594:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/ui/button.test.jsx[2m [ src/components/ui/button.test.jsx ][22m
+[31m[1mError[22m: Transform failed with 1 error:
+
+[31m[PARSE_ERROR] [0mExpected `}` but found `EOF`
+    [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/ui/button.test.jsx:70:5 [38;5;246m][0m
+    [38;5;246m│[0m
+ [38;5;246m24 │[0m [38;5;249m [0m[38;5;249m [0m[38;5;249mi[0m[38;5;249mt[0m[38;5;249m([0m[38;5;249m"[0m[38;5;249mr[0m[38;5;249me[0m[38;5;249mp[0m[38;5;249ml[0m[38;5;249ma[0m[38;5;249mc[0m[38;5;249me[0m[38;5;249ms[0m[38;5;249m [0m[38;5;249mc[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249mt[0m[38;5;249me[0m[38;5;249mn[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249mw[0m[38;5;249mh[0m[38;5;249me[0m[38;5;249mn[0m[38;5;249m [0m[38;5;249ms[0m[38;5;249mi[0m[38;5;249mz[0m[38;5;249me[0m[38;5;249m=[0m[38;5;249mi[0m[38;5;249mc[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249m [0m[38;5;249ma[0m[38;5;249mn[0m[38;5;249md[0m[38;5;249m [0m[38;5;249ml[0m[38;5;249mo[0m[38;5;249ma[0m[38;5;249md[0m[38;5;249mi[0m[38;5;249mn[0m[38;5;249mg[0m[38;5;249m"[0m[38;5;249m,[0m[38;5;249m [0m[38;5;249m([0m[38;5;249m)[0m[38;5;249m [0m[38;5;249m=[0m[38;5;249m>[0m[38;5;249m [0m{
+ [38;5;240m   │[0m                                                           ┬
+ [38;5;240m   │[0m                                                           ╰── Opened here
+ [38;5;240m   │[0m
+ [38;5;246m70 │[0m [38;5;249m}[0m[38;5;249m)[0m[38;5;249m;[0m
+ [38;5;240m   │[0m     │
+ [38;5;240m   │[0m     ╰─ `}` expected
+[38;5;246m────╯[0m
+[39m
+  Plugin: [35mvite:oxc[39m
+  File: [36m/app/src/components/ui/button.test.jsx[39m
+[90m [2m❯[22m transformWithOxc node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4090:19[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m4161:26[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m30796:51[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/node.js:[2m20594:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/test/validation/algorithmValidation.test.js[2m > [22mAlgorithm Validation against PRAAT
+[31m[1mTypeError[22m: PitchEnsemble is not a constructor[39m
+[36m [2m❯[22m src/test/validation/algorithmValidation.test.js:[2m63:25[22m[39m
+    [90m 61|[39m
+    [90m 62|[39m     [34mbeforeAll[39m(() [33m=>[39m {
+    [90m 63|[39m         pitchEnsemble [33m=[39m [35mnew[39m [33mPitchEnsemble[39m()[33m;[39m
+    [90m   |[39m                         [31m^[39m
+    [90m 64|[39m         formantTracker [33m=[39m [35mnew[39m [33mFormantTracker[39m([34m44100[39m)[33m;[39m
+    [90m 65|[39m     })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/21]⎯[22m[39m
+
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 12 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/context/AuthContext.test.jsx[2m > [22mAuthContext[2m > [22mlogs in successfully
+[31m[1mAssertionError[22m: expected 'null' to be 'testuser' // Object.is equality
+
+Ignored nodes: comments, script, style
+[36m<html>[31m
+  [36m<head />[31m
+  [36m<body>[31m
+    [36m<div>[31m
+      [36m<div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"user"[31m
+        [36m>[31m
+          [0mnull[0m
+        [36m</div>[31m
+        [36m<button>[31m
+          [0mLogin[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mSignup[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mLogout[0m
+        [36m</button>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</body>[31m
+[36m</html>[31m[39m
+
+Expected: [32m"testuser"[39m
+Received: [31m"null"[39m
+
+[36m [2m❯[22m src/context/AuthContext.test.jsx:[2m83:60[22m[39m
+    [90m 81|[39m
+    [90m 82|[39m         [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m 83|[39m             expect(result.getByTestId('user').textContent).toBe('testu…
+    [90m   |[39m                                                            [31m^[39m
+    [90m 84|[39m         })[33m;[39m
+    [90m 85|[39m     })[33m;[39m
+[90m [2m❯[22m runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:[2m47:12[22m[39m
+[90m [2m❯[22m checkCallback node_modules/@testing-library/dom/dist/wait-for.js:[2m124:77[22m[39m
+[90m [2m❯[22m Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:[2m118:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/context/AuthContext.test.jsx[2m > [22mAuthContext[2m > [22mclears local data on logout
+[31m[1mAssertionError[22m: expected 'null' to be 'testuser' // Object.is equality
+
+Ignored nodes: comments, script, style
+[36m<html>[31m
+  [36m<head />[31m
+  [36m<body>[31m
+    [36m<div>[31m
+      [36m<div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"user"[31m
+        [36m>[31m
+          [0mnull[0m
+        [36m</div>[31m
+        [36m<button>[31m
+          [0mLogin[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mSignup[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mLogout[0m
+        [36m</button>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</body>[31m
+[36m</html>[31m[39m
+
+Expected: [32m"testuser"[39m
+Received: [31m"null"[39m
+
+[36m [2m❯[22m src/context/AuthContext.test.jsx:[2m135:60[22m[39m
+    [90m133|[39m
+    [90m134|[39m         [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m135|[39m             expect(result.getByTestId('user').textContent).toBe('testu…
+    [90m   |[39m                                                            [31m^[39m
+    [90m136|[39m         })[33m;[39m
+    [90m137|[39m
+[90m [2m❯[22m runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:[2m47:12[22m[39m
+[90m [2m❯[22m checkCallback node_modules/@testing-library/dom/dist/wait-for.js:[2m124:77[22m[39m
+[90m [2m❯[22m Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:[2m118:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/engines/AudioEngine.socket.test.js[2m > [22mAudioEngine Socket Integration[2m > [22mshould initialize socket on start
+[41m[1m FAIL [22m[49m src/engines/AudioEngine.socket.test.js[2m > [22mAudioEngine Socket Integration[2m > [22mshould handle socket connection events
+[41m[1m FAIL [22m[49m src/engines/AudioEngine.socket.test.js[2m > [22mAudioEngine Socket Integration[2m > [22mshould emit audio_chunk when connected
+[41m[1m FAIL [22m[49m src/engines/AudioEngine.socket.test.js[2m > [22mAudioEngine Socket Integration[2m > [22mshould buffer chunks when disconnected and flush on connect
+[41m[1m FAIL [22m[49m src/engines/AudioEngine.socket.test.js[2m > [22mAudioEngine Socket Integration[2m > [22mshould update latestBackendAnalysis on analysis_update
+[31m[1mError[22m: [vitest] No "Macleod" export is defined on the "pitchfinder" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+[39m
+vi.mock(import("pitchfinder"), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    // your mocked methods
+  }
+})
+
+[36m [2m❯[22m new McLeodPitchDetector src/services/audio/McLeodPitchDetector.js:[2m30:25[22m[39m
+    [90m 28|[39m
+    [90m 29|[39m         [90m// Check direct named export[39m
+    [90m 30|[39m         if (Pitchfinder.Macleod) detectorConstructor = Pitchfinder.Mac…
+    [90m   |[39m                         [31m^[39m
+    [90m 31|[39m         else if (Pitchfinder.McLeod) detectorConstructor = Pitchfinder…
+    [90m 32|[39m         [90m// Check default export (ESM interop)[39m
+[90m [2m❯[22m new AudioEngine src/engines/AudioEngine.js:[2m68:31[22m[39m
+[90m [2m❯[22m src/engines/AudioEngine.socket.test.js:[2m102:18[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/Sidebar.test.jsx[2m > [22mSidebar Auth Integration[2m > [22mshows Sign In button when not logged in
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: Sign In. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<button[39m
+        [33mclass[39m=[32m"lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mdata-testid[39m=[32m"icon-menu"[39m
+          [33mrole[39m=[32m"img"[39m
+          [33msize[39m=[32m"24"[39m
+        [36m/>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col h-full"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-6 border-b border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-start justify-between"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<h1[39m
+                  [33mclass[39m=[32m"text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"[39m
+                [36m>[39m
+                  [0mVocal GEM[0m
+                [36m</h1>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-slate-500 mt-1"[39m
+                [36m>[39m
+                  [0mGender Expression Modulator[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-[10px] text-slate-600 font-mono bg-slate-800 px-2 py-1 rounded"[39m
+                [33mtitle[39m=[32m"App Version"[39m
+              [36m>[39m
+                [0mv[0m
+                [0m0.1.0[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"px-4 py-3 border-b border-slate-800/50 relative"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"relative"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4"[39m
+                [33mdata-testid[39m=[32m"icon-search"[39m
+                [33mrole[39m=[32m"img"[39m
+              [36m/>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"[39m
+                [33mplaceholder[39m=[32m"Search..."[39m
+                [33mtype[39m=[32m"text"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+              [36m<kbd[39m
+                [33mclass[39m=[32m"absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-block px-1.5 py-0.5 bg-slate-700/50 rounded text-[10px] text-slate-500 font-mono"[39m
+              [36m>[39m
+                [0m⌘K[0m
+              [36m</kbd>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"flex-1 p-4 space-y-2 overflow-y-auto"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-blue-600 text-white shadow-lg shadow-blue-900/20"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-home"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mDashboard[0m
+              [36m</span>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"ml-auto opacity-50"[39m
+                [33mdata-testid[39m=[32m"icon-chevron-right"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"16"[39m
+              [36m/>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mPractice[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-mic"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mVoice Log[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mHaptic Tool[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-settings"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mSettings[0m
+              [36m</span>[39m
+            [36m</button>[39m
+          [36m</nav>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-4 border-t border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"text-xs text-slate-500 text-center"[39m
+            [36m>[39m
+              [0mFrontend Demo Mode[0m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/layout/Sidebar.test.jsx:[2m70:16[22m[39m
+    [90m 68|[39m         mockUseAuth[33m.[39m[34mmockReturnValue[39m({ user[33m:[39m [35mnull[39m })[33m;[39m
+    [90m 69|[39m         const { getByText } = render(<Sidebar activeView="dashboard" o…
+    [90m 70|[39m         [34mexpect[39m([34mgetByText[39m([32m'Sign In'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                [31m^[39m
+    [90m 71|[39m     })[33m;[39m
+    [90m 72|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/Sidebar.test.jsx[2m > [22mSidebar Auth Integration[2m > [22mshows user info and Sign Out when logged in
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: CloudUser. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<button[39m
+        [33mclass[39m=[32m"lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mdata-testid[39m=[32m"icon-menu"[39m
+          [33mrole[39m=[32m"img"[39m
+          [33msize[39m=[32m"24"[39m
+        [36m/>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col h-full"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-6 border-b border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-start justify-between"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<h1[39m
+                  [33mclass[39m=[32m"text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"[39m
+                [36m>[39m
+                  [0mVocal GEM[0m
+                [36m</h1>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-slate-500 mt-1"[39m
+                [36m>[39m
+                  [0mGender Expression Modulator[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-[10px] text-slate-600 font-mono bg-slate-800 px-2 py-1 rounded"[39m
+                [33mtitle[39m=[32m"App Version"[39m
+              [36m>[39m
+                [0mv[0m
+                [0m0.1.0[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"px-4 py-3 border-b border-slate-800/50 relative"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"relative"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4"[39m
+                [33mdata-testid[39m=[32m"icon-search"[39m
+                [33mrole[39m=[32m"img"[39m
+              [36m/>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"[39m
+                [33mplaceholder[39m=[32m"Search..."[39m
+                [33mtype[39m=[32m"text"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+              [36m<kbd[39m
+                [33mclass[39m=[32m"absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-block px-1.5 py-0.5 bg-slate-700/50 rounded text-[10px] text-slate-500 font-mono"[39m
+              [36m>[39m
+                [0m⌘K[0m
+              [36m</kbd>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"flex-1 p-4 space-y-2 overflow-y-auto"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-blue-600 text-white shadow-lg shadow-blue-900/20"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-home"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mDashboard[0m
+              [36m</span>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"ml-auto opacity-50"[39m
+                [33mdata-testid[39m=[32m"icon-chevron-right"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"16"[39m
+              [36m/>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mPractice[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-mic"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mVoice Log[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mHaptic Tool[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-settings"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mSettings[0m
+              [36m</span>[39m
+            [36m</button>[39m
+          [36m</nav>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-4 border-t border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"text-xs text-slate-500 text-center"[39m
+            [36m>[39m
+              [0mFrontend Demo Mode[0m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/layout/Sidebar.test.jsx:[2m76:16[22m[39m
+    [90m 74|[39m         mockUseAuth.mockReturnValue({ user: { username: 'CloudUser' },…
+    [90m 75|[39m         const { getByText } = render(<Sidebar activeView="dashboard" o…
+    [90m 76|[39m         [34mexpect[39m([34mgetByText[39m([32m'CloudUser'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                [31m^[39m
+    [90m 77|[39m         [34mexpect[39m([34mgetByText[39m([32m'Sign Out'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m 78|[39m     })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/Sidebar.test.jsx[2m > [22mSidebar Auth Integration[2m > [22mopens Login modal on Sign In click
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: Sign In. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<button[39m
+        [33mclass[39m=[32m"lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mdata-testid[39m=[32m"icon-menu"[39m
+          [33mrole[39m=[32m"img"[39m
+          [33msize[39m=[32m"24"[39m
+        [36m/>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col h-full"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-6 border-b border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-start justify-between"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<h1[39m
+                  [33mclass[39m=[32m"text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"[39m
+                [36m>[39m
+                  [0mVocal GEM[0m
+                [36m</h1>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-slate-500 mt-1"[39m
+                [36m>[39m
+                  [0mGender Expression Modulator[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-[10px] text-slate-600 font-mono bg-slate-800 px-2 py-1 rounded"[39m
+                [33mtitle[39m=[32m"App Version"[39m
+              [36m>[39m
+                [0mv[0m
+                [0m0.1.0[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"px-4 py-3 border-b border-slate-800/50 relative"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"relative"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4"[39m
+                [33mdata-testid[39m=[32m"icon-search"[39m
+                [33mrole[39m=[32m"img"[39m
+              [36m/>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"[39m
+                [33mplaceholder[39m=[32m"Search..."[39m
+                [33mtype[39m=[32m"text"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+              [36m<kbd[39m
+                [33mclass[39m=[32m"absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-block px-1.5 py-0.5 bg-slate-700/50 rounded text-[10px] text-slate-500 font-mono"[39m
+              [36m>[39m
+                [0m⌘K[0m
+              [36m</kbd>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"flex-1 p-4 space-y-2 overflow-y-auto"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-blue-600 text-white shadow-lg shadow-blue-900/20"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-home"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mDashboard[0m
+              [36m</span>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"ml-auto opacity-50"[39m
+                [33mdata-testid[39m=[32m"icon-chevron-right"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"16"[39m
+              [36m/>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mPractice[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-mic"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mVoice Log[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mHaptic Tool[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-settings"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mSettings[0m
+              [36m</span>[39m
+            [36m</button>[39m
+          [36m</nav>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-4 border-t border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"text-xs text-slate-500 text-center"[39m
+            [36m>[39m
+              [0mFrontend Demo Mode[0m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/layout/Sidebar.test.jsx:[2m84:25[22m[39m
+    [90m 82|[39m         const { getByText, getByTestId } = render(<Sidebar activeView=…
+    [90m 83|[39m
+    [90m 84|[39m         fireEvent[33m.[39m[34mclick[39m([34mgetByText[39m([32m'Sign In'[39m))[33m;[39m
+    [90m   |[39m                         [31m^[39m
+    [90m 85|[39m         [34mexpect[39m([34mgetByTestId[39m([32m'login-modal'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m 86|[39m     })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/Sidebar.test.jsx[2m > [22mSidebar Auth Integration[2m > [22mcalls logout on Sign Out click
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: Sign Out. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<button[39m
+        [33mclass[39m=[32m"lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mdata-testid[39m=[32m"icon-menu"[39m
+          [33mrole[39m=[32m"img"[39m
+          [33msize[39m=[32m"24"[39m
+        [36m/>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col h-full"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-6 border-b border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-start justify-between"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<h1[39m
+                  [33mclass[39m=[32m"text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"[39m
+                [36m>[39m
+                  [0mVocal GEM[0m
+                [36m</h1>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-slate-500 mt-1"[39m
+                [36m>[39m
+                  [0mGender Expression Modulator[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-[10px] text-slate-600 font-mono bg-slate-800 px-2 py-1 rounded"[39m
+                [33mtitle[39m=[32m"App Version"[39m
+              [36m>[39m
+                [0mv[0m
+                [0m0.1.0[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"px-4 py-3 border-b border-slate-800/50 relative"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"relative"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4"[39m
+                [33mdata-testid[39m=[32m"icon-search"[39m
+                [33mrole[39m=[32m"img"[39m
+              [36m/>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"[39m
+                [33mplaceholder[39m=[32m"Search..."[39m
+                [33mtype[39m=[32m"text"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+              [36m<kbd[39m
+                [33mclass[39m=[32m"absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-block px-1.5 py-0.5 bg-slate-700/50 rounded text-[10px] text-slate-500 font-mono"[39m
+              [36m>[39m
+                [0m⌘K[0m
+              [36m</kbd>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"flex-1 p-4 space-y-2 overflow-y-auto"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-blue-600 text-white shadow-lg shadow-blue-900/20"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-home"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mDashboard[0m
+              [36m</span>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"ml-auto opacity-50"[39m
+                [33mdata-testid[39m=[32m"icon-chevron-right"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"16"[39m
+              [36m/>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mPractice[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-mic"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mVoice Log[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mHaptic Tool[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-settings"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mSettings[0m
+              [36m</span>[39m
+            [36m</button>[39m
+          [36m</nav>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-4 border-t border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"text-xs text-slate-500 text-center"[39m
+            [36m>[39m
+              [0mFrontend Demo Mode[0m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/layout/Sidebar.test.jsx:[2m92:25[22m[39m
+    [90m 90|[39m         const { getByText } = render(<Sidebar activeView="dashboard" o…
+    [90m 91|[39m
+    [90m 92|[39m         fireEvent[33m.[39m[34mclick[39m([34mgetByText[39m([32m'Sign Out'[39m))[33m;[39m
+    [90m   |[39m                         [31m^[39m
+    [90m 93|[39m         [34mexpect[39m(mockLogout)[33m.[39m[34mtoHaveBeenCalled[39m()[33m;[39m
+    [90m 94|[39m     })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/21]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/Sidebar.test.jsx[2m > [22mSidebar Auth Integration[2m > [22mopens Camera modal when Mirror button is clicked
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: Mirror. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<button[39m
+        [33mclass[39m=[32m"lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mdata-testid[39m=[32m"icon-menu"[39m
+          [33mrole[39m=[32m"img"[39m
+          [33msize[39m=[32m"24"[39m
+        [36m/>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col h-full"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-6 border-b border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-start justify-between"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<h1[39m
+                  [33mclass[39m=[32m"text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"[39m
+                [36m>[39m
+                  [0mVocal GEM[0m
+                [36m</h1>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-slate-500 mt-1"[39m
+                [36m>[39m
+                  [0mGender Expression Modulator[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-[10px] text-slate-600 font-mono bg-slate-800 px-2 py-1 rounded"[39m
+                [33mtitle[39m=[32m"App Version"[39m
+              [36m>[39m
+                [0mv[0m
+                [0m0.1.0[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"px-4 py-3 border-b border-slate-800/50 relative"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"relative"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4"[39m
+                [33mdata-testid[39m=[32m"icon-search"[39m
+                [33mrole[39m=[32m"img"[39m
+              [36m/>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"[39m
+                [33mplaceholder[39m=[32m"Search..."[39m
+                [33mtype[39m=[32m"text"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+              [36m<kbd[39m
+                [33mclass[39m=[32m"absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-block px-1.5 py-0.5 bg-slate-700/50 rounded text-[10px] text-slate-500 font-mono"[39m
+              [36m>[39m
+                [0m⌘K[0m
+              [36m</kbd>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"flex-1 p-4 space-y-2 overflow-y-auto"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-blue-600 text-white shadow-lg shadow-blue-900/20"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-home"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mDashboard[0m
+              [36m</span>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"ml-auto opacity-50"[39m
+                [33mdata-testid[39m=[32m"icon-chevron-right"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"16"[39m
+              [36m/>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mPractice[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-mic"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mVoice Log[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-activity"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mHaptic Tool[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-white"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mdata-testid[39m=[32m"icon-settings"[39m
+                [33mrole[39m=[32m"img"[39m
+                [33msize[39m=[32m"20"[39m
+              [36m/>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mSettings[0m
+              [36m</span>[39m
+            [36m</button>[39m
+          [36m</nav>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-4 border-t border-slate-800"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"text-xs text-slate-500 text-center"[39m
+            [36m>[39m
+              [0mFrontend Demo Mode[0m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/layout/Sidebar.test.jsx:[2m106:27[22m[39m
+    [90m104|[39m         const { getByText } = render(<Sidebar activeView="dashboard" o…
+    [90m105|[39m
+    [90m106|[39m         [35mconst[39m mirrorBtn [33m=[39m [34mgetByText[39m([32m'Mirror'[39m)[33m;[39m
+    [90m   |[39m                           [31m^[39m
+    [90m107|[39m         fireEvent[33m.[39m[34mclick[39m(mirrorBtn)[33m;[39m
+    [90m108|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/21]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m12 failed[39m[22m[2m | [22m[1m[32m59 passed[39m[22m[90m (71)[39m
+[2m      Tests [22m [1m[31m12 failed[39m[22m[2m | [22m[1m[32m311 passed[39m[22m[2m | [22m[33m6 skipped[39m[90m (329)[39m
+[2m   Start at [22m 06:37:39
+[2m   Duration [22m 30.31s[2m (transform 3.26s, setup 6.35s, import 9.56s, tests 6.99s, environment 51.83s)[22m
