@@ -108,7 +108,8 @@ def clean_audio():
         # Cleanup on error since after_request might not run or file might exist
         if 'tmp_path' in locals() and os.path.exists(tmp_path):
             os.remove(tmp_path)
-        return jsonify({'error': str(e)}), 500
+                current_app.logger.error(f'Voice cleaning error: {e}')
+        return jsonify({'error': 'An internal error occurred during audio cleaning.'}), 500
         # If we failed before send_file, clean up manually
         # Manual cleanup on error since after_request might not run if we crash before return
         if tmp_path and os.path.exists(tmp_path):
