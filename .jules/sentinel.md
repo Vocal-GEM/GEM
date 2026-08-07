@@ -75,7 +75,3 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
-## 2024-05-18 - [MEDIUM] Error messages leaking internal exception details
-**Vulnerability:** Internal exception details `str(e)` were directly passed to the client via `jsonify({'error': str(e)})` in various backend routes (`tts.py`, `voice_quality.py`, `__init__.py`).
-**Learning:** Returning exception traces strings directly to the client leaks internal backend information that could potentially be used for exploitation or intelligence gathering.
-**Prevention:** Avoid returning exception strings directly to the client in error handlers, instead log the exception internally (e.g. `current_app.logger.error(e)`) and return a generic error message (e.g. `Bad Request`, `Internal server error`).
