@@ -106,7 +106,8 @@ def create_app():
     @app.errorhandler(400)
     def bad_request(e):
         if request.accept_mimetypes.accept_json and not request.accept_mimetypes.accept_html:
-            return jsonify(error=str(e)), 400
+            # Security: Do not expose internal exception details to the client
+            return jsonify(error="Bad Request"), 400
         return jsonify(error="Bad Request"), 400
 
 

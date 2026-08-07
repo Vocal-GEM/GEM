@@ -66,8 +66,8 @@ def validate_email_address(email):
     try:
         validate_email(email, check_deliverability=False)
         return True, None
-    except EmailNotValidError as e:
-        return False, str(e)
+    except EmailNotValidError:
+        return False, "Invalid email address format"
 
 def validate_magic_number(file_stream, ext):
     """
