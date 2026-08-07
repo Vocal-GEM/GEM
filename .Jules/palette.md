@@ -1,0 +1,3 @@
+## 2024-05-18 - Missing Accessibility on Lucide-React Icon-Only Buttons
+**Learning:** Found a widespread accessibility issue pattern specific to this app's components where icon-only buttons (frequently utilizing `lucide-react` components) consistently lack `aria-label` attributes and keyboard focus indicators, making them invisible to screen readers and difficult to navigate via keyboard.
+**Action:** When adding or modifying interactive icons, always explicitly include `aria-label` (unless the button contains visible text) and `focus:outline-none focus-visible:ring-2` to ensure accessibility and keyboard navigability.
