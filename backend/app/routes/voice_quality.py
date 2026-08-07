@@ -108,17 +108,9 @@ def clean_audio():
         # Cleanup on error since after_request might not run or file might exist
         if 'tmp_path' in locals() and os.path.exists(tmp_path):
             os.remove(tmp_path)
-        return jsonify({'error': str(e)}), 500
-        # If we failed before send_file, clean up manually
-        # Manual cleanup on error since after_request might not run if we crash before return
-        if tmp_path and os.path.exists(tmp_path):
-            try:
-                os.remove(tmp_path)
-            except:
-                pass
         # Security: Do not expose internal error details to client
-        print(f"Voice cleaning error: {e}")
-        return jsonify({'error': 'An internal error occurred during audio cleaning.'}), 500
+        return jsonify({"error": "An internal error occurred during audio cleaning."}), 500
+
 
 # ----------------------
 # Voice Manipulation (Voice Lab / PSOLA)
@@ -204,7 +196,6 @@ def manipulate_file():
                 os.remove(tmp_path)
              except:
                 pass
-        return jsonify({'error': str(e)}), 500
         # Cleanup original temp file
         # Security: Do not expose internal error details to client
         current_app.logger.error(f"Voice manipulation error: {e}")
@@ -212,7 +203,10 @@ def manipulate_file():
     finally:
         # Cleanup original temp file immediately
         if tmp_path and os.path.exists(tmp_path):
-            os.remove(tmp_path)
+            try:
+                os.remove(tmp_path)
+            except:
+                pass
 
         # Cleanup processed file on error
         if processed_path and os.path.exists(processed_path):
@@ -220,6 +214,7 @@ def manipulate_file():
              try:
                 os.remove(processed_path)
              except:
+                pass
         # Cleanup original temp file immediately (always safe as it's not the one being sent)
         if tmp_path and os.path.exists(tmp_path):
             try:
