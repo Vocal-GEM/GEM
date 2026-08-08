@@ -1,5 +1,10 @@
 /* eslint-env node */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+vi.mock('../config/runtime.js', () => ({
+  isBackendEnabled: () => true,
+  getBackendUrl: () => 'http://localhost:5000'
+}));
 import { AudioEngine } from './AudioEngine';
 import { io } from 'socket.io-client';
 
@@ -11,6 +16,7 @@ vi.mock('socket.io-client', () => ({
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)),
     YIN: vi.fn(() => vi.fn((buffer) => 440))
 }));
 

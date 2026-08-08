@@ -1,3 +1,4 @@
+import { renderCoordinator } from '../services/RenderCoordinator';
 import { io } from 'socket.io-client';
 import { isBackendEnabled, getBackendUrl } from '../config/runtime';
 import { DSP } from '../utils/DSP';
@@ -40,7 +41,7 @@ export class AudioEngine {
         this.mediaRecorder = null;
         this.chunks = [];
         this.toneEngine = null;
-        this.animationFrameId = null;
+        // this.animationFrameId = null;
 
         // DSP State
         this.pitchBuffer = [];
@@ -357,7 +358,7 @@ export class AudioEngine {
 
         const loop = () => {
             if (!this.isActive) return;
-            this.animationFrameId = requestAnimationFrame(loop);
+            // Replaced with renderCoordinator
 
             // Fetch data (always needed for visualization/RMS)
             this.analyser.getFloatTimeDomainData(dataArray);
@@ -622,7 +623,7 @@ export class AudioEngine {
             }
         };
 
-        loop();
+        this.unsubscribeRender = renderCoordinator.subscribe('AudioEngine', loop, renderCoordinator.PRIORITY.HIGH);
     }
 
     // Explicitly add HNR calculation if needed for high precision mode, 
@@ -630,6 +631,11 @@ export class AudioEngine {
 
     stop() {
         this.isActive = false;
+
+        if (this.unsubscribeRender) {
+            this.unsubscribeRender();
+            this.unsubscribeRender = null;
+        }
 
         // Mute passthrough on stop
         if (this.passthroughGain) {
