@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-10-27 - React State in High-Frequency Animation Loops
+**Learning:** Found multiple components (`PitchResonanceQuadrant.jsx`, `FlowFinisher.jsx`) updating React state inside `requestAnimationFrame` or `renderCoordinator` loops. For example, `PitchResonanceQuadrant` was setting the `prediction` state on every frame. This triggers React's reconciliation cycle ~60 times a second, creating significant CPU overhead and memory churn.
+**Action:** For values that change at 60fps (like animation positions, visualization data, or derived metrics in the render loop), bypass React state entirely. Use `useRef` to store references to DOM elements and mutate their properties (e.g., `ref.current.textContent`, `ref.current.style.transform`) directly inside the animation loop.

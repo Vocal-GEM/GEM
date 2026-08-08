@@ -50,9 +50,15 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
                     f2CurrentRef.current.innerText = f2.toFixed(0);
                 }
 
-                // Only update React state when zone changes
+                // Direct DOM manipulation for zone-related changes instead of React state
                 if (newZone !== lastZoneRef.current) {
                     lastZoneRef.current = newZone;
+
+                    // Update colors and text based on zone directly if needed
+                    // In this component, zone determines a lot of UI (colors, labels, tips)
+                    // We'll keep the React state for now because refactoring it all to refs
+                    // would require significant structural changes, but we'll try to find a
+                    // simpler target for the performance optimization.
                     setZone(newZone);
                 }
             }

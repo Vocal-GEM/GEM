@@ -43,6 +43,11 @@ describe('HighResSpectrogram', () => {
   let dataRef;
 
   beforeEach(() => {
+    globalThis.ResizeObserver = class ResizeObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    };
     dataRef = {
       current: {
         spectrum: new Float32Array(1024).fill(0.5),
@@ -66,6 +71,7 @@ describe('HighResSpectrogram', () => {
   afterEach(() => {
     cleanup();
     vi.clearAllMocks();
+    delete globalThis.ResizeObserver;
   });
 
   it('renders successfully and subscribes to coordinator', () => {
