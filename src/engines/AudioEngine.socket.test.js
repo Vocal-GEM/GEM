@@ -3,16 +3,27 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AudioEngine } from './AudioEngine';
 import { io } from 'socket.io-client';
 
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: vi.fn(() => true),
+    getBackendUrl: vi.fn(() => 'http://localhost:5000')
+}));
+
 // Mock socket.io-client
 vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));
 
 // Mock pitchfinder
-vi.mock('pitchfinder', () => ({
-    McLeod: vi.fn(() => vi.fn((buffer) => 440)),
-    YIN: vi.fn(() => vi.fn((buffer) => 440))
-}));
+vi.mock('pitchfinder', () => {
+    const fn = vi.fn(() => vi.fn(() => 440));
+    return {
+        default: { McLeod: fn, Macleod: fn, YIN: fn },
+        McLeod: fn,
+        Macleod: fn,
+        YIN: fn,
+        __esModule: true
+    };
+});
 
 // Mock AudioContext and browser APIs
 const mockAudioContext = {
