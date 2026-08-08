@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2024-08-08 - Tooltip Close Buttons need explicit aria-labels
+**Learning:** Icon-only close and screenshot buttons in visualization components (`HighResSpectrogram`, `Spectrogram`, `SpectrumAnalyzer`) were missing `aria-label` attributes, making them opaque to screen readers.
+**Action:** When adding new interactive icons or tooltips to canvas-based visualization components, ensure `aria-label` and `focus-visible:ring-2` styles are explicitly set.
