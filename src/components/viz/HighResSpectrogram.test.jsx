@@ -2,7 +2,15 @@ import { render, cleanup, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import HighResSpectrogram from './HighResSpectrogram';
 import { renderCoordinator } from '../../services/RenderCoordinator';
-import React from 'react';
+import React, { useId } from 'react';
+
+vi.mock('react', async () => {
+  const actual = await vi.importActual('react');
+  return {
+    ...actual,
+    useId: () => 'mock-id'
+  };
+});
 
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
