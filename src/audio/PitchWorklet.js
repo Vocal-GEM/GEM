@@ -1,3 +1,5 @@
+/* global currentTime, currentFrame, sampleRate */
+/* eslint-disable no-unused-vars */
 /**
  * PitchWorklet.js
  * AudioWorklet processor for ultra-low-latency pitch detection

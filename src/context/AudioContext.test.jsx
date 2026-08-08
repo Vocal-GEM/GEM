@@ -4,7 +4,7 @@ import { AudioProvider, useAudio } from './AudioContext';
 import { SettingsProvider } from './SettingsContext';
 import { ProfileProvider } from './ProfileContext';
 
-/* eslint-disable no-undef */
+
 // Mock navigator.mediaDevices
 const mockEnumerateDevices = vi.fn().mockResolvedValue([
     { deviceId: 'default', kind: 'audioinput', label: 'Default Microphone' },
@@ -15,7 +15,7 @@ const mockGetUserMedia = vi.fn().mockResolvedValue({
     getTracks: () => [{ stop: vi.fn() }]
 });
 
-global.navigator.mediaDevices = {
+globalThis.navigator.mediaDevices = {
     enumerateDevices: mockEnumerateDevices,
     getUserMedia: mockGetUserMedia,
     addEventListener: vi.fn(),

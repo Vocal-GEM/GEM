@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-02-14 - Fix user enumeration timing attack in login route
+**Vulnerability:** A timing attack vulnerability existed in the `/login` route because the password hash check was skipped if the user did not exist.
+**Learning:** Checking a bcrypt password hash takes a noticeable amount of CPU time (e.g., ~100ms). By measuring the response time of the `/login` API, an attacker could enumerate valid usernames by noticing which requests took longer (meaning a user was found and the hash was checked).
+**Prevention:** Always perform a dummy password hash check using a precomputed generic hash if a user is not found, to ensure the response time is consistent regardless of whether the username is valid or not. Make sure to fallback to an empty string to avoid Werkzeug type errors when the password is not provided.
