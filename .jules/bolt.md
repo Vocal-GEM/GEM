@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-19 - Centralize requestAnimationFrame to RenderCoordinator
+**Learning:** Found multiple independent `requestAnimationFrame` loops in high-frequency visualization components (`AudioEngine`, `DynamicOrb`) which were not using the existing centralized `RenderCoordinator` service, leading to unnecessary CPU overhead and uncoordinated layout thrashing.
+**Action:** When working with high-frequency updates, always check for and utilize centralized animation schedulers like `RenderCoordinator` (`subscribe` / `unsubscribe`) instead of spinning up standalone `requestAnimationFrame` loops. When testing these components, ensure `RenderCoordinator` is properly mocked to return a cleanup function.
