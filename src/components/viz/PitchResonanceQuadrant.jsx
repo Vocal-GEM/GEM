@@ -23,7 +23,7 @@ const PitchResonanceQuadrant = ({ dataRef, size = 300 }) => {
     const { colorBlindMode } = useSettings();
     const canvasRef = useRef(null);
     const trailRef = useRef([]);
-    const [prediction, setPrediction] = useState(null);
+    const badgeRef = useRef(null);
     const componentId = useId();
 
     // Axis ranges
@@ -170,7 +170,22 @@ const PitchResonanceQuadrant = ({ dataRef, size = 300 }) => {
 
                     // Get prediction
                     const pred = predictGenderPerception(pitch, f1, resonanceScore);
-                    setPrediction(pred);
+
+                    // Update UI directly
+                    if (badgeRef.current) {
+                        if (pred && pred.confidence > 0) {
+                            badgeRef.current.style.display = 'block';
+                            badgeRef.current.textContent = pred.label;
+
+                            const color = getPerceptionColor(pred.score, colorBlindMode);
+
+                            badgeRef.current.style.backgroundColor = `${color}20`;
+                            badgeRef.current.style.borderColor = `${color}50`;
+                            badgeRef.current.style.color = color;
+                        } else {
+                            badgeRef.current.style.display = 'none';
+                        }
+                    }
 
                     // Add to trail
                     trailRef.current.push({ pitch, f1 });
@@ -220,19 +235,11 @@ const PitchResonanceQuadrant = ({ dataRef, size = 300 }) => {
                 className="rounded-xl bg-slate-900/50 border border-white/10"
             />
 
-            {/* Prediction badge */}
-            {prediction && prediction.confidence > 0 && (
-                <div
-                    className="absolute top-2 right-2 px-3 py-1.5 rounded-lg backdrop-blur-sm border text-xs font-bold"
-                    style={{
-                        backgroundColor: `${getPerceptionColor(prediction.score, colorBlindMode)}20`,
-                        borderColor: `${getPerceptionColor(prediction.score, colorBlindMode)}50`,
-                        color: getPerceptionColor(prediction.score, colorBlindMode)
-                    }}
-                >
-                    {prediction.label}
-                </div>
-            )}
+            {/* Prediction badge (Updated via ref) */}
+            <div
+                ref={badgeRef}
+                className="absolute top-2 right-2 px-3 py-1.5 rounded-lg backdrop-blur-sm border text-xs font-bold hidden transition-colors duration-200"
+            ></div>
 
             {/* Legend */}
             <div className="absolute bottom-2 left-2 right-2 flex justify-between text-[9px] text-slate-500">
