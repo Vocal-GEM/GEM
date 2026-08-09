@@ -8,6 +8,7 @@ import { validateAudioSignal, getSignalQualityMessage } from '../utils/signalVal
 import { PitchSmoother } from '../utils/PitchSmoother';
 import McLeodPitchDetector from '../services/audio/McLeodPitchDetector';
 import LPCFormantTracker from '../services/audio/LPCFormantTracker';
+import { renderCoordinator } from '../services/RenderCoordinator';
 
 
 
@@ -357,7 +358,7 @@ export class AudioEngine {
 
         const loop = () => {
             if (!this.isActive) return;
-            this.animationFrameId = requestAnimationFrame(loop);
+            // this.animationFrameId = requestAnimationFrame(loop); // Replaced with RenderCoordinator subscription
 
             // Fetch data (always needed for visualization/RMS)
             this.analyser.getFloatTimeDomainData(dataArray);
@@ -622,7 +623,11 @@ export class AudioEngine {
             }
         };
 
-        loop();
+        this.unsubscribeRenderCoordinator = renderCoordinator.subscribe(
+            'AudioEngine',
+            loop,
+            renderCoordinator.PRIORITY.HIGH
+        );
     }
 
     // Explicitly add HNR calculation if needed for high precision mode, 
@@ -639,6 +644,11 @@ export class AudioEngine {
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
             this.animationFrameId = null;
+        }
+
+        if (this.unsubscribeRenderCoordinator) {
+            this.unsubscribeRenderCoordinator();
+            this.unsubscribeRenderCoordinator = null;
         }
         if (this.microphone) {
             this.microphone.disconnect();

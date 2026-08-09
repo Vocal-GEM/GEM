@@ -8,9 +8,24 @@ vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));
 
+// Mock runtime config
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: () => true,
+    getBackendUrl: () => 'http://localhost:5000'
+}));
+
+// Mock renderCoordinator
+vi.mock('../services/RenderCoordinator', () => ({
+    renderCoordinator: {
+        subscribe: vi.fn(() => vi.fn()),
+        PRIORITY: { HIGH: 1, MEDIUM: 2, LOW: 3 }
+    }
+}));
+
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)),
     YIN: vi.fn(() => vi.fn((buffer) => 440))
 }));
 
