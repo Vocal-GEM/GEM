@@ -1,4 +1,5 @@
 import { io } from 'socket.io-client';
+import { renderCoordinator } from '../services/RenderCoordinator';
 import { isBackendEnabled, getBackendUrl } from '../config/runtime';
 import { DSP } from '../utils/DSP';
 import { PitchDetector } from '../utils/PitchDetector';
@@ -355,9 +356,11 @@ export class AudioEngine {
         this.visualPitchBuffer = [];
         this.visualAmpBuffer = [];
 
-        const loop = () => {
-            if (!this.isActive) return;
-            this.animationFrameId = requestAnimationFrame(loop);
+        // Subscribe to RenderCoordinator instead of standalone RAF
+        this.unsubscribeRenderCoordinator = renderCoordinator.subscribe(
+            'AudioEngine',
+            (deltaTime, currentTime) => {
+                if (!this.isActive) return;
 
             // Fetch data (always needed for visualization/RMS)
             this.analyser.getFloatTimeDomainData(dataArray);
@@ -620,9 +623,9 @@ export class AudioEngine {
 
                 this.onAudioUpdate(metricData);
             }
-        };
-
-        loop();
+            },
+            renderCoordinator.PRIORITY.HIGH
+        );
     }
 
     // Explicitly add HNR calculation if needed for high precision mode, 
@@ -636,9 +639,9 @@ export class AudioEngine {
             this.passthroughGain.gain.setTargetAtTime(0, this.audioContext.currentTime, 0.1);
         }
 
-        if (this.animationFrameId) {
-            cancelAnimationFrame(this.animationFrameId);
-            this.animationFrameId = null;
+        if (this.unsubscribeRenderCoordinator) {
+            this.unsubscribeRenderCoordinator();
+            this.unsubscribeRenderCoordinator = null;
         }
         if (this.microphone) {
             this.microphone.disconnect();
