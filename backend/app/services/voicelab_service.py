@@ -116,7 +116,8 @@ def estimate_vtl(sound, num_formants=4, max_formant_hz=5500):
         }
         
     except Exception as e:
-        return {"vtl_cm": None, "delta_f": None, "error": str(e)}
+        print(f"Formant regression error: {e}")
+        return {"vtl_cm": None, "delta_f": None, "error": "Failed to compute formant dispersion"}
 
 
 # ----------------------
@@ -195,7 +196,8 @@ def compute_perturbation_pca(sound, floor_hz=75, ceiling_hz=600):
         }
         
     except Exception as e:
-        return {"jitter_pca": None, "shimmer_pca": None, "error": str(e)}
+        print(f"PCA jitter/shimmer error: {e}")
+        return {"jitter_pca": None, "shimmer_pca": None, "error": "Failed to compute jitter/shimmer PCA"}
 
 
 # ----------------------
@@ -258,7 +260,8 @@ def measure_ltas(sound, bandwidth=100):
         }
         
     except Exception as e:
-        return {"error": str(e)}
+        print(f"Error in voicelab service: {e}")
+        return {"error": "An internal error occurred during voice analysis."}
 
 
 # ----------------------
@@ -335,7 +338,8 @@ def measure_speech_rate(sound, min_intensity_db=50, min_dip_db=2):
         }
         
     except Exception as e:
-        return {"error": str(e)}
+        print(f"Error in voicelab service: {e}")
+        return {"error": "An internal error occurred during voice analysis."}
 
 
 # ----------------------

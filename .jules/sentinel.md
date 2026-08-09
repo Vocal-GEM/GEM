@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2024-03-22 - [Fix] Information Leakage via Error Messages in Flask
+**Vulnerability:** API endpoints were returning raw internal error details to clients via `jsonify(error=str(e))` inside generic exception handlers. This exposed sensitive stack trace portions, database schema hints, and external service failure context.
+**Learning:** Returning `str(e)` in Flask production route exception handling is an anti-pattern. Developers often use it as a shortcut during development and forget to remove it, inadvertently exposing the app's internal workings which can be leveraged for further attacks.
+**Prevention:** Implement generic user-friendly error messages (e.g., "An internal error occurred") in client responses and use server-side logging (`current_app.logger.error()`) to retain diagnostic information.
