@@ -373,8 +373,9 @@ const ResonanceOrb = ({ dataRef, calibration, showDebug = false, size = 128, col
                     <div className="flex items-center justify-between mb-3">
                         <div className="text-slate-500 uppercase tracking-wider font-bold">Values</div>
                         <button
+                            aria-label="More information"
                             onClick={() => setShowTooltip(!showTooltip)}
-                            className="text-slate-500 hover:text-white transition-colors"
+                            className="text-slate-500 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 rounded"
                             title="Information"
                         >
                             <Info size={14} />

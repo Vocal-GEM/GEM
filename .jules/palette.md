@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2024-12-07 - Accessible info buttons
+**Learning:** Found a recurring pattern in the visualization components (`src/components/viz/`) where the `Info` button (using Lucide icon) lacked an `aria-label`, missing an accessible name for screen readers. This breaks accessibility for users trying to understand the metrics and visualizations using keyboard/assistive technologies. Additionally, they lacked a focus ring making it difficult for keyboard users to track their focus position.
+**Action:** Always ensure icon-only buttons (`<button><Icon/></button>`) have an explicit `aria-label` describing their purpose, and explicit focus indicators (e.g. `focus-visible:ring-2`) to provide a seamless navigational experience for keyboard and screen reader users alike.
