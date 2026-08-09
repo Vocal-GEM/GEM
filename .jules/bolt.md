@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-03-22 - Layout Thrashing in Animation Loops - ResizeObserver Side Effects
+**Learning:** When moving `canvas.getBoundingClientRect()` out of `requestAnimationFrame` loops to prevent layout thrashing (by caching dimensions with `ResizeObserver`), you cannot simply remove `canvas.width = rect.width`. Assigning to `canvas.width` has an implicit side effect of clearing the canvas context. If you remove it from the loop without adding an explicit `ctx.clearRect(0, 0, width, height)` and preserving `ctx.save()`/`ctx.restore()`, the canvas will smear visually because frames are no longer cleared. Furthermore, since `ResizeObserver` callbacks fire asynchronously, setting `canvas.width` inside the observer clears the canvas *outside* of the render loop, which can cause the canvas to go blank during resize until the next animation frame is painted.
+**Action:** Always replace the removed dimension assignments with an explicit `ctx.clearRect(0, 0, width, height)` at the start of the render loop when caching dimensions. Ensure that the initial layout paint triggers properly.
