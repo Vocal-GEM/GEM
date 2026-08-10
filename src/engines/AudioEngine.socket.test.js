@@ -2,8 +2,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AudioEngine } from './AudioEngine';
 import { io } from 'socket.io-client';
+import * as runtimeConfig from '../config/runtime';
 
 // Mock socket.io-client
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: vi.fn(() => true),
+    getBackendUrl: vi.fn(() => 'http://localhost:5000')
+}));
+
 vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));
@@ -11,7 +17,20 @@ vi.mock('socket.io-client', () => ({
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)),
     YIN: vi.fn(() => vi.fn((buffer) => 440))
+}));
+
+// Mock RenderCoordinator
+vi.mock('../services/RenderCoordinator', () => ({
+    default: {
+        subscribe: vi.fn(() => vi.fn()),
+        PRIORITY: { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
+    },
+    renderCoordinator: {
+        subscribe: vi.fn(() => vi.fn()),
+        PRIORITY: { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
+    }
 }));
 
 // Mock AudioContext and browser APIs
