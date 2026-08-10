@@ -1,4 +1,5 @@
 import { io } from 'socket.io-client';
+import renderCoordinator from '../services/RenderCoordinator';
 import { isBackendEnabled, getBackendUrl } from '../config/runtime';
 import { DSP } from '../utils/DSP';
 import { PitchDetector } from '../utils/PitchDetector';
@@ -357,7 +358,7 @@ export class AudioEngine {
 
         const loop = () => {
             if (!this.isActive) return;
-            this.animationFrameId = requestAnimationFrame(loop);
+
 
             // Fetch data (always needed for visualization/RMS)
             this.analyser.getFloatTimeDomainData(dataArray);
@@ -622,6 +623,8 @@ export class AudioEngine {
             }
         };
 
+        this.unsubscribeRender = renderCoordinator.subscribe('audio-engine', loop, renderCoordinator.PRIORITY.HIGH);
+        // We run loop once to populate initial data instantly
         loop();
     }
 
@@ -639,6 +642,10 @@ export class AudioEngine {
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
             this.animationFrameId = null;
+        }
+        if (this.unsubscribeRender) {
+            this.unsubscribeRender();
+            this.unsubscribeRender = null;
         }
         if (this.microphone) {
             this.microphone.disconnect();

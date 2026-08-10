@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-05-19 - Centralized Rendering for Performance
+**Learning:** Found an architectural pattern `RenderCoordinator` specifically designed to consolidate multiple high-frequency `requestAnimationFrame` loops into a single rendering loop to reduce CPU usage. Some engines like `AudioEngine` were still using raw `requestAnimationFrame`, causing potential overhead and redundant loops.
+**Action:** When finding raw `requestAnimationFrame` usage in engine files, replace it with `renderCoordinator.subscribe(id, callback, priority)` to leverage the centralized performance pattern in this codebase.
