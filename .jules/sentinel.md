@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-08-10 - Secure Exception Handling in Flask APIs
+**Vulnerability:** Information Leakage (CWE-209) via unhandled exceptions. Several Flask endpoints (`/api/tts/synthesize`, `/api/tts/voices`) passed raw `requests.exceptions.RequestException` strings directly back to the client using `jsonify(error=f"Failed to connect: {str(e)}")`.
+**Learning:** Returning `str(e)` directly to users leaks sensitive internal architecture details, internal paths, or downstream API error structures that adversaries can use for reconnaissance. Furthermore, test suites are often tightly coupled to the *exact* wording of generic error messages (e.g., in `test_settings_security.py`); modifying a safe generic error string to another safe generic error string can unnecessarily break tests.
+**Prevention:** Always log specific exception details internally (e.g., using `current_app.logger.error(e)`) and return a generic, non-descriptive error message to the client. When patching these issues, ensure no changes are made to the wording of already-secure fallback messages to maintain test suite compatibility.
