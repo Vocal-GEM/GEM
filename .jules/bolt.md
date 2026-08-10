@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-02-12 - Centralized Animation Loop Overhead
+**Learning:** Found that multiple visualization components (`DynamicOrb`, `OrbMetricsOverlay`) were running their own independent animation or polling loops (via `requestAnimationFrame` and `setInterval`). In a React tree, managing these independently causes unnecessary CPU usage and can lead to layout thrashing. The codebase has a centralized `RenderCoordinator` service specifically designed to consolidate these loops.
+**Action:** Always replace scattered `requestAnimationFrame` or `setInterval` visual updates with `RenderCoordinator.subscribe(id, callback, priority)`. For interval replacements (e.g., 200ms tick), use a `useRef` time accumulator inside the render loop rather than relying on the JS event loop, to ensure execution stays synchronized with paint cycles.
