@@ -75,3 +75,10 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-02-14 - Timing Attack Mitigation in Authentication
+**Vulnerability:** The login endpoint in `backend/app/routes/auth.py` was vulnerable to timing attacks for user enumeration. It only computed `check_password_hash` if the user existed, allowing an attacker to determine if a username exists by measuring the response time (which is significantly faster for non-existent users).
+**Learning:** `werkzeug.security.check_password_hash` raises a `TypeError` if passed `None` as the password argument. Furthermore, computing a real scrypt hash on the fly is computationally expensive, so the difference in response time is noticeable.
+**Prevention:**
+1. Used a pre-computed `DUMMY_PASSWORD_HASH` initialized during module load.
+2. If the user does not exist, executed `check_password_hash(DUMMY_PASSWORD_HASH, password)` to normalize the response time.
+3. Ensured that the `password` argument falls back to an empty string (`data.get('password', '')`) to avoid runtime `TypeError` when `password` is missing in the payload.
