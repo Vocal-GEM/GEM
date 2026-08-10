@@ -8,6 +8,7 @@ import { validateAudioSignal, getSignalQualityMessage } from '../utils/signalVal
 import { PitchSmoother } from '../utils/PitchSmoother';
 import McLeodPitchDetector from '../services/audio/McLeodPitchDetector';
 import LPCFormantTracker from '../services/audio/LPCFormantTracker';
+import { renderCoordinator } from '../services/RenderCoordinator';
 
 
 
@@ -40,7 +41,7 @@ export class AudioEngine {
         this.mediaRecorder = null;
         this.chunks = [];
         this.toneEngine = null;
-        this.animationFrameId = null;
+        this.unsubscribeRender = null;
 
         // DSP State
         this.pitchBuffer = [];
@@ -357,7 +358,6 @@ export class AudioEngine {
 
         const loop = () => {
             if (!this.isActive) return;
-            this.animationFrameId = requestAnimationFrame(loop);
 
             // Fetch data (always needed for visualization/RMS)
             this.analyser.getFloatTimeDomainData(dataArray);
@@ -622,7 +622,14 @@ export class AudioEngine {
             }
         };
 
-        loop();
+        // OPTIMIZATION: Replaced standalone requestAnimationFrame with centralized RenderCoordinator
+        // Expected Impact: Reduces CPU usage by consolidating animation frames across the app
+        // Measurement: Observe CPU usage in Chrome DevTools Performance tab
+        this.unsubscribeRender = renderCoordinator.subscribe(
+            'audio-engine',
+            loop,
+            renderCoordinator.PRIORITY.CRITICAL
+        );
     }
 
     // Explicitly add HNR calculation if needed for high precision mode, 
@@ -636,9 +643,9 @@ export class AudioEngine {
             this.passthroughGain.gain.setTargetAtTime(0, this.audioContext.currentTime, 0.1);
         }
 
-        if (this.animationFrameId) {
-            cancelAnimationFrame(this.animationFrameId);
-            this.animationFrameId = null;
+        if (this.unsubscribeRender) {
+            this.unsubscribeRender();
+            this.unsubscribeRender = null;
         }
         if (this.microphone) {
             this.microphone.disconnect();

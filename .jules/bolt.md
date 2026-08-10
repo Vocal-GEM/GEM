@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-01-20 - Centralized Rendering Loops
+**Learning:** Found that `AudioEngine.js` was using a standalone `requestAnimationFrame` loop to process DSP metrics and visual data, causing unnecessary CPU overhead. The app already provides a global `RenderCoordinator` singleton designed specifically to consolidate these exact loops.
+**Action:** When working on components or engines requiring high-frequency tick loops in this architecture, check for and subscribe to `renderCoordinator` (`renderCoordinator.subscribe(id, callback, priority)`) instead of spinning up standalone `requestAnimationFrame` loops. Remember to mock the coordinator appropriately in associated tests (e.g., `AudioEngine.socket.test.js`) to prevent `vi.mock` related failures.
