@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef, memo, useId } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { useSettings } from '../../context/SettingsContext';
 
 const OrbMetricsOverlay = memo(({ dataRef, calibration, mode, showDebug, variant = 'overlay', isVisible = true }) => {
@@ -18,10 +19,16 @@ const OrbMetricsOverlay = memo(({ dataRef, calibration, mode, showDebug, variant
     const scoreBuffer = useRef([]);
     const silenceStart = useRef(null);
 
+    const id = useId();
+    const timeAccumulator = useRef(0);
+
     useEffect(() => {
         if (!isVisible) return;
 
-        const interval = setInterval(() => {
+        const loop = (delta) => {
+            timeAccumulator.current += delta;
+            if (timeAccumulator.current >= 0.2) {
+                timeAccumulator.current = 0;
             if (dataRef.current) {
                 const { pitch, resonance, weight, volume } = dataRef.current;
                 const pitchVal = pitch || 0;
@@ -142,10 +149,19 @@ const OrbMetricsOverlay = memo(({ dataRef, calibration, mode, showDebug, variant
                     });
                 }
             }
-        }, 200);
+            }
+        };
 
-        return () => clearInterval(interval);
-    }, [dataRef, calibration, mode, showDebug, isVisible]);
+        // ⚡ Bolt: Replaced setInterval with RenderCoordinator and time accumulation
+        // Reduces JS thread overhead and syncs polling with the central render cycle
+        const unsubscribe = renderCoordinator.subscribe(
+            `OrbMetricsOverlay-${id}`,
+            loop,
+            renderCoordinator.PRIORITY.LOW
+        );
+
+        return () => unsubscribe();
+    }, [dataRef, calibration, mode, showDebug, isVisible, id]);
 
     if (!isVisible) return null;
 
