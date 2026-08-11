@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-08-11 - Excessive React Renders in High-Frequency Loops
+**Learning:** High-frequency audio visualization components (`LiveMetricsBar`) were using `useState` to store metrics parsed at ~60fps (CRITICAL priority in RenderCoordinator). This forced React to perform 60 reconciliation cycles per second, introducing unnecessary CPU overhead and potential layout thrashing.
+**Action:** Replace `useState` with `useRef` to directly manipulate DOM elements (`ref.current.textContent = value`) inside the loop, completely bypassing the React render cycle for high-frequency data streams.
