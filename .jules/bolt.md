@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-24 - [Replaced bare requestAnimationFrame with RenderCoordinator in visualization components]
+**Learning:** Found multiple components running redundant `requestAnimationFrame` loops for low-priority visualization metrics like `SZRatio`, `MPTTracker`, `TouchDetector`, `VowelSpacePlot` etc. These uncoordinated loops consume CPU and can cause frame tearing/dropped frames.
+**Action:** Replaced standalone `requestAnimationFrame` and `cancelAnimationFrame` blocks with subscriptions to the centralized `RenderCoordinator` singleton. It reduces redundant frame calculations, provides priority leveling, and throttles when necessary.
