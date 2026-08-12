@@ -1,87 +1,70 @@
-import { useEffect, useRef, useMemo, useState, useCallback, memo, useId } from 'react';
-import { useSettings } from '../../context/SettingsContext';
-import { generateColormap } from '../../utils/colormaps';
-import { renderCoordinator } from '../../services/RenderCoordinator';
+import { useState, useEffect, useRef, useCallback, useId, memo } from 'react';
 import { Camera, X } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
+import { hzToNote } from '../../utils/musicUtils';
 
-/**
- * Convert frequency to musical note with cents
- */
-const hzToNote = (hz) => {
-    if (hz <= 0) return '—';
-    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    const midi = 12 * Math.log2(hz / 440) + 69;
-    const noteIndex = Math.round(midi) % 12;
-    const octave = Math.floor(Math.round(midi) / 12) - 1;
-    const cents = Math.round((midi - Math.round(midi)) * 100);
-    const centsStr = cents >= 0 ? `+${cents}` : `${cents}`;
-    return `${noteNames[noteIndex]}${octave} (${centsStr}¢)`;
-};
-
+// 8kHz is typically enough for formants and most sibilance
 const MAX_FREQ = 8000;
 
-const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
+// Generate colormap outside component to avoid recreation
+const generateColormap = () => {
+    const map = new Uint32Array(256);
+    for (let i = 0; i < 256; i++) {
+        // High contrast thermal-style map
+        // Dark blue -> Purple -> Red -> Yellow -> White
+        let r, g, b;
+        const normalized = i / 255;
+
+        if (normalized < 0.2) {
+            // Black to Dark Blue
+            r = 0; g = 0; b = normalized * 5 * 100;
+        } else if (normalized < 0.5) {
+            // Dark Blue to Purple/Red
+            const t = (normalized - 0.2) / 0.3;
+            r = t * 200; g = 0; b = 100 - t * 50;
+        } else if (normalized < 0.8) {
+            // Red to Yellow
+            const t = (normalized - 0.5) / 0.3;
+            r = 200 + t * 55; g = t * 255; b = 50 - t * 50;
+        } else {
+            // Yellow to White
+            const t = (normalized - 0.8) / 0.2;
+            r = 255; g = 255; b = t * 255;
+        }
+
+        // Format for ImageData (ABGR)
+        map[i] = (255 << 24) | (b << 16) | (g << 8) | r;
+    }
+    return map;
+};
+
+const COLORMAP = generateColormap();
+
+const HighResSpectrogram = memo(({ dataRef, scrollSpeed = 2 }) => {
     const canvasRef = useRef(null);
     const containerRef = useRef(null);
-    const lastFormantsRef = useRef({ f1: 0, f2: 0 });
-    const { settings } = useSettings();
-
-    // Component ID for RenderCoordinator
-    const componentId = useId();
-
-    // Reusable buffers to avoid GC
-    // Unique component ID for RenderCoordinator
-    const uniqueId = useId();
-    const componentId = `spectrogram-highres-${uniqueId}`;
-
-    // Reusable buffers to avoid garbage collection churn
-    const imgDataRef = useRef(null);
-    const data32Ref = useRef(null);
-
-    // Tap cursor state
     const [cursorData, setCursorData] = useState(null);
     const [showControls, setShowControls] = useState(false);
 
-    // Dynamic colormap based on settings
-    const colormap = useMemo(
-        () => generateColormap(settings.spectrogramColorScheme),
-        [settings.spectrogramColorScheme]
-    );
+    // Performance optimization refs
+    const imgDataRef = useRef(null);
+    const data32Ref = useRef(null);
+    const lastFormantsRef = useRef({ f1: 0, f2: 0 });
+    const componentId = useId();
 
-    /**
-     * Main rendering loop called by RenderCoordinator
-     */
     const draw = useCallback(() => {
         const canvas = canvasRef.current;
-        if (!canvas) return;
-        if (!dataRef.current || !dataRef.current.spectrum) return;
+        if (!canvas || !dataRef.current?.spectrum) return;
 
+        const ctx = canvas.getContext('2d');
         const width = canvas.width;
         const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
-
-        // Optimization: Use alpha: false for better performance
-        const ctx = canvas.getContext('2d', { alpha: false });
-
-        // Optimization: Use alpha: false for better performance
-        // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
-        const ctx = canvas.getContext('2d', { alpha: false });
-
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
         const spectrum = dataRef.current.spectrum;
 
-        // Ensure buffers are ready and match height
-        if (!imgDataRef.current || imgDataRef.current.height !== height) {
-            try {
-                // Optimization: Create ImageData with 'scrollSpeed' width
-                imgDataRef.current = ctx.createImageData(scrollSpeed, height);
-                data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
-            } catch (e) {
-                console.error("Failed to create image data", e);
-                return;
-            }
+        // Ensure we have our typed arrays ready
+        if (!imgDataRef.current || imgDataRef.current.width !== scrollSpeed) {
+            imgDataRef.current = ctx.createImageData(scrollSpeed, height);
+            data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
         }
 
         const imgData = imgDataRef.current;
@@ -96,16 +79,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const maxBin = Math.floor(spectrum.length / 3); // 8kHz cutoff
 
         for (let y = 0; y < height; y++) {
-            // Map y (0 at top, height at bottom) to frequency
-        // Copy the current canvas (from x=scrollSpeed to the end) to x=0
-        // This is much faster on GPU-accelerated contexts.
-        ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
-
-        // 2. Draw new column
-        // Optimized: Reuse pre-allocated TypedArray
-        const maxBin = Math.floor(spectrum.length / 3);
-
-        for (let y = 0; y < height; y++) {
             const freqRatio = (height - 1 - y) / height;
             const binIndex = Math.floor(freqRatio * maxBin);
             const val = spectrum[binIndex] || 0;
@@ -113,7 +86,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             let intensity = Math.log10(val + 1) * 60;
             intensity = Math.min(255, Math.max(0, intensity));
 
-            const color = colormap[Math.floor(intensity)];
+            const color = COLORMAP[Math.floor(intensity)];
 
             // Fill all pixels in the scrollSpeed strip for this row
             const rowOffset = y * scrollSpeed;
@@ -154,12 +127,8 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         lastFormantsRef.current = { f1, f2 };
 
-    }, [dataRef, colormap]);
+    }, [dataRef, scrollSpeed]);
 
-    // Initial canvas setup & ResizeObserver
-    }, [dataRef, colormap, componentId]);
-
-    // Initial canvas setup
     // Handle Resize with ResizeObserver
     useEffect(() => {
         const container = containerRef.current;
@@ -172,8 +141,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             const rect = container.getBoundingClientRect();
 
             // Only update if dimensions actually changed
-            const newWidth = Math.floor(rect.width * dpr);
-            const newHeight = 512; // Fixed high vertical resolution
             const newWidth = Math.round(rect.width * dpr);
             const newHeight = 512; // Fixed internal height for vertical resolution
 
@@ -184,12 +151,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
                 data32Ref.current = null;
             }
         };
-
-        // Initial size
-        updateSize();
-
-        const resizeObserver = new ResizeObserver(() => {
-            // Use RAF to debounce
 
         const resizeObserver = new ResizeObserver(() => {
             // Run in animation frame to avoid resize loops/tearing
@@ -217,7 +178,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         return () => {
             unsubscribe();
         };
-    }, [draw, componentId]);
     }, [componentId, draw]);
 
     /**

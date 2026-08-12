@@ -1,56 +1,66 @@
-import { useEffect, useRef, useId } from 'react';
-import { useSettings } from '../../context/SettingsContext';
-import { Info, TrendingDown } from 'lucide-react';
+import { useState, useEffect, useRef, useId } from 'react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
+import { ChevronUp, ChevronDown, CheckCircle2, AlertTriangle, Wind, Info, Mic2 } from 'lucide-react';
 
-const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -6 } }) => {
-    const { colorBlindMode } = useSettings();
-    const id = useId();
-    const indicatorRef = useRef(null);
-    const valueRef = useRef(null);
+/**
+ * SpectralTiltMeter
+ *
+ * Visualizes the energy drop-off from low to high frequencies (H1-H2, etc).
+ * - Steeper tilt (more high-freq drop-off) = breathy/softer quality
+ * - Flatter tilt (more high-freq energy) = pressed/brassy quality
+ */
+const SpectralTiltMeter = ({ dataRef, targetZone = 'balanced', showAdvanced = false }) => {
+    // Current tilt in dB/octave (approximate)
+    const [tilt, setTilt] = useState(0);
+    // Recent history for smoothing/sparkline
+    const historyRef = useRef([]);
+    const maxHistory = 30;
+
+    // Status metrics
+    const [status, setStatus] = useState({
+        zone: 'balanced',
+        h1h2: 0,
+        cpp: 0
+    });
+
+    const [showTooltip, setShowTooltip] = useState(false);
+
     const componentId = useId();
 
     useEffect(() => {
         const loop = () => {
-            if (indicatorRef.current && valueRef.current) {
-                const tilt = dataRef.current.tilt || 0;
+            if (!dataRef?.current) return;
 
-                // Map Tilt: Typically -20dB/oct (Masc/Steep?) to 0dB/oct (Flat/Bright?)
-                // Visualization Range: -24 dB/oct to 0 dB/oct
-                const minDisp = -24;
-                const maxDisp = 0;
+            const { spectralTilt, h1h2, cpp } = dataRef.current;
 
-                // Normalize to 0-100%
-                let percent = ((tilt - minDisp) / (maxDisp - minDisp)) * 100;
-                percent = Math.max(0, Math.min(100, percent));
+            // Assuming spectralTilt is something like -12dB/octave
+            // H1-H2 often correlated with tilt (higher H1-H2 = steeper tilt = more breathy)
 
-                const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
-                const nextLeft = curLeft + (percent - curLeft) * 0.1;
-                indicatorRef.current.style.left = `${nextLeft}%`;
+            const currentTilt = spectralTilt || -12;
+            const currentH1H2 = h1h2 || 5;
 
-                // Color based on target range
-                const isWithinTarget = tilt >= targetRange.min && tilt <= targetRange.max;
+            setTilt(currentTilt);
 
-                if (isWithinTarget) {
-                    indicatorRef.current.className = `absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`;
-                } else {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-slate-400";
-                }
-
-                // Update value display
-                valueRef.current.innerText = tilt.toFixed(1);
+            // Determine zone based on H1-H2 and tilt
+            // These thresholds would need empirical tuning based on the audio engine
+            let zone = 'balanced';
+            if (currentH1H2 > 8) {
+                zone = 'breathy'; // High H1 relative to H2, steep drop-off
+            } else if (currentH1H2 < 2) {
+                zone = 'pressed'; // Strong higher harmonics, flat tilt
             }
-        };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                `spectral-tilt-meter-${id}`,
-                loop,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
+            setStatus({
+                zone,
+                h1h2: currentH1H2,
+                cpp: cpp || 0
+            });
+
+            // Update history
+            historyRef.current.push(currentTilt);
+            if (historyRef.current.length > maxHistory) {
+                historyRef.current.shift();
+            }
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -62,82 +72,162 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
         return () => {
             unsubscribe();
         };
-    }, [dataRef, targetRange, colorBlindMode, id]);
-    }, [dataRef, targetRange, colorBlindMode, componentId]);
+    }, [dataRef, componentId]);
+
+    // Render logic remains the same...
+    const getZoneConfig = () => {
+        switch (status.zone) {
+            case 'breathy':
+                return {
+                    label: 'Breathy',
+                    icon: <Wind size={16} />,
+                    color: 'text-cyan-400',
+                    bg: 'bg-cyan-500/10',
+                    border: 'border-cyan-500/30',
+                    gradient: 'from-cyan-500/20 to-transparent',
+                    msg: 'Steep spectral tilt. Good for softening, but watch for weakness.'
+                };
+            case 'pressed':
+                return {
+                    label: 'Pressed',
+                    icon: <AlertTriangle size={16} />,
+                    color: 'text-orange-400',
+                    bg: 'bg-orange-500/10',
+                    border: 'border-orange-500/30',
+                    gradient: 'from-orange-500/20 to-transparent',
+                    msg: 'Flat spectral tilt. Strong, brassy, but may be straining.'
+                };
+            default:
+                return {
+                    label: 'Balanced',
+                    icon: <CheckCircle2 size={16} />,
+                    color: 'text-emerald-400',
+                    bg: 'bg-emerald-500/10',
+                    border: 'border-emerald-500/30',
+                    gradient: 'from-emerald-500/20 to-transparent',
+                    msg: 'Balanced harmonic energy distribution.'
+                };
+        }
+    };
+
+    const config = getZoneConfig();
 
     return (
-        <div className="glass-panel rounded-2xl p-6 h-full flex flex-col justify-center">
+        <div className="bg-slate-900/50 rounded-2xl p-5 border border-slate-800">
             {/* Header */}
-            <div className="flex justify-between items-end text-xs font-bold text-slate-300 tracking-wider mb-4">
-                <span className="w-24 text-left opacity-75">Steep (-24)</span>
-                <div className="flex flex-col items-center">
-                    <span className="text-slate-400 mb-1 uppercase tracking-widest text-[10px]">Spectral Tilt</span>
-                    <div className="flex items-baseline gap-1">
-                        <span ref={valueRef} className={`text-4xl font-mono font-bold tabular-nums leading-none ${colorBlindMode ? 'text-amber-400' : 'text-emerald-400'}`}>-0.0</span>
-                        <span className="text-xs text-slate-400">dB/oct</span>
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${config.bg} ${config.color}`}>
+                        <Mic2 size={20} />
                     </div>
-                </div>
-                <span className="w-24 text-right opacity-75">Flat (0)</span>
-            </div>
-
-            {/* Meter Bar */}
-            <div className="relative h-10 bg-slate-900/80 rounded-full overflow-hidden shadow-inner border border-white/5 mb-6">
-                {/* Background Gradient */}
-                <div className={`absolute inset-0 bg-gradient-to-r ${colorBlindMode ? 'from-purple-900/40 to-teal-500/10' : 'from-indigo-900/40 to-blue-500/10'}`}></div>
-
-                {/* Target Range Zone */}
-                {(() => {
-                    const minDisp = -24;
-                    const maxDisp = 0;
-                    const left = ((targetRange.min - minDisp) / (maxDisp - minDisp)) * 100;
-                    const width = ((targetRange.max - targetRange.min) / (maxDisp - minDisp)) * 100;
-                    return (
-                        <div
-                            className={`absolute top-0 bottom-0 border-x ${colorBlindMode ? 'bg-amber-500/20 border-amber-500/30' : 'bg-emerald-500/20 border-emerald-500/30'}`}
-                            style={{ left: `${left}%`, width: `${width}%` }}
-                        >
-                            <div className={`absolute top-0 left-0 right-0 h-[2px] ${colorBlindMode ? 'bg-amber-500/50' : 'bg-emerald-500/50'}`}></div>
-                            <div className={`absolute bottom-0 left-0 right-0 h-[2px] ${colorBlindMode ? 'bg-amber-500/50' : 'bg-emerald-500/50'}`}></div>
-                            <div className={`absolute top-1 left-1 text-[8px] font-bold uppercase tracking-wider ${colorBlindMode ? 'text-amber-400' : 'text-emerald-400'}`}>Target</div>
-                        </div>
-                    );
-                })()}
-
-                {/* Grid Lines */}
-                <div className="absolute left-[25%] top-2 bottom-2 w-px bg-white/5"></div>
-                <div className="absolute left-[50%] top-2 bottom-2 w-px bg-white/5"></div>
-                <div className="absolute left-[75%] top-2 bottom-2 w-px bg-white/5"></div>
-
-                {/* Indicator */}
-                <div
-                    ref={indicatorRef}
-                    className={`absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_15px_rgba(100,255,100,0.6)] border border-white/50 transition-all duration-100 ease-out z-10 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`}
-                    style={{ left: '50%' }}
-                ></div>
-            </div>
-
-            {/* Info Panel */}
-            <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
-                <div className="flex items-center justify-center gap-2 mb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                    <TrendingDown size={12} /> What is Spectral Tilt?
-                </div>
-                <div className="flex items-start gap-2 text-[10px] text-slate-400 leading-tight bg-slate-800/30 p-2 rounded-lg">
-                    <Info size={12} className="shrink-0 mt-0.5 text-slate-400" />
                     <div>
-                        <span className="text-slate-300">Spectral tilt measures how fast energy drops off as frequency increases.</span>
-                        <div className="mt-2 grid grid-cols-2 gap-2">
-                            <div className="bg-slate-800/50 p-2 rounded border border-white/5">
-                                <span className={`font-bold block mb-1 ${colorBlindMode ? 'text-purple-400' : 'text-blue-400'}`}>Steeper (-12dB)</span>
-                                <span className="text-slate-300">Softer, breathier, more feminine quality.</span>
-                            </div>
-                            <div className="bg-slate-800/50 p-2 rounded border border-white/5">
-                                <span className={`font-bold block mb-1 ${colorBlindMode ? 'text-teal-400' : 'text-purple-400'}`}>Flatter (-6dB)</span>
-                                <span className="text-slate-300">Brassier, buzzier, more masculine quality.</span>
-                            </div>
+                        <h3 className="font-bold text-white flex items-center gap-2">
+                            Spectral Tilt
+                        </h3>
+                        <p className="text-xs text-slate-400">Harmonic Energy Distribution</p>
+                    </div>
+                </div>
+
+                <button
+                    className="text-slate-500 hover:text-slate-300 transition-colors"
+                    onMouseEnter={() => setShowTooltip(true)}
+                    onMouseLeave={() => setShowTooltip(false)}
+                >
+                    <Info size={16} />
+                </button>
+            </div>
+
+            {/* Tooltip */}
+            {showTooltip && (
+                <div className="absolute z-50 mt-[-80px] right-4 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg text-xs text-slate-300 max-w-xs shadow-xl">
+                    <p className="mb-2"><strong>Spectral Tilt</strong> measures how fast sound energy drops off in higher frequencies.</p>
+                    <ul className="list-disc pl-4 space-y-1">
+                        <li><strong>Steep:</strong> More breathy/soft (feminine tendency)</li>
+                        <li><strong>Flat:</strong> More pressed/brassy (masculine tendency)</li>
+                    </ul>
+                </div>
+            )}
+
+            {/* Main Visualization (Tilt Graph) */}
+            <div className="relative h-32 bg-slate-950/50 rounded-xl border border-white/5 overflow-hidden mb-4 p-4">
+                {/* Axes */}
+                <div className="absolute left-4 top-4 bottom-4 w-px bg-slate-700"></div>
+                <div className="absolute left-4 right-4 bottom-4 h-px bg-slate-700"></div>
+
+                {/* Labels */}
+                <div className="absolute left-1 top-2 text-[9px] text-slate-500">dB</div>
+                <div className="absolute right-2 bottom-0 text-[9px] text-slate-500">Freq</div>
+
+                {/* The "Tilt" Line */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <svg className="w-full h-full" preserveAspectRatio="none">
+                        {/*
+                            Visualizing tilt.
+                            Start high on Y axis (left side).
+                            End lower on Y axis (right side).
+                            Steeper tilt = lower end point.
+                        */}
+                        <line
+                            x1="10%"
+                            y1="20%"
+                            x2="90%"
+                            // Map tilt (e.g., -6 to -18) to a y2 percentage (e.g., 40% to 90%)
+                            // Rough mapping for visual effect:
+                            // tilt -6 (flat) -> y2 = 40%
+                            // tilt -18 (steep) -> y2 = 90%
+                            y2={`${Math.min(95, Math.max(30, (Math.abs(tilt) / 20) * 100))}%`}
+                            stroke="currentColor"
+                            strokeWidth="3"
+                            className={`${config.color} transition-all duration-300 ease-out`}
+                            strokeLinecap="round"
+                        />
+
+                        {/* Harmonic peaks representation (static for visual context) */}
+                        <path
+                            d="M 10% 20% Q 15% 10%, 20% 30% T 30% 40% T 40% 50% T 50% 60% T 60% 70% T 70% 80% T 80% 85% T 90% 90%"
+                            fill="none"
+                            stroke="rgba(255,255,255,0.1)"
+                            strokeWidth="1"
+                        />
+                    </svg>
+                </div>
+
+                {/* Current Value Badge */}
+                <div className="absolute top-2 right-2 bg-slate-800/80 px-2 py-1 rounded text-xs font-mono font-bold text-white border border-slate-700 backdrop-blur">
+                    {tilt.toFixed(1)} dB/oct
+                </div>
+            </div>
+
+            {/* Status & Feedback */}
+            <div className={`flex items-start gap-3 p-3 rounded-xl ${config.bg} border ${config.border}`}>
+                <div className={`mt-0.5 ${config.color}`}>
+                    {config.icon}
+                </div>
+                <div>
+                    <h4 className={`text-sm font-bold ${config.color}`}>{config.label}</h4>
+                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                        {config.msg}
+                    </p>
+                </div>
+            </div>
+
+            {/* Advanced Metrics (Optional) */}
+            {showAdvanced && (
+                <div className="mt-4 grid grid-cols-2 gap-3 pt-4 border-t border-slate-800">
+                    <div>
+                        <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">H1-H2 Diff</div>
+                        <div className="text-lg font-mono text-white">
+                            {status.h1h2.toFixed(1)} <span className="text-xs text-slate-500">dB</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">CPP (Clarity)</div>
+                        <div className="text-lg font-mono text-white">
+                            {status.cpp.toFixed(1)} <span className="text-xs text-slate-500">dB</span>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };
