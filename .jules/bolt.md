@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-18 - [Centralized Visualization Event Loop Pattern]
+**Learning:** This codebase centralizes high-frequency updates using a `RenderCoordinator` service rather than relying solely on component-level `requestAnimationFrame` loops. It's crucial to use direct DOM manipulation (`useRef` and `.textContent`/`.style`) inside these `renderCoordinator.subscribe` callbacks rather than React `useState`, as state updates triggered up to 60 times a second per visualization component cause massive, unnecessary React reconciliation trees and significantly degrade application performance.
+**Action:** Always favor `useRef` over `useState` for rapid metric updates, especially in components wired to the `RenderCoordinator` loop, to bypass React rendering and improve performance. Ensure the cleanup logic properly captures the `unsubscribe` method return.

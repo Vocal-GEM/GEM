@@ -1,337 +1,273 @@
-import { useEffect, useRef, useMemo, useState, useCallback, useId } from 'react';
-import { useAudio } from '../../context/AudioContext';
-import { useSettings } from '../../context/SettingsContext';
-import { renderCoordinator } from '../../services/RenderCoordinator';
-import { generateColormap } from '../../utils/colormaps';
+import { useState, useEffect, useRef, useCallback, memo, useId } from 'react';
 import { Camera, X } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
+import { hzToNote } from '../../utils/musicUtils';
 
-/**
- * Convert frequency to musical note
- */
-const hzToNote = (hz) => {
-    if (hz <= 0) return '—';
-    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    const midi = 12 * Math.log2(hz / 440) + 69;
-    const noteIndex = Math.round(midi) % 12;
-    const octave = Math.floor(Math.round(midi) / 12) - 1;
-    const cents = Math.round((midi - Math.round(midi)) * 100);
-    const centsStr = cents >= 0 ? `+${cents}` : `${cents}`;
-    return `${noteNames[noteIndex]}${octave} (${centsStr}¢)`;
+// Formant tracking configuration
+const FORMANT_CONFIG = {
+    COLORS: {
+        F1: 'rgba(239, 68, 68, 0.9)',   // Red
+        F2: 'rgba(59, 130, 246, 0.9)',  // Blue
+        F3: 'rgba(16, 185, 129, 0.9)',  // Green
+    },
+    RANGES: {
+        F1: { min: 200, max: 1000 },
+        F2: { min: 800, max: 3000 },
+        F3: { min: 2000, max: 4000 }
+    }
 };
 
-const Spectrogram = ({ height = 200, showLabels = true }) => {
+const Spectrogram = memo(({
+    dataRef,
+    maxFreq = 5000,
+    scrollSpeed = 2,
+    showFormants = true
+}) => {
     const canvasRef = useRef(null);
-    const { dataRef, isAudioActive, audioContext } = useAudio();
-    const { settings } = useSettings();
-
-    // Lazy initialization of component ID
-    const idRef = useRef(null);
-    if (!idRef.current) {
-        idRef.current = `spectrogram-${Math.random().toString(36).substr(2, 9)}`;
-    }
-    const componentId = idRef.current;
-
-    // Tap cursor state
+    const containerRef = useRef(null);
     const [cursorData, setCursorData] = useState(null);
     const [showControls, setShowControls] = useState(false);
 
-    // Optimized History Buffer (Circular Buffer)
-    // We allocate a large flat array to store history instead of pushing/shifting objects.
-    // Each frame stores 'maxBin' floats.
-    // We increase history size to handle large screens (e.g. 4k).
-    // 2500 frames * 2px speed = 5000px width coverage.
-    const HISTORY_FRAMES = 2500;
-    const historyBufferRef = useRef(null); // Float32Array
-    const historyMetaRef = useRef(null); // Metadata per frame
-
-    if (!historyMetaRef.current) {
-        historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
-    }
-
-    if (!historyMetaRef.current) {
-        historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
-    }
-    const historyHeadRef = useRef(0); // Points to the next write position (frame index)
-
-    useEffect(() => {
-        historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
-    }, []);
-
-    // Spectrogram State
-    const speed = 2; // Pixels per frame
-    const MAX_FREQ = 8000;
-
-    // Pre-calculate colormap as Uint32Array (ABGR) for fast pixel manipulation
-    const colormap = useMemo(
-        () => generateColormap(settings.spectrogramColorScheme),
-        [settings.spectrogramColorScheme]
-    );
+    // Performance optimization refs
+    const imgDataRef = useRef(null);
+    const data32Ref = useRef(null);
+    const lastFormantsRef = useRef({ f1: 0, f2: 0, f3: 0 });
+    const componentId = useId();
 
     const draw = useCallback(() => {
         const canvas = canvasRef.current;
-        if (!canvas || !dataRef.current) return;
+        if (!canvas || !dataRef.current?.spectrum) return;
 
-        const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: false });
+        const ctx = canvas.getContext('2d');
         const width = canvas.width;
-        const h = canvas.height;
-
-        // 1. Shift existing image to the left
-        // drawImage is optimized by browsers
-        ctx.drawImage(canvas, speed, 0, width - speed, h, 0, 0, width - speed, h);
-
+        const height = canvas.height;
         const spectrum = dataRef.current.spectrum;
-        if (spectrum && spectrum.length > 0) {
-            const sampleRate = audioContext?.sampleRate || 44100;
-            const contextNyquist = sampleRate / 2;
-            const binsTotal = spectrum.length;
-            const hzPerBin = contextNyquist / binsTotal;
-            const maxBin = Math.min(binsTotal, Math.ceil(MAX_FREQ / hzPerBin));
 
-            // --- OPTIMIZATION: History Buffer Management ---
-            // Lazy initialization of history buffer
-            if (!historyBufferRef.current || historyBufferRef.current.length < HISTORY_FRAMES * maxBin) {
-                // Allocate or re-allocate if maxBin grows significantly (unlikely dynamically)
-                historyBufferRef.current = new Float32Array(HISTORY_FRAMES * maxBin);
-                // Also reset meta
-                historyMetaRef.current = new Array(HISTORY_FRAMES).fill(null);
-                historyHeadRef.current = 0;
-            }
-
-            const head = historyHeadRef.current;
-            const buffer = historyBufferRef.current;
-            const offset = head * maxBin;
-
-            // Copy spectrum to history buffer (avoiding new Float32Array per frame)
-            // We only need the first maxBin items
-            for (let i = 0; i < maxBin; i++) {
-                buffer[offset + i] = spectrum[i];
-            }
-
-            // Store metadata for this frame
-            historyMetaRef.current[head] = { hzPerBin, maxBin };
-
-            // Advance head (circular)
-            historyHeadRef.current = (head + 1) % HISTORY_FRAMES;
-            // -----------------------------------------------
-
-            // --- OPTIMIZATION: Direct Pixel Manipulation ---
-            // Instead of thousands of ctx.fillRect calls, we generate the column pixels
-            // directly into an ImageData buffer and put it onto the canvas.
-
-            // Reuse ImageData object
-            // Reusable objects to reduce GC
-            if (!canvas.imageDataRef) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
-            }
-            // Ensure size match
-            if (canvas.imageDataRef.height !== h || canvas.imageDataRef.width !== speed) {
-                canvas.imageDataRef = ctx.createImageData(speed, h);
-            }
-
-            const imageData = canvas.imageDataRef;
-            const data32 = new Uint32Array(imageData.data.buffer); // View as 32-bit integers (ABGR)
-
-            // Fill the column(s). Since speed is width, we fill 'speed' columns identically.
-            // We map pixels (y) to frequency bins.
-            for (let y = 0; y < h; y++) {
-                // Invert y because canvas 0 is top, but we want low freq at bottom
-                // y=0 is top (high freq), y=h is bottom (low freq)
-                // Bin mapping: 0 -> maxBin (low -> high)
-
-                // Linear mapping matches the original code: y = h - (i / maxBin) * h
-                // So i / maxBin = (h - y) / h = 1 - y/h
-
-                const freqRatio = 1 - (y / h);
-                const binIndex = Math.min(maxBin - 1, Math.floor(freqRatio * maxBin));
-
-                // Get intensity from spectrum
-                const value = spectrum[binIndex] || 0;
-
-                let intensity = 0;
-                if (value < 0) {
-                    // DB-ish scale handling from original code
-                    intensity = Math.max(0, Math.min(255, (value + 100) * 3.6));
-                } else {
-                    // Linear scale handling
-                    intensity = Math.min(255, value * 255 * 2);
-                }
-
-                // Color lookup
-                let color = 0xFF000000; // Black (ABGR: A=255, B=0, G=0, R=0)
-                if (intensity > 10) {
-                    const colorIndex = Math.floor(intensity);
-                    color = colormap[Math.min(255, Math.max(0, colorIndex))];
-                }
-
-                // Write to all columns in the 'speed' strip
-                // Row y has 'speed' pixels
-                const rowOffset = y * speed;
-                for (let x = 0; x < speed; x++) {
-                    data32[rowOffset + x] = color;
-                }
-            }
-
-            ctx.putImageData(imageData, width - speed, 0);
-            // -----------------------------------------------
-        } else {
-            // Clear the new strip if no data
-            ctx.fillStyle = '#000';
-            ctx.fillRect(width - speed, 0, speed, h);
+        if (!imgDataRef.current || imgDataRef.current.width !== scrollSpeed) {
+            imgDataRef.current = ctx.createImageData(scrollSpeed, height);
+            data32Ref.current = new Uint32Array(imgDataRef.current.data.buffer);
         }
-    }, [isAudioActive, audioContext, colormap]);
 
+        const imgData = imgDataRef.current;
+        const data32 = data32Ref.current;
+
+        // Shift existing content
+        ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
+
+        // Draw new column
+        const nyquist = 24000;
+        const maxBin = Math.floor((maxFreq / nyquist) * spectrum.length);
+
+        for (let y = 0; y < height; y++) {
+            const freqRatio = (height - 1 - y) / height;
+            const binIndex = Math.floor(freqRatio * maxBin);
+            const val = spectrum[binIndex] || 0;
+
+            // Logarithmic mapping with noise floor handling
+            let intensity = Math.max(0, (val + 100) / 100);
+            intensity = Math.pow(intensity, 1.5) * 255;
+            intensity = Math.min(255, Math.max(0, intensity));
+
+            // Custom Viridis-like colormap (dark blue -> green -> yellow)
+            let r, g, b;
+            const normalized = intensity / 255;
+
+            if (normalized < 0.3) {
+                // Dark blue to blue
+                r = 0; g = 0; b = normalized * 3 * 255;
+            } else if (normalized < 0.7) {
+                // Blue to green
+                const t = (normalized - 0.3) / 0.4;
+                r = 0; g = t * 255; b = 255 - (t * 200);
+            } else {
+                // Green to yellow/white
+                const t = (normalized - 0.7) / 0.3;
+                r = t * 255; g = 255; b = t * 100;
+            }
+
+            const color = (255 << 24) | (b << 16) | (g << 8) | r;
+
+            const rowOffset = y * scrollSpeed;
+            for (let x = 0; x < scrollSpeed; x++) {
+                data32[rowOffset + x] = color;
+            }
+        }
+
+        ctx.putImageData(imgData, width - scrollSpeed, 0);
+
+        // Draw Formants
+        if (showFormants) {
+            const { f1, f2, f3 } = dataRef.current;
+            const last = lastFormantsRef.current;
+
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            const drawFormant = (currFreq, lastFreq, color, range) => {
+                // Basic validation against expected ranges to prevent wild jumps
+                if (currFreq > range.min && currFreq < range.max &&
+                    lastFreq > range.min && lastFreq < range.max) {
+
+                    const currY = height * (1 - currFreq / maxFreq);
+                    const lastY = height * (1 - lastFreq / maxFreq);
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = color;
+                    ctx.moveTo(width - scrollSpeed * 2, lastY);
+                    ctx.lineTo(width - scrollSpeed, currY);
+                    ctx.stroke();
+                }
+            };
+
+            drawFormant(f1, last.f1, FORMANT_CONFIG.COLORS.F1, FORMANT_CONFIG.RANGES.F1);
+            drawFormant(f2, last.f2, FORMANT_CONFIG.COLORS.F2, FORMANT_CONFIG.RANGES.F2);
+            // f3 optional depending on analysis depth
+            if (f3) drawFormant(f3, last.f3, FORMANT_CONFIG.COLORS.F3, FORMANT_CONFIG.RANGES.F3);
+
+            lastFormantsRef.current = { f1, f2, f3 };
+        }
+
+    }, [dataRef, maxFreq, scrollSpeed, showFormants]);
+
+    // Handle Resize
     useEffect(() => {
-        let unsubscribe;
-        if (isAudioActive) {
-            unsubscribe = renderCoordinator.subscribe(
-                componentId,
-                draw,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        }
-        return () => {
-            if (unsubscribe) unsubscribe();
-        };
-    }, [isAudioActive, draw, componentId]);
+        const container = containerRef.current;
+        const canvas = canvasRef.current;
 
-    /**
-     * Handle canvas click - show Hz/dB/Note at tap position
-     */
+        if (!container || !canvas) return;
+
+        const updateSize = () => {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = container.getBoundingClientRect();
+
+            const newWidth = Math.round(rect.width * dpr);
+            const newHeight = 300; // Fixed high vertical resolution
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                imgDataRef.current = null;
+                data32Ref.current = null;
+
+                // Fill black initially
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, 0, newWidth, newHeight);
+            }
+        };
+
+        const resizeObserver = new ResizeObserver(() => {
+            requestAnimationFrame(updateSize);
+        });
+
+        resizeObserver.observe(container);
+        updateSize();
+
+        return () => resizeObserver.disconnect();
+    }, []);
+
+    // Render loop
+    useEffect(() => {
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            draw,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+        return () => unsubscribe();
+    }, [componentId, draw]);
+
     const handleCanvasClick = useCallback((e) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
         const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-
-        // Map x/y to frequency and time
-        const canvasX = (x / rect.width) * canvas.width;
         const canvasY = (y / rect.height) * canvas.height;
+        const freqRatio = 1 - (canvasY / canvas.height);
+        const frequency = freqRatio * maxFreq;
 
-        // Find the frame in history
-        // The rightmost pixel (width-speed) corresponds to the latest frame (historyHead - 1)
-        // x moves left, so we go back in history.
-        // Distance from right edge:
-        const distanceFromRight = canvas.width - canvasX;
-        const framesBack = Math.floor(distanceFromRight / speed);
-
-        // Safety check: Don't look further back than our buffer allows
-        if (framesBack >= HISTORY_FRAMES) return;
-
-        let frameIndex = historyHeadRef.current - 1 - framesBack;
-
-        // Handle wrapping
-        if (frameIndex < 0) {
-            frameIndex += HISTORY_FRAMES;
+        const spectrum = dataRef.current?.spectrum;
+        let dB = -100;
+        if (spectrum) {
+            const nyquist = 24000;
+            const maxBin = Math.floor((maxFreq / nyquist) * spectrum.length);
+            const binIndex = Math.floor(freqRatio * maxBin);
+            const val = spectrum[binIndex] || 0;
+            dB = val < 0 ? val : 20 * Math.log10(val + 0.00001);
         }
 
-        if (!historyMetaRef.current) return;
+        setCursorData({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+            frequency: Math.round(frequency),
+            dB: dB.toFixed(1),
+            note: hzToNote(frequency)
+        });
+    }, [dataRef, maxFreq]);
 
-        const meta = historyMetaRef.current[frameIndex];
-
-        if (meta) {
-            // Retrieve data from flattened buffer
-            const buffer = historyBufferRef.current;
-            const offset = frameIndex * meta.maxBin;
-
-            const freqRatio = 1 - (canvasY / canvas.height);
-            const binIndex = Math.floor(freqRatio * meta.maxBin);
-            const frequency = binIndex * meta.hzPerBin;
-
-            // Read value
-            const rawValue = buffer[offset + binIndex] || 0;
-
-            // Convert to dB
-            let dB = rawValue;
-            if (rawValue >= 0) {
-                dB = 20 * Math.log10(rawValue + 0.00001);
-            }
-
-            setCursorData({
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top,
-                frequency: Math.round(frequency),
-                dB: dB.toFixed(1),
-                note: hzToNote(frequency)
-            });
-        }
-    }, []);
-
-    /**
-     * Take high-quality screenshot of spectrogram
-     */
     const handleScreenshot = useCallback(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        // Create a clean copy without UI overlays
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = canvas.width;
         tempCanvas.height = canvas.height;
         const tempCtx = tempCanvas.getContext('2d');
         tempCtx.drawImage(canvas, 0, 0);
 
-        // Add frequency labels
         tempCtx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-        tempCtx.font = '12px sans-serif';
+        tempCtx.font = '14px sans-serif';
         tempCtx.textAlign = 'left';
-        const labels = [0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000];
+
+        const labels = [0, maxFreq * 0.25, maxFreq * 0.5, maxFreq * 0.75, maxFreq];
         labels.forEach(hz => {
-            const y = canvas.height * (1 - hz / MAX_FREQ);
+            if (hz === 0) return;
+            const y = canvas.height * (1 - hz / maxFreq);
             tempCtx.fillText(`${hz < 1000 ? hz : hz / 1000 + 'k'} Hz`, 5, y + 4);
         });
 
-        // Download
         const link = document.createElement('a');
         link.download = `spectrogram_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
         link.href = tempCanvas.toDataURL('image/png');
         link.click();
-    }, []);
-
-    // Generate Labels
-    const renderLabels = () => {
-        if (!showLabels) return null;
-        const labels = [0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000];
-
-        return (
-            <div className="absolute inset-0 pointer-events-none select-none">
-                {labels.map(hz => {
-                    const p = (hz / 8000) * 100;
-                    const bottom = `${p}%`;
-                    if (p > 100) return null;
-
-                    return (
-                        <div key={hz} className="absolute left-1 w-full border-b border-white/5 text-[9px] text-white/50 flex items-end" style={{ bottom: bottom }}>
-                            <span className="bg-black/50 px-1 rounded">{hz < 1000 ? hz : `${hz / 1000}k`}</span>
-                        </div>
-                    );
-                })}
-            </div>
-        );
-    };
+    }, [maxFreq]);
 
     return (
         <div
-            className="relative w-full bg-black rounded-xl overflow-hidden border border-white/10 shadow-inner group"
+            className="relative h-full w-full bg-black rounded-xl overflow-hidden border border-slate-800 group"
+            ref={containerRef}
             onMouseEnter={() => setShowControls(true)}
             onMouseLeave={() => setShowControls(false)}
         >
             <canvas
                 ref={canvasRef}
-                width={800}
-                height={height}
-                className="w-full h-full block cursor-crosshair"
+                className="w-full h-full cursor-crosshair block"
                 onClick={handleCanvasClick}
             />
-            {renderLabels()}
 
-            {/* Tap Cursor Tooltip */}
+            {/* Legend / Axes overlay */}
+            <div className="absolute top-2 left-2 flex gap-3 text-[10px] font-bold bg-black/60 px-2 py-1 rounded backdrop-blur pointer-events-none">
+                {showFormants && (
+                    <>
+                        <span style={{color: FORMANT_CONFIG.COLORS.F1}}>F1 (Jaw)</span>
+                        <span style={{color: FORMANT_CONFIG.COLORS.F2}}>F2 (Tongue)</span>
+                        <span style={{color: FORMANT_CONFIG.COLORS.F3}}>F3 (Lips)</span>
+                    </>
+                )}
+            </div>
+
+            <div className="absolute left-1 top-0 bottom-0 flex flex-col justify-between text-[9px] text-white/50 py-2 pointer-events-none">
+                <span>{maxFreq / 1000}k</span>
+                <span>{maxFreq / 2000}k</span>
+                <span>0</span>
+            </div>
+
             {cursorData && (
                 <div
                     className="absolute z-20 bg-slate-900/95 border border-teal-500/50 rounded-lg px-3 py-2 shadow-xl pointer-events-none animate-in fade-in zoom-in-95 duration-150"
                     style={{
-                        left: Math.min(cursorData.x, 280) + 10,
+                        left: Math.min(cursorData.x, containerRef.current?.offsetWidth - 120 || 280) + 10,
                         top: Math.max(10, cursorData.y - 60)
                     }}
                 >
@@ -347,7 +283,6 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                 </div>
             )}
 
-            {/* Screenshot Button (appears on hover) */}
             {showControls && (
                 <button
                     onClick={handleScreenshot}
@@ -358,14 +293,15 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
                 </button>
             )}
 
-            {/* Tap hint */}
             {showControls && !cursorData && (
-                <div className="absolute bottom-2 left-2 text-[10px] text-white/40 bg-black/50 px-2 py-1 rounded animate-in fade-in duration-200">
+                <div className="absolute bottom-2 left-2 text-[10px] text-white/40 bg-black/50 px-2 py-1 rounded animate-in fade-in duration-200 pointer-events-none">
                     Click to inspect Hz/dB
                 </div>
             )}
         </div>
     );
-};
+});
+
+Spectrogram.displayName = 'Spectrogram';
 
 export default Spectrogram;
