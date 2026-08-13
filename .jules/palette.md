@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2023-10-24 - Accessibility pattern for icon-only buttons
+**Learning:** Icon-only buttons used in visualization components (e.g., DynamicOrb, RegisterGauge, Spectrogram) frequently lack accessible names and keyboard focus indicators, making them invisible to screen readers and difficult for keyboard users to interact with.
+**Action:** When creating or modifying icon-only interactive elements in visualization components, always include a descriptive `aria-label` and `focus-visible:ring-2` to ensure they meet basic accessibility standards.
