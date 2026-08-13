@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-01-24 - React Audio instantiation anti-pattern in LiveMetricsBar
+**Learning:** Found \`useState\` hook being used inside the `RenderCoordinator` loop which fires multiple times per second (e.g., up to 60 FPS) in `src/components/viz/LiveMetricsBar.jsx`. This causes severe performance issues as it triggers excessive React re-renders.
+**Action:** Replaced `useState` with `useRef` hooks and manipulated the DOM directly by mutating `textContent` in the loop to bypass the React rendering lifecycle entirely.
