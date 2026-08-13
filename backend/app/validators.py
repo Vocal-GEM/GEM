@@ -1,4 +1,6 @@
+import logging
 import re
+logger = logging.getLogger(__name__)
 import bleach
 import filetype
 from email_validator import validate_email, EmailNotValidError
@@ -67,7 +69,8 @@ def validate_email_address(email):
         validate_email(email, check_deliverability=False)
         return True, None
     except EmailNotValidError as e:
-        return False, str(e)
+        logger.error(f"Email validation error: {str(e)}")
+        return False, "Invalid email address format"
 
 def validate_magic_number(file_stream, ext):
     """
