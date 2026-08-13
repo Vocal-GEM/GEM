@@ -123,7 +123,8 @@ const SZRatio = ({ dataRef, isActive }) => {
                     <span className="text-[10px] text-slate-500">Auto</span>
                     <button
                         onClick={() => setAutoMode(!autoMode)}
-                        className={`w-8 h-4 rounded-full transition-colors relative ${autoMode ? 'bg-cyan-500' : 'bg-slate-700'}`}
+                        className={`w-8 h-4 rounded-full transition-colors relative ${autoMode ? 'bg-cyan-500' : 'bg-slate-700'} focus:outline-none focus-visible:ring-2`}
+                        aria-label="Toggle Auto Mode"
                     >
                         <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${autoMode ? 'left-4.5' : 'left-0.5'}`} />
                     </button>
@@ -184,7 +185,8 @@ const SZRatio = ({ dataRef, isActive }) => {
 
                 <button
                     onClick={reset}
-                    className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                    className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors focus:outline-none focus-visible:ring-2"
+                    aria-label="Reset"
                 >
                     <RotateCcw className="w-4 h-4 text-slate-400" />
                 </button>

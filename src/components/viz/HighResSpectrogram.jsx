@@ -318,8 +318,9 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
                     <div className="text-slate-300 text-sm">{cursorData.dB} dB</div>
                     <div className="text-amber-400 text-sm font-mono">{cursorData.note}</div>
                     <button
-                        className="absolute -top-2 -right-2 w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center text-slate-500 hover:text-white pointer-events-auto"
+                        className="absolute -top-2 -right-2 w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center text-slate-500 hover:text-white pointer-events-auto focus:outline-none focus-visible:ring-2"
                         onClick={(e) => { e.stopPropagation(); setCursorData(null); }}
+                        aria-label="Close"
                     >
                         <X size={12} />
                     </button>
@@ -329,8 +330,9 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             {showControls && (
                 <button
                     onClick={handleScreenshot}
-                    className="absolute top-2 right-2 p-2 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-white/70 hover:text-white transition-all z-10 animate-in fade-in duration-200"
+                    className="absolute top-2 right-2 p-2 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-white/70 hover:text-white transition-all z-10 animate-in fade-in duration-200 focus:outline-none focus-visible:ring-2"
                     title="Save Screenshot"
+                    aria-label="Save Screenshot"
                 >
                     <Camera size={16} />
                 </button>

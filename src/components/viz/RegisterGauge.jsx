@@ -83,7 +83,7 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                     </div>
                 </div>
                 <button
-                    className="text-slate-500 hover:text-white transition-colors"
+                    className="text-slate-500 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 rounded-full"
                     onMouseEnter={() => setShowTooltip(true)}
                     onMouseLeave={() => setShowTooltip(false)}
                     aria-label="More info about Laryngeal Register"

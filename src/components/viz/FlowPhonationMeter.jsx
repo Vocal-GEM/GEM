@@ -248,7 +248,7 @@ const FlowPhonationMeter = ({ dataRef, onReset, showDetails = true }) => {
                         </div>
                         <button
                             onClick={handleReset}
-                            className={`px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors ${colorBlindMode
+                            className={`px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors focus:outline-none focus-visible:ring-2 ${colorBlindMode
                                     ? 'bg-pink-500/20 text-pink-300 hover:bg-pink-500/30'
                                     : 'bg-red-500/20 text-red-300 hover:bg-red-500/30'
                                 }`}
