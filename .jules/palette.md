@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-11-20 - Adding Accessibility to IntonationTrainer icon-only buttons
+**Learning:** Found several icon-only buttons (`lucide-react` icons) in `IntonationTrainer` missing `aria-label`s and proper focus styles. This creates a challenging experience for screen reader users and keyboard navigators. Adding these makes a quick UX win.
+**Action:** Always verify `aria-label`s and focus styling (e.g. `focus-visible:ring-2 focus-visible:ring-blue-400 focus:outline-none`) for all icon-only buttons in complex visualization modules like `IntonationTrainer` going forward.
