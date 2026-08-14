@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef , useId} from 'react';
 import { Timer, Play, Square, RotateCcw } from 'lucide-react';
 
 const MPTTracker = ({ dataRef, isActive }) => {
+    const componentId = useId();
     const [isRecording, setIsRecording] = useState(false);
     const [time, setTime] = useState(0);
     const [lastResult, setLastResult] = useState(null);
@@ -50,18 +51,39 @@ const MPTTracker = ({ dataRef, isActive }) => {
         });
 
         return () => {
+            isCancelled = true;
             if (unsubscribe) unsubscribe();
         };
     }, [autoMode, isActive, isRecording, threshold, dataRef]);
 
     useEffect(() => {
-        let interval;
+        const lastRunTimeRef = useRef(0);
+
+        let unsubscribe;
+        let isCancelled = false;
         if (isRecording) {
-            interval = setInterval(() => {
-                setTime((Date.now() - startTimeRef.current.time) / 1000);
-            }, 50);
+            import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+                if (isCancelled) return;
+                const update = () => {
+                    const now = performance.now();
+                    if (now - lastRunTimeRef.current < 50) return;
+                    lastRunTimeRef.current = now;
+
+                    setTime((Date.now() - startTimeRef.current.time) / 1000);
+                };
+
+                unsubscribe = renderCoordinator.subscribe(
+                    componentId + '-timer',
+                    update,
+                    renderCoordinator.PRIORITY.HIGH
+                );
+            });
         }
-        return () => clearInterval(interval);
+
+        return () => {
+            isCancelled = true;
+            if (unsubscribe) unsubscribe();
+        };
     }, [isRecording]);
 
     const startTimer = () => {
