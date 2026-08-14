@@ -160,8 +160,10 @@ const Sidebar = ({ activeView, onViewChange }) => {
         <>
             {/* Mobile Toggle */}
             <button
+                aria-label={isOpen ? "Close menu" : "Open menu"}
+                aria-expanded={isOpen}
                 onClick={() => setIsOpen(!isOpen)}
-                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"
+                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -223,9 +225,10 @@ const Sidebar = ({ activeView, onViewChange }) => {
                                             return (
                                                 <button
                                                     key={result.id}
+                                                    aria-label={`Select ${result.title}`}
                                                     onClick={() => handleSelectResult(result)}
                                                     onMouseEnter={() => setSelectedIndex(resultIndex)}
-                                                    className={`w-full px-3 py-2 flex items-center gap-3 text-left transition-colors ${isSelected
+                                                    className={`w-full px-3 py-2 flex items-center gap-3 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg ${isSelected
                                                         ? 'bg-blue-600 text-white'
                                                         : 'text-slate-300 hover:bg-slate-700/50'
                                                         }`}
