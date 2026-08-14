@@ -1,8 +1,11 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef , useId} from 'react';
 import { Activity } from 'lucide-react';
 import { cppAnalyzer } from '../../utils/cppAnalysis';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const CPPMeter = ({ dataRef, isActive }) => {
+    const lastRunTimeRef = useRef(0);
+    const componentId = useId();
     const [cppData, setCppData] = useState({ cpp: 0, quality: 'unknown', interpretation: '', color: '#64748b' });
     const [history, setHistory] = useState([]);
     const canvasRef = useRef(null);
@@ -10,7 +13,11 @@ const CPPMeter = ({ dataRef, isActive }) => {
     useEffect(() => {
         if (!isActive || !dataRef?.current) return;
 
-        const interval = setInterval(() => {
+        const update = () => {
+            const now = performance.now();
+            if (now - lastRunTimeRef.current < 200) return; // 200ms throttle
+            lastRunTimeRef.current = now;
+
             const audioData = dataRef.current.timeDomainData;
             if (audioData && audioData.length > 0) {
                 // Convert Uint8Array to Float32Array (normalize to -1 to 1)
@@ -28,9 +35,11 @@ const CPPMeter = ({ dataRef, isActive }) => {
                     return newHistory.slice(-50); // Keep last 50 values
                 });
             }
-        }, 200); // Update every 200ms
+        };
 
-        return () => clearInterval(interval);
+        const unsubscribe = renderCoordinator.subscribe(componentId, update, renderCoordinator.PRIORITY.LOW);
+
+        return () => unsubscribe();
     }, [isActive, dataRef]);
 
     // Draw sparkline

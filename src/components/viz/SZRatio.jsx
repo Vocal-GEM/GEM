@@ -1,7 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect , useId} from 'react';
 import { Play, Square, RotateCcw, Divide } from 'lucide-react';
 
 const SZRatio = ({ dataRef, isActive }) => {
+    const lastRunTimeRef = useRef(0);
+    const componentId = useId();
     const [mode, setMode] = useState('s'); // 's' or 'z'
     const [sTime, setSTime] = useState(0);
     const [zTime, setZTime] = useState(0);
@@ -52,15 +54,34 @@ const SZRatio = ({ dataRef, isActive }) => {
 
     // Timer update
     useEffect(() => {
-        let interval;
+
+        let unsubscribe;
+        let isCancelled = false;
         if (isRecording) {
-            interval = setInterval(() => {
-                const elapsed = (Date.now() - startTimeRef.current.time) / 1000;
-                if (mode === 's') setSTime(elapsed);
-                else setZTime(elapsed);
-            }, 50);
+            import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+                if (isCancelled) return;
+                const update = () => {
+                    const now = performance.now();
+                    if (now - lastRunTimeRef.current < 50) return;
+                    lastRunTimeRef.current = now;
+
+                    const elapsed = (Date.now() - startTimeRef.current.time) / 1000;
+                    if (mode === 's') setSTime(elapsed);
+                    else setZTime(elapsed);
+                };
+
+                unsubscribe = renderCoordinator.subscribe(
+                    componentId + '-timer',
+                    update,
+                    renderCoordinator.PRIORITY.HIGH
+                );
+            });
         }
-        return () => clearInterval(interval);
+
+        return () => {
+            isCancelled = true;
+            if (unsubscribe) unsubscribe();
+        };
     }, [isRecording, mode]);
 
     const startTimer = () => {

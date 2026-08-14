@@ -4,8 +4,11 @@ import CelebrationAnimations from '../ui/CelebrationAnimations';
 import DriftAlert from '../ui/DriftAlert';
 import { getAdaptiveFeedbackController } from '../../services/AdaptiveFeedback';
 import FlowStateDetector from '../../utils/FlowStateDetector';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
+    const lastRunTimeRef = useRef(0);
+    const componentId = useId();
     const { settings } = useSettings();
     const [alert, setAlert] = useState(null);
     const [celebration, setCelebration] = useState(null);
@@ -27,7 +30,11 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     useEffect(() => {
         if (!active || !dataRef) return;
 
-        const interval = setInterval(() => {
+        const update = () => {
+            const now = performance.now();
+            if (now - lastRunTimeRef.current < 100) return; // 100ms throttle
+            lastRunTimeRef.current = now;
+
             const data = dataRef.current;
             if (!data) return;
 
@@ -48,9 +55,11 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
                     setInFlow(flowStats.isFlowState);
                 }
             }
-        }, 100);
+        };
 
-        return () => clearInterval(interval);
+        const unsubscribe = renderCoordinator.subscribe(componentId, update, renderCoordinator.PRIORITY.LOW);
+
+        return () => unsubscribe();
     }, [active, dataRef, targetRange, inFlow]);
 
     // Listen for custom events dispatched by services (if any)

@@ -1,7 +1,10 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef, memo , useId} from 'react';
 import { useSettings } from '../../context/SettingsContext';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const OrbMetricsOverlay = memo(({ dataRef, calibration, mode, showDebug, variant = 'overlay', isVisible = true }) => {
+    const lastRunTimeRef = useRef(0);
+    const componentId = useId();
     const { settings } = useSettings();
     const beginnerMode = settings?.beginnerMode;
 
@@ -21,7 +24,11 @@ const OrbMetricsOverlay = memo(({ dataRef, calibration, mode, showDebug, variant
     useEffect(() => {
         if (!isVisible) return;
 
-        const interval = setInterval(() => {
+        const update = () => {
+            const now = performance.now();
+            if (now - lastRunTimeRef.current < 200) return; // 200ms throttle
+            lastRunTimeRef.current = now;
+
             if (dataRef.current) {
                 const { pitch, resonance, weight, volume } = dataRef.current;
                 const pitchVal = pitch || 0;
@@ -142,9 +149,11 @@ const OrbMetricsOverlay = memo(({ dataRef, calibration, mode, showDebug, variant
                     });
                 }
             }
-        }, 200);
+        };
 
-        return () => clearInterval(interval);
+        const unsubscribe = renderCoordinator.subscribe(componentId, update, renderCoordinator.PRIORITY.LOW);
+
+        return () => unsubscribe();
     }, [dataRef, calibration, mode, showDebug, isVisible]);
 
     if (!isVisible) return null;
