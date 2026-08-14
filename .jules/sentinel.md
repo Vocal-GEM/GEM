@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2023-10-24 - User Enumeration via Timing Attack
+**Vulnerability:** The login endpoint checked `check_password_hash` only if the user was found in the database. When a username didn't exist, the endpoint returned much faster, allowing attackers to enumerate valid usernames based on response times.
+**Learning:** Python's Werkzeug `check_password_hash` is computationally expensive by design. Skipping it conditionally creates a significant and measurable timing difference. A dummy hash check needs to be performed when the user is not found to normalize response times.
+**Prevention:** Always ensure that authentication flows take roughly the same amount of time regardless of whether the user exists or not, especially when using expensive cryptographic operations like password hashing. Pre-compute a dummy hash at module startup and check it against the submitted password when the user is not found.
