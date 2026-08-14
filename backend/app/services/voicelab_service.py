@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 """
 VoiceLabService.py
 
@@ -116,7 +119,8 @@ def estimate_vtl(sound, num_formants=4, max_formant_hz=5500):
         }
         
     except Exception as e:
-        return {"vtl_cm": None, "delta_f": None, "error": str(e)}
+        logger.error(f"VTL analysis error: {e}")
+        return {"vtl_cm": None, "delta_f": None, "error": "Internal analysis error"}
 
 
 # ----------------------
@@ -195,7 +199,8 @@ def compute_perturbation_pca(sound, floor_hz=75, ceiling_hz=600):
         }
         
     except Exception as e:
-        return {"jitter_pca": None, "shimmer_pca": None, "error": str(e)}
+        logger.error(f"Jitter/Shimmer analysis error: {e}")
+        return {"jitter_pca": None, "shimmer_pca": None, "error": "Internal analysis error"}
 
 
 # ----------------------
@@ -258,7 +263,8 @@ def measure_ltas(sound, bandwidth=100):
         }
         
     except Exception as e:
-        return {"error": str(e)}
+        logger.error(f"Analysis error: {e}")
+        return {"error": "Internal analysis error"}
 
 
 # ----------------------
@@ -335,7 +341,8 @@ def measure_speech_rate(sound, min_intensity_db=50, min_dip_db=2):
         }
         
     except Exception as e:
-        return {"error": str(e)}
+        logger.error(f"Analysis error: {e}")
+        return {"error": "Internal analysis error"}
 
 
 # ----------------------
