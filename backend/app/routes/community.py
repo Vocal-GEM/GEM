@@ -61,7 +61,7 @@ def anonymize_audio(audio_path):
     except ImportError as e:
         # Fail securely - do not copy raw file if anonymization fails
         # Log error and raise
-        current_app.logger.error(f"Failed to anonymize audio (librosa missing?): {str(e)}")
+        current_app.logger.error(f'Failed to anonymize audio (librosa missing?): {e}')
         raise e
 
 
@@ -164,7 +164,7 @@ def share_voice():
         })
 
     except Exception as e:
-        current_app.logger.error(f"Error sharing voice: {str(e)}")
+        current_app.logger.error(f'Error sharing voice: {e}')
         return jsonify({'error': 'Failed to share voice sample'}), 500
 
 
@@ -192,7 +192,7 @@ def get_shared_voice(share_id):
         return send_file(sample.audio_path, mimetype='audio/wav')
 
     except Exception as e:
-        current_app.logger.error(f"Error retrieving shared voice: {str(e)}")
+        current_app.logger.error(f'Error retrieving shared voice: {e}')
         return jsonify({'error': 'Failed to retrieve voice sample'}), 500
 
 
@@ -223,7 +223,7 @@ def get_benchmarks():
         })
 
     except Exception as e:
-        current_app.logger.error(f"Error getting benchmarks: {str(e)}")
+        current_app.logger.error(f'Error getting benchmarks: {e}')
         return jsonify({'error': 'Failed to retrieve benchmarks'}), 500
 
 
@@ -261,7 +261,7 @@ def get_success_stories():
         return jsonify({'stories': result})
 
     except Exception as e:
-        current_app.logger.error(f"Error getting success stories: {str(e)}")
+        current_app.logger.error(f'Error getting success stories: {e}')
         return jsonify({'error': 'Failed to retrieve success stories'}), 500
 
 
@@ -354,7 +354,7 @@ def submit_success_story():
         })
 
     except Exception as e:
-        current_app.logger.error(f"Error submitting success story: {str(e)}")
+        current_app.logger.error(f'Error submitting success story: {e}')
         return jsonify({'error': 'Failed to submit success story'}), 500
 
 
@@ -373,7 +373,7 @@ def upvote_story(story_id):
         return jsonify({'success': True, 'upvotes': story.upvotes})
 
     except Exception as e:
-        current_app.logger.error(f"Error upvoting story: {str(e)}")
+        current_app.logger.error(f'Error upvoting story: {e}')
         return jsonify({'error': 'Failed to upvote story'}), 500
 
 
@@ -404,7 +404,7 @@ def get_group_challenges():
         return jsonify({'challenges': result})
 
     except Exception as e:
-        current_app.logger.error(f"Error getting group challenges: {str(e)}")
+        current_app.logger.error(f'Error getting group challenges: {e}')
         return jsonify({'error': 'Failed to retrieve group challenges'}), 500
 
 
@@ -445,7 +445,7 @@ def join_group_challenge(challenge_id):
         })
 
     except Exception as e:
-        current_app.logger.error(f"Error joining group challenge: {str(e)}")
+        current_app.logger.error(f'Error joining group challenge: {e}')
         return jsonify({'error': 'Failed to join challenge'}), 500
 
 
@@ -489,8 +489,7 @@ def update_challenge_progress(challenge_id):
         })
 
     except Exception as e:
-        current_app.logger.error(
-            f"Error updating challenge progress: {str(e)}")
+        current_app.logger.error(f'Error updating challenge progress: {e}')
         return jsonify({'error': 'Failed to update progress'}), 500
 
 
@@ -539,7 +538,7 @@ def request_connection():
         })
 
     except Exception as e:
-        current_app.logger.error(f"Error requesting connection: {str(e)}")
+        current_app.logger.error(f'Error requesting connection: {e}')
         return jsonify({'error': 'Failed to send connection request'}), 500
 
 
@@ -574,7 +573,7 @@ def respond_to_connection(connection_id):
         })
 
     except Exception as e:
-        current_app.logger.error(f"Error responding to connection: {str(e)}")
+        current_app.logger.error(f'Error responding to connection: {e}')
         return jsonify({'error': 'Failed to respond to connection'}), 500
 
 
@@ -623,7 +622,7 @@ def get_connections():
         return jsonify(result)
 
     except Exception as e:
-        current_app.logger.error(f"Error getting connections: {str(e)}")
+        current_app.logger.error(f'Error getting connections: {e}')
         return jsonify({'error': 'Failed to retrieve connections'}), 500
 
 
@@ -651,5 +650,5 @@ def flag_content():
         })
 
     except Exception as e:
-        current_app.logger.error(f"Error flagging content: {str(e)}")
+        current_app.logger.error(f'Error flagging content: {e}')
         return jsonify({'error': 'Failed to flag content'}), 500
