@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - React Audio Loop Anti-Pattern
+**Learning:** `useState` is an anti-pattern when used inside high-frequency `RenderCoordinator` callbacks (e.g., LiveMetricsBar). Updating state at 60fps forces constant React reconciliation, negating the benefits of the custom render loop.
+**Action:** Always replace `useState` with `useRef` and direct DOM mutation (`ref.current.textContent`) for visualizers displaying raw audio telemetry.
