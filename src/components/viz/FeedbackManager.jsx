@@ -7,6 +7,7 @@ import FlowStateDetector from '../../utils/FlowStateDetector';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
+    const lastRunTimeRef = useRef(0);
     const componentId = useId();
     const { settings } = useSettings();
     const [alert, setAlert] = useState(null);
@@ -28,7 +29,6 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
 
     useEffect(() => {
         if (!active || !dataRef) return;
-        const lastRunTimeRef = useRef(0);
 
         const update = () => {
             const now = performance.now();

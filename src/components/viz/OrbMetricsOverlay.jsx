@@ -3,6 +3,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const OrbMetricsOverlay = memo(({ dataRef, calibration, mode, showDebug, variant = 'overlay', isVisible = true }) => {
+    const lastRunTimeRef = useRef(0);
     const componentId = useId();
     const { settings } = useSettings();
     const beginnerMode = settings?.beginnerMode;
@@ -22,7 +23,6 @@ const OrbMetricsOverlay = memo(({ dataRef, calibration, mode, showDebug, variant
 
     useEffect(() => {
         if (!isVisible) return;
-        const lastRunTimeRef = useRef(0);
 
         const update = () => {
             const now = performance.now();

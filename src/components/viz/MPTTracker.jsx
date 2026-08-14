@@ -2,6 +2,7 @@ import { useState, useEffect, useRef , useId} from 'react';
 import { Timer, Play, Square, RotateCcw } from 'lucide-react';
 
 const MPTTracker = ({ dataRef, isActive }) => {
+    const lastRunTimeRef = useRef(0);
     const componentId = useId();
     const [isRecording, setIsRecording] = useState(false);
     const [time, setTime] = useState(0);
@@ -51,13 +52,11 @@ const MPTTracker = ({ dataRef, isActive }) => {
         });
 
         return () => {
-            isCancelled = true;
             if (unsubscribe) unsubscribe();
         };
     }, [autoMode, isActive, isRecording, threshold, dataRef]);
 
     useEffect(() => {
-        const lastRunTimeRef = useRef(0);
 
         let unsubscribe;
         let isCancelled = false;

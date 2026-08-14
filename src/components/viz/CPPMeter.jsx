@@ -4,6 +4,7 @@ import { cppAnalyzer } from '../../utils/cppAnalysis';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const CPPMeter = ({ dataRef, isActive }) => {
+    const lastRunTimeRef = useRef(0);
     const componentId = useId();
     const [cppData, setCppData] = useState({ cpp: 0, quality: 'unknown', interpretation: '', color: '#64748b' });
     const [history, setHistory] = useState([]);
@@ -11,7 +12,6 @@ const CPPMeter = ({ dataRef, isActive }) => {
 
     useEffect(() => {
         if (!isActive || !dataRef?.current) return;
-        const lastRunTimeRef = useRef(0);
 
         const update = () => {
             const now = performance.now();

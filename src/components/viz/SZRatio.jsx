@@ -2,6 +2,7 @@ import { useState, useRef, useEffect , useId} from 'react';
 import { Play, Square, RotateCcw, Divide } from 'lucide-react';
 
 const SZRatio = ({ dataRef, isActive }) => {
+    const lastRunTimeRef = useRef(0);
     const componentId = useId();
     const [mode, setMode] = useState('s'); // 's' or 'z'
     const [sTime, setSTime] = useState(0);
@@ -47,14 +48,12 @@ const SZRatio = ({ dataRef, isActive }) => {
         });
 
         return () => {
-            isCancelled = true;
             if (unsubscribe) unsubscribe();
         };
     }, [autoMode, isActive, isRecording, threshold, dataRef]);
 
     // Timer update
     useEffect(() => {
-        const lastRunTimeRef = useRef(0);
 
         let unsubscribe;
         let isCancelled = false;
