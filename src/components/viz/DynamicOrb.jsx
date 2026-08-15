@@ -1,5 +1,7 @@
 /* eslint-disable react/no-unknown-property */
-import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo } from 'react';
+import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo, useId } from 'react';
+import renderCoordinator from '../../services/RenderCoordinator';
+
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Diamond, Bug, Activity, Sliders, Gauge } from 'lucide-react';
@@ -400,9 +402,19 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
   const circleRef = useRef(null);
   const textRef = useRef(null);
 
+  const componentId = useId();
+
   useEffect(() => {
-    let frameId;
+    let isMounted = true;
+    let unsubscribe;
+
+    // PERFORMANCE OPTIMIZATION:
+    // Replaced localized, unmanaged requestAnimationFrame with a centralized RenderCoordinator.
+    // This batches DOM updates and reduces CPU overhead/layout thrashing by avoiding
+    // multiple standalone rendering loops running concurrently on the main thread.
+    // Expected impact: smoother animations and lower CPU usage for 2D fallback rendering.
     const loop = () => {
+      if (!isMounted) return;
       if (dataRef.current) {
         const { pitch, volume } = dataRef.current;
         // Update DOM directly
@@ -414,11 +426,19 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
           textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
         }
       }
-      frameId = requestAnimationFrame(loop);
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
-  }, [dataRef]);
+
+    unsubscribe = renderCoordinator.subscribe(
+        componentId,
+        loop,
+        renderCoordinator.PRIORITY.LOW
+    );
+
+    return () => {
+        isMounted = false;
+        if (unsubscribe) unsubscribe();
+    };
+  }, [dataRef, componentId]);
 
   return (
     <div className="w-full h-full flex items-center justify-center">
