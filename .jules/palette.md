@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-25 - Sidebar Mobile Toggle Accessibility
+**Learning:** Icon-only buttons, such as the mobile menu toggle in the Sidebar (`src/components/layout/Sidebar.jsx`), lack descriptive labels by default, making them inaccessible to screen reader users who cannot see the icon. In addition, keyboard users benefit from a visible focus state.
+**Action:** Always add an `aria-label` attribute (e.g., `aria-label={isOpen ? "Close sidebar" : "Open sidebar"}`) to icon-only buttons to communicate their purpose to assistive technologies, and include `focus:outline-none focus-visible:ring-2` to improve keyboard navigation visibility.
