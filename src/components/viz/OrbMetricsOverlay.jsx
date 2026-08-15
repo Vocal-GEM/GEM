@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef, memo, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const OrbMetricsOverlay = memo(({ dataRef, calibration, mode, showDebug, variant = 'overlay', isVisible = true }) => {
     const { settings } = useSettings();
     const beginnerMode = settings?.beginnerMode;
-
     const [debugInfo, setDebugInfo] = useState(null);
     const [genderPerception, setGenderPerception] = useState({ label: '—', color: 'text-slate-500' });
     const [metricClassifications, setMetricClassifications] = useState({
@@ -14,15 +14,23 @@ const OrbMetricsOverlay = memo(({ dataRef, calibration, mode, showDebug, variant
     });
     const [pitchDisplay, setPitchDisplay] = useState(null);
 
-    // Gender Perception Logic
+    // Smooth out perception changes
     const scoreBuffer = useRef([]);
     const silenceStart = useRef(null);
+    const id = useId();
 
     useEffect(() => {
-        if (!isVisible) return;
+        let timeAccumulator = 0;
+        let lastTime = performance.now();
 
-        const interval = setInterval(() => {
-            if (dataRef.current) {
+        const loop = (currentTime) => {
+            if (!dataRef?.current || !isVisible) return;
+            const dt = currentTime - lastTime;
+            lastTime = currentTime;
+            timeAccumulator += dt;
+
+            if (timeAccumulator >= 200) {
+                timeAccumulator = 0;
                 const { pitch, resonance, weight, volume } = dataRef.current;
                 const pitchVal = pitch || 0;
 
@@ -110,7 +118,6 @@ const OrbMetricsOverlay = memo(({ dataRef, calibration, mode, showDebug, variant
 
                 // --- DEBUG INFO ---
                 if (showDebug) {
-                    // Re-calculate scores for debug display if needed
                     let resScore = 0.5;
                     if (resonance && calibration) {
                         const { dark, bright } = calibration;
@@ -121,11 +128,11 @@ const OrbMetricsOverlay = memo(({ dataRef, calibration, mode, showDebug, variant
 
                     let pitchScore = 0.5;
                     if (pitchVal > 0) {
-                         if (pitchVal < 85) pitchScore = 0.0;
-                         else if (pitchVal < 165) pitchScore = ((pitchVal - 85) / 80) * 0.4;
-                         else if (pitchVal < 185) pitchScore = 0.4 + ((pitchVal - 165) / 20) * 0.2;
-                         else if (pitchVal < 255) pitchScore = 0.6 + ((pitchVal - 185) / 70) * 0.4;
-                         else pitchScore = 1.0;
+                        if (pitchVal < 85) pitchScore = 0.0;
+                        else if (pitchVal < 165) pitchScore = ((pitchVal - 85) / 80) * 0.4;
+                        else if (pitchVal < 185) pitchScore = 0.4 + ((pitchVal - 165) / 20) * 0.2;
+                        else if (pitchVal < 255) pitchScore = 0.6 + ((pitchVal - 185) / 70) * 0.4;
+                        else pitchScore = 1.0;
                     }
 
                     const currentScore = (pitchScore * 2 + resScore + weightScore) / 4;
@@ -142,10 +149,18 @@ const OrbMetricsOverlay = memo(({ dataRef, calibration, mode, showDebug, variant
                     });
                 }
             }
-        }, 200);
+        };
 
-        return () => clearInterval(interval);
-    }, [dataRef, calibration, mode, showDebug, isVisible]);
+        const unsubscribe = renderCoordinator.subscribe(
+            id,
+            loop,
+            renderCoordinator.PRIORITY.LOW
+        );
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
+    }, [dataRef, calibration, mode, showDebug, isVisible, id]);
 
     if (!isVisible) return null;
 
