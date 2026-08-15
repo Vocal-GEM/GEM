@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import CelebrationAnimations from '../ui/CelebrationAnimations';
 import DriftAlert from '../ui/DriftAlert';
 import { getAdaptiveFeedbackController } from '../../services/AdaptiveFeedback';
 import FlowStateDetector from '../../utils/FlowStateDetector';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     const { settings } = useSettings();
@@ -11,6 +12,7 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     const [celebration, setCelebration] = useState(null);
     const flowDetector = useRef(null);
     const adaptiveController = useRef(null);
+    const id = useId();
 
     // Lazy initialization
     if (!flowDetector.current) {
@@ -27,31 +29,49 @@ const FeedbackManager = ({ dataRef, targetRange, active = true }) => {
     useEffect(() => {
         if (!active || !dataRef) return;
 
-        const interval = setInterval(() => {
-            const data = dataRef.current;
-            if (!data) return;
+        let timeAccumulator = 0;
+        let lastTime = performance.now();
 
-            // 1. Update basic state for DriftAlert
-            if (data.pitch > 0) {
-                setCurrentPitch(data.pitch);
-            }
+        const loop = (currentTime) => {
+            const dt = currentTime - lastTime;
+            lastTime = currentTime;
+            timeAccumulator += dt;
 
-            // 2. Flow State
-            if (flowDetector.current) {
-                const metrics = {
-                    accuracy: (targetRange && data.pitch >= targetRange.min && data.pitch <= targetRange.max) ? 1 : 0,
-                    timestamp: Date.now()
-                };
-                flowDetector.current.update(metrics);
-                const flowStats = flowDetector.current.getStats();
-                if (flowStats.isFlowState !== inFlow) {
-                    setInFlow(flowStats.isFlowState);
+            if (timeAccumulator >= 100) {
+                timeAccumulator = 0;
+                const data = dataRef.current;
+                if (!data) return;
+
+                // 1. Update basic state for DriftAlert
+                if (data.pitch > 0) {
+                    setCurrentPitch(data.pitch);
+                }
+
+                // 2. Flow State
+                if (flowDetector.current) {
+                    const metrics = {
+                        accuracy: (targetRange && data.pitch >= targetRange.min && data.pitch <= targetRange.max) ? 1 : 0,
+                        timestamp: Date.now()
+                    };
+                    flowDetector.current.update(metrics);
+                    const flowStats = flowDetector.current.getStats();
+                    if (flowStats.isFlowState !== inFlow) {
+                        setInFlow(flowStats.isFlowState);
+                    }
                 }
             }
-        }, 100);
+        };
 
-        return () => clearInterval(interval);
-    }, [active, dataRef, targetRange, inFlow]);
+        const unsubscribe = renderCoordinator.subscribe(
+            id,
+            loop,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
+    }, [active, dataRef, targetRange, inFlow, id]);
 
     // Listen for custom events dispatched by services (if any)
     useEffect(() => {

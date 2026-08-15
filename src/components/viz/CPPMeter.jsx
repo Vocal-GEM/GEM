@@ -1,37 +1,58 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useId } from 'react';
 import { Activity } from 'lucide-react';
 import { cppAnalyzer } from '../../utils/cppAnalysis';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const CPPMeter = ({ dataRef, isActive }) => {
     const [cppData, setCppData] = useState({ cpp: 0, quality: 'unknown', interpretation: '', color: '#64748b' });
     const [history, setHistory] = useState([]);
     const canvasRef = useRef(null);
+    const id = useId();
 
     useEffect(() => {
         if (!isActive || !dataRef?.current) return;
 
-        const interval = setInterval(() => {
-            const audioData = dataRef.current.timeDomainData;
-            if (audioData && audioData.length > 0) {
-                // Convert Uint8Array to Float32Array (normalize to -1 to 1)
-                const floatData = new Float32Array(audioData.length);
-                for (let i = 0; i < audioData.length; i++) {
-                    floatData[i] = (audioData[i] - 128) / 128;
+        let timeAccumulator = 0;
+        let lastTime = performance.now();
+
+        const loop = (currentTime) => {
+            const dt = currentTime - lastTime;
+            lastTime = currentTime;
+            timeAccumulator += dt;
+
+            if (timeAccumulator >= 200) {
+                timeAccumulator = 0;
+
+                const audioData = dataRef.current.timeDomainData;
+                if (audioData && audioData.length > 0) {
+                    // Convert Uint8Array to Float32Array (normalize to -1 to 1)
+                    const floatData = new Float32Array(audioData.length);
+                    for (let i = 0; i < audioData.length; i++) {
+                        floatData[i] = (audioData[i] - 128) / 128;
+                    }
+
+                    const result = cppAnalyzer.analyzeRealTime(floatData);
+                    setCppData(result);
+
+                    // Update history for sparkline
+                    setHistory(prev => {
+                        const newHistory = [...prev, result.cpp];
+                        return newHistory.slice(-50); // Keep last 50 values
+                    });
                 }
-
-                const result = cppAnalyzer.analyzeRealTime(floatData);
-                setCppData(result);
-
-                // Update history for sparkline
-                setHistory(prev => {
-                    const newHistory = [...prev, result.cpp];
-                    return newHistory.slice(-50); // Keep last 50 values
-                });
             }
-        }, 200); // Update every 200ms
+        };
 
-        return () => clearInterval(interval);
-    }, [isActive, dataRef]);
+        const unsubscribe = renderCoordinator.subscribe(
+            id,
+            loop,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
+    }, [isActive, dataRef, id]);
 
     // Draw sparkline
     useEffect(() => {
