@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-24 - Add ARIA label to Sidebar toggle
+**Learning:** Mobile toggle buttons frequently lack dynamic aria-labels that indicate their open/closed state.
+**Action:** Always include an `aria-expanded` attribute in conjunction with a descriptive `aria-label` when modifying toggle buttons for optimal screen reader accessibility.
