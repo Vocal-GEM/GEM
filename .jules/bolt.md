@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-03-05 - Bypassing React Virtual DOM for Animation Metrics
+**Learning:** High-frequency audio and animation loops calling `useState()` inside a `RenderCoordinator` subscription loop triggered React's reconciliation process over 60 times a second for simple text updates.
+**Action:** When rapidly displaying raw string/number data without altering complex component structures, define references to individual DOM nodes via `useRef(null)` and manually mutate `ref.current.textContent` to fully bypass the React rendering tree.
