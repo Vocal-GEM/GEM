@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Home, BookOpen, Activity, BarChart2, Settings, Menu, X, ChevronRight, Waves, Search, FileText, HelpCircle, Layers, BookMarked, Camera, Briefcase, ClipboardCheck, Mic } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import { useNavigation } from '../../context/NavigationContext';
@@ -36,7 +36,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
     const { openModal } = useNavigation();
 
     // Consolidated navigation: Frontend-only features
-    const navItems = [
+    const navItems = useMemo(() => [
         { id: 'dashboard', label: 'Dashboard', icon: <Home size={20} /> },
         { id: 'practice', label: 'Practice', icon: <Activity size={20} /> },
         { id: 'journal', label: 'Voice Log', icon: <Mic size={20} /> },
@@ -49,7 +49,8 @@ const Sidebar = ({ activeView, onViewChange }) => {
         { id: 'pitch-tool', label: 'Haptic Tool', icon: <Activity size={20} /> },
         { id: 'camera', label: 'Mirror', icon: <Camera size={20} />, isModal: true },
         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
-    ].filter(item => FEATURES[item.id] !== false);
+
+    ].filter(item => FEATURES[item.id] !== false), []);
 
     // Search handler with debouncing
     useEffect(() => {
@@ -154,7 +155,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
     }, []);
 
     // Group results by type for display
-    const groupedResults = groupResultsByType(searchResults);
+    const groupedResults = useMemo(() => groupResultsByType(searchResults), [searchResults]);
 
     return (
         <>
@@ -319,4 +320,4 @@ const Sidebar = ({ activeView, onViewChange }) => {
     );
 };
 
-export default Sidebar;
+export default React.memo(Sidebar);
