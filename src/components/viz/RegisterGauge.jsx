@@ -3,6 +3,7 @@ import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
 
 /**
  * RegisterGauge - Visualize Laryngeal Mechanisms (M0-M3)
+ * ⚡ Bolt: Throttled React state updates to 10 FPS to prevent 60FPS re-render bottleneck.
  * 
  * Based on "Registers—The Snake Pit of Voice Pedagogy" logic.
  * Classifies mechanics based on F0 and Spectral Slope.
@@ -19,29 +20,77 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     });
     const [f0, setF0] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);
+    const f0Ref = useRef(0);
+    const registerDataRef = useRef({
+        mechanism: 'M1',
+        mixRatio: 100,
+        slope: -6.0,
+        confidence: 0
+    });
+    const lastUpdateTimeRef = useRef(0);
     const animationRef = useRef();
 
     useEffect(() => {
-        const update = () => {
-            if (dataRef?.current) {
-                // Get register data from socket stream
-                const reg = dataRef.current.register; // dataRef.current.register from sockets.py
+        const updateInterval = 100; // Throttle React state updates to 10 FPS
+
+        const update = (timestamp) => {
+            if (!dataRef?.current) {
+                animationRef.current = requestAnimationFrame(update);
+                return;
+            }
+
+            // Fallback to performance.now() if timestamp is missing
+            const now = timestamp || performance.now();
+
+            // Only update React state periodically to prevent 60FPS re-renders
+            if (now - lastUpdateTimeRef.current > updateInterval) {
+                const reg = dataRef.current.register;
                 const currentF0 = dataRef.current.f0 || 0;
                 const slope = dataRef.current.spectral_slope || -6.0;
 
+                let stateUpdated = false;
+
                 if (reg) {
-                    setRegisterData({
-                        mechanism: reg.mechanism,
-                        label: reg.label,
-                        description: reg.description,
-                        color: reg.color,
-                        confidence: reg.confidence || 0,
-                        mixRatio: reg.mix_ratio || (reg.mechanism === 'M1' ? 100 : reg.mechanism === 'M2' ? 0 : 50),
-                        slope: slope
-                    });
+                    const newConfidence = reg.confidence || 0;
+                    const newMixRatio = reg.mix_ratio || (reg.mechanism === 'M1' ? 100 : reg.mechanism === 'M2' ? 0 : 50);
+
+                    if (reg.mechanism !== registerDataRef.current.mechanism ||
+                        Math.abs(newMixRatio - registerDataRef.current.mixRatio) > 2 ||
+                        Math.abs(slope - registerDataRef.current.slope) > 0.5 ||
+                        Math.abs(newConfidence - registerDataRef.current.confidence) > 0.1) {
+
+                        const newData = {
+                            mechanism: reg.mechanism,
+                            label: reg.label,
+                            description: reg.description,
+                            color: reg.color,
+                            confidence: newConfidence,
+                            mixRatio: newMixRatio,
+                            slope: slope
+                        };
+
+                        registerDataRef.current = {
+                            mechanism: newData.mechanism,
+                            mixRatio: newData.mixRatio,
+                            slope: newData.slope,
+                            confidence: newData.confidence
+                        };
+                        setRegisterData(newData);
+                        stateUpdated = true;
+                    }
                 }
-                setF0(currentF0);
+
+                if (Math.abs(currentF0 - f0Ref.current) > 2 || (currentF0 === 0 && f0Ref.current !== 0)) {
+                    f0Ref.current = currentF0;
+                    setF0(currentF0);
+                    stateUpdated = true;
+                }
+
+                if (stateUpdated) {
+                    lastUpdateTimeRef.current = now;
+                }
             }
+
             animationRef.current = requestAnimationFrame(update);
         };
 
