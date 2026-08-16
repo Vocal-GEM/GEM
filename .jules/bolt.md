@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-08-16 - Memoization in heavily-used layout components
+**Learning:** Found that the primary Sidebar component was recreating large configuration arrays (navItems) and recalculating expensive grouping operations (groupedResults) on every render, even when the relevant props or state hadn't changed.
+**Action:** Use `React.memo` for heavy layout wrappers like Sidebar that receive stable props. Wrap static configuration arrays and expensive derived state computations in `useMemo` to prevent unnecessary garbage collection and repeated execution during frequent re-renders.
