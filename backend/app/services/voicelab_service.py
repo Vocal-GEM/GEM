@@ -116,7 +116,9 @@ def estimate_vtl(sound, num_formants=4, max_formant_hz=5500):
         }
         
     except Exception as e:
-        return {"vtl_cm": None, "delta_f": None, "error": str(e)}
+        import logging
+        logging.error(f"Error in measure_vtl: {e}")
+        return {"vtl_cm": None, "delta_f": None, "error": "An internal error occurred."}
 
 
 # ----------------------
@@ -195,7 +197,9 @@ def compute_perturbation_pca(sound, floor_hz=75, ceiling_hz=600):
         }
         
     except Exception as e:
-        return {"jitter_pca": None, "shimmer_pca": None, "error": str(e)}
+        import logging
+        logging.error(f"Error in measure_perturbation: {e}")
+        return {"jitter_pca": None, "shimmer_pca": None, "error": "An internal error occurred."}
 
 
 # ----------------------
@@ -258,7 +262,9 @@ def measure_ltas(sound, bandwidth=100):
         }
         
     except Exception as e:
-        return {"error": str(e)}
+        import logging
+        logging.getLogger(__name__).error(f"Error: {e}")
+        return {"error": "An internal error occurred."}
 
 
 # ----------------------
@@ -335,7 +341,9 @@ def measure_speech_rate(sound, min_intensity_db=50, min_dip_db=2):
         }
         
     except Exception as e:
-        return {"error": str(e)}
+        import logging
+        logging.getLogger(__name__).error(f"Error: {e}")
+        return {"error": "An internal error occurred."}
 
 
 # ----------------------
