@@ -106,7 +106,7 @@ const ClipCapture = ({ onCapture, showAnalysis = true }) => {
                     <button
                         onClick={handleCancel}
                         className="p-1.5 rounded-full bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-500/30 transition-all animate-in fade-in slide-in-from-right-4 duration-300"
-                        title="Cancel Recording"
+                        title="Cancel Recording" aria-label="Cancel recording"
                     >
                         <X size={14} />
                     </button>
@@ -114,6 +114,7 @@ const ClipCapture = ({ onCapture, showAnalysis = true }) => {
 
                 <button
                     onClick={handleToggle}
+                    aria-label={isRecording ? "Stop recording" : "Start recording"}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${isRecording
                         ? 'bg-red-500/20 text-red-400 border border-red-500/50 animate-pulse'
                         : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700'
@@ -137,7 +138,7 @@ const ClipCapture = ({ onCapture, showAnalysis = true }) => {
                     <button
                         onClick={() => setShowAnalysisModal(true)}
                         className="p-1.5 rounded-full bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 border border-purple-500/30 transition-all"
-                        title="Analyze last recording"
+                        title="Analyze last recording" aria-label="Analyze last recording"
                     >
                         <BarChart2 size={12} />
                     </button>

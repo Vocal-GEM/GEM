@@ -209,7 +209,7 @@ const ClipAnalysisModal = ({ audioBlob, audioUrl, onClose }) => {
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                        className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors" aria-label="Close modal"
                     >
                         <X size={20} />
                     </button>
@@ -236,7 +236,7 @@ const ClipAnalysisModal = ({ audioBlob, audioUrl, onClose }) => {
                             <div className="flex items-center gap-4 p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
                                 <button
                                     onClick={togglePlayback}
-                                    className="p-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-500 hover:to-pink-500 transition-all"
+                                    className="p-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-500 hover:to-pink-500 transition-all" aria-label={isPlaying ? "Pause audio" : "Play audio"}
                                 >
                                     {isPlaying ? <Pause size={20} /> : <Play size={20} />}
                                 </button>
