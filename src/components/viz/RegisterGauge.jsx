@@ -1,5 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
 import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
+
 
 /**
  * RegisterGauge - Visualize Laryngeal Mechanisms (M0-M3)
@@ -8,6 +10,7 @@ import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
  * Classifies mechanics based on F0 and Spectral Slope.
  */
 const RegisterGauge = ({ dataRef, showHint = true }) => {
+    const componentId = useId();
     const [registerData, setRegisterData] = useState({
         mechanism: 'M1',
         label: 'Chest / Modal (M1)',
@@ -19,7 +22,6 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     });
     const [f0, setF0] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);
-    const animationRef = useRef();
 
     useEffect(() => {
         const update = () => {
@@ -42,12 +44,15 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                 }
                 setF0(currentF0);
             }
-            animationRef.current = requestAnimationFrame(update);
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
-    }, [dataRef]);
+        // ⚡ Optimization: Subscribe to centralized renderCoordinator to avoid overlapping/duplicate requestAnimationFrame loops across viz components.
+        const unsubscribe = renderCoordinator.subscribe(componentId, update, renderCoordinator.PRIORITY.LOW);
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
+    }, [dataRef, componentId]);
 
     // Helpers
     const getIcon = () => {
