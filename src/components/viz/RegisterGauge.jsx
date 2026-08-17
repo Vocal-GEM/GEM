@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useId } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
