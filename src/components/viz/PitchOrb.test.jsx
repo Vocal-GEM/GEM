@@ -30,7 +30,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 
 // Mock ResizeObserver
-global.ResizeObserver = vi.fn(function() {
+window.ResizeObserver = vi.fn(function() {
     this.observe = vi.fn();
     this.disconnect = vi.fn();
     this.unobserve = vi.fn();
@@ -38,7 +38,7 @@ global.ResizeObserver = vi.fn(function() {
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+window.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('PitchOrb', () => {
     let dataRef;
