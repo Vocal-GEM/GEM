@@ -216,7 +216,7 @@ void main() {
 }
 `;
 
-const VisualizerMesh = ({ mode, setMode, dataRef, externalDataRef, calibration, targetRange }) => {
+const VisualizerMesh = memo(({ mode, setMode, dataRef, externalDataRef, calibration, targetRange }) => {
   const mesh = useRef();
   const material = useRef();
   const { gl } = useThree();
@@ -359,7 +359,8 @@ const VisualizerMesh = ({ mode, setMode, dataRef, externalDataRef, calibration, 
       />
     </mesh>
   );
-};
+});
+VisualizerMesh.displayName = 'VisualizerMesh';
 
 // Simple Intersection Observer Hook
 const useIntersectionObserver = (ref) => {
