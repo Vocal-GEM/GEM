@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-23 - VisualizerMesh Memoization
+**Learning:** `VisualizerCanvas` and `SafeModeVisualizer` inside `DynamicOrb.jsx` were wrapped in `memo` to avoid re-renders, but `VisualizerMesh` inside `VisualizerCanvas` was not. Since `DynamicOrb` receives frequent `dataRef` updates and mode switches, recreating the mesh and materials forces unnecessary three.js processing.
+**Action:** Added `memo` wrapping to `VisualizerMesh` to reduce computational overhead in the main visualization loop.
