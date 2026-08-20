@@ -28,9 +28,17 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     canvas: { width: 300, height: 300 }
 }));
 
+
+// Mock ResizeObserver
+window.ResizeObserver = vi.fn(function() {
+    this.observe = vi.fn();
+    this.disconnect = vi.fn();
+    this.unobserve = vi.fn();
+});
+
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+window.requestAnimationFrame = mockRequestAnimationFrame;
 
 describe('PitchOrb', () => {
     let dataRef;
@@ -66,6 +74,7 @@ describe('PitchOrb', () => {
         // Execute the callback
         callback();
 
+mockRequestAnimationFrame.mockClear();
         // With the bug, requestAnimationFrame is called.
         // We assert it IS called to confirm the bug exists in the current code,
         // OR we assert it is NOT called if we want to write the test for the desired state.

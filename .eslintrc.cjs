@@ -20,6 +20,9 @@ module.exports = {
         'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
     globals: {
+        global: "readonly",
+        window: "readonly",
+        global: "readonly",
         __APP_VERSION__: 'readonly',
     },
 }
