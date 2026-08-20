@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import DynamicOrb from './DynamicOrb';
@@ -39,7 +40,7 @@ vi.mock('../../services/RenderCoordinator', () => ({
 
 
 // Mock IntersectionObserver
-globalThis.IntersectionObserver = class IntersectionObserver {
+global.IntersectionObserver = class IntersectionObserver {
   constructor(callback) {
     this.callback = callback;
   }
