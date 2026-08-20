@@ -401,23 +401,31 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
   const textRef = useRef(null);
 
   useEffect(() => {
-    let frameId;
-    const loop = () => {
-      if (dataRef.current) {
-        const { pitch, volume } = dataRef.current;
-        // Update DOM directly
-        if (circleRef.current) {
-          const scale = 1 + (volume || 0); // volume is 0-1
-          circleRef.current.style.transform = `scale(${scale})`;
-        }
-        if (textRef.current) {
-          textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
-        }
+    let unsubscribe;
+    let isMounted = true;
+    // ⚡ Bolt Performance Optimization: Replaced raw requestAnimationFrame with centralized RenderCoordinator to prevent V-sync breakdown. Impact: Prevents main-thread loop competition and reduces CPU overhead.
+    import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+      if (isMounted) {
+        unsubscribe = renderCoordinator.subscribe('dynamic-orb-safe-mode', () => {
+          if (dataRef.current) {
+            const { pitch, volume } = dataRef.current;
+            // Update DOM directly
+            if (circleRef.current) {
+              const scale = 1 + (volume || 0); // volume is 0-1
+              circleRef.current.style.transform = `scale(${scale})`;
+            }
+            if (textRef.current) {
+              textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
+            }
+          }
+        }, renderCoordinator.PRIORITY.HIGH);
       }
-      frameId = requestAnimationFrame(loop);
+    });
+
+    return () => {
+      isMounted = false;
+      if (unsubscribe) unsubscribe();
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
   }, [dataRef]);
 
   return (
