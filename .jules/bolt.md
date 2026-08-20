@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - V-sync Breakdown via requestAnimationFrame
+**Learning:** High-frequency visualizations like `DynamicOrb` fallback modes used localized `requestAnimationFrame` loops alongside centralized services like `RenderCoordinator`. This creates independent render loops that compete for main thread execution, increasing CPU usage and breaking V-sync frame pacing.
+**Action:** Audit and replace raw `requestAnimationFrame` loops in React components. Centralize them under a single subscriber system (like `RenderCoordinator`) to guarantee a single, synchronized rendering pipeline for the entire application.
