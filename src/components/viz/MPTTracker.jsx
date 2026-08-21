@@ -9,7 +9,7 @@ const MPTTracker = ({ dataRef, isActive }) => {
     const [autoMode, setAutoMode] = useState(true);
 
     const startTimeRef = useRef(null);
-    const animationRef = useRef(null);
+
 
     useEffect(() => {
         if (!autoMode || !isActive) return;
@@ -37,19 +37,23 @@ const MPTTracker = ({ dataRef, isActive }) => {
                     }
                 }
             }
-            animationRef.current = requestAnimationFrame(checkAudio);
         };
 
+        // ⚡ Bolt Performance Optimization: Removed duplicate raw requestAnimationFrame in favor of the dynamic RenderCoordinator import below. Impact: Prevents orphaned animation loops.
         let unsubscribe;
+        let isMounted = true;
         import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'mpt-tracker',
-                checkAudio,
-                renderCoordinator.PRIORITY.LOW
-            );
+            if (isMounted) {
+                unsubscribe = renderCoordinator.subscribe(
+                    'mpt-tracker',
+                    checkAudio,
+                    renderCoordinator.PRIORITY.LOW
+                );
+            }
         });
 
         return () => {
+            isMounted = false;
             if (unsubscribe) unsubscribe();
         };
     }, [autoMode, isActive, isRecording, threshold, dataRef]);
