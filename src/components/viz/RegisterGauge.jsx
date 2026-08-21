@@ -22,7 +22,7 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     const animationRef = useRef();
 
     useEffect(() => {
-        const update = () => {
+        const update = (delta, time) => {
             if (dataRef?.current) {
                 // Get register data from socket stream
                 const reg = dataRef.current.register; // dataRef.current.register from sockets.py
@@ -42,11 +42,16 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                 }
                 setF0(currentF0);
             }
-            animationRef.current = requestAnimationFrame(update);
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
+        // ⚡ Bolt Performance Optimization: Replaced raw requestAnimationFrame loop with centralized RenderCoordinator.
+        // Impact: Reduces recursive main thread scheduling and improves overall application performance.
+        const unsubscribe = renderCoordinator.subscribe(
+            'RegisterGauge',
+            update,
+            renderCoordinator.PRIORITY.HIGH
+        );
+        return () => unsubscribe();
     }, [dataRef]);
 
     // Helpers

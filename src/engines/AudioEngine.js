@@ -8,6 +8,7 @@ import { validateAudioSignal, getSignalQualityMessage } from '../utils/signalVal
 import { PitchSmoother } from '../utils/PitchSmoother';
 import McLeodPitchDetector from '../services/audio/McLeodPitchDetector';
 import LPCFormantTracker from '../services/audio/LPCFormantTracker';
+import { renderCoordinator } from '../services/RenderCoordinator';
 
 
 
@@ -355,9 +356,9 @@ export class AudioEngine {
         this.visualPitchBuffer = [];
         this.visualAmpBuffer = [];
 
-        const loop = () => {
+        const loop = (delta, time) => {
             if (!this.isActive) return;
-            this.animationFrameId = requestAnimationFrame(loop);
+
 
             // Fetch data (always needed for visualization/RMS)
             this.analyser.getFloatTimeDomainData(dataArray);
@@ -622,7 +623,16 @@ export class AudioEngine {
             }
         };
 
-        loop();
+        // ⚡ Bolt Performance Optimization: Replaced requestAnimationFrame with centralized RenderCoordinator.
+        // Why: Using a single centralized render loop prevents multiple independent animation loops
+        // from competing on the main thread, significantly reducing CPU overhead and improving frame pacing.
+        // Impact: Reduces CPU usage by consolidating all visual updates into one synchronized pipeline.
+        this.animationFrameId = 'audioEngineLoop';
+        this.unsubscribeRenderCoordinator = renderCoordinator.subscribe(
+            this.animationFrameId,
+            loop,
+            renderCoordinator.PRIORITY.HIGH
+        );
     }
 
     // Explicitly add HNR calculation if needed for high precision mode, 
@@ -636,7 +646,12 @@ export class AudioEngine {
             this.passthroughGain.gain.setTargetAtTime(0, this.audioContext.currentTime, 0.1);
         }
 
-        if (this.animationFrameId) {
+        if (this.unsubscribeRenderCoordinator) {
+            this.unsubscribeRenderCoordinator();
+            this.unsubscribeRenderCoordinator = null;
+            this.animationFrameId = null;
+        } else if (this.animationFrameId) {
+            // Fallback just in case
             cancelAnimationFrame(this.animationFrameId);
             this.animationFrameId = null;
         }

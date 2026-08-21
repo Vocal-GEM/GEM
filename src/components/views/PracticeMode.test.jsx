@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react';
 
 import { vi, describe, it, expect } from 'vitest';
 import PracticeMode from './PracticeMode';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { NavigationProvider } from '../../context/NavigationContext';
 import { AudioProvider } from '../../context/AudioContext';
 import { ProfileProvider } from '../../context/ProfileContext';
@@ -92,3 +93,8 @@ describe('PracticeMode', () => {
         expect(await screen.findByTestId('dynamic-orb')).toBeInTheDocument();
     });
 });
+
+vi.mock('../../components/viz/RegisterGauge', () => ({
+  __esModule: true,
+  default: () => <div>Mocked RegisterGauge</div>
+}));
