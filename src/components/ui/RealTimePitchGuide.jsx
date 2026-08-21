@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useId } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Mic, MicOff, Target, TrendingUp } from 'lucide-react';
 
 const RealTimePitchGuide = ({ targetPitch = 200, tolerance = 20, onClose }) => {
@@ -9,8 +10,9 @@ const RealTimePitchGuide = ({ targetPitch = 200, tolerance = 20, onClose }) => {
 
     const audioContextRef = useRef(null);
     const analyserRef = useRef(null);
-    const animationRef = useRef(null);
     const streamRef = useRef(null);
+    const componentId = useId();
+    const unsubscribeRef = useRef(null);
 
     const startListening = async () => {
         try {
@@ -25,15 +27,21 @@ const RealTimePitchGuide = ({ targetPitch = 200, tolerance = 20, onClose }) => {
             source.connect(analyserRef.current);
 
             setIsListening(true);
-            detectPitch();
+            // ⚡ Bolt Performance Optimization: Replaced raw requestAnimationFrame with centralized RenderCoordinator.
+            unsubscribeRef.current = renderCoordinator.subscribe(
+                componentId,
+                detectPitch,
+                renderCoordinator.PRIORITY.HIGH
+            );
         } catch (error) {
             console.error('Microphone access denied:', error);
         }
     };
 
     const stopListening = () => {
-        if (animationRef.current) {
-            cancelAnimationFrame(animationRef.current);
+        if (unsubscribeRef.current) {
+            unsubscribeRef.current();
+            unsubscribeRef.current = null;
         }
         if (streamRef.current) {
             streamRef.current.getTracks().forEach(track => track.stop());
@@ -83,8 +91,6 @@ const RealTimePitchGuide = ({ targetPitch = 200, tolerance = 20, onClose }) => {
                 });
             }
         }
-
-        animationRef.current = requestAnimationFrame(detectPitch);
     }, [targetPitch, tolerance]);
 
     useEffect(() => {

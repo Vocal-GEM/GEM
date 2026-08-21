@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useId } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Mic, Square, Volume2, Info, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAudio } from '../../context/AudioContext';
@@ -63,7 +64,7 @@ const ArticulationView = () => {
     const [targetPhone, setTargetPhone] = useState('neutral');
 
     const analyzerRef = useRef(null);
-    const animationRef = useRef(null);
+    const componentId = useId();
 
     useEffect(() => {
         // Initialize analyzer
@@ -126,7 +127,6 @@ const ArticulationView = () => {
                     updateTargetFromAcoustics(results);
                 }
 
-                animationRef.current = requestAnimationFrame(loop);
             };
 
             loop();
@@ -135,9 +135,6 @@ const ArticulationView = () => {
 
     const stopAnalysis = () => {
         setIsRecording(false);
-        if (animationRef.current) {
-            cancelAnimationFrame(animationRef.current);
-        }
         // Cleanup analyser connection
         if (analyzerRef.current?.realtimeAnalyser) {
             analyzerRef.current.realtimeAnalyser.disconnect();

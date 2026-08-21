@@ -10,7 +10,7 @@ const SZRatio = ({ dataRef, isActive }) => {
     const [threshold, setThreshold] = useState(0.02);
 
     const startTimeRef = useRef(null);
-    const animationRef = useRef(null);
+
 
     // Auto-detection logic (similar to MPT)
     useEffect(() => {
@@ -33,19 +33,23 @@ const SZRatio = ({ dataRef, isActive }) => {
                     if (startTimeRef.current) startTimeRef.current.silenceStart = null;
                 }
             }
-            animationRef.current = requestAnimationFrame(checkAudio);
         };
 
+        // ⚡ Bolt Performance Optimization: Removed duplicate raw requestAnimationFrame in favor of the dynamic RenderCoordinator import below. Impact: Prevents orphaned animation loops.
         let unsubscribe;
+        let isMounted = true;
         import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'sz-ratio',
-                checkAudio,
-                renderCoordinator.PRIORITY.LOW
-            );
+            if (isMounted) {
+                unsubscribe = renderCoordinator.subscribe(
+                    'sz-ratio',
+                    checkAudio,
+                    renderCoordinator.PRIORITY.LOW
+                );
+            }
         });
 
         return () => {
+            isMounted = false;
             if (unsubscribe) unsubscribe();
         };
     }, [autoMode, isActive, isRecording, threshold, dataRef]);
