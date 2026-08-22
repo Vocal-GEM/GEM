@@ -6,8 +6,8 @@ import { Diamond, Bug, Activity, Sliders, Gauge } from 'lucide-react';
 import { OrbitControls } from '@react-three/drei';
 import { useSettings } from '../../context/SettingsContext';
 import OrbLegend from './OrbLegend';
-import OrbMetricsOverlay from './OrbMetricsOverlay';
 import { renderCoordinator } from '../../services/RenderCoordinator';
+import OrbMetricsOverlay from './OrbMetricsOverlay';
 
 
 const MixingBoardView = lazy(() => import('../views/MixingBoardView'));

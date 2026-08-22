@@ -61,7 +61,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         // Optimization: Use alpha: false for better performance
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
-        ctx = canvas.getContext('2d', { alpha: false });
+        const ctx = canvas.getContext('2d', { alpha: false });
 
         const width = canvas.width;
         const height = canvas.height;
