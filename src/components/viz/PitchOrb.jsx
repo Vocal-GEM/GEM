@@ -29,10 +29,35 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     const genderRanges = settings.genderRanges || defaultRanges;
 
+    const dimensionsRef = useRef({ width: 0, height: 0 });
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
+        let rafId;
+
+        if (!canvas) return;
+
+        const updateSize = () => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+
+            if (dimensionsRef.current.width !== rect.width || dimensionsRef.current.height !== rect.height) {
+                dimensionsRef.current = { width: rect.width, height: rect.height };
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                ctx.scale(dpr, dpr);
+            }
+        };
+
+        const resizeObserver = new ResizeObserver(() => {
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(updateSize);
+        });
+
+        resizeObserver.observe(canvas);
+        updateSize();
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,13 +92,9 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const { width, height } = dimensionsRef.current;
+            if (width === 0 || height === 0) return;
 
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -158,6 +179,11 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             }
         };
 
+        // ⚡ Bolt Performance Optimization:
+        // Replaced synchronous getBoundingClientRect() inside the high-frequency render loop
+        // with an asynchronous ResizeObserver.
+        // Impact: Eliminates ~60 layout thrashing recalculations per second,
+        // reducing CPU overhead and preventing main-thread stalling during animation.
         const unsubscribe = renderCoordinator.subscribe(
             `pitch-orb-${componentId}`,
             loop,
@@ -166,6 +192,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
+            if (rafId) cancelAnimationFrame(rafId);
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
