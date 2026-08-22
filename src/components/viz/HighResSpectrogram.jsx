@@ -188,12 +188,13 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         // Initial size
         updateSize();
 
+        let rafId;
         const resizeObserver = new ResizeObserver(() => {
-            // Use RAF to debounce
-
-        const resizeObserver = new ResizeObserver(() => {
-            // Run in animation frame to avoid resize loops/tearing
-            requestAnimationFrame(updateSize);
+            // Use RAF to debounce and prevent resize loops/tearing
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+            }
+            rafId = requestAnimationFrame(updateSize);
         });
 
         resizeObserver.observe(container);
@@ -203,6 +204,9 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         return () => {
             resizeObserver.disconnect();
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+            }
         };
     }, []);
 

@@ -355,6 +355,9 @@ export class AudioEngine {
         this.visualPitchBuffer = [];
         this.visualAmpBuffer = [];
 
+        // Note: Engine still uses raw requestAnimationFrame intentionally for now
+        // since it drives data processing not just rendering, and must run at full speed.
+        // In the future this could be migrated to RenderCoordinator if it supports high-priority processing loops.
         const loop = () => {
             if (!this.isActive) return;
             this.animationFrameId = requestAnimationFrame(loop);

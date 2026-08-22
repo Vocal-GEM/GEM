@@ -7,6 +7,7 @@ import { OrbitControls } from '@react-three/drei';
 import { useSettings } from '../../context/SettingsContext';
 import OrbLegend from './OrbLegend';
 import OrbMetricsOverlay from './OrbMetricsOverlay';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 
 const MixingBoardView = lazy(() => import('../views/MixingBoardView'));
@@ -401,23 +402,27 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
   const textRef = useRef(null);
 
   useEffect(() => {
-    let frameId;
-    const loop = () => {
-      if (dataRef.current) {
-        const { pitch, volume } = dataRef.current;
-        // Update DOM directly
-        if (circleRef.current) {
-          const scale = 1 + (volume || 0); // volume is 0-1
-          circleRef.current.style.transform = `scale(${scale})`;
+    // ⚡ Bolt Performance Optimization: Replaced raw requestAnimationFrame with RenderCoordinator
+    // Impact: Avoids multiple separate RAF loops running on the main thread, lowering CPU overhead.
+    const unsubscribe = renderCoordinator.subscribe(
+      'dynamic-orb-safe-mode',
+      () => {
+        if (dataRef.current) {
+          const { pitch, volume } = dataRef.current;
+          // Update DOM directly
+          if (circleRef.current) {
+            const scale = 1 + (volume || 0); // volume is 0-1
+            circleRef.current.style.transform = `scale(${scale})`;
+          }
+          if (textRef.current) {
+            textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
+          }
         }
-        if (textRef.current) {
-          textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
-        }
-      }
-      frameId = requestAnimationFrame(loop);
-    };
-    loop();
-    return () => cancelAnimationFrame(frameId);
+      },
+      renderCoordinator.PRIORITY.HIGH
+    );
+
+    return () => unsubscribe();
   }, [dataRef]);
 
   return (
