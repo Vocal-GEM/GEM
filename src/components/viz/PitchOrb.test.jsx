@@ -30,7 +30,13 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+globalThis.requestAnimationFrame = mockRequestAnimationFrame;
+
+globalThis.ResizeObserver = vi.fn(function() {
+    this.observe = vi.fn();
+    this.disconnect = vi.fn();
+    this.unobserve = vi.fn();
+});
 
 describe('PitchOrb', () => {
     let dataRef;
@@ -54,7 +60,8 @@ describe('PitchOrb', () => {
         vi.clearAllMocks();
     });
 
-    it('should not call requestAnimationFrame recursively in the draw loop', async () => {
+    it('should use ResizeObserver and only use requestAnimationFrame for resizing', async () => {
+        mockRequestAnimationFrame.mockClear();
         render(<PitchOrb dataRef={dataRef} />);
 
         // Wait for potential dynamic import resolution
@@ -63,13 +70,14 @@ describe('PitchOrb', () => {
         expect(renderCoordinator.subscribe).toHaveBeenCalled();
         const [id, callback] = renderCoordinator.subscribe.mock.calls[0];
 
-        // Execute the callback
+        // Check that observe was called
+        const observerInstance = globalThis.ResizeObserver.mock.instances[0];
+        expect(observerInstance.observe).toHaveBeenCalled();
+
+        // Execute the animation callback
         callback();
 
-        // With the bug, requestAnimationFrame is called.
-        // We assert it IS called to confirm the bug exists in the current code,
-        // OR we assert it is NOT called if we want to write the test for the desired state.
-        // Let's write the test for the DESIRED state (fail now, pass later).
+        // The draw loop should NOT call requestAnimationFrame recursively anymore
         expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
     });
 });
