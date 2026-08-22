@@ -30,9 +30,9 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 
 // Mock requestAnimationFrame to detect recursion
 const mockRequestAnimationFrame = vi.fn();
-global.requestAnimationFrame = mockRequestAnimationFrame;
+globalThis.requestAnimationFrame = mockRequestAnimationFrame;
 
-global.ResizeObserver = vi.fn(function() {
+globalThis.ResizeObserver = vi.fn(function() {
     this.observe = vi.fn();
     this.disconnect = vi.fn();
     this.unobserve = vi.fn();
@@ -71,7 +71,7 @@ describe('PitchOrb', () => {
         const [id, callback] = renderCoordinator.subscribe.mock.calls[0];
 
         // Check that observe was called
-        const observerInstance = global.ResizeObserver.mock.instances[0];
+        const observerInstance = globalThis.ResizeObserver.mock.instances[0];
         expect(observerInstance.observe).toHaveBeenCalled();
 
         // Execute the animation callback
