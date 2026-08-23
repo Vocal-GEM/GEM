@@ -1,5 +1,5 @@
 import { cloneElement, useState, useEffect } from 'react';
-import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen, Flame, Sparkles, Timer } from 'lucide-react';
+import { Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen, Flame, Sparkles, Timer } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import VocalHealthPanel from '../dashboard/VocalHealthPanel';
 import SmartCoachWidget from '../dashboard/SmartCoachWidget';

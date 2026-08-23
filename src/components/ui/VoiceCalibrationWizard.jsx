@@ -177,6 +177,7 @@ const VoiceCalibrationWizard = ({ onComplete, onClose }) => {
                             {isRecording ? (
                                 <div className="flex flex-col items-center gap-4">
                                     <button
+                                        aria-label="Stop Recording"
                                         onClick={stopRecording}
                                         className="w-20 h-20 rounded-full bg-red-500 animate-pulse flex items-center justify-center shadow-lg shadow-red-500/30 hover:bg-red-600 transition-colors"
                                     >
@@ -190,6 +191,7 @@ const VoiceCalibrationWizard = ({ onComplete, onClose }) => {
                                 </div>
                             ) : (
                                 <button
+                                    aria-label="Start Recording"
                                     onClick={startRecording}
                                     className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:scale-105 transition-all mx-auto"
                                 >

@@ -38,6 +38,7 @@ const LayoutControls = () => {
 
             {/* Reset Button */}
             <button
+                aria-label="Reset Layout"
                 onClick={resetLayout}
                 className="p-2 rounded-lg bg-slate-700/50 text-slate-400 hover:bg-slate-700 transition-all"
                 title="Reset to Default"
