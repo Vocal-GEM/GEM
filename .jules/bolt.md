@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-03-24 - Centralized RenderCoordinator for High-Frequency Loops
+**Learning:** Raw `requestAnimationFrame` loops in React components and engines competing on the main thread break V-sync frame pacing and increase CPU overhead. The app provides a `RenderCoordinator` service specifically to consolidate these loops into a single subscriber system.
+**Action:** Replaced local `requestAnimationFrame` with `RenderCoordinator.subscribe` in `src/engines/AudioEngine.js` for the main audio processing loop. Ensures a single synchronized rendering pipeline for the entire app.
