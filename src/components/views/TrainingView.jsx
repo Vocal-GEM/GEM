@@ -28,7 +28,7 @@ const ExerciseList = ({ category, onBack }) => {
     return (
         <div className="h-full flex flex-col">
             <div className="flex items-center gap-2 mb-6">
-                <button onClick={onBack} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                <button aria-label="Go back to previous screen" onClick={onBack} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
                     <ArrowLeft size={20} />
                 </button>
                 <div>
