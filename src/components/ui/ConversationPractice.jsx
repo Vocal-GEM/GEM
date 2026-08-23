@@ -633,6 +633,7 @@ const ConversationPractice = ({ onClose }) => {
                 <div className="flex items-center gap-3">
                     {view !== 'selection' && (
                         <button
+                            aria-label={view === 'conversation' ? "End Conversation" : "Back to Scenarios"}
                             onClick={view === 'conversation' ? endConversation : handleNewScenario}
                             className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
                         >
