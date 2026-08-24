@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAudio } from '../../../context/AudioContext';
 import { useHapticFeedback } from '../../../hooks/useHapticFeedback';
 import { useReferenceTone } from '../../../hooks/useReferenceTone';
