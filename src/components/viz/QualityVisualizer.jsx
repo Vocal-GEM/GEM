@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useId, useCallback } from 'react';
+import { useEffect, useState, useRef, useId, useCallback } from 'react'
 import { Sparkles, Waves, Wind, Activity } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
