@@ -160,8 +160,10 @@ const Sidebar = ({ activeView, onViewChange }) => {
         <>
             {/* Mobile Toggle */}
             <button
+                aria-label="Toggle navigation menu"
+                aria-expanded={isOpen}
                 onClick={() => setIsOpen(!isOpen)}
-                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"
+                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
