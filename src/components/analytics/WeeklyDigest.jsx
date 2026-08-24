@@ -1,6 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { ArrowUpRight, Trophy, Flame, TrendingUp } from 'lucide-react';
+import { Trophy, Flame, TrendingUp } from 'lucide-react';
 
 export const WeeklyDigest = () => {
     // Mock data - in real app, passed via props
