@@ -115,28 +115,7 @@ class TestVoiceQualitySecurity(unittest.TestCase):
                 # Since send_file is used, we expect file content
                 # We can't easily check 'get_json()' here as it might be binary
 
-    def test_manipulate_file_error_handling(self):
-        """
-        Test that an internal error returns a generic error message and does NOT leak details.
-        mock_sound = MagicMock()
 
-        def side_effect_save(path, format):
-            # Create a dummy file so send_file can find it
-            with open(path, 'w') as f:
-                f.write("dummy audio")
-
-        mock_sound.save.side_effect = side_effect_save
-
-        # Setup services mock
-        sys.modules['parselmouth'].Sound.return_value = mock_sound
-        sys.modules['backend.app.services.voicelab_service'].manipulate_voice.return_value = mock_sound
-
-        response = self.client.post('/api/voice-quality/manipulate',
-                                data={'audio': file_storage, 'pitch_shift': '1.0'},
-                                content_type='multipart/form-data')
-
-        self.assertEqual(response.status_code, 200, f"Expected 200 OK, got {response.status_code}. Response: {response.data}")
-        self.assertEqual(response.data, b"dummy audio")
 
     def test_manipulate_file_error_handling(self):
         """
