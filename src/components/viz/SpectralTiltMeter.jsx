@@ -1,4 +1,4 @@
-import { useEffect, useRef, useId } from 'react';
+import { useEffect, useRef, useId } from 'react'
 import { useSettings } from '../../context/SettingsContext';
 import { Info, TrendingDown } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
