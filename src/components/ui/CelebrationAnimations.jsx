@@ -1,9 +1,9 @@
+import { useEffect } from 'react';
 /**
  * CelebrationAnimations.jsx
  * Positive reinforcement animations for vocal achievements
  */
 
-import React, { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { Heart, Star, Trophy, ThumbsUp, Sparkles, TrendingUp } from 'lucide-react';

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Mic, Square, Play, Pause, RotateCcw, Check, Loader2 } from 'lucide-react';
 
 const TaskRecorder = ({ task, onComplete }) => {
@@ -6,7 +6,7 @@ const TaskRecorder = ({ task, onComplete }) => {
     const [recordingTime, setRecordingTime] = useState(0);
     const [audioUrl, setAudioUrl] = useState(null);
     const [audioBlob, setAudioBlob] = useState(null);
-    const [isPlaying, setIsPlaying] = useState(false);
+        const [isPlaying, setIsPlaying] = useState(false);
     const [error, setError] = useState(null);
 
     const mediaRecorderRef = useRef(null);
