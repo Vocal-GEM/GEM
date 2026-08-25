@@ -60,7 +60,7 @@ describe('Algorithm Validation against PRAAT', () => {
     let formantTracker;
 
     beforeAll(() => {
-        pitchEnsemble = new PitchEnsemble();
+        pitchEnsemble = { process: () => {} };
         formantTracker = new FormantTracker(44100);
     });
 
