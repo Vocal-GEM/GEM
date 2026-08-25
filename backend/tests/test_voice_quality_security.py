@@ -118,6 +118,7 @@ class TestVoiceQualitySecurity(unittest.TestCase):
     def test_manipulate_file_error_handling(self):
         """
         Test that an internal error returns a generic error message and does NOT leak details.
+        """
         mock_sound = MagicMock()
 
         def side_effect_save(path, format):
