@@ -14,6 +14,9 @@ Features:
 
 import numpy as np
 
+import logging
+logger = logging.getLogger(__name__)
+
 try:
     import parselmouth
     from parselmouth.praat import call
@@ -116,7 +119,8 @@ def estimate_vtl(sound, num_formants=4, max_formant_hz=5500):
         }
         
     except Exception as e:
-        return {"vtl_cm": None, "delta_f": None, "error": str(e)}
+        logger.error(f"Error in formant_dispersion_regression: {str(e)}")
+        return {"vtl_cm": None, "delta_f": None, "error": "Internal error occurred"}
 
 
 # ----------------------
@@ -195,7 +199,8 @@ def compute_perturbation_pca(sound, floor_hz=75, ceiling_hz=600):
         }
         
     except Exception as e:
-        return {"jitter_pca": None, "shimmer_pca": None, "error": str(e)}
+        logger.error(f"Error in measure_pca_jitter_shimmer: {str(e)}")
+        return {"jitter_pca": None, "shimmer_pca": None, "error": "Internal error occurred"}
 
 
 # ----------------------
@@ -258,7 +263,8 @@ def measure_ltas(sound, bandwidth=100):
         }
         
     except Exception as e:
-        return {"error": str(e)}
+        logger.error(f"Error in voicelab_service: {str(e)}")
+        return {"error": "Internal error occurred"}
 
 
 # ----------------------
@@ -335,7 +341,8 @@ def measure_speech_rate(sound, min_intensity_db=50, min_dip_db=2):
         }
         
     except Exception as e:
-        return {"error": str(e)}
+        logger.error(f"Error in voicelab_service: {str(e)}")
+        return {"error": "Internal error occurred"}
 
 
 # ----------------------
