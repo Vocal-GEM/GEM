@@ -39,6 +39,7 @@ class PitchProcessor extends AudioWorkletProcessor {
     process(inputs, outputs, parameters) {
         const input = inputs[0];
         if (!input || !input[0]) return true;
+        const currentTime = globalThis.currentTime;
 
         const inputChannel = input[0];
 
@@ -53,7 +54,7 @@ class PitchProcessor extends AudioWorkletProcessor {
                 // Detect pitch using YIN algorithm
                 const result = this.detectPitchYIN(this.buffer);
 
-                const processingTime = (currentTime - startTime) * 1000; // Convert to ms
+                const processingTime = ((currentTime) - startTime) * 1000; // Convert to ms
                 this.totalProcessTime += processingTime;
                 this.processCount++;
 
