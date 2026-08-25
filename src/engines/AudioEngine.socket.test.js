@@ -1,7 +1,14 @@
+vi.mock('pitchfinder', () => ({ Macleod: () => () => 100, McLeod: () => () => 100, default: { Macleod: () => () => 100, McLeod: () => () => 100 } }));
 /* eslint-env node */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AudioEngine } from './AudioEngine';
 import { io } from 'socket.io-client';
+
+vi.mock('pitchfinder', async (importOriginal) => {
+  const actual = await importOriginal();
+  return { ...actual, default: { ...actual.default, Macleod: vi.fn(), McLeod: vi.fn() }, Macleod: vi.fn(), McLeod: vi.fn() };
+});
+
 
 // Mock socket.io-client
 vi.mock('socket.io-client', () => ({

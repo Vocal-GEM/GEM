@@ -32,11 +32,11 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 const isWithinTarget = tilt >= targetRange.min && tilt <= targetRange.max;
 
                 if (isWithinTarget) {
-                    indicatorRef.current.className = `absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`} else {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-slate-400"}
+                    indicatorRef.current.className = `absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`; } else {
+                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-slate-400"; }
 
                 // Update value display
-                valueRef.current.innerText = tilt.toFixed(1)}
+                valueRef.current.innerText = tilt.toFixed(1); }
         };
 
         let unsubscribe;
@@ -45,7 +45,8 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 `spectral-tilt-meter-${id}`,
                 loop,
                 renderCoordinator.PRIORITY.MEDIUM
-            )});
+            );
+        };
             // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
@@ -56,7 +57,9 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
         );
 
         return () => {
-            unsubscribe()}}, [dataRef, targetRange, colorBlindMode, id])}, [dataRef, targetRange, colorBlindMode, componentId]);
+            unsubscribe();
+        };
+    }, [dataRef, targetRange, colorBlindMode, componentId]);
 
     return (
         <div className="glass-panel rounded-2xl p-6 h-full flex flex-col justify-center">
@@ -131,6 +134,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 </div>
             </div>
         </div>
-    )};
+    );
+};
 
 export default SpectralTiltMeter;
