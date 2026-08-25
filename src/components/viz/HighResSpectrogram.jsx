@@ -26,10 +26,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const lastFormantsRef = useRef({ f1: 0, f2: 0 });
     const { settings } = useSettings();
 
-    // Component ID for RenderCoordinator
-    const componentId = useId();
-
-    // Reusable buffers to avoid GC
     // Unique component ID for RenderCoordinator
     const uniqueId = useId();
     const componentId = `spectrogram-highres-${uniqueId}`;
@@ -55,13 +51,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const canvas = canvasRef.current;
         if (!canvas) return;
         if (!dataRef.current || !dataRef.current.spectrum) return;
-
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
-
-        // Optimization: Use alpha: false for better performance
-        const ctx = canvas.getContext('2d', { alpha: false });
 
         // Optimization: Use alpha: false for better performance
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
@@ -156,8 +145,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
     }, [dataRef, colormap]);
 
-    // Initial canvas setup & ResizeObserver
-    }, [dataRef, colormap, componentId]);
+
 
     // Initial canvas setup
     // Handle Resize with ResizeObserver
@@ -218,7 +206,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             unsubscribe();
         };
     }, [draw, componentId]);
-    }, [componentId, draw]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position
@@ -318,8 +305,9 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
                     <div className="text-slate-300 text-sm">{cursorData.dB} dB</div>
                     <div className="text-amber-400 text-sm font-mono">{cursorData.note}</div>
                     <button
-                        className="absolute -top-2 -right-2 w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center text-slate-500 hover:text-white pointer-events-auto"
+                        className="absolute -top-2 -right-2 w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center text-slate-500 hover:text-white pointer-events-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                         onClick={(e) => { e.stopPropagation(); setCursorData(null); }}
+                        aria-label="Close cursor details"
                     >
                         <X size={12} />
                     </button>
@@ -329,8 +317,9 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             {showControls && (
                 <button
                     onClick={handleScreenshot}
-                    className="absolute top-2 right-2 p-2 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-white/70 hover:text-white transition-all z-10 animate-in fade-in duration-200"
+                    className="absolute top-2 right-2 p-2 bg-slate-900/80 hover:bg-slate-800 rounded-lg text-white/70 hover:text-white transition-all z-10 animate-in fade-in duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
                     title="Save Screenshot"
+                    aria-label="Save screenshot"
                 >
                     <Camera size={16} />
                 </button>
