@@ -27,11 +27,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const { settings } = useSettings();
 
     // Component ID for RenderCoordinator
-    const componentId = useId();
-
-    // Reusable buffers to avoid GC
-    // Unique component ID for RenderCoordinator
-    const uniqueId = useId();
     const componentId = `spectrogram-highres-${uniqueId}`;
 
     // Reusable buffers to avoid garbage collection churn
@@ -61,10 +56,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const scrollSpeed = 2; // px per frame
 
         // Optimization: Use alpha: false for better performance
-        const ctx = canvas.getContext('2d', { alpha: false });
-
-        // Optimization: Use alpha: false for better performance
-        // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
 
         const width = canvas.width;
@@ -218,7 +209,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             unsubscribe();
         };
     }, [draw, componentId]);
-    }, [componentId, draw]);
+
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position

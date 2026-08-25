@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import Toast from '../components/ui/Toast';
 
 const ToastContext = createContext();
@@ -26,6 +26,17 @@ export const ToastProvider = ({ children }) => {
     const hideToast = useCallback((id) => {
         setToasts(prev => prev.filter(toast => toast.id !== id));
     }, []);
+
+    // Listen for custom events from services outside React context
+    useEffect(() => {
+        const handleCustomToast = (e) => {
+            const { message, type, duration } = e.detail;
+            showToast(message, type || 'info', duration);
+        };
+        window.addEventListener('gem-toast', handleCustomToast);
+        return () => window.removeEventListener('gem-toast', handleCustomToast);
+    }, [showToast]);
+
 
     const showSuccess = useCallback((message, duration) =>
         showToast(message, 'success', duration), [showToast]);
