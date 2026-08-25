@@ -606,9 +606,6 @@
 /app/src/services/LosslessRecorder.js
   59:38  warning  'reject' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
 
-/app/src/services/PrivacyManager.js
-  9:5  error  Duplicate key 'shareProgress'  no-dupe-keys
-
 /app/src/services/ProgressPredictor.js
   55:53  warning  'comparisonTarget' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
 
@@ -625,9 +622,6 @@
 
 /app/src/services/RecommendationService.js
   92:33  warning  'reports' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
-
-/app/src/services/ResearchMode.js
-  62:37  error  'process' is not defined  no-undef
 
 /app/src/services/RoutineBuilder.js
   106:69  warning  'difficulty' is assigned a value but never used  no-unused-vars
@@ -724,4 +718,4 @@
   347:29  warning  'sampleRate' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
   374:15  warning  'minDistance' is assigned a value but never used                              no-unused-vars
 
-✖ 361 problems (13 errors, 348 warnings)
+✖ 359 problems (11 errors, 348 warnings)
