@@ -29,6 +29,30 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     const genderRanges = settings.genderRanges || defaultRanges;
 
+    // Store dimensions to avoid getBoundingClientRect in loop
+    const dimensionsRef = useRef({ width: 0, height: 0 });
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const updateDimensions = () => {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            dimensionsRef.current = { width: rect.width, height: rect.height };
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+        };
+
+        const observer = new ResizeObserver(updateDimensions);
+        observer.observe(canvas);
+        updateDimensions();
+
+        return () => observer.disconnect();
+    }, []);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -67,17 +91,16 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            // Use cached dimensions to avoid layout thrashing
+            const { width, height } = dimensionsRef.current;
 
-            const width = rect.width;
-            const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
-            ctx.clearRect(0, 0, width, height);
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
