@@ -1,6 +1,7 @@
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
 import { useRef, useEffect, useState } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRecording = false }) => {
     const { colorBlindMode } = useSettings();
@@ -39,8 +40,6 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-
-        let animationId;
 
         const render = () => {
             // Clear Canvas
@@ -129,8 +128,7 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
                 }
             }
 
-            animationId = requestAnimationFrame(render);
-        };
+                    };
 
         // Resize handler
         const resize = () => {
@@ -141,10 +139,10 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
         window.addEventListener('resize', resize);
         resize();
 
-        render();
+        const unsubscribe = renderCoordinator.subscribe("vowel-space-plot", render, renderCoordinator.PRIORITY.MEDIUM);
 
         return () => {
-            cancelAnimationFrame(animationId);
+            unsubscribe();
             window.removeEventListener('resize', resize);
         };
     }, [targetVowel, isMasc, isRecording, colorBlindMode]);
