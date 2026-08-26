@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Centralized requestAnimationFrame Loops
+**Learning:** Multiple components and engine classes (`AudioEngine.js`, `DynamicOrb.jsx`, `HighResSpectrogram.jsx`) were creating their own isolated `requestAnimationFrame` loops. These localized loops compete on the main thread, increasing CPU overhead and breaking V-sync frame pacing.
+**Action:** Always replace raw `requestAnimationFrame` implementations with the centralized `RenderCoordinator` service (`RenderCoordinator.subscribe(id, loop, priority)`). This guarantees a single, synchronized rendering pipeline for the entire application. Ensure `cancelAnimationFrame()` cleanup logic is swapped for the returned `unsubscribe()` function from the coordinator.

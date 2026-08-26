@@ -192,8 +192,10 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             // Use RAF to debounce
 
         const resizeObserver = new ResizeObserver(() => {
-            // Run in animation frame to avoid resize loops/tearing
-            requestAnimationFrame(updateSize);
+            // Avoid recursive RAF directly, use local tracking or simple timeout if debouncing needed
+            // The canvas rendering is already in a RenderCoordinator loop
+            // So we can just call updateSize directly or with a slight debounce
+            updateSize();
         });
 
         resizeObserver.observe(container);
