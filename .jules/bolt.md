@@ -41,3 +41,11 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Layout Thrashing & Canvas Reallocation
+**Learning:** Calling `getBoundingClientRect()` synchronously inside a `requestAnimationFrame` loop forces layout thrashing. Furthermore, explicitly reassigning `canvas.width` and `canvas.height` on every frame (even if unchanged) forces the browser to reallocate canvas backing buffers, compounding the CPU overhead.
+**Action:** Use a `ResizeObserver` to cache dimensions into a `useRef` for the loop to read. Only update `canvas.width`/`canvas.height` if they actually differ from the newly cached dimensions.
+
+## 2026-01-24 - Canvas Transformations and Buffer Reallocation
+**Learning:** If you optimize canvas buffer reallocation (by avoiding resetting `canvas.width`/`height` every frame), the 2D Context transformation matrix is no longer implicitly reset to the identity matrix. If the loop relies on `ctx.scale(dpr, dpr)`, executing it every frame without resetting the transform causes the scaling factor to multiply exponentially (e.g., dpr^2, dpr^3), blowing up the render. Using `ctx.save()` and `ctx.restore()` around the `scale` won't work if the scale needs to persist through drawing.
+**Action:** When skipping canvas buffer reallocation, explicitly reset the matrix manually using `ctx.setTransform(1, 0, 0, 1, 0, 0)`, then `ctx.clearRect(0, 0, canvas.width, canvas.height)`, and *then* re-apply `ctx.scale(dpr, dpr)`.
