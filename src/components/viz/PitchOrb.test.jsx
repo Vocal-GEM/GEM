@@ -5,12 +5,6 @@ import { renderCoordinator } from '../../services/RenderCoordinator';
 import React from 'react';
 
 // Mock dependencies
-global.ResizeObserver = vi.fn(function() {
-    this.observe = vi.fn();
-    this.disconnect = vi.fn();
-    this.unobserve = vi.fn();
-});
-
 vi.mock('../../services/RenderCoordinator', () => ({
     renderCoordinator: {
         subscribe: vi.fn(() => vi.fn()),
@@ -28,9 +22,6 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     stroke: vi.fn(),
     fillText: vi.fn(),
     scale: vi.fn(),
-    save: vi.fn(),
-    restore: vi.fn(),
-    setTransform: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
