@@ -30,6 +30,9 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const componentId = useId();
 
     // Reusable buffers to avoid GC
+    // Unique component ID for RenderCoordinator
+    const uniqueId = useId();
+    const componentId = `spectrogram-highres-${uniqueId}`;
 
     // Reusable buffers to avoid garbage collection churn
     const imgDataRef = useRef(null);
@@ -215,6 +218,7 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             unsubscribe();
         };
     }, [draw, componentId]);
+    }, [componentId, draw]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position
