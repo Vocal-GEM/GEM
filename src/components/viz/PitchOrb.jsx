@@ -87,7 +87,6 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
             const { width, height } = dimensions;
 
-            // Reapply scale on each frame after clearRect if needed, or set transform directly.
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.scale(dpr, dpr);
