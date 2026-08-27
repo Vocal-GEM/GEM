@@ -33,6 +33,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
+        // ⚡ Bolt Performance Optimization: Replaced synchronous getBoundingClientRect() with ResizeObserver. Impact: Eliminates synchronous layout thrashing (60 reflows/sec), significantly reducing main thread CPU overhead.
+
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -64,16 +66,31 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        let dimensions = { width: canvas.clientWidth, height: canvas.clientHeight };
+
+        const updateSize = () => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            dimensions = { width: rect.width, height: rect.height };
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+        };
+
+        const resizeObserver = new ResizeObserver(() => {
+            requestAnimationFrame(updateSize);
+        });
+        resizeObserver.observe(canvas);
+        updateSize();
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const { width, height } = dimensions;
 
-            const width = rect.width;
-            const height = rect.height;
+            // Reapply scale on each frame after clearRect if needed, or set transform directly.
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.scale(dpr, dpr);
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -166,6 +183,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
