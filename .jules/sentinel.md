@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-24 - Information Exposure in Error Handling
+**Vulnerability:** API endpoints (`voice_quality.py`) returned raw exception strings (`str(e)`) to the client inside `return jsonify(...)` statements when errors occurred.
+**Learning:** These `return` statements were aggressively short-circuiting the established, secure global error handling logic (which only logged the error internally). Additionally, they exposed severe duplicate/messy cleanup logic that would crash with `UnboundLocalError` if the error happened before temporary variables were assigned.
+**Prevention:** Always verify that cleanup blocks check both variable existence in `locals()` and truthiness (`if 'tmp_path' in locals() and tmp_path and os.path.exists(tmp_path):`) before acting. Never return `str(e)` in an API response; log it securely on the server and return a generic user-friendly message.
