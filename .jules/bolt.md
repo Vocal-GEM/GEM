@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-12 - Layout Thrashing in ResizeObserver Callbacks
+**Learning:** Calling `requestAnimationFrame` repeatedly inside a high-frequency `ResizeObserver` callback without debouncing creates a backlog of animation frames. This can cause severe stuttering or out-of-memory crashes on continuous window resizes.
+**Action:** Always store the returned frame ID and call `cancelAnimationFrame(rafId)` before requesting a new frame inside a `ResizeObserver` callback to ensure only the latest frame is queued.
