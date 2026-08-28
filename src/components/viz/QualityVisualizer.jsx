@@ -66,7 +66,7 @@ const QualityVisualizer = ({ dataRef }) => {
             });
 
             // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
+        } // ;
 
         // Update history
         ['jitter', 'shimmer', 'weight'].forEach(key => {
