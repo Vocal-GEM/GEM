@@ -9,7 +9,7 @@ vi.mock('../../context/AudioContext', () => ({
     audioEngineRef: {
       current: {
         startRecording: vi.fn(),
-        stopRecording: vi.fn().mockResolvedValue('mock-url'),
+        // stopRecording: vi.fn().mockResolvedValue('mock-url'),
       }
     }
   })
