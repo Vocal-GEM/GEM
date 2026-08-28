@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-12 - Throttling High-Frequency Updates with Deadbanding
+**Learning:** When trying to throttle React state updates inside a high-frequency polling loop (like `requestAnimationFrame` or `renderCoordinator`), mutating `lastUpdateRef.current = currentTime` only *conditionally* (i.e. only when a state change is detected) defeats the throttle when the data is stable. The time check `(currentTime - lastUpdateRef.current < 66)` will evaluate to `false` every frame, forcing the system to poll and queue state updates at 60 FPS instead of the intended 15 FPS.
+**Action:** Always place the `lastUpdateRef.current = currentTime` update unconditionally *immediately after* the throttle check, before any conditional logic. Additionally, use functional state updates (`prev => { ... }`) and return the exact `prev` reference when the data hasn't significantly changed to preserve referential equality and prevent re-renders.

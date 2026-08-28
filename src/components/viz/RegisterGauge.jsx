@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
 
 /**
@@ -19,10 +20,16 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     });
     const [f0, setF0] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);
-    const animationRef = useRef();
+    const lastUpdateRef = useRef(0);
+    const componentId = useId();
+    const renderCoordinatorId = useRef(`register-gauge-${componentId.replace(/:/g, '')}`);
 
     useEffect(() => {
-        const update = () => {
+        const update = (delta, currentTime) => {
+            // Throttle updates to ~15 FPS to reduce React rendering overhead
+            if (currentTime - lastUpdateRef.current < 66) return;
+            lastUpdateRef.current = currentTime;
+
             if (dataRef?.current) {
                 // Get register data from socket stream
                 const reg = dataRef.current.register; // dataRef.current.register from sockets.py
@@ -30,23 +37,58 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                 const slope = dataRef.current.spectral_slope || -6.0;
 
                 if (reg) {
-                    setRegisterData({
-                        mechanism: reg.mechanism,
-                        label: reg.label,
-                        description: reg.description,
-                        color: reg.color,
-                        confidence: reg.confidence || 0,
-                        mixRatio: reg.mix_ratio || (reg.mechanism === 'M1' ? 100 : reg.mechanism === 'M2' ? 0 : 50),
-                        slope: slope
+                    setRegisterData(prev => {
+                        if (!prev) return {
+                            mechanism: reg.mechanism,
+                            label: reg.label,
+                            description: reg.description,
+                            color: reg.color,
+                            confidence: reg.confidence || 0,
+                            mixRatio: reg.mix_ratio || (reg.mechanism === 'M1' ? 100 : reg.mechanism === 'M2' ? 0 : 50),
+                            slope: slope
+                        };
+                        // Only update if there are significant changes to prevent re-renders
+                        if (
+                            prev.mechanism !== reg.mechanism ||
+                            Math.abs(prev.mixRatio - (reg.mix_ratio || (reg.mechanism === 'M1' ? 100 : reg.mechanism === 'M2' ? 0 : 50))) > 2 ||
+                            Math.abs(prev.slope - slope) > 0.5 ||
+                            Math.abs(prev.confidence - (reg.confidence || 0)) > 0.1
+                        ) {
+                            return {
+                                mechanism: reg.mechanism,
+                                label: reg.label,
+                                description: reg.description,
+                                color: reg.color,
+                                confidence: reg.confidence || 0,
+                                mixRatio: reg.mix_ratio || (reg.mechanism === 'M1' ? 100 : reg.mechanism === 'M2' ? 0 : 50),
+                                slope: slope
+                            };
+                        }
+                        return prev;
                     });
                 }
-                setF0(currentF0);
+
+                setF0(prev => {
+                    if (Math.abs(prev - currentF0) > 2) {
+                        return currentF0;
+                    }
+                    return prev;
+                });
             }
-            animationRef.current = requestAnimationFrame(update);
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
+        // ⚡ Bolt Performance Optimization: Replaced raw requestAnimationFrame with RenderCoordinator
+        // and added setState throttling/deadband. Impact: Eliminates redundant 60FPS re-renders
+        // and synchronizes with main loop.
+        const unsubscribe = renderCoordinator.subscribe(
+            renderCoordinatorId.current,
+            update,
+            renderCoordinator.PRIORITY.LOW
+        );
+
+        return () => {
+            unsubscribe();
+        };
     }, [dataRef]);
 
     // Helpers
