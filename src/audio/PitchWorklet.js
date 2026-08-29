@@ -37,6 +37,8 @@ class PitchProcessor extends AudioWorkletProcessor {
     }
 
     process(inputs, outputs, parameters) {
+        // CurrentTime is not available in worklet directly via standard means easily, use Date.now() / 1000 for relative timing
+        const currentTime = globalThis.currentTime || (Date.now() / 1000);
         const input = inputs[0];
         if (!input || !input[0]) return true;
 
