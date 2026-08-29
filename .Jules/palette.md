@@ -1,0 +1,3 @@
+## 2024-08-29 - Missing Keyboard Accessibility on Info Tooltips
+**Learning:** Found an accessibility issue pattern where `Info` icon buttons triggering tooltips on hover (`onMouseEnter`/`onMouseLeave`) lacked equivalent keyboard navigation events (`onFocus`/`onBlur`) and aria-labels, making the tooltips inaccessible to keyboard and screen reader users. Also container elements that have hover events did not have tabIndex.
+**Action:** When adding hover-based tooltips or interactive popups, always include `onFocus` and `onBlur` for keyboard accessibility, assign a semantic `aria-label`, and use focus-visible styling (like `focus-visible:ring-2`) to show keyboard focus.

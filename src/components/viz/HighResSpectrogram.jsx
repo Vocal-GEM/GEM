@@ -284,6 +284,10 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             ref={containerRef}
             onMouseEnter={() => setShowControls(true)}
             onMouseLeave={() => setShowControls(false)}
+            onFocus={() => setShowControls(true)}
+            onBlur={() => setShowControls(false)}
+            tabIndex={0}
+            aria-label="High Resolution Spectrogram Controls Container"
         >
             <canvas
                 ref={canvasRef}
