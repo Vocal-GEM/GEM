@@ -246,9 +246,7 @@ const QualityVisualizer = ({ dataRef }) => {
                     <p className="text-xs text-slate-400 leading-relaxed">
                         Indicates vocal fold closure. Lower values are breathier (softer), higher values are pressed (harder).
                     </p>
-                </div>
             </div>
-        </div>
     );
 };
 
