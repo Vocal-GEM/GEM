@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-08-29 - React Component State Deadbanding
+**Learning:** High-frequency socket stream updates (`dataRef.current`) driving React component re-renders (like `RegisterGauge`) can cause significant CPU overhead and dropped frames, even when the underlying visual data hasn't materially changed.
+**Action:** When migrating from raw `requestAnimationFrame` to `RenderCoordinator`, always implement state deadbanding (checking `prev` state in functional updates) to ensure React only re-renders the component when the display values actually differ, reducing unnecessary DOM diffing.
