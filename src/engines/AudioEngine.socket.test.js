@@ -4,6 +4,8 @@ import { AudioEngine } from './AudioEngine';
 import { io } from 'socket.io-client';
 
 // Mock socket.io-client
+vi.mock('../services/RenderCoordinator', () => ({ default: { subscribe: vi.fn(() => vi.fn()), PRIORITY: { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 } }, renderCoordinator: { subscribe: vi.fn(() => vi.fn()), PRIORITY: { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 } } }));
+
 vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));

@@ -3,19 +3,19 @@ import { Activity, Play, Calendar, Trophy, ArrowRight, Mic, Dumbbell, BookOpen, 
 import { useTranslation } from 'react-i18next';
 import VocalHealthPanel from '../dashboard/VocalHealthPanel';
 import SmartCoachWidget from '../dashboard/SmartCoachWidget';
-import JourneyEntryCard from '../ui/JourneyEntryCard';
+
 import SessionSummaryCard from '../ui/SessionSummaryCard';
-import RecommendedExercises from '../ui/RecommendedExercises';
-import DailyChallengeCard from '../ui/DailyChallengeCard';
+
+
 import SmartPracticeSession from '../ui/SmartPracticeSession';
 import QuickWarmupSession from '../ui/QuickWarmupSession';
 import QuickVoiceCheck from '../ui/QuickVoiceCheck';
 import { useGuidedJourney } from '../../context/GuidedJourneyContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { checkStreakStatus, getStreakMessage } from '../../services/StreakService';
-import RecommendedToolsWidget from '../ui/RecommendedToolsWidget';
+
 import MoodCheckIn from '../ui/MoodCheckIn';
-import PersonalMilestonesDisplay from '../ui/PersonalMilestonesDisplay';
+
 import WelcomeBanner from '../ui/WelcomeBanner';
 import ContextualTips from '../ui/ContextualTips';
 
