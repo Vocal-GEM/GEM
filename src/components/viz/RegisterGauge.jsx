@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
 import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * RegisterGauge - Visualize Laryngeal Mechanisms (M0-M3)
@@ -19,7 +20,9 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     });
     const [f0, setF0] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);
-    const animationRef = useRef();
+
+    // Unique ID for RenderCoordinator
+    const componentId = useId();
 
     useEffect(() => {
         const update = () => {
@@ -30,23 +33,48 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                 const slope = dataRef.current.spectral_slope || -6.0;
 
                 if (reg) {
-                    setRegisterData({
-                        mechanism: reg.mechanism,
-                        label: reg.label,
-                        description: reg.description,
-                        color: reg.color,
-                        confidence: reg.confidence || 0,
-                        mixRatio: reg.mix_ratio || (reg.mechanism === 'M1' ? 100 : reg.mechanism === 'M2' ? 0 : 50),
-                        slope: slope
+                    setRegisterData(prev => {
+                        const newConfidence = reg.confidence || 0;
+                        const newMixRatio = reg.mix_ratio || (reg.mechanism === 'M1' ? 100 : reg.mechanism === 'M2' ? 0 : 50);
+
+                        // Prevent state updates if values haven't meaningfully changed
+                        if (prev.mechanism === reg.mechanism &&
+                            prev.mixRatio === newMixRatio &&
+                            Math.abs(prev.slope - slope) < 0.1 &&
+                            Math.abs(prev.confidence - newConfidence) < 0.05) {
+                            return prev;
+                        }
+
+                        return {
+                            mechanism: reg.mechanism,
+                            label: reg.label,
+                            description: reg.description,
+                            color: reg.color,
+                            confidence: newConfidence,
+                            mixRatio: newMixRatio,
+                            slope: slope
+                        };
                     });
                 }
-                setF0(currentF0);
+
+                setF0(prev => {
+                    // Deadband for f0 to prevent constant tiny re-renders
+                    if (Math.abs(prev - currentF0) < 0.5) return prev;
+                    return currentF0;
+                });
             }
-            animationRef.current = requestAnimationFrame(update);
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
+        // Subscribe to RenderCoordinator instead of using raw requestAnimationFrame
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            update,
+            renderCoordinator.PRIORITY.HIGH
+        );
+
+        return () => {
+            unsubscribe();
+        };
     }, [dataRef]);
 
     // Helpers
