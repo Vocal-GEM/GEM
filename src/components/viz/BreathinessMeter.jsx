@@ -52,14 +52,6 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     useEffect(() => {
         const update = () => {
             if (!dataRef.current) return;
-        const updateMeter = () => {
-            if (!dataRef.current) return;
-        const loop = () => {
-            if (!dataRef.current) return;
-        const loop = (delta, currentTime) => {
-            if (!dataRef.current) {
-                return;
-            }
 
             const { breathinessGrbas, oq_percent, oq_zone, ventricular_detected, ventricular_severity, ventricular_feedback } = dataRef.current;
 
@@ -166,38 +158,8 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
             renderCoordinator.PRIORITY.MEDIUM
         );
 
-        return unsubscribe;
-    }, [dataRef, colorBlindMode, componentId]);
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            componentId,
-            updateMeter,
-
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `BreathinessMeter-${componentId}`,
-            loop,
-            renderCoordinator.PRIORITY.MEDIUM
-        );
-
         return () => unsubscribe();
     }, [dataRef, colorBlindMode, componentId]);
-            `breathiness-meter-${componentId}`,
-        };
-
-        const unsubscribe = renderCoordinator.subscribe(
-            `breathiness-meter-${id}`,
-            loop,
-            renderCoordinator.PRIORITY.CRITICAL
-        );
-
-        return () => {
-            unsubscribe();
-        };
-    }, [dataRef, colorBlindMode, componentId]);
-    }, [dataRef, colorBlindMode, id]);
 
     // Determine if in sweet spot for static rendering
     const breathinessGrbas = dataRef.current?.breathinessGrbas;
