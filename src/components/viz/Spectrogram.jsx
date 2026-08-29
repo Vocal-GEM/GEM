@@ -316,6 +316,10 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
             className="relative w-full bg-black rounded-xl overflow-hidden border border-white/10 shadow-inner group"
             onMouseEnter={() => setShowControls(true)}
             onMouseLeave={() => setShowControls(false)}
+            onFocus={() => setShowControls(true)}
+            onBlur={() => setShowControls(false)}
+            tabIndex={0}
+            aria-label="Spectrogram Controls Container"
         >
             <canvas
                 ref={canvasRef}

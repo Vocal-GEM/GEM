@@ -50,9 +50,12 @@ const ResonanceMetrics = ({ dataRef }) => {
             <div className="flex justify-between items-start mb-2">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{label}</span>
                 <button
-                    className="text-slate-600 hover:text-slate-300 transition-colors"
+                    className="text-slate-600 hover:text-slate-300 transition-colors rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                     onMouseEnter={() => setShowTooltip(id)}
                     onMouseLeave={() => setShowTooltip(null)}
+                    onFocus={() => setShowTooltip(id)}
+                    onBlur={() => setShowTooltip(null)}
+                    aria-label={`More information about ${label}`}
                 >
                     <Info size={14} />
                 </button>

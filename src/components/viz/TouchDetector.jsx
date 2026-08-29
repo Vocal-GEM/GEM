@@ -93,9 +93,12 @@ const TouchDetector = ({ dataRef, showFeedback = true }) => {
                     </div>
                 </div>
                 <button
-                    className="text-slate-600 hover:text-slate-300 transition-colors"
+                    className="text-slate-600 hover:text-slate-300 transition-colors rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
                     onMouseEnter={() => setShowTooltip(true)}
                     onMouseLeave={() => setShowTooltip(false)}
+                    onFocus={() => setShowTooltip(true)}
+                    onBlur={() => setShowTooltip(false)}
+                    aria-label="More information about Twang/Touch Detection"
                 >
                     <Info size={16} />
                 </button>

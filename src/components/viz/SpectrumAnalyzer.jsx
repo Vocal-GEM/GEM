@@ -203,6 +203,10 @@ const SpectrumAnalyzer = ({ dataRef, userMode }) => {
             className="relative bg-slate-900 rounded-xl border border-slate-800 overflow-hidden"
             onMouseEnter={() => setShowControls(true)}
             onMouseLeave={() => setShowControls(false)}
+            onFocus={() => setShowControls(true)}
+            onBlur={() => setShowControls(false)}
+            tabIndex={0}
+            aria-label="Spectrum Analyzer Controls Container"
         >
             <div className="absolute top-2 left-3 text-xs font-bold text-slate-400 z-10">
                 Spectrum & LPC Overlay

@@ -32,7 +32,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     // Reusable buffers to avoid GC
     // Unique component ID for RenderCoordinator
     const uniqueId = useId();
-    const componentId = `spectrogram-highres-${uniqueId}`;
 
     // Reusable buffers to avoid garbage collection churn
     const imgDataRef = useRef(null);
@@ -284,6 +283,10 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             ref={containerRef}
             onMouseEnter={() => setShowControls(true)}
             onMouseLeave={() => setShowControls(false)}
+            onFocus={() => setShowControls(true)}
+            onBlur={() => setShowControls(false)}
+            tabIndex={0}
+            aria-label="High Resolution Spectrogram Controls Container"
         >
             <canvas
                 ref={canvasRef}
