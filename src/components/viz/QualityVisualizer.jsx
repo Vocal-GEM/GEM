@@ -68,7 +68,6 @@ const QualityVisualizer = ({ dataRef }) => {
             // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
-    };
 
     useEffect(() => {
         const unsubscribe = renderCoordinator.subscribe(

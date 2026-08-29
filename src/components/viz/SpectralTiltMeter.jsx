@@ -42,9 +42,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
             }
         };
 
-        let unsubscribe;
         // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
 
         let unsubscribe = () => {};
         import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
