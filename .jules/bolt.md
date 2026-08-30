@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-09 - Performance Optimization: State deadbanding in RegisterGauge
+**Learning:** React state updates in high-frequency rendering loops (like audio analysis visualization on every animation frame) can trigger unnecessary re-renders.
+**Action:** Implementing state deadbanding by checking if the previous state equals the new state in `setState` limits re-renders substantially during steady data scenarios. Used functional updates `setRegisterData(prev => ...)` to accurately compare specific object properties.
