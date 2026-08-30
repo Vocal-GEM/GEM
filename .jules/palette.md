@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-02-18 - Missing ARIA Labels on Navigation Elements
+**Learning:** Foundational navigation components like the mobile sidebar toggle button (`<button className="lg:hidden...">`) were missing explicit accessibility labels and state attributes. A screen reader encountering the button would announce an unhelpful or ambiguous description of the embedded SVG icons (`<Menu />` or `<X />`) and fail to convey the menu's collapsed/expanded state. This indicates a broader pattern where interactive navigation elements rely purely on visual affordances.
+**Action:** When auditing navigation UI, always ensure interactive toggle buttons include an explicit `aria-label` describing the action (e.g., "Open menu" or "Close menu") and an `aria-expanded` attribute dynamically bound to the visibility state of the controlled element.
