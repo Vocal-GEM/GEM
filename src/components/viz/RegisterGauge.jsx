@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
+import { useId } from 'react';
 
 /**
  * RegisterGauge - Visualize Laryngeal Mechanisms (M0-M3)
@@ -18,9 +20,8 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
         slope: -6.0
     });
     const [f0, setF0] = useState(0);
+    const componentId = useId();
     const [showTooltip, setShowTooltip] = useState(false);
-    const animationRef = useRef();
-
     useEffect(() => {
         const update = () => {
             if (dataRef?.current) {
@@ -30,24 +31,39 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                 const slope = dataRef.current.spectral_slope || -6.0;
 
                 if (reg) {
-                    setRegisterData({
-                        mechanism: reg.mechanism,
-                        label: reg.label,
-                        description: reg.description,
-                        color: reg.color,
-                        confidence: reg.confidence || 0,
-                        mixRatio: reg.mix_ratio || (reg.mechanism === 'M1' ? 100 : reg.mechanism === 'M2' ? 0 : 50),
-                        slope: slope
+                    setRegisterData(prev => {
+                        // ⚡ Bolt Performance Optimization: State deadbanding.
+                        // Impact: Prevents unnecessary React re-renders when register data hasn't changed.
+                        const newConfidence = reg.confidence || 0;
+                        const newMixRatio = reg.mix_ratio || (reg.mechanism === 'M1' ? 100 : reg.mechanism === 'M2' ? 0 : 50);
+                        if (prev.mechanism === reg.mechanism &&
+                            prev.confidence === newConfidence &&
+                            prev.mixRatio === newMixRatio &&
+                            prev.slope === slope) {
+                            return prev;
+                        }
+                        return {
+                            mechanism: reg.mechanism,
+                            label: reg.label,
+                            description: reg.description,
+                            color: reg.color,
+                            confidence: newConfidence,
+                            mixRatio: newMixRatio,
+                            slope: slope
+                        };
                     });
                 }
-                setF0(currentF0);
+                setF0(prev => prev === currentF0 ? prev : currentF0);
             }
-            animationRef.current = requestAnimationFrame(update);
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
-    }, [dataRef]);
+        const unsubscribe = renderCoordinator.subscribe(
+            componentId,
+            update,
+            renderCoordinator.PRIORITY.MEDIUM
+        );
+        return () => unsubscribe();
+    }, [dataRef, componentId]);
 
     // Helpers
     const getIcon = () => {
