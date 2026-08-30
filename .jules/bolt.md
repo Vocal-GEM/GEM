@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-10-27 - Centralized render loop in DynamicOrb SafeModeVisualizer
+**Learning:** `SafeModeVisualizer` inside `DynamicOrb.jsx` was still using `requestAnimationFrame(loop)` directly. Multiple isolated components calling `requestAnimationFrame` creates unnecessary overhead and breaks V-sync pacing when multiple active visuals are mounted.
+**Action:** Replaced the localized `requestAnimationFrame` polling loop with `RenderCoordinator.subscribe` and `RenderCoordinator.PRIORITY.HIGH` to ensure the 2D visualizer continues to run reliably but on the single shared animation loop, matching the codebase performance standard.
