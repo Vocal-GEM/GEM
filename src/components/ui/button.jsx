@@ -55,6 +55,7 @@ const Button = React.forwardRef(
         disabled={isDisabled}
         aria-busy={isLoading}
         aria-disabled={isDisabled}
+        aria-label={isLoading && isIcon ? "Loading" : props["aria-label"]}
         ref={ref}
         {...props}
       >
