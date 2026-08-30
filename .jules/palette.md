@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-15 - Adding accessibility labels to loading states and sidebar
+**Learning:** When a button with `size="icon"` is in an `isLoading` state, it visually displays a spinner but doesn't convey its loading state well enough to screen readers because its content is fully replaced without a textual alternative.
+**Action:** Always add a visually hidden `<span className="sr-only">Loading</span>` next to the loading spinner for icon-sized buttons. Modify the element in `Button` to receive `aria-label={isLoading && isIcon ? "Loading" : props["aria-label"]}` so that the button's accessible name appropriately communicates the loading state.
