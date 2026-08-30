@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-18 - Replacing `requestAnimationFrame` with `RenderCoordinator` in `RegisterGauge`
+**Learning:** Found an isolated `requestAnimationFrame` loop in `RegisterGauge.jsx` that was competing with the centralized `RenderCoordinator` service. Having multiple independent RAF loops running simultaneously breaks V-sync pacing and significantly increases CPU usage, especially since they can trigger React re-renders out of sync. Furthermore, the loop lacked state deadbanding, causing unnecessary re-renders when data (like F0 or register mechanism) remained unchanged.
+**Action:** Replaced the localized RAF with `renderCoordinator.subscribe()` and implemented state deadbanding (`setState(prev => ...)`). This ensures a single synchronized rendering pipeline for the entire application and eliminates redundant component re-renders.
