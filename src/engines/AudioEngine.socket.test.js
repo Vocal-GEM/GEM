@@ -5,16 +5,19 @@ import { io } from 'socket.io-client';
 
 
 // Mock RenderCoordinator
-vi.mock('../services/RenderCoordinator', () => ({
-    default: {
-        subscribe: vi.fn(() => vi.fn()),
-        PRIORITY: { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
-    },
-    renderCoordinator: {
-        subscribe: vi.fn(() => vi.fn()),
-        PRIORITY: { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
-    }
-}));
+vi.mock('../services/RenderCoordinator', () => {
+    const fn = vi.fn(() => vi.fn());
+    return {
+        default: {
+            subscribe: fn,
+            PRIORITY: { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
+        },
+        renderCoordinator: {
+            subscribe: fn,
+            PRIORITY: { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
+        }
+    };
+});
 
 // Mock socket.io-client
 vi.mock('socket.io-client', () => ({

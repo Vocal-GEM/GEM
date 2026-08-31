@@ -13,7 +13,6 @@ import QuickVoiceCheck from '../ui/QuickVoiceCheck';
 import { useGuidedJourney } from '../../context/GuidedJourneyContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { checkStreakStatus, getStreakMessage } from '../../services/StreakService';
-import RecommendedToolsWidget from '../ui/RecommendedToolsWidget';
 import MoodCheckIn from '../ui/MoodCheckIn';
 import PersonalMilestonesDisplay from '../ui/PersonalMilestonesDisplay';
 import WelcomeBanner from '../ui/WelcomeBanner';
