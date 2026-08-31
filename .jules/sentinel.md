@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-08-31 - [Medium] Fix Information Leakage via `str(e)` in error responses
+**Vulnerability:** Information Leakage (CWE-209) where raw, stringified internal exception data (`str(e)`) was being returned directly in HTTP JSON response payloads across multiple `flask` routes (e.g. `tts.py`, `voice_quality.py`).
+**Learning:** Returning exception objects or stack traces directly to the client exposes sensitive internal architecture, path details, or downstream service interactions (like ElevenLabs API errors) to potential attackers. Furthermore, using `.catch` or `try/except` without preserving internal server-side logging causes silent failures and hinders observability. We must also be careful with complex exception cleanups, as `UnboundLocalError` can occur if variables in `finally:` blocks were never initialized.
+**Prevention:** Implement defense-in-depth by separating error logging from error responses. Internally, log the raw exception (e.g. using `current_app.logger.error` or standard python `logging`). Externally, return a static, generic string (e.g., "An internal error occurred"). Ensure `finally:` block variables are checked using `if 'var_name' in locals() and var_name:`.
