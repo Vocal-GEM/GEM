@@ -19,6 +19,7 @@ const GlossaryView = () => {
                 <button
                     onClick={() => navigate('coach')}
                     className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
+                    aria-label="Back to coach"
                 >
                     <ArrowLeft size={24} />
                 </button>
