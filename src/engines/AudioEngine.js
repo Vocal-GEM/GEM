@@ -6,6 +6,7 @@ import { ResonanceCalculator } from '../utils/ResonanceCalculator';
 import { FormantAnalyzer } from '../utils/FormantAnalyzer';
 import { validateAudioSignal, getSignalQualityMessage } from '../utils/signalValidator';
 import { PitchSmoother } from '../utils/PitchSmoother';
+import renderCoordinator from '../services/RenderCoordinator';
 import McLeodPitchDetector from '../services/audio/McLeodPitchDetector';
 import LPCFormantTracker from '../services/audio/LPCFormantTracker';
 
@@ -40,7 +41,7 @@ export class AudioEngine {
         this.mediaRecorder = null;
         this.chunks = [];
         this.toneEngine = null;
-        this.animationFrameId = null;
+        this.unsubscribeRender = null;
 
         // DSP State
         this.pitchBuffer = [];
@@ -355,9 +356,8 @@ export class AudioEngine {
         this.visualPitchBuffer = [];
         this.visualAmpBuffer = [];
 
-        const loop = () => {
+        const loop = (delta, time) => {
             if (!this.isActive) return;
-            this.animationFrameId = requestAnimationFrame(loop);
 
             // Fetch data (always needed for visualization/RMS)
             this.analyser.getFloatTimeDomainData(dataArray);
@@ -622,7 +622,11 @@ export class AudioEngine {
             }
         };
 
-        loop();
+        // Performance Optimization (Bolt):
+        // Replaced raw requestAnimationFrame with centralized RenderCoordinator.
+        // This consolidates multiple independent animation loops into a single subscriber system,
+        // reducing CPU overhead and improving frame pacing across the application.
+        this.unsubscribeRender = renderCoordinator.subscribe('audio-engine', loop, renderCoordinator.PRIORITY.CRITICAL);
     }
 
     // Explicitly add HNR calculation if needed for high precision mode, 
@@ -636,9 +640,9 @@ export class AudioEngine {
             this.passthroughGain.gain.setTargetAtTime(0, this.audioContext.currentTime, 0.1);
         }
 
-        if (this.animationFrameId) {
-            cancelAnimationFrame(this.animationFrameId);
-            this.animationFrameId = null;
+        if (this.unsubscribeRender) {
+            this.unsubscribeRender();
+            this.unsubscribeRender = null;
         }
         if (this.microphone) {
             this.microphone.disconnect();

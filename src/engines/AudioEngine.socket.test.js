@@ -3,6 +3,22 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AudioEngine } from './AudioEngine';
 import { io } from 'socket.io-client';
 
+
+// Mock RenderCoordinator
+vi.mock('../services/RenderCoordinator', () => {
+    const fn = vi.fn(() => vi.fn());
+    return {
+        default: {
+            subscribe: fn,
+            PRIORITY: { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
+        },
+        renderCoordinator: {
+            subscribe: fn,
+            PRIORITY: { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
+        }
+    };
+});
+
 // Mock socket.io-client
 vi.mock('socket.io-client', () => ({
     io: vi.fn()
@@ -11,6 +27,7 @@ vi.mock('socket.io-client', () => ({
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)),
     YIN: vi.fn(() => vi.fn((buffer) => 440))
 }));
 
