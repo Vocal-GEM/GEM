@@ -27,12 +27,8 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const { settings } = useSettings();
 
     // Component ID for RenderCoordinator
-    const componentId = useId();
-
-    // Reusable buffers to avoid GC
-    // Unique component ID for RenderCoordinator
-    const uniqueId = useId();
-    const componentId = `spectrogram-highres-${uniqueId}`;
+    const baseId = useId();
+    const componentId = `spectrogram-highres-${baseId}`;
 
     // Reusable buffers to avoid garbage collection churn
     const imgDataRef = useRef(null);
