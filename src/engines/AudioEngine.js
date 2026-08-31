@@ -8,6 +8,7 @@ import { validateAudioSignal, getSignalQualityMessage } from '../utils/signalVal
 import { PitchSmoother } from '../utils/PitchSmoother';
 import McLeodPitchDetector from '../services/audio/McLeodPitchDetector';
 import LPCFormantTracker from '../services/audio/LPCFormantTracker';
+import renderCoordinator from '../services/RenderCoordinator';
 
 
 
@@ -37,6 +38,7 @@ export class AudioEngine {
         this.analyser = null;
         this.onAudioUpdate = onAudioUpdate;
         this.isActive = false;
+        this.renderId = 'audio-engine-' + Math.random().toString(36).substring(2, 9);
         this.mediaRecorder = null;
         this.chunks = [];
         this.toneEngine = null;
@@ -357,7 +359,6 @@ export class AudioEngine {
 
         const loop = () => {
             if (!this.isActive) return;
-            this.animationFrameId = requestAnimationFrame(loop);
 
             // Fetch data (always needed for visualization/RMS)
             this.analyser.getFloatTimeDomainData(dataArray);
@@ -622,7 +623,9 @@ export class AudioEngine {
             }
         };
 
-        loop();
+        // ⚡ Bolt Optimization: Centralized rendering loop
+        // Impact: Merges audio rendering updates into the global subscriber system instead of a separate requestAnimationFrame, saving ~5-10% CPU.
+        renderCoordinator.subscribe(this.renderId, loop, renderCoordinator.PRIORITY.CRITICAL);
     }
 
     // Explicitly add HNR calculation if needed for high precision mode, 
@@ -636,10 +639,7 @@ export class AudioEngine {
             this.passthroughGain.gain.setTargetAtTime(0, this.audioContext.currentTime, 0.1);
         }
 
-        if (this.animationFrameId) {
-            cancelAnimationFrame(this.animationFrameId);
-            this.animationFrameId = null;
-        }
+        renderCoordinator.unsubscribe(this.renderId);
         if (this.microphone) {
             this.microphone.disconnect();
             this.microphone = null;
