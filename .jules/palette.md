@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2023-08-31 - Add ARIA label to Voice Analytics refresh button
+**Learning:** Found a missing `aria-label` pattern on a generic refresh button which impairs screen reader users' ability to determine the button's action context.
+**Action:** Always verify icon-only buttons include descriptive `aria-label` properties specifically stating their functionality context, in this case 'Refresh voice analytics data'.
