@@ -247,6 +247,7 @@ const ProgressiveStackingSession = ({ onClose }) => {
                     onClick={handleReset}
                     className="text-slate-400 hover:text-white transition-colors"
                     title="Reset Session"
+                    aria-label="Reset session"
                 >
                     <RotateCcw size={20} />
                 </button>
