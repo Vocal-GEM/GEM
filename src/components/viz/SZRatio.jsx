@@ -4,15 +4,10 @@ import { Play, Square, RotateCcw, Divide } from 'lucide-react';
 const SZRatio = ({ dataRef, isActive }) => {
     const subscriberId = useId();
     const [mode, setMode] = useState('s'); // 's' or 'z'
-    const subscriberId = useId();
     const [sTime, setSTime] = useState(0);
-    const subscriberId = useId();
     const [zTime, setZTime] = useState(0);
-    const subscriberId = useId();
     const [isRecording, setIsRecording] = useState(false);
-    const subscriberId = useId();
     const [autoMode, setAutoMode] = useState(true);
-    const subscriberId = useId();
     const [threshold, setThreshold] = useState(0.02);
 
     const startTimeRef = useRef(null);

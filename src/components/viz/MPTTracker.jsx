@@ -4,13 +4,9 @@ import { Timer, Play, Square, RotateCcw } from 'lucide-react';
 const MPTTracker = ({ dataRef, isActive }) => {
     const subscriberId = useId();
     const [isRecording, setIsRecording] = useState(false);
-    const subscriberId = useId();
     const [time, setTime] = useState(0);
-    const subscriberId = useId();
     const [lastResult, setLastResult] = useState(null);
-    const subscriberId = useId();
     const [threshold, setThreshold] = useState(0.02); // Volume threshold
-    const subscriberId = useId();
     const [autoMode, setAutoMode] = useState(true);
 
     const startTimeRef = useRef(null);

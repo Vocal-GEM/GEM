@@ -3,9 +3,7 @@ import { useEffect, useState, useId } from 'react';
 const VowelAnalysis = ({ dataRef, colorBlindMode }) => {
     const subscriberId = useId();
     const [currentVowel, setCurrentVowel] = useState('');
-    const subscriberId = useId();
     const [currentF1, setCurrentF1] = useState(0);
-    const subscriberId = useId();
     const [currentF2, setCurrentF2] = useState(0);
 
     useEffect(() => {

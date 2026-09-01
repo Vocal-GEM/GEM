@@ -58,6 +58,8 @@ vi.mock('@react-three/fiber', () => ({
 
 // Mock Drei
 
+const global = {};
+window.global = window;
 vi.mock('../../services/RenderCoordinator', () => ({
     renderCoordinator: {
         subscribe: vi.fn(() => vi.fn()),
