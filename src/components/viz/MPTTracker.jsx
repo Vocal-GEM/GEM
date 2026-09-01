@@ -1,11 +1,16 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
 import { Timer, Play, Square, RotateCcw } from 'lucide-react';
 
 const MPTTracker = ({ dataRef, isActive }) => {
+    const subscriberId = useId();
     const [isRecording, setIsRecording] = useState(false);
+    const subscriberId = useId();
     const [time, setTime] = useState(0);
+    const subscriberId = useId();
     const [lastResult, setLastResult] = useState(null);
+    const subscriberId = useId();
     const [threshold, setThreshold] = useState(0.02); // Volume threshold
+    const subscriberId = useId();
     const [autoMode, setAutoMode] = useState(true);
 
     const startTimeRef = useRef(null);
@@ -37,20 +42,13 @@ const MPTTracker = ({ dataRef, isActive }) => {
                     }
                 }
             }
-            animationRef.current = requestAnimationFrame(checkAudio);
+
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'mpt-tracker',
-                checkAudio,
-                renderCoordinator.PRIORITY.LOW
-            );
-        });
+        const unsubscribe = renderCoordinator.subscribe(subscriberId, checkAudio, renderCoordinator.PRIORITY.LOW);
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
     }, [autoMode, isActive, isRecording, threshold, dataRef]);
 

@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useId } from 'react';
 
 const VowelAnalysis = ({ dataRef, colorBlindMode }) => {
+    const subscriberId = useId();
     const [currentVowel, setCurrentVowel] = useState('');
+    const subscriberId = useId();
     const [currentF1, setCurrentF1] = useState(0);
+    const subscriberId = useId();
     const [currentF2, setCurrentF2] = useState(0);
 
     useEffect(() => {
@@ -13,20 +16,13 @@ const VowelAnalysis = ({ dataRef, colorBlindMode }) => {
                 setCurrentF1(f1 || 0);
                 setCurrentF2(f2 || 0);
             }
-            requestAnimationFrame(loop);
+
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'vowel-analysis',
-                loop,
-                renderCoordinator.PRIORITY.LOW
-            );
-        });
+        const unsubscribe = renderCoordinator.subscribe(subscriberId, loop, renderCoordinator.PRIORITY.LOW);
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
     }, [dataRef]);
 

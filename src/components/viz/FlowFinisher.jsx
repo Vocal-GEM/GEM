@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
 import { AudioWaveform, DoorOpen, Info } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * FlowFinisher - Phrase ending decay analysis

@@ -1,12 +1,18 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useId } from 'react';
 import { Play, Square, RotateCcw, Divide } from 'lucide-react';
 
 const SZRatio = ({ dataRef, isActive }) => {
+    const subscriberId = useId();
     const [mode, setMode] = useState('s'); // 's' or 'z'
+    const subscriberId = useId();
     const [sTime, setSTime] = useState(0);
+    const subscriberId = useId();
     const [zTime, setZTime] = useState(0);
+    const subscriberId = useId();
     const [isRecording, setIsRecording] = useState(false);
+    const subscriberId = useId();
     const [autoMode, setAutoMode] = useState(true);
+    const subscriberId = useId();
     const [threshold, setThreshold] = useState(0.02);
 
     const startTimeRef = useRef(null);
@@ -33,20 +39,13 @@ const SZRatio = ({ dataRef, isActive }) => {
                     if (startTimeRef.current) startTimeRef.current.silenceStart = null;
                 }
             }
-            animationRef.current = requestAnimationFrame(checkAudio);
+
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                'sz-ratio',
-                checkAudio,
-                renderCoordinator.PRIORITY.LOW
-            );
-        });
+        const unsubscribe = renderCoordinator.subscribe(subscriberId, checkAudio, renderCoordinator.PRIORITY.LOW);
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
     }, [autoMode, isActive, isRecording, threshold, dataRef]);
 

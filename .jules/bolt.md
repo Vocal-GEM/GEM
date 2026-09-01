@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-21 - Centralized RenderCoordinator Migration
+**Learning:** Having multiple `requestAnimationFrame` loops across different components (like `DynamicOrb`, `LTASPlot`, `RegisterGauge`, etc.) causes severe performance degradation and layout thrashing as they all compete on the main thread and break V-sync frame pacing.
+**Action:** Replaced distributed `requestAnimationFrame` and recursive loop calls with centralized subscriptions to `RenderCoordinator.subscribe()`. Also migrated updates inside these loops to use state deadbanding (`setState(prev => ...)`) to avoid unnecessary re-renders.
