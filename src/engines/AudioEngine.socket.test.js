@@ -4,6 +4,20 @@ import { AudioEngine } from './AudioEngine';
 import { io } from 'socket.io-client';
 
 // Mock socket.io-client
+
+vi.mock('../services/RenderCoordinator', () => ({
+    default: {
+        subscribe: vi.fn(() => vi.fn()),
+        unsubscribe: vi.fn(),
+        PRIORITY: { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
+    },
+    renderCoordinator: {
+        subscribe: vi.fn(() => vi.fn()),
+        unsubscribe: vi.fn(),
+        PRIORITY: { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
+    }
+}));
+
 vi.mock('socket.io-client', () => ({
     io: vi.fn()
 }));
@@ -11,6 +25,7 @@ vi.mock('socket.io-client', () => ({
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)),
     YIN: vi.fn(() => vi.fn((buffer) => 440))
 }));
 
