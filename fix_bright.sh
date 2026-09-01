@@ -1,0 +1,1 @@
+sed -i '/vi.mock('"'"'lucide-react'"'"', () => {/a \    const createIcon = (name) => { const Icon = (props) => React.createElement('"'"'div'"'"', { ...props, '"'"'data-testid'"'"': name }); Icon.displayName = name; return Icon; };' src/components/viz/BrightnessMeter.test.jsx
