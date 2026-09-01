@@ -57,6 +57,16 @@ vi.mock('@react-three/fiber', () => ({
 }));
 
 // Mock Drei
+
+const global = {};
+window.global = window;
+vi.mock('../../services/RenderCoordinator', () => ({
+    renderCoordinator: {
+        subscribe: vi.fn(() => vi.fn()),
+        PRIORITY: { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
+    }
+}));
+
 vi.mock('@react-three/drei', () => ({
     OrbitControls: () => null,
     PerspectiveCamera: () => null

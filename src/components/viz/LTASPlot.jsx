@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useId } from 'react';
 import { useAudio } from '../../context/AudioContext';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const LTASPlot = ({ width = 600, height = 300 }) => {
     const { dataRef } = useAudio();
@@ -13,8 +14,9 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
         accumulatorRef.current = new Float32Array(1024).fill(0);
     }
 
+    const subscriberId = useId();
     useEffect(() => {
-        let animationId;
+
 
         const draw = () => {
             if (!canvasRef.current) return;
@@ -83,12 +85,10 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
                 }
                 ctx.stroke();
             }
-
-            animationId = requestAnimationFrame(draw);
         };
 
-        draw();
-        return () => cancelAnimationFrame(animationId);
+        const unsubscribe = renderCoordinator.subscribe(subscriberId, draw, renderCoordinator.PRIORITY.MEDIUM);
+        return () => unsubscribe();
     }, [isRecording, dataRef]);
 
     const reset = () => {
