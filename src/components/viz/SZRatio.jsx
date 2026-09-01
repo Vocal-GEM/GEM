@@ -1,3 +1,4 @@
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { useState, useRef, useEffect, useId } from 'react';
 import { Play, Square, RotateCcw, Divide } from 'lucide-react';
 
@@ -11,7 +12,7 @@ const SZRatio = ({ dataRef, isActive }) => {
     const [threshold, setThreshold] = useState(0.02);
 
     const startTimeRef = useRef(null);
-    const animationRef = useRef(null);
+
 
     // Auto-detection logic (similar to MPT)
     useEffect(() => {

@@ -1,3 +1,4 @@
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { useState, useEffect, useRef, useId } from 'react';
 import { Timer, Play, Square, RotateCcw } from 'lucide-react';
 
@@ -10,7 +11,7 @@ const MPTTracker = ({ dataRef, isActive }) => {
     const [autoMode, setAutoMode] = useState(true);
 
     const startTimeRef = useRef(null);
-    const animationRef = useRef(null);
+
 
     useEffect(() => {
         if (!autoMode || !isActive) return;

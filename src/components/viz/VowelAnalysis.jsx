@@ -1,3 +1,4 @@
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { useEffect, useState, useId } from 'react';
 
 const VowelAnalysis = ({ dataRef, colorBlindMode }) => {
