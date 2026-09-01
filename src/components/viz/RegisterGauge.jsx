@@ -85,7 +85,7 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     };
 
     // F0 Threshold Check (300 Hz)
-    const showChestWarning = f0 > 300 && registerData.mechanism === 'M1';
+    // const showChestWarning = f0 > 300 && registerData.mechanism === 'M1';
 
     return (
         <div className="bg-slate-900/50 rounded-2xl p-5 border border-slate-800">
