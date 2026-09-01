@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-01-24 - RegisterGauge RenderCoordinator Optimization
+**Learning:** requestAnimationFrame polling loops in individual React components break V-sync frame pacing and increase CPU overhead. The state object updates inside these loops lack referential equality checks, leading to continuous needless re-renders.
+**Action:** Replace requestAnimationFrame with a centralized RenderCoordinator.subscribe and implement state deadbanding using functional updates (e.g., setState(prev => ...)).
