@@ -10,7 +10,7 @@ const AudioSourceManager = ({ onSourceChange }) => {
         checkPermissionAndEnumerate();
     }, []);
 
-    const checkPermissionAndEnumerate = async () => {
+    const checkPermissionAndEnumerate = useCallback(async () => {
         try {
             // Must request permission first to get labels
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
