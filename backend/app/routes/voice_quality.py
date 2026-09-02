@@ -220,6 +220,7 @@ def manipulate_file():
              try:
                 os.remove(processed_path)
              except:
+                pass
         # Cleanup original temp file immediately (always safe as it's not the one being sent)
         if tmp_path and os.path.exists(tmp_path):
             try:
