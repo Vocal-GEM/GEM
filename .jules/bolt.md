@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-09-02 - RenderCoordinator Migration Pattern
+**Learning:** Raw `requestAnimationFrame` loops in React components competing on the main thread break V-sync frame pacing and increase CPU overhead.
+**Action:** Replace `requestAnimationFrame` with the centralized `RenderCoordinator.subscribe(componentId, update, PRIORITY.MEDIUM)` service and ensure tests mock the module correctly, including the `PRIORITY` object.
