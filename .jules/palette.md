@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-05-27 - Action Buttons and Context
+**Learning:** Generic action buttons like "Fix", "Update", or "Retry" often appear multiple times in a single list or panel (e.g., `ToolHealthCheck.jsx`). For screen reader users, hearing "Fix button" repeatedly provides no context about what is being fixed, making navigation difficult and prone to errors.
+**Action:** Always add context-aware `aria-label`s to generic action buttons (e.g., `aria-label={\`Fix \${label} issue\`}`) to ensure screen reader users understand the specific target of the action.
