@@ -1,60 +1,87 @@
-import { useEffect, useRef, useId } from 'react';
-import { useSettings } from '../../context/SettingsContext';
-import { Info, TrendingDown } from 'lucide-react';
+import { useEffect, useState, useRef, useId, useCallback } from 'react';
+import { Sparkles, Waves, Wind, Activity } from 'lucide-react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
-const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -6 } }) => {
-    const { colorBlindMode } = useSettings();
-    const id = useId();
-    const indicatorRef = useRef(null);
-    const valueRef = useRef(null);
+const QualityVisualizer = ({ dataRef }) => {
+    const [metrics, setMetrics] = useState({
+        jitter: 0,
+        shimmer: 0,
+        weight: 50
+    });
+
+    // Generate unique ID for this component instance
     const componentId = useId();
 
+    // History buffers for sparklines
+    const historyRef = useRef({
+        jitter: [],
+        shimmer: [],
+        weight: []
+    });
+    const maxHistory = 100;
+
+    // Define the loop callback (not creating it inside useEffect to allow useCallback if needed,
+    // though here it captures state setters so it's tricky.
+    // Actually, RenderCoordinator passes deltaTime, but we just need to poll dataRef.)
+    // We use useCallback to keep the function reference stable if possible,
+    // but we depend on dataRef.
+    const loop = useCallback(() => {
+        if (!dataRef.current) return;
+        const data = dataRef.current;
+
+        // Update local state
+        // Jitter/Shimmer are often small values (e.g. 0.01), we might want to scale them for display
+        // Jitter > 0.01 (1%) is often considered rough
+        // Shimmer > 0.35 dB (or 3-4%) is often considered rough.
+        // Assuming the engine returns raw values.
+
+        setMetrics({
+            jitter: data.jitter || 0,
+            shimmer: data.shimmer || 0,
+            weight: data.weight || 50
+        });
     useEffect(() => {
         const loop = () => {
-            if (indicatorRef.current && valueRef.current) {
-                const tilt = dataRef.current.tilt || 0;
+            if (!dataRef.current) return;
+            const data = dataRef.current;
 
-                // Map Tilt: Typically -20dB/oct (Masc/Steep?) to 0dB/oct (Flat/Bright?)
-                // Visualization Range: -24 dB/oct to 0 dB/oct
-                const minDisp = -24;
-                const maxDisp = 0;
+            // Update local state
+            // Jitter/Shimmer are often small values (e.g. 0.01), we might want to scale them for display
+            // Jitter > 0.01 (1%) is often considered rough
+            // Shimmer > 0.35 dB (or 3-4%) is often considered rough.
+            // Assuming the engine returns raw values.
 
-                // Normalize to 0-100%
-                let percent = ((tilt - minDisp) / (maxDisp - minDisp)) * 100;
-                percent = Math.max(0, Math.min(100, percent));
+            setMetrics({
+                jitter: data.jitter || 0,
+                shimmer: data.shimmer || 0,
+                weight: data.weight || 50
+            });
 
-                const curLeft = parseFloat(indicatorRef.current.style.left) || 0;
-                const nextLeft = curLeft + (percent - curLeft) * 0.1;
-                indicatorRef.current.style.left = `${nextLeft}%`;
-
-                // Color based on target range
-                const isWithinTarget = tilt >= targetRange.min && tilt <= targetRange.max;
-
-                if (isWithinTarget) {
-                    indicatorRef.current.className = `absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`;
-                } else {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-slate-400";
+            // Update history
+            ['jitter', 'shimmer', 'weight'].forEach(key => {
+                historyRef.current[key].push(data[key] || 0);
+                if (historyRef.current[key].length > maxHistory) {
+                    historyRef.current[key].shift();
                 }
+            });
 
-                // Update value display
-                valueRef.current.innerText = tilt.toFixed(1);
-            }
-        };
-
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                `spectral-tilt-meter-${id}`,
-                loop,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
             // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
+        // Update history
+        ['jitter', 'shimmer', 'weight'].forEach(key => {
+            historyRef.current[key].push(data[key] || 0);
+            if (historyRef.current[key].length > maxHistory) {
+                historyRef.current[key].shift();
+            }
+        });
+
+        // REMOVED: requestAnimationFrame(loop) - handled by renderCoordinator
+    }, [dataRef]);
+
+    useEffect(() => {
         const unsubscribe = renderCoordinator.subscribe(
-            `spectral-tilt-meter-${componentId}`,
+            componentId,
             loop,
             renderCoordinator.PRIORITY.MEDIUM
         );
@@ -62,84 +89,167 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
         return () => {
             unsubscribe();
         };
-    }, [dataRef, targetRange, colorBlindMode, id]);
-    }, [dataRef, targetRange, colorBlindMode, componentId]);
+    }, [componentId, loop]);
+
+    // Helper to render sparkline
+    const renderSparkline = (key, colorClass, _height = 40) => {
+        const data = historyRef.current[key];
+        if (data.length < 2) return null;
+
+        const max = Math.max(...data, key === 'weight' ? 100 : 0.05); // Dynamic max or fixed
+        const min = 0;
+
+        const points = data.map((val, i) => {
+            const x = (i / (maxHistory - 1)) * 100;
+            const y = 100 - ((val - min) / (max - min)) * 100;
+            return `${x},${y}`;
+        }).join(' ');
+
+        return (
+            <svg className="w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <polyline
+                    points={points}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className={colorClass}
+                />
+            </svg>
+        );
+    };
+
+    // Helper for status labels
+    const getStatus = (type, val) => {
+        if (type === 'jitter') {
+            // Thresholds for Jitter (approximate for visual feedback)
+            if (val < 0.004) return { label: 'Stable', color: 'text-emerald-400' };
+            if (val < 0.01) return { label: 'Normal', color: 'text-blue-400' };
+            return { label: 'Rough', color: 'text-orange-400' };
+        }
+        if (type === 'shimmer') {
+            // Thresholds for Shimmer
+            if (val < 0.15) return { label: 'Stable', color: 'text-emerald-400' };
+            if (val < 0.35) return { label: 'Normal', color: 'text-blue-400' };
+            return { label: 'Breathy/Rough', color: 'text-orange-400' };
+        }
+        if (type === 'weight') {
+            if (val < 30) return { label: 'Breathy', color: 'text-cyan-400' };
+            if (val > 70) return { label: 'Pressed', color: 'text-orange-400' };
+            return { label: 'Balanced', color: 'text-emerald-400' };
+        }
+        return { label: '-', color: 'text-slate-400' };
+    };
 
     return (
-        <div className="glass-panel rounded-2xl p-6 h-full flex flex-col justify-center">
-            {/* Header */}
-            <div className="flex justify-between items-end text-xs font-bold text-slate-300 tracking-wider mb-4">
-                <span className="w-24 text-left opacity-75">Steep (-24)</span>
-                <div className="flex flex-col items-center">
-                    <span className="text-slate-400 mb-1 uppercase tracking-widest text-[10px]">Spectral Tilt</span>
-                    <div className="flex items-baseline gap-1">
-                        <span ref={valueRef} className={`text-4xl font-mono font-bold tabular-nums leading-none ${colorBlindMode ? 'text-amber-400' : 'text-emerald-400'}`}>-0.0</span>
-                        <span className="text-xs text-slate-400">dB/oct</span>
-                    </div>
-                </div>
-                <span className="w-24 text-right opacity-75">Flat (0)</span>
+        <div className="h-full flex flex-col p-6">
+            <div className="mb-6">
+                <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                    <Sparkles className="w-6 h-6 text-purple-400" />
+                    Voice Quality
+                </h3>
+                <p className="text-slate-400 text-sm mt-1">
+                    Analyze the texture and stability of your voice.
+                </p>
             </div>
 
-            {/* Meter Bar */}
-            <div className="relative h-10 bg-slate-900/80 rounded-full overflow-hidden shadow-inner border border-white/5 mb-6">
-                {/* Background Gradient */}
-                <div className={`absolute inset-0 bg-gradient-to-r ${colorBlindMode ? 'from-purple-900/40 to-teal-500/10' : 'from-indigo-900/40 to-blue-500/10'}`}></div>
-
-                {/* Target Range Zone */}
-                {(() => {
-                    const minDisp = -24;
-                    const maxDisp = 0;
-                    const left = ((targetRange.min - minDisp) / (maxDisp - minDisp)) * 100;
-                    const width = ((targetRange.max - targetRange.min) / (maxDisp - minDisp)) * 100;
-                    return (
-                        <div
-                            className={`absolute top-0 bottom-0 border-x ${colorBlindMode ? 'bg-amber-500/20 border-amber-500/30' : 'bg-emerald-500/20 border-emerald-500/30'}`}
-                            style={{ left: `${left}%`, width: `${width}%` }}
-                        >
-                            <div className={`absolute top-0 left-0 right-0 h-[2px] ${colorBlindMode ? 'bg-amber-500/50' : 'bg-emerald-500/50'}`}></div>
-                            <div className={`absolute bottom-0 left-0 right-0 h-[2px] ${colorBlindMode ? 'bg-amber-500/50' : 'bg-emerald-500/50'}`}></div>
-                            <div className={`absolute top-1 left-1 text-[8px] font-bold uppercase tracking-wider ${colorBlindMode ? 'text-amber-400' : 'text-emerald-400'}`}>Target</div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-grow">
+                {/* Jitter Card */}
+                <div className="bg-slate-900/50 rounded-2xl border border-white/5 p-6 flex flex-col">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
+                            <Activity size={24} />
                         </div>
-                    );
-                })()}
+                        <div>
+                            <h4 className="font-bold text-white">Jitter</h4>
+                            <p className="text-xs text-slate-500">Frequency Instability</p>
+                        </div>
+                    </div>
 
-                {/* Grid Lines */}
-                <div className="absolute left-[25%] top-2 bottom-2 w-px bg-white/5"></div>
-                <div className="absolute left-[50%] top-2 bottom-2 w-px bg-white/5"></div>
-                <div className="absolute left-[75%] top-2 bottom-2 w-px bg-white/5"></div>
-
-                {/* Indicator */}
-                <div
-                    ref={indicatorRef}
-                    className={`absolute top-1 bottom-1 w-2 rounded-full shadow-[0_0_15px_rgba(100,255,100,0.6)] border border-white/50 transition-all duration-100 ease-out z-10 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`}
-                    style={{ left: '50%' }}
-                ></div>
-            </div>
-
-            {/* Info Panel */}
-            <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
-                <div className="flex items-center justify-center gap-2 mb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                    <TrendingDown size={12} /> What is Spectral Tilt?
-                </div>
-                <div className="flex items-start gap-2 text-[10px] text-slate-400 leading-tight bg-slate-800/30 p-2 rounded-lg">
-                    <Info size={12} className="shrink-0 mt-0.5 text-slate-400" />
-                    <div>
-                        <span className="text-slate-300">Spectral tilt measures how fast energy drops off as frequency increases.</span>
-                        <div className="mt-2 grid grid-cols-2 gap-2">
-                            <div className="bg-slate-800/50 p-2 rounded border border-white/5">
-                                <span className={`font-bold block mb-1 ${colorBlindMode ? 'text-purple-400' : 'text-blue-400'}`}>Steeper (-12dB)</span>
-                                <span className="text-slate-300">Softer, breathier, more feminine quality.</span>
+                    <div className="flex-grow flex flex-col justify-end mb-4">
+                        <div className="h-24 w-full bg-slate-950/50 rounded-lg border border-white/5 p-2 mb-2">
+                            {renderSparkline('jitter', 'text-blue-500')}
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div className="text-3xl font-mono font-bold text-white">
+                                {(metrics.jitter * 100).toFixed(2)}<span className="text-sm text-slate-500 ml-1">%</span>
                             </div>
-                            <div className="bg-slate-800/50 p-2 rounded border border-white/5">
-                                <span className={`font-bold block mb-1 ${colorBlindMode ? 'text-teal-400' : 'text-purple-400'}`}>Flatter (-6dB)</span>
-                                <span className="text-slate-300">Brassier, buzzier, more masculine quality.</span>
+                            <div className={`text-sm font-bold uppercase ${getStatus('jitter', metrics.jitter).color}`}>
+                                {getStatus('jitter', metrics.jitter).label}
                             </div>
                         </div>
                     </div>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                        Micro-fluctuations in pitch. Lower values indicate a smoother, more stable tone. High jitter is perceived as roughness.
+                    </p>
+                </div>
+
+                {/* Shimmer Card */}
+                <div className="bg-slate-900/50 rounded-2xl border border-white/5 p-6 flex flex-col">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400">
+                            <Waves size={24} />
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-white">Shimmer</h4>
+                            <p className="text-xs text-slate-500">Amplitude Instability</p>
+                        </div>
+                    </div>
+
+                    <div className="flex-grow flex flex-col justify-end mb-4">
+                        <div className="h-24 w-full bg-slate-950/50 rounded-lg border border-white/5 p-2 mb-2">
+                            {renderSparkline('shimmer', 'text-purple-500')}
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div className="text-3xl font-mono font-bold text-white">
+                                {metrics.shimmer.toFixed(2)}<span className="text-sm text-slate-500 ml-1">dB</span>
+                            </div>
+                            <div className={`text-sm font-bold uppercase ${getStatus('shimmer', metrics.shimmer).color}`}>
+                                {getStatus('shimmer', metrics.shimmer).label}
+                            </div>
+                        </div>
+                    </div>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                        Micro-fluctuations in loudness. High shimmer can sound breathy or hoarse. Lower is generally clearer.
+                    </p>
+                </div>
+
+                {/* Weight/Breathiness Card */}
+                <div className="bg-slate-900/50 rounded-2xl border border-white/5 p-6 flex flex-col">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 bg-cyan-500/10 rounded-lg text-cyan-400">
+                            <Wind size={24} />
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-white">Breathiness</h4>
+                            <p className="text-xs text-slate-500">Vocal Weight Inverse</p>
+                        </div>
+                    </div>
+
+                    <div className="flex-grow flex flex-col justify-end mb-4">
+                        <div className="h-24 w-full bg-slate-950/50 rounded-lg border border-white/5 p-2 mb-2 relative">
+                            {/* Custom visualization for weight range */}
+                            <div className="absolute inset-x-0 top-1/2 h-1 bg-gradient-to-r from-cyan-500 via-emerald-500 to-orange-500 rounded-full opacity-30"></div>
+                            <div
+                                className="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-100"
+                                style={{ left: `${metrics.weight}%` }}
+                            ></div>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div className="text-3xl font-mono font-bold text-white">
+                                {metrics.weight.toFixed(0)}<span className="text-sm text-slate-500 ml-1">/100</span>
+                            </div>
+                            <div className={`text-sm font-bold uppercase ${getStatus('weight', metrics.weight).color}`}>
+                                {getStatus('weight', metrics.weight).label}
+                            </div>
+                        </div>
+                    </div>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                        Indicates vocal fold closure. Lower values are breathier (softer), higher values are pressed (harder).
+                    </p>
                 </div>
             </div>
         </div>
     );
 };
 
-export default SpectralTiltMeter;
+export default QualityVisualizer;
