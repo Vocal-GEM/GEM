@@ -75,3 +75,10 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-02-19 - Information Leakage in TTS Routes & Destructive Patching
+**Vulnerability:** The TTS routes in `backend/app/routes/tts.py` were directly passing external API error strings (e.g., `str(e)`, `response.text`) via `jsonify` back to the client. This leaked internal infrastructure and API request details.
+**Learning:** Returning unhandled exception messages to the client is a common anti-pattern that exposes sensitive internal operational details. Furthermore, automated patching of test files using simple string-matching scripts (e.g. `readlines()` with a `break` condition) can easily become destructive, accidentally deleting large swaths of unrelated tests.
+**Prevention:**
+1. Intercept generic `requests.exceptions` and return safe, sanitized error strings to the client while logging the true error with `current_app.logger.error`.
+2. When creating targeted test files (like `test_tts_security.py`), ensure they can be run in isolation if the main test suite contains baseline syntax errors (like in `test_voice_quality_security.py`).
+3. Never use fragile truncation scripts to "fix" failing test files; fix the specific syntax errors or leave the baseline errors intact.
