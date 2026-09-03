@@ -282,7 +282,7 @@ class ProgramService {
             this.saveProgress();
         } else {
             // Program Complete!
-            alert("Congratulations! You've finished the program!");
+            window.dispatchEvent(new CustomEvent('gem-toast', { detail: { message: "Congratulations! You've finished the program!", type: 'success' } }));
         }
     }
 
