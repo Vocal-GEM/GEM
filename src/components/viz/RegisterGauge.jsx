@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import renderCoordinator from '../../services/RenderCoordinator';
 import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
 
 /**
@@ -19,10 +20,15 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
     });
     const [f0, setF0] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);
-    const animationRef = useRef();
 
     useEffect(() => {
-        const update = () => {
+        let lastUpdate = 0;
+
+        const update = (timestamp) => {
+            // Throttle to 15fps for UI updates (every ~66ms)
+            if (timestamp - lastUpdate < 66) return;
+            lastUpdate = timestamp;
+
             if (dataRef?.current) {
                 // Get register data from socket stream
                 const reg = dataRef.current.register; // dataRef.current.register from sockets.py
@@ -30,23 +36,43 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                 const slope = dataRef.current.spectral_slope || -6.0;
 
                 if (reg) {
-                    setRegisterData({
-                        mechanism: reg.mechanism,
-                        label: reg.label,
-                        description: reg.description,
-                        color: reg.color,
-                        confidence: reg.confidence || 0,
-                        mixRatio: reg.mix_ratio || (reg.mechanism === 'M1' ? 100 : reg.mechanism === 'M2' ? 0 : 50),
-                        slope: slope
+                    setRegisterData(prev => {
+                        const newMixRatio = reg.mix_ratio || (reg.mechanism === 'M1' ? 100 : reg.mechanism === 'M2' ? 0 : 50);
+                        if (
+                            prev.mechanism === reg.mechanism &&
+                            prev.label === reg.label &&
+                            prev.description === reg.description &&
+                            prev.color === reg.color &&
+                            prev.confidence === (reg.confidence || 0) &&
+                            prev.mixRatio === newMixRatio &&
+                            prev.slope === slope
+                        ) {
+                            return prev;
+                        }
+                        return {
+                            mechanism: reg.mechanism,
+                            label: reg.label,
+                            description: reg.description,
+                            color: reg.color,
+                            confidence: reg.confidence || 0,
+                            mixRatio: newMixRatio,
+                            slope: slope
+                        };
                     });
                 }
-                setF0(currentF0);
+
+                setF0(prev => {
+                    if (prev === currentF0) return prev;
+                    return currentF0;
+                });
             }
-            animationRef.current = requestAnimationFrame(update);
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
+        const unsubscribe = renderCoordinator.subscribe(update, renderCoordinator.PRIORITY.MEDIUM, 'RegisterGauge');
+
+        return () => {
+            unsubscribe();
+        };
     }, [dataRef]);
 
     // Helpers
