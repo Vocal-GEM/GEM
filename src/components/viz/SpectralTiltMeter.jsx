@@ -32,25 +32,14 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 const isWithinTarget = tilt >= targetRange.min && tilt <= targetRange.max;
 
                 if (isWithinTarget) {
-                    indicatorRef.current.className = `absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`;
-                } else {
-                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-slate-400";
-                }
+                    indicatorRef.current.className = `absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,255,100,0.8)] transition-colors duration-75 ${colorBlindMode ? 'bg-amber-500' : 'bg-emerald-500'}`
+} else {
+                    indicatorRef.current.className = "absolute top-0 bottom-0 w-1.5 rounded-full shadow-[0_0_10px_rgba(100,200,255,0.8)] transition-colors duration-75 bg-slate-400"
+}
 
-                // Update value display
-                valueRef.current.innerText = tilt.toFixed(1);
+// Update value display
+                valueRef.current.innerText = tilt.toFixed(1)
             }
-        };
-
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
-                `spectral-tilt-meter-${id}`,
-                loop,
-                renderCoordinator.PRIORITY.MEDIUM
-            );
-        });
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -60,10 +49,9 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
         );
 
         return () => {
-            unsubscribe();
+            unsubscribe()
         };
-    }, [dataRef, targetRange, colorBlindMode, id]);
-    }, [dataRef, targetRange, colorBlindMode, componentId]);
+    }, [dataRef, targetRange, componentId, colorBlindMode]);
 
     return (
         <div className="glass-panel rounded-2xl p-6 h-full flex flex-col justify-center">
@@ -100,8 +88,8 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                             <div className={`absolute bottom-0 left-0 right-0 h-[2px] ${colorBlindMode ? 'bg-amber-500/50' : 'bg-emerald-500/50'}`}></div>
                             <div className={`absolute top-1 left-1 text-[8px] font-bold uppercase tracking-wider ${colorBlindMode ? 'text-amber-400' : 'text-emerald-400'}`}>Target</div>
                         </div>
-                    );
-                })()}
+                    )
+})()}
 
                 {/* Grid Lines */}
                 <div className="absolute left-[25%] top-2 bottom-2 w-px bg-white/5"></div>
@@ -139,7 +127,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 </div>
             </div>
         </div>
-    );
+    )
 };
 
 export default SpectralTiltMeter;
