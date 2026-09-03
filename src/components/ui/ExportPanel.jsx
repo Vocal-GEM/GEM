@@ -61,7 +61,7 @@ const ExportPanel = ({ onClose }) => {
                             <p className="text-xs text-slate-400">Download your progress</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-white">
+                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-white" aria-label="Close Export Panel">
                         <X size={20} />
                     </button>
                 </div>
@@ -74,6 +74,7 @@ const ExportPanel = ({ onClose }) => {
                             onClick={() => handleExport(option)}
                             disabled={exporting === option.id}
                             className="w-full p-4 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-blue-500/50 rounded-xl text-left transition-all group disabled:opacity-50"
+                            aria-busy={exporting === option.id}
                         >
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
