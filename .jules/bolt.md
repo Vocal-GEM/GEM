@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Centralized Render Loop Replaces requestAnimationFrame
+**Learning:** React components (like `RegisterGauge`) using localized `requestAnimationFrame` loops create intense main-thread contention, breaking V-sync frame pacing. High-frequency state updates inside these loops without referential deadbanding continuously trigger needless React re-renders.
+**Action:** Replace localized `requestAnimationFrame` loops with `RenderCoordinator.subscribe`. Always use state deadbanding (`setState(prev => ...)`) to prevent re-renders when data remains stable.
