@@ -153,10 +153,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     }, [dataRef, colormap]);
 
     // Initial canvas setup & ResizeObserver
-    }, [dataRef, colormap, componentId]);
-
-    // Initial canvas setup
-    // Handle Resize with ResizeObserver
     useEffect(() => {
         const container = containerRef.current;
         const canvas = canvasRef.current;
@@ -214,7 +210,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             unsubscribe();
         };
     }, [draw, componentId]);
-    }, [componentId, draw]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position
