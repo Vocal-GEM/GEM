@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-28 - Centralizing RAF in Core AudioEngine
+**Learning:** `AudioEngine.js` used a raw `requestAnimationFrame` loop to process audio data and dispatch events (`this.animationFrameId = requestAnimationFrame(loop);`). This core loop was running independently of the `RenderCoordinator` service, competing on the main thread and breaking V-sync frame pacing.
+**Action:** Replaced `requestAnimationFrame` in `AudioEngine` with `RenderCoordinator.subscribe(..., PRIORITY.HIGH)`. Centralizing these loops under a single subscriber system guarantees a synchronized rendering pipeline for the entire application and reduces CPU overhead.
