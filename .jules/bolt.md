@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-19 - [Centralized Rendering Loop]
+**Learning:** Using a single RenderCoordinator loop for `requestAnimationFrame` prevents multiple local loops from thrashing and reduces CPU overhead by grouping synchronous work into a single V-sync heartbeat.
+**Action:** When working with high-frequency rendering or canvas updates, use `RenderCoordinator.subscribe()` rather than local `requestAnimationFrame()` loops whenever possible.
