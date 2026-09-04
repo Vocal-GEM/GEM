@@ -163,7 +163,7 @@ const WelcomeStep = () => (
         </ul>
         <div className="mt-6 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg">
             <p className="text-sm text-purple-300">
-                🔒 Your data is stored locally and private to you. We only capture what's needed to help you find your voice.
+                🔒 Your data is stored locally and private to you. We only capture what&apos;s needed to help you find your voice.
             </p>
         </div>
     </div>

@@ -1,7 +1,7 @@
 import { render, screen, cleanup, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import BrightnessMeter from './BrightnessMeter';
-const React = await import('react');
+
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
 // Mock RenderCoordinator
@@ -14,8 +14,8 @@ vi.mock('../../services/RenderCoordinator', () => ({
 
 // Override global mock for this test to include Smile
 vi.mock('lucide-react', () => {
-    import React from 'react';
-    const createIcon = (name) => { const Icon = (props) => React.createElement('div', { ...props, 'data-testid': name }); Icon.displayName = name; return Icon; };
+
+    const createIcon = (name) => { const Icon = (props) => require('react').createElement('div', { ...props, 'data-testid': name }); Icon.displayName = name; return Icon; };
 
     return {
         Sun: createIcon('Sun'),
