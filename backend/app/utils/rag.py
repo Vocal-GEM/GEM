@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 import json
 import os
 try:
@@ -27,7 +30,7 @@ class SimpleRAG:
             )
             return result['embedding']
         except Exception as e:
-            print(f"Embedding error: {e}")
+            logger.error(f"Embedding error: {e}")
             return None
 
     def document_exists(self, source):
@@ -35,7 +38,7 @@ class SimpleRAG:
             exists = db.session.query(KnowledgeDocument.id).filter_by(source=source).first() is not None
             return exists
         except Exception as e:
-            print(f"Error checking document existence: {e}")
+            logger.error(f"Error checking document existence: {e}")
             return False
 
     def add_document(self, text, source="unknown"):
@@ -65,7 +68,7 @@ class SimpleRAG:
         try:
             db.session.commit()
         except Exception as e:
-            print(f"Database error: {e}")
+            logger.error(f"Database error: {e}")
             db.session.rollback()
             return 0
             
@@ -79,7 +82,7 @@ class SimpleRAG:
                 text += page.extract_text() + "\n"
             return self.add_document(text, source=os.path.basename(file_path))
         except Exception as e:
-            print(f"Error reading PDF: {e}")
+            logger.error(f"Error reading PDF: {e}")
             return 0
 
     def query(self, query_text, k=3):
@@ -88,7 +91,7 @@ class SimpleRAG:
         try:
             documents = KnowledgeDocument.query.all()
         except Exception as e:
-            print(f"Database query error: {e}")
+            logger.error(f"Database query error: {e}")
             return []
 
         if not documents:
@@ -102,7 +105,7 @@ class SimpleRAG:
                 task_type="retrieval_query"
             )['embedding']
         except Exception as e:
-            print(f"Query embedding error: {e}")
+            logger.error(f"Query embedding error: {e}")
             return []
 
         # Calculate Cosine Similarity
