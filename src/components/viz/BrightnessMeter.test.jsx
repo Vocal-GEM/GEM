@@ -14,8 +14,9 @@ vi.mock('../../services/RenderCoordinator', () => ({
 
 // Override global mock for this test to include Smile
 vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+    // We cannot use await vi.importActual in sync factory. Using div directly.
+const createIcon = (name) => { const Icon = (props) => <div {...props} data-testid={name} />; Icon.displayName = name; return Icon; };
+
 
     return {
         Sun: createIcon('Sun'),

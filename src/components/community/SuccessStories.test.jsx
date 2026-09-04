@@ -1,4 +1,6 @@
-/* eslint-disable no-undef, no-unused-vars */
+import CommunityService from '../../services/CommunityService';
+import ModerationService from '../../services/ModerationService';
+/* eslint-disable no-unused-vars */
 /* global global */
 import { describe, test, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
