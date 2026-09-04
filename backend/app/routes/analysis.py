@@ -4,7 +4,7 @@ Provides endpoints for analyzing recorded audio with voice metrics.
 Uses librosa for analysis and faster-whisper for transcription (no compilation needed).
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from werkzeug.utils import secure_filename
 import os
 import tempfile
@@ -72,7 +72,7 @@ def extract_pitch_librosa(y, sr):
             }
         return None
     except Exception as e:
-        print(f"Pitch extraction error: {e}")
+        current_app.logger.error(f"Pitch extraction error: {e}")
         return None
 
 
@@ -104,7 +104,7 @@ def estimate_formants_lpc(y, sr, n_formants=3):
         return formants if formants else {'f1': None, 'f2': None, 'f3': None}
         
     except Exception as e:
-        print(f"Formant extraction error: {e}")
+        current_app.logger.error(f"Formant extraction error: {e}")
         return {'f1': None, 'f2': None, 'f3': None}
 
 
@@ -137,7 +137,7 @@ def calculate_jitter_shimmer(y, sr, f0_contour):
         return float(jitter), float(shimmer) if shimmer else None
         
     except Exception as e:
-        print(f"Jitter/Shimmer calculation error: {e}")
+        current_app.logger.error(f"Jitter/Shimmer calculation error: {e}")
         return None, None
 
 
@@ -159,7 +159,7 @@ def calculate_hnr(y, sr):
         return float(hnr_db) if hnr_db else None
         
     except Exception as e:
-        print(f"HNR calculation error: {e}")
+        current_app.logger.error(f"HNR calculation error: {e}")
         return None
 
 
@@ -344,9 +344,7 @@ def analyze_audio():
         return jsonify(response), 200
         
     except Exception as e:
-        print(f"Analysis error: {e}")
-        import traceback
-        traceback.print_exc()
+        current_app.logger.error(f"Analysis error: {e}")
         # Security: Do not expose internal error details to client
         return jsonify({'error': 'An internal error occurred during analysis.'}), 500
         
