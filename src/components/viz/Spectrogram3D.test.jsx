@@ -1,3 +1,4 @@
+/* global global */
 import { render, cleanup, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Spectrogram3D from './Spectrogram3D';
