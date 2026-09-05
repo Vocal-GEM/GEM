@@ -1,4 +1,5 @@
 import { io } from 'socket.io-client';
+import renderCoordinator from '../services/RenderCoordinator';
 import { isBackendEnabled, getBackendUrl } from '../config/runtime';
 import { DSP } from '../utils/DSP';
 import { PitchDetector } from '../utils/PitchDetector';
@@ -355,9 +356,14 @@ export class AudioEngine {
         this.visualPitchBuffer = [];
         this.visualAmpBuffer = [];
 
+        // Generate unique subscriber ID once
+        if (!this.renderSubscriberId) {
+            this.renderSubscriberId = 'engine-' + Math.random().toString(36).substring(2, 11);
+        }
+
         const loop = () => {
             if (!this.isActive) return;
-            this.animationFrameId = requestAnimationFrame(loop);
+            // REMOVED: requestAnimationFrame(loop) - handled by renderCoordinator
 
             // Fetch data (always needed for visualization/RMS)
             this.analyser.getFloatTimeDomainData(dataArray);
@@ -622,7 +628,8 @@ export class AudioEngine {
             }
         };
 
-        loop();
+        // Subscribe to RenderCoordinator instead of using raw requestAnimationFrame
+        renderCoordinator.subscribe(this.renderSubscriberId, loop, renderCoordinator.PRIORITY.HIGH);
     }
 
     // Explicitly add HNR calculation if needed for high precision mode, 
@@ -636,9 +643,8 @@ export class AudioEngine {
             this.passthroughGain.gain.setTargetAtTime(0, this.audioContext.currentTime, 0.1);
         }
 
-        if (this.animationFrameId) {
-            cancelAnimationFrame(this.animationFrameId);
-            this.animationFrameId = null;
+        if (this.renderSubscriberId) {
+            renderCoordinator.unsubscribe(this.renderSubscriberId);
         }
         if (this.microphone) {
             this.microphone.disconnect();
