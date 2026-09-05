@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-12 - RenderCoordinator for Core AudioEngine
+**Learning:** The core `AudioEngine` class was using a raw `requestAnimationFrame` loop to dispatch updates to the UI, competing with UI components and bypassing the centralized `RenderCoordinator`. Multiple localized loops on the main thread increase CPU overhead and break V-sync frame pacing.
+**Action:** Always replace raw `requestAnimationFrame` loops in React components and core JS engine classes with a centralized JavaScript-based singleton (like `RenderCoordinator`) to coordinate frame rendering. Ensure a persistent unique subscriber ID is generated once in the constructor or class properties.
