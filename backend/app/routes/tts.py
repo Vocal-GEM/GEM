@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 import os
 import requests
 from ..extensions import limiter
@@ -49,9 +49,10 @@ def synthesize_speech():
 
         if not response.ok:
             error_text = response.text
+            current_app.logger.error(f"ElevenLabs API error {response.status_code}: {error_text}")
             return jsonify({
-                "error": f"ElevenLabs API error: {response.status_code}",
-                "details": error_text
+                "error": "ElevenLabs API error",
+                "details": "An error occurred with the upstream service"
             }), response.status_code
 
         # Return audio data
@@ -63,7 +64,8 @@ def synthesize_speech():
     except requests.exceptions.Timeout:
         return jsonify({"error": "Request to ElevenLabs timed out"}), 504
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Failed to connect to ElevenLabs: {str(e)}"}), 502
+        current_app.logger.error(f"Failed to connect to ElevenLabs: {str(e)}")
+        return jsonify({"error": "Failed to connect to upstream service"}), 502
 
 
 @tts_bp.route('/voices', methods=['GET'])
@@ -99,4 +101,5 @@ def get_voices():
     except requests.exceptions.Timeout:
         return jsonify({"error": "Request timed out", "voices": []}), 504
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Failed to connect: {str(e)}", "voices": []}), 502
+        current_app.logger.error(f"Failed to connect: {str(e)}")
+        return jsonify({"error": "Failed to connect to upstream service", "voices": []}), 502

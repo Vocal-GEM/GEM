@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-02-27 - Information Leakage in TTS Service Errors
+**Vulnerability:** External TTS API errors and downstream exception details (like stack/network errors) were directly returned in the JSON response payload.
+**Learning:** Returning `str(e)` directly inside `jsonify()` exposes the application's internal structure and potentially sensitive upstream API details (like full URLs, connection paths, or internal tracebacks). In Python, `str(e)` on standard library network exceptions often leaks far more than just "connection failed".
+**Prevention:** Always catch broad exceptions, mask the `jsonify()` response with a generic, safe string like "Failed to connect to upstream service," and explicitly log the true `str(e)` server-side using `current_app.logger.error`.
