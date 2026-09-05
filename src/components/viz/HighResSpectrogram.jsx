@@ -64,7 +64,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         // Optimization: Use alpha: false for better performance
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
-        const ctx = canvas.getContext('2d', { alpha: false });
 
         const width = canvas.width;
         const height = canvas.height;
@@ -137,13 +136,13 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
                 if (currFreq > 0 && lastFreq > 0) {
                     const currY = height * (1 - currFreq / MAX_FREQ);
                     const lastY = height * (1 - lastFreq / MAX_FREQ);
-                    ctx.beginPath();
+                    overlayCtx.beginPath();
                     ctx.strokeStyle = color;
                     // Draw from previous frame's position (shifted left by scrollSpeed)
                     // Previous point was at 'width - scrollSpeed', now at 'width - scrollSpeed * 2'
                     ctx.moveTo(width - scrollSpeed * 2, lastY);
                     ctx.lineTo(width - scrollSpeed, currY);
-                    ctx.stroke();
+                    overlayCtx.stroke();
                 }
             };
 

@@ -6,7 +6,6 @@ import { renderCoordinator } from '../../services/RenderCoordinator';
 
 // Mock RenderCoordinator
 vi.mock('../../services/RenderCoordinator', () => ({
-  __esModule: true,
     renderCoordinator: {
         subscribe: vi.fn(() => vi.fn()), // Returns unsubscribe fn
         PRIORITY: { MEDIUM: 2 }
@@ -15,14 +14,11 @@ vi.mock('../../services/RenderCoordinator', () => ({
 
 // Override global mock for this test to include Smile
 vi.mock('lucide-react', () => {
-    const React = await import('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
-
     return {
-        Sun: createIcon('Sun'),
-        Moon: createIcon('Moon'),
-        Info: createIcon('Info'),
-        Smile: createIcon('Smile')
+        Sun: (props) => <div data-testid="Sun" {...props} />,
+        Moon: (props) => <div data-testid="Moon" {...props} />,
+        Info: (props) => <div data-testid="Info" {...props} />,
+        Smile: (props) => <div data-testid="Smile" {...props} />
     };
 });
 
