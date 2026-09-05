@@ -83,3 +83,7 @@
 **Vulnerability:** CI was failing because ESLint enforces escaped quotes in JSX text.
 **Learning:** Using raw double quotes `"` in JSX text nodes causes ESLint to throw `react/no-unescaped-entities`. Additionally, using string interpolation with `replace` directly inside JSX curly braces requires careful quoting to avoid syntax errors that break CI.
 **Prevention:** Always use `&quot;` for quotes in JSX text nodes. When using inline string manipulation, enclose the expression inside `{}` properly or use template literals carefully. Ensure to run ESLint locally before pushing changes.
+## 2025-02-27 - CI Build Failures from Missing Globals and Duplicates
+**Vulnerability:** The CI pipeline was failing due to syntax errors including duplicate keys in object literals and missing globals in test environments.
+**Learning:** Hardcoded environment variables (e.g., `process.env.REACT_APP_RESEARCH_SALT`) can cause `process is not defined` errors if the project uses a bundler like Vite which expects `import.meta.env`. Duplicate object keys cause fatal linting/parsing errors. Test suites often need explicit `globalThis.` prefixes for standard APIs like `ResizeObserver` or `requestAnimationFrame` if the test environment is not fully configured.
+**Prevention:** Use `import.meta.env` for environment variables in Vite projects. Always check for duplicate keys when refactoring config objects. Use `globalThis.` when modifying global browser APIs in test mocks to ensure compatibility across node versions and test runners.
