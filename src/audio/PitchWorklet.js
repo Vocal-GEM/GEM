@@ -41,6 +41,7 @@ class PitchProcessor extends AudioWorkletProcessor {
         if (!input || !input[0]) return true;
 
         const inputChannel = input[0];
+        const currentTime = globalThis.currentTime;
 
         // Fill buffer with incoming audio
         for (let i = 0; i < inputChannel.length; i++) {
