@@ -79,3 +79,7 @@
 **Vulnerability:** External TTS API errors and downstream exception details (like stack/network errors) were directly returned in the JSON response payload.
 **Learning:** Returning `str(e)` directly inside `jsonify()` exposes the application's internal structure and potentially sensitive upstream API details (like full URLs, connection paths, or internal tracebacks). In Python, `str(e)` on standard library network exceptions often leaks far more than just "connection failed".
 **Prevention:** Always catch broad exceptions, mask the `jsonify()` response with a generic, safe string like "Failed to connect to upstream service," and explicitly log the true `str(e)` server-side using `current_app.logger.error`.
+## 2025-02-27 - CI Linting Failure due to Unescaped Quotes
+**Vulnerability:** CI was failing because ESLint enforces escaped quotes in JSX text.
+**Learning:** Using raw double quotes `"` in JSX text nodes causes ESLint to throw `react/no-unescaped-entities`. Additionally, using string interpolation with `replace` directly inside JSX curly braces requires careful quoting to avoid syntax errors that break CI.
+**Prevention:** Always use `&quot;` for quotes in JSX text nodes. When using inline string manipulation, enclose the expression inside `{}` properly or use template literals carefully. Ensure to run ESLint locally before pushing changes.
