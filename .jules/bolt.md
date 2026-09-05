@@ -41,6 +41,3 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
-## 2024-09-05 - AudioEngine RenderCoordinator Optimization
-**Learning:** Replaced `requestAnimationFrame` in `AudioEngine` with `RenderCoordinator` for performance. We must replace `this.animationFrameId` with a generated ID string in the constructor, implement a loop that takes `deltaTime`, and call `RenderCoordinator.subscribe()` rather than initiating a recursive loop. Unsubscribing logic needs to accurately replace `cancelAnimationFrame()` in `stop()`.
-**Action:** Always replace recursive `requestAnimationFrame` hooks with the centralized `RenderCoordinator` to prevent competing main thread loops and optimize frame rendering. Ensure tests mock both `import('../config/runtime')` and all necessary object values to avoid pipeline regressions.
