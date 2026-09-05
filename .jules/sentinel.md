@@ -75,3 +75,15 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-02-27 - Information Leakage in TTS Service Errors
+**Vulnerability:** External TTS API errors and downstream exception details (like stack/network errors) were directly returned in the JSON response payload.
+**Learning:** Returning `str(e)` directly inside `jsonify()` exposes the application's internal structure and potentially sensitive upstream API details (like full URLs, connection paths, or internal tracebacks). In Python, `str(e)` on standard library network exceptions often leaks far more than just "connection failed".
+**Prevention:** Always catch broad exceptions, mask the `jsonify()` response with a generic, safe string like "Failed to connect to upstream service," and explicitly log the true `str(e)` server-side using `current_app.logger.error`.
+## 2025-02-27 - CI Linting Failure due to Unescaped Quotes
+**Vulnerability:** CI was failing because ESLint enforces escaped quotes in JSX text.
+**Learning:** Using raw double quotes `"` in JSX text nodes causes ESLint to throw `react/no-unescaped-entities`. Additionally, using string interpolation with `replace` directly inside JSX curly braces requires careful quoting to avoid syntax errors that break CI.
+**Prevention:** Always use `&quot;` for quotes in JSX text nodes. When using inline string manipulation, enclose the expression inside `{}` properly or use template literals carefully. Ensure to run ESLint locally before pushing changes.
+## 2025-02-27 - CI Build Failures from Missing Globals and Duplicates
+**Vulnerability:** The CI pipeline was failing due to syntax errors including duplicate keys in object literals and missing globals in test environments.
+**Learning:** Hardcoded environment variables (e.g., `process.env.REACT_APP_RESEARCH_SALT`) can cause `process is not defined` errors if the project uses a bundler like Vite which expects `import.meta.env`. Duplicate object keys cause fatal linting/parsing errors. Test suites often need explicit `globalThis.` prefixes for standard APIs like `ResizeObserver` or `requestAnimationFrame` if the test environment is not fully configured.
+**Prevention:** Use `import.meta.env` for environment variables in Vite projects. Always check for duplicate keys when refactoring config objects. Use `globalThis.` when modifying global browser APIs in test mocks to ensure compatibility across node versions and test runners.
