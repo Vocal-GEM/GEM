@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-03-10 - AudioEngine requestAnimationFrame Refactoring
+**Learning:** The `AudioEngine` was using a dedicated `requestAnimationFrame(loop)` to run its update loop, independent of the `RenderCoordinator`. This meant multiple visualization loops running concurrently on the main thread, causing frame pacing issues and unnecessary CPU load. The baseline test failures are expected syntax issues in Vitest mock configuration.
+**Action:** Replaced `requestAnimationFrame` with `RenderCoordinator.subscribe` to synchronize engine updates with the central render pipeline, generating a persistent unique ID in the constructor (`useId` not available here as it's not a React component, so using `Math.random`) and properly cleaning up in the `stop` method.
