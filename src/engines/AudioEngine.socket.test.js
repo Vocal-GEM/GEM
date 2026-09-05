@@ -1,3 +1,17 @@
+vi.mock('../config/runtime', () => ({
+    isBackendEnabled: vi.fn(() => true),
+    getBackendUrl: vi.fn(() => 'http://localhost:5000')
+}));
+
+// Mock RenderCoordinator
+vi.mock('../services/RenderCoordinator', () => ({
+    renderCoordinator: {
+        subscribe: vi.fn(() => vi.fn()),
+        unsubscribe: vi.fn(),
+        PRIORITY: { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
+    }
+}));
+
 /* eslint-env node */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AudioEngine } from './AudioEngine';
@@ -11,6 +25,8 @@ vi.mock('socket.io-client', () => ({
 // Mock pitchfinder
 vi.mock('pitchfinder', () => ({
     McLeod: vi.fn(() => vi.fn((buffer) => 440)),
+    Macleod: vi.fn(() => vi.fn((buffer) => 440)),
+    AMDF: vi.fn(() => vi.fn((buffer) => 440)),
     YIN: vi.fn(() => vi.fn((buffer) => 440))
 }));
 
