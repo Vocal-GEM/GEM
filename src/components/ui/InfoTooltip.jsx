@@ -7,8 +7,15 @@ const InfoTooltip = ({ content, icon: Icon = HelpCircle, size = 16, className = 
     return (
         <div className={`relative inline-flex items-center ${className}`}
             onMouseEnter={() => setIsVisible(true)}
+            onFocus={() => setIsVisible(true)}
             onMouseLeave={() => setIsVisible(false)}
+            onBlur={() => setIsVisible(false)}
             onClick={() => setIsVisible(!isVisible)}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setIsVisible(!isVisible); } }}
+            tabIndex={0}
+            role="button"
+            aria-expanded={isVisible}
+            aria-label="Show information"
         >
             <Icon size={size} className="text-slate-500 hover:text-blue-400 cursor-pointer transition-colors" />
 
