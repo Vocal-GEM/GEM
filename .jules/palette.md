@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-02-18 - Tooltip/Control Overlay Accessibility
+**Learning:** Floating utility components (like camera controls or tooltips) often use icon-only buttons for compactness, but if they lack `aria-label`s, screen reader users cannot identify their function, rendering the controls completely inaccessible.
+**Action:** Always ensure icon-only buttons in overlays (like zoom, resize, or close controls) have explicit `aria-label` attributes to convey their purpose to assistive technologies.
