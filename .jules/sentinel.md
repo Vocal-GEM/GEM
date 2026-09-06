@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-24 - Missing Authentication on Third-Party Proxy
+**Vulnerability:** The `/api/tts/synthesize` and `/api/tts/voices` endpoints in `tts.py`, which act as proxies for the paid ElevenLabs API using a server-side API key, lacked any authentication requirements.
+**Learning:** Endpoints that consume external, paid APIs or utilize server-side credentials are prime targets for abuse and resource exhaustion (financial DoS) if left unauthenticated, as anyone on the internet could freely send requests through the proxy.
+**Prevention:** Always ensure that proxy endpoints consuming paid external APIs are protected with `@login_required` (or equivalent auth mechanisms) and strict rate limits to prevent unauthorized financial exploitation.
