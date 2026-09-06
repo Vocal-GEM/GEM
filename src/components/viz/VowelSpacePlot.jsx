@@ -1,6 +1,7 @@
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useId } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRecording = false }) => {
     const { colorBlindMode } = useSettings();
@@ -32,6 +33,7 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
     const canvasRef = useRef(null);
 
     const [currentVowel, setCurrentVowel] = useState('');
+    const renderSubId = useId();
     const [hitScore, setHitScore] = useState(0);
 
     // Animation Loop
@@ -40,7 +42,6 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
 
-        let animationId;
 
         const render = () => {
             // Clear Canvas
@@ -129,7 +130,6 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
                 }
             }
 
-            animationId = requestAnimationFrame(render);
         };
 
         // Resize handler
@@ -141,13 +141,13 @@ const VowelSpacePlot = ({ dataRef, showAnalysis = true, targetVowel = null, isRe
         window.addEventListener('resize', resize);
         resize();
 
-        render();
+        const unsubscribe = renderCoordinator.subscribe(`vowel-space-plot-${renderSubId}`, render, renderCoordinator.PRIORITY.MEDIUM);
 
         return () => {
-            cancelAnimationFrame(animationId);
+            unsubscribe();
             window.removeEventListener('resize', resize);
         };
-    }, [targetVowel, isMasc, isRecording, colorBlindMode]);
+    }, [targetVowel, isMasc, isRecording, colorBlindMode, renderSubId]);
 
     return (
         <div className="w-full h-full relative bg-slate-950 rounded-xl overflow-hidden shadow-inner">

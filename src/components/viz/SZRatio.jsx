@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useId } from 'react';
 import { Play, Square, RotateCcw, Divide } from 'lucide-react';
 
 const SZRatio = ({ dataRef, isActive }) => {
@@ -10,7 +10,7 @@ const SZRatio = ({ dataRef, isActive }) => {
     const [threshold, setThreshold] = useState(0.02);
 
     const startTimeRef = useRef(null);
-    const animationRef = useRef(null);
+    const renderSubId = useId();
 
     // Auto-detection logic (similar to MPT)
     useEffect(() => {
@@ -33,13 +33,12 @@ const SZRatio = ({ dataRef, isActive }) => {
                     if (startTimeRef.current) startTimeRef.current.silenceStart = null;
                 }
             }
-            animationRef.current = requestAnimationFrame(checkAudio);
         };
 
         let unsubscribe;
         import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
             unsubscribe = renderCoordinator.subscribe(
-                'sz-ratio',
+                `sz-ratio-${renderSubId}`,
                 checkAudio,
                 renderCoordinator.PRIORITY.LOW
             );
