@@ -1,6 +1,6 @@
 import { useEffect, useRef, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
-import { renderCoordinator } from '../../services/RenderCoordinator';
+import renderCoordinator from '../../services/RenderCoordinator';
 import { Wind, CheckCircle2, AlertTriangle, Info, Sparkles, Activity, HelpCircle } from 'lucide-react';
 
 /**
