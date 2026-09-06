@@ -113,6 +113,16 @@ const FlowFinisher = ({ dataRef, showFeedback = true }) => {
                     className="text-slate-600 hover:text-slate-300 transition-colors"
                     onMouseEnter={() => setShowTooltip(true)}
                     onMouseLeave={() => setShowTooltip(false)}
+                    onFocus={() => setShowTooltip(true)}
+                    onBlur={() => setShowTooltip(false)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setShowTooltip(!showTooltip);
+                        }
+                    }}
+                    aria-label="Toggle Flow Finisher info"
+                    aria-expanded={showTooltip}
                 >
                     <Info size={16} />
                 </button>
