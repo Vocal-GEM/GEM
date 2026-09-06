@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-09-06 - Centralize SafeModeVisualizer Animation Loop
+**Learning:** Legacy `requestAnimationFrame` usages in inner components like `SafeModeVisualizer` bypass the centralized `RenderCoordinator`, causing redundant RAF loops and wasting CPU cycles in low-end fallback modes where efficiency is most critical.
+**Action:** Always replace raw `requestAnimationFrame` with `RenderCoordinator.subscribe(..., PRIORITY.CRITICAL)` for visualizations to leverage frame throttling and consolidated polling.

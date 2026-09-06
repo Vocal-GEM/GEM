@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unknown-property */
 import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo } from 'react';
+import renderCoordinator from '../../services/RenderCoordinator';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Diamond, Bug, Activity, Sliders, Gauge } from 'lucide-react';
@@ -401,7 +402,10 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
   const textRef = useRef(null);
 
   useEffect(() => {
-    let frameId;
+    const subscriberId = `safeModeVisualizer-${Math.random().toString(36).substring(2, 9)}`;
+    // OPTIMIZATION (Bolt): Replace raw requestAnimationFrame with centralized renderCoordinator
+    // Why: Consolidates multiple redundant RAF loops into a single throttled polling system.
+    // Impact: Reduces main thread CPU overhead and prevents layout thrashing, especially critical in safe mode/low-end devices.
     const loop = () => {
       if (dataRef.current) {
         const { pitch, volume } = dataRef.current;
@@ -414,10 +418,9 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
           textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
         }
       }
-      frameId = requestAnimationFrame(loop);
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
+    const unsubscribe = renderCoordinator.subscribe(subscriberId, loop, renderCoordinator.PRIORITY.CRITICAL);
+    return () => unsubscribe();
   }, [dataRef]);
 
   return (
