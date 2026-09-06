@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
 import { Hand, Zap, Info } from 'lucide-react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * TouchDetector - Articulatory pressure indicator for consonant production
@@ -15,7 +16,8 @@ const TouchDetector = ({ dataRef, showFeedback = true }) => {
     });
     const [showTooltip, setShowTooltip] = useState(false);
     const [history, setHistory] = useState([]);
-    const animationRef = useRef();
+
+    const renderSubId = useId();
 
     useEffect(() => {
         const update = () => {
@@ -35,12 +37,11 @@ const TouchDetector = ({ dataRef, showFeedback = true }) => {
                     }
                 }
             }
-            animationRef.current = requestAnimationFrame(update);
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
-    }, [dataRef]);
+        const unsubscribe = renderCoordinator.subscribe(`touch-detector-${renderSubId}`, update, renderCoordinator.PRIORITY.LOW);
+        return () => unsubscribe();
+    }, [dataRef, renderSubId]);
 
     const getQualityConfig = () => {
         switch (touch.quality) {

@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unknown-property */
-import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo } from 'react';
+import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo, useId } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Diamond, Bug, Activity, Sliders, Gauge } from 'lucide-react';
@@ -7,6 +7,7 @@ import { OrbitControls } from '@react-three/drei';
 import { useSettings } from '../../context/SettingsContext';
 import OrbLegend from './OrbLegend';
 import OrbMetricsOverlay from './OrbMetricsOverlay';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 
 const MixingBoardView = lazy(() => import('../views/MixingBoardView'));
@@ -401,8 +402,10 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
   const textRef = useRef(null);
 
   useEffect(() => {
-    let frameId;
-    const loop = () => {
+    // Use RenderCoordinator instead of raw RAF for better performance
+    const renderSubId = `dynamic-orb-${useId()}`;
+
+    const unsubscribe = renderCoordinator.subscribe(renderSubId, () => {
       if (dataRef.current) {
         const { pitch, volume } = dataRef.current;
         // Update DOM directly
@@ -414,10 +417,9 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
           textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
         }
       }
-      frameId = requestAnimationFrame(loop);
-    };
-    loop();
-    return () => cancelAnimationFrame(frameId);
+    }, renderCoordinator.PRIORITY.HIGH);
+
+    return () => unsubscribe();
   }, [dataRef]);
 
   return (

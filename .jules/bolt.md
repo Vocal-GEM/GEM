@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-25 - Un-coordinated RAF Loops
+**Learning:** Found several components (DynamicOrb, FlowFinisher, RegisterGauge, TouchDetector, LTASPlot, VowelSpacePlot) making independent `requestAnimationFrame` calls. In a single page, multiple visualization components doing this results in CPU overload and layout trashing as each component recalculates separately.
+**Action:** Replaced standalone RAF calls with subscriptions to `RenderCoordinator`, a centralized singleton that batches these high-frequency polling/rendering updates into a unified loop to maintain performance and hit 60fps targets.
