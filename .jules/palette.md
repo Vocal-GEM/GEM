@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2023-10-27 - Dynamic Aria Labels on Text-containing buttons
+**Learning:** Adding a static `aria-label` to a button that contains both an icon and dynamic visible text (like an upvote count in SuccessStories.jsx) completely overrides all inner text for screen readers. This hides the dynamic value (the upvote count) and causes a severe accessibility regression.
+**Action:** When adding an `aria-label` to buttons with dynamic text, ensure the `aria-label` incorporates that dynamic value (e.g., `aria-label={\`Upvote. Current upvotes: ${story.upvotes}\`}`).
