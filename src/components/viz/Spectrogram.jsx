@@ -21,6 +21,8 @@ const hzToNote = (hz) => {
 
 const Spectrogram = ({ height = 200, showLabels = true }) => {
     const canvasRef = useRef(null);
+    const uniqueId = useId();
+    const componentId = `spectrogram-${uniqueId}`;
     const { dataRef, isAudioActive, audioContext } = useAudio();
     const { settings } = useSettings();
 

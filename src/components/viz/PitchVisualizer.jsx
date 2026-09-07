@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef, memo, useId } from 'react';
 import { useProfile } from '../../context/ProfileContext';
 import { useSettings } from '../../context/SettingsContext';
 import { RotateCcw, HelpCircle, AlertTriangle, X, Sparkles, BarChart2 } from 'lucide-react';
@@ -16,6 +16,8 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
     const { voiceProfiles, activeProfile } = useProfile();
     const { colorBlindMode } = useSettings();
     const canvasRef = useRef(null);
+    const uniqueId = useId();
+    const componentId = `pitch-visualizer-${uniqueId}`;
 
     // Lazy initialization for Image objects - avoid creating on every render
     const balloonRef = useRef(null);
@@ -569,7 +571,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
         };
 
         const unsubscribe = renderCoordinator.subscribe(
-            'pitch-visualizer',
+            componentId,
             loop,
             renderCoordinator.PRIORITY.HIGH
         );
@@ -577,7 +579,7 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
         return () => {
             unsubscribe();
         };
-    }, [targetRange, exercise, zoomRange, voiceProfiles, settings, colorBlindMode, activeProfile, dataRef, onScore]);
+    }, [targetRange, exercise, zoomRange, voiceProfiles, settings, colorBlindMode, activeProfile, dataRef, onScore, componentId]);
 
     return (
         <div className="w-full h-full relative overflow-hidden group">

@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unknown-property */
-import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo } from 'react';
+import { useRef, useMemo, useState, useEffect, Suspense, lazy, memo, useId } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Diamond, Bug, Activity, Sliders, Gauge } from 'lucide-react';
@@ -7,6 +7,7 @@ import { OrbitControls } from '@react-three/drei';
 import { useSettings } from '../../context/SettingsContext';
 import OrbLegend from './OrbLegend';
 import OrbMetricsOverlay from './OrbMetricsOverlay';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 
 const MixingBoardView = lazy(() => import('../views/MixingBoardView'));
@@ -398,10 +399,11 @@ VisualizerCanvas.displayName = 'VisualizerCanvas';
 
 const SafeModeVisualizer = memo(({ dataRef }) => {
   const circleRef = useRef(null);
+  const uniqueId = useId();
+  const componentId = `safemode-visualizer-${uniqueId}`;
   const textRef = useRef(null);
 
   useEffect(() => {
-    let frameId;
     const loop = () => {
       if (dataRef.current) {
         const { pitch, volume } = dataRef.current;
@@ -414,11 +416,10 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
           textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
         }
       }
-      frameId = requestAnimationFrame(loop);
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
-  }, [dataRef]);
+    const unsubscribe = renderCoordinator.subscribe(componentId, loop, renderCoordinator.PRIORITY.CRITICAL);
+    return () => unsubscribe();
+  }, [dataRef, componentId]);
 
   return (
     <div className="w-full h-full flex items-center justify-center">
