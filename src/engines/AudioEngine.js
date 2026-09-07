@@ -1,5 +1,6 @@
 import { io } from 'socket.io-client';
 import { isBackendEnabled, getBackendUrl } from '../config/runtime';
+import { renderCoordinator } from '../services/RenderCoordinator';
 import { DSP } from '../utils/DSP';
 import { PitchDetector } from '../utils/PitchDetector';
 import { ResonanceCalculator } from '../utils/ResonanceCalculator';
@@ -40,7 +41,8 @@ export class AudioEngine {
         this.mediaRecorder = null;
         this.chunks = [];
         this.toneEngine = null;
-        this.animationFrameId = null;
+        // Removed this.animationFrameId
+        this.renderSubscriberId = 'audio-engine-' + Math.random().toString(36).substring(2, 11);
 
         // DSP State
         this.pitchBuffer = [];
@@ -344,6 +346,7 @@ export class AudioEngine {
         this.debugInfo.state = 'running';
     }
 
+
     startProcessing() {
         if (!this.isActive) return;
 
@@ -357,7 +360,8 @@ export class AudioEngine {
 
         const loop = () => {
             if (!this.isActive) return;
-            this.animationFrameId = requestAnimationFrame(loop);
+            // REMOVED: this.animationFrameId = requestAnimationFrame(loop);
+
 
             // Fetch data (always needed for visualization/RMS)
             this.analyser.getFloatTimeDomainData(dataArray);
@@ -617,16 +621,22 @@ export class AudioEngine {
                         metrics: metricData
                     });
                 }
-
                 this.onAudioUpdate(metricData);
             }
         };
 
-        loop();
+        // Subscribe to centralized render loop with HIGH priority
+        renderCoordinator.subscribe(
+            this.renderSubscriberId,
+            loop,
+            renderCoordinator.PRIORITY.HIGH
+        );
     }
+
 
     // Explicitly add HNR calculation if needed for high precision mode, 
     // but the loop above uses a heuristic for performance.
+
 
     stop() {
         this.isActive = false;
@@ -636,11 +646,13 @@ export class AudioEngine {
             this.passthroughGain.gain.setTargetAtTime(0, this.audioContext.currentTime, 0.1);
         }
 
-        if (this.animationFrameId) {
-            cancelAnimationFrame(this.animationFrameId);
-            this.animationFrameId = null;
+        // Unsubscribe from render coordinator
+        if (this.renderSubscriberId) {
+            renderCoordinator.unsubscribe(this.renderSubscriberId);
         }
+
         if (this.microphone) {
+
             this.microphone.disconnect();
             this.microphone = null;
         }
