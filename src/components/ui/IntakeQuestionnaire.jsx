@@ -398,7 +398,7 @@ const SummaryStep = ({ data }) => (
         </div>
 
         <p className="text-center text-gray-400 mt-4">
-            Click "Complete Profile" to generate your personalized roadmap.
+            Click &quot;Complete Profile&quot; to generate your personalized roadmap.
         </p>
     </div>
 );
