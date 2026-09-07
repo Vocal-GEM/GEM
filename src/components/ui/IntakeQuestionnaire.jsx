@@ -1,7 +1,7 @@
-import React, { useState } from &apos;react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVoiceProfile } from '../../context/VoiceProfileContext';
-import { useTranslation } from &apos;react-i18next'; // Assuming i18n is available, or remove if not
+import { useTranslation } from 'react-i18next'; // Assuming i18n is available, or remove if not
 
 const IntakeQuestionnaire = ({ onComplete, onClose }) => {
     const { updateGoals, updateHealth, profile } = useVoiceProfile();
@@ -26,7 +26,7 @@ const IntakeQuestionnaire = ({ onComplete, onClose }) => {
 
         // Learning Style (Self-reported)
         selfReportedStyle: 'visual',
-        sessionLength: &apos;short'
+        sessionLength: 'short'
     });
 
     const steps = [
@@ -35,7 +35,7 @@ const IntakeQuestionnaire = ({ onComplete, onClose }) => {
         { id: 'health', title: 'Voice & Health History' },
         { id: 'experience', title: 'Experience Level' },
         { id: 'preferences', title: 'Learning Preferences' },
-        { id: &apos;summary', title: 'Profile Summary' }
+        { id: 'summary', title: 'Profile Summary' }
     ];
 
     const handleNext = () => {
@@ -163,7 +163,7 @@ const WelcomeStep = () => (
         </ul>
         <div className="mt-6 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg">
             <p className="text-sm text-purple-300">
-                🔒 Your data is stored locally and private to you. We only capture what&apos;s needed to help you find your voice.
+                🔒 Your data is stored locally and private to you. We only capture what's needed to help you find your voice.
             </p>
         </div>
     </div>
@@ -192,7 +192,7 @@ const GoalsStep = ({ data, update }) => (
         <div>
             <label className="block text-gray-300 mb-2 font-medium">Primary Focus</label>
             <div className="grid grid-cols-2 gap-3">
-                {['pitch', &apos;resonance', 'weight', 'balanced'].map(priority => (
+                {['pitch', 'resonance', 'weight', 'balanced'].map(priority => (
                     <button
                         key={priority}
                         onClick={() => update('priority', priority)}
@@ -316,7 +316,7 @@ const ExperienceStep = ({ data, update }) => (
                 {['none', 'beginner', 'intermediate', 'advanced', 'professional'].map(level => (
                     <button
                         key={level}
-                        onClick={() => update(&apos;singingExperience', level)}
+                        onClick={() => update('singingExperience', level)}
                         className={`w-full p-3 text-left rounded-lg border transition-all ${data.singingExperience === level
                                 ? 'bg-purple-600/20 border-purple-500 text-purple-200'
                                 : 'bg-gray-800 border-gray-700 text-gray-400'
@@ -342,7 +342,7 @@ const PreferencesStep = ({ data, update }) => (
                 ].map(style => (
                     <button
                         key={style.id}
-                        onClick={() => update(&apos;selfReportedStyle', style.id)}
+                        onClick={() => update('selfReportedStyle', style.id)}
                         className={`p-4 rounded-xl border text-center transition-all ${data.selfReportedStyle === style.id
                                 ? 'bg-cyan-600/20 border-cyan-500 text-cyan-200'
                                 : 'bg-gray-800 border-gray-700 text-gray-400'
@@ -361,13 +361,13 @@ const PreferencesStep = ({ data, update }) => (
             <div className="grid grid-cols-2 gap-3">
                 {[
                     { id: 'micro', label: 'Micro (2-5m)', desc: 'Quick check-ins' },
-                    { id: &apos;short', label: 'Short (10-15m)', desc: 'Standard practice' },
-                    { id: &apos;standard', label: 'Medium (20-30m)', desc: 'Deep dive' },
+                    { id: 'short', label: 'Short (10-15m)', desc: 'Standard practice' },
+                    { id: 'standard', label: 'Medium (20-30m)', desc: 'Deep dive' },
                     { id: 'long', label: 'Long (45m+)', desc: 'Intensive session' },
                 ].map(opt => (
                     <button
                         key={opt.id}
-                        onClick={() => update(&apos;sessionLength', opt.id)}
+                        onClick={() => update('sessionLength', opt.id)}
                         className={`p-3 rounded-lg border text-left transition-all ${data.sessionLength === opt.id
                                 ? 'bg-green-600/20 border-green-500 text-green-200'
                                 : 'bg-gray-800 border-gray-700 text-gray-400'
