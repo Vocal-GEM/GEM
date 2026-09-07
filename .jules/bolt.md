@@ -41,3 +41,10 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-15 - Fixed Component ID Collision in RenderCoordinator
+**Learning:** The \`RenderCoordinator\` is a singleton that uses a \`Map\` to track subscribers by ID. Several visualization components (like \`PitchVisualizer\`, \`Spectrogram\`, and \`SafeModeVisualizer\` within \`DynamicOrb\`) were using static string IDs (e.g., \`'pitch-visualizer'\`). If multiple instances of these components were rendered simultaneously, they would overwrite each other's subscriber IDs in the \`RenderCoordinator\`, leading to only one instance updating or both breaking on unmount.
+**Action:** Always use React's native \`useId()\` hook to generate globally unique IDs for components when registering them with singleton services like \`RenderCoordinator\`. E.g., \`const componentId = \`pitch-visualizer-\${useId()}\`\`.
+
+## 2025-05-15 - Migrated SafeModeVisualizer to RenderCoordinator
+**Learning:** \`SafeModeVisualizer\` (within \`DynamicOrb.jsx\`) was manually creating a \`requestAnimationFrame\` loop and updating the DOM directly. This bypasses the \`RenderCoordinator\`'s performance throttling, deadbanding, and prioritization features, defeating the purpose of having a centralized render loop for visualizations.
+**Action:** Always use \`renderCoordinator.subscribe()\` instead of raw \`requestAnimationFrame()\` for continuous visualizations to ensure consistent performance management across the app.
