@@ -26,12 +26,7 @@ const Spectrogram = ({ height = 200, showLabels = true }) => {
     const { dataRef, isAudioActive, audioContext } = useAudio();
     const { settings } = useSettings();
 
-    // Lazy initialization of component ID
-    const idRef = useRef(null);
-    if (!idRef.current) {
-        idRef.current = `spectrogram-${Math.random().toString(36).substr(2, 9)}`;
-    }
-    const componentId = idRef.current;
+
 
     // Tap cursor state
     const [cursorData, setCursorData] = useState(null);
