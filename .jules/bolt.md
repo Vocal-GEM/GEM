@@ -41,3 +41,15 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-18 - Optimized MetricCard with React.memo
+**Learning:** Found a component (`MetricCard`) that is used heavily in lists and dashboards (used over 20 times in `AnalysisView.jsx` and `ClinicalAssessmentView.jsx`) but was not wrapped in `React.memo`, leading to unnecessary re-renders when parent components updated state.
+**Action:** Wrapped `MetricCard` in `React.memo` to prevent re-renders when props are unchanged, reducing rendering overhead significantly in complex views like `AnalysisView`.
+## 2024-05-18 - Fixed implicit global in AudioWorklet
+**Learning:** Found a runtime crash in `PitchWorklet.js` due to a `ReferenceError: currentTime is not defined`. AudioWorklet scope doesn't expose implicit globals like `currentTime` consistently depending on the environment context.
+**Action:** Replaced `currentTime` with explicit `globalThis.currentTime` to safely access the audio context's time in the worklet scope.
+## 2024-05-18 - Fixed undefined import in ClientDashboard
+**Learning:** Found a CI failure caused by `ReferenceError: Activity is not defined` in `ClientDashboard.jsx`. The icon was used in JSX but missing from the lucide-react import list.
+**Action:** Added `Activity` to the lucide-react imports to fix the reference error.
+## 2024-05-18 - Fixed test suite reference error in BrightnessMeter.test.jsx
+**Learning:** Encountered `ReferenceError: require is not defined` and `Component definition is missing display name` in `BrightnessMeter.test.jsx` within the Vite/Vitest environment. ES modules do not support `require()`.
+**Action:** Refactored the `lucide-react` mock to use `async (importOriginal)` and `await import('react')`, spread `...mod`, and explicitly attached `.displayName` to the created functional mock components.
