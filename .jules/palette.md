@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-23 - Disclosure Widget Accessibility
+**Learning:** Icon-only disclosure widgets (like a hamburger menu button) lacking `aria-label` and `aria-expanded` attributes leave screen reader users unaware of the button's purpose and state, leading to confusing navigation.
+**Action:** When creating or auditing icon-only toggles, always include a dynamic `aria-label` (e.g., 'Open menu' vs 'Close menu') and an `aria-expanded` attribute that reflects the current open/closed state.
