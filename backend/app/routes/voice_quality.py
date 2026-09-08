@@ -49,8 +49,8 @@ def analyze():
             result = analyze_file(tmp_path, goal_name=goal_name)
     except Exception as e:
         # Security: Do not expose internal error details to client
-        print(f"Voice quality analysis error: {e}")
-        return jsonify({"error": "An internal error occurred during voice quality analysis."}), 500
+        current_app.logger.error(f"Voice quality analysis error: {e}")
+        return jsonify({"error": "An internal error occurred"}), 500
     finally:
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
@@ -108,7 +108,6 @@ def clean_audio():
         # Cleanup on error since after_request might not run or file might exist
         if 'tmp_path' in locals() and os.path.exists(tmp_path):
             os.remove(tmp_path)
-        return jsonify({'error': str(e)}), 500
         # If we failed before send_file, clean up manually
         # Manual cleanup on error since after_request might not run if we crash before return
         if tmp_path and os.path.exists(tmp_path):
@@ -117,8 +116,8 @@ def clean_audio():
             except:
                 pass
         # Security: Do not expose internal error details to client
-        print(f"Voice cleaning error: {e}")
-        return jsonify({'error': 'An internal error occurred during audio cleaning.'}), 500
+        current_app.logger.error(f"Voice cleaning error: {e}")
+        return jsonify({"error": "An internal error occurred"}), 500
 
 # ----------------------
 # Voice Manipulation (Voice Lab / PSOLA)
@@ -204,11 +203,10 @@ def manipulate_file():
                 os.remove(tmp_path)
              except:
                 pass
-        return jsonify({'error': str(e)}), 500
         # Cleanup original temp file
         # Security: Do not expose internal error details to client
         current_app.logger.error(f"Voice manipulation error: {e}")
-        return jsonify({'error': 'An internal error occurred during voice manipulation.'}), 500
+        return jsonify({"error": "An internal error occurred"}), 500
     finally:
         # Cleanup original temp file immediately
         if tmp_path and os.path.exists(tmp_path):

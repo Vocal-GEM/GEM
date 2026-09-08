@@ -23,7 +23,7 @@ class TestSettingsSecurity(unittest.TestCase):
         self.app = Flask(__name__)
         self.app.config['SECRET_KEY'] = 'test'
         self.app.register_blueprint(settings.settings_bp, url_prefix='/api/settings')
-        self.app.register_blueprint(settings.settings_bp)
+
 
         self.login_manager = LoginManager()
         self.login_manager.init_app(self.app)
@@ -61,8 +61,8 @@ class TestSettingsSecurity(unittest.TestCase):
 
         with patch('flask_login.utils._get_user', return_value=mock_user):
             # Mock db.session.commit to raise an exception with sensitive info
-            sensitive_info = "Connection failed to database at 192.168.1.5:5432"
-            self.mock_db.session.commit.side_effect = Exception(sensitive_info)
+            secret_db_error = "Connection failed to database at 192.168.1.5:5432"
+            self.mock_db.session.commit.side_effect = Exception(secret_db_error)
     def test_update_settings_generic_error(self):
         """
         Test that update_settings returns a GENERIC error message on failure
@@ -85,8 +85,8 @@ class TestSettingsSecurity(unittest.TestCase):
 
             # Security Check: The sensitive info should NOT be in the response
             # Currently this assertion is expected to FAIL until we fix the code
-            self.assertNotIn(sensitive_info, response.get_json()['error'])
-            self.assertEqual(response.get_json()['error'], "An error occurred while saving settings")
+            self.assertNotIn(secret_db_error, response.get_json()['error'])
+            self.assertEqual(response.get_json()["error"], "Failed to update settings")
             data = json.loads(response.data)
 
             # SECURITY VERIFICATION:
