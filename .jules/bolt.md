@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-03-22 - Layout Thrashing in Animation Loops (DynamicOrb)
+**Learning:** `SafeModeVisualizer` inside `DynamicOrb.jsx` was recursively calling `requestAnimationFrame` manually rather than using the centralized `RenderCoordinator` service. In an app with heavy visualization like Vocal GEM, allowing individual components to spawn untracked `requestAnimationFrame` loops leads to layout thrashing, severe CPU spikes, and disjointed frame rendering since these individual loops do not respect a unified priority queue or pause state.
+**Action:** Replace all direct calls to `requestAnimationFrame` and `cancelAnimationFrame` in visualizations with `renderCoordinator.subscribe` and `.unsubscribe`, ensuring components pass their `componentId` and a suitable priority (e.g., `renderCoordinator.PRIORITY.LOW` for fallback UIs).
