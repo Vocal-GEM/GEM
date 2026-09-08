@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-24 - Stop Information Leakage in API Routes
+**Vulnerability:** External API errors (e.g., ElevenLabs TTS errors) and raw exception strings (`str(e)`) were being passed directly to the client in JSON responses (e.g., `backend/app/routes/tts.py`), which leaks stack traces, network paths, and potentially API keys or sensitive internal details to the end-user.
+**Learning:** Returning `error_text = response.text` from an external API or `str(e)` directly in a JSON error response can expose backend implementation details and bypass internal application security boundaries.
+**Prevention:** Catch external API errors and exceptions, log the detailed error server-side using `current_app.logger.error`, and return a sanitized, generic error message to the client (e.g., "External service error", "Failed to connect to external service").
