@@ -50,3 +50,6 @@
 ## 2024-05-18 - Fixed undefined import in ClientDashboard
 **Learning:** Found a CI failure caused by `ReferenceError: Activity is not defined` in `ClientDashboard.jsx`. The icon was used in JSX but missing from the lucide-react import list.
 **Action:** Added `Activity` to the lucide-react imports to fix the reference error.
+## 2024-05-18 - Fixed test suite reference error in BrightnessMeter.test.jsx
+**Learning:** Encountered `ReferenceError: require is not defined` and `Component definition is missing display name` in `BrightnessMeter.test.jsx` within the Vite/Vitest environment. ES modules do not support `require()`.
+**Action:** Refactored the `lucide-react` mock to use `async (importOriginal)` and `await import('react')`, spread `...mod`, and explicitly attached `.displayName` to the created functional mock components.
