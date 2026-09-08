@@ -7,6 +7,7 @@
 ## 2025-05-21 - Layout Thrashing in Animation Loops
 **Learning:** `getBoundingClientRect()` causes a synchronous reflow (layout thrashing) when called inside a high-frequency animation loop (e.g., `requestAnimationFrame`). In `PitchVisualizer.jsx`, this was being called ~60 times per second along with canvas resizing, which forces a full repaint.
 **Action:** Use `ResizeObserver` to track element dimensions asynchronously. Update the canvas size only when the physical dimensions actually change, and store the dimensions in a `ref` for use in the animation loop.
+
 ## 2025-05-21 - Widespread Lazy Initialization Anti-Pattern
 **Learning:** The `useRef(new Class())` anti-pattern was found in 7+ components, involving `Float32Array` buffers (up to 16KB per render in `Spectrogram3D`), `Image` objects, and service classes. This creates invisible memory pressure that doesn't break functionality but triggers frequent GC pauses.
 **Action:** Audit all `useRef` calls during code reviews. Any `new` keyword inside `useRef(...)` is a red flag. Use `if (!ref.current) ref.current = new Class()` for strict lazy loading.
@@ -41,3 +42,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Layout Thrashing in PitchOrb loop
+**Learning:** Similar to PitchVisualizer, PitchOrb.jsx was calling getBoundingClientRect() inside the high-frequency renderCoordinator animation loop (~60fps). This causes a synchronous reflow (layout thrashing) every frame.
+**Action:** Use ResizeObserver to track canvas dimensions asynchronously and update the canvas dimensions only when they have truly changed, avoiding layout thrashing.
