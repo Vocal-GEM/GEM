@@ -44,3 +44,6 @@
 ## 2024-05-18 - Optimized MetricCard with React.memo
 **Learning:** Found a component (`MetricCard`) that is used heavily in lists and dashboards (used over 20 times in `AnalysisView.jsx` and `ClinicalAssessmentView.jsx`) but was not wrapped in `React.memo`, leading to unnecessary re-renders when parent components updated state.
 **Action:** Wrapped `MetricCard` in `React.memo` to prevent re-renders when props are unchanged, reducing rendering overhead significantly in complex views like `AnalysisView`.
+## 2024-05-18 - Fixed implicit global in AudioWorklet
+**Learning:** Found a runtime crash in `PitchWorklet.js` due to a `ReferenceError: currentTime is not defined`. AudioWorklet scope doesn't expose implicit globals like `currentTime` consistently depending on the environment context.
+**Action:** Replaced `currentTime` with explicit `globalThis.currentTime` to safely access the audio context's time in the worklet scope.
