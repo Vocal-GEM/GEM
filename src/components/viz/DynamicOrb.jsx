@@ -7,6 +7,7 @@ import { OrbitControls } from '@react-three/drei';
 import { useSettings } from '../../context/SettingsContext';
 import OrbLegend from './OrbLegend';
 import OrbMetricsOverlay from './OrbMetricsOverlay';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 
 const MixingBoardView = lazy(() => import('../views/MixingBoardView'));
@@ -399,9 +400,9 @@ VisualizerCanvas.displayName = 'VisualizerCanvas';
 const SafeModeVisualizer = memo(({ dataRef }) => {
   const circleRef = useRef(null);
   const textRef = useRef(null);
+  const componentId = useId();
 
   useEffect(() => {
-    let frameId;
     const loop = () => {
       if (dataRef.current) {
         const { pitch, volume } = dataRef.current;
@@ -414,11 +415,18 @@ const SafeModeVisualizer = memo(({ dataRef }) => {
           textRef.current.innerText = pitch > 0 ? Math.round(pitch) + ' Hz' : '...';
         }
       }
-      frameId = requestAnimationFrame(loop);
     };
-    loop();
-    return () => cancelAnimationFrame(frameId);
-  }, [dataRef]);
+
+    const unsubscribe = renderCoordinator.subscribe(
+        'safemode-visualizer-' + componentId,
+        loop,
+        renderCoordinator.PRIORITY.LOW
+    );
+
+    return () => {
+        unsubscribe();
+    };
+  }, [dataRef, componentId]);
 
   return (
     <div className="w-full h-full flex items-center justify-center">
