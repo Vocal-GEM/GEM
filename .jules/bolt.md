@@ -47,3 +47,6 @@
 ## 2024-05-18 - Fixed implicit global in AudioWorklet
 **Learning:** Found a runtime crash in `PitchWorklet.js` due to a `ReferenceError: currentTime is not defined`. AudioWorklet scope doesn't expose implicit globals like `currentTime` consistently depending on the environment context.
 **Action:** Replaced `currentTime` with explicit `globalThis.currentTime` to safely access the audio context's time in the worklet scope.
+## 2024-05-18 - Fixed undefined import in ClientDashboard
+**Learning:** Found a CI failure caused by `ReferenceError: Activity is not defined` in `ClientDashboard.jsx`. The icon was used in JSX but missing from the lucide-react import list.
+**Action:** Added `Activity` to the lucide-react imports to fix the reference error.
