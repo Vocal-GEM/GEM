@@ -10,11 +10,15 @@ const CPPMeter = ({ dataRef, isActive }) => {
     useEffect(() => {
         if (!isActive || !dataRef?.current) return;
 
+        let floatDataBuffer = null;
         const interval = setInterval(() => {
             const audioData = dataRef.current.timeDomainData;
             if (audioData && audioData.length > 0) {
                 // Convert Uint8Array to Float32Array (normalize to -1 to 1)
-                const floatData = new Float32Array(audioData.length);
+                if (!floatDataBuffer || floatDataBuffer.length !== audioData.length) {
+                    floatDataBuffer = new Float32Array(audioData.length);
+                }
+                const floatData = floatDataBuffer;
                 for (let i = 0; i < audioData.length; i++) {
                     floatData[i] = (audioData[i] - 128) / 128;
                 }

@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-12 - Re-using Float32Array and Uint32Array Buffers
+**Learning:** Frequent instantiations of `new Float32Array` or `new Uint32Array` within rapid animation loops (`requestAnimationFrame`, audio stream processing) cause significant memory churn and trigger expensive garbage collection pauses, leading to layout thrashing or stuttering.
+**Action:** Use a `useRef` to maintain a persistent reference to a typed array, and reallocate it only if the required buffer size changes.
