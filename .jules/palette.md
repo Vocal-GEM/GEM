@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-03-10 - Icon-only buttons lacking ARIA labels
+**Learning:** Foundational components such as those in the `viz` directory (e.g. `OrbLegend`, `IntonationTrainer`) frequently use icon-only buttons (like for toggle or navigation) without proper `aria-label`s or `aria-expanded` attributes, making them inaccessible to screen readers.
+**Action:** Always verify icon-only buttons include an `aria-label` and, if they toggle state, an `aria-expanded` attribute for screen reader accessibility.
