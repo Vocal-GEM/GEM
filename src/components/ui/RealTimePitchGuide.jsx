@@ -44,11 +44,15 @@ const RealTimePitchGuide = ({ targetPitch = 200, tolerance = 20, onClose }) => {
         setIsListening(false);
     };
 
+    const pitchBufferRef = useRef(null);
     const detectPitch = useCallback(() => {
         if (!analyserRef.current) return;
 
         const bufferLength = analyserRef.current.fftSize;
-        const buffer = new Float32Array(bufferLength);
+        if (!pitchBufferRef.current || pitchBufferRef.current.length !== bufferLength) {
+            pitchBufferRef.current = new Float32Array(bufferLength);
+        }
+        const buffer = pitchBufferRef.current;
         analyserRef.current.getFloatTimeDomainData(buffer);
 
         // Simple autocorrelation pitch detection
