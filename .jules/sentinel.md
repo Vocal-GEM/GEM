@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2026-09-09 - [Information Leakage in TTS API Responses]
+**Vulnerability:** Raw exception strings (e.g. `str(e)`) from external API request errors were directly returned in JSON responses to the client.
+**Learning:** This exposes internal error details such as connection strings, tracebacks or configuration paths that attackers can use for reconnaissance.
+**Prevention:** Catch external exceptions and explicitly log them using `current_app.logger.error`, then return a generic error message to the client.
