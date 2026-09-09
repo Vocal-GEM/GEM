@@ -12,7 +12,7 @@ class PitchProcessor extends AudioWorkletProcessor {
         this.bufferIndex = 0;
         this.sampleRate = 44100; // Will be updated from main thread
 
-        // YIN algorithm parameters
+        // YIN algorithm _parameters
         this.threshold = 0.1;
         this.minFreq = 80; // Hz
         this.maxFreq = 500; // Hz
@@ -36,7 +36,7 @@ class PitchProcessor extends AudioWorkletProcessor {
         };
     }
 
-    process(inputs, outputs, parameters) {
+    process(inputs, _outputs, parameters) {
         const input = inputs[0];
         if (!input || !input[0]) return true;
 
