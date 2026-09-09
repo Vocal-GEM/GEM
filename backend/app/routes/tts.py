@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 import os
 import requests
 from ..extensions import limiter
@@ -48,10 +48,9 @@ def synthesize_speech():
         )
 
         if not response.ok:
-            error_text = response.text
+            current_app.logger.error(f"ElevenLabs API error {response.status_code}: {response.text}")
             return jsonify({
-                "error": f"ElevenLabs API error: {response.status_code}",
-                "details": error_text
+                "error": "Failed to synthesize speech due to external API error."
             }), response.status_code
 
         # Return audio data
@@ -63,7 +62,8 @@ def synthesize_speech():
     except requests.exceptions.Timeout:
         return jsonify({"error": "Request to ElevenLabs timed out"}), 504
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Failed to connect to ElevenLabs: {str(e)}"}), 502
+        current_app.logger.error(f"Failed to connect to ElevenLabs: {str(e)}")
+        return jsonify({"error": "Failed to connect to speech synthesis service."}), 502
 
 
 @tts_bp.route('/voices', methods=['GET'])
@@ -88,8 +88,9 @@ def get_voices():
         )
 
         if not response.ok:
+            current_app.logger.error(f"ElevenLabs API error fetching voices: {response.status_code} - {response.text}")
             return jsonify({
-                "error": f"Failed to fetch voices: {response.status_code}",
+                "error": "Failed to fetch voices due to external API error.",
                 "voices": []
             }), response.status_code
 
@@ -99,4 +100,5 @@ def get_voices():
     except requests.exceptions.Timeout:
         return jsonify({"error": "Request timed out", "voices": []}), 504
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Failed to connect: {str(e)}", "voices": []}), 502
+        current_app.logger.error(f"Failed to connect to ElevenLabs: {str(e)}")
+        return jsonify({"error": "Failed to connect to speech synthesis service.", "voices": []}), 502
