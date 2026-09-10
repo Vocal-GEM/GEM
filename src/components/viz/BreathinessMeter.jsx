@@ -1,8 +1,7 @@
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { useEffect, useRef, useId } from 'react';
 import { useSettings } from '../../context/SettingsContext';
-import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Wind, CheckCircle2, AlertTriangle, Info, Sparkles, Activity, HelpCircle } from 'lucide-react';
-import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * BreathinessMeter Component
@@ -170,7 +169,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
         );
 
         return unsubscribe;
-    }, [dataRef, colorBlindMode, componentId]);
+        }, [dataRef, colorBlindMode, componentId]);
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -186,7 +185,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
         );
 
         return () => unsubscribe();
-    }, [dataRef, colorBlindMode, componentId]);
+        }, [dataRef, colorBlindMode, componentId]);
             `breathiness-meter-${componentId}`,
         };
 
@@ -199,7 +198,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
         return () => {
             unsubscribe();
         };
-    }, [dataRef, colorBlindMode, componentId]);
+        }, [dataRef, colorBlindMode, componentId]);
     }, [dataRef, colorBlindMode, id]);
 
     // Determine if in sweet spot for static rendering

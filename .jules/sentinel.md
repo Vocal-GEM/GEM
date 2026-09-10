@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-24 - Information Leakage in API Exceptions
+**Vulnerability:** External APIs like ElevenLabs returning raw exceptions directly to users in API responses.
+**Learning:** Returning exception details (e.g. `str(e)`) for external services might leak URLs, API versions, error codes, and backend networking information to potential attackers, which is an information leakage vulnerability.
+**Prevention:** Always log the full exception on the backend for debugging using the application logger, but return a generic, sanitized error message to the client.

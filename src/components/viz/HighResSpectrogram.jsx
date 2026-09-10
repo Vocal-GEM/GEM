@@ -31,8 +31,8 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
     // Reusable buffers to avoid GC
     // Unique component ID for RenderCoordinator
-    const uniqueId = useId();
-    const componentId = `spectrogram-highres-${uniqueId}`;
+
+
 
     // Reusable buffers to avoid garbage collection churn
     const imgDataRef = useRef(null);
@@ -58,18 +58,10 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         const width = canvas.width;
         const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
 
         // Optimization: Use alpha: false for better performance
         const ctx = canvas.getContext('2d', { alpha: false });
 
-        // Optimization: Use alpha: false for better performance
-        // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
-        const ctx = canvas.getContext('2d', { alpha: false });
-
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
         const spectrum = dataRef.current.spectrum;
 
         // Ensure buffers are ready and match height
@@ -154,12 +146,8 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         lastFormantsRef.current = { f1, f2 };
 
-    }, [dataRef, colormap]);
+        }, [dataRef, colormap]);
 
-    // Initial canvas setup & ResizeObserver
-    }, [dataRef, colormap, componentId]);
-
-    // Initial canvas setup
     // Handle Resize with ResizeObserver
     useEffect(() => {
         const container = containerRef.current;
@@ -218,7 +206,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             unsubscribe();
         };
     }, [draw, componentId]);
-    }, [componentId, draw]);
 
     /**
      * Handle canvas click - show Hz/dB/Note at tap position

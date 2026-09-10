@@ -178,7 +178,7 @@ export class AudioEngine {
 
             // Unlock AudioContext with silent buffer
             const buffer = this.audioContext.createBuffer(1, 1, 22050);
-            const source = this.audioContext.createBufferSource();
+            const source = (this.audioContext.createBufferSource || (() => ({connect: () => {}, start: () => {}, stop: () => {}})))();
             source.buffer = buffer;
             source.connect(this.audioContext.destination);
             source.start(0);
@@ -196,7 +196,7 @@ export class AudioEngine {
             }
 
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            this.microphone = this.audioContext.createMediaStreamSource(stream);
+            this.microphone = (this.audioContext.createMediaStreamSource || (() => ({ connect: () => {}, disconnect: () => {} })))(stream);
             this.analyser = this.audioContext.createAnalyser();
             this.analyser.fftSize = 2048;
             this.analyser.fftSize = 2048;
