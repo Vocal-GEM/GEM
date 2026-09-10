@@ -39,8 +39,6 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
     const zoneRef = useRef(null);
     const feedbackRef = useRef(null);
     const lastValueRef = useRef(50);
-    const componentId = useId();
-    const id = useId();
 
     // NEW: Refs for OQ and ventricular displays
     const oqValueRef = useRef(null);
@@ -190,7 +188,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
         };
 
         const unsubscribe = renderCoordinator.subscribe(
-            `breathiness-meter-${id}`,
+            `breathiness-meter-${componentId}`,
             loop,
             renderCoordinator.PRIORITY.CRITICAL
         );
@@ -199,7 +197,6 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
             unsubscribe();
         };
     }, [dataRef, colorBlindMode, componentId]);
-    }, [dataRef, colorBlindMode, id]);
 
     // Determine if in sweet spot for static rendering
     const breathinessGrbas = dataRef.current?.breathinessGrbas;
