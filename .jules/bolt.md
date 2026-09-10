@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-21 - React useEffect RenderCoordinator Lazy Initialization Anti-Pattern
+**Learning:** Found multiple components dynamically loading `RenderCoordinator` using `import().then(...)` inside `useEffect` (e.g., `SZRatio`, `LiveMetricsBar`, `VowelAnalysis`, `ContourVisualizer`, `SpectralTiltMeter`, `MPTTracker`). Because the import is asynchronous, if a component unmounts quickly, the cleanup function runs before the subscription resolves. The cleanup function fails to unsubscribe because `unsubscribe` is still undefined, resulting in a zombie animation loop and severe memory leak.
+**Action:** Always import service singletons like `RenderCoordinator` statically (`import { renderCoordinator } from ...`) instead of dynamic imports when setting up subscriptions inside React `useEffect` loops to ensure deterministic cleanup.
