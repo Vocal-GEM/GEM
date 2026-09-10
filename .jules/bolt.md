@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-09-10 - AudioEngine Render Loops Anti-Pattern
+**Learning:** `AudioEngine` was using its own independent `requestAnimationFrame` loop, which competes with other visualizations for main thread execution and contributes to layout thrashing.
+**Action:** Use `renderCoordinator` (a centralized RenderCoordinator service) for high-frequency render loops to consolidate visual updates and reduce CPU churn.
