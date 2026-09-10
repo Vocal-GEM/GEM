@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-24 - [Remove Raw Exception Traces in HTTP Responses]
+**Vulnerability:** Leaking internal request exception details (`str(e)`) in 502 error responses in `backend/app/routes/tts.py`.
+**Learning:** Returning unhandled exception strings directly to users can expose sensitive internal API behaviors, network structures, or component paths, which aids reconnaissance.
+**Prevention:** Always catch exceptions, log the raw exception internally (e.g., using `current_app.logger.error`), and return a generic error message to the client.
