@@ -7,6 +7,12 @@ const mockLogout = vi.fn();
 const mockUseAuth = vi.fn();
 const mockUseProfile = vi.fn();
 
+vi.mock('../../config/featureFlags', () => ({
+    FEATURES: { camera: true },
+    isFeatureEnabled: (id) => true
+}));
+
+
 vi.mock('../../context/AuthContext', () => ({
     useAuth: () => mockUseAuth()
 }));
