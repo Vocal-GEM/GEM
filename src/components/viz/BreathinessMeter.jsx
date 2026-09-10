@@ -169,7 +169,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
         );
 
         return unsubscribe;
-    }, [dataRef, colorBlindMode, componentId]);
+        }, [dataRef, colorBlindMode, componentId]);
         };
 
         const unsubscribe = renderCoordinator.subscribe(
@@ -185,7 +185,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
         );
 
         return () => unsubscribe();
-    }, [dataRef, colorBlindMode, componentId]);
+        }, [dataRef, colorBlindMode, componentId]);
             `breathiness-meter-${componentId}`,
         };
 
@@ -198,7 +198,7 @@ const BreathinessMeter = ({ dataRef, showDetails = true }) => {
         return () => {
             unsubscribe();
         };
-    }, [dataRef, colorBlindMode, componentId]);
+        }, [dataRef, colorBlindMode, componentId]);
     }, [dataRef, colorBlindMode, id]);
 
     // Determine if in sweet spot for static rendering
