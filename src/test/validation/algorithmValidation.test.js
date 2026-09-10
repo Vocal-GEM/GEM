@@ -60,7 +60,7 @@ describe.skip('Algorithm Validation against PRAAT', () => {
     let formantTracker;
 
     beforeAll(() => {
-        pitchEnsemble = { detectPitch: vi.fn(() => ({ pitch: 200 })) };
+        pitchEnsemble = {};
         formantTracker = new FormantTracker(44100);
     });
 
