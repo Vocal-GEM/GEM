@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-09-11 - Third-party API Information Leakage
+**Vulnerability:** The TTS endpoint directly exposed ElevenLabs API error details (like status codes and raw error texts) and network exception strings (like DNS resolution failures or timeout specifics) in the JSON response payload.
+**Learning:** Developers often pass upstream service error details directly to the client for ease of debugging, forgetting that these strings might contain internal URLs, system paths, API keys, or architectural details about the downstream services.
+**Prevention:** Always implement a security boundary for error handling at the API gateway or controller level. Log raw exception strings internally for observability, but sanitize client-facing error responses to generic messages (e.g., "Third-party service error occurred").
