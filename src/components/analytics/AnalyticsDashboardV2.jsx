@@ -1,4 +1,5 @@
 import React from 'react';
+import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -29,7 +30,7 @@ export const AnalyticsDashboardV2 = () => {
     const [insight, setInsight] = React.useState(null);
     const [isDemoData, setIsDemoData] = React.useState(false);
 
-    React.useEffect(() => {
+    React.React.useEffect(() => {
         const loadData = async () => {
             try {
                 const realSessions = await indexedDB.getSessions();
