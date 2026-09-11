@@ -45,3 +45,7 @@
 ## 2026-02-15 - Fixed Layout Thrashing in PitchOrb Loop
 **Learning:** `getBoundingClientRect()` was being called on every animation frame in `PitchOrb.jsx`, causing a synchronous reflow and resulting in layout thrashing.
 **Action:** Replaced synchronous polling inside `requestAnimationFrame` with a `ResizeObserver` to track the canvas dimensions asynchronously, eliminating the bottleneck.
+
+## 2026-02-15 - Fixed PitchWorklet.js CI Errors
+**Learning:** `currentTime` might throw reference errors if accessed directly depending on context in AudioWorklet. And `process(inputs, outputs, parameters)` might trigger unused argument lint errors for outputs and parameters.
+**Action:** Replaced `currentTime` with `globalThis.currentTime` and renamed unused arguments to `_outputs` and `_parameters`.
