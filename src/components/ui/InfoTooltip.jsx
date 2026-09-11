@@ -1,19 +1,39 @@
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import { HelpCircle } from 'lucide-react';
 
 const InfoTooltip = ({ content, icon: Icon = HelpCircle, size = 16, className = "" }) => {
     const [isVisible, setIsVisible] = useState(false);
+    const tooltipId = useId();
 
     return (
-        <div className={`relative inline-flex items-center ${className}`}
+        <div className={`relative inline-flex items-center ${className} focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full`}
             onMouseEnter={() => setIsVisible(true)}
             onMouseLeave={() => setIsVisible(false)}
             onClick={() => setIsVisible(!isVisible)}
+            role="button"
+            tabIndex={0}
+            aria-expanded={isVisible}
+            aria-label="Information"
+            aria-describedby={isVisible ? tooltipId : undefined}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setIsVisible(!isVisible);
+                } else if (e.key === 'Escape') {
+                    setIsVisible(false);
+                }
+            }}
+            onFocus={() => setIsVisible(true)}
+            onBlur={() => setIsVisible(false)}
         >
             <Icon size={size} className="text-slate-500 hover:text-blue-400 cursor-pointer transition-colors" />
 
             {isVisible && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 border border-white/10 rounded-xl shadow-xl z-50 animate-in fade-in zoom-in duration-200">
+                <div
+                    id={tooltipId}
+                    role="tooltip"
+                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 border border-white/10 rounded-xl shadow-xl z-50 animate-in fade-in zoom-in duration-200"
+                >
                     <div className="text-xs text-slate-300 leading-relaxed">
                         {content}
                     </div>
