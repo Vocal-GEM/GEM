@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-18 - Missing Authentication and Validation on TTS Endpoints
+**Vulnerability:** The TTS endpoints (`/api/tts/synthesize` and `/api/tts/voices`) were missing `@login_required` decorators and input validation on the `voiceId` parameter, allowing unauthorized access to the ElevenLabs API and potential SSRF risks.
+**Learning:** Endpoints that proxy external APIs (and cost money) must be secured with authentication and strict input validation, even if they have rate limiting.
+**Prevention:** Always apply `@login_required` to endpoints proxying paid external APIs and strictly validate any user-supplied parameters (like `voiceId`) used to construct external request URLs.
