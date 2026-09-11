@@ -1,5 +1,6 @@
+import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { TrendAnalyzer } from '../../services/TrendAnalyzer';
 import { InsightGenerator } from '../../services/InsightGenerator';
@@ -22,13 +23,13 @@ const analyzer = new TrendAnalyzer();
 const insightGen = new InsightGenerator();
 
 export const AnalyticsDashboardV2 = () => {
-    const [timeframe, setTimeframe] = useState('month');
-    const [metric, setMetric] = useState('pitch');
-    const [trends, setTrends] = useState(null);
-    const [insight, setInsight] = useState(null);
-    const [isDemoData, setIsDemoData] = useState(false);
+    const [timeframe, setTimeframe] = React.useState('month');
+    const [metric, setMetric] = React.useState('pitch');
+    const [trends, setTrends] = React.useState(null);
+    const [insight, setInsight] = React.useState(null);
+    const [isDemoData, setIsDemoData] = React.useState(false);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const loadData = async () => {
             try {
                 const realSessions = await indexedDB.getSessions();

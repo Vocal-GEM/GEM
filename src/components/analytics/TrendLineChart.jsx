@@ -13,7 +13,7 @@ export const TrendLineChart = ({ data, metric, trendInfo }) => {
     const dataKey = getDataKey(metric);
 
     // Create projection line if trend info exists
-    const projectedData = [...data];
+    // const projectedData = [...data];
     if (trendInfo && trendInfo.prediction) {
         // Add a couple of future points for visualization
         // logic simplified for demo
