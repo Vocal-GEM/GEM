@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-05-18 - Avoiding Typed Array Allocation in High-Frequency Canvas Animations
+**Learning:** Instantiating `new Uint32Array(imageData.data.buffer)` inside a `requestAnimationFrame` loop (e.g., in `Spectrogram.jsx`) creates unnecessary garbage collection churn, which can lead to micro-stutters and dropped frames in rapid rendering scenarios. While `Uint32Array` on an existing buffer is lightweight, doing it 60 times a second per active component adds up.
+**Action:** When working with canvas `ImageData` objects that are cached to avoid reallocation, always cache the `Uint32Array` view alongside it. Only reallocate the `Uint32Array` when the underlying `ImageData` needs to be resized.
