@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-01-24 - TypedArray Instantiation inside Animation Loop Anti-Pattern
+**Learning:** Found multiple instances where `new Float32Array(...)` was being called inside `requestAnimationFrame` loops or high-frequency intervals (e.g., `AudioEngine.js` and `CPPMeter.jsx`). This causes massive garbage collection pauses (GC churn) and layout thrashing as these arrays are quickly instantiated and discarded up to 60 times per second.
+**Action:** Pre-allocate `Float32Array` buffers using `useRef` in React or class instance properties. Only reallocate if the required buffer size changes.
