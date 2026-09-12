@@ -52,14 +52,11 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         if (!canvas) return;
         if (!dataRef.current || !dataRef.current.spectrum) return;
 
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
+
 
         // Optimization: Use alpha: false for better performance
         // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
-
         const width = canvas.width;
         const height = canvas.height;
         const scrollSpeed = 2; // px per frame
@@ -91,8 +88,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
         for (let y = 0; y < height; y++) {
             // Map y (0 at top, height at bottom) to frequency
-
-        for (let y = 0; y < height; y++) {
             const freqRatio = (height - 1 - y) / height;
             const binIndex = Math.floor(freqRatio * maxBin);
             const val = spectrum[binIndex] || 0;
@@ -159,8 +154,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             // Only update if dimensions actually changed
             const newWidth = Math.floor(rect.width * dpr);
             const newHeight = 512; // Fixed high vertical resolution
-            const newWidth = Math.round(rect.width * dpr);
-            const newHeight = 512; // Fixed internal height for vertical resolution
 
             if (canvas.width !== newWidth || canvas.height !== newHeight) {
                 canvas.width = newWidth;
