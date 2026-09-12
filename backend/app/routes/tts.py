@@ -29,8 +29,12 @@ def synthesize_speech():
 
     try:
         # Forward request to ElevenLabs API
+        import urllib.parse
+        # Security: sanitize voice_id to prevent path traversal / SSRF injection
+        safe_voice_id = urllib.parse.quote(str(voice_id), safe="")
+
         response = requests.post(
-            f'https://api.elevenlabs.io/v1/text-to-speech/{voice_id}',
+            f'https://api.elevenlabs.io/v1/text-to-speech/{safe_voice_id}',
             headers={
                 'Accept': 'audio/mpeg',
                 'Content-Type': 'application/json',
