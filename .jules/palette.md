@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-01-20 - [Missing ARIA label on icon buttons]
+**Learning:** Icon-only buttons (like the `RefreshCw` button in VoiceAnalytics) lack descriptive aria-labels, making them inaccessible to screen readers, and do not show focus states, breaking keyboard navigation.
+**Action:** When adding or updating icon-only buttons, always ensure an `aria-label` (and often a `title`) is provided, and use standard focus-visible utility classes to indicate keyboard focus.
