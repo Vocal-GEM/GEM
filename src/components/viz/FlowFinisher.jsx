@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { AudioWaveform, DoorOpen, Info } from 'lucide-react';
 
 /**
@@ -34,11 +35,14 @@ const FlowFinisher = ({ dataRef, showFeedback = true }) => {
                     setEnvelope(amplitudeEnvelope.slice(-30));
                 }
             }
-            animationRef.current = requestAnimationFrame(update);
         };
 
-        animationRef.current = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(animationRef.current);
+        const subscriberId = `flow-finisher-${Math.random().toString(36).substring(2, 11)}`;
+        const unsubscribe = renderCoordinator.subscribe(subscriberId, update, renderCoordinator.PRIORITY.HIGH);
+
+        return () => {
+            unsubscribe();
+        };
     }, [dataRef]);
 
     const getQualityConfig = () => {

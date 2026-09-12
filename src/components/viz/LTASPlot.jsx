@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { useAudio } from '../../context/AudioContext';
 
 const LTASPlot = ({ width = 600, height = 300 }) => {
@@ -14,7 +15,6 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
     }
 
     useEffect(() => {
-        let animationId;
 
         const draw = () => {
             if (!canvasRef.current) return;
@@ -84,11 +84,14 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
                 ctx.stroke();
             }
 
-            animationId = requestAnimationFrame(draw);
         };
 
-        draw();
-        return () => cancelAnimationFrame(animationId);
+        const subscriberId = `ltas-${Math.random().toString(36).substring(2, 11)}`;
+        const unsubscribe = renderCoordinator.subscribe(subscriberId, draw, renderCoordinator.PRIORITY.MEDIUM);
+
+        return () => {
+            unsubscribe();
+        };
     }, [isRecording, dataRef]);
 
     const reset = () => {

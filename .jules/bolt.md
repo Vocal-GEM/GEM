@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-21 - Consolidating Animation Loops
+**Learning:** Found widespread usage of raw `requestAnimationFrame` calls inside multiple visualization components (`RegisterGauge`, `DynamicOrb`, `SZRatio`, `MPTTracker`, `TouchDetector`, `FlowFinisher`, `VowelAnalysis`, `VowelSpacePlot`, `LTASPlot`). Having many uncoordinated animation loops leads to severe performance degradation and layout thrashing as each runs independently without prioritizing critical UI updates.
+**Action:** Replaced all raw `requestAnimationFrame` calls with subscriptions to the `RenderCoordinator` singleton. It handles scheduling, prioritizing, and throttling based on component need, dramatically reducing CPU usage and GC pauses. Subscriptions were correctly created and cleaned up inside `useEffect` hooks.
