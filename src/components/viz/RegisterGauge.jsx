@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { Layers, Activity, AlertTriangle, Wind, Info } from 'lucide-react';
-import { renderCoordinator } from '../../services/RenderCoordinator';
 
 /**
  * RegisterGauge - Visualize Laryngeal Mechanisms (M0-M3)
@@ -43,15 +42,11 @@ const RegisterGauge = ({ dataRef, showHint = true }) => {
                 }
                 setF0(currentF0);
             }
-            // No recursive requestAnimationFrame - RenderCoordinator handles this
+            animationRef.current = requestAnimationFrame(update);
         };
 
-        const subscriberId = `register-gauge-${Math.random().toString(36).substring(2, 11)}`;
-        const unsubscribe = renderCoordinator.subscribe(subscriberId, update, renderCoordinator.PRIORITY.HIGH);
-
-        return () => {
-            unsubscribe();
-        };
+        animationRef.current = requestAnimationFrame(update);
+        return () => cancelAnimationFrame(animationRef.current);
     }, [dataRef]);
 
     // Helpers

@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Play, Square, RotateCcw, Divide } from 'lucide-react';
 
 const SZRatio = ({ dataRef, isActive }) => {
@@ -34,14 +33,17 @@ const SZRatio = ({ dataRef, isActive }) => {
                     if (startTimeRef.current) startTimeRef.current.silenceStart = null;
                 }
             }
+            animationRef.current = requestAnimationFrame(checkAudio);
         };
 
-        const subscriberId = `sz-ratio-${Math.random().toString(36).substring(2, 11)}`;
-        const unsubscribe = renderCoordinator.subscribe(
-            subscriberId,
-            checkAudio,
-            renderCoordinator.PRIORITY.LOW
-        );
+        let unsubscribe;
+        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
+            unsubscribe = renderCoordinator.subscribe(
+                'sz-ratio',
+                checkAudio,
+                renderCoordinator.PRIORITY.LOW
+            );
+        });
 
         return () => {
             if (unsubscribe) unsubscribe();

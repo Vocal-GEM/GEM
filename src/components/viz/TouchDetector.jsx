@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Hand, Zap, Info } from 'lucide-react';
 
 /**
@@ -36,14 +35,11 @@ const TouchDetector = ({ dataRef, showFeedback = true }) => {
                     }
                 }
             }
+            animationRef.current = requestAnimationFrame(update);
         };
 
-        const subscriberId = `touch-detector-${Math.random().toString(36).substring(2, 11)}`;
-        const unsubscribe = renderCoordinator.subscribe(subscriberId, update, renderCoordinator.PRIORITY.HIGH);
-
-        return () => {
-            unsubscribe();
-        };
+        animationRef.current = requestAnimationFrame(update);
+        return () => cancelAnimationFrame(animationRef.current);
     }, [dataRef]);
 
     const getQualityConfig = () => {
