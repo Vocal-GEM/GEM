@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-24 - Do Not Leak Raw Exceptions in API Error Responses
+**Vulnerability:** The application was catching generic `requests.exceptions.RequestException` during outbound proxy requests (like ElevenLabs API calls) and returning the raw stringified exception (`str(e)`) directly to the client in the JSON error response payload.
+**Learning:** Returning raw exception strings from external libraries or system dependencies directly to clients creates a severe information leakage vulnerability. These exceptions can often contain sensitive internal system paths, underlying IP addresses, stack traces, database schema details, or even query parameters/API keys if the failed request URL is echoed back in the error message.
+**Prevention:** Always follow the "Fail Securely" principle. Catch generic exceptions and log their raw, detailed contents internally (e.g., using `current_app.logger.error()`) for debugging and monitoring purposes. However, the API error response returned to the client must only contain a sanitized, generic error message (e.g., "Failed to connect to external service") that provides no internal system context or implementation details.
