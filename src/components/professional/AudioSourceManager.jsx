@@ -6,10 +6,6 @@ const AudioSourceManager = ({ onSourceChange }) => {
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [permissionGranted, setPermissionGranted] = useState(false);
 
-    useEffect(() => {
-        checkPermissionAndEnumerate();
-    }, []);
-
     const checkPermissionAndEnumerate = async () => {
         try {
             // Must request permission first to get labels
@@ -28,6 +24,14 @@ const AudioSourceManager = ({ onSourceChange }) => {
             setPermissionGranted(false);
         }
     };
+
+    useEffect(() => {
+        checkPermissionAndEnumerate();
+
+        return () => {
+            navigator.mediaDevices.ondevicechange = null;
+        };
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const enumerateDevices = async () => {
         try {
