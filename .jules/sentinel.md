@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-03-01 - Server-Side Request Forgery in External API Proxies
+**Vulnerability:** The `/api/tts/synthesize` endpoint blindly interpolated the client-provided `voice_id` into a backend request URL to the ElevenLabs API, creating a Server-Side Request Forgery (SSRF) and Path Traversal risk.
+**Learning:** External API proxy routes must always strictly validate any path parameters provided by the client before constructing backend URLs, to prevent attackers from breaking out of the intended API path.
+**Prevention:** Use regular expressions to enforce a strict allowlist of permitted characters (e.g., alphanumeric, dashes, underscores) for any client-provided identifiers used in URL construction.
