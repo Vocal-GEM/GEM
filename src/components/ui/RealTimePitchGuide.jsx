@@ -9,7 +9,6 @@ const RealTimePitchGuide = ({ targetPitch = 200, tolerance = 20, onClose }) => {
 
     const audioContextRef = useRef(null);
     const analyserRef = useRef(null);
-    const floatDataRef = useRef(null);
     const animationRef = useRef(null);
     const streamRef = useRef(null);
 
@@ -49,10 +48,7 @@ const RealTimePitchGuide = ({ targetPitch = 200, tolerance = 20, onClose }) => {
         if (!analyserRef.current) return;
 
         const bufferLength = analyserRef.current.fftSize;
-        if (!floatDataRef.current || floatDataRef.current.length !== bufferLength) {
-            floatDataRef.current = new Float32Array(bufferLength);
-        }
-        const buffer = floatDataRef.current;
+        const buffer = new Float32Array(bufferLength);
         analyserRef.current.getFloatTimeDomainData(buffer);
 
         // Simple autocorrelation pitch detection

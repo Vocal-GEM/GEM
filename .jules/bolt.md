@@ -41,6 +41,3 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
-## 2025-05-22 - Float32Array allocation in interval loops
-**Learning:** Creating new Float32Array instances inside high-frequency setInterval loops causes garbage collection pressure and stuttering.
-**Action:** Use lazy initialization with useRef or closure variables to maintain a persistent reference.
