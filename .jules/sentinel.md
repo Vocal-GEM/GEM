@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-09-14 - Information Leakage in TTS Proxy
+**Vulnerability:** Raw exception strings (e.g., `requests.exceptions.RequestException`) were being directly returned in the JSON response when the ElevenLabs API failed.
+**Learning:** External API proxies must sanitize error responses. Returning raw exceptions leaks internal network state, stack details, and potentially upstream connection parameters.
+**Prevention:** Catch external request exceptions, log the raw `str(e)` internally using `current_app.logger.error`, and return a generic 502/504 JSON error message to the client.
