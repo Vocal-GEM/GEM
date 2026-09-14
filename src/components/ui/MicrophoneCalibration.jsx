@@ -297,7 +297,7 @@ const MicrophoneCalibration = ({ audioEngine }) => {
                             <div className="text-center animate-in fade-in zoom-in duration-300">
                                 <Volume2 className="w-16 h-16 text-emerald-400 mx-auto mb-6 animate-pulse" />
                                 <h4 className="text-xl font-bold text-white mb-2">Speak Clearly</h4>
-                                <p className="text-slate-400 mb-6">Say "Ahhhh" or count to 5... ({countdown}s)</p>
+                                <p className="text-slate-400 mb-6">Say &quot;Ahhhh&quot; or count to 5... ({countdown}s)</p>
                                 <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
                                     <div className="h-full bg-emerald-500 transition-all duration-1000" style={{ width: `${((3 - countdown) / 3) * 100}%` }} />
                                 </div>
