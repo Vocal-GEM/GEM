@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-24 - Interactive non-button tooltips
+**Learning:** Hover-based tooltips on interactive non-button elements like divs require explicit keyboard event handlers (onFocus, onBlur, onKeyDown) and ARIA attributes (role="button", aria-expanded) to be accessible to screen readers.
+**Action:** Always implement equivalent focus and keydown handlers when using onMouseEnter and onMouseLeave for interactive elements.
