@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-25 - Prevent Float32Array GC Churn in Animation Loops
+**Learning:** `requestAnimationFrame` loops shouldn't contain `new Float32Array(...)`. In `RealTimePitchGuide.jsx`, calling `new Float32Array(bufferLength)` on every frame creates significant garbage collection pressure which can cause jank.
+**Action:** Always maintain a persistent reference to the typed array (using `useRef`) and lazily re-allocate it only if the required buffer size changes.
