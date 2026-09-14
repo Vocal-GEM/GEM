@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-09-14 - [RenderCoordinator Memory Leaks]
+**Learning:** [Dynamic imports of `RenderCoordinator` within `useEffect` can cause a race condition where the component unmounts and executes its cleanup function before the subscription resolves. This leaves orphaned animation loops that cause severe memory leaks and CPU churn.]
+**Action:** [Always use synchronous static imports for `RenderCoordinator` when subscribing within `useEffect`.]
