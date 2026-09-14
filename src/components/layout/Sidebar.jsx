@@ -161,6 +161,8 @@ const Sidebar = ({ activeView, onViewChange }) => {
             {/* Mobile Toggle */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
+                aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
+                aria-expanded={isOpen}
                 className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"
             >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -193,6 +195,8 @@ const Sidebar = ({ activeView, onViewChange }) => {
                                 type="text"
                                 placeholder="Search..."
                                 value={searchQuery}
+                                aria-label="Search navigation"
+                                aria-expanded={showResults}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyDown={handleSearchKeyDown}
                                 onFocus={() => searchQuery.length > 0 && setShowResults(true)}
@@ -225,6 +229,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
                                                     key={result.id}
                                                     onClick={() => handleSelectResult(result)}
                                                     onMouseEnter={() => setSelectedIndex(resultIndex)}
+                                                    aria-label={result.title}
                                                     className={`w-full px-3 py-2 flex items-center gap-3 text-left transition-colors ${isSelected
                                                         ? 'bg-blue-600 text-white'
                                                         : 'text-slate-300 hover:bg-slate-700/50'
@@ -283,6 +288,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
                                     }
                                     setIsOpen(false);
                                 }}
+                                aria-current={activeView === item.id ? 'page' : undefined}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${item.isModal
                                     ? 'text-violet-400 hover:bg-violet-500/10 hover:text-violet-300 border border-violet-500/20'
                                     : activeView === item.id

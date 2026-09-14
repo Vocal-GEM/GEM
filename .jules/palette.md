@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-05-20 - ARIA Navigation States
+**Learning:** Custom sidebar navigation elements often rely entirely on visual cues (e.g., background colors or active classes) to indicate the current page, which leaves screen reader users without context about their location.
+**Action:** Always add `aria-current="page"` to the active item in a navigation list to programmatically communicate the current page state to assistive technologies. Additionally, ensure custom disclosure widgets (like search dropdowns and mobile menus) properly manage `aria-expanded` and clear descriptive labels.
