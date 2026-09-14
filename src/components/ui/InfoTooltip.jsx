@@ -9,6 +9,20 @@ const InfoTooltip = ({ content, icon: Icon = HelpCircle, size = 16, className = 
             onMouseEnter={() => setIsVisible(true)}
             onMouseLeave={() => setIsVisible(false)}
             onClick={() => setIsVisible(!isVisible)}
+            onFocus={() => setIsVisible(true)}
+            onBlur={() => setIsVisible(false)}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setIsVisible(!isVisible);
+                } else if (e.key === 'Escape') {
+                    setIsVisible(false);
+                }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-expanded={isVisible}
+            aria-label="Help information"
         >
             <Icon size={size} className="text-slate-500 hover:text-blue-400 cursor-pointer transition-colors" />
 
