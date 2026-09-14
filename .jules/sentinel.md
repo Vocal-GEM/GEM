@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-02-19 - Path Traversal in Backend Proxy
+**Vulnerability:** The proxy endpoint for ElevenLabs TTS API (`/api/tts/synthesize`) was using unvalidated user input (`voiceId`) directly in the external API URL string formatting. This allowed a Path Traversal vulnerability where an attacker could inject path traversal characters (like `../`) to access unintended endpoints on the ElevenLabs API.
+**Learning:** When proxying requests to external services, always validate and sanitize user-provided identifiers before interpolating them into URLs. Do not trust that the client has sent a valid identifier.
+**Prevention:** Implement strict regex validation for all URL parameters or path segments provided by the user, ensuring they only contain allowed characters (e.g., alphanumeric, hyphens, underscores) and rejecting invalid input before making the external request.
