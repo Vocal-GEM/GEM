@@ -63,6 +63,7 @@ const ArticulationView = () => {
     const [targetPhone, setTargetPhone] = useState('neutral');
 
     const analyzerRef = useRef(null);
+    const floatDataRef = useRef(null);
     const animationRef = useRef(null);
 
     useEffect(() => {
@@ -102,7 +103,10 @@ const ArticulationView = () => {
             analyzerRef.current.realtimeAnalyser = analyser;
 
             const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Float32Array(bufferLength);
+            if (!floatDataRef.current || floatDataRef.current.length !== bufferLength) {
+                floatDataRef.current = new Float32Array(bufferLength);
+            }
+            const dataArray = floatDataRef.current;
 
             // Start analysis loop
             const loop = () => {
