@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-15 - [SSRF vulnerability in API proxy endpoint]
+**Vulnerability:** Unvalidated external parameter `voice_id` directly concatenated into ElevenLabs API proxy URL.
+**Learning:** Backend proxies are susceptible to Server-Side Request Forgery if external parameters can alter the URL path or behavior.
+**Prevention:** Apply strict regex validation to external parameters used in constructing third-party API request URLs.
