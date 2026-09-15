@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-10-24 - Accessibility of Icon-Only Pagination Buttons
+**Learning:** Icon-only navigation buttons (like "previous/next pattern" or "toggle history") inside visualization components frequently lack ARIA labels and focus-visible outlines, meaning keyboard/screen-reader users cannot identify or effectively navigate through the data patterns.
+**Action:** When adding small contextual controls to dense visualization dashboards, always explicitly add `aria-label` describing the action and `focus-visible` utility classes to support keyboard users.
