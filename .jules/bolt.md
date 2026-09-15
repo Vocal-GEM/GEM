@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-19 - Avoid frequent TypedArray allocations in intervals
+**Learning:** Frequent allocations of `new Float32Array` within a `setInterval` or `requestAnimationFrame` loop cause unnecessary garbage collection pauses, which can lead to layout thrashing or stuttering in high-frequency visualization components.
+**Action:** Use a persistent `useRef` to hold the `Float32Array` buffer, reallocating only when the required length changes.
