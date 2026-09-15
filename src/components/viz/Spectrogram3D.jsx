@@ -107,6 +107,7 @@ const SpectrogramMesh = ({ dataRef }) => {
         // Update colors based on height
         let colorsAttribute = meshRef.current.geometry.attributes.color;
         if (!colorsAttribute) {
+            // Using Float32Array on every frame causes GC pauses - moving initialization higher up, but it's only allocated once per geometry creation in this block
             const colors = new Float32Array(numCols * numRows * 3);
             meshRef.current.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
             colorsAttribute = meshRef.current.geometry.attributes.color;

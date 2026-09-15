@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-10-24 - Float32Array GC Churn in Render Loops
+**Learning:** Instantiating new Float32Array buffers on every frame within requestAnimationFrame or frequent setTimeouts causes severe garbage collection pauses.
+**Action:** Use useRef to maintain persistent buffer references and only reallocate when the required length changes.
