@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-02-18 - IntonationTrainer Accessibility Improvements
+**Learning:** Icon-only buttons used for history toggles and pattern navigation in `IntonationTrainer` lacked `aria-label`, `title`, and `focus-visible` styles, rendering them inaccessible to screen reader users and keyboard navigators.
+**Action:** Always ensure that icon-only buttons have explicit ARIA labels (dynamic if the state changes, e.g., "Show/Hide history") and keyboard focus indicators using `focus-visible:ring-2 focus-visible:outline-none`.
