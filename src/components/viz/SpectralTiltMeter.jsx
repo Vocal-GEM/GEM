@@ -48,7 +48,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 `spectral-tilt-meter-${id}`,
                 loop,
                 renderCoordinator.PRIORITY.MEDIUM
-            );
+            )
         });
             // No recursive requestAnimationFrame - RenderCoordinator handles this
         };
@@ -100,7 +100,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                             <div className={`absolute bottom-0 left-0 right-0 h-[2px] ${colorBlindMode ? 'bg-amber-500/50' : 'bg-emerald-500/50'}`}></div>
                             <div className={`absolute top-1 left-1 text-[8px] font-bold uppercase tracking-wider ${colorBlindMode ? 'text-amber-400' : 'text-emerald-400'}`}>Target</div>
                         </div>
-                    );
+                    )
                 })()}
 
                 {/* Grid Lines */}

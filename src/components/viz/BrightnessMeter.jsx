@@ -113,9 +113,11 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
                     </div>
                 </div>
                 <button
-                    className="text-slate-600 hover:text-slate-300 transition-colors"
+                    className="text-slate-600 hover:text-slate-300 transition-colors focus-visible:ring-2 focus-visible:outline-none"
                     onMouseEnter={() => setShowTooltip(true)}
                     onMouseLeave={() => setShowTooltip(false)}
+                    aria-label="More information about Brightness Meter"
+                    title="More information about Brightness Meter"
                 >
                     <Info size={16} />
                 </button>
@@ -123,7 +125,7 @@ const BrightnessMeter = ({ dataRef, showTip = true }) => {
 
             {/* Tooltip */}
             {showTooltip && (
-                <div className="absolute z-50 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg text-xs text-slate-300 max-w-xs shadow-xl">
+                <div className="absolute z-50 mt-2 p-3 bg-slate-900/95 backdrop-blur border border-white/10 rounded-lg text-xs text-slate-300 max-w-xs shadow-xl" aria-hidden="true">
                     Measures how &quot;bright&quot; or &quot;forward&quot; your vowel resonance is based on F2 frequency.
                     The /i/ vowel (as in &quot;feet&quot;) has the highest F2 and is your brightness target.
                 </div>
