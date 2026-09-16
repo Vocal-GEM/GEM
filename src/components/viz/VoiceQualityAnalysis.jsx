@@ -110,7 +110,7 @@ const VoiceQualityAnalysis = ({ dataRef, colorBlindMode, toggleAudio, isAudioAct
                 `VoiceQualityAnalysis-${componentId}`,
                 analyze,
                 renderCoordinator.PRIORITY.LOW
-            );
+            )
         }
 
         return () => {
