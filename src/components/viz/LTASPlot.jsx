@@ -28,7 +28,8 @@ const LTASPlot = ({ width = 600, height = 300 }) => {
             // Accumulate if recording
             if (isRecording && spectrum && spectrum.length > 0) {
                 if (!accumulatorRef.current || accumulatorRef.current.length !== spectrum.length) {
-                    accumulatorRef.current = new Float32Array(spectrum.length).fill(0);
+                    accumulatorRef.current = new Float32Array(spectrum.length);
+                    accumulatorRef.current.fill(0);
                     frameCountRef.current = 0;
                 }
 

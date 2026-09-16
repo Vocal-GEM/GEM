@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - TypedArray Instantiation inside Animation/Render Loops
+**Learning:** Found multiple components (`CPPMeter.jsx`, `SpectrumAnalyzer.jsx`, `Spectrogram.jsx`, `LTASPlot.jsx`) instantiating `new Float32Array` or `new Uint32Array` on *every single frame* or interval tick (e.g. `setInterval`, `requestAnimationFrame`). Even small array allocations (1024 floats = 4KB) rapidly accumulate when running at 60fps, generating 240KB/sec of garbage, triggering frequent micro-pauses for Garbage Collection which causes layout thrashing and animation stuttering.
+**Action:** Always maintain a persistent reference using `useRef` for TypedArrays in high-frequency loops. Reallocate only if the required buffer size actually changes.
