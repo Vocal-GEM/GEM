@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-27 - Float32Array Allocation inside setInterval
+**Learning:** Frequent instantiations of `new Float32Array` inside rapid `setInterval` loops (e.g., in `CPPMeter.jsx`) cause unnecessary garbage collection pauses and can lead to layout thrashing.
+**Action:** Maintain a persistent array reference using `useRef` and only reallocate if the required buffer size changes.
