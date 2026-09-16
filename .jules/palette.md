@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-24 - Accessible Info Tooltips
+**Learning:** When using custom hover tooltips on icon-only buttons, applying aria-label to the button while keeping the tooltip content visible to screen readers causes redundant or confusing announcements. Adding aria-hidden to the visual tooltip element resolves this.
+**Action:** Always pair an aria-label on the interactive trigger with aria-hidden on the visual tooltip content to ensure a clean screen reader experience.
