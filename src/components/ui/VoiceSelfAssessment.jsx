@@ -33,6 +33,7 @@ const VoiceSelfAssessment = ({ onClose }) => {
     const timerRef = useRef(null);
     const audioContextRef = useRef(null);
     const analyserRef = useRef(null);
+    const bufferRef = useRef(null);
 
     // Scale definitions with actual values
     const scales = {
@@ -167,7 +168,13 @@ const VoiceSelfAssessment = ({ onClose }) => {
         if (!analyserRef.current || !audioContextRef.current) return 0;
 
         const bufferLength = analyserRef.current.fftSize;
-        const buffer = new Float32Array(bufferLength);
+
+        // ⚡ Bolt: Cache Float32Array to avoid GC churn during interval loops
+        if (!bufferRef.current || bufferRef.current.length !== bufferLength) {
+            bufferRef.current = new Float32Array(bufferLength);
+        }
+        const buffer = bufferRef.current;
+
         analyserRef.current.getFloatTimeDomainData(buffer);
 
         // Find the RMS to check if there's signal
