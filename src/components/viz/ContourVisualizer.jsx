@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Activity, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
+import { renderCoordinator } from '../../services/RenderCoordinator';
 const ContourVisualizer = ({ dataRef }) => {
     const canvasRef = useRef(null);
     const [metrics, setMetrics] = useState({
@@ -106,17 +107,14 @@ const ContourVisualizer = ({ dataRef }) => {
             }
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
+        const unsubscribe = renderCoordinator.subscribe(
                 'contour-visualizer',
                 loop,
                 renderCoordinator.PRIORITY.HIGH
             );
-        });
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
     }, [dataRef]);
 

@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-05-24 - RenderCoordinator Race Condition
+**Learning:** Lazy-loading RenderCoordinator inside useEffect via dynamic `import().then(...)` causes a severe race condition. If the component unmounts before the import resolves, the `useEffect` cleanup function executes with `unsubscribe` still undefined. Then, the import resolves and starts a high-frequency animation loop (via `requestAnimationFrame` or `RenderCoordinator`) that becomes completely untracked and continues running indefinitely in the background, causing CPU spikes and memory leaks.
+**Action:** Always use synchronous static imports for singleton services like RenderCoordinator.
