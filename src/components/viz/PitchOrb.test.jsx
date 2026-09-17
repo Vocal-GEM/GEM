@@ -4,6 +4,8 @@ import PitchOrb from './PitchOrb';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 import React from 'react';
 
+const global = globalThis;
+
 // Mock dependencies
 vi.mock('../../services/RenderCoordinator', () => ({
     renderCoordinator: {
