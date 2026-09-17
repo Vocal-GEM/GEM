@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-02-19 - Audio Playback Accessibility
+**Learning:** Interactive media buttons (like Play/Pause) often lack ARIA labels and focus states, making the media experience inaccessible to keyboard and screen reader users.
+**Action:** Always add dynamic `aria-label` attributes to playback controls and explicit `focus-visible` styles to ensure keyboard users can navigate media controls.
