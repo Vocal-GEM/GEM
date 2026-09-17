@@ -1,4 +1,3 @@
-import React from 'react';
 import { MarketplaceBrowser } from '../marketplace/MarketplaceBrowser';
 
 const MarketplaceView = () => {
