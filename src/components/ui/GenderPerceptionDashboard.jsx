@@ -4,6 +4,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { useProfile } from '../../context/ProfileContext';
 import { predictGenderPerception, getPerceptionLabel } from '../../services/GenderPerceptionPredictor';
 
+import { renderCoordinator } from '../../services/RenderCoordinator';
 const GenderPerceptionDashboard = ({ dataRef, view }) => {
     const { settings } = useSettings();
     const { activeProfile, targetRange } = useProfile();
@@ -52,17 +53,14 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
             });
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
+        const unsubscribe = renderCoordinator.subscribe(
                 'gender-perception-dashboard',
                 loop,
                 renderCoordinator.PRIORITY.HIGH
             );
-        });
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
     }, [dataRef, genderFeedbackMode]);
 
