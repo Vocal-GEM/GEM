@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-22 - Float32Array garbage collection in audio pipelines
+**Learning:** Frequent instantiations of `new Float32Array` within rapid animation loops (`requestAnimationFrame` via `RenderCoordinator`) or high-frequency intervals (like in `CPPMeter` and `VoiceSelfAssessment`) cause excessive memory pressure. This leads to garbage collection pauses which drop frames in audio-visualizers, causing stutter and layout thrashing.
+**Action:** Persistent buffers using `useRef` combined with length verification (reallocating only when `fftSize` or buffer length changes) solves the GC churn without needing complex buffer pooling.
