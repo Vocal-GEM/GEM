@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-22 - Float32Array allocations in inner loops
+**Learning:** Instantiating `new Float32Array` within high-frequency analysis functions like YIN pitch detection and LPC analysis causes significant memory churn and triggers garbage collection pauses, leading to layout thrashing and dropped frames.
+**Action:** Pre-allocate and reuse shared `Float32Array` buffers for high-frequency algorithms (e.g., using `subarray` to adjust length safely) instead of allocating new buffers on every call.
