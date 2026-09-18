@@ -3,7 +3,11 @@
  * Ported from resonance-processor.js for main-thread fallback
  */
 
+
+let sharedYinBuffer = new Float32Array(2048);
+
 export class DSP {
+
     static decimate(buffer, inputRate, targetRate) {
         if (targetRate >= inputRate) return buffer;
         const ratio = Math.floor(inputRate / targetRate);
@@ -30,7 +34,12 @@ export class DSP {
     static calculatePitchYIN(buffer, sampleRate, adaptiveThreshold = 0.15) {
         const bufferSize = buffer.length;
         const halfSize = Math.floor(bufferSize / 2);
-        const yinBuffer = new Float32Array(halfSize);
+        // Optimize: reuse buffer to avoid GC
+        if (sharedYinBuffer.length < halfSize) {
+            sharedYinBuffer = new Float32Array(halfSize);
+        }
+        const yinBuffer = sharedYinBuffer;
+        yinBuffer.fill(0, 0, halfSize);
 
         for (let tau = 0; tau < halfSize; tau++) {
             for (let i = 0; i < halfSize; i++) {
