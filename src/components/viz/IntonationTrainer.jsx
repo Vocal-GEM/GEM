@@ -312,13 +312,13 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
                 </div>
 
                 <div className="flex gap-2">
-                    <button onClick={() => setShowHistory(!showHistory)} className={`p-1.5 rounded hover:bg-slate-800 ${showHistory ? 'text-blue-400' : 'text-slate-400'}`}>
-                        <History size={16} />
+                    <button onClick={() => setShowHistory(!showHistory)} className={`p-1.5 rounded hover:bg-slate-800 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-blue-400 ${showHistory ? 'text-blue-400' : 'text-slate-400'}`} aria-label={showHistory ? 'Hide history' : 'Show history'} title="Toggle history">
+                        <History size={16} aria-hidden="true" />
                     </button>
                     <div className="flex items-center bg-slate-800 rounded px-1">
-                        <button onClick={prevPattern} className="p-1 hover:bg-slate-700 rounded"><ChevronLeft className="w-4 h-4 text-slate-400" /></button>
+                        <button onClick={prevPattern} className="p-1 hover:bg-slate-700 rounded focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-slate-400" aria-label="Previous pattern" title="Previous pattern"><ChevronLeft className="w-4 h-4 text-slate-400" aria-hidden="true" /></button>
                         <span className="text-xs text-slate-300 font-mono w-4 text-center">{selectedPattern + 1}</span>
-                        <button onClick={nextPattern} className="p-1 hover:bg-slate-700 rounded"><ChevronRight className="w-4 h-4 text-slate-400" /></button>
+                        <button onClick={nextPattern} className="p-1 hover:bg-slate-700 rounded focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-slate-400" aria-label="Next pattern" title="Next pattern"><ChevronRight className="w-4 h-4 text-slate-400" aria-hidden="true" /></button>
                     </div>
                 </div>
             </div>
