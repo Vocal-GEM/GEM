@@ -28,7 +28,7 @@ const ExerciseList = ({ category, onBack }) => {
     return (
         <div className="h-full flex flex-col">
             <div className="flex items-center gap-2 mb-6">
-                <button onClick={onBack} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                <button onClick={onBack} aria-label="Go back" className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors focus-visible:ring-2 focus-visible:outline-none">
                     <ArrowLeft size={20} />
                 </button>
                 <div>
@@ -161,7 +161,8 @@ const TrainingView = () => {
                     (!activeModule.component || activeModule.id.startsWith('pitch') || activeModule.id.startsWith('intonation')) && (
                         <button
                             onClick={() => setActiveModule(null)}
-                            className="flex items-center gap-2 text-slate-400 hover:text-white mb-4 transition-colors"
+                            aria-label="Back to Gym"
+                            className="flex items-center gap-2 text-slate-400 hover:text-white mb-4 transition-colors focus-visible:ring-2 focus-visible:outline-none"
                         >
                             <ArrowLeft size={20} /> Back to Gym
                         </button>
