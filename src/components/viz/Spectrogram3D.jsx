@@ -45,9 +45,6 @@ const SpectrogramMesh = ({ dataRef }) => {
 
     // Buffer for historical data
     const historyRef = useRef(null);
-    useEffect(() => {
-        historyRef.current = new Float32Array(numCols * numRows);
-    }, []);
     if (!historyRef.current) {
         historyRef.current = new Float32Array(numCols * numRows);
     }

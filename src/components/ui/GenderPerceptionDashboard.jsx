@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { renderCoordinator } from '../../services/RenderCoordinator';
 import { Activity, Target, Lightbulb } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 import { useProfile } from '../../context/ProfileContext';
@@ -52,17 +53,14 @@ const GenderPerceptionDashboard = ({ dataRef, view }) => {
             });
         };
 
-        let unsubscribe;
-        import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            unsubscribe = renderCoordinator.subscribe(
+        const unsubscribe = renderCoordinator.subscribe(
                 'gender-perception-dashboard',
                 loop,
                 renderCoordinator.PRIORITY.HIGH
             );
-        });
 
         return () => {
-            if (unsubscribe) unsubscribe();
+            unsubscribe();
         };
     }, [dataRef, genderFeedbackMode]);
 

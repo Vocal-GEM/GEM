@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { renderCoordinator } from '../services/RenderCoordinator';
 import { indexedDB } from '../services/IndexedDBManager';
 import { textToSpeechService } from '../services/TextToSpeechService';
 import i18n from '../i18n';
@@ -170,8 +171,7 @@ export const SettingsProvider = ({ children }) => {
 
     // Sync performance mode with RenderCoordinator
     useEffect(() => {
-        import('../services/RenderCoordinator').then(({ renderCoordinator }) => {
-            renderCoordinator.setPerformanceMode(settings.performanceMode);
+        renderCoordinator.setPerformanceMode(settings.performanceMode);
 
             // Update quality settings based on mode
             const qualityPresets = {
@@ -187,7 +187,6 @@ export const SettingsProvider = ({ children }) => {
                     visualizationQuality: newQuality
                 }));
             }
-        });
     }, [settings.performanceMode, settings.visualizationQuality]);
 
     // Sync feedback settings to services
