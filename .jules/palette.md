@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-24 - Missing ARIA on utility icons
+**Learning:** Developers frequently forget ARIA labels on utility buttons (like back or close) within interactive modals or exercises, especially when using icon libraries.
+**Action:** Proactively scan modal headers and list item action buttons for missing aria-label and title attributes to improve screen reader navigation.
