@@ -21,7 +21,7 @@ sys.modules['backend.app.voice_quality_analysis'] = MagicMock()
 sys.modules['backend.app.asr_transcriber'] = MagicMock()
 sys.modules['backend.app.utils'] = MagicMock()
 sys.modules['backend.app.utils.cleanup'] = MagicMock()
-sys.modules['parselmouth'] = MagicMock()
+
 sys.modules['backend.app.services'] = MagicMock()
 sys.modules['backend.app.services.voicelab_service'] = MagicMock()
 
@@ -99,7 +99,12 @@ class TestVoiceQualitySecurity(unittest.TestCase):
 
         # Mock manipulate_voice to return a mock Sound object
         mock_sound = MagicMock()
-        mock_sound.save = MagicMock()
+        def side_effect_save(path, format):
+            # Create a dummy file so send_file can find it
+            with open(path, 'w') as f:
+                f.write("dummy audio")
+
+        mock_sound.save.side_effect = side_effect_save
 
         with patch('backend.app.services.voicelab_service.manipulate_voice', return_value=mock_sound):
             with patch('parselmouth.Sound', return_value=MagicMock()):
@@ -115,9 +120,17 @@ class TestVoiceQualitySecurity(unittest.TestCase):
                 # Since send_file is used, we expect file content
                 # We can't easily check 'get_json()' here as it might be binary
 
-    def test_manipulate_file_error_handling(self):
+    def test_manipulate_file_success_response(self):
         """
-        Test that an internal error returns a generic error message and does NOT leak details.
+        Test that successful manipulation returns dummy audio.
+        """
+        file_content = b'fake audio data'
+        file_storage = FileStorage(
+            stream=BytesIO(file_content),
+            filename='test.wav',
+            name='audio',
+            content_type='audio/wav'
+        )
         mock_sound = MagicMock()
 
         def side_effect_save(path, format):
@@ -166,16 +179,7 @@ class TestVoiceQualitySecurity(unittest.TestCase):
                 # SECURITY CHECK: It SHOULD NOT leak the secret message
                 self.assertNotIn(secret_message, data.get('error', ''), "Should NOT leak internal error details")
                 self.assertEqual(data.get('error'), "An internal error occurred during voice manipulation.")
-        # Force an error with a secret message
-        sys.modules['backend.app.services.voicelab_service'].manipulate_voice.side_effect = ValueError("INTERNAL_SECRET_ERROR")
 
-        response = self.client.post('/api/voice-quality/manipulate',
-                                data={'audio': file_storage},
-                                content_type='multipart/form-data')
-
-        self.assertEqual(response.status_code, 500)
-        self.assertNotIn("INTERNAL_SECRET_ERROR", response.data.decode(), "Error message leaked internal details!")
-        self.assertIn("An internal error occurred", response.data.decode(), "Expected generic error message")
 # ... (imports and mock setup same as before)
 import unittest
 from unittest.mock import MagicMock, patch
@@ -214,19 +218,19 @@ services = create_mock_module('backend.app.services')
 vl_service = create_mock_module('backend.app.services.voicelab_service')
 vl_service.manipulate_voice = MagicMock()
 
-sys.modules['flask'] = MagicMock()
-sys.modules['flask_login'] = MagicMock()
-sys.modules['parselmouth'] = MagicMock()
-sys.modules['soundfile'] = MagicMock()
 
-mock_flask = sys.modules['flask']
-mock_bp = MagicMock()
-mock_flask.Blueprint.return_value = mock_bp
-mock_bp.route.side_effect = lambda *args, **kwargs: lambda func: func
-mock_flask.jsonify = lambda x: (x, 500 if 'error' in x else 200)
-mock_flask.send_file = MagicMock()
-mock_flask.after_this_request = lambda f: f
-mock_flask.request = MagicMock()
+
+
+
+
+
+
+
+
+
+
+
+
 
 if 'backend' not in sys.modules:
     create_mock_module('backend')
@@ -238,54 +242,3 @@ if 'backend.app.routes' not in sys.modules:
     backend_app_routes.__path__ = [os.path.abspath('backend/app/routes')]
 
 from backend.app.routes.voice_quality import manipulate_file
-
-class TestVoiceQualitySecurity(unittest.TestCase):
-    def setUp(self):
-        self.mock_request = mock_flask.request
-        self.mock_request.files = {}
-        self.mock_request.form = {}
-        sys.modules['backend.app.validators'].validate_file_upload.reset_mock()
-        sys.modules['backend.app.services.voicelab_service'].manipulate_voice.reset_mock()
-
-    def tearDown(self):
-        pass
-
-    @patch('backend.app.routes.voice_quality.validate_file_upload')
-    @patch('backend.app.routes.voice_quality.tempfile')
-    @patch('backend.app.routes.voice_quality.os')
-    def test_manipulate_file_exception_leakage(self, mock_os, mock_tempfile, mock_validate):
-        mock_file = MagicMock()
-        mock_file.filename = "test.wav"
-        self.mock_request.files = {'audio': mock_file}
-        self.mock_request.form = {'pitch_shift': '0.0', 'formant_shift': '1.0'}
-        mock_validate.return_value = (True, None)
-
-        mock_temp_obj = MagicMock()
-        mock_temp_obj.name = "/tmp/test.wav"
-        mock_tempfile.NamedTemporaryFile.return_value.__enter__.return_value = mock_temp_obj
-
-        mock_service = sys.modules['backend.app.services.voicelab_service']
-        mock_service.manipulate_voice.side_effect = Exception("SENSITIVE_INTERNAL_INFO")
-
-        sys.modules['parselmouth'].Sound.return_value = MagicMock()
-
-        try:
-            ret = manipulate_file()
-            response, status_code = ret
-
-            # Now we expect generic error message
-            if "SENSITIVE_INTERNAL_INFO" in str(response):
-                self.fail("SECURITY VULNERABILITY: Exception message leaked to client!")
-
-            if "An internal error occurred" in str(response) and status_code == 500:
-                 print("Success: Generic error returned.")
-            else:
-                 self.fail(f"Expected generic 500 error, got: {ret}")
-
-        except UnboundLocalError:
-             self.fail("UnboundLocalError caught! Fix failed.")
-        except Exception as e:
-            self.fail(f"Unexpected exception: {e}")
-
-if __name__ == '__main__':
-    unittest.main()

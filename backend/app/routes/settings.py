@@ -1,5 +1,4 @@
 import logging
-from flask import Blueprint, request, jsonify
 from flask import Blueprint, request, jsonify, current_app
 from flask_login import login_required, current_user
 from ..models import db, Settings
@@ -42,5 +41,3 @@ def update_settings():
         # Security: Log the error internally but return a generic message to the user
         logger.error(f"Error saving settings: {str(e)}")
         return jsonify({"error": "An error occurred while saving settings"}), 500
-        current_app.logger.error(f"Error updating settings: {str(e)}")
-        return jsonify({"error": "Failed to update settings"}), 500
