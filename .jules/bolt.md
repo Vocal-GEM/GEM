@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-09-20 - Reusing Array Buffers in Pitch Trackers
+**Learning:** High-frequency loop calls inside requestAnimationFrame or audio worklets recreating Float32Array on each pass cause major GC churn and layout thrashing.
+**Action:** Use shared module-scoped variable or useRef to persist buffer and only reallocate if required buffer size changes, while taking care to explicitly clear the reused array portion before loop computations if implicit browser clear behavior is overridden.
