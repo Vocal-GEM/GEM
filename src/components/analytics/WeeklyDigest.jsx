@@ -1,5 +1,5 @@
 
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Trophy, Flame, TrendingUp } from 'lucide-react';

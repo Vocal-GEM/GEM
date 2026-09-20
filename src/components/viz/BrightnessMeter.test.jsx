@@ -1,7 +1,7 @@
+import React from 'react';
 import { render, screen, cleanup, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import BrightnessMeter from './BrightnessMeter';
-import React from 'react';
 import { renderCoordinator } from '../../services/RenderCoordinator';
 
 // Mock RenderCoordinator
