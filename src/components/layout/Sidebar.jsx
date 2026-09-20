@@ -161,9 +161,12 @@ const Sidebar = ({ activeView, onViewChange }) => {
             {/* Mobile Toggle */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"
+                aria-expanded={isOpen}
+                aria-label={isOpen ? "Close sidebar menu" : "Open sidebar menu"}
+                title={isOpen ? "Close menu" : "Open menu"}
+                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-blue-500 hover:bg-slate-700 transition-colors"
             >
-                {isOpen ? <X size={24} /> : <Menu size={24} />}
+                {isOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
             </button>
 
             {/* Sidebar Container */}

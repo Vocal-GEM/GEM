@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-02-18 - Icon-Only Button Accessibility in Layouts
+**Learning:** High-level layout components (like Sidebar toggles) often use icon-only buttons (Menu/Close icons) without semantic `aria-label` or `aria-expanded` attributes, breaking navigation for screen reader users on mobile devices.
+**Action:** Always provide explicit `aria-label`, dynamic `aria-expanded` attributes, and `aria-hidden="true"` on the SVG children for icon-only layout toggles to ensure structural navigation remains accessible. Ensure proper `focus-visible` styling is present for keyboard users.
