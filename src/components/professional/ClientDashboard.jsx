@@ -1,3 +1,4 @@
+import { Activity } from "lucide-react";
 import React, { useState } from 'react';
 import { Users, UserPlus, Search, FileText, Calendar, ChevronRight, MoreVertical } from 'lucide-react';
 
