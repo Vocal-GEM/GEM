@@ -15,6 +15,9 @@
  * @param {number} threshold - Threshold for peak picking (default 0.15)
  * @returns {Object} { pitch: number|null, confidence: number } - Pitch in Hz and confidence (0-1)
  */
+// Reusable buffer to prevent GC churn during rapid pitch detection
+let sharedYinBuffer = null;
+
 export function detectPitchYIN(buffer, sampleRate, threshold = 0.15) {
     if (!buffer || buffer.length === 0) {
         return { pitch: null, confidence: 0 };
@@ -24,7 +27,14 @@ export function detectPitchYIN(buffer, sampleRate, threshold = 0.15) {
     const halfSize = Math.floor(bufferSize / 2);
 
     // Step 1: Difference function
-    const yinBuffer = new Float32Array(halfSize);
+    // Reallocate shared buffer only if needed
+    if (!sharedYinBuffer || sharedYinBuffer.length < halfSize) {
+        sharedYinBuffer = new Float32Array(halfSize);
+    }
+    const yinBuffer = sharedYinBuffer;
+
+    // Important: we must clear the part of the buffer we will use
+    yinBuffer.fill(0, 0, halfSize);
     for (let tau = 0; tau < halfSize; tau++) {
         for (let i = 0; i < halfSize; i++) {
             const delta = buffer[i] - buffer[i + tau];

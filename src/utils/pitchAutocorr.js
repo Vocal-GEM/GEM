@@ -15,6 +15,9 @@
  * @param {number} maxFreq - Maximum frequency to detect (default 800 Hz)
  * @returns {Object} { pitch: number|null, confidence: number } - Pitch in Hz and confidence (0-1)
  */
+// Reusable buffer to prevent GC churn during rapid pitch detection
+let sharedAutocorrBuffer = null;
+
 export function detectPitchAutocorr(buffer, sampleRate, minFreq = 50, maxFreq = 800) {
     if (!buffer || buffer.length === 0) {
         return { pitch: null, confidence: 0 };
@@ -32,7 +35,14 @@ export function detectPitchAutocorr(buffer, sampleRate, minFreq = 50, maxFreq = 
     }
 
     // Compute autocorrelation
-    const autocorr = new Float32Array(maxLag + 1);
+    // Reallocate shared buffer only if needed
+    const requiredSize = maxLag + 1;
+    if (!sharedAutocorrBuffer || sharedAutocorrBuffer.length < requiredSize) {
+        sharedAutocorrBuffer = new Float32Array(requiredSize);
+    }
+    const autocorr = sharedAutocorrBuffer;
+
+    // No need to clear buffer as we directly assign to it below: autocorr[lag] = sum;
 
     for (let lag = 0; lag <= maxLag; lag++) {
         let sum = 0;
