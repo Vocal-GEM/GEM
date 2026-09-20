@@ -11,6 +11,7 @@ const RealTimePitchGuide = ({ targetPitch = 200, tolerance = 20, onClose }) => {
     const analyserRef = useRef(null);
     const animationRef = useRef(null);
     const streamRef = useRef(null);
+    const bufferRef = useRef(null); // ⚡ Bolt: Persistent buffer to prevent GC pauses
 
     const startListening = async () => {
         try {
@@ -48,7 +49,11 @@ const RealTimePitchGuide = ({ targetPitch = 200, tolerance = 20, onClose }) => {
         if (!analyserRef.current) return;
 
         const bufferLength = analyserRef.current.fftSize;
-        const buffer = new Float32Array(bufferLength);
+        // ⚡ Bolt: Reuse Float32Array to avoid garbage collection on every frame
+        if (!bufferRef.current || bufferRef.current.length !== bufferLength) {
+            bufferRef.current = new Float32Array(bufferLength);
+        }
+        const buffer = bufferRef.current;
         analyserRef.current.getFloatTimeDomainData(buffer);
 
         // Simple autocorrelation pitch detection
