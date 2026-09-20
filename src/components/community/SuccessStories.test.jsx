@@ -45,7 +45,7 @@ const MockAudio = vi.fn(function(src) {
     return new MockAudioImplementation(src);
 });
 
-global.Audio = MockAudio;
+globalThis.Audio = MockAudio;
 
 describe('SuccessStories Optimization Verification', () => {
     beforeEach(() => {
@@ -69,7 +69,7 @@ describe('SuccessStories Optimization Verification', () => {
         });
     });
 
-    test('renders stories and initializes Audio correctly', async () => {
+    it('renders stories and initializes Audio correctly', async () => {
         render(<SuccessStories />);
 
         await waitFor(() => {
@@ -82,7 +82,7 @@ describe('SuccessStories Optimization Verification', () => {
         expect(MockAudio).toHaveBeenCalledWith("http://example.com/after.mp3");
     });
 
-    test('does not recreate Audio on re-render', async () => {
+    it('does not recreate Audio on re-render', async () => {
         render(<SuccessStories />);
 
         await waitFor(() => {
@@ -103,11 +103,7 @@ describe('SuccessStories Optimization Verification', () => {
         // Audio constructor should NOT be called again
         expect(MockAudio.mock.calls.length).toBe(initialCallCount);
     });
-  default: {
-    getSuccessStories: vi.fn(),
-    submitSuccessStory: vi.fn(),
-  },
-}));
+});
 
 vi.mock('../../services/ModerationService', () => ({
   default: {
