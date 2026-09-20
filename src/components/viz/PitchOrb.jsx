@@ -20,6 +20,9 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
     const [showSemitones, setShowSemitones] = useState(false);
     const componentId = useId();
 
+    // Cached dimensions to avoid getBoundingClientRect in loop
+    const dimensionsRef = useRef({ width: 0, height: 0 });
+
     // Default gender ranges if not set in settings
     const defaultRanges = {
         feminine: { min: 165, max: 300 },
@@ -64,16 +67,33 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        // Monitor canvas size with ResizeObserver
+        const updateDimensions = () => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+
+            // Update physical dimensions
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+
+            // Update ref for the loop
+            dimensionsRef.current = {
+                width: rect.width,
+                height: rect.height
+            };
+
+            // Restore scale
+            ctx.scale(dpr, dpr);
+        };
+
+        const observer = new ResizeObserver(updateDimensions);
+        observer.observe(canvas);
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            const { width, height } = dimensionsRef.current;
+            if (width === 0 || height === 0) return; // Not ready yet
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -166,6 +186,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            observer.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
