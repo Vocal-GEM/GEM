@@ -7,6 +7,8 @@ const CPPMeter = ({ dataRef, isActive }) => {
     const [history, setHistory] = useState([]);
     const canvasRef = useRef(null);
 
+    const floatBufferRef = useRef(null);
+
     useEffect(() => {
         if (!isActive || !dataRef?.current) return;
 
@@ -14,7 +16,12 @@ const CPPMeter = ({ dataRef, isActive }) => {
             const audioData = dataRef.current.timeDomainData;
             if (audioData && audioData.length > 0) {
                 // Convert Uint8Array to Float32Array (normalize to -1 to 1)
-                const floatData = new Float32Array(audioData.length);
+                // Optimization: Reuse Float32Array to avoid GC churn
+                if (!floatBufferRef.current || floatBufferRef.current.length !== audioData.length) {
+                    floatBufferRef.current = new Float32Array(audioData.length);
+                }
+                const floatData = floatBufferRef.current;
+
                 for (let i = 0; i < audioData.length; i++) {
                     floatData[i] = (audioData[i] - 128) / 128;
                 }

@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-24 - CPPMeter GC Churn
+**Learning:** Frequent Float32Array allocations inside a setInterval can cause garbage collection churn and frame drops in visualization components.
+**Action:** Use a useRef to maintain a persistent buffer and only reallocate when the required size changes.
