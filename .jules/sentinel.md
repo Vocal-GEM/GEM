@@ -75,3 +75,10 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-05-23 - Information Leakage in Voice Quality Routes
+**Vulnerability:** The `clean_audio` and `manipulate_file` endpoints in `backend/app/routes/voice_quality.py` were catching all exceptions and returning `str(e)` in the JSON response. This exposes sensitive details (e.g., database connection errors, SQL syntax issues, internal paths) to the client.
+**Learning:** Returning raw exception strings directly to the client is a common mistake that can leak internal implementation details. Flask Blueprints require `current_app` to access the logger properly when used inside request context or error handling.
+**Prevention:**
+1. Always use a generic error message for the client (e.g., "An internal error occurred").
+2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
+3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.

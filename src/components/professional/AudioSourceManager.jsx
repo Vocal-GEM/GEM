@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
 
 const AudioSourceManager = ({ onSourceChange }) => {
@@ -6,11 +6,34 @@ const AudioSourceManager = ({ onSourceChange }) => {
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [permissionGranted, setPermissionGranted] = useState(false);
 
+    const checkPermissionAndEnumerate = useCallback(async () => {
+        try {
+            // Must request permission first to get labels
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            setPermissionGranted(true);
+
+            const devs = await navigator.mediaDevices.enumerateDevices();
+            const audioInputDevices = devs.filter(device => device.kind === 'audioinput');
+            setDevices(audioInputDevices);
+
+            if (audioInputDevices.length > 0 && !selectedDeviceId) {
+                setSelectedDeviceId(audioInputDevices[0].deviceId);
+            }
+
+            // Release stream immediately to avoid keeping mic active
+            stream.getTracks().forEach(track => track.stop());
+        } catch (err) {
+            console.error("Error accessing microphone:", err);
+            setPermissionGranted(false);
+        }
+    }, [selectedDeviceId]);
+
     useEffect(() => {
         checkPermissionAndEnumerate();
-    }, []);
+    }, [checkPermissionAndEnumerate]);
 
-    const checkPermissionAndEnumerate = async () => {
+    // Overwrite the original checkPermissionAndEnumerate declaration since we redefined it as a callback
+    const oldCheckPermissionAndEnumerate = async () => {
         try {
             // Must request permission first to get labels
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
