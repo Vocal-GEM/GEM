@@ -61,7 +61,7 @@ const ExportPanel = ({ onClose }) => {
                             <p className="text-xs text-slate-400">Download your progress</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-white">
+                    <button onClick={onClose} aria-label="Close export panel" className="p-2 text-slate-400 hover:text-white rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-colors">
                         <X size={20} />
                     </button>
                 </div>
@@ -73,7 +73,7 @@ const ExportPanel = ({ onClose }) => {
                             key={option.id}
                             onClick={() => handleExport(option)}
                             disabled={exporting === option.id}
-                            className="w-full p-4 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-blue-500/50 rounded-xl text-left transition-all group disabled:opacity-50"
+                            className="w-full p-4 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-blue-500/50 rounded-xl text-left transition-all group disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         >
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
