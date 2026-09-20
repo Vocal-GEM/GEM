@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-19 - Accessibility Improvements in Export Panel
+**Learning:** Found that the export panel UI components lacked proper accessibility tags (`aria-label`) and visual indicators (`focus-visible:ring-2`) for keyboard focus, making it difficult for keyboard users and screen readers to navigate successfully.
+**Action:** Always verify keyboard accessibility using `focus-visible` states and include informative `aria-label` tags for interactive buttons with no text.
