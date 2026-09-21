@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-18 - Avoid reallocating typed arrays in high frequency audio loops
+**Learning:** `new Float32Array` within `startProcessing()` was creating overhead by destroying and instantiating memory every time audio engine resets.
+**Action:** Share buffer by retaining object memory instance references (`this.dataArray` & `this.freqData`) and update size conditionally.
