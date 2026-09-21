@@ -42,6 +42,10 @@ export class AudioEngine {
         this.toneEngine = null;
         this.animationFrameId = null;
 
+        // Shared buffers for performance
+        this.dataArray = null;
+        this.freqData = null;
+
         // DSP State
         this.pitchBuffer = [];
         this.smoothPitchBuffer = [];
@@ -348,8 +352,15 @@ export class AudioEngine {
         if (!this.isActive) return;
 
         const bufferLength = this.analyser.frequencyBinCount;
-        const dataArray = new Float32Array(bufferLength);
-        const freqData = new Float32Array(bufferLength);
+
+        // Optimize: Reuse buffers instead of reallocating on every start
+        if (!this.dataArray || this.dataArray.length !== bufferLength) {
+            this.dataArray = new Float32Array(bufferLength);
+            this.freqData = new Float32Array(bufferLength);
+        }
+
+        const dataArray = this.dataArray;
+        const freqData = this.freqData;
 
         // Buffers for calculating perturbation metrics
         this.visualPitchBuffer = [];
