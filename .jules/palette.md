@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-19 - Adding ARIA labels to Icon Buttons in ShadowingExercise
+**Learning:** Found several icon-only buttons in `src/components/exercises/ShadowingExercise.jsx` that were missing ARIA labels, a common pattern that impacts screen reader accessibility. Also, `focus-visible` utility classes were missing for keyboard navigation.
+**Action:** When adding icon-only buttons, always ensure an `aria-label` (and often a `title`) is provided for screen readers, and use standard `focus-visible` utility classes (e.g., `focus-visible:ring-2 focus-visible:outline-none`) to indicate keyboard focus.
