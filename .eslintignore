@@ -1,2 +1,7 @@
-backend/
-venv/
+dist
+android
+ios
+public
+*.cjs
+*.min.js
+build
