@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-09-22 - React Three Fiber geometry rebuilds
+**Learning:** Dynamically setting or replacing buffer attributes inside the render loop in React Three Fiber triggers a full geometry rebuild and causes frame stutters.
+**Action:** Pre-allocate all buffer arrays like positions, uvs, and colors once in useMemo and mutate them in-place during the animation loop.
