@@ -1,4 +1,45 @@
-import { render, screen, cleanup, act } from '@testing-library/react';
+import fs from 'fs';
+
+let content = fs.readFileSync('src/components/viz/BrightnessMeter.test.jsx', 'utf8');
+content = content.replace(
+    "import React from 'react';",
+    "import React from 'react';\nimport { Sun, Moon, Info, Smile } from 'lucide-react';"
+);
+content = content.replace(
+    "    return {\n        Sun: createIcon('Sun'),\n        Moon: createIcon('Moon'),\n        Info: createIcon('Info'),\n        Smile: createIcon('Smile')\n    };\n});",
+    "    return {\n        ...require('lucide-react'),\n        Sun: createIcon('Sun'),\n        Moon: createIcon('Moon'),\n        Info: createIcon('Info'),\n        Smile: createIcon('Smile')\n    };\n});"
+);
+
+// We need to use vi.importActual instead of require if this is a vitest mock
+content = fs.readFileSync('src/components/viz/BrightnessMeter.test.jsx', 'utf8');
+const mockStart = "vi.mock('lucide-react', () => {";
+const mockReplacement = `vi.mock('lucide-react', async () => {
+    const actual = await vi.importActual('lucide-react');
+    const React = await import('react');
+
+    const createIcon = (name) => {
+        const MockComponent = function MockComponent(props) {
+            return React.default.createElement('div', { ...props, 'data-testid': name });
+        };
+        MockComponent.displayName = name;
+        return MockComponent;
+    };
+
+    return {
+        ...actual,
+        Sun: createIcon('Sun'),
+        Moon: createIcon('Moon'),
+        Info: createIcon('Info'),
+        Smile: createIcon('Smile')
+    };
+});`;
+content = content.replace(
+    /vi\.mock\('lucide-react'[\s\S]*?\}\);\n\}\);/,
+    mockReplacement
+);
+// just overwrite the file entirely it's easier
+
+const newContent = `import { render, screen, cleanup, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import BrightnessMeter from './BrightnessMeter';
 import React from 'react';
@@ -77,3 +118,6 @@ describe('BrightnessMeter', () => {
         expect(screen.getByText('Bright ✓')).toBeDefined();
     });
 });
+`;
+
+fs.writeFileSync('src/components/viz/BrightnessMeter.test.jsx', newContent);
