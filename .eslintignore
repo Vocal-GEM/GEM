@@ -1,3 +1,6 @@
+backend/
+venv/
+
 dist
 android
 ios
