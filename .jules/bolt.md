@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-25 - Three.js Buffer Attribute Rebuild Anti-pattern
+**Learning:** Dynamically setting or replacing buffer attributes inside a useFrame loop in React Three Fiber triggers a full geometry rebuild and causes severe frame stutters.
+**Action:** Pre-allocate all buffer arrays once in useMemo and include them directly in the bufferGeometry JSX to allow in-place mutation during the animation loop without rebuilds.
