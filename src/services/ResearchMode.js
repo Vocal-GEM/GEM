@@ -1,3 +1,4 @@
+/* global process */
 /**
  * Research Mode Controller
  * Manages clinical trials, research studies, and participant data collection
