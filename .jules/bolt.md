@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-03-02 - Float32Array Instantiation inside loops/animation
+**Learning:** Instantiating `new Float32Array()` inside tight animation loops (e.g. `requestAnimationFrame` or `useFrame`) or high-frequency rendering intervals leads to severe garbage collection pressure and layout thrashing, reducing frame rates and increasing battery usage. Found an instance of this in `Spectrogram3D.jsx` where a 12KB `Float32Array` was being recreated 60 times per second for colors in a React Three Fiber `useFrame` hook if the colors attribute was newly added. Actually, there's another hidden issue: the buffer attribute replacement itself can trigger a full geometry rebuild. The best approach is to initialize all large buffer arrays (like `positions`, `uvs`, `colors`) once in `useMemo` and mutate them in-place during the render loop.
+**Action:** Audit and refactor high-frequency code paths to lazily initialize or pre-allocate large `Float32Array` buffers (using `useMemo` or a `useRef` initialized once) and strictly reuse them across frames to minimize memory churn.
