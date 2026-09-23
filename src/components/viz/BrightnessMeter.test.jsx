@@ -14,8 +14,13 @@ vi.mock('../../services/RenderCoordinator', () => ({
 
 // Override global mock for this test to include Smile
 vi.mock('lucide-react', () => {
-    const React = require('react');
-    const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
+    // eslint-disable-next-line no-undef
+    const ReactMock = require('react');
+    const createIcon = (name) => {
+        const MockIcon = (props) => ReactMock.createElement('div', { ...props, 'data-testid': name });
+        MockIcon.displayName = name;
+        return MockIcon;
+    };
 
     return {
         Sun: createIcon('Sun'),
