@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-21 - Three.js BufferAttribute Allocation
+**Learning:** Instantiating Float32Array and calling geometry.setAttribute inside useFrame triggers full geometry rebuilds and causes frame stutters.
+**Action:** Pre-allocate all buffer arrays in useMemo and mutate them in-place during the animation loop.
