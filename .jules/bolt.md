@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-24 - Prevent WebGL Geometry Rebuilds in R3F
+**Learning:** Dynamically calling `geometry.setAttribute()` inside a `useFrame` render loop, even once conditionally, triggers a costly WebGL geometry and shader recompilation which causes main-thread jank.
+**Action:** Always pre-allocate all required Three.js buffer arrays (positions, uvs, colors) in a `useMemo` hook during initialization and declare them declaratively via `<bufferAttribute>` before mutating them in-place during the animation loop.
