@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-02-12 - Icon-Only Action Buttons Accessibility
+**Learning:** Icon-only floating action buttons and modal close buttons must provide explicit `aria-label`s for screen readers and `title` attributes for tooltips, and require prominent `focus-visible` states to ensure keyboard accessibility isn't compromised by absolute positioning or overlapping z-indexes.
+**Action:** Always append standard `focus-visible:ring-2` utility classes and `aria-label` attributes to any icon-based `<button>` element across the design system.
