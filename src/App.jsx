@@ -52,6 +52,7 @@ const ProgramView = lazy(() => import('./components/views/ProgramView'));
 // Lazy Loaded Components - Visualizations
 
 import FeedbackSettings from './components/ui/FeedbackSettings';
+import FeedbackWidget from './components/ui/FeedbackWidget';
 import FeedbackModal from './components/ui/FeedbackModal';
 import BottomNav from './components/ui/BottomNav';
 import CelebrationModal from './components/ui/CelebrationModal';
@@ -393,6 +394,7 @@ const App = () => {
                             }}
                         />
 
+                        <FeedbackWidget />
                         <FeedbackModal
                             isOpen={modals.feedback}
                             onClose={() => closeModal('feedback')}

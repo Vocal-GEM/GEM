@@ -42,8 +42,10 @@ const FeedbackWidget = () => {
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-24 right-4 lg:bottom-8 z-40 p-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg transition-all hover:scale-110"
+
                 title="Send Feedback"
+                aria-label="Send Feedback"
+                className="fixed bottom-24 right-4 lg:bottom-8 z-40 p-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg transition-all hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
             >
                 <MessageCircle size={24} />
             </button>
@@ -57,7 +59,9 @@ const FeedbackWidget = () => {
                 <h3 className="font-bold text-white">Send Feedback</h3>
                 <button
                     onClick={() => setIsOpen(false)}
-                    className="text-slate-400 hover:text-white"
+                    className="text-slate-400 hover:text-white p-1 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                    aria-label="Close Feedback Widget"
+                    title="Close Feedback Widget"
                 >
                     <X size={18} />
                 </button>
@@ -79,7 +83,8 @@ const FeedbackWidget = () => {
                             <button
                                 key={ft.id}
                                 onClick={() => setType(ft.id)}
-                                className={`flex-1 p-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1 transition-colors ${type === ft.id
+                                aria-pressed={type === ft.id}
+                                className={`flex-1 p-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${type === ft.id
                                     ? ft.color === 'red'
                                         ? 'bg-red-500/20 text-red-400 border border-red-500/30'
                                         : ft.color === 'amber'
