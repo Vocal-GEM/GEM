@@ -42,7 +42,7 @@ const FeedbackModal = ({ isOpen, onClose, initialType = 'feedback', errorDetails
                         {type === 'bug' ? <Bug className="w-5 h-5 text-red-400" /> : <MessageSquare className="w-5 h-5 text-teal-400" />}
                         {type === 'bug' ? 'Report a Bug' : 'Send Feedback'}
                     </h2>
-                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <button onClick={onClose} aria-label="Close feedback modal" className="p-2 hover:bg-white/10 rounded-full transition-colors focus-visible:ring-2 focus-visible:outline-none">
                         <X className="w-5 h-5 text-slate-400" />
                     </button>
                 </div>
