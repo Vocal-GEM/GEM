@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-24 - [Duplicate / Redundant Error Handlers Revealing Internal Details]
+**Vulnerability:** Several endpoints in `backend/app/routes/voice_quality.py` had multiple redundant `except Exception as e:` blocks, some of which inadvertently returned `str(e)` instead of the safe generic error message due to misplaced return statements and improperly structured try/except/finally blocks.
+**Learning:** This codebase pattern attempts to add generic error messages for safety but had messy merge conflicts or copy-pasted error handling that broke the control flow and exposed actual exceptions to the API user, and left orphaned `finally` blocks with syntax errors.
+**Prevention:** Always ensure exception handlers consistently return sanitized error messages and do not leak `str(e)` directly into the `jsonify` response, carefully testing or linting to catch misplaced return statements inside except blocks.
