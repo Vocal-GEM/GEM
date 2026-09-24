@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-02-23 - Spectrogram3D geometry rebuild optimization
+**Learning:** Dynamically setting buffer attributes (like `setAttribute('color', ...)`) in Three.js/React Three Fiber inside the `useFrame` render loop triggers a full geometry rebuild every frame, leading to GC churn and frame stutters.
+**Action:** Pre-allocate all required buffer arrays (positions, uvs, colors) once inside `useMemo` and mutate them in-place during the animation loop using `.attributes.color.setXYZ(...)`.
