@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-18 - Added Accessibility Attributes to Shadowing Exercise Buttons
+**Learning:** Found multiple icon-only buttons in the `ShadowingExercise` component that lacked `aria-label` attributes and visible focus states, making them difficult for screen reader and keyboard users to interact with.
+**Action:** When adding icon-only interactive elements in modal headers or specific tool views, ensure `aria-label` and `title` attributes are present to describe the action, and include robust `focus-visible` ring styling to maintain visibility against complex or varied background colors (like dark mode slates).
