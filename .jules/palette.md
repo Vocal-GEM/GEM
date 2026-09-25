@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-10-25 - ARIA Labels on Icon Buttons
+**Learning:** Many icon-only buttons in complex components like FloatingCamera or IntonationTrainer lack ARIA labels, creating a poor screen reader experience.
+**Action:** Always audit icon-only buttons for missing aria-label attributes when reviewing or creating new components.
