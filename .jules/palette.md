@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2025-02-18 - Mobile Navigation Accessibility
+**Learning:** Icon-only toggle buttons for global mobile navigation elements (like sidebars) are often overlooked for screen reader accessibility, resulting in "silent" buttons that toggle major page layout changes without context.
+**Action:** Always ensure responsive mobile-only toggles (like those with `lg:hidden`) have dynamic `aria-label`s reflecting their current state (e.g., "Open menu" / "Close menu") and distinct `focus-visible` utility classes for keyboard navigation.
