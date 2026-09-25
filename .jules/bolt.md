@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-21 - Three.js Buffer Attribute Allocation in Render Loop
+**Learning:** In React Three Fiber, dynamically setting or replacing buffer attributes such as geometry.setAttribute('color', ...) inside the render loop useFrame triggers a full geometry rebuild and causes frame stutters.
+**Action:** Pre-allocate all buffer arrays such as positions, uvs, colors once in useMemo and mutate them in-place during the animation loop.

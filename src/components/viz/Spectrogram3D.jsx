@@ -9,10 +9,11 @@ const SpectrogramMesh = ({ dataRef }) => {
     const numRows = 64; // Frequency bins
 
     // Create geometry and initial positions
-    const { positions, indices, uvs } = useMemo(() => {
+    const { positions, indices, uvs, colors } = useMemo(() => {
         const pos = [];
         const ind = [];
         const uv = [];
+        const col = [];
 
         for (let i = 0; i < numCols; i++) {
             for (let j = 0; j < numRows; j++) {
@@ -21,6 +22,7 @@ const SpectrogramMesh = ({ dataRef }) => {
                 const y = 0;
                 pos.push(x, y, z);
                 uv.push(i / (numCols - 1), j / (numRows - 1));
+                col.push(1, 1, 1);
             }
         }
 
@@ -39,7 +41,8 @@ const SpectrogramMesh = ({ dataRef }) => {
         return {
             positions: new Float32Array(pos),
             indices: new Uint16Array(ind),
-            uvs: new Float32Array(uv)
+            uvs: new Float32Array(uv),
+            colors: new Float32Array(col)
         };
     }, []);
 
@@ -106,11 +109,6 @@ const SpectrogramMesh = ({ dataRef }) => {
 
         // Update colors based on height
         let colorsAttribute = meshRef.current.geometry.attributes.color;
-        if (!colorsAttribute) {
-            const colors = new Float32Array(numCols * numRows * 3);
-            meshRef.current.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            colorsAttribute = meshRef.current.geometry.attributes.color;
-        }
 
         if (colorsAttribute) {
             const colors = colorsAttribute;
@@ -153,6 +151,12 @@ const SpectrogramMesh = ({ dataRef }) => {
                     count={uvs.length / 2}
                     array={uvs}
                     itemSize={2}
+                />
+                <bufferAttribute
+                    attach="attributes-color"
+                    count={colors.length / 3}
+                    array={colors}
+                    itemSize={3}
                 />
             </bufferGeometry>
             <meshStandardMaterial
