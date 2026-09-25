@@ -35,7 +35,7 @@ const IntakeQuestionnaire = ({ onComplete, onClose }) => {
         { id: 'health', title: 'Voice & Health History' },
         { id: 'experience', title: 'Experience Level' },
         { id: 'preferences', title: 'Learning Preferences' },
-        { id: 'summary', title: 'Profile Summary' }
+        { id: &apos;summary', title: 'Profile Summary' }
     ];
 
     const handleNext = () => {
@@ -79,19 +79,19 @@ const IntakeQuestionnaire = ({ onComplete, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div className=&quot;fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4&quot;>
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl border border-gray-700 overflow-hidden flex flex-col max-h-[90vh]"
+                className=&quot;bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl border border-gray-700 overflow-hidden flex flex-col max-h-[90vh]&quot;
             >
                 {/* Header */}
-                <div className="p-6 border-b border-gray-800 flex justify-between items-center">
+                <div className=&quot;p-6 border-b border-gray-800 flex justify-between items-center&quot;>
                     <div>
-                        <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+                        <h2 className=&quot;text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent&quot;>
                             {steps[step].title}
                         </h2>
-                        <div className="flex gap-1 mt-2">
+                        <div className=&quot;flex gap-1 mt-2&quot;>
                             {steps.map((_, idx) => (
                                 <div
                                     key={idx}
@@ -104,8 +104,8 @@ const IntakeQuestionnaire = ({ onComplete, onClose }) => {
                 </div>
 
                 {/* Content */}
-                <div className="p-8 overflow-y-auto flex-grow">
-                    <AnimatePresence mode="wait">
+                <div className=&quot;p-8 overflow-y-auto flex-grow&quot;>
+                    <AnimatePresence mode=&quot;wait&quot;>
                         <motion.div
                             key={step}
                             initial={{ x: 20, opacity: 0 }}
@@ -124,7 +124,7 @@ const IntakeQuestionnaire = ({ onComplete, onClose }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-gray-800 flex justify-between">
+                <div className=&quot;p-6 border-t border-gray-800 flex justify-between&quot;>
                     <button
                         onClick={handleBack}
                         disabled={step === 0}
@@ -135,7 +135,7 @@ const IntakeQuestionnaire = ({ onComplete, onClose }) => {
                     </button>
                     <button
                         onClick={handleNext}
-                        className="px-8 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-white font-medium hover:from-purple-500 hover:to-pink-500 transition-all shadow-lg shadow-purple-900/20"
+                        className=&quot;px-8 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-white font-medium hover:from-purple-500 hover:to-pink-500 transition-all shadow-lg shadow-purple-900/20&quot;
                     >
                         {step === steps.length - 1 ? 'Complete Profile' : 'Next'}
                     </button>
@@ -148,32 +148,32 @@ const IntakeQuestionnaire = ({ onComplete, onClose }) => {
 // --- Step Components ---
 
 const WelcomeStep = () => (
-    <div className="space-y-4">
-        <p className="text-gray-300 text-lg">
+    <div className=&quot;space-y-4&quot;>
+        <p className=&quot;text-gray-300 text-lg&quot;>
             To give you the most personalized voice training experience, we need to know a little bit about you, your goals, and your history.
         </p>
-        <p className="text-gray-400">
+        <p className=&quot;text-gray-400&quot;>
             This will allow our AI to:
         </p>
-        <ul className="list-disc list-inside space-y-2 text-gray-300 ml-4">
+        <ul className=&quot;list-disc list-inside space-y-2 text-gray-300 ml-4&quot;>
             <li>Recommend realistic pitch and resonance targets</li>
             <li>Predict your progress timeline</li>
             <li>Adjust feedback sensitivity to your skill level</li>
             <li>Tailor exercises to your learning style</li>
         </ul>
-        <div className="mt-6 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg">
-            <p className="text-sm text-purple-300">
-                🔒 Your data is stored locally and private to you. We only capture what's needed to help you find your voice.
+        <div className=&quot;mt-6 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg&quot;>
+            <p className=&quot;text-sm text-purple-300&quot;>
+                🔒 Your data is stored locally and private to you. We only capture what&apos;s needed to help you find your voice.
             </p>
         </div>
     </div>
 );
 
 const GoalsStep = ({ data, update }) => (
-    <div className="space-y-6">
+    <div className=&quot;space-y-6&quot;>
         <div>
-            <label className="block text-gray-300 mb-2 font-medium">Target Voice Type</label>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <label className=&quot;block text-gray-300 mb-2 font-medium&quot;>Target Voice Type</label>
+            <div className=&quot;grid grid-cols-1 md:grid-cols-3 gap-3&quot;>
                 {['feminine', 'masculine', 'androgynous'].map(type => (
                     <button
                         key={type}
@@ -183,15 +183,15 @@ const GoalsStep = ({ data, update }) => (
                                 : 'bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-750'
                             }`}
                     >
-                        <div className="text-lg font-bold capitalize">{type}</div>
+                        <div className=&quot;text-lg font-bold capitalize&quot;>{type}</div>
                     </button>
                 ))}
             </div>
         </div>
 
         <div>
-            <label className="block text-gray-300 mb-2 font-medium">Primary Focus</label>
-            <div className="grid grid-cols-2 gap-3">
+            <label className=&quot;block text-gray-300 mb-2 font-medium&quot;>Primary Focus</label>
+            <div className=&quot;grid grid-cols-2 gap-3&quot;>
                 {['pitch', 'resonance', 'weight', 'balanced'].map(priority => (
                     <button
                         key={priority}
@@ -201,15 +201,15 @@ const GoalsStep = ({ data, update }) => (
                                 : 'bg-gray-800 border-gray-700 text-gray-400'
                             }`}
                     >
-                        <span className="capitalize">{priority}</span>
+                        <span className=&quot;capitalize&quot;>{priority}</span>
                     </button>
                 ))}
             </div>
         </div>
 
         <div>
-            <label className="block text-gray-300 mb-2 font-medium">Desired Timeline</label>
-            <div className="grid grid-cols-3 gap-3">
+            <label className=&quot;block text-gray-300 mb-2 font-medium&quot;>Desired Timeline</label>
+            <div className=&quot;grid grid-cols-3 gap-3&quot;>
                 {[
                     { id: 'gentle', label: 'Gentle', desc: 'Slow & steady' },
                     { id: 'moderate', label: 'Moderate', desc: 'Consistent work' },
@@ -223,8 +223,8 @@ const GoalsStep = ({ data, update }) => (
                                 : 'bg-gray-800 border-gray-700 text-gray-400'
                             }`}
                     >
-                        <div className="font-bold">{opt.label}</div>
-                        <div className="text-xs opacity-70">{opt.desc}</div>
+                        <div className=&quot;font-bold&quot;>{opt.label}</div>
+                        <div className=&quot;text-xs opacity-70&quot;>{opt.desc}</div>
                     </button>
                 ))}
             </div>
@@ -233,44 +233,44 @@ const GoalsStep = ({ data, update }) => (
 );
 
 const HealthStep = ({ data, update }) => (
-    <div className="space-y-6">
+    <div className=&quot;space-y-6&quot;>
         <div>
-            <label className="flex items-center space-x-3 cursor-pointer p-3 bg-gray-800 rounded-lg border border-gray-700">
+            <label className=&quot;flex items-center space-x-3 cursor-pointer p-3 bg-gray-800 rounded-lg border border-gray-700&quot;>
                 <input
-                    type="checkbox"
+                    type=&quot;checkbox&quot;
                     checked={data.onHRT}
                     onChange={(e) => update('onHRT', e.target.checked)}
-                    className="w-5 h-5 rounded border-gray-600 text-purple-600 focus:ring-purple-500 bg-gray-700"
+                    className=&quot;w-5 h-5 rounded border-gray-600 text-purple-600 focus:ring-purple-500 bg-gray-700&quot;
                 />
-                <span className="text-gray-200 font-medium">I am strictly on Hormone Replacement Therapy (HRT)</span>
+                <span className=&quot;text-gray-200 font-medium&quot;>I am strictly on Hormone Replacement Therapy (HRT)</span>
             </label>
 
             {data.onHRT && (
                 <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
-                    className="mt-4 ml-8 space-y-4 p-4 bg-gray-800/50 rounded-lg border-l-2 border-purple-500"
+                    className=&quot;mt-4 ml-8 space-y-4 p-4 bg-gray-800/50 rounded-lg border-l-2 border-purple-500&quot;
                 >
                     <div>
-                        <label className="block text-gray-400 text-sm mb-1">HRT Type</label>
+                        <label className=&quot;block text-gray-400 text-sm mb-1&quot;>HRT Type</label>
                         <select
                             value={data.hrtType}
                             onChange={(e) => update('hrtType', e.target.value)}
-                            className="w-full bg-gray-700 border border-gray-600 rounded-md p-2 text-white"
+                            className=&quot;w-full bg-gray-700 border border-gray-600 rounded-md p-2 text-white&quot;
                         >
-                            <option value="">Select Type</option>
-                            <option value="estrogen">Estrogen (E)</option>
-                            <option value="testosterone">Testosterone (T)</option>
-                            <option value="other">Other</option>
+                            <option value=&quot;&quot;>Select Type</option>
+                            <option value=&quot;estrogen&quot;>Estrogen (E)</option>
+                            <option value=&quot;testosterone&quot;>Testosterone (T)</option>
+                            <option value=&quot;other&quot;>Other</option>
                         </select>
                     </div>
                     <div>
-                        <label className="block text-gray-400 text-sm mb-1">Duration (Months)</label>
+                        <label className=&quot;block text-gray-400 text-sm mb-1&quot;>Duration (Months)</label>
                         <input
-                            type="number"
+                            type=&quot;number&quot;
                             value={data.hrtDuration}
                             onChange={(e) => update('hrtDuration', e.target.value)}
-                            className="w-full bg-gray-700 border border-gray-600 rounded-md p-2 text-white"
+                            className=&quot;w-full bg-gray-700 border border-gray-600 rounded-md p-2 text-white&quot;
                         />
                     </div>
                 </motion.div>
@@ -278,28 +278,28 @@ const HealthStep = ({ data, update }) => (
         </div>
 
         <div>
-            <label className="flex items-center space-x-3 cursor-pointer p-3 bg-gray-800 rounded-lg border border-gray-700">
+            <label className=&quot;flex items-center space-x-3 cursor-pointer p-3 bg-gray-800 rounded-lg border border-gray-700&quot;>
                 <input
-                    type="checkbox"
+                    type=&quot;checkbox&quot;
                     checked={data.hasHadVFS}
                     onChange={(e) => update('hasHadVFS', e.target.checked)}
-                    className="w-5 h-5 rounded border-gray-600 text-purple-600 focus:ring-purple-500 bg-gray-700"
+                    className=&quot;w-5 h-5 rounded border-gray-600 text-purple-600 focus:ring-purple-500 bg-gray-700&quot;
                 />
-                <span className="text-gray-200 font-medium">I have had Vocal Surgery (VFS)</span>
+                <span className=&quot;text-gray-200 font-medium&quot;>I have had Vocal Surgery (VFS)</span>
             </label>
             {data.hasHadVFS && (
                 <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
-                    className="mt-4 ml-8 space-y-4 p-4 bg-gray-800/50 rounded-lg border-l-2 border-pink-500"
+                    className=&quot;mt-4 ml-8 space-y-4 p-4 bg-gray-800/50 rounded-lg border-l-2 border-pink-500&quot;
                 >
                     <div>
-                        <label className="block text-gray-400 text-sm mb-1">Surgery Date (Approx)</label>
+                        <label className=&quot;block text-gray-400 text-sm mb-1&quot;>Surgery Date (Approx)</label>
                         <input
-                            type="date"
+                            type=&quot;date&quot;
                             value={data.vfsDate}
                             onChange={(e) => update('vfsDate', e.target.value)}
-                            className="w-full bg-gray-700 border border-gray-600 rounded-md p-2 text-white"
+                            className=&quot;w-full bg-gray-700 border border-gray-600 rounded-md p-2 text-white&quot;
                         />
                     </div>
                 </motion.div>
@@ -309,20 +309,20 @@ const HealthStep = ({ data, update }) => (
 );
 
 const ExperienceStep = ({ data, update }) => (
-    <div className="space-y-6">
+    <div className=&quot;space-y-6&quot;>
         <div>
-            <label className="block text-gray-300 mb-2 font-medium">Singing Experience</label>
-            <div className="space-y-2">
+            <label className=&quot;block text-gray-300 mb-2 font-medium&quot;>Singing Experience</label>
+            <div className=&quot;space-y-2&quot;>
                 {['none', 'beginner', 'intermediate', 'advanced', 'professional'].map(level => (
                     <button
                         key={level}
-                        onClick={() => update('singingExperience', level)}
+                        onClick={() => update(&apos;singingExperience', level)}
                         className={`w-full p-3 text-left rounded-lg border transition-all ${data.singingExperience === level
                                 ? 'bg-purple-600/20 border-purple-500 text-purple-200'
                                 : 'bg-gray-800 border-gray-700 text-gray-400'
                             }`}
                     >
-                        <span className="capitalize font-medium">{level}</span>
+                        <span className=&quot;capitalize font-medium&quot;>{level}</span>
                     </button>
                 ))}
             </div>
@@ -331,10 +331,10 @@ const ExperienceStep = ({ data, update }) => (
 );
 
 const PreferencesStep = ({ data, update }) => (
-    <div className="space-y-6">
+    <div className=&quot;space-y-6&quot;>
         <div>
-            <label className="block text-gray-300 mb-2 font-medium">Learning Style</label>
-            <div className="grid grid-cols-3 gap-3">
+            <label className=&quot;block text-gray-300 mb-2 font-medium&quot;>Learning Style</label>
+            <div className=&quot;grid grid-cols-3 gap-3&quot;>
                 {[
                     { id: 'visual', icon: '👁️', label: 'Visual', desc: 'Graphs & Charts' },
                     { id: 'auditory', icon: '👂', label: 'Auditory', desc: 'Listening & Mimicry' },
@@ -342,39 +342,39 @@ const PreferencesStep = ({ data, update }) => (
                 ].map(style => (
                     <button
                         key={style.id}
-                        onClick={() => update('selfReportedStyle', style.id)}
+                        onClick={() => update(&apos;selfReportedStyle', style.id)}
                         className={`p-4 rounded-xl border text-center transition-all ${data.selfReportedStyle === style.id
                                 ? 'bg-cyan-600/20 border-cyan-500 text-cyan-200'
                                 : 'bg-gray-800 border-gray-700 text-gray-400'
                             }`}
                     >
-                        <div className="text-2xl mb-1">{style.icon}</div>
-                        <div className="font-bold">{style.label}</div>
-                        <div className="text-xs opacity-70">{style.desc}</div>
+                        <div className=&quot;text-2xl mb-1&quot;>{style.icon}</div>
+                        <div className=&quot;font-bold&quot;>{style.label}</div>
+                        <div className=&quot;text-xs opacity-70&quot;>{style.desc}</div>
                     </button>
                 ))}
             </div>
         </div>
 
         <div>
-            <label className="block text-gray-300 mb-2 font-medium">Preferred Session Length</label>
-            <div className="grid grid-cols-2 gap-3">
+            <label className=&quot;block text-gray-300 mb-2 font-medium&quot;>Preferred Session Length</label>
+            <div className=&quot;grid grid-cols-2 gap-3&quot;>
                 {[
                     { id: 'micro', label: 'Micro (2-5m)', desc: 'Quick check-ins' },
                     { id: 'short', label: 'Short (10-15m)', desc: 'Standard practice' },
-                    { id: 'standard', label: 'Medium (20-30m)', desc: 'Deep dive' },
+                    { id: &apos;standard', label: 'Medium (20-30m)', desc: 'Deep dive' },
                     { id: 'long', label: 'Long (45m+)', desc: 'Intensive session' },
                 ].map(opt => (
                     <button
                         key={opt.id}
-                        onClick={() => update('sessionLength', opt.id)}
+                        onClick={() => update(&apos;sessionLength', opt.id)}
                         className={`p-3 rounded-lg border text-left transition-all ${data.sessionLength === opt.id
                                 ? 'bg-green-600/20 border-green-500 text-green-200'
                                 : 'bg-gray-800 border-gray-700 text-gray-400'
                             }`}
                     >
-                        <div className="font-bold text-sm">{opt.label}</div>
-                        <div className="text-xs opacity-70">{opt.desc}</div>
+                        <div className=&quot;font-bold text-sm&quot;>{opt.label}</div>
+                        <div className=&quot;text-xs opacity-70&quot;>{opt.desc}</div>
                     </button>
                 ))}
             </div>
@@ -383,30 +383,30 @@ const PreferencesStep = ({ data, update }) => (
 );
 
 const SummaryStep = ({ data }) => (
-    <div className="space-y-4">
-        <h3 className="text-xl font-bold text-white text-center mb-6">Profile Ready!</h3>
+    <div className=&quot;space-y-4&quot;>
+        <h3 className=&quot;text-xl font-bold text-white text-center mb-6&quot;>Profile Ready!</h3>
 
-        <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700 space-y-4">
-            <SummaryRow label="Voice Goal" value={data.voiceType} />
-            <SummaryRow label="Primary Focus" value={data.priority} />
-            <SummaryRow label="Factors" value={[
+        <div className=&quot;bg-gray-800/50 rounded-xl p-6 border border-gray-700 space-y-4&quot;>
+            <SummaryRow label=&quot;Voice Goal&quot; value={data.voiceType} />
+            <SummaryRow label=&quot;Primary Focus&quot; value={data.priority} />
+            <SummaryRow label=&quot;Factors&quot; value={[
                 data.onHRT ? 'HRT' : null,
                 data.hasHadVFS ? 'Surgery' : null,
                 data.singingExperience !== 'none' ? `Singer (${data.singingExperience})` : null
             ].filter(Boolean).join(', ') || 'None'} />
-            <SummaryRow label="Learning Style" value={data.selfReportedStyle} />
+            <SummaryRow label=&quot;Learning Style&quot; value={data.selfReportedStyle} />
         </div>
 
-        <p className="text-center text-gray-400 mt-4">
-            Click "Complete Profile" to generate your personalized roadmap.
+        <p className=&quot;text-center text-gray-400 mt-4&quot;>
+            Click &quot;Complete Profile&quot; to generate your personalized roadmap.
         </p>
     </div>
 );
 
 const SummaryRow = ({ label, value }) => (
-    <div className="flex justify-between items-center border-b border-gray-700/50 pb-2 last:border-0 last:pb-0">
-        <span className="text-gray-400">{label}</span>
-        <span className="text-white font-medium capitalize">{value}</span>
+    <div className=&quot;flex justify-between items-center border-b border-gray-700/50 pb-2 last:border-0 last:pb-0&quot;>
+        <span className=&quot;text-gray-400&quot;>{label}</span>
+        <span className=&quot;text-white font-medium capitalize&quot;>{value}</span>
     </div>
 );
 
