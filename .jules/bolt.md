@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Declarative Attributes in React Three Fiber
+**Learning:** Imperatively adding a buffer attribute (e.g., `geometry.setAttribute('color', ...)`) during the first iteration of a `useFrame` loop forces Three.js to rebuild the geometry and potentially recompile materials. This causes an initial frame stutter.
+**Action:** Always pre-allocate all buffer attributes (`positions`, `uvs`, `colors`) in `useMemo` and define them declaratively using `<bufferAttribute />` in the JSX, even if the data will be populated later in the render loop.
