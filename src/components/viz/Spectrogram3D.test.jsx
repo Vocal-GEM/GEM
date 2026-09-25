@@ -65,6 +65,13 @@ vi.mock('@react-three/drei', () => ({
 // Setup global requestAnimationFrame mock
 globalThis.requestAnimationFrame = (cb) => setTimeout(cb, 16);
 
+// Mock ResizeObserver
+globalThis.ResizeObserver = vi.fn(function() {
+  this.observe = vi.fn();
+  this.unobserve = vi.fn();
+  this.disconnect = vi.fn();
+});
+
 describe('Spectrogram3D', () => {
     let dataRef;
 
