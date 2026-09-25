@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-21 - Three.js setAttribute inside useFrame
+**Learning:** Dynamically setting or replacing buffer attributes (e.g., `geometry.setAttribute('color', ...)` ) inside the `useFrame` render loop, even if guarded by a conditional, can trigger a full geometry rebuild and cause a stutter during initialization.
+**Action:** Always pre-allocate all buffer arrays (`positions`, `uvs`, `colors`) once in `useMemo` and mutate them in-place during the animation loop using their `needsUpdate = true` flag.
