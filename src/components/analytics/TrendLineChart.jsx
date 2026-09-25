@@ -45,13 +45,6 @@ export const TrendLineChart = ({ data, metric }) => {
                     dot={{ r: 4, fill: '#8b5cf6' }}
                     activeDot={{ r: 8 }}
                 />
-
-                {/* Render a simple linear trend line if we calculated one */}
-                {trendInfo && trendInfo.rateOfChange !== 0 && (
-                    // visualizing trend line would require generating points y = mx + b
-                    // omitted for brevity, but this is where it would go
-                    <></>
-                )}
             </LineChart>
         </ResponsiveContainer>
     );
