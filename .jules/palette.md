@@ -37,3 +37,9 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-05-23 - InfoTooltip Accessibility
+**Learning:** Foundational components like `InfoTooltip` are often used to explain complex UI patterns. When they lack proper keyboard support (no focusable elements) and ARIA attributes (no `aria-expanded`, `aria-label`, or `role="tooltip"`), they become black holes for keyboard and screen reader users. Furthermore, relying purely on hover for visual display breaks the experience for users who only use a keyboard.
+**Action:** When auditing custom components, explicitly verify that tooltips have a focusable trigger (like a `button`), announce themselves with `role="tooltip"`, use `aria-expanded` and `aria-label` appropriately, and can be dismissed via keyboard (e.g., the Escape key).
+## 2024-05-23 - InfoTooltip Screen Reader Support
+**Learning:** Adding a focusable button with `role="tooltip"` is not enough for screen readers. The screen reader user will land on the button and hear its `aria-label`, but they will never hear the actual tooltip content because focus remains on the trigger.
+**Action:** Always link the trigger button to the tooltip container using `aria-describedby` (or `aria-details`) with a dynamically generated ID so that the tooltip's text is announced when the user focuses the trigger.
