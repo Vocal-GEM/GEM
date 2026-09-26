@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-21 - Array Allocation Anti-Pattern in RequestAnimationFrame and SetInterval
+**Learning:** Multiple components (`RealTimePitchGuide`, `VoiceSelfAssessment`, and `CPPMeter`) were allocating new `Float32Array` buffers inside high-frequency loops (`requestAnimationFrame` and `setInterval`). This causes severe garbage collection churn (up to 60 allocations per second), leading to micro-stutters and increased CPU usage during active analysis.
+**Action:** Use `useRef(null)` to pre-allocate array buffers outside the animation/interval loop, only reallocating if the required `bufferLength` changes. This completely eliminates memory allocations during the hot path.

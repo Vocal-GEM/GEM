@@ -162,12 +162,18 @@ const VoiceSelfAssessment = ({ onClose }) => {
         }
     };
 
+    // Pre-allocate buffer to prevent garbage collection pauses during interval loop
+    const bufferRef = useRef(null);
+
     // Simple autocorrelation pitch detection
     const estimatePitch = () => {
         if (!analyserRef.current || !audioContextRef.current) return 0;
 
         const bufferLength = analyserRef.current.fftSize;
-        const buffer = new Float32Array(bufferLength);
+        if (!bufferRef.current || bufferRef.current.length !== bufferLength) {
+            bufferRef.current = new Float32Array(bufferLength);
+        }
+        const buffer = bufferRef.current;
         analyserRef.current.getFloatTimeDomainData(buffer);
 
         // Find the RMS to check if there's signal
