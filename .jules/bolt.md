@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-21 - Three.js BufferAttribute Allocation in useFrame
+**Learning:** `Spectrogram3D.jsx` was checking for the existence of `colorsAttribute` and dynamically instantiating `new Float32Array` and calling `geometry.setAttribute(...)` during the `useFrame` loop. While guarded by a conditional, this pattern forces a full geometry rebuild and layout thrashing in React Three Fiber because buffer attributes should be pre-allocated once during geometry creation.
+**Action:** Always pre-allocate all buffer arrays (`positions`, `uvs`, `colors`) together within a single `useMemo` block when setting up custom `<bufferGeometry>`, then mutate them in-place during the animation loop.
