@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-09-26 - Dynamic Buffer Attributes in React Three Fiber
+**Learning:** In `Spectrogram3D.jsx`, a `Float32Array` color buffer and `THREE.BufferAttribute` were being dynamically created and attached via `setAttribute('color', ...)` on every render or upon initialization inside `useFrame`. This causes geometry rebuilds and frame stutters.
+**Action:** Pre-allocate all buffer attributes (positions, uvs, colors) once inside the initial `useMemo` where the geometry data is constructed, and pass them down as `<bufferAttribute>` nodes to `<bufferGeometry>`.
