@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import { render, screen, cleanup, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import BrightnessMeter from './BrightnessMeter';
@@ -14,6 +15,7 @@ vi.mock('../../services/RenderCoordinator', () => ({
 
 // Override global mock for this test to include Smile
 vi.mock('lucide-react', () => {
+        // eslint-disable-next-line no-undef
     const React = require('react');
     const createIcon = (name) => (props) => React.createElement('div', { ...props, 'data-testid': name });
 
