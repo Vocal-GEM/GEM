@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-18 - Exception Leakage in Voice Quality Endpoints
+**Vulnerability:** The `clean_audio` and `manipulate_file` endpoints in `voice_quality.py` were returning `str(e)` directly in the JSON response on failure, leaking internal exception details.
+**Learning:** Relying on simple `str(e)` for client-facing error messages exposes internal backend information, such as IP addresses or module internals.
+**Prevention:** Catch blocks should log the actual exception details using `logger.error` for internal debugging and return a generic error message (e.g., 'An internal error occurred') to the client.
