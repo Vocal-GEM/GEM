@@ -6,6 +6,7 @@ const CPPMeter = ({ dataRef, isActive }) => {
     const [cppData, setCppData] = useState({ cpp: 0, quality: 'unknown', interpretation: '', color: '#64748b' });
     const [history, setHistory] = useState([]);
     const canvasRef = useRef(null);
+    const bufferRef = useRef(null);
 
     useEffect(() => {
         if (!isActive || !dataRef?.current) return;
@@ -14,7 +15,11 @@ const CPPMeter = ({ dataRef, isActive }) => {
             const audioData = dataRef.current.timeDomainData;
             if (audioData && audioData.length > 0) {
                 // Convert Uint8Array to Float32Array (normalize to -1 to 1)
-                const floatData = new Float32Array(audioData.length);
+                // Use a ref to avoid garbage collection pause in setInterval loop
+                if (!bufferRef.current || bufferRef.current.length !== audioData.length) {
+                    bufferRef.current = new Float32Array(audioData.length);
+                }
+                const floatData = bufferRef.current;
                 for (let i = 0; i < audioData.length; i++) {
                     floatData[i] = (audioData[i] - 128) / 128;
                 }
