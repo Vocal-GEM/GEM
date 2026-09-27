@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-24 - Pre-allocating buffers in loops
+**Learning:** Frequent Float32Array instantiation in requestAnimationFrame and setInterval causes severe garbage collection churn and UI stuttering in this application's high-frequency audio analysis components (like CPPMeter, RealTimePitchGuide, and VoiceSelfAssessment).
+**Action:** Pre-allocate the buffer using a React useRef to reuse the same memory block across frames/intervals, avoiding unnecessary memory allocations and subsequent garbage collection sweeps.
