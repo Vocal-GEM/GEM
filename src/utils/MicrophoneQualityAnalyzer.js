@@ -10,6 +10,9 @@
  * @param {number} durationMs - Analysis duration in milliseconds
  * @returns {Promise<Object>} Quality analysis results
  */
+let micTimeBuffer = null;
+let micFreqBuffer = null;
+
 export const analyzeMicrophoneQuality = async (audioContext, microphoneSource, durationMs = 3000) => {
     // Create analyzer
     const analyser = audioContext.createAnalyser();
@@ -17,8 +20,14 @@ export const analyzeMicrophoneQuality = async (audioContext, microphoneSource, d
     microphoneSource.connect(analyser);
 
     const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Float32Array(bufferLength);
-    const freqData = new Float32Array(bufferLength);
+    if (!micTimeBuffer || micTimeBuffer.length !== bufferLength) {
+        micTimeBuffer = new Float32Array(bufferLength);
+    }
+    if (!micFreqBuffer || micFreqBuffer.length !== bufferLength) {
+        micFreqBuffer = new Float32Array(bufferLength);
+    }
+    const dataArray = micTimeBuffer;
+    const freqData = micFreqBuffer;
 
     // Collect samples
     const samples = [];

@@ -102,7 +102,10 @@ const ArticulationView = () => {
             analyzerRef.current.realtimeAnalyser = analyser;
 
             const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Float32Array(bufferLength);
+            if (!analyzerRef.current.floatBuffer || analyzerRef.current.floatBuffer.length !== bufferLength) {
+                analyzerRef.current.floatBuffer = new Float32Array(bufferLength);
+            }
+            const dataArray = analyzerRef.current.floatBuffer;
 
             // Start analysis loop
             const loop = () => {

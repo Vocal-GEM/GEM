@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-21 - Audio Buffer instantiation anti-pattern
+**Learning:** High-frequency Web Audio API data collection loops instantiated new Float32Array buffers on every frame.
+**Action:** Pre-allocate the buffer using a React useRef or instance variables to reuse the same memory block and avoid severe garbage collection churn and UI stuttering.
