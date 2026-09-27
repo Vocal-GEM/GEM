@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-24 - Sanitizing Flask Error Handlers
+**Vulnerability:** Found multiple instances where Flask exception handlers returned `str(e)` directly in `jsonify({'error': str(e)})` responses or similar formats across multiple endpoints (`__init__.py`, `tts.py`, `voice_quality.py`). This leaks internal application and database details, potentially providing attackers with system context.
+**Learning:** Returning `str(e)` in exception handlers is a common pattern for debugging but poses an information disclosure risk in production.
+**Prevention:** Always sanitize error messages (e.g., returning a generic string like "An internal error occurred" or "Bad Request") and ensure rigorous server-side logging (`current_app.logger.error(str(e))`) for the original exception so operability is maintained while preventing data leakage.
