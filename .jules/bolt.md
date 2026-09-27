@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-21 - GC Churn Anti-Pattern in Pitch Detection Loops
+**Learning:** `RealTimePitchGuide.jsx` and `VoiceSelfAssessment.jsx` were instantiating a `new Float32Array` on every single frame inside their real-time loops (`requestAnimationFrame` and `setInterval`), causing severe garbage collection churn and periodic UI stuttering due to continuous memory allocations and deallocations.
+**Action:** Always pre-allocate standard TypedArray buffers required for real-time analysis inside a `useRef` and conditionally instantiate them only on the first frame or if the target analyzer size changes. Reusing a single buffer eliminates continuous memory re-allocation.
