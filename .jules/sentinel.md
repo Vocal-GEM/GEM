@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-05-24 - Information Leakage in TTS/Voice Quality Routes
+**Vulnerability:** Exception handlers in `backend/app/routes/tts.py` and `backend/app/routes/voice_quality.py` were returning `str(e)` directly in `jsonify()` responses. This could leak internal application or network details (e.g. ElevenLabs API internal errors, requests exception traceback text) to end users.
+**Learning:** Exception handlers returning `str(e)` directly in `jsonify()` responses leak internal application details. This is a common vulnerability pattern for this Flask backend.
+**Prevention:** Sanitize error messages by logging the actual exception details on the server and returning generic error messages to the client.
