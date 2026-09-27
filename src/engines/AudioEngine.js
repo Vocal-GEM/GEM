@@ -348,8 +348,14 @@ export class AudioEngine {
         if (!this.isActive) return;
 
         const bufferLength = this.analyser.frequencyBinCount;
-        const dataArray = new Float32Array(bufferLength);
-        const freqData = new Float32Array(bufferLength);
+        if (!this.timeDomainBuffer || this.timeDomainBuffer.length !== bufferLength) {
+            this.timeDomainBuffer = new Float32Array(bufferLength);
+        }
+        if (!this.frequencyBuffer || this.frequencyBuffer.length !== bufferLength) {
+            this.frequencyBuffer = new Float32Array(bufferLength);
+        }
+        const dataArray = this.timeDomainBuffer;
+        const freqData = this.frequencyBuffer;
 
         // Buffers for calculating perturbation metrics
         this.visualPitchBuffer = [];
