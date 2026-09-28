@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-18 - Avoid buffer allocation inside useFrame loop
+**Learning:** In `Spectrogram3D.jsx`, a `new Float32Array` of size `64 * 64 * 3` (12288 elements) and a dynamic `setAttribute` call was being created in `useFrame` if the color attribute wasn't found. This leads to major GC churn and frame stuttering.
+**Action:** Always pre-allocate geometry buffers (like `colors`) directly inside the initial `useMemo` where `positions`, `indices`, and `uvs` are created, and pass them as `bufferAttribute` nodes in the JSX instead of dynamically calling `setAttribute` in the render loop.
