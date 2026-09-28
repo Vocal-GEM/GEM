@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - Float32Array Pre-allocation in High Frequency Loops
+**Learning:** High-frequency loops like requestAnimationFrame and audio buffers create severe GC churn when instantiating new arrays inside the loop. In AudioEngine.js and Spectrogram3D.jsx, buffers were being re-allocated on every start/frame.
+**Action:** Pre-allocate all buffers once (via class properties or useMemo) and mutate them in-place during the animation loop.
