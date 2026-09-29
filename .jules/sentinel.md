@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2025-02-28 - Information Exposure in Exception Handlers
+**Vulnerability:** Exception handlers returned str(e) directly in jsonify() responses.
+**Learning:** This leaks internal application details and potentially sensitive information to the user.
+**Prevention:** Sanitize error messages returned to the user and log the actual error internally using current_app.logger.error.
