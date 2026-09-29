@@ -8,8 +8,13 @@
  * @module pitchYIN
  */
 
+
+// Reusable buffer to avoid garbage collection churn
+let sharedYinBuffer = null;
+
 /**
  * Detect pitch using the YIN algorithm
+
  * @param {Float32Array} buffer - Audio data
  * @param {number} sampleRate - Sample rate in Hz
  * @param {number} threshold - Threshold for peak picking (default 0.15)
@@ -24,7 +29,11 @@ export function detectPitchYIN(buffer, sampleRate, threshold = 0.15) {
     const halfSize = Math.floor(bufferSize / 2);
 
     // Step 1: Difference function
-    const yinBuffer = new Float32Array(halfSize);
+    if (!sharedYinBuffer || sharedYinBuffer.length < halfSize) {
+        sharedYinBuffer = new Float32Array(Math.max(halfSize, 2048));
+    }
+    const yinBuffer = sharedYinBuffer;
+    yinBuffer.fill(0, 0, halfSize);
     for (let tau = 0; tau < halfSize; tau++) {
         for (let i = 0; i < halfSize; i++) {
             const delta = buffer[i] - buffer[i + tau];

@@ -7,8 +7,13 @@
  * @module pitchAutocorr
  */
 
+
+// Reusable buffer to avoid garbage collection churn
+let sharedAutocorrBuffer = null;
+
 /**
  * Detect pitch using autocorrelation method
+
  * @param {Float32Array} buffer - Audio data
  * @param {number} sampleRate - Sample rate in Hz
  * @param {number} minFreq - Minimum frequency to detect (default 50 Hz)
@@ -32,7 +37,11 @@ export function detectPitchAutocorr(buffer, sampleRate, minFreq = 50, maxFreq = 
     }
 
     // Compute autocorrelation
-    const autocorr = new Float32Array(maxLag + 1);
+    if (!sharedAutocorrBuffer || sharedAutocorrBuffer.length < maxLag + 1) {
+        sharedAutocorrBuffer = new Float32Array(maxLag + 1024);
+    }
+    const autocorr = sharedAutocorrBuffer;
+    autocorr.fill(0, 0, maxLag + 1);
 
     for (let lag = 0; lag <= maxLag; lag++) {
         let sum = 0;
