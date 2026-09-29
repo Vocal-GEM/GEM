@@ -75,3 +75,12 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2026-09-29 - Flask Exception Leakage & Cleanup Rot
+**Vulnerability:** API endpoints returned raw exception strings (str(e)) inside JSON 500 responses.
+**Learning:** In Flask apps, exposing raw exceptions directly leaks internal DB/FS paths. Additionally, temporary file cleanup inside  blocks can easily rot or become malformed (like missing code blocks in ) causing disk leaks.
+**Prevention:** Always log the raw exception securely server-side via , return a sanitized generic error message to the client, and ensure temp files are rigorously cleaned using properly structured try/except/finally blocks or  hooks.
+## 2024-05-18 - Flask Exception Leakage & Cleanup Rot
+**Vulnerability:** API endpoints returned raw exception strings (`str(e)`) inside JSON 500 responses.
+**Learning:** In Flask apps, exposing raw exceptions directly leaks internal DB/FS paths. Additionally, temporary file cleanup inside `except:` blocks can easily rot or become malformed (like missing code blocks in `except:`) causing disk leaks.
+**Prevention:** Always log the raw exception securely server-side via `current_app.logger.error()`, return a sanitized generic error message to the client, and ensure temp files are rigorously cleaned using properly structured try/except/finally blocks or `after_this_request` hooks.
