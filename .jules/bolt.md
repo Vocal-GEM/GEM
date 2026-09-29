@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-05-24 - Pitch Detection GC Churn
+**Learning:** High-frequency web audio loops (e.g. YIN/McLeod algorithms) repeatedly instantiating large Float32Arrays inside the analysis loop cause significant garbage collection pauses and frame drops.
+**Action:** Pre-allocate module-level shared Float32Array buffers, size them defensively for maximum lag, and reuse them across loop iterations, making sure to .fill(0) prior to calculation to maintain deterministic output without memory churn.

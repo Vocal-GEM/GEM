@@ -9,8 +9,15 @@
  * @module pitchMcLeod
  */
 
+
+// Reusable buffers to avoid garbage collection churn
+let sharedRBuffer = null;
+let sharedMBuffer = null;
+let sharedNsdfBuffer = null;
+
 /**
  * Detect pitch using McLeod Pitch Method
+
  * @param {Float32Array} buffer - Audio data
  * @param {number} sampleRate - Sample rate in Hz
  * @param {number} minFreq - Minimum frequency to detect (default 50 Hz)
@@ -35,7 +42,21 @@ export function detectPitchMcLeod(buffer, sampleRate, minFreq = 50, maxFreq = 80
     }
 
     // Compute autocorrelation (r)
-    const r = new Float32Array(maxLag + 1);
+    if (!sharedRBuffer || sharedRBuffer.length < maxLag + 1) {
+        const size = maxLag + 1024;
+        sharedRBuffer = new Float32Array(size);
+        sharedMBuffer = new Float32Array(size);
+        sharedNsdfBuffer = new Float32Array(size);
+    }
+
+    const r = sharedRBuffer;
+    const m = sharedMBuffer;
+    const nsdf = sharedNsdfBuffer;
+
+    r.fill(0, 0, maxLag + 1);
+    m.fill(0, 0, maxLag + 1);
+    nsdf.fill(0, 0, maxLag + 1);
+
     for (let tau = 0; tau <= maxLag; tau++) {
         for (let i = 0; i < bufferSize - tau; i++) {
             r[tau] += buffer[i] * buffer[i + tau];
@@ -43,7 +64,6 @@ export function detectPitchMcLeod(buffer, sampleRate, minFreq = 50, maxFreq = 80
     }
 
     // Compute mean square (m)
-    const m = new Float32Array(maxLag + 1);
     for (let tau = 0; tau <= maxLag; tau++) {
         let sum1 = 0, sum2 = 0;
         for (let i = 0; i < bufferSize - tau; i++) {
@@ -52,9 +72,6 @@ export function detectPitchMcLeod(buffer, sampleRate, minFreq = 50, maxFreq = 80
         }
         m[tau] = sum1 + sum2;
     }
-
-    // Compute Normalized Square Difference Function (NSDF)
-    const nsdf = new Float32Array(maxLag + 1);
     for (let tau = 0; tau <= maxLag; tau++) {
         if (m[tau] === 0) {
             nsdf[tau] = 0;
