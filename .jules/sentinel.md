@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-02-27 - Information Disclosure via Raw Exception Bubbling
+**Vulnerability:** Multiple Flask route exception handlers returned `str(e)` directly inside JSON responses (e.g., `return jsonify({'error': str(e)}), 500`).
+**Learning:** This architectural gap occurs because developers aim for quick debugging but inadvertently expose internal system structures, database paths, or service API keys to end-users on unexpected crashes.
+**Prevention:** Always substitute raw error messages with generic client-facing messages (e.g., `"An internal error occurred"`) while simultaneously using `current_app.logger.error(f"Context: {e}")` to persist the actionable details securely in server logs.
