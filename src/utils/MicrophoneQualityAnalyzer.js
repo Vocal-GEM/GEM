@@ -17,6 +17,7 @@ export const analyzeMicrophoneQuality = async (audioContext, microphoneSource, d
     microphoneSource.connect(analyser);
 
     const bufferLength = analyser.frequencyBinCount;
+    // Pre-allocate single set of buffers for the analysis loop
     const dataArray = new Float32Array(bufferLength);
     const freqData = new Float32Array(bufferLength);
 
@@ -39,9 +40,15 @@ export const analyzeMicrophoneQuality = async (audioContext, microphoneSource, d
             analyser.getFloatTimeDomainData(dataArray);
             analyser.getFloatFrequencyData(freqData);
 
+            // We must copy the data for historical samples since dataArray and freqData are reused
+            const timeDomainCopy = new Float32Array(bufferLength);
+            timeDomainCopy.set(dataArray);
+            const freqCopy = new Float32Array(bufferLength);
+            freqCopy.set(freqData);
+
             samples.push({
-                timeDomain: new Float32Array(dataArray),
-                frequency: new Float32Array(freqData)
+                timeDomain: timeDomainCopy,
+                frequency: freqCopy
             });
 
             requestAnimationFrame(collectSamples);

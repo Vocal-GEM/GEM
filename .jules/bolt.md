@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-18 - Audio Data Allocation in Animation Loops
+**Learning:** In multiple components (e.g. `RealTimePitchGuide.jsx`, `VoiceSelfAssessment.jsx`, `ArticulationView.jsx`), `new Float32Array()` was being created on every frame within `requestAnimationFrame` or `setInterval` loops to capture audio data. This creates massive memory overhead and forces the garbage collector to run constantly, leading to UI stuttering and frame drops during live audio analysis.
+**Action:** Always pre-allocate a single `Float32Array` of the required `bufferLength` using `useRef` (or a class property) and reuse it in the animation loop. Reinstantiating typed arrays inside high-frequency loops is a critical anti-pattern.
