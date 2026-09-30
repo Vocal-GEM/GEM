@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, UserPlus, Search, FileText, Calendar, ChevronRight, MoreVertical } from 'lucide-react';
+import { Users, UserPlus, Search, FileText, Calendar, ChevronRight, MoreVertical, Activity, Mic, Share2, Download, Settings, ChevronLeft } from 'lucide-react';
 
 const ClientDashboard = () => {
     const [clients, setClients] = useState([

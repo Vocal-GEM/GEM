@@ -41,3 +41,4 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+2024-03-24 - Pre-allocating Float32Array to avoid GC churn. Learning: Instantiating new Float32Array buffers inside high-frequency loops causes severe GC churn. Action: Use useRef to pre-allocate and reuse Float32Array buffers.
