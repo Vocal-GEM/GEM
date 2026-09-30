@@ -102,18 +102,20 @@ const ArticulationView = () => {
             analyzerRef.current.realtimeAnalyser = analyser;
 
             const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Float32Array(bufferLength);
+            if (!analyzerRef.current.dataArray || analyzerRef.current.dataArray.length !== bufferLength) {
+                analyzerRef.current.dataArray = new Float32Array(bufferLength);
+            }
 
             // Start analysis loop
             const loop = () => {
                 if (!isRecording) return;
 
-                analyser.getFloatTimeDomainData(dataArray);
+                analyser.getFloatTimeDomainData(analyzerRef.current.dataArray);
 
                 // Analyze frame
                 if (analyzerRef.current) {
                     const results = analyzerRef.current.analyzeFrame(
-                        dataArray,
+                        analyzerRef.current.dataArray,
                         audioCtx.sampleRate
                     );
 
