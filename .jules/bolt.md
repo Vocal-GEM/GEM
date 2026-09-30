@@ -41,3 +41,8 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+
+## 2026-01-24 - TypedArray Allocation in High-Frequency Loops
+**Learning:** Instantiating new Float32Arrays inside high-frequency loops like requestAnimationFrame or setInterval causes excessive garbage collection pressure.
+**Action:** Always use useRef or persistent class properties to pre-allocate and reuse typed arrays for Web Audio API methods like getFloatTimeDomainData.
