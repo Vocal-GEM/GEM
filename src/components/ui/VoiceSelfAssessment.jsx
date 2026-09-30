@@ -29,6 +29,7 @@ const VoiceSelfAssessment = ({ onClose }) => {
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
     const streamRef = useRef(null);
+    const bufferRef = useRef(null);
     const audioRef = useRef(null);
     const timerRef = useRef(null);
     const audioContextRef = useRef(null);
@@ -167,7 +168,11 @@ const VoiceSelfAssessment = ({ onClose }) => {
         if (!analyserRef.current || !audioContextRef.current) return 0;
 
         const bufferLength = analyserRef.current.fftSize;
-        const buffer = new Float32Array(bufferLength);
+        // Pre-allocate buffer for pitch detection loop to avoid GC pauses
+        if (!bufferRef.current || bufferRef.current.length !== bufferLength) {
+            bufferRef.current = new Float32Array(bufferLength);
+        }
+        const buffer = bufferRef.current;
         analyserRef.current.getFloatTimeDomainData(buffer);
 
         // Find the RMS to check if there's signal
