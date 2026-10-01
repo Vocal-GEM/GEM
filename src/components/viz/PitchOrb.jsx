@@ -64,16 +64,40 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        let dimensions = { width: canvas.clientWidth, height: canvas.clientHeight };
+
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                // Use contentBoxSize if available, fallback to contentRect
+                const width = entry.contentBoxSize ? entry.contentBoxSize[0].inlineSize : entry.contentRect.width;
+                const height = entry.contentBoxSize ? entry.contentBoxSize[0].blockSize : entry.contentRect.height;
+                dimensions = {
+                    width,
+                    height
+                };
+            }
+        });
+        resizeObserver.observe(canvas);
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
+            if (canvas.width !== Math.floor(dimensions.width * dpr) || canvas.height !== Math.floor(dimensions.height * dpr)) {
+                canvas.width = Math.floor(dimensions.width * dpr);
+                canvas.height = Math.floor(dimensions.height * dpr);
+            }
+
+            // Re-apply scale every frame to ensure consistent drawing scale regardless of resize condition
+            // In a high-frequency animation loop, setting width/height resets the transform matrix.
+            if (ctx.resetTransform) {
+                ctx.resetTransform();
+            } else if (ctx.setTransform) {
+                ctx.setTransform(1, 0, 0, 1, 0, 0); // fallback for environments (like jsdom) that don't support resetTransform
+            }
             ctx.scale(dpr, dpr);
 
-            const width = rect.width;
-            const height = rect.height;
+            const width = dimensions.width;
+            const height = dimensions.height;
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -165,6 +189,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         );
 
         return () => {
+            resizeObserver.disconnect();
             unsubscribe();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
