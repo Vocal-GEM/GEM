@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2024-05-18 - Tooltip ARIA improvements
+**Learning:** Icon-only buttons used for tooltips, zooming, toggling history and navigation must always include explicit aria-label attributes for accessibility to ensure screen readers provide necessary context to visually impaired users.
+**Action:** Consistently enforce aria-label requirements for all UI buttons that rely strictly on visual icons (such as ZoomIn, ZoomOut, History, ArrowLeft, and Chevron navigation buttons) to communicate function.
