@@ -5,6 +5,9 @@ import { Music, Volume2, VolumeX } from 'lucide-react';
  * ToneGenerator - A visual piano keyboard for generating reference tones
  * Helps users learn to recognize and hold specific pitches
  */
+const WHITE_KEYS = NOTES.filter(n => !n.isBlack);
+const BLACK_KEYS = NOTES.filter(n => n.isBlack);
+
 const ToneGenerator = ({ onNotePlay, compact = false }) => {
     const [activeNote, setActiveNote] = useState(null);
     const [volume, setVolume] = useState(0.3);
@@ -47,7 +50,7 @@ const ToneGenerator = ({ onNotePlay, compact = false }) => {
     ];
 
     // Gender range indicators
-    const genderRanges = {
+    const GENDER_RANGES = {
         male: { min: 85, max: 180, color: 'from-blue-500 to-cyan-500' },
         androgynous: { min: 135, max: 220, color: 'from-purple-500 to-pink-500' },
         female: { min: 180, max: 300, color: 'from-pink-500 to-rose-500' }
@@ -120,20 +123,16 @@ const ToneGenerator = ({ onNotePlay, compact = false }) => {
     }, []);
 
     const getGenderIndicator = (freq) => {
-        if (freq >= genderRanges.female.min) return 'female';
-        if (freq >= genderRanges.androgynous.min) return 'androgynous';
+        if (freq >= GENDER_RANGES.female.min) return 'female';
+        if (freq >= GENDER_RANGES.androgynous.min) return 'androgynous';
         return 'male';
     };
-
-    const whiteKeys = notes.filter(n => !n.isBlack);
-    const blackKeys = notes.filter(n => n.isBlack);
-
     // Get black key position based on its index in the scale
     const getBlackKeyPosition = (blackNote) => {
-        const noteIndex = notes.findIndex(n => n.note === blackNote.note);
-        const whiteKeysBefore = notes.slice(0, noteIndex).filter(n => !n.isBlack).length;
+        const noteIndex = NOTES.findIndex(n => n.note === blackNote.note);
+        const WHITE_KEYSBefore = NOTES.slice(0, noteIndex).filter(n => !n.isBlack).length;
         const keyWidth = compact ? 24 : 32;
-        return (whiteKeysBefore * keyWidth) - (compact ? 8 : 10);
+        return (WHITE_KEYSBefore * keyWidth) - (compact ? 8 : 10);
     };
 
     if (compact) {
@@ -148,7 +147,7 @@ const ToneGenerator = ({ onNotePlay, compact = false }) => {
                         <div className="flex items-center gap-2">
                             <span className="text-sm font-mono text-pink-400">{activeNote}</span>
                             <span className="text-xs text-slate-400">
-                                {notes.find(n => n.note === activeNote)?.freq.toFixed(0)} Hz
+                                {NOTES.find(n => n.note === activeNote)?.freq.toFixed(0)} Hz
                             </span>
                         </div>
                     )}
@@ -158,7 +157,7 @@ const ToneGenerator = ({ onNotePlay, compact = false }) => {
                 <div className="relative h-12 overflow-hidden rounded">
                     {/* White keys */}
                     <div className="flex h-full">
-                        {whiteKeys.map((noteData) => (
+                        {WHITE_KEYS.map((noteData) => (
                             <button
                                 key={noteData.note}
                                 onMouseDown={() => startNote(noteData)}
@@ -175,7 +174,7 @@ const ToneGenerator = ({ onNotePlay, compact = false }) => {
                     </div>
                     {/* Black keys */}
                     <div className="absolute top-0 left-0 h-7">
-                        {blackKeys.map((noteData) => (
+                        {BLACK_KEYS.map((noteData) => (
                             <button
                                 key={noteData.note}
                                 onMouseDown={() => startNote(noteData)}
@@ -240,21 +239,21 @@ const ToneGenerator = ({ onNotePlay, compact = false }) => {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <span className="text-2xl font-bold text-white">{activeNote}</span>
-                            {notes.find(n => n.note === activeNote)?.label && (
+                            {NOTES.find(n => n.note === activeNote)?.label && (
                                 <span className="text-xs text-slate-400">
-                                    ({notes.find(n => n.note === activeNote)?.label})
+                                    ({NOTES.find(n => n.note === activeNote)?.label})
                                 </span>
                             )}
                         </div>
                         <div className="text-right">
                             <div className="text-lg font-mono text-pink-400">
-                                {notes.find(n => n.note === activeNote)?.freq.toFixed(1)} Hz
+                                {NOTES.find(n => n.note === activeNote)?.freq.toFixed(1)} Hz
                             </div>
-                            <div className={`text-xs font-bold capitalize ${getGenderIndicator(notes.find(n => n.note === activeNote)?.freq) === 'female' ? 'text-pink-400' :
-                                getGenderIndicator(notes.find(n => n.note === activeNote)?.freq) === 'androgynous' ? 'text-purple-400' :
+                            <div className={`text-xs font-bold capitalize ${getGenderIndicator(NOTES.find(n => n.note === activeNote)?.freq) === 'female' ? 'text-pink-400' :
+                                getGenderIndicator(NOTES.find(n => n.note === activeNote)?.freq) === 'androgynous' ? 'text-purple-400' :
                                     'text-blue-400'
                                 }`}>
-                                {getGenderIndicator(notes.find(n => n.note === activeNote)?.freq)} range
+                                {getGenderIndicator(NOTES.find(n => n.note === activeNote)?.freq)} range
                             </div>
                         </div>
                     </div>
@@ -265,7 +264,7 @@ const ToneGenerator = ({ onNotePlay, compact = false }) => {
             <div className="relative h-24 overflow-x-auto overflow-y-hidden rounded-lg">
                 {/* White keys */}
                 <div className="flex h-full min-w-max">
-                    {whiteKeys.map((noteData, _idx) => {
+                    {WHITE_KEYS.map((noteData, _idx) => {
                         const gender = getGenderIndicator(noteData.freq);
                         return (
                             <button
@@ -276,7 +275,7 @@ const ToneGenerator = ({ onNotePlay, compact = false }) => {
                                 onTouchStart={(e) => { e.preventDefault(); startNote(noteData); }}
                                 onTouchEnd={stopNote}
                                 className={`w-8 h-full border-r border-slate-300 transition-all relative group ${activeNote === noteData.note
-                                    ? `bg-gradient-to-b ${genderRanges[gender].color}`
+                                    ? `bg-gradient-to-b ${GENDER_RANGES[gender].color}`
                                     : 'bg-slate-100 hover:bg-slate-50'
                                     }`}
                             >
@@ -290,7 +289,7 @@ const ToneGenerator = ({ onNotePlay, compact = false }) => {
                 </div>
                 {/* Black keys */}
                 <div className="absolute top-0 left-0 h-14">
-                    {blackKeys.map((noteData) => {
+                    {BLACK_KEYS.map((noteData) => {
                         const gender = getGenderIndicator(noteData.freq);
                         return (
                             <button
@@ -301,7 +300,7 @@ const ToneGenerator = ({ onNotePlay, compact = false }) => {
                                 onTouchStart={(e) => { e.preventDefault(); startNote(noteData); }}
                                 onTouchEnd={stopNote}
                                 className={`absolute w-5 h-full rounded-b-md transition-all shadow-lg ${activeNote === noteData.note
-                                    ? `bg-gradient-to-b ${genderRanges[gender].color}`
+                                    ? `bg-gradient-to-b ${GENDER_RANGES[gender].color}`
                                     : 'bg-slate-900 hover:bg-slate-800'
                                     }`}
                                 style={{ left: getBlackKeyPosition(noteData) }}

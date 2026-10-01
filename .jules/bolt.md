@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-23 - Unnecessary Array Re-creation in Renders
+**Learning:** React component `ToneGenerator` re-creates `notes`, `whiteKeys` and `blackKeys` arrays on every render. This was causing unnecessary memory allocations.
+**Action:** Extract static configuration arrays entirely outside of the component function. This avoids both unnecessary re-creation and the overhead of `useMemo`.
