@@ -40,7 +40,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
                 // Update value display
                 valueRef.current.innerText = tilt.toFixed(1);
             }
-        };
+        }
 
         let unsubscribe;
         import('../../services/RenderCoordinator').then(({ renderCoordinator }) => {
@@ -51,7 +51,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
             );
         });
             // No recursive requestAnimationFrame - RenderCoordinator handles this
-        };
+        }
 
         const unsubscribe = renderCoordinator.subscribe(
             `spectral-tilt-meter-${componentId}`,
@@ -61,7 +61,7 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
 
         return () => {
             unsubscribe();
-        };
+        }
     }, [dataRef, targetRange, colorBlindMode, id]);
     }, [dataRef, targetRange, colorBlindMode, componentId]);
 
@@ -140,6 +140,6 @@ const SpectralTiltMeter = ({ dataRef, userMode, targetRange = { min: -12, max: -
             </div>
         </div>
     );
-};
+}
 
 export default SpectralTiltMeter;
