@@ -57,7 +57,7 @@ const QuickActions = ({ onAction }) => {
                         aria-hidden={!isOpen}
                         className="flex items-center justify-end gap-3 group focus:outline-none"
                         className="flex items-center justify-end gap-3 group focus-visible:outline-none"
-                        style={{ transitionDelay: `${index * 50}ms` }}
+                        style={{ transitionDelay: `${index * 50}ms` }
                         aria-label={action.label}
                         aria-hidden={!isOpen}
                     >
