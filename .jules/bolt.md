@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-17 - React Three Fiber Geometry Rebuild Anti-Pattern
+**Learning:** Instantiating a new Float32Array in a high-frequency animation loop (e.g., inside useFrame) to add a color attribute to a geometry forces Three.js to recompile the shader program mid-render, causing GC churn and frame stutters.
+**Action:** Pre-allocate all buffer arrays (positions, uvs, colors) once in useMemo and declaratively attach them via <bufferAttribute> in the JSX, then mutate them in-place during the animation loop.
