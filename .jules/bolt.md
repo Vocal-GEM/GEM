@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-10-02 - Float32Array GC Churn in Animation Loops
+**Learning:** In audio analysis components like RealTimePitchGuide and ArticulationView, calling new Float32Array inside high-frequency animation loops or callbacks causes severe garbage collection churn and frame stutters.
+**Action:** Always pre-allocate audio buffers using a useRef and reuse the same memory block across frames.
