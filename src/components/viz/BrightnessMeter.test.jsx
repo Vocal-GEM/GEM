@@ -24,17 +24,11 @@ vi.mock('lucide-react', async () => {
     return {
         Sun: createIcon('Sun'),
         Moon: createIcon('Moon'),
-        Smile: createIcon('Smile')
+        Smile: createIcon('Smile'),
+        Info: createIcon('Info')
     };
 });
 
-    return {
-        Sun: createIcon('Sun'),
-        Moon: createIcon('Moon'),
-        Info: createIcon('Info'),
-        Smile: createIcon('Smile')
-    };
-});
 
 describe('BrightnessMeter', () => {
     let dataRef;
