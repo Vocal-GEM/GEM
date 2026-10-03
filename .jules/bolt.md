@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-21 - Widespread Lazy Initialization Anti-Pattern in Audio Analysis
+**Learning:** Instantiating `new Float32Array()` inside high-frequency `requestAnimationFrame` loops (like `getFloatTimeDomainData` calls) creates severe memory churn, causing frequent Garbage Collection pauses that manifest as UI stutters.
+**Action:** Pre-allocate arrays using `useRef(null)` (with lazy initialization checking the required length) or store them as instance properties on class objects to reuse the same memory block across frames.
