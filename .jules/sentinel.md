@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2025-02-12 - Information Exposure in Flask API Error Handlers
+**Vulnerability:** Raw exception strings (e.g., `str(e)`) were being leaked to the client via `jsonify` inside `except Exception as e` blocks in backend endpoints (`voice_quality.py`). This allows attackers to gain insights into backend structure or database layout if an unexpected error occurs.
+**Learning:** Returning exception details to API consumers is a common anti-pattern that violates the "Fail securely" principle. Developers often do this for ease of debugging, forgetting it exposes internal architecture.
+**Prevention:** Always replace raw exception returns with generic error messages (e.g., "An internal error occurred"). To maintain debuggability, log the actual exception details on the server side using the application's logger (e.g., `current_app.logger.error(f"Error: {e}")`).
