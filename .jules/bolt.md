@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - Float32Array Instantiation Anti-Pattern
+**Learning:** Multiple components like RealTimePitchGuide, VoiceSelfAssessment and ArticulationView were instantiating Float32Array inside high frequency loops requestAnimationFrame or setInterval causing severe garbage collection churn.
+**Action:** Allocate the array using useRef outside the loop and reuse it on every iteration to minimize memory allocations.
