@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-24 - Canvas rendering GC churn optimization
+**Learning:** Re-allocating `ImageData` inside high-frequency canvas render loops (e.g., `HighResSpectrogram.jsx`) causes significant garbage collection churn and performance stuttering. Additionally, `willReadFrequently: true` is an anti-pattern for GPU-accelerated drawing when just appending slices.
+**Action:** Pre-allocate `ImageData` and use `ctx.drawImage(canvas...)` to shift the canvas instead of offscreen buffers. Reuse `Uint32Array` views of the image data buffer.
