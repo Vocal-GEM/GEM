@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - Float32Array allocations in render loop
+**Learning:** High-frequency Web Audio API fetch loops instantiated a new Float32Array on every tick, causing GC churn.
+**Action:** Pre-allocate buffers with useRef.
