@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-10-07 - Pre-allocate buffers in high-frequency audio loops
+**Learning:** Instantiating new Float32Array buffers on every frame within `requestAnimationFrame` or `setInterval` for Web Audio API methods like `getFloatTimeDomainData` causes severe garbage collection churn and UI stuttering.
+**Action:** Use a React `useRef` (or similar persistent reference on a class) to pre-allocate the buffer and reuse the same memory block across frames.
