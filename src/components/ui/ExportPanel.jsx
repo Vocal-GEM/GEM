@@ -61,7 +61,7 @@ const ExportPanel = ({ onClose }) => {
                             <p className="text-xs text-slate-400">Download your progress</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-white">
+                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-white" aria-label="Close export panel">
                         <X size={20} />
                     </button>
                 </div>
