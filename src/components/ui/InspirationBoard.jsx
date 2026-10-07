@@ -92,6 +92,7 @@ const InspirationBoard = ({ onComplete }) => {
                                     <button
                                         onClick={() => setVoices(prev => prev.filter(v => v.id !== voice.id))}
                                         className="p-2 text-slate-600 hover:text-red-400 transition-colors"
+                                        aria-label="Remove voice"
                                     >
                                         <Trash2 size={16} />
                                     </button>
