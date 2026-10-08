@@ -37,3 +37,14 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-10-08 - Icon Buttons Need ARIA Labels and Keyboard Focus
+**Learning:** Found several icon-only buttons in the HighResSpectrogram, DynamicOrb, and OrbLegend visualization components that were missing aria-label attributes and proper keyboard focus states, making them inaccessible to screen readers and difficult to use for keyboard-only users.
+**Action:** When adding icon-only buttons or interactive UI controls, ensure they always have descriptive aria-label attributes (and conditionally aria-expanded or aria-pressed if they toggle state), and apply clear focus-visible styling so keyboard navigation is apparent.
+
+## 2026-10-08 - Icon Buttons Need ARIA Labels and Keyboard Focus
+**Learning:** Found several icon-only buttons in the HighResSpectrogram, DynamicOrb, and OrbLegend visualization components that were missing aria-label attributes and proper keyboard focus states, making them inaccessible to screen readers and difficult to use for keyboard-only users.
+**Action:** When adding icon-only buttons or interactive UI controls, ensure they always have descriptive aria-label attributes (and conditionally aria-expanded or aria-pressed if they toggle state), and apply clear focus-visible styling so keyboard navigation is apparent.
+
+## 2026-10-08 - ESLint React Quotes Escaping
+**Learning:** Found several places where unescaped quotes in JSX text triggered the react/no-unescaped-entities rule, causing CI failures.
+**Action:** When adding text within JSX, always escape quotes (e.g., &quot; instead of ") to avoid ESLint warnings and errors.
