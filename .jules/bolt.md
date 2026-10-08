@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-02-09 - Avoid creating buffers in intervals
+**Learning:** In CPPMeter.jsx, creating a new Float32Array every 200ms causes unnecessary GC churn.
+**Action:** Use a ref to cache and reuse the buffer instead of creating a new one on every interval execution.
