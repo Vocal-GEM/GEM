@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-05-18 - Prevent Float32Array reallocation in requestAnimationFrame
+**Learning:** Instantiating new Float32Array buffers on every frame inside a requestAnimationFrame loop causes severe garbage collection churn and UI stuttering.
+**Action:** Always pre-allocate Web Audio API buffers using a React useRef and reuse the same memory block across frames.
