@@ -433,11 +433,13 @@ const VoiceJournalView = () => {
                     {/* Filter Toggle */}
                     <button
                         onClick={() => setShowFilters(!showFilters)}
+                        aria-expanded={showFilters}
+                        aria-label="Toggle filters"
                         className={`px-4 py-3 rounded-xl border transition-colors flex items-center gap-2 ${showFilters ? 'bg-pink-500/20 border-pink-500 text-pink-400' : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'}`}
                     >
-                        <Filter size={18} />
+                        <Filter size={18} aria-hidden="true" />
                         <span className="hidden sm:inline">Filters</span>
-                        <ChevronDown size={16} className={`transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+                        <ChevronDown size={16} aria-hidden="true" className={`transition-transform ${showFilters ? 'rotate-180' : ''}`} />
                     </button>
                 </div>
 
@@ -446,8 +448,8 @@ const VoiceJournalView = () => {
                     <div className="p-4 bg-slate-900 rounded-xl border border-slate-800 space-y-4 animate-in slide-in-from-top-2 duration-200">
                         {/* Date Filter */}
                         <div>
-                            <label className="text-sm text-slate-400 mb-2 block">Date Range</label>
-                            <div className="flex gap-2 flex-wrap">
+                            <label className="text-sm text-slate-400 mb-2 block" id="date-range-label">Date Range</label>
+                            <div className="flex gap-2 flex-wrap" role="group" aria-labelledby="date-range-label">
                                 {[
                                     { id: 'all', label: 'All Time' },
                                     { id: 'today', label: 'Today' },
@@ -457,6 +459,8 @@ const VoiceJournalView = () => {
                                     <button
                                         key={option.id}
                                         onClick={() => setDateFilter(option.id)}
+                                        aria-pressed={dateFilter === option.id}
+                                        aria-label={`Filter by ${option.label}`}
                                         className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${dateFilter === option.id
                                             ? 'bg-pink-500 text-white'
                                             : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
@@ -470,10 +474,12 @@ const VoiceJournalView = () => {
 
                         {/* Tag Filter */}
                         <div>
-                            <label className="text-sm text-slate-400 mb-2 block">Filter by Tag</label>
-                            <div className="flex gap-2 flex-wrap">
+                            <label className="text-sm text-slate-400 mb-2 block" id="tag-filter-label">Filter by Tag</label>
+                            <div className="flex gap-2 flex-wrap" role="group" aria-labelledby="tag-filter-label">
                                 <button
                                     onClick={() => setFilterTag(null)}
+                                    aria-pressed={filterTag === null}
+                                    aria-label="Filter by all tags"
                                     className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${filterTag === null
                                         ? 'bg-pink-500 text-white'
                                         : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
@@ -485,6 +491,8 @@ const VoiceJournalView = () => {
                                     <button
                                         key={tag.id}
                                         onClick={() => setFilterTag(tag.id)}
+                                        aria-pressed={filterTag === tag.id}
+                                        aria-label={`Filter by tag: ${tag.label}`}
                                         className={`px-3 py-1.5 rounded-lg text-sm border transition-colors ${filterTag === tag.id
                                             ? tag.color
                                             : 'bg-slate-800 text-slate-400 hover:bg-slate-700 border-transparent'
@@ -504,6 +512,7 @@ const VoiceJournalView = () => {
                                     setFilterTag(null);
                                     setDateFilter('all');
                                 }}
+                                aria-label="Clear all filters"
                                 className="text-sm text-pink-400 hover:text-pink-300"
                             >
                                 Clear all filters
