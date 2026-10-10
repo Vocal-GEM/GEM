@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-10-10 - Optimized Float32Array allocations in animation loops
+**Learning:** Instantiating new Float32Array inside high-frequency intervals or animation loops causes significant GC churn and memory spikes, which may lead to stuttering in the UI. In particular, allocating arrays inside a for loop that builds up history (like in FileSpectrogram) is dangerous if not done right, because reusing the same reference inside a map/loop causes all entries to reference the same data.
+**Action:** Use a useRef to store buffers persistently for ephemeral data (like audio chunks), but be careful not to reuse a single reference if the data needs to be stored independently in an array.

@@ -14,6 +14,8 @@ const FileSpectrogram = ({
     onSeek
 }) => {
     const canvasRef = useRef(null);
+    const fftBufferRef = useRef(null);
+    const windowBufferRef = useRef(null);
     const spectrogramDataRef = useRef(null);
     const { settings } = useSettings();
 
@@ -52,8 +54,13 @@ const FileSpectrogram = ({
 
         // Store spectrogram as 2D array [time][frequency]
         const spectrogram = [];
-        const fftBuffer = new Float32Array(FFT_SIZE);
-        const windowFunction = new Float32Array(FFT_SIZE);
+        // Optimization: Lazy initialize Float32Arrays to avoid GC churn
+        if (!fftBufferRef.current || fftBufferRef.current.length !== FFT_SIZE) {
+            fftBufferRef.current = new Float32Array(FFT_SIZE);
+            windowBufferRef.current = new Float32Array(FFT_SIZE);
+        }
+        const fftBuffer = fftBufferRef.current;
+        const windowFunction = windowBufferRef.current;
 
         // Hann window
         for (let i = 0; i < FFT_SIZE; i++) {
