@@ -64,19 +64,41 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        // Store dimensions from ResizeObserver
+        let currentWidth = canvas.clientWidth;
+        let currentHeight = canvas.clientHeight;
+
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                if (entry.target === canvas) {
+                    currentWidth = entry.contentRect.width;
+                    currentHeight = entry.contentRect.height;
+                }
+            }
+        });
+        resizeObserver.observe(canvas);
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            const targetWidth = Math.round(currentWidth * dpr);
+            const targetHeight = Math.round(currentHeight * dpr);
 
-            const width = rect.width;
-            const height = rect.height;
+            if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+            }
+
+            const width = currentWidth;
+            const height = currentHeight;
             const centerX = width / 2;
             const centerY = height / 2;
 
+            // When resizing canvas.width, it implicitly clears the context transform and clears the pixels.
+            // Since we conditionally resize, we must manually reset transform and clear pixels unconditionally
+            // to ensure frame-over-frame state doesn't accumulate.
+            if (ctx.resetTransform) ctx.resetTransform(); else if (ctx.setTransform) ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
             ctx.clearRect(0, 0, width, height);
 
             const pitch = dataRef.current?.pitch || 0;
@@ -166,6 +188,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 

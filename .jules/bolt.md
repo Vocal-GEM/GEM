@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2025-05-23 - Avoiding getBoundingClientRect in Animation Loops
+**Learning:** In components rendering with a recursive `requestAnimationFrame` loop (like `PitchOrb.jsx`), calling `getBoundingClientRect()` on every frame causes synchronous reflows and layout thrashing, severely impacting performance.
+**Action:** Use `ResizeObserver` to track dimensions outside the render loop and only update the internal width/height when they actually change.
