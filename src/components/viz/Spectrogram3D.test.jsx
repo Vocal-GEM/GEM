@@ -63,7 +63,7 @@ vi.mock('@react-three/drei', () => ({
 }));
 
 // Setup global requestAnimationFrame mock
-global.requestAnimationFrame = (cb) => setTimeout(cb, 16);
+globalThis.requestAnimationFrame = (cb) => setTimeout(cb, 16);
 
 describe('Spectrogram3D', () => {
     let dataRef;
