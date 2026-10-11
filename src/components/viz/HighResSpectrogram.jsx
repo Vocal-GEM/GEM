@@ -1,36 +1,42 @@
-import { useEffect, useRef, useMemo, useState, useCallback, memo, useId } from 'react';
-import { useSettings } from '../../context/SettingsContext';
-import { generateColormap } from '../../utils/colormaps';
-import { renderCoordinator } from '../../services/RenderCoordinator';
+import React, { useEffect, useRef, useState, useCallback, useId, memo } from 'react';
 import { Camera, X } from 'lucide-react';
-
-/**
- * Convert frequency to musical note with cents
- */
-const hzToNote = (hz) => {
-    if (hz <= 0) return '—';
-    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    const midi = 12 * Math.log2(hz / 440) + 69;
-    const noteIndex = Math.round(midi) % 12;
-    const octave = Math.floor(Math.round(midi) / 12) - 1;
-    const cents = Math.round((midi - Math.round(midi)) * 100);
-    const centsStr = cents >= 0 ? `+${cents}` : `${cents}`;
-    return `${noteNames[noteIndex]}${octave} (${centsStr}¢)`;
-};
+import { renderCoordinator } from '../../services/RenderCoordinator';
 
 const MAX_FREQ = 8000;
+
+// Optimized colormap generation (runs once)
+const generateColormap = () => {
+    const map = new Array(256);
+    for (let i = 0; i < 256; i++) {
+        const r = Math.min(255, Math.max(0, i * 2 - 100));
+        const g = Math.min(255, Math.max(0, i * 1.5 - 50));
+        const b = Math.min(255, Math.max(0, i * 1.5));
+
+        const alpha = Math.min(255, Math.max(0, i * 3));
+
+        map[i] = (alpha << 24) | (b << 16) | (g << 8) | r;
+    }
+    return map;
+};
+
+// Notes lookup
+const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const hzToNote = (hz) => {
+    if (hz < 20) return '';
+    const semitones = Math.round(12 * Math.log2(hz / 440)) + 69;
+    const note = notes[semitones % 12];
+    const octave = Math.floor(semitones / 12) - 1;
+    return `${note}${octave}`;
+};
 
 const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const canvasRef = useRef(null);
     const containerRef = useRef(null);
+    const [showControls, setShowControls] = useState(false);
+    const [cursorData, setCursorData] = useState(null);
+    const colormap = useRef(generateColormap()).current;
     const lastFormantsRef = useRef({ f1: 0, f2: 0 });
-    const { settings } = useSettings();
 
-    // Component ID for RenderCoordinator
-    const componentId = useId();
-
-    // Reusable buffers to avoid GC
-    // Unique component ID for RenderCoordinator
     const uniqueId = useId();
     const componentId = `spectrogram-highres-${uniqueId}`;
 
@@ -38,33 +44,10 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
     const imgDataRef = useRef(null);
     const data32Ref = useRef(null);
 
-    // Tap cursor state
-    const [cursorData, setCursorData] = useState(null);
-    const [showControls, setShowControls] = useState(false);
-
-    // Dynamic colormap based on settings
-    const colormap = useMemo(
-        () => generateColormap(settings.spectrogramColorScheme),
-        [settings.spectrogramColorScheme]
-    );
-
-    /**
-     * Main rendering loop called by RenderCoordinator
-     */
     const draw = useCallback(() => {
         const canvas = canvasRef.current;
-        if (!canvas) return;
-        if (!dataRef.current || !dataRef.current.spectrum) return;
+        if (!canvas || !dataRef.current?.spectrum) return;
 
-        const width = canvas.width;
-        const height = canvas.height;
-        const scrollSpeed = 2; // px per frame
-
-        // Optimization: Use alpha: false for better performance
-        const ctx = canvas.getContext('2d', { alpha: false });
-
-        // Optimization: Use alpha: false for better performance
-        // Optimized: Remove 'willReadFrequently: true' to encourage GPU acceleration
         const ctx = canvas.getContext('2d', { alpha: false });
 
         const width = canvas.width;
@@ -88,15 +71,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         const data32 = data32Ref.current;
 
         // 1. Shift existing content to left
-        // Optimization: Draw canvas onto itself instead of using an offscreen temp canvas.
-        ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
-
-        // 2. Draw new column
-        // Reuse pre-allocated TypedArray
-        const maxBin = Math.floor(spectrum.length / 3); // 8kHz cutoff
-
-        for (let y = 0; y < height; y++) {
-            // Map y (0 at top, height at bottom) to frequency
         // Copy the current canvas (from x=scrollSpeed to the end) to x=0
         // This is much faster on GPU-accelerated contexts.
         ctx.drawImage(canvas, scrollSpeed, 0, width - scrollSpeed, height, 0, 0, width - scrollSpeed, height);
@@ -156,10 +130,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
 
     }, [dataRef, colormap]);
 
-    // Initial canvas setup & ResizeObserver
-    }, [dataRef, colormap, componentId]);
-
-    // Initial canvas setup
     // Handle Resize with ResizeObserver
     useEffect(() => {
         const container = containerRef.current;
@@ -172,8 +142,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
             const rect = container.getBoundingClientRect();
 
             // Only update if dimensions actually changed
-            const newWidth = Math.floor(rect.width * dpr);
-            const newHeight = 512; // Fixed high vertical resolution
             const newWidth = Math.round(rect.width * dpr);
             const newHeight = 512; // Fixed internal height for vertical resolution
 
@@ -189,17 +157,11 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         updateSize();
 
         const resizeObserver = new ResizeObserver(() => {
-            // Use RAF to debounce
-
-        const resizeObserver = new ResizeObserver(() => {
             // Run in animation frame to avoid resize loops/tearing
             requestAnimationFrame(updateSize);
         });
 
         resizeObserver.observe(container);
-
-        // Initial sizing
-        updateSize();
 
         return () => {
             resizeObserver.disconnect();
@@ -217,7 +179,6 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         return () => {
             unsubscribe();
         };
-    }, [draw, componentId]);
     }, [componentId, draw]);
 
     /**
