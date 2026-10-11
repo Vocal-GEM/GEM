@@ -8,6 +8,7 @@ import { Mic, Square, Play, Pause, RotateCcw, Eye, Check } from 'lucide-react';
 const VoiceSelfAssessment = ({ onClose }) => {
     // Recording state
     const [recordingState, setRecordingState] = useState('idle'); // idle, recording, recorded
+    const bufferRef = useRef(null);
     const [recordingTime, setRecordingTime] = useState(0);
     const [audioUrl, setAudioUrl] = useState(null);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -167,7 +168,10 @@ const VoiceSelfAssessment = ({ onClose }) => {
         if (!analyserRef.current || !audioContextRef.current) return 0;
 
         const bufferLength = analyserRef.current.fftSize;
-        const buffer = new Float32Array(bufferLength);
+        if (!bufferRef.current || bufferRef.current.length !== bufferLength) {
+            bufferRef.current = new Float32Array(bufferLength);
+        }
+        const buffer = bufferRef.current;
         analyserRef.current.getFloatTimeDomainData(buffer);
 
         // Find the RMS to check if there's signal
