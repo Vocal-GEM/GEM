@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-10-11 - Cache Dimensions in Animation Loops
+**Learning:** Calling getBoundingClientRect() or reassigning canvas.width/height within high-frequency animation loops forces synchronous reflows and resets the 2D context, causing layout thrashing and stuttering.
+**Action:** Use a ResizeObserver to cache logical dimensions to a ref or closure variables and reuse them inside the animation loop.
