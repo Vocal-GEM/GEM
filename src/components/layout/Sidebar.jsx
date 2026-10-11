@@ -162,12 +162,15 @@ const Sidebar = ({ activeView, onViewChange }) => {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"
+                aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-expanded={isOpen}
+                aria-controls="sidebar-navigation"
             >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
 
             {/* Sidebar Container */}
-            <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div id="sidebar-navigation" className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="flex flex-col h-full">
                     {/* Header */}
                     <div className="p-6 border-b border-slate-800">
@@ -192,6 +195,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
                                 ref={searchInputRef}
                                 type="text"
                                 placeholder="Search..."
+                                aria-label="Search tools, exercises, and lessons"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyDown={handleSearchKeyDown}
@@ -225,6 +229,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
                                                     key={result.id}
                                                     onClick={() => handleSelectResult(result)}
                                                     onMouseEnter={() => setSelectedIndex(resultIndex)}
+                                                    aria-label={`Select search result: ${result.title}`}
                                                     className={`w-full px-3 py-2 flex items-center gap-3 text-left transition-colors ${isSelected
                                                         ? 'bg-blue-600 text-white'
                                                         : 'text-slate-300 hover:bg-slate-700/50'
@@ -271,7 +276,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
                     </div>
 
                     {/* Nav Items */}
-                    <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+                    <nav className="flex-1 p-4 space-y-2 overflow-y-auto" aria-label="Main Navigation">
                         {navItems.map((item) => (
                             <button
                                 key={item.id}
@@ -283,6 +288,8 @@ const Sidebar = ({ activeView, onViewChange }) => {
                                     }
                                     setIsOpen(false);
                                 }}
+                                aria-label={item.label}
+                                aria-current={!item.isModal && activeView === item.id ? "page" : undefined}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${item.isModal
                                     ? 'text-violet-400 hover:bg-violet-500/10 hover:text-violet-300 border border-violet-500/20'
                                     : activeView === item.id
