@@ -3,6 +3,7 @@ import { Mic, MicOff, Target, TrendingUp } from 'lucide-react';
 
 const RealTimePitchGuide = ({ targetPitch = 200, tolerance = 20, onClose }) => {
     const [isListening, setIsListening] = useState(false);
+    const bufferRef = useRef(null);
     const [currentPitch, setCurrentPitch] = useState(0);
     const [pitchHistory, setPitchHistory] = useState([]);
     const [accuracy, setAccuracy] = useState(0);
@@ -48,7 +49,10 @@ const RealTimePitchGuide = ({ targetPitch = 200, tolerance = 20, onClose }) => {
         if (!analyserRef.current) return;
 
         const bufferLength = analyserRef.current.fftSize;
-        const buffer = new Float32Array(bufferLength);
+        if (!bufferRef.current || bufferRef.current.length !== bufferLength) {
+            bufferRef.current = new Float32Array(bufferLength);
+        }
+        const buffer = bufferRef.current;
         analyserRef.current.getFloatTimeDomainData(buffer);
 
         // Simple autocorrelation pitch detection
