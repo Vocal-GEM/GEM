@@ -1,20 +1,40 @@
-import { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 
-const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
-    const canvasRef = useRef(null);
+const MIN_FREQ_DEFAULT = 50;
+const MAX_FREQ_DEFAULT = 500;
+
+const PitchTrace = ({ data = [], targetRange, currentTime, duration }) => {
     const containerRef = useRef(null);
-
-    // Zoom state: { tMin, tMax, fMin, fMax } or null (default)
+    const canvasRef = useRef(null);
     const [zoom, setZoom] = useState(null);
-
-    // Selection state for drag-to-zoom
-    const [selection, setSelection] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [selection, setSelection] = useState(null);
+    // Add internal state for width and height updated by ResizeObserver
+    const [dimensions, setDimensions] = useState({ width: 800, height: 200 });
 
-    // Default bounds
-    const MIN_FREQ_DEFAULT = 50;
-    const MAX_FREQ_DEFAULT = 400;
+    // Handle resize observation to avoid reading bounds in loop
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const observer = new ResizeObserver(() => {
+            const rect = container.getBoundingClientRect();
+            // Get physical dimensions to match DOM pixel size
+            setDimensions({
+                width: rect.width,
+                height: rect.height
+            });
+        });
+
+        observer.observe(container);
+
+        // Initial setup
+        const rect = container.getBoundingClientRect();
+        setDimensions({ width: rect.width, height: rect.height });
+
+        return () => observer.disconnect();
+    }, []);
 
     // Helper to get current bounds
     const getBounds = () => {
@@ -43,11 +63,28 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
     // Drawing Logic
     useEffect(() => {
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!canvas || dimensions.width === 0) return;
 
         const ctx = canvas.getContext('2d');
-        const width = canvas.width;
-        const height = canvas.height;
+        const dpr = window.devicePixelRatio || 1;
+
+        const width = dimensions.width;
+        const height = dimensions.height;
+
+        // Update actual canvas size for DPR
+        const newWidth = Math.round(width * dpr);
+        const newHeight = Math.round(height * dpr);
+
+        if (canvas.width !== newWidth || canvas.height !== newHeight) {
+            canvas.width = newWidth;
+            canvas.height = newHeight;
+            // Scale context only when dimensions change
+            if (ctx.resetTransform) ctx.resetTransform();
+            else if (ctx.setTransform) ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
+        } else {
+            // Keep existing scale, just clear canvas
+        }
 
         // Clear canvas
         ctx.clearRect(0, 0, width, height);
@@ -181,7 +218,7 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
             ctx.strokeRect(x, y, w, h);
         }
 
-    }, [data, targetRange, currentTime, duration, zoom, selection]);
+    }, [data, targetRange, currentTime, duration, zoom, selection, dimensions, bounds.tMin, bounds.tMax, bounds.fMin, bounds.fMax]);
 
 
     // Interaction Handlers
@@ -207,9 +244,8 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
         if (!isDragging || !selection) return;
         setIsDragging(false);
 
-        const canvas = canvasRef.current;
-        const width = canvas.width;
-        const height = canvas.height;
+        const width = dimensions.width;
+        const height = dimensions.height;
 
         const start = selection.start;
         const end = selection.current;
@@ -275,9 +311,7 @@ const PitchTrace = ({ data, targetRange, currentTime, duration }) => {
         >
             <canvas
                 ref={canvasRef}
-                width={800}
-                height={200}
-                className="w-full h-full pointer-events-none" // Events handled by container
+                className="w-full h-full pointer-events-none block" // Events handled by container
             />
 
             {/* Axis Labels (Dynamic) */}
