@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-05-22 - Layout Thrashing in Animation Loops Addendum
+**Learning:** `getBoundingClientRect()` causes synchronous reflow (layout thrashing) when called inside high-frequency animation loops or frequent renders. This was identified in `PitchVisualizer.jsx` previously, but the same anti-pattern was found and fixed in `PitchOrb.jsx` and `PitchTrace.jsx`. Additionally, when using `ctx.resetTransform()`, we must provide a fallback for test environments (JSDOM/Vitest) that might not support it out of the box, throwing errors that fail the CI tests.
+**Action:** Use `ResizeObserver` to track element dimensions asynchronously. Store dimensions in a state/ref and update the canvas size only when physical dimensions actually change, keeping `getBoundingClientRect()` out of `requestAnimationFrame` loops or render cycles. Fallback for transform reset: `if (ctx.resetTransform) ctx.resetTransform(); else if (ctx.setTransform) ctx.setTransform(1, 0, 0, 1, 0, 0);`.
