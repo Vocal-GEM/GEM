@@ -305,8 +305,8 @@ const ArticulationView = () => {
                         </p>
                     </div>
                     <div className="bg-slate-900 p-1 rounded-lg flex gap-1 w-full md:w-auto">
-                        <button onClick={() => setViewMode('practice')} className={`flex-1 md:flex-none px-6 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'practice' ? 'bg-slate-800 text-white shadow' : 'text-slate-500 hover:text-slate-300'}`}>{t('articulation.modes.practice')}</button>
-                        <button onClick={() => setViewMode('challenge')} className={`flex-1 md:flex-none px-6 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'challenge' ? 'bg-slate-800 text-white shadow' : 'text-slate-500 hover:text-slate-300'}`}>{t('articulation.modes.challenges')}</button>
+                        <button onClick={() => setViewMode('practice')} className={`flex-1 md:flex-none px-6 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'practice' ? 'bg-slate-800 text-white shadow' : 'text-slate-500 hover:text-slate-300'}`} aria-label="Switch to Practice Mode">{t('articulation.modes.practice')}</button>
+                        <button onClick={() => setViewMode('challenge')} className={`flex-1 md:flex-none px-6 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'challenge' ? 'bg-slate-800 text-white shadow' : 'text-slate-500 hover:text-slate-300'}`} aria-label="Switch to Challenge Mode">{t('articulation.modes.challenges')}</button>
                     </div>
                 </div>
 

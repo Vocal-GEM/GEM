@@ -109,7 +109,7 @@ const AdaptivePracticeSession = ({ onClose }) => {
                     We couldn&apos;t find any exercises matching your current profile settings.
                     Try adjusting your skill level or goals.
                 </p>
-                <button onClick={onClose} className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition-colors">
+                <button onClick={onClose} className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition-colors" aria-label="End Session">
                     Back to Dashboard
                 </button>
             </div>
@@ -129,7 +129,7 @@ const AdaptivePracticeSession = ({ onClose }) => {
                     <button onClick={onClose} className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition-colors">
                         Back to Dashboard
                     </button>
-                    <button onClick={handleRestart} className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-colors flex items-center gap-2">
+                    <button onClick={handleRestart} className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-colors flex items-center gap-2" aria-label="Restart Session">
                         <RefreshCw size={18} /> Practice Again
                     </button>
                 </div>
@@ -144,7 +144,7 @@ const AdaptivePracticeSession = ({ onClose }) => {
         <div className="h-full flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
-                <button onClick={onClose} className="text-slate-400 hover:text-white flex items-center gap-2">
+                <button onClick={onClose} className="text-slate-400 hover:text-white flex items-center gap-2" aria-label="Back to Dashboard">
                     <ArrowLeft size={20} /> <span className="font-bold">Exit Session</span>
                 </button>
                 <div className="text-sm font-bold text-slate-500">
