@@ -312,13 +312,13 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
                 </div>
 
                 <div className="flex gap-2">
-                    <button onClick={() => setShowHistory(!showHistory)} className={`p-1.5 rounded hover:bg-slate-800 ${showHistory ? 'text-blue-400' : 'text-slate-400'}`}>
+                    <button onClick={() => setShowHistory(!showHistory)} className={`p-1.5 rounded hover:bg-slate-800 ${showHistory ? 'text-blue-400' : 'text-slate-400'}`} aria-label="Toggle History">
                         <History size={16} />
                     </button>
                     <div className="flex items-center bg-slate-800 rounded px-1">
-                        <button onClick={prevPattern} className="p-1 hover:bg-slate-700 rounded"><ChevronLeft className="w-4 h-4 text-slate-400" /></button>
+                        <button onClick={prevPattern} className="p-1 hover:bg-slate-700 rounded" aria-label="Previous Pattern"><ChevronLeft className="w-4 h-4 text-slate-400" /></button>
                         <span className="text-xs text-slate-300 font-mono w-4 text-center">{selectedPattern + 1}</span>
-                        <button onClick={nextPattern} className="p-1 hover:bg-slate-700 rounded"><ChevronRight className="w-4 h-4 text-slate-400" /></button>
+                        <button onClick={nextPattern} className="p-1 hover:bg-slate-700 rounded" aria-label="Next Pattern"><ChevronRight className="w-4 h-4 text-slate-400" /></button>
                     </div>
                 </div>
             </div>

@@ -252,6 +252,7 @@ const FlowPhonationMeter = ({ dataRef, onReset, showDetails = true }) => {
                                     ? 'bg-pink-500/20 text-pink-300 hover:bg-pink-500/30'
                                     : 'bg-red-500/20 text-red-300 hover:bg-red-500/30'
                                 }`}
+                            aria-label="Reset Flow Phonation Meter"
                         >
                             <RotateCcw className="w-3 h-3" />
                             Reset
