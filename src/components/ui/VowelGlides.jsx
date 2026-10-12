@@ -56,6 +56,7 @@ const VowelGlides = ({ onComplete }) => {
 
                 <div className="flex justify-center gap-4">
                     <button
+                        aria-label="Toggle Recording"
                         onClick={toggleRecord}
                         className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-slate-700 hover:bg-red-600'
                             }`}
