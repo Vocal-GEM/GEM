@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-12 - Re-instantiating buffers in loops causes GC churn
+**Learning:** Initializing `new Float32Array()` inside `detectPitch` or `estimatePitch` methods that are called repeatedly (e.g. within `requestAnimationFrame` loops) causes massive garbage collection churn and UI stuttering.
+**Action:** Store the buffer inside a `useRef` and conditionally re-allocate it only if the required size changes. Reuse the buffer reference on subsequent iterations.
