@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2025-02-18 - Feedback Widget Accessibility
+**Learning:** Floating action buttons and toggle widgets (like the Feedback widget) often use icons without accessible names, making their purpose ambiguous to screen reader users.
+**Action:** Ensure all icon-only buttons, especially global UI elements like feedback toggles and close buttons, include explicit `aria-label` attributes to describe their action.
