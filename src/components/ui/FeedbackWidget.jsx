@@ -44,6 +44,7 @@ const FeedbackWidget = () => {
                 onClick={() => setIsOpen(true)}
                 className="fixed bottom-24 right-4 lg:bottom-8 z-40 p-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg transition-all hover:scale-110"
                 title="Send Feedback"
+                aria-label="Send Feedback"
             >
                 <MessageCircle size={24} />
             </button>
@@ -58,6 +59,7 @@ const FeedbackWidget = () => {
                 <button
                     onClick={() => setIsOpen(false)}
                     className="text-slate-400 hover:text-white"
+                    aria-label="Close feedback widget"
                 >
                     <X size={18} />
                 </button>
