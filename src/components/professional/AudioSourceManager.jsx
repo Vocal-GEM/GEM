@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Mic, Settings, Volume2, RefreshCw } from 'lucide-react';
 
 const AudioSourceManager = ({ onSourceChange }) => {
@@ -8,7 +8,7 @@ const AudioSourceManager = ({ onSourceChange }) => {
 
     useEffect(() => {
         checkPermissionAndEnumerate();
-    }, []);
+    }, [checkPermissionAndEnumerate]);
 
     const checkPermissionAndEnumerate = async () => {
         try {

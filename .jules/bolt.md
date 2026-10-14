@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Merge Conflict Artifacts Re-discovered
+**Learning:** Unresolved merge conflict artifacts were found again in HighResSpectrogram.jsx and Spectrogram3D.jsx. In HighResSpectrogram.jsx, they caused duplicate const declarations (ctx, width, height, scrollSpeed) and duplicate syntax in useEffects. In Spectrogram3D.jsx, it caused a duplicated lazy initialization block for historyRef. ESLint does not catch duplicate const declarations in different scopes or duplicate react hooks.
+**Action:** Always check git diff carefully after conflict resolution and build the project to catch these issues.
