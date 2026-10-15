@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-21 - Implicit Canvas State Wipe Anti-Pattern
+**Learning:** Removing an explicit canvas dimension reset (e.g., canvas.width = rect.width) to prevent layout thrashing also removes its implicit side effect of wiping the canvas state and resetting transformations. Failing to explicitly clear the canvas and reset transformations when caching dimensions leads to visual artifacts (smearing) and incorrect drawing scales.
+**Action:** When implementing ResizeObserver to cache canvas dimensions, ensure explicit calls to ctx.clearRect() and ctx.resetTransform() (or equivalent) are made in the animation loop to maintain visual parity.
