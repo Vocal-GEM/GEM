@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2026-02-18 - Missing ARIA Labels on Tooltip Buttons
+**Learning:** Foundational tooltips and small helper buttons (like X close icons or camera screenshot icons) without text content lack aria-label attributes, making them inaccessible to screen readers.
+**Action:** Always add descriptive aria-labels to buttons that only render an icon and do not have child text.
