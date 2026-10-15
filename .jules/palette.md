@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+2024-05-24 - Missing ARIA labels in Visualization Overlays
+Learning: Custom visualization components (like canvas overlays) often implement their own custom UI controls. While tooltips and titles are commonly used for sighted users, they frequently omit aria-label attributes, causing screen reader opacity for core features.
+Action: Always explicitly verify and add aria-labels to all absolute-positioned overlay controls and toggle buttons within visualization widgets.
