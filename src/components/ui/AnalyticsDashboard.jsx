@@ -36,8 +36,7 @@ const AnalyticsDashboard = ({ onClose }) => {
                         <button onClick={refreshData} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
                             <RefreshCw className="w-5 h-5" />
                         </button>
-                        <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
-                            <X className="w-5 h-5" />
+                        <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors" aria-label="Close"><X className="w-5 h-5" />
                         </button>
                     </div>
                 </div>

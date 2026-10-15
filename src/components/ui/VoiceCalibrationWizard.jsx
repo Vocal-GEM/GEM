@@ -128,8 +128,8 @@ const VoiceCalibrationWizard = ({ onComplete, onClose }) => {
                     </h2>
                     <div className="flex items-center gap-4">
                         <div className="text-slate-400 text-sm">Step {step + 1} of 4</div>
-                        <button onClick={onClose} className="text-slate-400 hover:text-white">
-                            <X size={20} />
+                        <button onClick={onClose} className="text-slate-400 hover:text-white" aria-label="Close">
+<X size={20} />
                         </button>
                     </div>
                 </div>

@@ -76,8 +76,7 @@ const PracticeReminderBanner = () => {
                     <button
                         onClick={handleDismiss}
                         className="text-white/60 hover:text-white p-1"
-                    >
-                        <X size={18} />
+                     aria-label="Close"><X size={18} />
                     </button>
                 </div>
             </div>

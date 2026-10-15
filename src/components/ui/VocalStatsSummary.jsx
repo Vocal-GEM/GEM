@@ -110,8 +110,8 @@ const VocalStatsSummary = ({ sessionData, onClose, previousSession }) => {
                     <button
                         onClick={onClose}
                         className="p-2 rounded-lg hover:bg-slate-700/50 transition-colors"
-                    >
-                        <X className="w-5 h-5 text-slate-400" />
+                     aria-label="Close">
+<X className="w-5 h-5 text-slate-400" />
                     </button>
                 </div>
 

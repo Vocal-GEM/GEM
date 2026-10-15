@@ -145,8 +145,8 @@ const TourOverlay = () => {
             >
                 <div className="flex justify-between items-start">
                     <h3 className="font-bold text-lg text-white">{step.title}</h3>
-                    <button onClick={skipTour} className="text-slate-400 hover:text-slate-200 p-1">
-                        <X size={16} />
+                    <button onClick={skipTour} className="text-slate-400 hover:text-slate-200 p-1" aria-label="Close">
+<X size={16} />
                     </button>
                 </div>
                 <p className="text-slate-300 text-sm leading-relaxed">{step.content}</p>

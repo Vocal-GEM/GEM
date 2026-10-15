@@ -36,8 +36,8 @@ const ForwardFocusDrill = ({ onClose, embedded = false }) => {
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-white">Forward Focus Drill</h2>
                     {!embedded && (
-                        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                            <X className="w-5 h-5 text-slate-400" />
+                        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors" aria-label="Close">
+<X className="w-5 h-5 text-slate-400" />
                         </button>
                     )}
                 </div>

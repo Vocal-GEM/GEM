@@ -79,8 +79,8 @@ const PostSessionSummary = ({ sessionData, onClose, onStartRecommended }) => {
                     <button
                         onClick={onClose}
                         className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white"
-                    >
-                        <X size={20} />
+                     aria-label="Close">
+<X size={20} />
                     </button>
 
                     <div className="text-center">

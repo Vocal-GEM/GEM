@@ -77,8 +77,8 @@ const AssessmentModule = ({ onClose, embedded = false }) => {
                         <ClipboardCheck className="text-blue-400" /> Baseline Assessment
                     </h2>
                     {!embedded && onClose && (
-                        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                            <X className="w-5 h-5 text-slate-400" />
+                        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors" aria-label="Close">
+<X className="w-5 h-5 text-slate-400" />
                         </button>
                     )}
                 </div>

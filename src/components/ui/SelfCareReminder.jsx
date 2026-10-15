@@ -25,8 +25,8 @@ const SelfCareReminder = ({ context = 'fatigued', onDismiss, onViewPlan }) => {
                         </div>
                     </div>
                     {onDismiss && (
-                        <button onClick={onDismiss} className="text-slate-400 hover:text-white shrink-0">
-                            <X size={16} />
+                        <button onClick={onDismiss} className="text-slate-400 hover:text-white shrink-0" aria-label="Close">
+<X size={16} />
                         </button>
                     )}
                 </div>
@@ -50,8 +50,8 @@ const SelfCareReminder = ({ context = 'fatigued', onDismiss, onViewPlan }) => {
                     </div>
                 </div>
                 {onDismiss && (
-                    <button onClick={onDismiss} className="text-slate-400 hover:text-white shrink-0">
-                        <X size={16} />
+                    <button onClick={onDismiss} className="text-slate-400 hover:text-white shrink-0" aria-label="Close">
+<X size={16} />
                     </button>
                 )}
             </div>

@@ -15,8 +15,8 @@ const AssessmentView = ({ feedback, onClose, onPractice }) => {
                     <button
                         onClick={onClose}
                         className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
-                    >
-                        <X className="w-5 h-5 text-slate-400" />
+                     aria-label="Close">
+<X className="w-5 h-5 text-slate-400" />
                     </button>
                 )}
             </div>
