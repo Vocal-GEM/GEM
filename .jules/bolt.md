@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Float32Array Instantiation in Loops
+**Learning:** Instantiating new `Float32Array` objects inside high-frequency loops like `setInterval` or `requestAnimationFrame` causes continuous garbage collection churn and performance degradation.
+**Action:** Always use a `useRef` hook to cache and reuse `Float32Array` buffers when the size remains consistent, rather than recreating them on every execution tick. This was fixed in components like `CPPMeter`, `VoiceSelfAssessment`, `RealTimePitchGuide`, and `ArticulationView`.
