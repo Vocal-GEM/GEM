@@ -41,8 +41,7 @@ const CelebrationModal = ({ achievement, onClose }) => {
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"
-                >
-                    <X size={20} />
+                 aria-label="Close"><X size={20} />
                 </button>
 
                 <div className="w-20 h-20 mx-auto bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-orange-500/30 animate-bounce">

@@ -87,8 +87,8 @@ const ProgressCard = ({ stats, onClose }) => {
                     <button
                         onClick={onClose}
                         className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
-                    >
-                        <X size={18} />
+                     aria-label="Close">
+<X size={18} />
                     </button>
                 </div>
 

@@ -107,8 +107,7 @@ const ClipCapture = ({ onCapture, showAnalysis = true }) => {
                         onClick={handleCancel}
                         className="p-1.5 rounded-full bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-500/30 transition-all animate-in fade-in slide-in-from-right-4 duration-300"
                         title="Cancel Recording"
-                    >
-                        <X size={14} />
+                     aria-label="Close"><X size={14} />
                     </button>
                 )}
 

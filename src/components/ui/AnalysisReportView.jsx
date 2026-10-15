@@ -164,8 +164,8 @@ const AnalysisReportView = ({ report, audioBlob, onClose }) => {
                 <button
                     onClick={onClose}
                     className="p-2 hover:bg-white/10 rounded-full text-slate-400 hover:text-white transition-colors"
-                >
-                    <X size={20} />
+                 aria-label="Close">
+<X size={20} />
                 </button>
             </div>
 

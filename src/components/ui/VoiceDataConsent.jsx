@@ -77,8 +77,7 @@ const VoiceDataConsent = ({ isOpen, onClose, onConsentChange }) => {
                     <button
                         onClick={onClose}
                         className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
-                    >
-                        <X size={20} />
+                     aria-label="Close"><X size={20} />
                     </button>
                 </div>
 

@@ -125,8 +125,7 @@ const PracticeTimer = ({ onComplete, onClose, compact = false }) => {
                     <button
                         onClick={onClose}
                         className="p-1 rounded-full hover:bg-slate-700 text-slate-500 hover:text-white transition-colors"
-                    >
-                        <X size={12} />
+                     aria-label="Close"><X size={12} />
                     </button>
                 )}
             </div>
@@ -145,8 +144,7 @@ const PracticeTimer = ({ onComplete, onClose, compact = false }) => {
                     <button
                         onClick={onClose}
                         className="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
-                    >
-                        <X size={18} />
+                     aria-label="Close"><X size={18} />
                     </button>
                 )}
             </div>
