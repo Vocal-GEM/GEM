@@ -128,18 +128,22 @@ const PitchVisualizer = memo(({ dataRef, targetRange, userMode, exercise, onScor
             const dpr = window.devicePixelRatio || 1;
 
             // Update physical dimensions
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
+            const targetWidth = Math.round(rect.width * dpr);
+            const targetHeight = Math.round(rect.height * dpr);
+
+            if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+                // Restore scale after resize clears canvas
+                const ctx = canvas.getContext('2d');
+                ctx.scale(dpr, dpr);
+            }
 
             // Update ref for the loop
             dimensionsRef.current = {
                 width: rect.width,
                 height: rect.height
             };
-
-            // Restore scale after resize clears canvas
-            const ctx = canvas.getContext('2d');
-            ctx.scale(dpr, dpr);
         };
 
         const observer = new ResizeObserver(updateDimensions);

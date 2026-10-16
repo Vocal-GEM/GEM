@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-10-24 - Canvas Dimension Update Optimization
+**Learning:** Assigning canvas.width or canvas.height implicitly clears the canvas buffer and resets the 2D context state, even if the value has not changed. When using a ResizeObserver, fractional rect dimensions can cause an infinite loop of canvas resetting if not carefully checked.
+**Action:** Round calculated dimensions and strictly check them against current canvas dimensions before updating to avoid unnecessary redraws and context state loss.
