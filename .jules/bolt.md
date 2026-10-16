@@ -41,3 +41,11 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - Prevent GC Churn with Float32Array
+**Learning:** Re-instantiating  buffers inside high-frequency loops (e.g., , ) causes unnecessary memory allocations and garbage collection churn, which can lead to UI stuttering and frame drops in visualization components.
+**Action:** Use a  to cache the  (e.g., ) and only conditionally reallocate it if the required buffer length changes (e.g., ).
+
+## 2026-01-24 - Prevent GC Churn with Float32Array
+**Learning:** Re-instantiating `Float32Array` buffers inside high-frequency loops (e.g., `setInterval`, `requestAnimationFrame`) causes unnecessary memory allocations and garbage collection churn, which can lead to UI stuttering and frame drops in visualization components.
+**Action:** Use a `useRef` to cache the `Float32Array` (e.g., `const bufferRef = useRef(null)`) and only conditionally reallocate it if the required buffer length changes (e.g., `if (!bufferRef.current || bufferRef.current.length !== requiredLength)`).
