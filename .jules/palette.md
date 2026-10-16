@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2026-02-14 - Replacing Blocking Native UI Elements
+**Learning:** Using blocking native elements like `window.alert()` creates a jarring user experience, completely stops JS execution, and fails to match the application's overall design system.
+**Action:** Always replace instances of native blocking alerts with application-specific UI feedback mechanisms like `Toast` notifications, mapping them to the appropriate ARIA role (`role="alert"` for errors).
