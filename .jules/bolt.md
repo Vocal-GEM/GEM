@@ -41,3 +41,15 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - ImageData memory churn
+**Learning:** Creating a `new Uint32Array(imgData.data.buffer)` inside a high-frequency render loop (like `requestAnimationFrame`) creates a new TypedArray view on every frame. Even though it shares the underlying buffer, the view object itself must be repeatedly allocated and garbage collected.
+**Action:** When accessing `ImageData.data.buffer` as a `Uint32Array`, lazily instantiate the `Uint32Array` view and store it in a `ref` or class property, recreating it only when the `ImageData` dimensions change.
+
+## 2026-01-24 - Duplicate id errors due to merge artifacts
+**Learning:** Merge artifacts can result in variables being declared twice leading to unexpected syntax errors (like duplicate const declarations) that are easy to spot using the lint tool and running builds.
+**Action:** Use `npm run build` and `npm run lint` properly to check for missing/unneeded code that may have been caused by partial merge operations or bad find and replace logic.
+
+## 2026-01-24 - Missing closing braces in React Hooks
+**Learning:** When using tools to apply diffs (like `replace_with_git_merge_diff`), be extremely careful not to accidentally remove closing braces or brackets of surrounding functions or hooks (e.g. `useEffect`). Leaving behind a dangling `}, [deps]);` or omitting one entirely causes a critical syntax error that fails the build.
+**Action:** Always run `npm run build` and `npm run lint` after modifying code using automated search/replace tools to catch dangling syntax errors before committing.
