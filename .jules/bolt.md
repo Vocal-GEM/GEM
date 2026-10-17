@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - ImageData memory churn
+**Learning:** Creating a `new Uint32Array(imgData.data.buffer)` inside a high-frequency render loop (like `requestAnimationFrame`) creates a new TypedArray view on every frame. Even though it shares the underlying buffer, the view object itself must be repeatedly allocated and garbage collected.
+**Action:** When accessing `ImageData.data.buffer` as a `Uint32Array`, lazily instantiate the `Uint32Array` view and store it in a `ref` or class property, recreating it only when the `ImageData` dimensions change.
