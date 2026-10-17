@@ -37,3 +37,7 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+
+## 2024-05-24 - Accessibility Pattern for Interactive Icons
+**Learning:** Foundational components using icons (like Trash2 or RefreshCw) often lack `aria-label`s, rendering them inaccessible to screen readers as they are not self-descriptive.
+**Action:** Always verify icon-only interactive elements in `src/components/ui` and ensure they have a descriptive `aria-label` describing the action, not just the icon name.
