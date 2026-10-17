@@ -6,7 +6,6 @@ const PRIVACY_KEY = 'gem_privacy_settings';
 
 const DEFAULT_SETTINGS = {
     shareProgress: false,
-    shareProgress: false,
     showInLeaderboards: false,
     dataRetentionDays: 90
 };
@@ -45,7 +44,6 @@ class PrivacyManager {
             case 'milestone':
                 return this.currentSettings.shareMilestones;
             case 'progress':
-                return this.currentSettings.shareProgress;
             case 'profile':
                 return this.currentSettings.profileVisibility === 'public';
             default:
