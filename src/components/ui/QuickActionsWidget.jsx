@@ -50,6 +50,7 @@ const QuickActionsWidget = () => {
                 {actions.map(action => (
                     <button
                         key={action.id}
+                        aria-label={action.label}
                         onClick={() => handleAction(action.target)}
                         className="flex flex-col items-center gap-2 p-3 rounded-xl bg-slate-800 hover:bg-slate-700 transition-all hover:scale-105"
                     >
