@@ -41,3 +41,11 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-10-18 - Avoid layout thrashing in canvas rendering loops
+**Learning:** In `PitchOrb.jsx`, `getBoundingClientRect()` was being called inside the animation loop (approx 60fps). This forces a synchronous layout calculation on every frame, which severely degrades performance.
+**Action:** Use a `ResizeObserver` to track the canvas dimensions asynchronously, store the values in local variables (`currentWidth`, `currentHeight`), and only trigger updates (and `ctx.scale` resets) when the canvas size actually changes.
+
+## 2026-10-18 - Canvas Flicker with requestAnimationFrame and ResizeObserver
+**Learning:** When moving canvas `updateSize` logic (which modifies `canvas.width` and inherently clears it) from a `requestAnimationFrame` render loop into a `ResizeObserver`, wrapping the resize update in another `requestAnimationFrame` can cause them to fire out of sync with the main render loop. This results in the canvas clearing on a resize frame *after* it was just drawn, creating a visual flicker.
+**Action:** Execute dimension updates synchronously inside the `ResizeObserver` callback (before the next paint cycle) to ensure the newly sized, cleared canvas is ready before the next render tick draws to it.
