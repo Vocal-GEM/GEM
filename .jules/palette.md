@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2023-10-25 - Unlabelled Icon-Only Toggle Button
+**Learning:** The Sidebar component uses an icon-only button for the mobile menu toggle without an accessible name.
+**Action:** Add an aria-label to ensure screen reader users can identify the menu toggle functionality.
