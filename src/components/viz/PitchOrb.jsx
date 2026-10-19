@@ -64,16 +64,39 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        // Monitor canvas size with ResizeObserver
+        const observer = new ResizeObserver((entries) => {
+            if (!canvas || !entries.length) return;
+
+            const entry = entries[0];
+            const width = entry.contentRect.width;
+            const height = entry.contentRect.height;
+
+            // Only update if dimensions actually changed
+            const newWidth = Math.round(width * dpr);
+            const newHeight = Math.round(height * dpr);
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                ctx.scale(dpr, dpr);
+            }
+        });
+
+        observer.observe(canvas);
+
+        // Initial setup
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.round(rect.width * dpr);
+        canvas.height = Math.round(rect.height * dpr);
+        ctx.scale(dpr, dpr);
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            // Avoid layout thrashing in animation loop
+            const width = canvas.width / dpr || canvas.clientWidth || 300;
+            const height = canvas.height / dpr || canvas.clientHeight || 300;
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -165,8 +188,10 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         );
 
         return () => {
-            unsubscribe();
-        };
+                unsubscribe();
+                observer.disconnect();
+            };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
     return (
