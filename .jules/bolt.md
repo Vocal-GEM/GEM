@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-21 - Layout Thrashing in Animation Loops (Continued)
+**Learning:** The `getBoundingClientRect()` performance anti-pattern was found in `PitchOrb.jsx` as well, where it was called inside the high-frequency animation loop.
+**Action:** Use `ResizeObserver` to track element dimensions asynchronously. Store the dimensions, and only recalculate layout when physically changed to prevent synchronous reflows.
