@@ -41,3 +41,9 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2026-01-24 - Layout Thrashing in PitchOrb.jsx
+**Learning:** Similar to PitchVisualizer, PitchOrb.jsx was calling getBoundingClientRect() inside the loop along with canvas assignments, forcing reflows/repaints. This layout thrashing issue was fixed by extracting dimensions using a ResizeObserver into a ref and rendering off that.
+**Action:** Use ResizeObserver to decouple dimension tracking from rendering loops whenever possible.
+## 2026-01-24 - Layout Thrashing with Canvas state reset
+**Learning:** When moving canvas resize logic out of requestAnimationFrame loops into ResizeObserver, you must remember that assigning canvas.width implicitly resets 2D context state. Removing this assignment requires adding explicit ctx.resetTransform() and ctx.clearRect() calls to preserve intended frame clearing behavior.
+**Action:** Audit canvas optimization patches to ensure context reset behavior is preserved.
