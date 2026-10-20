@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2024-10-20 - Stored XSS in Marketplace Pack Creation
+**Vulnerability:** The `create_pack` endpoint in `backend/app/routes/marketplace.py` was not sanitizing the `category`, `target_audience`, and `voice_goal` fields before saving them to the database. Null values from missing payload fields could also cause `TypeError` if blindly passed to `sanitize_html`.
+**Learning:** Secondary string fields that are returned to the client unescaped were overlooked, presenting a Stored XSS vector. Always handle missing payload keys gracefully (e.g. converting to `None`) when sanitizing.
+**Prevention:** Always identify all user-controlled string fields that are persisted to the database and subsequently returned to clients, and ensure they are sanitized with a tool like `sanitize_html`. Check for `None` or missing fields prior to passing them into string sanitization functions.

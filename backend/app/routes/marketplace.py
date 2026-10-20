@@ -82,9 +82,9 @@ def create_pack():
         creator_id=current_user.id,
         title=title,
         description=description,
-        category=data.get('category'),
-        target_audience=data.get('target_audience'),
-        voice_goal=data.get('voice_goal'),
+        category=sanitize_html(data.get('category')) if data.get('category') else None,
+        target_audience=sanitize_html(data.get('target_audience')) if data.get('target_audience') else None,
+        voice_goal=sanitize_html(data.get('voice_goal')) if data.get('voice_goal') else None,
         price_cents=data.get('price_cents', 0)
     )
     
