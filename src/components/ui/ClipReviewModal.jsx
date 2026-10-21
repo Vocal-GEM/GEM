@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { Play, Pause, Upload, Check, Share2, Download } from 'lucide-react';
 
 
 const ClipReviewModal = ({ clip, onClose }) => {
     // const { user } = useAuth(); // unused
     const [isPlaying, setIsPlaying] = useState(false);
+    const { showError } = useToast();
     const [uploading, setUploading] = useState(false);
     const [shareUrl, setShareUrl] = useState(null);
     const audioRef = useRef(null);
@@ -52,7 +54,7 @@ const ClipReviewModal = ({ clip, onClose }) => {
             setShareUrl(data.url);
         } catch (e) {
             console.error("Upload error:", e);
-            alert("Failed to upload clip.");
+            showError("Failed to upload clip.");
         } finally {
             setUploading(false);
         }
