@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { Book, FileText, TrendingUp, Calendar, Clock, Activity, BarChart2, Mic, Settings, X, Share2 } from 'lucide-react';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
@@ -45,6 +46,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
     const [activeTab, setActiveTab] = useState('overview'); // overview, sessions, journals, recordings
     const [cardFilter, setCardFilter] = useState(null); // Filter sessions by card set
     const [showProgressCard, setShowProgressCard] = useState(false);
+    const { showError } = useToast();
 
     useEffect(() => {
         const loadSessions = async () => {
@@ -158,7 +160,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
             doc.save(`voice-therapy-report-${new Date().toISOString().split('T')[0]}.pdf`);
         } catch (error) {
             console.error('Error generating report:', error);
-            alert('Failed to generate report.');
+            showError('Failed to generate report.');
         } finally {
             setIsGenerating(false);
         }

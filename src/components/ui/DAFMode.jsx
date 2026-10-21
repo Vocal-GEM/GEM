@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { Headphones, Volume2, VolumeX, Play, Square, Settings } from 'lucide-react';
 
 /**
@@ -8,6 +9,7 @@ import { Headphones, Volume2, VolumeX, Play, Square, Settings } from 'lucide-rea
  */
 const DAFMode = ({ onClose }) => {
     const [isActive, setIsActive] = useState(false);
+    const { showError } = useToast();
     const [delay, setDelay] = useState(150); // ms
     const [volume, setVolume] = useState(0.8);
     const [isMuted, setIsMuted] = useState(false);
@@ -94,7 +96,7 @@ const DAFMode = ({ onClose }) => {
             setIsActive(true);
         } catch (err) {
             console.error('Failed to start DAF:', err);
-            alert('Could not access microphone. Please check permissions.');
+            showError('Could not access microphone. Please check permissions.');
         }
     };
 
