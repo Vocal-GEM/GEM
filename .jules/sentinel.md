@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2026-02-14 - Information Leakage in Settings and TTS Routes
+**Vulnerability:** Similar to previous logic errors, several endpoints in `backend/app/routes/settings.py` and `backend/app/routes/tts.py` were returning `str(e)` directly to the client when handling exceptions. This leaks internal exception details (e.g., database connection issues, external API connection issues) that could be leveraged by an attacker to map out internal infrastructure or gain insights into potential backend weaknesses.
+**Learning:** Developers often forget to scrub generic catch-all exception blocks, leading to unintended information leakage. Logging exceptions server-side is essential, but client-facing messages should remain generic.
+**Prevention:** Always ensure that `except Exception as e:` blocks log the detailed error using `current_app.logger.error` but only return generic, non-informative error messages to the client. Validate this practice through careful code reviews and unit tests that assert against sensitive data leakage.
