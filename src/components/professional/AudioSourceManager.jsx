@@ -8,7 +8,7 @@ const AudioSourceManager = ({ onSourceChange }) => {
 
     useEffect(() => {
         checkPermissionAndEnumerate();
-    }, []);
+    }, [checkPermissionAndEnumerate]);
 
     const checkPermissionAndEnumerate = async () => {
         try {
