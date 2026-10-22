@@ -1,4 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { vi } from 'vitest';
+vi.mock('../../context/ToastContext', () => ({
+    useToast: () => ({
+        showToast: vi.fn(),
+        hideToast: vi.fn()
+    })
+}));
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import HistoryView from './HistoryView';
 
