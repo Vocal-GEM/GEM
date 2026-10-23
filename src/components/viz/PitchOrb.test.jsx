@@ -22,6 +22,9 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     stroke: vi.fn(),
     fillText: vi.fn(),
     scale: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    setTransform: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
     })),
@@ -36,6 +39,16 @@ describe('PitchOrb', () => {
     let dataRef;
 
     beforeEach(() => {
+        // Mock ResizeObserver
+        global.ResizeObserver = class ResizeObserver {
+            constructor(cb) {
+                this.cb = cb;
+            }
+            observe() {}
+            unobserve() {}
+            disconnect() {}
+        };
+
         dataRef = { current: { pitch: 200 } };
         // Add getBoundingClientRect mock
         Element.prototype.getBoundingClientRect = vi.fn(() => ({
