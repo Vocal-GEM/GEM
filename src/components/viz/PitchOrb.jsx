@@ -64,20 +64,57 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
             };
         };
 
+        let currentWidth = 0;
+        let currentHeight = 0;
+
+        // Initial setup for the first render
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+             canvas.width = Math.round(rect.width * dpr);
+             canvas.height = Math.round(rect.height * dpr);
+             ctx.scale(dpr, dpr);
+             currentWidth = rect.width;
+             currentHeight = rect.height;
+        }
+
+        const resizeObserver = new ResizeObserver((entries) => {
+            if (!entries.length) return;
+            const entry = entries[0];
+            // Get dimensions from contentRect for better performance/accuracy
+            const { width, height } = entry.contentRect;
+
+            const newWidth = Math.round(width * dpr);
+            const newHeight = Math.round(height * dpr);
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                // scale needs to be applied after width/height resize which clears transform
+                ctx.scale(dpr, dpr);
+                currentWidth = width;
+                currentHeight = height;
+            }
+        });
+
+        if (canvas.parentElement) {
+            resizeObserver.observe(canvas.parentElement);
+        } else {
+            resizeObserver.observe(canvas);
+        }
+
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            const width = currentWidth || canvas.width / dpr || 300;
+            const height = currentHeight || canvas.height / dpr || 200;
             const centerX = width / 2;
             const centerY = height / 2;
 
-            ctx.clearRect(0, 0, width, height);
+            // Explicitly clear canvas before drawing (moved from dimension resize)
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
 
             const pitch = dataRef.current?.pitch || 0;
             const colorData = getGenderColor(pitch);
@@ -166,6 +203,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            resizeObserver.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 

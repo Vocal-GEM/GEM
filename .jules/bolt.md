@@ -41,3 +41,11 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-23 - getBoundingClientRect in Animation Loop
+**Learning:** Found a component (`PitchOrb.jsx`) calling `getBoundingClientRect()` synchronously inside its animation loop (~60fps). This causes layout thrashing by forcing the browser to recalculate layout and repaint on every single frame, causing significant CPU usage and framerate drops.
+**Action:** Migrated to use `ResizeObserver` asynchronously. The dimensions are tracked outside the render loop in a `ResizeObserver` callback and only when they change do we update the canvas dimensions and local dimension cache variables. The animation loop then uses the cached dimensions. Always avoid layout-measuring functions in loops.
+
+## 2026-05-23 - HTML5 Canvas Context Transform Reset via Resize
+**Learning:** In HTML5 Canvas, any assignment to `canvas.width` or `canvas.height` implicitly clears the entire canvas and entirely resets the 2D context state, including the transformation matrix (`ctx.scale`). When optimizing canvas dimension updates by moving the assignment outside of an animation loop (like into a `ResizeObserver`), you are also inadvertently removing the implicit clearing and state-resetting behavior that the animation loop might have relied on.
+**Action:** When removing implicit canvas clearing via dimension reassignment from an animation loop, you must explicitly implement the clearing and transform reset in the loop using `ctx.save()`, `ctx.setTransform(1, 0, 0, 1, 0, 0)`, `ctx.clearRect()`, and `ctx.restore()`. Additionally, ensure that `ctx.scale()` is re-applied *after* any explicit assignments to `canvas.width` or `canvas.height` inside the `ResizeObserver` callback.
