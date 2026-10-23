@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-03-24 - Canvas resize optimization
+**Learning:** Calling `getBoundingClientRect()` triggers reflows in the DOM and causes layout thrashing, which is expensive in high-frequency rendering environments like animation loops. In `HighResSpectrogram.jsx`, there were duplicate dimensions calculation blocks where `newWidth` and `newHeight` were being calculated twice in the `updateSize` function. Removing this duplicated code eliminates a tiny redundant computation per resize observer tick, and simplifies the codebase.
+**Action:** Always verify components don't have duplicated dimension logic or variables when inspecting canvas resizes.
