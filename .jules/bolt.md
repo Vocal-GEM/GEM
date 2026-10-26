@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-10-26 - Remove duplicate CommandPalette
+**Learning:** Found two `<CommandPalette />` instances being rendered in `src/App.jsx`.
+**Action:** Remove one of them to improve performance by avoiding redundant component rendering.
