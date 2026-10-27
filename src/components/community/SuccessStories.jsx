@@ -232,8 +232,8 @@ const SuccessStories = () => {
 
                         <div className="flex justify-between items-center text-xs text-slate-500 border-t border-slate-700/50 pt-3">
                             <span>Goal: {story.voice_goal}</span>
-                            <button className="flex items-center gap-1 hover:text-pink-400 transition-colors">
-                                <Heart size={14} />
+                            <button className="flex items-center gap-1 hover:text-pink-400 transition-colors" aria-label={`Upvote, ${story.upvotes} upvotes`}>
+                                <Heart size={14} aria-hidden="true" />
                                 {story.upvotes}
                             </button>
                         </div>
