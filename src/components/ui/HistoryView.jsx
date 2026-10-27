@@ -22,6 +22,7 @@ import {
     BarElement,
 } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
+import Toast from './Toast';
 
 ChartJS.register(
     CategoryScale,
@@ -42,6 +43,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
     const { cardSets } = usePracticeCards();
     const [sessions, setSessions] = useState([]);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [toast, setToast] = useState(null);
     const [activeTab, setActiveTab] = useState('overview'); // overview, sessions, journals, recordings
     const [cardFilter, setCardFilter] = useState(null); // Filter sessions by card set
     const [showProgressCard, setShowProgressCard] = useState(false);
@@ -158,7 +160,7 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
             doc.save(`voice-therapy-report-${new Date().toISOString().split('T')[0]}.pdf`);
         } catch (error) {
             console.error('Error generating report:', error);
-            alert('Failed to generate report.');
+            setToast({ message: 'Failed to generate report.', type: 'error' });
         } finally {
             setIsGenerating(false);
         }
@@ -478,6 +480,14 @@ const HistoryView = ({ stats, journals, onLogClick, userMode }) => {
                         firstSessionDate: sessions.length > 0 ? sessions[sessions.length - 1]?.timestamp : null
                     }}
                     onClose={() => setShowProgressCard(false)}
+                />
+            )}
+
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
                 />
             )}
         </div>

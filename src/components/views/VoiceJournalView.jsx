@@ -1,3 +1,4 @@
+import Toast from "../ui/Toast";
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Mic, Square, Play, Pause, Trash2, Calendar, Clock, Music, Plus, X, Tag, FileText, Search, Filter, TrendingUp, ChevronDown } from 'lucide-react';
 import LoadingSpinner from '../ui/LoadingSpinner';
@@ -181,6 +182,7 @@ const PitchTrendChart = ({ recordings }) => {
                 </div>
             </div>
             <canvas ref={canvasRef} width={280} height={60} className="w-full" />
+
         </div>
     );
 };
@@ -207,6 +209,7 @@ const VoiceJournalView = () => {
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [currentBlob, setCurrentBlob] = useState(null);
     const [recordingTime, setRecordingTime] = useState(0);
+    const [toast, setToast] = useState(null);
     const [selectedTags, setSelectedTags] = useState([]);
 
     // Search and Filter State
@@ -314,7 +317,7 @@ const VoiceJournalView = () => {
             }, 1000);
         } catch (err) {
             console.error('Failed to start recording:', err);
-            alert('Could not access microphone. Please check permissions.');
+            setToast({ message: 'Could not access microphone. Please check permissions.', type: 'error' });
         }
     };
 
@@ -754,6 +757,14 @@ const VoiceJournalView = () => {
                         )}
                     </div>
                 </div>
+            )}
+
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
             )}
         </div>
     );

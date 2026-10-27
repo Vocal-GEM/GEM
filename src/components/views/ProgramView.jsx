@@ -1,10 +1,21 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useProgram } from '../../hooks/useProgram';
+import Toast from '../ui/Toast';
 import { CheckCircle, Circle, Lock, PlayCircle, BookOpen, Clock, ChevronRight } from 'lucide-react';
 
 const ProgramView = ({ onNavigate }) => {
     const { activeProgram, progress, currentDay, completeTask, isTaskComplete, nextDay } = useProgram();
+
+    useEffect(() => {
+        const handleProgramCompleted = (e) => {
+            setToast({ message: e.detail.message, type: 'success' });
+        };
+        window.addEventListener('program-completed', handleProgramCompleted);
+        return () => window.removeEventListener('program-completed', handleProgramCompleted);
+    }, []);
+
+    const [toast, setToast] = useState(null);
     const [selectedWeekId, setSelectedWeekId] = useState(activeProgram?.weeks[Math.min(progress.currentWeek, activeProgram.weeks.length - 1)].id);
 
     if (!activeProgram) {
@@ -171,6 +182,14 @@ const ProgramView = ({ onNavigate }) => {
                     </div>
                 )}
             </div>
+
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </div>
     );
 };
