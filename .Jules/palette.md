@@ -1,0 +1,3 @@
+## 2024-10-27 - Upvote Button Accessibility Pattern
+**Learning:** Icon-only buttons or buttons combining icons with dynamic counts (like upvote buttons displaying `story.upvotes`) often lack sufficient context for screen readers. An explicit `aria-label` that includes both the action ("Upvote") and the dynamic variable is necessary. Also, decorative icons within these buttons should be explicitly hidden using `aria-hidden="true"`.
+**Action:** When auditing list or card components, always check interactive elements (buttons, links) that use icons alongside numbers. Ensure they have comprehensive `aria-labels` describing the full state and intent, and hide purely decorative SVG elements from assistive technologies.
