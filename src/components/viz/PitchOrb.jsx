@@ -33,6 +33,17 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
+        const container = canvas.parentElement;
+        let rect = { width: 0, height: 0 };
+        const updateSize = () => {
+            rect = canvas.getBoundingClientRect();
+            canvas.width = Math.round(rect.width * dpr);
+            canvas.height = Math.round(rect.height * dpr);
+            ctx.scale(dpr, dpr);
+        };
+        const observer = new ResizeObserver(updateSize);
+        observer.observe(container);
+        updateSize();
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -66,12 +77,6 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
-
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
             const width = rect.width;
             const height = rect.height;
             const centerX = width / 2;
@@ -166,6 +171,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            observer.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 

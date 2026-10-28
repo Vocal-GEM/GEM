@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-10-28 - Removed synchronous layout in animation loop
+**Learning:** `PitchOrb.jsx` was calling `getBoundingClientRect()` inside its main animation loop (running 60fps). This causes synchronous layout calculation which thrashes the main thread.
+**Action:** Relocated `getBoundingClientRect()` to a `ResizeObserver` listener and pre-calculated canvas sizing.
