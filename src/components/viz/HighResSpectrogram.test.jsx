@@ -39,6 +39,12 @@ const mockContext = {
 
 HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext);
 
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
 describe('HighResSpectrogram', () => {
   let dataRef;
 
