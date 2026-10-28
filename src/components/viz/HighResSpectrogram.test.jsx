@@ -40,7 +40,12 @@ const mockContext = {
 HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext);
 
 global.ResizeObserver = class ResizeObserver {
-  observe() {}
+  constructor(callback) {
+    this.callback = callback;
+  }
+  observe() {
+    this.callback([{ contentRect: { width: 800, height: 512 } }]);
+  }
   unobserve() {}
   disconnect() {}
 };
@@ -65,6 +70,8 @@ describe('HighResSpectrogram', () => {
       right: 800,
       bottom: 512,
     }));
+
+    Element.prototype.contentRect = { width: 800, height: 512 };
 
     vi.clearAllMocks();
   });

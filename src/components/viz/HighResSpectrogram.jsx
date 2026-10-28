@@ -145,7 +145,8 @@ const HighResSpectrogram = memo(function HighResSpectrogram({ dataRef }) {
         if (!container || !canvas) return;
 
         const updateSize = (rect) => {
-            if (!rect) return;
+            const canvas = canvasRef.current;
+            if (!rect || !canvas) return;
             const dpr = window.devicePixelRatio || 1;
 
             // Only update if dimensions actually changed
