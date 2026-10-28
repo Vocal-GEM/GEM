@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-05-19 - Fixed Layout Thrashing in HighResSpectrogram
+**Learning:** `getBoundingClientRect()` was being called continuously inside a `ResizeObserver` callback but forcing synchronous layout, causing layout thrashing. Moreover, merge conflicts had left broken redundant variables in the file.
+**Action:** Always clean up redundant refs and merge conflicts in components. Do not re-evaluate `getBoundingClientRect()` unnecessarily.
