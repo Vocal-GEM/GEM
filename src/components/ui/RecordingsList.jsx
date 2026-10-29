@@ -174,8 +174,8 @@ const RecordingsList = () => {
                                         autoFocus
                                         onKeyDown={(e) => e.key === 'Enter' && saveEdit(recording)}
                                     />
-                                    <button onClick={() => saveEdit(recording)} className="p-1 hover:text-green-400 text-slate-400"><Check size={16} /></button>
-                                    <button onClick={cancelEdit} className="p-1 hover:text-red-400 text-slate-400"><X size={16} /></button>
+                                    <button onClick={() => saveEdit(recording)} className="p-1 hover:text-green-400 text-slate-400" aria-label="Save edit"><Check size={16} /></button>
+                                    <button onClick={cancelEdit} className="p-1 hover:text-red-400 text-slate-400" aria-label="Cancel edit"><X size={16} /></button>
                                 </div>
                             ) : (
                                 <div>
@@ -184,7 +184,7 @@ const RecordingsList = () => {
                                         <button
                                             id={index === 0 ? 'recording-edit-btn' : undefined}
                                             onClick={() => startEditing(recording)}
-                                            className="opacity-0 group-hover:opacity-100 p-1 text-slate-500 hover:text-violet-400 transition-opacity"
+                                            className="opacity-0 group-hover:opacity-100 p-1 text-slate-500 hover:text-violet-400 transition-opacity" aria-label="Edit recording"
                                         >
                                             <Edit2 size={12} />
                                         </button>
