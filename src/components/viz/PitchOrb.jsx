@@ -31,8 +31,46 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
+
+        let canvasWidth = 0;
+        let canvasHeight = 0;
+
+        const updateDimensions = () => {
+            const rect = canvas.getBoundingClientRect();
+            const newWidth = Math.round(rect.width * dpr);
+            const newHeight = Math.round(rect.height * dpr);
+
+            if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                canvasWidth = rect.width;
+                canvasHeight = rect.height;
+                ctx.scale(dpr, dpr);
+            }
+        };
+
+        const observer = new ResizeObserver((entries) => {
+            if (!entries || entries.length === 0) return;
+            const entry = entries[0];
+            const { width, height } = entry.contentRect;
+
+            requestAnimationFrame(() => {
+                const newWidth = Math.round(width * dpr);
+                const newHeight = Math.round(height * dpr);
+                if (canvas.width !== newWidth || canvas.height !== newHeight) {
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
+                    canvasWidth = width;
+                    canvasHeight = height;
+                    ctx.scale(dpr, dpr);
+                }
+            });
+        });
+        observer.observe(canvas);
+        updateDimensions();
 
         // Determine color based on pitch and gender ranges
         const getGenderColor = (pitch) => {
@@ -67,13 +105,8 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
         const loop = () => {
             if (!canvas) return; // Guard against cleanup
 
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-
-            const width = rect.width;
-            const height = rect.height;
+            const width = canvasWidth;
+            const height = canvasHeight;
             const centerX = width / 2;
             const centerY = height / 2;
 
@@ -166,6 +199,7 @@ const PitchOrb = ({ dataRef, settings = {} }) => {
 
         return () => {
             unsubscribe();
+            observer.disconnect();
         };
     }, [dataRef, showSemitones, genderRanges, componentId]);
 
