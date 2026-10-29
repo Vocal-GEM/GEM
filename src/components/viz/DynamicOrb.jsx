@@ -513,6 +513,7 @@ const DynamicOrb = memo(({ dataRef, calibration, externalDataRef, audioEngine, t
               onClick={() => setMode(m.id)}
               className={`p-2 rounded-full transition-all ${isActive ? 'bg-teal-500 text-white shadow-[0_0_10px_rgba(20,184,166,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
               title={m.label}
+              aria-label={`Switch to ${m.label} mode`}
             >
               <Icon size={18} />
             </button>
