@@ -312,13 +312,13 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
                 </div>
 
                 <div className="flex gap-2">
-                    <button onClick={() => setShowHistory(!showHistory)} className={`p-1.5 rounded hover:bg-slate-800 ${showHistory ? 'text-blue-400' : 'text-slate-400'}`}>
+                    <button aria-label="Toggle history" onClick={() => setShowHistory(!showHistory)} className={`p-1.5 rounded hover:bg-slate-800 ${showHistory ? 'text-blue-400' : 'text-slate-400'}`}>
                         <History size={16} />
                     </button>
                     <div className="flex items-center bg-slate-800 rounded px-1">
-                        <button onClick={prevPattern} className="p-1 hover:bg-slate-700 rounded"><ChevronLeft className="w-4 h-4 text-slate-400" /></button>
+                        <button onClick={prevPattern} className="p-1 hover:bg-slate-700 rounded" aria-label="Previous pattern"><ChevronLeft className="w-4 h-4 text-slate-400" /></button>
                         <span className="text-xs text-slate-300 font-mono w-4 text-center">{selectedPattern + 1}</span>
-                        <button onClick={nextPattern} className="p-1 hover:bg-slate-700 rounded"><ChevronRight className="w-4 h-4 text-slate-400" /></button>
+                        <button onClick={nextPattern} className="p-1 hover:bg-slate-700 rounded" aria-label="Next pattern"><ChevronRight className="w-4 h-4 text-slate-400" /></button>
                     </div>
                 </div>
             </div>
@@ -381,7 +381,7 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
                 <div className="flex gap-2">
                     <button
                         onClick={playTarget}
-                        className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors group"
+                        className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors group" aria-label="Play target tone"
                         title="Play Target Tone"
                     >
                         <Volume2 className="w-4 h-4 text-slate-400 group-hover:text-blue-400" />
@@ -398,7 +398,7 @@ const IntonationTrainer = ({ dataRef, isActive, audioEngine }) => {
 
                     <button
                         onClick={reset}
-                        className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                        className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors" aria-label="Reset trace"
                         title="Reset Trace"
                     >
                         <RefreshCw className="w-4 h-4 text-slate-400" />
