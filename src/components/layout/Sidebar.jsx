@@ -159,7 +159,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
     return (
         <>
             {/* Mobile Toggle */}
-            <button
+            <button aria-label={isOpen ? "Close mobile menu" : "Open mobile menu"}
                 onClick={() => setIsOpen(!isOpen)}
                 className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-slate-700"
             >
