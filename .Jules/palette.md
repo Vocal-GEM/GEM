@@ -1,0 +1,3 @@
+## 2024-10-30 - Sidebar Mobile Toggle ARIA Label
+**Learning:** Found an icon-only button without an ARIA label in the mobile sidebar toggle. This is a common accessibility anti-pattern in responsive layouts, where visual cues (hamburger/X icons) are relied upon without providing context to screen reader users. The `aria-label` should dynamically reflect the action (e.g., 'Close menu' when open, 'Open menu' when closed) rather than just a static state description.
+**Action:** Added dynamic `aria-label` to the Sidebar component's mobile toggle button and will check other responsive layout components for similar issues.
