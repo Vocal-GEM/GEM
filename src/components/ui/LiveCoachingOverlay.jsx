@@ -125,6 +125,7 @@ const LiveCoachingOverlay = ({ enabled = true, position = 'bottom-right' }) => {
             {/* Minimized indicator */}
             {isMinimized && (
                 <button
+                    aria-label="Maximize coaching overlay"
                     onClick={() => setIsMinimized(false)}
                     className={`fixed ${positionClasses[position]} z-40 p-3 bg-slate-800/90 border border-slate-600 rounded-full shadow-lg transition-all hover:scale-105`}
                 >
@@ -156,6 +157,7 @@ const LiveCoachingOverlay = ({ enabled = true, position = 'bottom-right' }) => {
                                 )}
                             </div>
                             <button
+                                aria-label="Dismiss feedback message"
                                 onClick={() => {
                                     setIsVisible(false);
                                     setTimeout(() => setCurrentFeedback(null), 100);
@@ -220,12 +222,14 @@ const LiveCoachingOverlay = ({ enabled = true, position = 'bottom-right' }) => {
             {!isMinimized && !currentFeedback && isAudioActive && settings.enabled && (
                 <div className={`fixed ${positionClasses[position]} z-40 flex gap-2`}>
                     <button
+                        aria-label={showSettings ? "Hide settings" : "Show settings"}
                         onClick={() => setShowSettings(!showSettings)}
                         className="p-2 bg-slate-800/80 border border-slate-600 rounded-lg text-slate-400 hover:text-white transition-colors"
                     >
                         <Settings size={16} />
                     </button>
                     <button
+                        aria-label="Minimize coaching overlay"
                         onClick={() => setIsMinimized(true)}
                         className="p-2 bg-slate-800/80 border border-slate-600 rounded-lg text-slate-400 hover:text-white transition-colors"
                     >
