@@ -21,6 +21,8 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
     fill: vi.fn(),
     stroke: vi.fn(),
     fillText: vi.fn(),
+    setTransform: vi.fn(),
+    resetTransform: vi.fn(),
     scale: vi.fn(),
     createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn()
