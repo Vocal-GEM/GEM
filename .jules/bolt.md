@@ -41,3 +41,6 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+## 2024-11-21 - Canvas Animation Performance Optimization
+**Learning:** Found an instance where `getBoundingClientRect` is called on every frame within a canvas animation loop (`src/components/viz/PitchOrb.jsx`). This forces a synchronous layout recalculation (layout thrashing) on every frame, which can significantly degrade frame rate and CPU performance.
+**Action:** Replace frame-by-frame dimension querying with a ResizeObserver to update dimensions only when they actually change, caching the width/height to be read in the render loop.
