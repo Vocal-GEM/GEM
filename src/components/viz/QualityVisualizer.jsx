@@ -249,6 +249,7 @@ const QualityVisualizer = ({ dataRef }) => {
                 </div>
             </div>
         </div>
+        </div>
     );
 };
 
