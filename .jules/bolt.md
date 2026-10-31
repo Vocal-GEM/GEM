@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-05-18 - PitchOrb Performance
+**Learning:** Found a performance bottleneck where `getBoundingClientRect()` was being called continuously inside the `requestAnimationFrame` loop in `PitchOrb.jsx`, causing unnecessary layout thrashing.
+**Action:** Replaced `getBoundingClientRect()` within the render loop with a `ResizeObserver` to update canvas dimensions only when the container resizes. This avoids layout thrashing and ensures smooth 60fps rendering for animations. Also explicitly added `ctx.clearRect` to ensure the canvas clears properly without relying on dimension resetting.
