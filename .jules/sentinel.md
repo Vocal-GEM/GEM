@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-18 - XSS Fix in WarmUpModule
+
+**Vulnerability:** Found `innerHTML` assignment in the `onError` handler of an `<img>` tag in `src/components/ui/WarmUpModule.jsx`.
+**Learning:** `innerHTML` is inherently unsafe as it can introduce Cross-Site Scripting (XSS) vulnerabilities if an attacker manages to control the text string. Using `textContent` is a safer alternative.
+**Prevention:** Always use `textContent` when updating plain text values to prevent script injection.
