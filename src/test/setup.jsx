@@ -58,9 +58,9 @@ class AudioContextMock {
     }
 }
 
-global.AudioContext = AudioContextMock;
-global.window.AudioContext = AudioContextMock;
-global.window.webkitAudioContext = AudioContextMock;
+globalThis.AudioContext = AudioContextMock;
+globalThis.window.AudioContext = AudioContextMock;
+globalThis.window.webkitAudioContext = AudioContextMock;
 
 // Mock AudioWorkletNode
 class AudioWorkletNodeMock {
@@ -73,10 +73,10 @@ class AudioWorkletNodeMock {
         this.disconnect = vi.fn();
     }
 }
-global.AudioWorkletNode = AudioWorkletNodeMock;
+globalThis.AudioWorkletNode = AudioWorkletNodeMock;
 
 // Mock ResizeObserver
-global.ResizeObserver = class ResizeObserver {
+globalThis.ResizeObserver = class ResizeObserver {
     observe() { }
     unobserve() { }
     disconnect() { }
@@ -124,8 +124,8 @@ const indexedDBMock = {
         close: vi.fn(),
     })),
 };
-global.indexedDB = indexedDBMock;
-global.window.indexedDB = indexedDBMock;
+globalThis.indexedDB = indexedDBMock;
+globalThis.window.indexedDB = indexedDBMock;
 
 // Mock Lucide React
 vi.mock('lucide-react', () => {
