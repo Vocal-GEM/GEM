@@ -14,7 +14,7 @@ const MicQualityTips = ({ onClose }) => {
                         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                             <Mic className="text-teal-400" /> Recording Tips
                         </h2>
-                        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                        <button aria-label="Close" onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
                             <X className="w-5 h-5 text-slate-400" />
                         </button>
                     </div>
