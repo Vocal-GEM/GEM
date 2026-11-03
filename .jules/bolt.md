@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-12 - Date Object Initialization in useState
+**Learning:** Found multiple instances where components initialize state using `useState(new Date())` or similar date manipulations (like `new Date().getMonth()`). The Date constructor evaluates on *every render*, causing unnecessary object creation and processing, which wastes memory and processing time.
+**Action:** Use lazy initialization for state by providing a function instead of a direct value: `useState(() => new Date())` or `useState(() => new Set())`. This ensures the constructor only runs during the initial render.
