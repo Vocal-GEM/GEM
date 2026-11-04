@@ -4,8 +4,8 @@ import { getStreakData } from '../../services/StreakService';
 import { getReports } from '../../services/SessionReportService';
 
 const StreakCalendar = () => {
-    const [currentMonth, setCurrentMonth] = useState(new Date());
-    const [practiceDays, setPracticeDays] = useState(new Set());
+    const [currentMonth, setCurrentMonth] = useState(() => new Date());
+    const [practiceDays, setPracticeDays] = useState(() => new Set());
     const [streak, setStreak] = useState({ currentStreak: 0, longestStreak: 0 });
 
     useEffect(() => {
