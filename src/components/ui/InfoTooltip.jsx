@@ -8,9 +8,18 @@ const InfoTooltip = ({ content, icon: Icon = HelpCircle, size = 16, className = 
         <div className={`relative inline-flex items-center ${className}`}
             onMouseEnter={() => setIsVisible(true)}
             onMouseLeave={() => setIsVisible(false)}
-            onClick={() => setIsVisible(!isVisible)}
         >
-            <Icon size={size} className="text-slate-500 hover:text-blue-400 cursor-pointer transition-colors" />
+            <button
+                type="button"
+                className="focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full focus:ring-offset-2 focus:ring-offset-slate-900"
+                onClick={() => setIsVisible(!isVisible)}
+                onFocus={() => setIsVisible(true)}
+                onBlur={() => setIsVisible(false)}
+                aria-label="More information"
+                aria-expanded={isVisible}
+            >
+                <Icon size={size} className="text-slate-500 hover:text-blue-400 cursor-pointer transition-colors" aria-hidden="true" />
+            </button>
 
             {isVisible && (
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 border border-white/10 rounded-xl shadow-xl z-50 animate-in fade-in zoom-in duration-200">
