@@ -6,9 +6,10 @@ the password_hash column from VARCHAR(120) to VARCHAR(255).
 """
 
 import sys
+import os
 import psycopg2
 
-DATABASE_URL = "postgresql://vo_yr7l_user:cX4VWQOuywA0na2qGxonjmljQSgEVTEt@dpg-d4hrdv6mcj7s73c7igu0-a.oregon-postgres.render.com/vo_yr7l"
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 print(f"Connecting to database...")
 

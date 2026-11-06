@@ -75,3 +75,8 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+
+## 2024-05-24 - Hardcoded Secrets in Migration Scripts
+**Vulnerability:** A hardcoded production database URL (`postgresql://vo_yr7l_user:cX4VWQOuywA0na2qGxonjmljQSgEVTEt@dpg-d4hrdv6mcj7s73c7igu0-a.oregon-postgres.render.com/vo_yr7l`) was found in `backend/migrate_password_hash.py`. This exposes sensitive database credentials, allowing anyone with access to the source code to connect directly to the production database and potentially read, modify, or delete data.
+**Learning:** Migration and utility one-off scripts are often written quickly and developers sometimes hardcode credentials for convenience, forgetting to remove them before committing. This is a common source of credential leakage.
+**Prevention:** Never hardcode credentials in any script. Always use environment variables (e.g., `os.environ.get("DATABASE_URL")`) even for temporary or utility scripts. Use tools like `git-secrets` or `trufflehog` in CI/CD pipelines to scan for accidentally committed secrets.
