@@ -53,6 +53,15 @@ vi.mock('../../services/SearchService', () => ({
 
 const MockNavigationProvider = ({ children }) => <div>{children}</div>;
 
+vi.mock('../../config/featureFlags', () => ({
+    FEATURES: {
+        camera: true,
+        dashboard: true,
+        practice: true,
+        settings: true
+    }
+}));
+
 describe('Sidebar Auth Integration', () => {
     beforeEach(() => {
         vi.clearAllMocks();
