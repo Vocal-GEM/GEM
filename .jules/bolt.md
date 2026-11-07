@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-03-24 - Eliminated Date object churn and useEffect re-renders
+**Learning:** `useState(new Date())` (and variations like `.getMonth()`) inside React components executes the constructor on every render, causing unnecessary memory allocation. Additionally, calculating derived state (like recap or streak calendars) inside a `useEffect` that triggers `setState` causes an unnecessary double render cycle (initial render -> effect runs -> set state -> re-render).
+**Action:** Use lazy initialization `useState(() => new Date())` for expensive initial states. Replace `useEffect` + `setState` with `useMemo` for derived data to eliminate the double render cycle and improve performance.

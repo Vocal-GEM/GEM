@@ -1,30 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Calendar, TrendingUp, Flame, Clock, Trophy, BarChart2 } from 'lucide-react';
 import { getActivitySummary, getReports } from '../../services/SessionReportService';
 import { getStreakData } from '../../services/StreakService';
 import { getXPData } from '../../services/DailyChallengeService';
 
 const MonthlyRecap = () => {
-    const [recap, setRecap] = useState(null);
-    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    // ⚡ Bolt: Use lazy initialization to avoid instantiating Date on every render
+    const [selectedMonth, setSelectedMonth] = useState(() => new Date().getMonth());
+    const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
 
-    useEffect(() => {
-        generateRecap();
-    }, [selectedMonth, selectedYear]);
-
-    const generateRecap = () => {
+    // ⚡ Bolt: Replaced useEffect + setState with useMemo to eliminate unnecessary render cycle
+    const recap = useMemo(() => {
         const reports = getReports();
         const streak = getStreakData();
         const xp = getXPData();
 
-        // Filter reports for selected month
         const monthReports = reports.filter(r => {
             const date = new Date(r.timestamp);
             return date.getMonth() === selectedMonth && date.getFullYear() === selectedYear;
         });
 
-        // Calculate stats
         const totalSessions = monthReports.length;
         const totalMinutes = monthReports.reduce((sum, r) => sum + (r.duration || 0), 0);
         const exerciseCount = monthReports.reduce((sum, r) => sum + (r.exercises?.length || 0), 0);
@@ -34,7 +29,6 @@ const MonthlyRecap = () => {
             monthReports.map(r => new Date(r.timestamp).toISOString().split('T')[0])
         ).size;
 
-        // Longest streak in month
         let longestStreakInMonth = 0;
         let currentStreak = 0;
         const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
@@ -51,7 +45,7 @@ const MonthlyRecap = () => {
             }
         }
 
-        setRecap({
+        return {
             totalSessions,
             totalMinutes,
             exerciseCount,
@@ -61,8 +55,8 @@ const MonthlyRecap = () => {
             currentStreak: streak.currentStreak,
             totalXP: xp.totalXP,
             level: xp.level
-        });
-    };
+        };
+    }, [selectedMonth, selectedYear]);
 
     const monthNames = [
         'January', 'February', 'March', 'April', 'May', 'June',
