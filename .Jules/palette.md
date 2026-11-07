@@ -1,0 +1,3 @@
+## 2024-11-07 - Add ARIA Labels to Icon-Only Buttons
+**Learning:** Icon-only buttons without `aria-label` are inaccessible to screen readers as they provide no context of the action. By adding `aria-label`s to buttons where only icons are visible (like in `DynamicOrb` and `OrbLegend`), we improve accessibility for users relying on assistive technology. It's a common pattern to forget this on icon-heavy UI components. Adding dynamic values to `aria-label` based on state (like `aria-expanded` and varying `aria-label` text) is essential for interactive elements like the `OrbLegend` toggle.
+**Action:** Always include an `aria-label` for buttons that only contain an icon, and ensure dynamic elements like toggles use proper `aria-expanded` and stateful `aria-label` values.
