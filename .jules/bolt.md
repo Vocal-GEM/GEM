@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-01 - React Date instantiation anti-pattern
+**Learning:** Multiple components were using `const [date, setDate] = useState(new Date())`. This constructor runs on *every render*, creating detached Date objects that are immediately discarded by React's hook reconciliation, causing minor memory churn and CPU overhead.
+**Action:** Always use `useState(() => new Date())` for lazy initialization of objects like `Date` when setting default values in `useState`.
