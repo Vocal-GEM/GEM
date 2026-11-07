@@ -1,22 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Flame } from 'lucide-react';
 import { getStreakData } from '../../services/StreakService';
 import { getReports } from '../../services/SessionReportService';
 
 const StreakCalendar = () => {
-    const [currentMonth, setCurrentMonth] = useState(new Date());
-    const [practiceDays, setPracticeDays] = useState(new Set());
-    const [streak, setStreak] = useState({ currentStreak: 0, longestStreak: 0 });
+    // ⚡ Bolt: Use lazy initialization to avoid instantiating Date on every render
+    const [currentMonth, setCurrentMonth] = useState(() => new Date());
 
-    useEffect(() => {
-        loadData();
-    }, [currentMonth]);
-
-    const loadData = () => {
+    // ⚡ Bolt: Replaced useEffect + setState with useMemo to eliminate unnecessary render cycle
+    const { practiceDays, streak } = useMemo(() => {
         const streakData = getStreakData();
-        setStreak(streakData);
-
-        // Get practice days for current month
         const reports = getReports();
         const daysSet = new Set();
 
@@ -28,8 +21,8 @@ const StreakCalendar = () => {
             }
         });
 
-        setPracticeDays(daysSet);
-    };
+        return { practiceDays: daysSet, streak: streakData };
+    }, [currentMonth]);
 
     const getDaysInMonth = (date) => {
         return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
