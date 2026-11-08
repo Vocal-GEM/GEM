@@ -75,3 +75,7 @@
 1. Always use a generic error message for the client (e.g., "Failed to update settings").
 2. Log the full exception details on the server using `current_app.logger.error(f"Error: {str(e)}")`.
 3. Add security unit tests that explicitly mock failure scenarios and assert that the exception details are NOT present in the response.
+## 2024-05-18 - Hardcoded Credentials in Ad-hoc Scripts
+**Vulnerability:** A production PostgreSQL database URL containing plaintext credentials was hardcoded in `backend/migrate_password_hash.py`.
+**Learning:** Ad-hoc or manual migration scripts often bypass standard application configuration (like Flask's config or `python-dotenv`), leading developers to temporarily hardcode secrets that mistakenly get committed to version control. This represents a significant gap in our secret management discipline.
+**Prevention:** All scripts, even temporary or ad-hoc tools, must strictly use environment variables (e.g., `os.environ.get('DATABASE_URL')`) for sensitive configuration. Pre-commit hooks should scan for common credential patterns across all files, not just application source code.
