@@ -472,7 +472,7 @@ const DynamicOrb = memo(({ dataRef, calibration, externalDataRef, audioEngine, t
   }, []);
 
   return (
-    <div ref={containerRef} className="w-full h-full relative group flex flex-col items-center justify-center">
+    <div ref={containerRef} className="w-full h-full relative group flex flex-col items-center justify-center" data-testid="dynamic-orb">
 
       <div className="absolute top-2 text-xs font-bold text-slate-300 uppercase tracking-widest z-10 w-full text-center">
         Dynamic Orb - Pitch, Resonance, Weight, & Volume
@@ -513,6 +513,7 @@ const DynamicOrb = memo(({ dataRef, calibration, externalDataRef, audioEngine, t
               onClick={() => setMode(m.id)}
               className={`p-2 rounded-full transition-all ${isActive ? 'bg-teal-500 text-white shadow-[0_0_10px_rgba(20,184,166,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
               title={m.label}
+              aria-label={`Switch to ${m.label} mode`}
             >
               <Icon size={18} />
             </button>
@@ -524,6 +525,7 @@ const DynamicOrb = memo(({ dataRef, calibration, externalDataRef, audioEngine, t
             onClick={() => setShowDebug(!showDebug)}
             className={`p-2 rounded-full transition-all ${showDebug ? 'bg-amber-500 text-white shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
             title="Toggle Debug Panel"
+            aria-label={showDebug ? "Hide Debug Panel" : "Show Debug Panel"}
           >
             <Bug size={18} />
           </button>
