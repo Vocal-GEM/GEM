@@ -11,7 +11,7 @@ on:
 jobs:
   # This job represents the "Claude Codex" agent's automated work
   claude_qa_agent:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     
     # We use 'name' to clearly label this agent's task in the GitHub UI
     name: 🧪 Claude Codex - Automated Testing
@@ -25,7 +25,7 @@ jobs:
         # Change this to match the language of your project (e.g., Node.js, Ruby)
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install Dependencies
