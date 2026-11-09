@@ -11,7 +11,8 @@ const AnalysisReportView = ({ report, audioBlob, onClose }) => {
     useEffect(() => {
         if (audioBlob) {
             const url = URL.createObjectURL(audioBlob);
-            audioRef.current = new Audio(url);
+            if (!audioRef.current) audioRef.current = new Audio();
+            audioRef.current.src = url;
             audioRef.current.onended = () => setIsPlaying(false);
             audioRef.current.ontimeupdate = () => setCurrentTime(audioRef.current.currentTime);
         }
