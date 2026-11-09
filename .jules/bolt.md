@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-03-20 - React Performance: Lazy Initialization
+**Learning:** Instantiating objects directly inside hooks (like `useState(new Date())` or `useRef(new Audio())`) executes the constructor on every single render, causing memory churn and CPU overhead. In a React component tree that re-renders often, this can become a significant bottleneck.
+**Action:** Use lazy initialization (e.g., `useState(() => new Date())`) and ref patterns (e.g., `if (!ref.current) ref.current = new Audio();`) to ensure expensive objects are only created once per component lifecycle.
