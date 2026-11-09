@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2024-11-09 - Prevent Memory Churn in React Hooks
+**Learning:** Instantiating objects directly inside hooks (e.g., `useState(new Date())`) executes the constructor on every render, causing memory churn and CPU overhead.
+**Action:** Use lazy initialization instead (e.g., `useState(() => new Date())`) so the constructor only runs once on the initial render.
