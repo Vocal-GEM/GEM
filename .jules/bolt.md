@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2025-05-22 - Lazy Initialization in React Components
+**Learning:** Instantiating objects directly inside `useState` like `useState(new Date())` runs the constructor on every render. This creates unnecessary memory churn and CPU overhead, especially with more complex classes.
+**Action:** Always use lazy initialization like `useState(() => new Date())` to ensure the constructor is only called on the initial render.
