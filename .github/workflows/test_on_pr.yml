@@ -7,7 +7,7 @@ on:
 
 jobs:
   claude_qa_agent: # <--- THIS IS THE JOB ID WE NEED TO SEE
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: 🧪 Claude Codex - Automated Testing
 
     steps:

@@ -8,7 +8,7 @@ on:
 
 jobs:
   frontend:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
     
@@ -20,6 +20,8 @@ jobs:
         
     - name: Install Dependencies
       run: npm ci
+      env:
+        SHARP_IGNORE_GLOBAL_LIBVIPS: 1
       
     - name: Lint
       run: npm run lint
@@ -31,14 +33,14 @@ jobs:
       run: npm run build
 
   backend:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
     
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.9'
+        python-version: '3.11'
         cache: 'pip'
         
     - name: Install Dependencies
