@@ -6,8 +6,8 @@ import { getXPData } from '../../services/DailyChallengeService';
 
 const MonthlyRecap = () => {
     const [recap, setRecap] = useState(null);
-    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [selectedMonth, setSelectedMonth] = useState(() => new Date().getMonth()); // ⚡ Bolt: Lazy load date to avoid on-render object creation
+    const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear()); // ⚡ Bolt: Lazy load date to avoid on-render object creation
 
     useEffect(() => {
         generateRecap();
