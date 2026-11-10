@@ -37,3 +37,6 @@
 ## 2026-01-18 - Replacing Native Alerts
 **Learning:** Native `window.alert()` calls interrupt the user flow and are visually jarring, whereas Toast notifications provide non-blocking feedback that maintains context.
 **Action:** Systematically replace all `alert()` calls with the `Toast` component, using `role="alert"` for errors and `role="status"` for success messages.
+## 2024-11-10 - VoiceFingerprint Refresh Button A11y
+**Learning:** Found a refresh button in VoiceFingerprint.jsx that was an icon-only button without an ARIA label, which makes it inaccessible to screen readers.
+**Action:** Add aria-label="Refresh voice analytics data" to the icon-only refresh button in src/components/ui/VoiceFingerprint.jsx to improve accessibility.
