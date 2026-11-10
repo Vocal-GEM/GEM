@@ -6,8 +6,8 @@ import { getXPData } from '../../services/DailyChallengeService';
 
 const MonthlyRecap = () => {
     const [recap, setRecap] = useState(null);
-    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [selectedMonth, setSelectedMonth] = useState(() => new Date().getMonth());
+    const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
 
     useEffect(() => {
         generateRecap();

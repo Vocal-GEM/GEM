@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-01-24 - React State Instantiation Anti-Pattern
+**Learning:** Found multiple components using `useState(new Date())` or `useState(new Set())`. Similar to the `useRef(new Class())` anti-pattern, instantiating objects directly in `useState` executes the constructor on *every render*, causing memory churn and CPU overhead.
+**Action:** Use lazy initialization for state variables that require instantiation: `useState(() => new Date())` or `useState(() => new Set())`.
