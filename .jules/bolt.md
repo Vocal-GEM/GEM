@@ -41,3 +41,7 @@
 - `src/test/setup.jsx` - added ~80 missing lucide-react icon mocks
 - `ResonanceMetrics.jsx` - missing `useRef` import (caught by tests)
 **Result:** Test suite improved from 14 failing to 11 failing (residual failures are unrelated to merge conflicts).
+
+## 2026-02-12 - Re-evaluating Canvas Dimensions Anti-Pattern
+**Learning:** Found an anti-pattern in `PitchOrb.jsx` (and potentially other canvas visualization components) where the canvas dimensions were being continuously evaluated using `canvas.getBoundingClientRect()` inside a high-frequency animation loop (running via `requestAnimationFrame`). Calling `getBoundingClientRect()` synchronously triggers a browser reflow, which is highly detrimental to performance when executed 60 times a second.
+**Action:** Replaced the synchronous `getBoundingClientRect()` inside the animation loop with an asynchronous `ResizeObserver`. The dimensions are now only updated when a resize event actually occurs, and cached dimensions are used inside the animation loop. This significantly reduces layout thrashing and CPU overhead.
