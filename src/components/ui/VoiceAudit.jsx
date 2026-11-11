@@ -14,7 +14,7 @@ const DEFAULT_MODES = [
 
 const VoiceAudit = ({ onComplete }) => {
     const { audioEngineRef } = useAudio();
-    const [modes, setModes] = useState(DEFAULT_MODES.map(m => ({ ...m, recordingUrl: null, notes: '', sensation: '' })));
+    const [modes, setModes] = useState(() => DEFAULT_MODES.map(m => ({ ...m, recordingUrl: null, notes: '', sensation: '' })));
     const [activeRecordingId, setActiveRecordingId] = useState(null);
     const [newModeName, setNewModeName] = useState('');
     const [isAddingMode, setIsAddingMode] = useState(false);
